@@ -101,25 +101,22 @@ public class EDACCView extends FrameView {
     private void initComponents() {
 
         mainPanel = new javax.swing.JPanel();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel1 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jPanel2 = new javax.swing.JPanel();
+        manageDBTabbedPanel = new javax.swing.JTabbedPane();
+        manageDBSolverPanel = new javax.swing.JPanel();
+        manageDBInstancePanel = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
-        jLabel1 = new javax.swing.JLabel();
+        manageDBMOdusText = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
-        jMenuItem4 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
+        connectToDBMenuItem = new javax.swing.JMenuItem();
+        generateDBMenuItem = new javax.swing.JMenuItem();
         javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
-        jMenu1 = new javax.swing.JMenu();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
-        jRadioButtonMenuItem1 = new javax.swing.JRadioButtonMenuItem();
-        jRadioButtonMenuItem2 = new javax.swing.JRadioButtonMenuItem();
-        jRadioButtonMenuItem3 = new javax.swing.JRadioButtonMenuItem();
+        gridMenu = new javax.swing.JMenu();
+        settingsMenuItem = new javax.swing.JMenuItem();
+        modusMenu = new javax.swing.JMenu();
+        mangeDBMenuItem = new javax.swing.JRadioButtonMenuItem();
+        manageExperimentMenuItem = new javax.swing.JRadioButtonMenuItem();
         javax.swing.JMenu helpMenu = new javax.swing.JMenu();
         javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -131,49 +128,27 @@ public class EDACCView extends FrameView {
 
         mainPanel.setName("mainPanel"); // NOI18N
 
-        jTabbedPane1.setName("manageDBTab"); // NOI18N
+        manageDBTabbedPanel.setName("manageDBTab"); // NOI18N
 
-        jPanel1.setName("jPanel1"); // NOI18N
+        manageDBSolverPanel.setAutoscrolls(true);
+        manageDBSolverPanel.setName("manageDBSolverPanel"); // NOI18N
 
-        jScrollPane1.setName("jScrollPane1"); // NOI18N
-
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        jTable1.setName("jTable1"); // NOI18N
-        jScrollPane1.setViewportView(jTable1);
-
-        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 722, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(207, Short.MAX_VALUE))
+        org.jdesktop.layout.GroupLayout manageDBSolverPanelLayout = new org.jdesktop.layout.GroupLayout(manageDBSolverPanel);
+        manageDBSolverPanel.setLayout(manageDBSolverPanelLayout);
+        manageDBSolverPanelLayout.setHorizontalGroup(
+            manageDBSolverPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 935, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        manageDBSolverPanelLayout.setVerticalGroup(
+            manageDBSolverPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 417, Short.MAX_VALUE)
         );
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCView.class);
-        jTabbedPane1.addTab(resourceMap.getString("jPanel1.TabConstraints.tabTitle"), jPanel1); // NOI18N
+        manageDBTabbedPanel.addTab(resourceMap.getString("manageDBSolverPanel.TabConstraints.tabTitle"), manageDBSolverPanel); // NOI18N
 
-        jPanel2.setAutoscrolls(true);
-        jPanel2.setName("jPanel2"); // NOI18N
+        manageDBInstancePanel.setAutoscrolls(true);
+        manageDBInstancePanel.setName("manageDBInstancePanel"); // NOI18N
 
         jScrollPane2.setName("jScrollPane2"); // NOI18N
 
@@ -192,27 +167,27 @@ public class EDACCView extends FrameView {
         jTable2.setName("jTable2"); // NOI18N
         jScrollPane2.setViewportView(jTable2);
 
-        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
+        org.jdesktop.layout.GroupLayout manageDBInstancePanelLayout = new org.jdesktop.layout.GroupLayout(manageDBInstancePanel);
+        manageDBInstancePanel.setLayout(manageDBInstancePanelLayout);
+        manageDBInstancePanelLayout.setHorizontalGroup(
+            manageDBInstancePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(manageDBInstancePanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 652, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(277, Short.MAX_VALUE))
+                .addContainerGap(271, Short.MAX_VALUE))
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
+        manageDBInstancePanelLayout.setVerticalGroup(
+            manageDBInstancePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(manageDBInstancePanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 393, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab(resourceMap.getString("jPanel2.TabConstraints.tabTitle"), jPanel2); // NOI18N
+        manageDBTabbedPanel.addTab(resourceMap.getString("manageDBInstancePanel.TabConstraints.tabTitle"), manageDBInstancePanel); // NOI18N
 
-        jLabel1.setText(resourceMap.getString("manageDBModusText.text")); // NOI18N
-        jLabel1.setName("manageDBModusText"); // NOI18N
+        manageDBMOdusText.setText(resourceMap.getString("manageDBModusText.text")); // NOI18N
+        manageDBMOdusText.setName("manageDBModusText"); // NOI18N
 
         org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
@@ -221,17 +196,18 @@ public class EDACCView extends FrameView {
             .add(mainPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel1)
-                    .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 944, Short.MAX_VALUE))
+                    .add(manageDBTabbedPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 940, Short.MAX_VALUE)
+                    .add(manageDBMOdusText))
                 .addContainerGap())
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(mainPanelLayout.createSequentialGroup()
-                .add(jLabel1)
+                .addContainerGap()
+                .add(manageDBMOdusText)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 447, Short.MAX_VALUE)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .add(manageDBTabbedPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE)
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
         menuBar.setAutoscrolls(true);
@@ -240,13 +216,13 @@ public class EDACCView extends FrameView {
         fileMenu.setText(resourceMap.getString("fileMenu.text")); // NOI18N
         fileMenu.setName("fileMenu"); // NOI18N
 
-        jMenuItem4.setText(resourceMap.getString("jMenuItem4.text")); // NOI18N
-        jMenuItem4.setName("jMenuItem4"); // NOI18N
-        fileMenu.add(jMenuItem4);
+        connectToDBMenuItem.setText(resourceMap.getString("connectToDBMenuItem.text")); // NOI18N
+        connectToDBMenuItem.setName("connectToDBMenuItem"); // NOI18N
+        fileMenu.add(connectToDBMenuItem);
 
-        jMenuItem3.setText(resourceMap.getString("jMenuItem3.text")); // NOI18N
-        jMenuItem3.setName("jMenuItem3"); // NOI18N
-        fileMenu.add(jMenuItem3);
+        generateDBMenuItem.setText(resourceMap.getString("generateDBMenuItem.text")); // NOI18N
+        generateDBMenuItem.setName("generateDBMenuItem"); // NOI18N
+        fileMenu.add(generateDBMenuItem);
 
         javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCView.class, this);
         exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
@@ -255,35 +231,30 @@ public class EDACCView extends FrameView {
 
         menuBar.add(fileMenu);
 
-        jMenu1.setText(resourceMap.getString("jMenu1.text")); // NOI18N
-        jMenu1.setName("jMenu1"); // NOI18N
+        gridMenu.setText(resourceMap.getString("gridMenu.text")); // NOI18N
+        gridMenu.setName("gridMenu"); // NOI18N
 
-        jMenuItem2.setText(resourceMap.getString("jMenuItem2.text")); // NOI18N
-        jMenuItem2.setToolTipText(resourceMap.getString("jMenuItem2.toolTipText")); // NOI18N
-        jMenuItem2.setName("jMenuItem2"); // NOI18N
-        jMenu1.add(jMenuItem2);
+        settingsMenuItem.setText(resourceMap.getString("settingsMenuItem.text")); // NOI18N
+        settingsMenuItem.setToolTipText(resourceMap.getString("settingsMenuItem.toolTipText")); // NOI18N
+        settingsMenuItem.setName("settingsMenuItem"); // NOI18N
+        gridMenu.add(settingsMenuItem);
 
-        menuBar.add(jMenu1);
+        menuBar.add(gridMenu);
 
-        jMenu2.setText(resourceMap.getString("jMenu2.text")); // NOI18N
-        jMenu2.setName("jMenu2"); // NOI18N
+        modusMenu.setText(resourceMap.getString("modusMenu.text")); // NOI18N
+        modusMenu.setName("modusMenu"); // NOI18N
 
-        jRadioButtonMenuItem1.setSelected(true);
-        jRadioButtonMenuItem1.setText(resourceMap.getString("jRadioButtonMenuItem1.text")); // NOI18N
-        jRadioButtonMenuItem1.setName("jRadioButtonMenuItem1"); // NOI18N
-        jMenu2.add(jRadioButtonMenuItem1);
+        mangeDBMenuItem.setSelected(true);
+        mangeDBMenuItem.setText(resourceMap.getString("mangeDBMenuItem.text")); // NOI18N
+        mangeDBMenuItem.setName("mangeDBMenuItem"); // NOI18N
+        modusMenu.add(mangeDBMenuItem);
 
-        jRadioButtonMenuItem2.setSelected(true);
-        jRadioButtonMenuItem2.setText(resourceMap.getString("jRadioButtonMenuItem2.text")); // NOI18N
-        jRadioButtonMenuItem2.setName("jRadioButtonMenuItem2"); // NOI18N
-        jMenu2.add(jRadioButtonMenuItem2);
+        manageExperimentMenuItem.setSelected(true);
+        manageExperimentMenuItem.setText(resourceMap.getString("manageExperimentMenuItem.text")); // NOI18N
+        manageExperimentMenuItem.setName("manageExperimentMenuItem"); // NOI18N
+        modusMenu.add(manageExperimentMenuItem);
 
-        jRadioButtonMenuItem3.setSelected(true);
-        jRadioButtonMenuItem3.setText(resourceMap.getString("jRadioButtonMenuItem3.text")); // NOI18N
-        jRadioButtonMenuItem3.setName("jRadioButtonMenuItem3"); // NOI18N
-        jMenu2.add(jRadioButtonMenuItem3);
-
-        menuBar.add(jMenu2);
+        menuBar.add(modusMenu);
 
         helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
         helpMenu.setName("helpMenu"); // NOI18N
@@ -317,7 +288,7 @@ public class EDACCView extends FrameView {
             .add(statusPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(statusMessageLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 840, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 780, Short.MAX_VALUE)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusAnimationLabel)
@@ -341,26 +312,23 @@ public class EDACCView extends FrameView {
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuItem connectToDBMenuItem;
+    private javax.swing.JMenuItem generateDBMenuItem;
+    private javax.swing.JMenu gridMenu;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
-    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
-    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem3;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
     private javax.swing.JPanel mainPanel;
+    private javax.swing.JPanel manageDBInstancePanel;
+    private javax.swing.JLabel manageDBMOdusText;
+    private javax.swing.JPanel manageDBSolverPanel;
+    private javax.swing.JTabbedPane manageDBTabbedPanel;
+    private javax.swing.JRadioButtonMenuItem manageExperimentMenuItem;
+    private javax.swing.JRadioButtonMenuItem mangeDBMenuItem;
     private javax.swing.JMenuBar menuBar;
+    private javax.swing.JMenu modusMenu;
     private javax.swing.JProgressBar progressBar;
+    private javax.swing.JMenuItem settingsMenuItem;
     private javax.swing.JLabel statusAnimationLabel;
     private javax.swing.JLabel statusMessageLabel;
     private javax.swing.JPanel statusPanel;
