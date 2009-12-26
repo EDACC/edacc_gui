@@ -2,6 +2,7 @@ package edacc.model;
 
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Hashtable;
 import java.sql.*;
 
 /**
@@ -9,32 +10,46 @@ import java.sql.*;
  * @author daniel
  */
 public class InstanceDAO {
-    private static final String table = "instances";
-    
-    /*
-     * So there are still some problems with this. Suppose we call getById() from two different
-     * places with the same id. getById() will return 2 different objects in memory currently. Changing one
-     * of them won't affect the other. This might lead to inconsistencies or memory hogs (although this is java after all...)
-     * possible solution: local cache for Instance objects (e.g. in a hash table). All get methods will
-     * have to check if the retrieved object already exists in memory and if so, return a reference to the
-     * cached object instead.
-     * problem: newly created objects will have to be added to the cache, so InstanceDAO could act as factory responsible
-     * for the creation of all new Instance objects.
+    private static final String table = "Instances";
+    private static final Hashtable<Instance, Instance> cache = new Hashtable<Instance, Instance>();
+
+    /**
+     * Instance factory method, ensures that the created instance is persisted and assigned an ID
+     * so it can be referenced by related objects
+     * @return new Instance object
      */
+     public static Instance createInstance() {
+        Instance i = new Instance();
+        save(i);
+        cacheInstance(i);
+        return i;
+     }
 
     /**
      * persists an instance object in the database
      * @param instance The instance object to persist
      */
-    public static void save(Instance instance) {
+    private static void save(Instance instance) {
         if (instance.isNew()) {
-            // insert query
+            // insert query, set ID!
             instance.setSaved();
         }
         else if (instance.isModified()) {
             // update query
             instance.setSaved();
         }
+    }
+
+    private static Instance getCached(Instance i) {
+        if (cache.containsKey(i)) {
+            return cache.get(i);
+        }
+        else return null;
+    }
+
+    private static void cacheInstance(Instance i) {
+        if (cache.containsKey(i)) return;
+        else cache.put(i, i);
     }
 
     /**
@@ -47,19 +62,25 @@ public class InstanceDAO {
         PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement("SELECT * FROM " + table + " WHERE idInstance=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
+        Instance i = new Instance();
         if (rs.next()) {
-            Instance i = new Instance();
             i.setId(rs.getInt("idInstance"));
             i.setMaxClauseLength(rs.getInt("maxClauseLength"));
-            // ...
-            i.setSaved();
-            rs.close();
-            return i;
+            i.setMd5(rs.getString("md5"));
+            i.setName(rs.getString("name"));
+            i.setNumAtoms(rs.getInt("numAtoms"));
+            i.setNumClauses(rs.getInt("numClauses"));
+            i.setRatio(rs.getInt("ratio"));
+
+            Instance c = getCached(i);
+            if (c != null) return c;
+            else {
+                i.setSaved();
+                cacheInstance(i);
+                return i;
+            }
         }
-        else {
-            rs.close();
-            return null;
-        }
+        return null;
     }
 
     /**
@@ -67,7 +88,7 @@ public class InstanceDAO {
      * @return all instances in a List
      * @throws SQLException
      */
-    public static List<Instance> getAll() throws SQLException {
+    public static LinkedList<Instance> getAll() throws SQLException {
         // return linked list with all instances
         Statement st = DatabaseConnector.getInstance().conn.createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM " + table);
@@ -76,9 +97,19 @@ public class InstanceDAO {
             Instance i = new Instance();
             i.setId(rs.getInt("idInstance"));
             i.setMaxClauseLength(rs.getInt("maxClauseLength"));
-            // ...
-            i.setSaved();
-            res.add(i);
+            i.setMd5(rs.getString("md5"));
+            i.setName(rs.getString("name"));
+            i.setNumAtoms(rs.getInt("numAtoms"));
+            i.setNumClauses(rs.getInt("numClauses"));
+            i.setRatio(rs.getInt("ratio"));
+            
+            Instance c = getCached(i);
+            if (c != null) res.add(c);
+            else {
+                i.setSaved();
+                cacheInstance(i);
+                res.add(i);
+            }
         }
         rs.close();
         return res;

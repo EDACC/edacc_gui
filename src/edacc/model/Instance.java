@@ -1,6 +1,23 @@
 package edacc.model;
 
 public class Instance extends BaseModel {
+
+    @Override
+    public int hashCode() {
+        return 31 + id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof Instance) {
+            Instance o = (Instance)obj;
+            return (o.name.equals(name) && o.maxClauseLength == maxClauseLength &&
+                    o.md5.equals(md5) && o.numAtoms == numAtoms && o.numClauses == numClauses &&
+                    o.ratio == ratio && o.id == id);
+        }
+        return false;
+    }
+
     public int getId() {
         return id;
     }
@@ -55,6 +72,11 @@ public class Instance extends BaseModel {
 
     public void setRatio(int ratio) {
         this.ratio = ratio;
+    }
+
+    protected Instance() {
+        id = numAtoms = numClauses = ratio = maxClauseLength = 0;
+        name = md5 = "";
     }
 
     private int id;
