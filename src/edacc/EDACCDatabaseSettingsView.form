@@ -31,7 +31,6 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="chkSSL" alignment="0" min="-2" pref="200" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="1" max="-2" attributes="0">
                           <Group type="102" alignment="0" attributes="1">
@@ -65,6 +64,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnConnect" min="-2" pref="93" max="-2" attributes="0"/>
                   </Group>
+                  <Component id="chkSSL" alignment="0" min="-2" pref="268" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -113,12 +113,18 @@
         <Property name="text" type="java.lang.String" resourceKey="btnConnect.text"/>
         <Property name="name" type="java.lang.String" value="btnConnect" noResource="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConnectActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnCancel">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="btnCancel.text"/>
         <Property name="name" type="java.lang.String" value="btnCancel" noResource="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCancelActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lblHostname">
       <Properties>

@@ -18,7 +18,7 @@ public class DBTest {
      */
     public static void main(String[] args) throws Exception {
         DatabaseConnector.getInstance().connect("localhost", 3306, "root", "EDACC", "affe42" );
-        LinkedList<Instance> l = InstanceDAO.getAll();
+        /*LinkedList<Instance> l = InstanceDAO.getAll();
         Instance i1 = l.getFirst();
         for (Instance i : l) {
             System.out.println(i.getId());
@@ -26,7 +26,8 @@ public class DBTest {
 
         LinkedList<Instance> l2 = InstanceDAO.getAll();
         Instance i2 = l2.getFirst();
-        assert(i1 == i2);
+        assert(i1 == i2);*/
+
     }
 
 }

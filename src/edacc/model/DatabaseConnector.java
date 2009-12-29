@@ -17,17 +17,17 @@ public class DatabaseConnector {
         return instance;
     }
 
-    public void connect(String hostname, int port, String username, String database, String password) {
+    public void connect(String hostname, int port, String username, String database, String password) throws ClassNotFoundException, SQLException {
+        if (conn != null) conn.close();
         try {
             Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?user=" + username + "&password=" + password);
-            
         }
         catch (ClassNotFoundException e) {
-            e.printStackTrace(System.out);
+            throw e;
         }
         catch (SQLException e) {
-            e.printStackTrace(System.out);
+            throw e;
         }
         
     }

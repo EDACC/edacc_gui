@@ -1,6 +1,5 @@
 package edacc.model;
 
-import java.util.List;
 import java.util.LinkedList;
 import java.util.Hashtable;
 import java.sql.*;
@@ -10,7 +9,7 @@ import java.sql.*;
  * @author daniel
  */
 public class InstanceDAO {
-    private static final String table = "Instances";
+    protected static final String table = "Instances";
     private static final Hashtable<Instance, Instance> cache = new Hashtable<Instance, Instance>();
 
     /**
@@ -29,7 +28,7 @@ public class InstanceDAO {
      * persists an instance object in the database
      * @param instance The instance object to persist
      */
-    private static void save(Instance instance) {
+    public static void save(Instance instance) {
         if (instance.isNew()) {
             // insert query, set ID!
             instance.setSaved();
@@ -103,6 +102,36 @@ public class InstanceDAO {
             i.setNumClauses(rs.getInt("numClauses"));
             i.setRatio(rs.getInt("ratio"));
             
+            Instance c = getCached(i);
+            if (c != null) res.add(c);
+            else {
+                i.setSaved();
+                cacheInstance(i);
+                res.add(i);
+            }
+        }
+        rs.close();
+        return res;
+    }
+
+    public static LinkedList<Instance> getAllByExperimentId(int id) throws SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement(
+                "SELECT i.* FROM " + table + " as i JOIN Experiment_has_Instances as ei ON " +
+                "i.idInstance = ei.Instances_idInstance WHERE ei.Experiments_idExperiment = ?"
+                );
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        LinkedList<Instance> res = new LinkedList<Instance>();
+        while (rs.next()) {
+            Instance i = new Instance();
+            i.setId(rs.getInt("i.idInstance"));
+            i.setMaxClauseLength(rs.getInt("i.maxClauseLength"));
+            i.setMd5(rs.getString("i.md5"));
+            i.setName(rs.getString("i.name"));
+            i.setNumAtoms(rs.getInt("i.numAtoms"));
+            i.setNumClauses(rs.getInt("i.numClauses"));
+            i.setRatio(rs.getInt("i.ratio"));
+
             Instance c = getCached(i);
             if (c != null) res.add(c);
             else {
