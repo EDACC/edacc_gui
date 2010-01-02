@@ -1,10 +1,14 @@
 package edacc.model;
 
+import java.util.Vector;
+
+
 public class Solver extends BaseModel {
     private int id;
     private String name;
     private String binaryName;
     private String description;
+    private String md5;
 
     public String getBinaryName() {
         return binaryName;
@@ -45,5 +49,4 @@ public class Solver extends BaseModel {
     public void setName(String name) {
         this.name = name;
     }
-    private String md5;
 }

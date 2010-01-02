@@ -1,7 +1,7 @@
 package edacc.model;
 
 enum PersistenceState {
-    SAVED, MODIFIED, NEW
+    SAVED, MODIFIED, NEW, DELETED
 }
 
 /**
@@ -28,6 +28,10 @@ abstract class BaseModel {
         this.persistenceState = PersistenceState.SAVED;
     }
 
+    protected void setDeleted() {
+        this.persistenceState = PersistenceState.DELETED;
+    }
+
     protected boolean isNew() {
         return persistenceState.equals(PersistenceState.NEW);
     }
@@ -38,5 +42,9 @@ abstract class BaseModel {
 
     protected boolean isSaved() {
         return persistenceState.equals(PersistenceState.SAVED);
+    }
+
+    protected boolean isDeleted() {
+        return persistenceState.equals(PersistenceState.DELETED);
     }
 }

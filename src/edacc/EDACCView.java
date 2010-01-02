@@ -1,7 +1,6 @@
 /*
  * EDACCView.java
  */
-
 package edacc;
 
 import org.jdesktop.application.Action;
@@ -15,16 +14,13 @@ import javax.swing.Timer;
 import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import edacc.experiment.*;
-import java.util.Locale;
 
 /**
  * The application's main frame.
  */
 public class EDACCView extends FrameView {
-    public ExperimentController expController;
-    public ExperimentTableModel expTableModel;
-    public InstanceTableModel insTableModel;
+
+    public EDACCExperimentMode experimentMode;
 
     public EDACCView(SingleFrameApplication app) {
         super(app);
@@ -35,6 +31,7 @@ public class EDACCView extends FrameView {
         ResourceMap resourceMap = getResourceMap();
         int messageTimeout = resourceMap.getInteger("StatusBar.messageTimeout");
         messageTimer = new Timer(messageTimeout, new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 statusMessageLabel.setText("");
             }
@@ -45,6 +42,7 @@ public class EDACCView extends FrameView {
             busyIcons[i] = resourceMap.getIcon("StatusBar.busyIcons[" + i + "]");
         }
         busyIconTimer = new Timer(busyAnimationRate, new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
                 statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
@@ -57,6 +55,7 @@ public class EDACCView extends FrameView {
         // connecting action tasks to status bar via TaskMonitor
         TaskMonitor taskMonitor = new TaskMonitor(getApplication().getContext());
         taskMonitor.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
                 String propertyName = evt.getPropertyName();
                 if ("started".equals(propertyName)) {
@@ -73,27 +72,34 @@ public class EDACCView extends FrameView {
                     progressBar.setVisible(false);
                     progressBar.setValue(0);
                 } else if ("message".equals(propertyName)) {
-                    String text = (String)(evt.getNewValue());
+                    String text = (String) (evt.getNewValue());
                     statusMessageLabel.setText((text == null) ? "" : text);
                     messageTimer.restart();
                 } else if ("progress".equals(propertyName)) {
-                    int value = (Integer)(evt.getNewValue());
+                    int value = (Integer) (evt.getNewValue());
                     progressBar.setVisible(true);
                     progressBar.setIndeterminate(false);
                     progressBar.setValue(value);
                 }
             }
         });
+        experimentMode = new EDACCExperimentMode();
+        changeToExperimentMode();
+    
+        
+    }
 
-        manageExperimentPane.setEnabledAt(1, false);
-        manageExperimentPane.setEnabledAt(2, false);
-        manageExperimentPane.setEnabledAt(3, false);
-
-        expController = new ExperimentController(this);
-        expTableModel = new ExperimentTableModel();
-        insTableModel = new InstanceTableModel();
-        tableExperiments.setModel(expTableModel);
-        tableInstances.setModel(insTableModel);
+    private void changeToExperimentMode() {
+        javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
+        mainPanel.setLayout(mainPanelLayout);
+        mainPanelLayout.setHorizontalGroup(
+            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(experimentMode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        mainPanelLayout.setVerticalGroup(
+            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(experimentMode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
     }
 
     @Action
@@ -116,39 +122,6 @@ public class EDACCView extends FrameView {
     private void initComponents() {
 
         mainPanel = new javax.swing.JPanel();
-        manageExperimentPane = new javax.swing.JTabbedPane();
-        panelManageExperiment = new javax.swing.JPanel();
-        scrollPaneExperimentsTable = new javax.swing.JScrollPane();
-        tableExperiments = new javax.swing.JTable();
-        btnRemoveExperiment = new javax.swing.JButton();
-        btnLoadExperiment = new javax.swing.JButton();
-        pnlNewExperiment = new javax.swing.JPanel();
-        lblExperimentName = new javax.swing.JLabel();
-        lblExperimentDate = new javax.swing.JLabel();
-        lblExperimentDescription = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txtExperimentDescription = new javax.swing.JTextArea();
-        txtExperimentName = new javax.swing.JTextField();
-        txtExperimentDate = new javax.swing.JTextField();
-        btnCreateExperiment = new javax.swing.JButton();
-        panelChooseSolver = new javax.swing.JPanel();
-        jSplitPane1 = new javax.swing.JSplitPane();
-        jPanel2 = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jButton9 = new javax.swing.JButton();
-        jButton10 = new javax.swing.JButton();
-        jButton8 = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        panelChooseInstances = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tableInstances = new javax.swing.JTable();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
-        jButton7 = new javax.swing.JButton();
-        panelExperimentParams = new javax.swing.JPanel();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         connectToDBMenuItem = new javax.swing.JMenuItem();
@@ -170,321 +143,25 @@ public class EDACCView extends FrameView {
 
         mainPanel.setName("mainPanel"); // NOI18N
 
-        manageExperimentPane.setName("manageExperimentPane"); // NOI18N
-
-        panelManageExperiment.setName("panelManageExperiment"); // NOI18N
-
-        scrollPaneExperimentsTable.setName("scrollPaneExperimentsTable"); // NOI18N
-
-        tableExperiments.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-
-            }
-        ));
-        tableExperiments.setName("tableExperiments"); // NOI18N
-        scrollPaneExperimentsTable.setViewportView(tableExperiments);
-
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCView.class);
-        btnRemoveExperiment.setText(resourceMap.getString("btnRemoveExperiment.text")); // NOI18N
-        btnRemoveExperiment.setName("btnRemoveExperiment"); // NOI18N
-
-        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCView.class, this);
-        btnLoadExperiment.setAction(actionMap.get("btnLoadExperiment")); // NOI18N
-        btnLoadExperiment.setText(resourceMap.getString("btnLoadExperiment.text")); // NOI18N
-        btnLoadExperiment.setName("btnLoadExperiment"); // NOI18N
-
-        pnlNewExperiment.setBorder(javax.swing.BorderFactory.createTitledBorder("New Experiment"));
-        pnlNewExperiment.setName("pnlNewExperiment"); // NOI18N
-
-        lblExperimentName.setText(resourceMap.getString("lblExperimentName.text")); // NOI18N
-        lblExperimentName.setName("lblExperimentName"); // NOI18N
-
-        lblExperimentDate.setText(resourceMap.getString("lblExperimentDate.text")); // NOI18N
-        lblExperimentDate.setName("lblExperimentDate"); // NOI18N
-
-        lblExperimentDescription.setText(resourceMap.getString("lblExperimentDescription.text")); // NOI18N
-        lblExperimentDescription.setName("lblExperimentDescription"); // NOI18N
-
-        jScrollPane1.setName("jScrollPane1"); // NOI18N
-
-        txtExperimentDescription.setColumns(20);
-        txtExperimentDescription.setRows(5);
-        txtExperimentDescription.setName("txtExperimentDescription"); // NOI18N
-        jScrollPane1.setViewportView(txtExperimentDescription);
-
-        txtExperimentName.setName("txtExperimentName"); // NOI18N
-
-        txtExperimentDate.setName("txtExperimentDate"); // NOI18N
-
-        btnCreateExperiment.setText(resourceMap.getString("btnCreateExperiment.text")); // NOI18N
-        btnCreateExperiment.setName("btnCreateExperiment"); // NOI18N
-
-        org.jdesktop.layout.GroupLayout pnlNewExperimentLayout = new org.jdesktop.layout.GroupLayout(pnlNewExperiment);
-        pnlNewExperiment.setLayout(pnlNewExperimentLayout);
-        pnlNewExperimentLayout.setHorizontalGroup(
-            pnlNewExperimentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(pnlNewExperimentLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(pnlNewExperimentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(lblExperimentDate)
-                    .add(lblExperimentName)
-                    .add(lblExperimentDescription))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pnlNewExperimentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(txtExperimentName)
-                    .add(txtExperimentDate)
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE))
-                .add(12, 12, 12)
-                .add(btnCreateExperiment, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        pnlNewExperimentLayout.setVerticalGroup(
-            pnlNewExperimentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, pnlNewExperimentLayout.createSequentialGroup()
-                .add(pnlNewExperimentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(pnlNewExperimentLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(btnCreateExperiment, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(pnlNewExperimentLayout.createSequentialGroup()
-                        .add(pnlNewExperimentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(txtExperimentName, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(lblExperimentName))
-                        .add(8, 8, 8)
-                        .add(pnlNewExperimentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(txtExperimentDate, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(lblExperimentDate))
-                        .add(10, 10, 10)
-                        .add(pnlNewExperimentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(lblExperimentDescription)
-                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE))))
-                .addContainerGap())
-        );
-
-        org.jdesktop.layout.GroupLayout panelManageExperimentLayout = new org.jdesktop.layout.GroupLayout(panelManageExperiment);
-        panelManageExperiment.setLayout(panelManageExperimentLayout);
-        panelManageExperimentLayout.setHorizontalGroup(
-            panelManageExperimentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panelManageExperimentLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(panelManageExperimentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(scrollPaneExperimentsTable, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 953, Short.MAX_VALUE)
-                    .add(panelManageExperimentLayout.createSequentialGroup()
-                        .add(pnlNewExperiment, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 108, Short.MAX_VALUE)
-                        .add(btnRemoveExperiment, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 108, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(18, 18, 18)
-                        .add(btnLoadExperiment, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 129, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
-        );
-        panelManageExperimentLayout.setVerticalGroup(
-            panelManageExperimentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panelManageExperimentLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(scrollPaneExperimentsTable, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 344, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(panelManageExperimentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(pnlNewExperiment, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(panelManageExperimentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                        .add(btnLoadExperiment)
-                        .add(btnRemoveExperiment)))
-                .addContainerGap())
-        );
-
-        manageExperimentPane.addTab("Experiments", panelManageExperiment);
-
-        panelChooseSolver.setName("panelChooseSolver"); // NOI18N
-
-        jSplitPane1.setDividerLocation(500);
-        jSplitPane1.setName("jSplitPane1"); // NOI18N
-
-        jPanel2.setName("jPanel2"); // NOI18N
-
-        jScrollPane3.setName("jScrollPane3"); // NOI18N
-
-        jButton9.setText(resourceMap.getString("jButton9.text")); // NOI18N
-        jButton9.setName("jButton9"); // NOI18N
-
-        jButton10.setText(resourceMap.getString("jButton10.text")); // NOI18N
-        jButton10.setName("jButton10"); // NOI18N
-
-        jButton8.setText(resourceMap.getString("jButton8.text")); // NOI18N
-        jButton8.setName("jButton8"); // NOI18N
-
-        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .add(jButton8)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(jButton9)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 260, Short.MAX_VALUE)
-                        .add(jButton10))
-                    .add(jScrollPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 488, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
-                .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 373, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(12, 12, 12)
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jButton10)
-                    .add(jButton8)
-                    .add(jButton9))
-                .addContainerGap(76, Short.MAX_VALUE))
-        );
-
-        jSplitPane1.setLeftComponent(jPanel2);
-
-        jPanel3.setName("jPanel3"); // NOI18N
-
-        jScrollPane4.setName("jScrollPane4"); // NOI18N
-
-        org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel3Layout.createSequentialGroup()
-                .add(jScrollPane4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 429, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(61, Short.MAX_VALUE))
-        );
-
-        jSplitPane1.setRightComponent(jPanel3);
-
-        org.jdesktop.layout.GroupLayout panelChooseSolverLayout = new org.jdesktop.layout.GroupLayout(panelChooseSolver);
-        panelChooseSolver.setLayout(panelChooseSolverLayout);
-        panelChooseSolverLayout.setHorizontalGroup(
-            panelChooseSolverLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panelChooseSolverLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 953, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        panelChooseSolverLayout.setVerticalGroup(
-            panelChooseSolverLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panelChooseSolverLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(jSplitPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 490, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(78, Short.MAX_VALUE))
-        );
-
-        manageExperimentPane.addTab("Solvers", panelChooseSolver);
-
-        panelChooseInstances.setName("panelChooseInstances"); // NOI18N
-
-        jScrollPane2.setName("jScrollPane2"); // NOI18N
-
-        tableInstances.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tableInstances.setName("tableInstances"); // NOI18N
-        jScrollPane2.setViewportView(tableInstances);
-
-        jButton3.setName("jButton3"); // NOI18N
-
-        jButton4.setName("jButton4"); // NOI18N
-
-        jButton5.setName("jButton5"); // NOI18N
-
-        jButton6.setName("jButton6"); // NOI18N
-
-        jButton7.setName("jButton7"); // NOI18N
-
-        org.jdesktop.layout.GroupLayout panelChooseInstancesLayout = new org.jdesktop.layout.GroupLayout(panelChooseInstances);
-        panelChooseInstances.setLayout(panelChooseInstancesLayout);
-        panelChooseInstancesLayout.setHorizontalGroup(
-            panelChooseInstancesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panelChooseInstancesLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(panelChooseInstancesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 953, Short.MAX_VALUE)
-                    .add(panelChooseInstancesLayout.createSequentialGroup()
-                        .add(jButton4)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jButton5)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jButton6)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jButton3)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 787, Short.MAX_VALUE)
-                        .add(jButton7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 100, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
-        );
-        panelChooseInstancesLayout.setVerticalGroup(
-            panelChooseInstancesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panelChooseInstancesLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 459, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(panelChooseInstancesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jButton3)
-                    .add(jButton4)
-                    .add(jButton5)
-                    .add(jButton6)
-                    .add(jButton7))
-                .addContainerGap(85, Short.MAX_VALUE))
-        );
-
-        manageExperimentPane.addTab("Instances", panelChooseInstances);
-
-        panelExperimentParams.setName("panelExperimentParams"); // NOI18N
-
-        org.jdesktop.layout.GroupLayout panelExperimentParamsLayout = new org.jdesktop.layout.GroupLayout(panelExperimentParams);
-        panelExperimentParams.setLayout(panelExperimentParamsLayout);
-        panelExperimentParamsLayout.setHorizontalGroup(
-            panelExperimentParamsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 977, Short.MAX_VALUE)
-        );
-        panelExperimentParamsLayout.setVerticalGroup(
-            panelExperimentParamsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 580, Short.MAX_VALUE)
-        );
-
-        manageExperimentPane.addTab("Experiment Parameters", panelExperimentParams);
-
         org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(mainPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(manageExperimentPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 981, Short.MAX_VALUE)
-                .addContainerGap())
+            .add(0, 1006, Short.MAX_VALUE)
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(mainPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(manageExperimentPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
-                .addContainerGap())
+            .add(0, 639, Short.MAX_VALUE)
         );
 
         menuBar.setAutoscrolls(true);
         menuBar.setName("menuBar"); // NOI18N
 
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCView.class);
         fileMenu.setText(resourceMap.getString("fileMenu.text")); // NOI18N
         fileMenu.setName("fileMenu"); // NOI18N
 
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCView.class, this);
         connectToDBMenuItem.setAction(actionMap.get("btnConnectToDB")); // NOI18N
         connectToDBMenuItem.setText(resourceMap.getString("connectToDBMenuItem.text")); // NOI18N
         connectToDBMenuItem.setName("connectToDBMenuItem"); // NOI18N
@@ -547,11 +224,11 @@ public class EDACCView extends FrameView {
         statusPanel.setLayout(statusPanelLayout);
         statusPanelLayout.setHorizontalGroup(
             statusPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(statusPanelSeparator, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1005, Short.MAX_VALUE)
+            .add(statusPanelSeparator, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1006, Short.MAX_VALUE)
             .add(statusPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(statusMessageLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 823, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 836, Short.MAX_VALUE)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusAnimationLabel)
@@ -582,76 +259,31 @@ public class EDACCView extends FrameView {
             databaseSettings.setLocationRelativeTo(mainFrame);
         }
         EDACCApp.getApplication().show(databaseSettings);
-        expController.initialize();
+        experimentMode.initialize();
     }
 
-    @Action
-    public void btnLoadExperiment() {
-        if (tableExperiments.getSelectedRow() != -1) {
-            Integer i = (Integer)expTableModel.getValueAt(tableExperiments.getSelectedRow(), 5);
-            expController.loadExperiment(i.intValue());
-            manageExperimentPane.setEnabledAt(1, true);
-            manageExperimentPane.setEnabledAt(2, true);
-            manageExperimentPane.setEnabledAt(3, true);
-        }
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCreateExperiment;
-    private javax.swing.JButton btnLoadExperiment;
-    private javax.swing.JButton btnRemoveExperiment;
     private javax.swing.JMenuItem connectToDBMenuItem;
     private javax.swing.JMenuItem generateDBMenuItem;
     private javax.swing.JMenu gridMenu;
-    private javax.swing.JButton jButton10;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JButton jButton8;
-    private javax.swing.JButton jButton9;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JLabel lblExperimentDate;
-    private javax.swing.JLabel lblExperimentDescription;
-    private javax.swing.JLabel lblExperimentName;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JRadioButtonMenuItem manageExperimentMenuItem;
-    private javax.swing.JTabbedPane manageExperimentPane;
     private javax.swing.JRadioButtonMenuItem mangeDBMenuItem;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu modusMenu;
-    private javax.swing.JPanel panelChooseInstances;
-    private javax.swing.JPanel panelChooseSolver;
-    private javax.swing.JPanel panelExperimentParams;
-    private javax.swing.JPanel panelManageExperiment;
-    private javax.swing.JPanel pnlNewExperiment;
     private javax.swing.JProgressBar progressBar;
-    private javax.swing.JScrollPane scrollPaneExperimentsTable;
     private javax.swing.JMenuItem settingsMenuItem;
     private javax.swing.JLabel statusAnimationLabel;
     private javax.swing.JLabel statusMessageLabel;
     private javax.swing.JPanel statusPanel;
-    private javax.swing.JTable tableExperiments;
-    private javax.swing.JTable tableInstances;
-    private javax.swing.JTextField txtExperimentDate;
-    private javax.swing.JTextArea txtExperimentDescription;
-    private javax.swing.JTextField txtExperimentName;
     // End of variables declaration//GEN-END:variables
-
     private final Timer messageTimer;
     private final Timer busyIconTimer;
     private final Icon idleIcon;
     private final Icon[] busyIcons = new Icon[15];
     private int busyIconIndex = 0;
-
     private JDialog aboutBox;
     private JDialog databaseSettings;
 }

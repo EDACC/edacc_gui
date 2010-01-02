@@ -28,4 +28,5 @@ public class SolverConfiguration extends BaseModel {
     public void setSolver_id(int solver_id) {
         this.solver_id = solver_id;
     }
+
 }
