@@ -66,7 +66,11 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     }
 
     public void setTitleNumber(int number) {
-        border.setTitle(title + " (" + number + ")");
+        if (number == 1) {
+            border.setTitle(title);
+        } else {
+            border.setTitle(title + " (" + number + ")");
+        }
     }
 
     /**
@@ -197,8 +201,6 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     @Action
     public void btnRemove() {
         parent.removeEntry(this);
-        parent.revalidate();
-        parent.repaint();
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRemove;

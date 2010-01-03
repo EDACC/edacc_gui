@@ -47,9 +47,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
                     oldId = e.getSolverId();
                     count = 1;
                 } else { count++;}
-                if (count > 1) {
-                    e.setTitleNumber(count);
-                }
+                e.setTitleNumber(count);
             }
             this.repaint();
             this.revalidate();
@@ -126,6 +124,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
             SolverConfigurationDAO.removeSolverConfiguration(entry.getSolverConfiguration());
         }
         this.remove(entry);
+        doRepaint();
     }
 
     /**
