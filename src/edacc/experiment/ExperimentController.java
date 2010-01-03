@@ -74,6 +74,7 @@ public class ExperimentController {
         main.solTableModel.setSolvers(solvers);
 
         Vector<SolverConfiguration> vss = SolverConfigurationDAO.getSolverConfigurationByExperimentId(id);
+        main.solverConfigPanel.beginUpdate();
         for (int i = 0; i < vss.size(); i++) {
             main.solverConfigPanel.addSolverConfiguration(vss.get(i));
             for (int k = 0; k < main.solTableModel.getRowCount(); k++) {
@@ -82,6 +83,7 @@ public class ExperimentController {
                 }
             }
         }
+        main.solverConfigPanel.endUpdate();
         main.afterExperimentLoaded();
     }
 

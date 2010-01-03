@@ -200,7 +200,6 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, "Couldn't connect to the database: \n\n" + e.getMessage(), "Connection error", JOptionPane.ERROR_MESSAGE);
         }
 
-
     }//GEN-LAST:event_btnConnectActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

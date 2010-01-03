@@ -58,6 +58,7 @@ public class InstanceTableModel extends AbstractTableModel {
         else return false;
     }
 
+    @Override
     public void setValueAt(Object value, int row, int col) {
         if (col == 5) selected.set(row, (Boolean)value);
         fireTableCellUpdated(row, col);

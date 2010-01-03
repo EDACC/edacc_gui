@@ -8,7 +8,6 @@
  *
  * Created on 30.12.2009, 20:11:16
  */
-
 package edacc;
 
 import edacc.experiment.SolverConfigEntryTableModel;
@@ -29,7 +28,10 @@ import org.jdesktop.application.Action;
  * @author simon
  */
 public class EDACCSolverConfigEntry extends javax.swing.JPanel {
+
     private SolverConfigEntryTableModel solverConfigEntryTableModel;
+    private String title;
+    private TitledBorder border;
     private SolverConfiguration solverConfiguration;
     private Solver solver;
     private EDACCSolverConfigPanel parent;
@@ -41,13 +43,9 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
      * @throws SQLException
      */
     public EDACCSolverConfigEntry(SolverConfiguration solverConfiguration) throws SQLException {
-        this.setBorder(new TitledBorder(SolverDAO.getById(solverConfiguration.getSolver_id()).getName()));
+        this(SolverDAO.getById(solverConfiguration.getSolver_id()));
         this.solverConfiguration = solverConfiguration;
-        solverConfigEntryTableModel = new SolverConfigEntryTableModel();
-        initComponents();
-        solverConfigEntryTableModel.setParameters(ParameterDAO.getParameterFromSolverId(solverConfiguration.getSolver_id()));
         solverConfigEntryTableModel.setParameterInstances(SolverConfigurationDAO.getSolverConfigurationParameters(solverConfiguration));
-        
     }
 
     /**
@@ -57,23 +55,38 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
      * @throws SQLException
      */
     public EDACCSolverConfigEntry(Solver solver) throws SQLException {
-        this.setBorder(new TitledBorder(solver.getName()));
-        this.solver = solver;
-        this.solverConfiguration = null;
         solverConfigEntryTableModel = new SolverConfigEntryTableModel();
         initComponents();
+        this.solver = solver;
+        this.title = solver.getName();
+        this.border = new TitledBorder(title);
+        this.setBorder(border);
         solverConfigEntryTableModel.setParameters(ParameterDAO.getParameterFromSolverId(solver.getId()));
-        
+        this.solverConfiguration = null;
     }
 
+    public void setTitleNumber(int number) {
+        border.setTitle(title + " (" + number + ")");
+    }
+
+    /**
+     * Assigns all parameter values/selections from entry.
+     * @param entry
+     */
     public void assign(EDACCSolverConfigEntry entry) {
         for (int i = 0; i < entry.solverConfigEntryTableModel.getRowCount(); i++) {
             solverConfigEntryTableModel.setValueAt(entry.solverConfigEntryTableModel.getValueAt(i, 2), i, 2);
+            solverConfigEntryTableModel.setValueAt(entry.solverConfigEntryTableModel.getValueAt(i, 4), i, 4);
         }
     }
+
     public int getSolverId() {
-        if (solver != null) return solver.getId();
-        if (solverConfiguration != null) return solverConfiguration.getSolver_id();
+        if (solver != null) {
+            return solver.getId();
+        }
+        if (solverConfiguration != null) {
+            return solverConfiguration.getSolver_id();
+        }
         return -1;
     }
 
@@ -95,14 +108,14 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
      */
     public void saveParameterInstances() throws SQLException {
         for (int i = 0; i < solverConfigEntryTableModel.getRowCount(); i++) {
-            if ((Boolean)solverConfigEntryTableModel.getValueAt(i, 4)) {
-                Parameter p = (Parameter)solverConfigEntryTableModel.getValueAt(i, 5);
-                ParameterInstance pi = (ParameterInstance)solverConfigEntryTableModel.getValueAt(i, 6);
+            if ((Boolean) solverConfigEntryTableModel.getValueAt(i, 4)) {
+                Parameter p = (Parameter) solverConfigEntryTableModel.getValueAt(i, 5);
+                ParameterInstance pi = (ParameterInstance) solverConfigEntryTableModel.getValueAt(i, 6);
                 if (pi == null) {
-                    pi = ParameterInstanceDAO.createParameterInstance(p.getId(), solverConfiguration.getId(),(String)solverConfigEntryTableModel.getValueAt(i,2));
+                    pi = ParameterInstanceDAO.createParameterInstance(p.getId(), solverConfiguration.getId(), (String) solverConfigEntryTableModel.getValueAt(i, 2));
                 }
-                if (!pi.getValue().equals((String)solverConfigEntryTableModel.getValueAt(i,2))) {
-                    pi.setValue((String)solverConfigEntryTableModel.getValueAt(i,2));
+                if (!pi.getValue().equals((String) solverConfigEntryTableModel.getValueAt(i, 2))) {
+                    pi.setValue((String) solverConfigEntryTableModel.getValueAt(i, 2));
                     ParameterInstanceDAO.setModified(pi);
                     ParameterInstanceDAO.save(pi);
                 }
@@ -187,12 +200,10 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         parent.revalidate();
         parent.repaint();
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRemove;
     private javax.swing.JButton btnReplicate;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable parameterTable;
     // End of variables declaration//GEN-END:variables
-
 }

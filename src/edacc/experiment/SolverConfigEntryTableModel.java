@@ -70,9 +70,6 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int col) {
-        if (col == 4) {
-            return Boolean.class;
-        }
         return getValueAt(0, col).getClass();
     }
 

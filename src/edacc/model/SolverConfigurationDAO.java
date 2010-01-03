@@ -84,7 +84,7 @@ public class SolverConfigurationDAO {
 
     public static Vector<SolverConfiguration> getSolverConfigurationByExperimentId(int experimentId) throws SQLException {
         Vector<SolverConfiguration> res = new Vector<SolverConfiguration>();
-        PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement("SELECT * FROM " + table + " WHERE Experiment_IdExperiment=?");
+        PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement("SELECT * FROM " + table + " WHERE Experiment_IdExperiment=? ORDER BY Solver_IdSolver");
         st.setInt(1, experimentId);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {

@@ -14,6 +14,7 @@ import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.sql.SQLException;
@@ -26,15 +27,37 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
 
     private GridBagConstraints gridBagConstraints = new GridBagConstraints();
     private GridBagLayout layout;
+    private boolean update;
+
     /** Creates new form EDACCSolverConfigPanel */
     public EDACCSolverConfigPanel() {
         initComponents();
         layout = new GridBagLayout();
         this.setLayout(layout);
+        this.update = false;
+    }
+
+    private void doRepaint() {
+        if (!update) {
+            int oldId = -1;
+            int count = 1;
+            for (int i = 0; i < this.getComponentCount(); i++) {
+                EDACCSolverConfigEntry e = (EDACCSolverConfigEntry)this.getComponent(i);
+                if (e.getSolverId() != oldId) {
+                    oldId = e.getSolverId();
+                    count = 1;
+                } else { count++;}
+                if (count > 1) {
+                    e.setTitleNumber(count);
+                }
+            }
+            this.repaint();
+            this.revalidate();
+        }
     }
 
     /**
-     * Generates a new entry with a new SolverConfiguration for a specified solver.
+     * Generates a new entry for a solver.
      * @param o Solver
      */
     public void addSolver(Object o) {
@@ -45,7 +68,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
                 entry.setParent(this);
                 gridBagConstraints.gridy++;
                 this.add(entry, gridBagConstraints);
-                this.revalidate();
+                doRepaint();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -61,10 +84,15 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
         EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solverConfiguration);
         entry.setParent(this);
         gridBagConstraints.gridy++;
-        this.add(entry,gridBagConstraints);
-        this.revalidate();
+        this.add(entry, gridBagConstraints);
+        doRepaint();
     }
 
+    /**
+     * Copies an entry and adds it after that entry.
+     * @param entry
+     * @throws SQLException
+     */
     public void replicateEntry(EDACCSolverConfigEntry entry) throws SQLException {
         EDACCSolverConfigEntry repl = new EDACCSolverConfigEntry(SolverDAO.getById(entry.getSolverId()));
         repl.setParent(this);
@@ -79,14 +107,13 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
             }
         }
         gridBagConstraints.gridy++;
-        this.add(repl, pos);
+        this.add(repl, pos+1);
         gridBagConstraints.gridy = 0;
         for (int i = 0; i < this.getComponentCount(); i++) {
             gridBagConstraints.gridy++;
             layout.setConstraints(this.getComponent(i), gridBagConstraints);
         }
-
-        this.revalidate();
+        doRepaint();
     }
 
     /**
@@ -98,15 +125,55 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
         if (entry.getSolverConfiguration() != null) {
             SolverConfigurationDAO.removeSolverConfiguration(entry.getSolverConfiguration());
         }
-	this.remove(entry);
+        this.remove(entry);
     }
 
+    /**
+     * Removes every entry which was generated with this solver.
+     * @param o solver to be removed
+     */
+    public void removeSolver(Object o) {
+        if (!(o instanceof Solver)) {
+            return;
+        }
+        Solver solver = (Solver) o;
+        Component[] c = this.getComponents();
+        for (int i = c.length - 1; i >= 0; i--) {
+            EDACCSolverConfigEntry e = (EDACCSolverConfigEntry) c[i];
+            if (e.getSolverId() == solver.getId()) {
+                this.remove(i);
+            }
+        }
+        doRepaint();
+    }
+
+    /**
+     * Returns true if a solver configuration exists with this solverId
+     * @param solverId
+     * @return
+     */
     public boolean solverExists(int solverId) {
-         for (int i = 0; i < this.getComponentCount(); i++) {
-             if (((EDACCSolverConfigEntry)this.getComponent(i)).getSolverId() == solverId)
+        for (int i = 0; i < this.getComponentCount(); i++) {
+            if (((EDACCSolverConfigEntry) this.getComponent(i)).getSolverId() == solverId) {
                 return true;
-         }
-         return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Prevents from updating the GUI until endUpdate() is called.
+     */
+    public void beginUpdate() {
+        this.update = true;
+    }
+
+    /**
+     * GUI will be updated after every single change.
+     */
+    public void endUpdate() {
+        this.update = false;
+        doRepaint();
     }
 
     /** This method is called from within the constructor to
