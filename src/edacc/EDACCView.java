@@ -21,6 +21,7 @@ import javax.swing.JFrame;
 public class EDACCView extends FrameView {
 
     public EDACCExperimentMode experimentMode;
+    public EDACCManageDBMode manageDBMode;
 
     public EDACCView(SingleFrameApplication app) {
         super(app);
@@ -84,6 +85,7 @@ public class EDACCView extends FrameView {
             }
         });
         experimentMode = new EDACCExperimentMode();
+        manageDBMode = new EDACCManageDBMode();
         changeToExperimentMode();
     
         
@@ -99,6 +101,19 @@ public class EDACCView extends FrameView {
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(experimentMode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+    }
+
+     private void changeToManageDBMode() {
+        javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
+        mainPanel.setLayout(mainPanelLayout);
+        mainPanelLayout.setHorizontalGroup(
+            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(manageDBMode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        mainPanelLayout.setVerticalGroup(
+            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(manageDBMode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }
 
@@ -130,8 +145,8 @@ public class EDACCView extends FrameView {
         gridMenu = new javax.swing.JMenu();
         settingsMenuItem = new javax.swing.JMenuItem();
         modusMenu = new javax.swing.JMenu();
-        mangeDBMenuItem = new javax.swing.JRadioButtonMenuItem();
-        manageExperimentMenuItem = new javax.swing.JRadioButtonMenuItem();
+        ManageDBMode = new javax.swing.JRadioButtonMenuItem();
+        ManageExperimentMode = new javax.swing.JRadioButtonMenuItem();
         javax.swing.JMenu helpMenu = new javax.swing.JMenu();
         javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -151,7 +166,7 @@ public class EDACCView extends FrameView {
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 639, Short.MAX_VALUE)
+            .add(0, 634, Short.MAX_VALUE)
         );
 
         menuBar.setAutoscrolls(true);
@@ -184,15 +199,18 @@ public class EDACCView extends FrameView {
 
         menuBar.add(gridMenu);
 
+        modusMenu.setText(resourceMap.getString("modusMenu.text")); // NOI18N
         modusMenu.setName("modusMenu"); // NOI18N
 
-        mangeDBMenuItem.setSelected(true);
-        mangeDBMenuItem.setName("mangeDBMenuItem"); // NOI18N
-        modusMenu.add(mangeDBMenuItem);
+        ManageDBMode.setSelected(true);
+        ManageDBMode.setText(resourceMap.getString("ManageDBMode.text")); // NOI18N
+        ManageDBMode.setName("ManageDBMode"); // NOI18N
+        modusMenu.add(ManageDBMode);
 
-        manageExperimentMenuItem.setSelected(true);
-        manageExperimentMenuItem.setName("manageExperimentMenuItem"); // NOI18N
-        modusMenu.add(manageExperimentMenuItem);
+        ManageExperimentMode.setSelected(true);
+        ManageExperimentMode.setText(resourceMap.getString("ManageExperimentMode.text")); // NOI18N
+        ManageExperimentMode.setName("ManageExperimentMode"); // NOI18N
+        modusMenu.add(ManageExperimentMode);
 
         menuBar.add(modusMenu);
 
@@ -264,13 +282,13 @@ public class EDACCView extends FrameView {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButtonMenuItem ManageDBMode;
+    private javax.swing.JRadioButtonMenuItem ManageExperimentMode;
     private javax.swing.JMenuItem connectToDBMenuItem;
     private javax.swing.JMenuItem generateDBMenuItem;
     private javax.swing.JMenu gridMenu;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel mainPanel;
-    private javax.swing.JRadioButtonMenuItem manageExperimentMenuItem;
-    private javax.swing.JRadioButtonMenuItem mangeDBMenuItem;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu modusMenu;
     private javax.swing.JProgressBar progressBar;

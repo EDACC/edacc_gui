@@ -15,7 +15,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="639" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="634" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -83,19 +83,22 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="modusMenu">
           <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="modusMenu.text"/>
             <Property name="name" type="java.lang.String" value="modusMenu" noResource="true"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JRadioButtonMenuItem" name="mangeDBMenuItem">
+            <MenuItem class="javax.swing.JRadioButtonMenuItem" name="ManageDBMode">
               <Properties>
                 <Property name="selected" type="boolean" value="true"/>
-                <Property name="name" type="java.lang.String" value="mangeDBMenuItem" noResource="true"/>
+                <Property name="text" type="java.lang.String" resourceKey="ManageDBMode.text"/>
+                <Property name="name" type="java.lang.String" value="ManageDBMode" noResource="true"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JRadioButtonMenuItem" name="manageExperimentMenuItem">
+            <MenuItem class="javax.swing.JRadioButtonMenuItem" name="ManageExperimentMode">
               <Properties>
                 <Property name="selected" type="boolean" value="true"/>
-                <Property name="name" type="java.lang.String" value="manageExperimentMenuItem" noResource="true"/>
+                <Property name="text" type="java.lang.String" resourceKey="ManageExperimentMode.text"/>
+                <Property name="name" type="java.lang.String" value="ManageExperimentMode" noResource="true"/>
               </Properties>
             </MenuItem>
           </SubComponents>
