@@ -5,6 +5,7 @@
 
 package edacc.experiment;
 
+import edacc.model.ExperimentHasInstance;
 import edacc.model.Instance;
 import javax.swing.table.AbstractTableModel;
 import java.util.Vector;
@@ -16,22 +17,40 @@ import java.util.Vector;
 public class InstanceTableModel extends AbstractTableModel {
     private String[] columns = {"Name", "numAtoms", "numClauses", "ratio", "maxClauseLength", "selected"};
     protected Vector<Instance> instances;
-    protected Vector<Boolean> selected;
+    protected ExperimentHasInstance[] experimentHasInstances;
+    protected Boolean[] selected;
 
     public void setInstances(Vector<Instance> instances) {
         this.instances = instances;
-        selected.setSize(instances.size());
-        for (int i = 0; i < selected.size(); i++) {
-            selected.set(i, new Boolean(false));
+        experimentHasInstances = new ExperimentHasInstance[instances.size()];
+        selected = new Boolean[instances.size()];
+        for (int i = 0; i < selected.length; i++) {
+            selected[i] = false;
         }
-        System.out.println(selected.size());
-
         this.fireTableDataChanged();
+    }
+
+    public void setExperimentHasInstances(Vector<ExperimentHasInstance> experimentHasInstances) {
+        for (int i = 0; i < instances.size(); i++) {
+            this.setValueAt(false, i, 5);
+        }
+        for (int i = 0; i < experimentHasInstances.size(); i++) {
+            for (int j = 0; j < instances.size(); j++) {
+                if (instances.get(j).getId() == experimentHasInstances.get(i).getInstances_id()) {
+                    this.experimentHasInstances[j] = experimentHasInstances.get(i);
+                    this.selected[i] = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    public void setExperimentHasInstance(ExperimentHasInstance e, int row) {
+        this.experimentHasInstances[row] = e;
     }
 
     public InstanceTableModel() {
         this.instances = new Vector<Instance>();
-        this.selected = new Vector<Boolean>();
     }
 
     public int getRowCount() {
@@ -60,7 +79,7 @@ public class InstanceTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int col) {
-        if (col == 5) selected.set(row, (Boolean)value);
+        if (col == 5) selected[row] = (Boolean)value;
         fireTableCellUpdated(row, col);
     }
 
@@ -79,8 +98,11 @@ public class InstanceTableModel extends AbstractTableModel {
             case 4:
                 return instances.get(rowIndex).getMaxClauseLength();
             case 5:
-                return selected.get(rowIndex);
-            
+                return selected[rowIndex];
+            case 6:
+                return experimentHasInstances[rowIndex];
+            case 7:
+                return instances.get(rowIndex);
             default:
                 return "";
         }

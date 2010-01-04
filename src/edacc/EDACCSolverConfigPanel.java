@@ -140,7 +140,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
         for (int i = c.length - 1; i >= 0; i--) {
             EDACCSolverConfigEntry e = (EDACCSolverConfigEntry) c[i];
             if (e.getSolverId() == solver.getId()) {
-                this.remove(i);
+                this.removeEntry(e);
             }
         }
         doRepaint();
