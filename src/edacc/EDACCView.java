@@ -145,8 +145,8 @@ public class EDACCView extends FrameView {
         gridMenu = new javax.swing.JMenu();
         settingsMenuItem = new javax.swing.JMenuItem();
         modusMenu = new javax.swing.JMenu();
-        ManageDBMode = new javax.swing.JRadioButtonMenuItem();
-        ManageExperimentMode = new javax.swing.JRadioButtonMenuItem();
+        manageDBModeMenuItem = new javax.swing.JRadioButtonMenuItem();
+        manageExperimentModeMenuItem = new javax.swing.JRadioButtonMenuItem();
         javax.swing.JMenu helpMenu = new javax.swing.JMenu();
         javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -192,8 +192,10 @@ public class EDACCView extends FrameView {
 
         menuBar.add(fileMenu);
 
+        gridMenu.setText(resourceMap.getString("gridMenu.text")); // NOI18N
         gridMenu.setName("gridMenu"); // NOI18N
 
+        settingsMenuItem.setText(resourceMap.getString("settingsMenuItem.text")); // NOI18N
         settingsMenuItem.setName("settingsMenuItem"); // NOI18N
         gridMenu.add(settingsMenuItem);
 
@@ -202,15 +204,15 @@ public class EDACCView extends FrameView {
         modusMenu.setText(resourceMap.getString("modusMenu.text")); // NOI18N
         modusMenu.setName("modusMenu"); // NOI18N
 
-        ManageDBMode.setSelected(true);
-        ManageDBMode.setText(resourceMap.getString("ManageDBMode.text")); // NOI18N
-        ManageDBMode.setName("ManageDBMode"); // NOI18N
-        modusMenu.add(ManageDBMode);
+        manageDBModeMenuItem.setSelected(true);
+        manageDBModeMenuItem.setText(resourceMap.getString("manageDBModeMenuItem.text")); // NOI18N
+        manageDBModeMenuItem.setName("manageDBModeMenuItem"); // NOI18N
+        modusMenu.add(manageDBModeMenuItem);
 
-        ManageExperimentMode.setSelected(true);
-        ManageExperimentMode.setText(resourceMap.getString("ManageExperimentMode.text")); // NOI18N
-        ManageExperimentMode.setName("ManageExperimentMode"); // NOI18N
-        modusMenu.add(ManageExperimentMode);
+        manageExperimentModeMenuItem.setSelected(true);
+        manageExperimentModeMenuItem.setText(resourceMap.getString("manageExperimentModeMenuItem.text")); // NOI18N
+        manageExperimentModeMenuItem.setName("manageExperimentModeMenuItem"); // NOI18N
+        modusMenu.add(manageExperimentModeMenuItem);
 
         menuBar.add(modusMenu);
 
@@ -282,13 +284,13 @@ public class EDACCView extends FrameView {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JRadioButtonMenuItem ManageDBMode;
-    private javax.swing.JRadioButtonMenuItem ManageExperimentMode;
     private javax.swing.JMenuItem connectToDBMenuItem;
     private javax.swing.JMenuItem generateDBMenuItem;
     private javax.swing.JMenu gridMenu;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel mainPanel;
+    private javax.swing.JRadioButtonMenuItem manageDBModeMenuItem;
+    private javax.swing.JRadioButtonMenuItem manageExperimentModeMenuItem;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu modusMenu;
     private javax.swing.JProgressBar progressBar;

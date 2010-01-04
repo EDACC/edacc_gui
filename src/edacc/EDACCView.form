@@ -71,11 +71,13 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="gridMenu">
           <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="gridMenu.text"/>
             <Property name="name" type="java.lang.String" value="gridMenu" noResource="true"/>
           </Properties>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="settingsMenuItem">
               <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="settingsMenuItem.text"/>
                 <Property name="name" type="java.lang.String" value="settingsMenuItem" noResource="true"/>
               </Properties>
             </MenuItem>
@@ -87,18 +89,18 @@
             <Property name="name" type="java.lang.String" value="modusMenu" noResource="true"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JRadioButtonMenuItem" name="ManageDBMode">
+            <MenuItem class="javax.swing.JRadioButtonMenuItem" name="manageDBModeMenuItem">
               <Properties>
                 <Property name="selected" type="boolean" value="true"/>
-                <Property name="text" type="java.lang.String" resourceKey="ManageDBMode.text"/>
-                <Property name="name" type="java.lang.String" value="ManageDBMode" noResource="true"/>
+                <Property name="text" type="java.lang.String" resourceKey="manageDBModeMenuItem.text"/>
+                <Property name="name" type="java.lang.String" value="manageDBModeMenuItem" noResource="true"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JRadioButtonMenuItem" name="ManageExperimentMode">
+            <MenuItem class="javax.swing.JRadioButtonMenuItem" name="manageExperimentModeMenuItem">
               <Properties>
                 <Property name="selected" type="boolean" value="true"/>
-                <Property name="text" type="java.lang.String" resourceKey="ManageExperimentMode.text"/>
-                <Property name="name" type="java.lang.String" value="ManageExperimentMode" noResource="true"/>
+                <Property name="text" type="java.lang.String" resourceKey="manageExperimentModeMenuItem.text"/>
+                <Property name="name" type="java.lang.String" value="manageExperimentModeMenuItem" noResource="true"/>
               </Properties>
             </MenuItem>
           </SubComponents>
