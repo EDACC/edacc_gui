@@ -79,6 +79,13 @@ public class Instance extends BaseModel {
         name = md5 = "";
     }
 
+    public int getFile() {
+        return file;
+    }
+
+    public void setFile(int file) {
+        this.file = file;
+    }
     private int id;
     private String name;
     private String md5;
@@ -86,4 +93,7 @@ public class Instance extends BaseModel {
     private int numClauses;
     private int ratio;
     private int maxClauseLength;
+    private int file;
+
+
 }

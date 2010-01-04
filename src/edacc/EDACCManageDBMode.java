@@ -10,18 +10,20 @@
  */
 package edacc;
 
-import java.io.File;
 import edacc.manageDB.*;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Vector;
-import javax.swing.JOptionPane;
 
 /**
  *
  * @author rretz
  */
 public class EDACCManageDBMode extends javax.swing.JPanel {
+
+     public ManageDBInstances manageDBInstances;
+
+     public EDACCManageDBMode(){
+        initComponents();
+         manageDBInstances = new ManageDBInstances(this, panelManageDBInstances, jFileChooserManageDBInstance );
+     }
 
      /** This method is called from within the constructor to
      * initialize the form.
@@ -173,32 +175,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddInstancesActionPerformed
-        try {
-            int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
-            File ret = jFileChooserManageDBInstance.getSelectedFile();
-            RecursiveFileScanner solverScanner = new RecursiveFileScanner("cnf");
-            Vector<File> solverFiles = solverScanner.searchFileExtension(ret);
-            if (solverFiles.isEmpty()) {
-                JOptionPane.showMessageDialog(panelManageDBInstances,
-                "No solvers have been found.",
-                "Error",
-                JOptionPane.WARNING_MESSAGE);
-            }
-        }catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-            "Choosen file or directory not found.",
-            "Error",
-            JOptionPane.ERROR_MESSAGE);
-        }catch (IOException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-            "Error reading choosen file or directory.",
-            "Error",
-            JOptionPane.ERROR_MESSAGE);
-        }
+        manageDBInstances.addInstances();
     }//GEN-LAST:event_btnAddInstancesActionPerformed
-    /**
-     * Method to be called after an experiment is loaded.
-     */
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddInstances;
