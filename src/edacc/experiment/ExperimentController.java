@@ -5,6 +5,8 @@ import edacc.EDACCSolverConfigEntry;
 import edacc.EDACCSolverConfigPanel;
 import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
+import edacc.model.ExperimentHasInstance;
+import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.Solver;
@@ -78,12 +80,14 @@ public class ExperimentController {
         for (int i = 0; i < vss.size(); i++) {
             main.solverConfigPanel.addSolverConfiguration(vss.get(i));
             for (int k = 0; k < main.solTableModel.getRowCount(); k++) {
-                if (((Solver)main.solTableModel.getValueAt(k, 5)).getId() == vss.get(i).getSolver_id()) {
+                if (((Solver) main.solTableModel.getValueAt(k, 5)).getId() == vss.get(i).getSolver_id()) {
                     main.solTableModel.setValueAt(true, k, 4);
                 }
             }
         }
         main.solverConfigPanel.endUpdate();
+
+        main.insTableModel.setExperimentHasInstances(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
         main.afterExperimentLoaded();
     }
 
@@ -130,5 +134,21 @@ public class ExperimentController {
             entry.saveParameterInstances();
         }
         SolverConfigurationDAO.saveAll();
+    }
+
+    public void saveExperimentHasInstances() throws SQLException {
+        for (int i = 0; i < main.insTableModel.getRowCount(); i++) {
+            if ((Boolean) main.insTableModel.getValueAt(i, 5)) {
+                if ((ExperimentHasInstance) main.insTableModel.getValueAt(i, 6) == null) {
+                    main.insTableModel.setExperimentHasInstance(ExperimentHasInstanceDAO.createExperimentHasInstance(activeExperiment.getId(), ((Instance)main.insTableModel.getValueAt(i, 7)).getId()), i);
+                }
+            } else {
+                ExperimentHasInstance ei = (ExperimentHasInstance) main.insTableModel.getValueAt(i, 6);
+                if (ei != null) {
+                    ExperimentHasInstanceDAO.removeExperimentHasInstance(ei);
+                    main.insTableModel.setExperimentHasInstance(null, i);
+                }
+            }
+        }
     }
 }
