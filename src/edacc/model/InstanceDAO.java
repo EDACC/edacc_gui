@@ -17,7 +17,7 @@ public class InstanceDAO {
      * so it can be referenced by related objects
      * @return new Instance object
      */
-     public static Instance createInstance() {
+     public static Instance createInstance() throws SQLException {
         Instance i = new Instance();
         save(i);
         cacheInstance(i);
@@ -28,15 +28,45 @@ public class InstanceDAO {
      * persists an instance object in the database
      * @param instance The instance object to persist
      */
-    public static void save(Instance instance) {
+    public static void save(Instance instance) throws SQLException {
+        PreparedStatement ps;
         if (instance.isNew()) {
             // insert query, set ID!
-            instance.setSaved();
+            // TODO insert instance blob
+            // insert instance into db
+            final String insertQuery = "INSERT INTO " + table + " (name, md5, numAtoms, numClauses, ratio, maxClauseLength) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
+            ps = DatabaseConnector.getInstance().conn.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);       
         }
         else if (instance.isModified()) {
             // update query
-            instance.setSaved();
+            final String updateQuery = "UPDATE " + table + " SET name=?, md5=?, numAtoms=?, numClauses=?, ratio=?, maxClauseLength=? " +
+                    "WHERE idInstance=?";
+            ps = DatabaseConnector.getInstance().conn.prepareStatement(updateQuery);
+           
+            ps.setInt(7, instance.getId());
+            
+        } else
+            return;
+
+        ps.setString(1, instance.getName());
+        ps.setString(2, instance.getMd5());
+        ps.setInt(3, instance.getNumAtoms());
+        ps.setInt(4, instance.getNumClauses());
+        ps.setInt(5, instance.getRatio());
+        ps.setInt(6, instance.getMaxClauseLength());
+        ps.executeUpdate();
+
+        // set id
+        if (instance.isNew()) {
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next())
+                instance.setId(rs.getInt(1));
         }
+
+        instance.setSaved();
+
+        instance.setSaved();
     }
 
     private static Instance getCached(Instance i) {
@@ -142,5 +172,18 @@ public class InstanceDAO {
         }
         rs.close();
         return res;
+    }
+
+    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+        DatabaseConnector db = DatabaseConnector.getInstance();
+        db.connect("localhost", 3306, "root", "EDACC", "sopra");
+        Instance i = new Instance();
+        i.setName("test1234");
+        i.setNew();
+        i.setMd5("12345");
+        save(i);
+        cacheInstance(i);
+        System.out.println(i.getId());
+        db.conn.close();
     }
 }
