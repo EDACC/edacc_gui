@@ -7,29 +7,252 @@ import java.sql.*;
  * @author daniel
  */
 public class DatabaseConnector {
+
     private static DatabaseConnector instance = null;
     protected Connection conn;
 
-    private DatabaseConnector() {}
+    private DatabaseConnector() {
+    }
 
     public static DatabaseConnector getInstance() {
-        if (instance == null) instance = new DatabaseConnector();
+        if (instance == null) {
+            instance = new DatabaseConnector();
+        }
         return instance;
     }
 
     public void connect(String hostname, int port, String username, String database, String password) throws ClassNotFoundException, SQLException {
-        if (conn != null) conn.close();
+        if (conn != null) {
+            conn.close();
+        }
         try {
             Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?user=" + username + "&password=" + password);
-        }
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
+            throw e;
+        } catch (SQLException e) {
             throw e;
         }
-        catch (SQLException e) {
-            throw e;
-        }
-        
+
     }
 
+    /**
+     * Creates the correct DB schema for EDACC using an already established connection.
+     */
+    public void createDBSchema() throws NoConnectionToDBException, SQLException {
+        if (conn == null) {
+            throw new NoConnectionToDBException();
+        }
+        Statement st = conn.createStatement();
+
+        /*
+         * Table `Solver`
+         */
+        st.addBatch("DROP TABLE IF EXISTS `Solver`");
+
+        st.addBatch("CREATE  TABLE IF NOT EXISTS `Solver` ( "
+                + "`idSolver` INT NOT NULL AUTO_INCREMENT , "
+                + "`name` VARCHAR(60) NOT NULL COMMENT 'The solvername has to be unique!' , "
+                + "`binaryName` VARCHAR(100) NOT NULL ,"
+                + "`binary` MEDIUMBLOB NOT NULL COMMENT 'Contains the file of the solver' , "
+                + "`description` TEXT NULL , "
+                + "`md5` VARCHAR(60) NOT NULL , "
+                + "`code` MEDIUMBLOB NULL , "
+                + "PRIMARY KEY (`idSolver`) , "
+                + "UNIQUE INDEX `name` (`name` ASC) ) "
+                + "ENGINE = InnoDB "
+                + "DEFAULT CHARACTER SET = latin1 "
+                + "COLLATE = latin1_german1_ci");
+
+        /*
+         * Table `Parameters`
+         */
+        st.addBatch("DROP TABLE IF EXISTS `Parameters`");
+
+        st.addBatch("CREATE  TABLE IF NOT EXISTS `Parameters` ( "
+                + "`idParameter` INT NOT NULL AUTO_INCREMENT , "
+                + "`name` VARCHAR(60) NULL , "
+                + "`prefix` VARCHAR(60) NULL , "
+                + "`value` VARCHAR(60) NULL , "
+                + "`order` INT NULL ,"
+                + "`Solver_idSolver` INT NOT NULL , "
+                + "PRIMARY KEY (`idParameter`) , "
+                + "INDEX `fk_Parameters_Solver` (`Solver_idSolver` ASC) , "
+                + "CONSTRAINT `fk_Parameters_Solver` "
+                + "FOREIGN KEY (`Solver_idSolver` ) "
+                + "REFERENCES `Solver` (`idSolver` ) "
+                + "ON DELETE CASCADE "
+                + "ON UPDATE CASCADE) "
+                + "ENGINE = InnoDB");
+
+        /*
+         * Table `Instances`
+         */
+
+        st.addBatch("DROP TABLE IF EXISTS `Instances`");
+
+        st.addBatch("CREATE  TABLE IF NOT EXISTS `Instances` ( "
+                + "`idInstance` INT NOT NULL AUTO_INCREMENT , "
+                + "`name` VARCHAR(255) NOT NULL , "
+                + "`instance` MEDIUMBLOB NOT NULL COMMENT 'contains ' , "
+                + "`md5` VARCHAR(60) NOT NULL , "
+                + "`numAtoms` INT NULL , "
+                + "`numClauses` INT NULL , "
+                + "`ratio` INT NULL , "
+                + "`maxClauseLength` INT NULL , "
+                + "PRIMARY KEY (`idInstance`) , "
+                + "UNIQUE INDEX `name` (`name` ASC) ) "
+                + "ENGINE = InnoDB");
+
+        /*
+         * Table `gridSettings`
+         */
+        st.addBatch("DROP TABLE IF EXISTS `gridSettings`");
+
+        st.addBatch("CREATE  TABLE IF NOT EXISTS `gridSettings` ( "
+                + "`numNodes` INT NOT NULL , "
+                + "`maxRuntime` INT NULL , "
+                + "`maxJobsInQueue` INT NULL , "
+                + "PRIMARY KEY (`numNodes`) ) "
+                + "ENGINE = InnoDB");
+
+        /*
+         * Table `Experiment`
+         */
+        st.addBatch("DROP TABLE IF EXISTS `Experiment`");
+
+        st.addBatch("CREATE  TABLE IF NOT EXISTS `Experiment` ( "
+                + "`idExperiment` INT NOT NULL , "
+                + "`description` TEXT NULL , "
+                + "`date` DATE NOT NULL , "
+                + "`numRuns` INT NOT NULL , "
+                + "`timeOut` INT NOT NULL COMMENT 'Seconds!\n\n' , "
+                + "`autoGeneratedSeeds` TINYINT(1) NOT NULL , "
+                + "`name` VARCHAR(255) NULL , "
+                + "PRIMARY KEY (`idExperiment`) ) "
+                + "ENGINE = InnoDB");
+
+
+        /*
+         * Table `Experiment_has_Instances`
+         */
+        st.addBatch("DROP TABLE IF EXISTS `Experiment_has_Instances`");
+
+        st.addBatch("CREATE  TABLE IF NOT EXISTS `Experiment_has_Instances` ( "
+                + "`idEI` INT NOT NULL AUTO_INCREMENT , "
+                + "`Experiment_idExperiment` INT NOT NULL , "
+                + "`Instances_idInstance` INT NOT NULL , "
+                + "PRIMARY KEY (`idEI`) ,"
+                + "INDEX `fk_Experiment_has_Instances_Experiment1` (`Experiment_idExperiment` ASC) , "
+                + "INDEX `fk_Experiment_has_Instances_Instances1` (`Instances_idInstance` ASC) , "
+                + "CONSTRAINT `fk_Experiment_has_Instances_Experiment1` "
+                + "FOREIGN KEY (`Experiment_idExperiment` ) "
+                + "REFERENCES `Experiment` (`idExperiment` ) "
+                + "ON DELETE CASCADE "
+                + "ON UPDATE CASCADE,"
+                + "CONSTRAINT `fk_Experiment_has_Instances_Instances1` "
+                + "FOREIGN KEY (`Instances_idInstance` ) "
+                + "REFERENCES `Instances` (`idInstance` ) "
+                + "ON DELETE CASCADE "
+                + "ON UPDATE CASCADE) "
+                + "ENGINE = InnoDB");
+
+
+        /*
+         * Table `SolverConfig`
+         */
+        st.addBatch("DROP TABLE IF EXISTS `SolverConfig`");
+
+        st.addBatch("CREATE  TABLE IF NOT EXISTS `SolverConfig` ( "
+                + "`idSolverConfig` INT NOT NULL , "
+                + "`Solver_idSolver` INT NOT NULL , "
+                + "`Experiment_idExperiment` INT NOT NULL , "
+                + "PRIMARY KEY (`idSolverConfig`) , "
+                + "INDEX `fk_SolverConfig_Solver1` (`Solver_idSolver` ASC) , "
+                + "INDEX `fk_SolverConfig_Experiment1` (`Experiment_idExperiment` ASC) , "
+                + "CONSTRAINT `fk_SolverConfig_Solver1` "
+                + "FOREIGN KEY (`Solver_idSolver` ) "
+                + "REFERENCES `Solver` (`idSolver` ) "
+                + "ON DELETE CASCADE "
+                + "ON UPDATE CASCADE, "
+                + "CONSTRAINT `fk_SolverConfig_Experiment1` "
+                + "FOREIGN KEY (`Experiment_idExperiment` ) "
+                + "REFERENCES `Experiment` (`idExperiment` ) "
+                + "ON DELETE CASCADE "
+                + "ON UPDATE CASCADE) "
+                + "ENGINE = InnoDB");
+
+
+        /*
+         * Table `ExperimentResults`
+         */
+
+        st.addBatch("DROP TABLE IF EXISTS `ExperimentResults`");
+
+        st.addBatch("CREATE  TABLE IF NOT EXISTS `ExperimentResults` ( "
+                + "`idJob` INT NOT NULL AUTO_INCREMENT , "
+                + "`run` INT NOT NULL , "
+                + "`status` INT NOT NULL , "
+                + "`seed` INT NOT NULL , "
+                + "`resultFileName` VARCHAR(255) NULL , "
+                + "`time` FLOAT NULL , "
+                + "`statusCode` INT NULL , "
+                + "`SolverConfig_idSolverConfig` INT NOT NULL , "
+                + "`Experiment_idExperiment` INT NOT NULL , "
+                + "`Instances_idInstance` INT NOT NULL , "
+                + "PRIMARY KEY (`idJob`, `run`) , "
+                + "INDEX `fk_ExperimentResults_SolverConfig1` (`SolverConfig_idSolverConfig` ASC) , "
+                + "INDEX `fk_ExperimentResults_Experiment1` (`Experiment_idExperiment` ASC) , "
+                + "INDEX `fk_ExperimentResults_Instances1` (`Instances_idInstance` ASC) , "
+                + "CONSTRAINT `fk_ExperimentResults_SolverConfig1` "
+                + "FOREIGN KEY (`SolverConfig_idSolverConfig` ) "
+                + "REFERENCES `SolverConfig` (`idSolverConfig` ) "
+                + "ON DELETE CASCADE "
+                + "ON UPDATE CASCADE, "
+                + "CONSTRAINT `fk_ExperimentResults_Experiment1` "
+                + "FOREIGN KEY (`Experiment_idExperiment` ) "
+                + "REFERENCES `Experiment` (`idExperiment` ) "
+                + "ON DELETE CASCADE "
+                + "ON UPDATE CASCADE, "
+                + "CONSTRAINT `fk_ExperimentResults_Instances1` "
+                + "FOREIGN KEY (`Instances_idInstance` ) "
+                + "REFERENCES `Instances` (`idInstance` ) "
+                + "ON DELETE CASCADE "
+                + "ON UPDATE CASCADE) "
+                + "ENGINE = InnoDB");
+
+        /*
+         * Table `SolverConfig_has_Parameters`
+         */
+
+        st.addBatch("DROP TABLE IF EXISTS `SolverConfig_has_Parameters`");
+
+        st.addBatch("CREATE  TABLE IF NOT EXISTS `SolverConfig_has_Parameters` ( "
+                + "`SolverConfig_idSolverConfig` INT NOT NULL , "
+                + "`Parameters_idParameter` INT NOT NULL , "
+                + "`value` VARCHAR(45) NULL , "
+                + "PRIMARY KEY (`SolverConfig_idSolverConfig`, `Parameters_idParameter`) , "
+                + "INDEX `fk_SolverConfig_has_Parameters_SolverConfig1` (`SolverConfig_idSolverConfig` ASC) , "
+                + "INDEX `fk_SolverConfig_has_Parameters_Parameters1` (`Parameters_idParameter` ASC) , "
+                + "CONSTRAINT `fk_SolverConfig_has_Parameters_SolverConfig1` "
+                + "FOREIGN KEY (`SolverConfig_idSolverConfig` ) "
+                + "REFERENCES `SolverConfig` (`idSolverConfig` ) "
+                + "ON DELETE CASCADE "
+                + "ON UPDATE CASCADE, "
+                + "CONSTRAINT `fk_SolverConfig_has_Parameters_Parameters1` "
+                + "FOREIGN KEY (`Parameters_idParameter` ) "
+                + "REFERENCES `Parameters` (`idParameter` ) "
+                + "ON DELETE CASCADE "
+                + "ON UPDATE CASCADE) "
+                + "ENGINE = InnoDB");
+
+        st.executeBatch();
+    }
+
+    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+        DatabaseConnector db = DatabaseConnector.getInstance();
+        db.connect("localhost", 3306, "root", "EDACCtest", "sopra");
+        db.createDBSchema();
+        db.conn.close();
+    }
 }
