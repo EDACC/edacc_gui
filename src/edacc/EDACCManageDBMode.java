@@ -10,6 +10,7 @@
  */
 package edacc;
 
+
 import edacc.manageDB.*;
 
 /**
@@ -19,10 +20,13 @@ import edacc.manageDB.*;
 public class EDACCManageDBMode extends javax.swing.JPanel {
 
      public ManageDBInstances manageDBInstances;
+     public InstanceTableModel instanceTableModel;
 
      public EDACCManageDBMode(){
         initComponents();
-         manageDBInstances = new ManageDBInstances(this, panelManageDBInstances, jFileChooserManageDBInstance );
+        manageDBInstances = new ManageDBInstances(this, panelManageDBInstances, jFileChooserManageDBInstance );
+        instanceTableModel = new InstanceTableModel();
+        tableInstances.setModel(instanceTableModel);
      }
 
      /** This method is called from within the constructor to
@@ -99,12 +103,27 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
         btnRemoveInstances.setText(resourceMap.getString("btnRemoveInstances.text")); // NOI18N
         btnRemoveInstances.setName("btnRemoveInstances"); // NOI18N
+        btnRemoveInstances.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveInstancesActionPerformed(evt);
+            }
+        });
 
         btnRefreshTableInstances.setText(resourceMap.getString("btnRefreshTableInstances.text")); // NOI18N
         btnRefreshTableInstances.setName("btnRefreshTableInstances"); // NOI18N
+        btnRefreshTableInstances.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshTableInstancesActionPerformed(evt);
+            }
+        });
 
         btnSaveInstances.setText(resourceMap.getString("btnSaveInstances.text")); // NOI18N
         btnSaveInstances.setName("btnSaveInstances"); // NOI18N
+        btnSaveInstances.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveInstancesActionPerformed(evt);
+            }
+        });
 
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
@@ -177,6 +196,18 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private void btnAddInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddInstancesActionPerformed
         manageDBInstances.addInstances();
     }//GEN-LAST:event_btnAddInstancesActionPerformed
+
+    private void btnRemoveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstancesActionPerformed
+        manageDBInstances.removeInstances(tableInstances.getSelectedRows());
+    }//GEN-LAST:event_btnRemoveInstancesActionPerformed
+
+    private void btnRefreshTableInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshTableInstancesActionPerformed
+        tableInstances.updateUI();
+    }//GEN-LAST:event_btnRefreshTableInstancesActionPerformed
+
+    private void btnSaveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveInstancesActionPerformed
+        manageDBInstances.saveInstances();
+    }//GEN-LAST:event_btnSaveInstancesActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddInstances;

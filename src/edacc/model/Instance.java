@@ -1,5 +1,7 @@
 package edacc.model;
 
+import java.io.File;
+
 public class Instance extends BaseModel {
 
     @Override
@@ -77,13 +79,14 @@ public class Instance extends BaseModel {
     protected Instance() {
         id = numAtoms = numClauses = ratio = maxClauseLength = 0;
         name = md5 = "";
+        file = null;
     }
 
-    public int getFile() {
+    public File getFile() {
         return file;
     }
 
-    public void setFile(int file) {
+    public void setFile(File file) {
         this.file = file;
     }
     private int id;
@@ -93,7 +96,7 @@ public class Instance extends BaseModel {
     private int numClauses;
     private int ratio;
     private int maxClauseLength;
-    private int file;
+    private File file;
 
 
 }

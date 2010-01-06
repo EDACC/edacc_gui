@@ -180,18 +180,27 @@
                 <Property name="text" type="java.lang.String" resourceKey="btnRemoveInstances.text"/>
                 <Property name="name" type="java.lang.String" value="btnRemoveInstances" noResource="true"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRemoveInstancesActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnRefreshTableInstances">
               <Properties>
                 <Property name="text" type="java.lang.String" resourceKey="btnRefreshTableInstances.text"/>
                 <Property name="name" type="java.lang.String" value="btnRefreshTableInstances" noResource="true"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRefreshTableInstancesActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnSaveInstances">
               <Properties>
                 <Property name="text" type="java.lang.String" resourceKey="btnSaveInstances.text"/>
                 <Property name="name" type="java.lang.String" value="btnSaveInstances" noResource="true"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSaveInstancesActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnCancel">
               <Properties>
