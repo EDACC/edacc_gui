@@ -94,14 +94,18 @@
           <SubComponents>
             <MenuItem class="javax.swing.JRadioButtonMenuItem" name="manageDBModeMenuItem">
               <Properties>
-                <Property name="selected" type="boolean" value="true"/>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                  <action class="edacc.EDACCView" id="manageDBMode" methodName="manageDBMode"/>
+                </Property>
                 <Property name="text" type="java.lang.String" resourceKey="manageDBModeMenuItem.text"/>
                 <Property name="name" type="java.lang.String" value="manageDBModeMenuItem" noResource="true"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JRadioButtonMenuItem" name="manageExperimentModeMenuItem">
               <Properties>
-                <Property name="selected" type="boolean" value="true"/>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                  <action class="edacc.EDACCView" id="manageExperimentMode" methodName="manageExperimentMode"/>
+                </Property>
                 <Property name="text" type="java.lang.String" resourceKey="manageExperimentModeMenuItem.text"/>
                 <Property name="name" type="java.lang.String" value="manageExperimentModeMenuItem" noResource="true"/>
               </Properties>
