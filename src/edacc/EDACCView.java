@@ -103,6 +103,10 @@ public class EDACCView extends FrameView {
         mode = noMode;
     }
 
+    private void createDatabaseErrorMessage(SQLException e) {
+        javax.swing.JOptionPane.showMessageDialog(null, "There was an error while communicating with the database: " +e, "Connection error", javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
+
     @Action
     public void showAboutBox() {
         if (aboutBox == null) {
@@ -309,9 +313,8 @@ public class EDACCView extends FrameView {
             mainPanelLayout.replace(mode, experimentMode);
             mode = experimentMode;
             manageExperimentModeMenuItem.setSelected(true);
-        } catch (Exception ex) {
-            // TODO MSG DIALOG
-            //ex.printStackTrace();
+        } catch (SQLException ex) {
+            createDatabaseErrorMessage(ex);
             noMode();
         }
     }

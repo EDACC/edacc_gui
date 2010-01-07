@@ -74,7 +74,7 @@ public class SolverDAO {
      * @throws SQLException
      */
     public static Solver getById(int id) throws SQLException {
-        PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement("SELECT * FROM "+table+ " WHERE idSolver=?");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM "+table+ " WHERE idSolver=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         if (rs.next()) {
@@ -98,7 +98,7 @@ public class SolverDAO {
      * @throws SQLException
      */
     public static LinkedList<Solver> getAll() throws SQLException {
-        Statement st = DatabaseConnector.getInstance().conn.createStatement();
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM " + table);
         LinkedList<Solver> res = new LinkedList<Solver>();
         while (rs.next()) {

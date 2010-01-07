@@ -38,7 +38,7 @@ public class ExperimentResultDAO {
 
     private static void save(ExperimentResult r) throws SQLException {
         if (r.isNew()) {
-            PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             st.setInt(2, r.getRun());
             st.setInt(3, r.getStatus());
             st.setInt(4, r.getSeed());
@@ -79,7 +79,7 @@ public class ExperimentResultDAO {
 
     public Vector<ExperimentResult> getAllByExperimentId(int id) throws SQLException {
         Vector<ExperimentResult> v = new Vector<ExperimentResult>();
-        PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement("SELECT * FROM " + table + " WHERE Experiment_idExperiment");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Experiment_idExperiment");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {

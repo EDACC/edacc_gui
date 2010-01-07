@@ -9,7 +9,7 @@ import java.sql.*;
 public class DatabaseConnector {
 
     private static DatabaseConnector instance = null;
-    protected Connection conn;
+    private Connection conn;
 
     private DatabaseConnector() {
     }
@@ -36,14 +36,20 @@ public class DatabaseConnector {
 
     }
 
+    public Connection getConn() throws NoConnectionToDBException {
+        if (conn == null) {
+            throw new NoConnectionToDBException();
+        } else return conn;
+    }
+
+
+
     /**
      * Creates the correct DB schema for EDACC using an already established connection.
      */
     public void createDBSchema() throws NoConnectionToDBException, SQLException {
-        if (conn == null) {
-            throw new NoConnectionToDBException();
-        }
-        Statement st = conn.createStatement();
+        
+        Statement st = getConn().createStatement();
 
         /*
          * Table `Solver`

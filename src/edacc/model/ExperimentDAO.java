@@ -39,9 +39,9 @@ public class ExperimentDAO {
     public static void save(Experiment experiment) throws SQLException {
         PreparedStatement st = null;
         if (experiment.isNew()) {
-            st = DatabaseConnector.getInstance().conn.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+            st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
         } else if (experiment.isModified()) {
-            st = DatabaseConnector.getInstance().conn.prepareStatement(updateQuery);
+            st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
             st.setInt(7, experiment.getId());
             experiment.setSaved();
         } else {
@@ -70,7 +70,7 @@ public class ExperimentDAO {
      */
     public static void removeExperiment(Experiment experiment) throws SQLException {
         cache.remove(experiment);
-        PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement(deleteQuery);
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
         st.setInt(1, experiment.getId());
         st.executeUpdate();
     }
@@ -114,7 +114,7 @@ public class ExperimentDAO {
      * @throws SQLException
      */
     public static Experiment getById(int id) throws SQLException {
-        PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement("SELECT * FROM " + table + " WHERE idExperiment=?");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idExperiment=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         if (rs.next()) {
@@ -138,7 +138,7 @@ public class ExperimentDAO {
      * @throws SQLException
      */
     public static LinkedList<Experiment> getAll() throws SQLException {
-        Statement st = DatabaseConnector.getInstance().conn.createStatement();
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM " + table);
         LinkedList<Experiment> res = new LinkedList<Experiment>();
         while (rs.next()) {

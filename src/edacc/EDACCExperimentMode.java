@@ -559,8 +559,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
             expController.createExperiment(txtExperimentName.getText(), java.sql.Date.valueOf(txtExperimentDate.getText()), txtExperimentDescription.getText());
         } catch (IllegalArgumentException ex) {
             javax.swing.JOptionPane.showMessageDialog(null, "The date format you entered could not be recognized. Expected: yyyy-mm-dd", "Incorrect Date", javax.swing.JOptionPane.ERROR_MESSAGE);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            createDatabaseErrorMessage(ex);
         }
     }
 
@@ -593,8 +593,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
     public void btnSaveSolverConfigurations() {
         try {
             expController.saveSolverConfigurations();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            createDatabaseErrorMessage(e);
         }
     }
 
@@ -624,7 +624,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         try {
             expController.saveExperimentHasInstances();
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            createDatabaseErrorMessage(ex);
         }
 
     }
