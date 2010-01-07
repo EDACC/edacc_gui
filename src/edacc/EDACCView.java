@@ -23,9 +23,9 @@ import javax.swing.JOptionPane;
  */
 public class EDACCView extends FrameView {
 
-    public EDACCExperimentMode experimentMode;
-    public EDACCManageDBMode manageDBMode;
-    public EDACCNoMode noMode;
+    private EDACCExperimentMode experimentMode;
+    private EDACCManageDBMode manageDBMode;
+    private EDACCNoMode noMode;
     private Component mode;
     private javax.swing.GroupLayout mainPanelLayout;
 
@@ -282,19 +282,15 @@ public class EDACCView extends FrameView {
     @Action
     public void manageDBMode() {
         if (!manageDBModeMenuItem.isSelected()) {
-            // TODO: UNLOAD DBMode
             noMode();
             return;
         }
         if (manageExperimentModeMenuItem.isSelected()) {
             manageExperimentModeMenuItem.setSelected(false);
-            // UNLOAD ExperimentMode
         }
         mainPanelLayout.replace(mode, manageDBMode);
         mode = manageDBMode;
         manageDBModeMenuItem.setSelected(true);
-
-
     }
 
     @Action
@@ -302,14 +298,11 @@ public class EDACCView extends FrameView {
         {
         }
         if (!manageExperimentModeMenuItem.isSelected()) {
-            // TODO: UNLOAD ExperimentMode
             noMode();
             return;
         }
         if (manageDBModeMenuItem.isSelected()) {
             manageDBModeMenuItem.setSelected(false);
-            // UNLOAD DBMode
-
         }
         try {
             experimentMode.initialize();
