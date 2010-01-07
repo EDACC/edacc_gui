@@ -266,7 +266,6 @@ public class EDACCView extends FrameView {
             databaseSettings.setLocationRelativeTo(mainFrame);
         }
         EDACCApp.getApplication().show(databaseSettings);
-        experimentMode.initialize();
     }
 
     @Action
