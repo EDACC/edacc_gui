@@ -38,19 +38,7 @@ public class ExperimentResultDAO {
 
     private static void save(ExperimentResult r) throws SQLException {
         if (r.isNew()) {
-<<<<<<< HEAD
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
-            st.setInt(2, r.getRun());
-            st.setInt(3, r.getStatus());
-            st.setInt(4, r.getSeed());
-            st.setString(5, r.getResultFileName());
-            st.setFloat(6, r.getTime());
-            st.setInt(7, r.getStatusCode());
-            st.setInt(8, r.getSolverConfigId());
-            st.setInt(9, r.getExperimentId());
-            st.setInt(10, r.getInstanceId());
-=======
-            PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             st.setInt(1, r.getRun());
             st.setInt(2, r.getStatus());
             st.setInt(3, r.getSeed());
@@ -60,7 +48,6 @@ public class ExperimentResultDAO {
             st.setInt(7, r.getSolverConfigId());
             st.setInt(8, r.getExperimentId());
             st.setInt(9, r.getInstanceId());
->>>>>>> ebce06b665441b704cd8a6ad28b141125ccd2fcb
             st.executeUpdate();
             ResultSet generatedKeys = st.getGeneratedKeys();
             if (generatedKeys.next()) {
