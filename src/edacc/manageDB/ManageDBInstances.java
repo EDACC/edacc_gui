@@ -68,7 +68,7 @@ public class ManageDBInstances {
      * @param rows the rows which have to be deleted
      */
     public void removeInstances(int[] rows){
-        Vector<Instance> rem = new <Instance>Vector();
+        Vector<Instance> rem = new Vector<Instance>();
         for(int i = 0; i < rows.length; i++){
             rem.add((Instance)main.instanceTableModel.getValueAt(i, 5));
         }
@@ -86,7 +86,7 @@ public class ManageDBInstances {
     }
 
     private Vector<Instance> buildTempInstances(Vector<File> instanceFiles){
-        Vector<Instance> instances = new <Instance>Vector();
+        Vector<Instance> instances = new Vector<Instance>();
         while(!instanceFiles.isEmpty()){
             Instance temp = InstanceDAO.createInstanceTemp();
              // TODO! set all Attributes
