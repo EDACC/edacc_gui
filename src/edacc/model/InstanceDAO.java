@@ -166,7 +166,7 @@ public class InstanceDAO {
     public static LinkedList<Instance> getAllByExperimentId(int id) throws SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT i.* FROM " + table + " as i JOIN Experiment_has_Instances as ei ON " +
-                "i.idInstance = ei.Instances_idInstance WHERE ei.Experiments_idExperiment = ?"
+                "i.idInstance = ei.Instances_idInstance WHERE ei.Experiment_idExperiment = ?"
                 );
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
