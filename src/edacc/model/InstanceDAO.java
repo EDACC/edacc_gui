@@ -24,6 +24,25 @@ public class InstanceDAO {
         return i;
      }
 
+     /**
+      * Instance factory methode for an Instance which is temporary and therfor requires no
+      *  datebase item
+      * @return new Instance object
+      */
+     public static Instance createInstanceTemp(){
+        Instance i = new Instance();
+        return i;
+     }
+
+     /**
+      * persists an temporary instance object to the database
+      * @param instance The temporary instance object to persist
+      */
+     public static void saveTempInstance(Instance instance) throws SQLException{
+        save(instance);
+        cacheInstance(instance);
+     }
+
     /**
      * persists an instance object in the database
      * @param instance The instance object to persist

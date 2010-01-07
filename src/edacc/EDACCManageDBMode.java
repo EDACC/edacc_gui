@@ -10,18 +10,24 @@
  */
 package edacc;
 
-import java.io.File;
+
 import edacc.manageDB.*;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Vector;
-import javax.swing.JOptionPane;
 
 /**
  *
  * @author rretz
  */
 public class EDACCManageDBMode extends javax.swing.JPanel {
+
+     public ManageDBInstances manageDBInstances;
+     public InstanceTableModel instanceTableModel;
+
+     public EDACCManageDBMode(){
+        initComponents();
+        manageDBInstances = new ManageDBInstances(this, panelManageDBInstances, jFileChooserManageDBInstance );
+        instanceTableModel = new InstanceTableModel();
+        tableInstances.setModel(instanceTableModel);
+     }
 
      /** This method is called from within the constructor to
      * initialize the form.
@@ -97,12 +103,27 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
         btnRemoveInstances.setText(resourceMap.getString("btnRemoveInstances.text")); // NOI18N
         btnRemoveInstances.setName("btnRemoveInstances"); // NOI18N
+        btnRemoveInstances.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveInstancesActionPerformed(evt);
+            }
+        });
 
         btnRefreshTableInstances.setText(resourceMap.getString("btnRefreshTableInstances.text")); // NOI18N
         btnRefreshTableInstances.setName("btnRefreshTableInstances"); // NOI18N
+        btnRefreshTableInstances.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshTableInstancesActionPerformed(evt);
+            }
+        });
 
         btnSaveInstances.setText(resourceMap.getString("btnSaveInstances.text")); // NOI18N
         btnSaveInstances.setName("btnSaveInstances"); // NOI18N
+        btnSaveInstances.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveInstancesActionPerformed(evt);
+            }
+        });
 
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
@@ -173,32 +194,20 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddInstancesActionPerformed
-        try {
-            int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
-            File ret = jFileChooserManageDBInstance.getSelectedFile();
-            RecursiveFileScanner solverScanner = new RecursiveFileScanner("cnf");
-            Vector<File> solverFiles = solverScanner.searchFileExtension(ret);
-            if (solverFiles.isEmpty()) {
-                JOptionPane.showMessageDialog(panelManageDBInstances,
-                "No solvers have been found.",
-                "Error",
-                JOptionPane.WARNING_MESSAGE);
-            }
-        }catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-            "Choosen file or directory not found.",
-            "Error",
-            JOptionPane.ERROR_MESSAGE);
-        }catch (IOException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-            "Error reading choosen file or directory.",
-            "Error",
-            JOptionPane.ERROR_MESSAGE);
-        }
+        manageDBInstances.addInstances();
     }//GEN-LAST:event_btnAddInstancesActionPerformed
-    /**
-     * Method to be called after an experiment is loaded.
-     */
+
+    private void btnRemoveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstancesActionPerformed
+        manageDBInstances.removeInstances(tableInstances.getSelectedRows());
+    }//GEN-LAST:event_btnRemoveInstancesActionPerformed
+
+    private void btnRefreshTableInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshTableInstancesActionPerformed
+        tableInstances.updateUI();
+    }//GEN-LAST:event_btnRefreshTableInstancesActionPerformed
+
+    private void btnSaveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveInstancesActionPerformed
+        manageDBInstances.saveInstances();
+    }//GEN-LAST:event_btnSaveInstancesActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddInstances;
