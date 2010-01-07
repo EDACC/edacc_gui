@@ -38,7 +38,7 @@ public class InstanceDAO {
       * persists an temporary instance object to the database
       * @param instance The temporary instance object to persist
       */
-     public static void saveTempInstance(Instance instance){
+     public static void saveTempInstance(Instance instance) throws SQLException{
         save(instance);
         cacheInstance(instance);
      }

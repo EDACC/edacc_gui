@@ -11,6 +11,7 @@ import edacc.model.InstanceDAO;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -68,7 +69,7 @@ public class ManageDBInstances {
      * @param rows the rows which have to be deleted
      */
     public void removeInstances(int[] rows){
-        Vector<Instance> rem = new <Instance>Vector();
+        Vector<Instance> rem = new Vector<Instance>();
         for(int i = 0; i < rows.length; i++){
             rem.add((Instance)main.instanceTableModel.getValueAt(i, 5));
         }
@@ -78,7 +79,7 @@ public class ManageDBInstances {
     /**
      * Saves all instances from the instanceTableModel into the Database
      */
-    public void saveInstances(){
+    public void saveInstances() throws SQLException{
         Instance[] toSave =  (Instance[]) main.instanceTableModel.getInstances().toArray();
         for(int i = 0; i < toSave.length; i++){
             InstanceDAO.saveTempInstance(toSave[i]);
@@ -86,7 +87,7 @@ public class ManageDBInstances {
     }
 
     private Vector<Instance> buildTempInstances(Vector<File> instanceFiles){
-        Vector<Instance> instances = new <Instance>Vector();
+        Vector<Instance> instances = new Vector<Instance>();
         while(!instanceFiles.isEmpty()){
             Instance temp = InstanceDAO.createInstanceTemp();
              // TODO! set all Attributes

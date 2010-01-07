@@ -309,6 +309,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         jScrollPane4.setName("jScrollPane4"); // NOI18N
         solverConfigPanel = new EDACCSolverConfigPanel();
         jScrollPane4.setViewportView(solverConfigPanel);
+        jScrollPane4.getVerticalScrollBar().setUnitIncrement(30);
         jSplitPane1.setRightComponent(jScrollPane4);
 
         btnSaveSolverConfigurations.setAction(actionMap.get("btnSaveSolverConfigurations")); // NOI18N

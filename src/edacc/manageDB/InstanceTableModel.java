@@ -18,7 +18,7 @@ public class InstanceTableModel extends AbstractTableModel{
     protected Vector<Instance> instances;
 
     public InstanceTableModel(){
-        this.instances = new <Instance> Vector();
+        this.instances = new Vector<Instance>();
     }
 
     public Vector<Instance> getInstances() {
