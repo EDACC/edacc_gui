@@ -87,7 +87,7 @@ public class EDACCView extends FrameView {
         });
         experimentMode = new EDACCExperimentMode();
         manageDBMode = new EDACCManageDBMode();
-        changeToManageDBMode();
+        changeToExperimentMode();
     
         
     }
