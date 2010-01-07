@@ -8,6 +8,163 @@
         <Property name="name" type="java.lang.String" value="jFileChooserManageDBInstance" noResource="true"/>
       </Properties>
     </Component>
+    <Container class="javax.swing.JFrame" name="InstanceFilter">
+      <Properties>
+        <Property name="name" type="java.lang.String" value="InstanceFilter" noResource="true"/>
+      </Properties>
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jlInstanceFilterName" alignment="0" min="-2" pref="43" max="-2" attributes="0"/>
+                              <Component id="jlInstanceFilterNumAtoms" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jlInstanceFilterNumClauses" alignment="0" min="-2" pref="98" max="-2" attributes="0"/>
+                              <Component id="jlInstanceFilterRatio" alignment="0" min="-2" pref="43" max="-2" attributes="0"/>
+                              <Component id="jlInstanceFilterMaxClauseLength" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+                          <Component id="btnInstanceFilter" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="tfInstanceFilterMaxClauseLength" alignment="0" min="-2" pref="78" max="-2" attributes="0"/>
+                      <Component id="tfInstanceFilterRatio" alignment="0" min="-2" pref="78" max="-2" attributes="0"/>
+                      <Component id="tfInstanceFilterNumClauses" alignment="0" min="-2" pref="78" max="-2" attributes="0"/>
+                      <Component id="tfInstanceFilterNumAtoms" alignment="0" min="-2" pref="78" max="-2" attributes="0"/>
+                      <Component id="tfInstanceFilterName" alignment="0" min="-2" pref="78" max="-2" attributes="0"/>
+                      <Component id="btnInstanceFilterCancel" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="tfInstanceFilterName" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jlInstanceFilterName" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="tfInstanceFilterNumAtoms" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jlInstanceFilterNumAtoms" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="tfInstanceFilterNumClauses" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jlInstanceFilterNumClauses" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="tfInstanceFilterRatio" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jlInstanceFilterRatio" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="tfInstanceFilterMaxClauseLength" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jlInstanceFilterMaxClauseLength" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="btnInstanceFilter" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnInstanceFilterCancel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="javax.swing.JButton" name="btnInstanceFilter">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="btnInstanceFilter.text"/>
+            <Property name="name" type="java.lang.String" value="btnInstanceFilter" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnInstanceFilterActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="btnInstanceFilterCancel">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="btnInstanceFilterCancel.text"/>
+            <Property name="name" type="java.lang.String" value="btnInstanceFilterCancel" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnInstanceFilterCancelActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JTextField" name="tfInstanceFilterName">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="tfInstanceFilterName.text"/>
+            <Property name="name" type="java.lang.String" value="tfInstanceFilterName" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="tfInstanceFilterNumAtoms">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="tfInstanceFilterNumAtoms.text"/>
+            <Property name="name" type="java.lang.String" value="tfInstanceFilterNumAtoms" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="tfInstanceFilterNumClauses">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="tfInstanceFilterNumClauses.text"/>
+            <Property name="name" type="java.lang.String" value="tfInstanceFilterNumClauses" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="tfInstanceFilterRatio">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="tfInstanceFilterRatio.text"/>
+            <Property name="name" type="java.lang.String" value="tfInstanceFilterRatio" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="tfInstanceFilterMaxClauseLength">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="tfInstanceFilterMaxClauseLength.text"/>
+            <Property name="name" type="java.lang.String" value="tfInstanceFilterMaxClauseLength" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jlInstanceFilterName">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jlInstanceFilterName.text"/>
+            <Property name="name" type="java.lang.String" value="jlInstanceFilterName" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jlInstanceFilterNumAtoms">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jlInstanceFilterNumAtoms.text"/>
+            <Property name="name" type="java.lang.String" value="jlInstanceFilterNumAtoms" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jlInstanceFilterNumClauses">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jlInstanceFilterNumClauses.text"/>
+            <Property name="name" type="java.lang.String" value="jlInstanceFilterNumClauses" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jlInstanceFilterRatio">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jlInstanceFilterRatio.text"/>
+            <Property name="name" type="java.lang.String" value="jlInstanceFilterRatio" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jlInstanceFilterMaxClauseLength">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jlInstanceFilterMaxClauseLength.text"/>
+            <Property name="name" type="java.lang.String" value="jlInstanceFilterMaxClauseLength" noResource="true"/>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
   </NonVisualComponents>
   <Properties>
     <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
@@ -27,25 +184,19 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <EmptySpace min="0" pref="893" max="32767" attributes="0"/>
-          <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="manageDBPane" min="-2" pref="873" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
-              </Group>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="manageDBPane" min="-2" pref="873" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <EmptySpace min="0" pref="521" max="32767" attributes="0"/>
-          <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="manageDBPane" min="-2" pref="499" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
-              </Group>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="manageDBPane" min="-2" pref="499" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
