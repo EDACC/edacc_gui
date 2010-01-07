@@ -46,7 +46,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         tableSolvers.setModel(solTableModel);
     }
 
-    public void initialize() {
+    public void initialize() throws SQLException {
         expController.initialize();
     }
 

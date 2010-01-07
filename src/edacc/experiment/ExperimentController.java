@@ -42,21 +42,18 @@ public class ExperimentController {
 
     /**
      * Initializes the experiment controller. Loads the experiments and the instances.
+     * @throws SQLException
      */
-    public void initialize() {
-        try {
-            Vector<Experiment> v = new Vector<Experiment>();
-            v.addAll(ExperimentDAO.getAll());
-            experiments = v;
-            main.expTableModel.setExperiments(experiments);
+    public void initialize() throws SQLException {
+        Vector<Experiment> v = new Vector<Experiment>();
+        v.addAll(ExperimentDAO.getAll());
+        experiments = v;
+        main.expTableModel.setExperiments(experiments);
 
-            Vector<Instance> vi = new Vector<Instance>();
-            vi.addAll(InstanceDAO.getAll());
-            instances = vi;
-            main.insTableModel.setInstances(instances);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        Vector<Instance> vi = new Vector<Instance>();
+        vi.addAll(InstanceDAO.getAll());
+        instances = vi;
+        main.insTableModel.setInstances(instances);
     }
 
     /**
@@ -140,7 +137,7 @@ public class ExperimentController {
         for (int i = 0; i < main.insTableModel.getRowCount(); i++) {
             if ((Boolean) main.insTableModel.getValueAt(i, 5)) {
                 if ((ExperimentHasInstance) main.insTableModel.getValueAt(i, 6) == null) {
-                    main.insTableModel.setExperimentHasInstance(ExperimentHasInstanceDAO.createExperimentHasInstance(activeExperiment.getId(), ((Instance)main.insTableModel.getValueAt(i, 7)).getId()), i);
+                    main.insTableModel.setExperimentHasInstance(ExperimentHasInstanceDAO.createExperimentHasInstance(activeExperiment.getId(), ((Instance) main.insTableModel.getValueAt(i, 7)).getId()), i);
                 }
             } else {
                 ExperimentHasInstance ei = (ExperimentHasInstance) main.insTableModel.getValueAt(i, 6);
