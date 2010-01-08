@@ -41,7 +41,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private void initComponents() {
 
         jFileChooserManageDBInstance = new javax.swing.JFileChooser();
-        InstanceFilter = new javax.swing.JFrame();
+        instanceFilter = new javax.swing.JFrame();
         btnInstanceFilter = new javax.swing.JButton();
         btnInstanceFilterCancel = new javax.swing.JButton();
         tfInstanceFilterName = new javax.swing.JTextField();
@@ -69,9 +69,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         jFileChooserManageDBInstance.setFileSelectionMode(javax.swing.JFileChooser.FILES_AND_DIRECTORIES);
         jFileChooserManageDBInstance.setName("jFileChooserManageDBInstance"); // NOI18N
 
-        InstanceFilter.setName("InstanceFilter"); // NOI18N
-
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCManageDBMode.class);
+        instanceFilter.setTitle(resourceMap.getString("instanceFilter.title")); // NOI18N
+        instanceFilter.setMinimumSize(new java.awt.Dimension(220, 220));
+        instanceFilter.setName("instanceFilter"); // NOI18N
+        instanceFilter.setResizable(false);
+
         btnInstanceFilter.setText(resourceMap.getString("btnInstanceFilter.text")); // NOI18N
         btnInstanceFilter.setName("btnInstanceFilter"); // NOI18N
         btnInstanceFilter.addActionListener(new java.awt.event.ActionListener() {
@@ -118,58 +121,59 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         jlInstanceFilterMaxClauseLength.setText(resourceMap.getString("jlInstanceFilterMaxClauseLength.text")); // NOI18N
         jlInstanceFilterMaxClauseLength.setName("jlInstanceFilterMaxClauseLength"); // NOI18N
 
-        javax.swing.GroupLayout InstanceFilterLayout = new javax.swing.GroupLayout(InstanceFilter.getContentPane());
-        InstanceFilter.getContentPane().setLayout(InstanceFilterLayout);
-        InstanceFilterLayout.setHorizontalGroup(
-            InstanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(InstanceFilterLayout.createSequentialGroup()
-                .addGroup(InstanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(InstanceFilterLayout.createSequentialGroup()
+        javax.swing.GroupLayout instanceFilterLayout = new javax.swing.GroupLayout(instanceFilter.getContentPane());
+        instanceFilter.getContentPane().setLayout(instanceFilterLayout);
+        instanceFilterLayout.setHorizontalGroup(
+            instanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(instanceFilterLayout.createSequentialGroup()
+                .addGroup(instanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(instanceFilterLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(InstanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jlInstanceFilterName, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(instanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jlInstanceFilterNumAtoms)
-                            .addComponent(jlInstanceFilterNumClauses, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jlInstanceFilterRatio, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jlInstanceFilterMaxClauseLength)))
-                    .addGroup(InstanceFilterLayout.createSequentialGroup()
+                            .addComponent(jlInstanceFilterMaxClauseLength)
+                            .addComponent(jlInstanceFilterName, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jlInstanceFilterNumClauses, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(instanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(tfInstanceFilterNumClauses, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfInstanceFilterName, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfInstanceFilterRatio, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfInstanceFilterMaxClauseLength, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfInstanceFilterNumAtoms, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(instanceFilterLayout.createSequentialGroup()
                         .addGap(28, 28, 28)
-                        .addComponent(btnInstanceFilter)))
-                .addGap(24, 24, 24)
-                .addGroup(InstanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tfInstanceFilterMaxClauseLength, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfInstanceFilterRatio, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfInstanceFilterNumClauses, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfInstanceFilterNumAtoms, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfInstanceFilterName, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnInstanceFilterCancel))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(btnInstanceFilter)
+                        .addGap(31, 31, 31)
+                        .addComponent(btnInstanceFilterCancel)))
+                .addGap(15, 15, 15))
         );
-        InstanceFilterLayout.setVerticalGroup(
-            InstanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(InstanceFilterLayout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addGroup(InstanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfInstanceFilterName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jlInstanceFilterName))
+        instanceFilterLayout.setVerticalGroup(
+            instanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(instanceFilterLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(instanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jlInstanceFilterName)
+                    .addComponent(tfInstanceFilterName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
+                .addGroup(instanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jlInstanceFilterNumAtoms)
+                    .addComponent(tfInstanceFilterNumAtoms, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(InstanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfInstanceFilterNumAtoms, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jlInstanceFilterNumAtoms))
+                .addGroup(instanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jlInstanceFilterNumClauses)
+                    .addComponent(tfInstanceFilterNumClauses, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(InstanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfInstanceFilterNumClauses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jlInstanceFilterNumClauses))
+                .addGroup(instanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jlInstanceFilterRatio)
+                    .addComponent(tfInstanceFilterRatio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(InstanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfInstanceFilterRatio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jlInstanceFilterRatio))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(InstanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfInstanceFilterMaxClauseLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jlInstanceFilterMaxClauseLength))
+                .addGroup(instanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jlInstanceFilterMaxClauseLength)
+                    .addComponent(tfInstanceFilterMaxClauseLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(InstanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(instanceFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnInstanceFilter)
                     .addComponent(btnInstanceFilterCancel))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -250,6 +254,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
         btnFilter.setText(resourceMap.getString("btnFilter.text")); // NOI18N
         btnFilter.setName("btnFilter"); // NOI18N
+        btnFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFilterActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelManageDBInstancesLayout = new javax.swing.GroupLayout(panelManageDBInstances);
         panelManageDBInstances.setLayout(panelManageDBInstancesLayout);
@@ -333,16 +342,22 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     }//GEN-LAST:event_btnSaveInstancesActionPerformed
 
     private void btnInstanceFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInstanceFilterActionPerformed
-        InstanceFilter.setVisible(false);
+        instanceFilter.setVisible(false);
         /**ToDo Filter ausführen */
     }//GEN-LAST:event_btnInstanceFilterActionPerformed
 
     private void btnInstanceFilterCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInstanceFilterCancelActionPerformed
-        InstanceFilter.setVisible(false);
+        instanceFilter.setVisible(false);
     }//GEN-LAST:event_btnInstanceFilterCancelActionPerformed
 
+    private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
+        manageDBInstances.filter(tableInstances, tfInstanceFilterName.getText(),
+                tfInstanceFilterNumAtoms.getText(), tfInstanceFilterNumClauses.getText(), 
+                tfInstanceFilterRatio.getText(), tfInstanceFilterMaxClauseLength.getText() );
+        instanceFilter.setVisible(false);
+    }//GEN-LAST:event_btnFilterActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JFrame InstanceFilter;
     private javax.swing.JButton btnAddInstances;
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnFilter;
@@ -351,6 +366,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private javax.swing.JButton btnRefreshTableInstances;
     private javax.swing.JButton btnRemoveInstances;
     private javax.swing.JButton btnSaveInstances;
+    private javax.swing.JFrame instanceFilter;
     private javax.swing.JFileChooser jFileChooserManageDBInstance;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel jlInstanceFilterMaxClauseLength;

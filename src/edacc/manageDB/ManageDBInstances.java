@@ -16,6 +16,10 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.RowFilter;
+import javax.swing.RowFilter.Entry;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -94,6 +98,44 @@ public class ManageDBInstances {
             instances.add(temp);
         }
         return instances;
+    }
+    /**
+     * Creates filters with the given values for given JTable
+     * @param tableInstances
+     * @param name
+     * @param numOfAtoms
+     * @param numOfClause
+     * @param ratio
+     * @param maxClauseLength
+     */
+    public void filter(JTable tableInstances, String name, String numOfAtoms, String numOfClause , String ratio, String maxClauseLength) {
+
+
+        if(name != null){
+            TableRowSorter sorter = new TableRowSorter();
+            sorter.setRowFilter( RowFilter.regexFilter(name, 0) );
+            tableInstances.setRowSorter(sorter);
+        }
+        if(numOfAtoms != null){
+            TableRowSorter sorter = new TableRowSorter();
+            sorter.setRowFilter( RowFilter.regexFilter(numOfAtoms, 1) );
+            tableInstances.setRowSorter(sorter);
+        }
+        if(numOfClause != null){
+            TableRowSorter sorter = new TableRowSorter();
+            sorter.setRowFilter( RowFilter.regexFilter(numOfClause, 2));
+            tableInstances.setRowSorter(sorter);
+        }
+        if(ratio != null){
+            TableRowSorter sorter = new TableRowSorter();
+            sorter.setRowFilter( RowFilter.regexFilter(ratio, 3) );
+            tableInstances.setRowSorter(sorter);
+        }
+        if(maxClauseLength != null){
+            TableRowSorter sorter = new TableRowSorter();
+            sorter.setRowFilter( RowFilter.regexFilter(maxClauseLength, 4) );
+            tableInstances.setRowSorter(sorter);
+        }
     }
 
 }
