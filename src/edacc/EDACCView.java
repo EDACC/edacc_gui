@@ -286,7 +286,7 @@ public class EDACCView extends FrameView {
 
     @Action
     public void btnGenerateTables() {
-        
+        JOptionPane.showConfirmDialog(mainPanel, "This will delete all EDACC tables and create new empty ones. Do you wish to continue?", "Warning!", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
     }
 
 
