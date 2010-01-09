@@ -18,8 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
-import javax.swing.RowFilter.Entry;
-import javax.swing.table.TableRowSorter;
+
 
 /**
  *
@@ -92,50 +91,45 @@ public class ManageDBInstances {
 
     private Vector<Instance> buildTempInstances(Vector<File> instanceFiles){
         Vector<Instance> instances = new Vector<Instance>();
-        while(!instanceFiles.isEmpty()){
+        for(int i = 0; i < instanceFiles.size(); i++){
             Instance temp = InstanceDAO.createInstanceTemp();
-             // TODO! set all Attributes
+            temp.setFile(instanceFiles.get(i));
+            temp.setName("test");
+            temp.setNumAtoms(5);
+            temp.setNumClauses(10);
+            temp.setMaxClauseLength(100);
             instances.add(temp);
         }
         return instances;
     }
     /**
-     * Creates filters with the given values for given JTable
-     * @param tableInstances
+     * Creates filters with the given values and adds them to the sorter of EDACCManageDBMode
      * @param name
      * @param numOfAtoms
-     * @param numOfClause
+     * @param numOfClauses
      * @param ratio
      * @param maxClauseLength
      */
-    public void filter(JTable tableInstances, String name, String numOfAtoms, String numOfClause , String ratio, String maxClauseLength) {
+    public void newFilter(String name, String numOfAtoms, String numOfClauses, String ratio, String maxClauseLength) {
+         Vector<RowFilter<Object,Object>> filters = new Vector<RowFilter<Object,Object>>();
+         try {
+             filters.add(RowFilter.regexFilter(name, 0));
+             filters.add(RowFilter.regexFilter(numOfAtoms, 1));
+             filters.add(RowFilter.regexFilter(numOfClauses, 2));
+             filters.add(RowFilter.regexFilter(ratio, 3));
+             filters.add(RowFilter.regexFilter(maxClauseLength, 4));
+        } catch (java.util.regex.PatternSyntaxException e) {
+            return;
+        }
+          RowFilter<Object,Object> filter = RowFilter.andFilter(filters);
+          main.sorter.setRowFilter(filter);
 
-
-        if(name != null){
-            TableRowSorter sorter = new TableRowSorter();
-            sorter.setRowFilter( RowFilter.regexFilter(name, 0) );
-            tableInstances.setRowSorter(sorter);
-        }
-        if(numOfAtoms != null){
-            TableRowSorter sorter = new TableRowSorter();
-            sorter.setRowFilter( RowFilter.regexFilter(numOfAtoms, 1) );
-            tableInstances.setRowSorter(sorter);
-        }
-        if(numOfClause != null){
-            TableRowSorter sorter = new TableRowSorter();
-            sorter.setRowFilter( RowFilter.regexFilter(numOfClause, 2));
-            tableInstances.setRowSorter(sorter);
-        }
-        if(ratio != null){
-            TableRowSorter sorter = new TableRowSorter();
-            sorter.setRowFilter( RowFilter.regexFilter(ratio, 3) );
-            tableInstances.setRowSorter(sorter);
-        }
-        if(maxClauseLength != null){
-            TableRowSorter sorter = new TableRowSorter();
-            sorter.setRowFilter( RowFilter.regexFilter(maxClauseLength, 4) );
-            tableInstances.setRowSorter(sorter);
-        }
+    }
+    /**
+     * Removes the Filter of the given JTable
+     */
+    public void removeFilter(JTable table) {
+        table.setRowSorter(null);
     }
 
 }
