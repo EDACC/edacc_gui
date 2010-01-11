@@ -16,6 +16,9 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.RowFilter;
+
 
 /**
  *
@@ -88,12 +91,45 @@ public class ManageDBInstances {
 
     private Vector<Instance> buildTempInstances(Vector<File> instanceFiles){
         Vector<Instance> instances = new Vector<Instance>();
-        while(!instanceFiles.isEmpty()){
+        for(int i = 0; i < instanceFiles.size(); i++){
             Instance temp = InstanceDAO.createInstanceTemp();
-             // TODO! set all Attributes
+            temp.setFile(instanceFiles.get(i));
+            temp.setName("test");
+            temp.setNumAtoms(5);
+            temp.setNumClauses(10);
+            temp.setMaxClauseLength(100);
             instances.add(temp);
         }
         return instances;
+    }
+    /**
+     * Creates filters with the given values and adds them to the sorter of EDACCManageDBMode
+     * @param name
+     * @param numOfAtoms
+     * @param numOfClauses
+     * @param ratio
+     * @param maxClauseLength
+     */
+    public void newFilter(String name, String numOfAtoms, String numOfClauses, String ratio, String maxClauseLength) {
+         Vector<RowFilter<Object,Object>> filters = new Vector<RowFilter<Object,Object>>();
+         try {
+             filters.add(RowFilter.regexFilter(name, 0));
+             filters.add(RowFilter.regexFilter(numOfAtoms, 1));
+             filters.add(RowFilter.regexFilter(numOfClauses, 2));
+             filters.add(RowFilter.regexFilter(ratio, 3));
+             filters.add(RowFilter.regexFilter(maxClauseLength, 4));
+        } catch (java.util.regex.PatternSyntaxException e) {
+            return;
+        }
+          RowFilter<Object,Object> filter = RowFilter.andFilter(filters);
+          main.sorter.setRowFilter(filter);
+
+    }
+    /**
+     * Removes the Filter of the given JTable
+     */
+    public void removeFilter(JTable table) {
+        table.setRowSorter(null);
     }
 
 }
