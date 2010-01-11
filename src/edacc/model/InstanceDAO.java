@@ -55,13 +55,13 @@ public class InstanceDAO {
             // insert instance into db
             final String insertQuery = "INSERT INTO " + table + " (name, md5, numAtoms, numClauses, ratio, maxClauseLength) " +
                     "VALUES (?, ?, ?, ?, ?, ?)";
-            ps = DatabaseConnector.getInstance().conn.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);       
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
         }
         else if (instance.isModified()) {
             // update query
             final String updateQuery = "UPDATE " + table + " SET name=?, md5=?, numAtoms=?, numClauses=?, ratio=?, maxClauseLength=? " +
                     "WHERE idInstance=?";
-            ps = DatabaseConnector.getInstance().conn.prepareStatement(updateQuery);
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
            
             ps.setInt(7, instance.getId());
             
@@ -107,7 +107,7 @@ public class InstanceDAO {
      * @throws SQLException
      */
     public static Instance getById(int id) throws SQLException {
-        PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement("SELECT * FROM " + table + " WHERE idInstance=?");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idInstance=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         Instance i = new Instance();
@@ -138,7 +138,7 @@ public class InstanceDAO {
      */
     public static LinkedList<Instance> getAll() throws SQLException {
         // return linked list with all instances
-        Statement st = DatabaseConnector.getInstance().conn.createStatement();
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM " + table);
         LinkedList<Instance> res = new LinkedList<Instance>();
         while (rs.next()) {
@@ -164,9 +164,9 @@ public class InstanceDAO {
     }
 
     public static LinkedList<Instance> getAllByExperimentId(int id) throws SQLException {
-        PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement(
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT i.* FROM " + table + " as i JOIN Experiment_has_Instances as ei ON " +
-                "i.idInstance = ei.Instances_idInstance WHERE ei.Experiments_idExperiment = ?"
+                "i.idInstance = ei.Instances_idInstance WHERE ei.Experiment_idExperiment = ?"
                 );
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
@@ -203,6 +203,6 @@ public class InstanceDAO {
         save(i);
         cacheInstance(i);
         System.out.println(i.getId());
-        db.conn.close();
+        db.getConn().close();
     }
 }

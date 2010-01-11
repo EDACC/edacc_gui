@@ -41,19 +41,19 @@ public class ParameterInstanceDAO {
 
     public static void save(ParameterInstance i) throws SQLException {
         if (i.isDeleted()) {
-            PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement(deleteQuery);
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
             st.setInt(1, i.getSolver_config_id());
             st.setInt(2, i.getParameter_id());
             st.executeUpdate();
         } else if (i.isModified()) {
-            PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement(updateQuery);
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
             st.setString(1, i.getValue());
             st.setInt(2, i.getSolver_config_id());
             st.setInt(3, i.getParameter_id());
             st.executeUpdate();
             i.setSaved();
         } else if (i.isNew()) {
-            PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement(insertQuery);
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
             st.setInt(1, i.getSolver_config_id());
             st.setInt(2, i.getParameter_id());
             st.setString(3, i.getValue());
@@ -107,7 +107,7 @@ public class ParameterInstanceDAO {
      */
     public static Vector<ParameterInstance> getBySolverConfigId(int id) throws SQLException {
         Vector<ParameterInstance> res = new Vector<ParameterInstance>();
-        PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement("SELECT * FROM " + table + " WHERE SolverConfig_idSolverConfig=?");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE SolverConfig_idSolverConfig=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {

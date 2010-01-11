@@ -49,11 +49,11 @@ public class SolverConfigurationDAO {
     private static void save(SolverConfiguration i) throws SQLException {
         if (i.isDeleted()) {
             cache.remove(i);
-            PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement(deleteQuery);
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
             st.setInt(1, i.getId());
             st.executeUpdate();
         } else if (i.isNew()) {
-            PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             st.setInt(1, i.getSolver_id());
             st.setInt(2, i.getExperiment_id());
             st.executeUpdate();
@@ -84,7 +84,7 @@ public class SolverConfigurationDAO {
 
     public static Vector<SolverConfiguration> getSolverConfigurationByExperimentId(int experimentId) throws SQLException {
         Vector<SolverConfiguration> res = new Vector<SolverConfiguration>();
-        PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement("SELECT * FROM " + table + " WHERE Experiment_IdExperiment=? ORDER BY Solver_IdSolver");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Experiment_IdExperiment=? ORDER BY Solver_IdSolver");
         st.setInt(1, experimentId);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {

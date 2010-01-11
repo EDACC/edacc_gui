@@ -415,7 +415,7 @@
                     <Property name="name" type="java.lang.String" value="jScrollPane4" noResource="true"/>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="solverConfigPanel = new EDACCSolverConfigPanel();&#xa;jScrollPane4.setViewportView(solverConfigPanel);"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="solverConfigPanel = new EDACCSolverConfigPanel();&#xa;jScrollPane4.setViewportView(solverConfigPanel);&#xa;jScrollPane4.getVerticalScrollBar().setUnitIncrement(30);"/>
                   </AuxValues>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
@@ -592,9 +592,9 @@
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" pref="142" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="1" attributes="0">
-                              <Component id="jButton1" alignment="1" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnGenerateJobs" alignment="1" min="-2" max="-2" attributes="0"/>
                               <Group type="103" alignment="1" groupAlignment="0" max="-2" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
                                       <Group type="103" groupAlignment="0" attributes="0">
@@ -603,45 +603,45 @@
                                       </Group>
                                       <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                          <Component id="jTextField1" max="32767" attributes="1"/>
-                                          <Component id="jTextField3" alignment="0" pref="109" max="32767" attributes="1"/>
+                                          <Component id="txtNumRuns" max="32767" attributes="1"/>
+                                          <Component id="txtTimeout" alignment="0" min="-2" pref="109" max="-2" attributes="1"/>
                                       </Group>
                                   </Group>
-                                  <Component id="jCheckBox1" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkGenerateSeeds" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="1">
                                       <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                                      <Component id="jTextField2" max="32767" attributes="0"/>
+                                      <Component id="txtMaxSeeds" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="1052" max="32767" attributes="0"/>
+                          <EmptySpace pref="1182" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" pref="95" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="1"/>
-                              <Component id="jTextField1" alignment="3" min="-2" max="-2" attributes="1"/>
+                              <Component id="txtNumRuns" alignment="3" min="-2" max="-2" attributes="1"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jTextField3" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtTimeout" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jCheckBox1" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkGenerateSeeds" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jTextField2" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtMaxSeeds" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jButton1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="292" max="32767" attributes="0"/>
+                          <Component id="btnGenerateJobs" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="375" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -653,10 +653,10 @@
                     <Property name="name" type="java.lang.String" value="jLabel1" noResource="true"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JTextField" name="jTextField1">
+                <Component class="javax.swing.JTextField" name="txtNumRuns">
                   <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="jTextField1.text"/>
-                    <Property name="name" type="java.lang.String" value="jTextField1" noResource="true"/>
+                    <Property name="text" type="java.lang.String" resourceKey="txtNumRuns.text"/>
+                    <Property name="name" type="java.lang.String" value="txtNumRuns" noResource="true"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel2">
@@ -665,16 +665,19 @@
                     <Property name="name" type="java.lang.String" value="jLabel2" noResource="true"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JCheckBox" name="jCheckBox1">
+                <Component class="javax.swing.JCheckBox" name="chkGenerateSeeds">
                   <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="jCheckBox1.text"/>
-                    <Property name="name" type="java.lang.String" value="jCheckBox1" noResource="true"/>
+                    <Property name="text" type="java.lang.String" resourceKey="chkGenerateSeeds.text"/>
+                    <Property name="name" type="java.lang.String" value="chkGenerateSeeds" noResource="true"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JButton" name="jButton1">
+                <Component class="javax.swing.JButton" name="btnGenerateJobs">
                   <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="jButton1.text"/>
-                    <Property name="name" type="java.lang.String" value="jButton1" noResource="true"/>
+                    <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                      <action class="edacc.EDACCExperimentMode" id="btnGenerateJobs" methodName="btnGenerateJobs"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" resourceKey="btnGenerateJobs.text"/>
+                    <Property name="name" type="java.lang.String" value="btnGenerateJobs" noResource="true"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel3">
@@ -683,16 +686,16 @@
                     <Property name="name" type="java.lang.String" value="jLabel3" noResource="true"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JTextField" name="jTextField2">
+                <Component class="javax.swing.JTextField" name="txtMaxSeeds">
                   <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="jTextField2.text"/>
-                    <Property name="name" type="java.lang.String" value="jTextField2" noResource="true"/>
+                    <Property name="text" type="java.lang.String" resourceKey="txtMaxSeeds.text"/>
+                    <Property name="name" type="java.lang.String" value="txtMaxSeeds" noResource="true"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JTextField" name="jTextField3">
+                <Component class="javax.swing.JTextField" name="txtTimeout">
                   <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="jTextField3.text"/>
-                    <Property name="name" type="java.lang.String" value="jTextField3" noResource="true"/>
+                    <Property name="text" type="java.lang.String" resourceKey="txtTimeout.text"/>
+                    <Property name="name" type="java.lang.String" value="txtTimeout" noResource="true"/>
                   </Properties>
                 </Component>
               </SubComponents>

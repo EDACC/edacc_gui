@@ -45,12 +45,12 @@ public class ExperimentHasInstanceDAO {
 
     private static void save(ExperimentHasInstance i) throws SQLException {
         if (i.isDeleted()) {
-            PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement(deleteQuery);
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
             st.setInt(1, i.getId());
             st.executeUpdate();
             cache.remove(i);
         } else if (i.isNew()) {
-            PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             st.setInt(1, i.getExperiment_id());
             st.setInt(2, i.getInstances_id());
             st.executeUpdate();
@@ -86,7 +86,7 @@ public class ExperimentHasInstanceDAO {
 
     public static Vector<ExperimentHasInstance> getExperimentHasInstanceByExperimentId(int id) throws SQLException {
         Vector<ExperimentHasInstance> res = new Vector<ExperimentHasInstance>();
-        PreparedStatement st = DatabaseConnector.getInstance().conn.prepareStatement("SELECT * FROM " + table + " WHERE Experiment_idExperiment=?");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Experiment_idExperiment=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {

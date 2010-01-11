@@ -3,6 +3,8 @@
  */
 package edacc;
 
+import java.awt.Component;
+import java.sql.SQLException;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
@@ -21,8 +23,11 @@ import javax.swing.JOptionPane;
  */
 public class EDACCView extends FrameView {
 
-    public EDACCExperimentMode experimentMode;
-    public EDACCManageDBMode manageDBMode;
+    private EDACCExperimentMode experimentMode;
+    private EDACCManageDBMode manageDBMode;
+    private EDACCNoMode noMode;
+    private Component mode;
+    private javax.swing.GroupLayout mainPanelLayout;
 
     public EDACCView(SingleFrameApplication app) {
         super(app);
@@ -87,35 +92,19 @@ public class EDACCView extends FrameView {
         });
         experimentMode = new EDACCExperimentMode();
         manageDBMode = new EDACCManageDBMode();
-        changeToManageDBMode();
-    
-        
-    }
-
-    private void changeToExperimentMode() {
-        javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
+        noMode = new EDACCNoMode();
+        mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
-            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(experimentMode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+                mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(noMode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
         mainPanelLayout.setVerticalGroup(
-            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(experimentMode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+                mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(noMode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+
+        mode = noMode;
     }
 
-     private void changeToManageDBMode() {
-        javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
-        mainPanel.setLayout(mainPanelLayout);
-        mainPanelLayout.setHorizontalGroup(
-            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(manageDBMode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        mainPanelLayout.setVerticalGroup(
-            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(manageDBMode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+    private void createDatabaseErrorMessage(SQLException e) {
+        javax.swing.JOptionPane.showMessageDialog(null, "There was an error while communicating with the database: " +e, "Connection error", javax.swing.JOptionPane.ERROR_MESSAGE);
     }
 
     @Action
@@ -167,7 +156,7 @@ public class EDACCView extends FrameView {
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 639, Short.MAX_VALUE)
+            .add(0, 631, Short.MAX_VALUE)
         );
 
         menuBar.setAutoscrolls(true);
@@ -206,12 +195,12 @@ public class EDACCView extends FrameView {
         modusMenu.setText(resourceMap.getString("modusMenu.text")); // NOI18N
         modusMenu.setName("modusMenu"); // NOI18N
 
-        manageDBModeMenuItem.setSelected(true);
+        manageDBModeMenuItem.setAction(actionMap.get("manageDBMode")); // NOI18N
         manageDBModeMenuItem.setText(resourceMap.getString("manageDBModeMenuItem.text")); // NOI18N
         manageDBModeMenuItem.setName("manageDBModeMenuItem"); // NOI18N
         modusMenu.add(manageDBModeMenuItem);
 
-        manageExperimentModeMenuItem.setSelected(true);
+        manageExperimentModeMenuItem.setAction(actionMap.get("manageExperimentMode")); // NOI18N
         manageExperimentModeMenuItem.setText(resourceMap.getString("manageExperimentModeMenuItem.text")); // NOI18N
         manageExperimentModeMenuItem.setName("manageExperimentModeMenuItem"); // NOI18N
         modusMenu.add(manageExperimentModeMenuItem);
@@ -281,15 +270,55 @@ public class EDACCView extends FrameView {
             databaseSettings.setLocationRelativeTo(mainFrame);
         }
         EDACCApp.getApplication().show(databaseSettings);
-        experimentMode.initialize();
     }
 
     @Action
     public void btnGenerateTables() {
-        JOptionPane.showConfirmDialog(mainPanel, "This will delete all EDACC tables and create new empty ones. Do you wish to continue?", "Warning!", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        
     }
 
+    public void noMode() {
+        manageExperimentModeMenuItem.setSelected(false);
+        manageDBModeMenuItem.setSelected(false);
+        mainPanelLayout.replace(mode, noMode);
+        mode = noMode;
+    }
 
+    @Action
+    public void manageDBMode() {
+        if (!manageDBModeMenuItem.isSelected()) {
+            noMode();
+            return;
+        }
+        if (manageExperimentModeMenuItem.isSelected()) {
+            manageExperimentModeMenuItem.setSelected(false);
+        }
+        mainPanelLayout.replace(mode, manageDBMode);
+        mode = manageDBMode;
+        manageDBModeMenuItem.setSelected(true);
+    }
+
+    @Action
+    public void manageExperimentMode() {
+        {
+        }
+        if (!manageExperimentModeMenuItem.isSelected()) {
+            noMode();
+            return;
+        }
+        if (manageDBModeMenuItem.isSelected()) {
+            manageDBModeMenuItem.setSelected(false);
+        }
+        try {
+            experimentMode.initialize();
+            mainPanelLayout.replace(mode, experimentMode);
+            mode = experimentMode;
+            manageExperimentModeMenuItem.setSelected(true);
+        } catch (SQLException ex) {
+            createDatabaseErrorMessage(ex);
+            noMode();
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem connectToDBMenuItem;
     private javax.swing.JMenuItem generateDBMenuItem;
