@@ -29,6 +29,10 @@ public class InstanceTableModel extends AbstractTableModel{
         this.instances.addAll(instances);
     }
 
+    public void clearTable(){
+        instances.removeAllElements();
+    }
+
     public void removeInstances(Vector<Instance> instances){
         this.instances.removeAll(instances);
     }
@@ -39,6 +43,11 @@ public class InstanceTableModel extends AbstractTableModel{
 
     public int getColumnCount() {
         return columns.length;
+    }
+
+      @Override
+    public String getColumnName(int col) {
+        return columns[col];
     }
 
     /**
