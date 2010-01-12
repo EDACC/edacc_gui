@@ -72,7 +72,7 @@ public class InstanceDAO {
         ps.setString(2, instance.getMd5());
         ps.setInt(3, instance.getNumAtoms());
         ps.setInt(4, instance.getNumClauses());
-        ps.setInt(5, instance.getRatio());
+        ps.setFloat(5, instance.getRatio());
         ps.setInt(6, instance.getMaxClauseLength());
         ps.executeUpdate();
 

@@ -4,15 +4,22 @@
  */
 
 package edacc.manageDB;
-
+import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -41,7 +48,7 @@ public class ManageDBInstances {
      * instance files into the "instance table" of the MangeDBMode.
      * @param 
      */
-    public void addInstances(){
+    public void addInstances() {
         try {
             int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
             File ret = jFileChooserManageDBInstance.getSelectedFile();
@@ -50,10 +57,20 @@ public class ManageDBInstances {
             main.instanceTableModel.addInstances(buildTempInstances(instanceFiles));
             if (instanceFiles.isEmpty()) {
                 JOptionPane.showMessageDialog(panelManageDBInstances,
-                "No solvers have been found.",
+                "No Instances have been found.",
                 "Error",
                 JOptionPane.WARNING_MESSAGE);
             }
+        } catch (NoSuchAlgorithmException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+            "A problem with the MD5-algorithm has occured." ,
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        } catch (InstanceException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+            ex.getMessage(),
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
         }catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
             "Choosen file or directory not found.",
@@ -89,15 +106,19 @@ public class ManageDBInstances {
         }
     }
 
-    private Vector<Instance> buildTempInstances(Vector<File> instanceFiles){
+    private Vector<Instance> buildTempInstances(Vector<File> instanceFiles)
+        throws InstanceException, FileNotFoundException, NullPointerException, IOException, NoSuchAlgorithmException{
         Vector<Instance> instances = new Vector<Instance>();
         for(int i = 0; i < instanceFiles.size(); i++){
+            InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
             Instance temp = InstanceDAO.createInstanceTemp();
             temp.setFile(instanceFiles.get(i));
-            temp.setName("test");
-            temp.setNumAtoms(5);
-            temp.setNumClauses(10);
-            temp.setMaxClauseLength(100);
+            temp.setName(tempInstance.name);
+            temp.setNumAtoms(tempInstance.n);
+            temp.setNumClauses(tempInstance.m);
+            temp.setRatio(tempInstance.r);
+            temp.setMaxClauseLength(tempInstance.k);
+            temp.setMd5(calculateMD5(instanceFiles.get(i)));
             instances.add(temp);
         }
         return instances;
@@ -130,6 +151,19 @@ public class ManageDBInstances {
      */
     public void removeFilter(JTable table) {
         table.setRowSorter(null);
+    }
+
+    public String calculateMD5(File file) throws FileNotFoundException, IOException, NoSuchAlgorithmException{
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            InputStream is = new FileInputStream(file);
+            byte[] buffer = new byte[8192];
+            int read = 0;
+            while ((read = is.read(buffer)) > 0) {
+                digest.update(buffer, 0, read);
+            }
+            byte[] md5sum = digest.digest();
+            BigInteger bigInt = new BigInteger(1, md5sum);
+            return bigInt.toString(16);
     }
 
 }
