@@ -3,8 +3,12 @@
  */
 package edacc;
 
+import edacc.model.DatabaseConnector;
+import edacc.model.NoConnectionToDBException;
 import java.awt.Component;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
@@ -274,7 +278,25 @@ public class EDACCView extends FrameView {
 
     @Action
     public void btnGenerateTables() {
-        
+        if (JOptionPane.showConfirmDialog(mode,
+                "This will destroy the EDACC tables of your DB an create new ones. Do you wish to continue?",
+                "Warning!",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+            try {
+                // User clicked on "Yes"
+                DatabaseConnector.getInstance().createDBSchema();
+            } catch (NoConnectionToDBException ex) {
+                JOptionPane.showMessageDialog(mode,
+                        "Couldn't generate the EDACC tables: No connection to database. Please connect to a database first.",
+                        "Error!", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(mode,
+                        "An error occured while trying to generate the EDACC tables: " + ex.getMessage(),
+                        "Error!", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+                        System.out.println("NO!");
+        }
     }
 
     public void noMode() {

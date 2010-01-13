@@ -11,7 +11,7 @@ import java.sql.SQLException;
  *
  * @author dgall
  */
-class NoConnectionToDBException extends SQLException {
+public class NoConnectionToDBException extends SQLException {
 
     public NoConnectionToDBException() {
         this("No connection to database.");
