@@ -12,6 +12,7 @@ package edacc;
 
 
 import edacc.manageDB.*;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
@@ -126,7 +127,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                 {null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4", "Title 5"
+                "Name", "numAtoms", "numClauses", "ratio", "maxClauseLength"
             }
         ));
         tableInstances.setName("tableInstances"); // NOI18N
@@ -172,6 +173,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
 
         btnFilter.setText(resourceMap.getString("btnFilter.text")); // NOI18N
         btnFilter.setName("btnFilter"); // NOI18N
@@ -290,7 +296,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 506, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(panelFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(108, Short.MAX_VALUE))
+                .addContainerGap(118, Short.MAX_VALUE))
         );
         panelManageDBInstancesLayout.setVerticalGroup(
             panelManageDBInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -340,6 +346,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
     private void btnRemoveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstancesActionPerformed
         manageDBInstances.removeInstances(tableInstances.getSelectedRows());
+        tableInstances.updateUI();
     }//GEN-LAST:event_btnRemoveInstancesActionPerformed
 
     private void btnRefreshTableInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshTableInstancesActionPerformed
@@ -351,22 +358,20 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             manageDBInstances.saveInstances();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
-            "Instances cannot be saved. There is a problem with the Database.",
+            "Instances cannot be saved. There is a problem with the Database: " + ex.getMessage(),
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        } catch (FileNotFoundException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+            "Instances cannot be saved because a file couldn't be found: " + ex.getMessage(),
             "Error",
             JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnSaveInstancesActionPerformed
 
     private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
-        if(panelFilter.isVisible()){
-           manageDBInstances.removeFilter(tableInstances);
-           panelFilter.setVisible(false);
-           tfInstanceFilterName.setText("");
-           tfInstanceFilterNumAtoms.setText("");
-           tfInstanceFilterNumClauses.setText("");
-           tfInstanceFilterRatio.setText("");
-           tfInstanceFilterMaxClauseLength.setText("");
-        }else{
+        if(panelFilter.isVisible())clearFilter();
+        else{
             tableInstances.setRowSorter(sorter);
             addDocumentListener(tfInstanceFilterName);
             addDocumentListener(tfInstanceFilterNumAtoms);
@@ -385,6 +390,23 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
     }//GEN-LAST:event_tfInstanceFilterNameInputMethodTextChanged
 
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        instanceTableModel.clearTable();
+        clearFilter();
+        tableInstances.updateUI();
+    }//GEN-LAST:event_btnCancelActionPerformed
+
+    private void clearFilter(){
+       if(panelFilter.isVisible()){
+           manageDBInstances.removeFilter(tableInstances);
+           panelFilter.setVisible(false);
+           tfInstanceFilterName.setText("");
+           tfInstanceFilterNumAtoms.setText("");
+           tfInstanceFilterNumClauses.setText("");
+           tfInstanceFilterRatio.setText("");
+           tfInstanceFilterMaxClauseLength.setText("");
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddInstances;
     private javax.swing.JButton btnCancel;

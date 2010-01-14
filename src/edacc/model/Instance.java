@@ -68,16 +68,17 @@ public class Instance extends BaseModel {
         this.numClauses = numClauses;
     }
 
-    public int getRatio() {
+    public float getRatio() {
         return ratio;
     }
 
-    public void setRatio(int ratio) {
+    public void setRatio(float ratio) {
         this.ratio = ratio;
     }
 
     protected Instance() {
-        id = numAtoms = numClauses = ratio = maxClauseLength = 0;
+        id = numAtoms = numClauses = maxClauseLength = 0;
+        ratio = 0;
         name = md5 = "";
         file = null;
     }
@@ -94,7 +95,7 @@ public class Instance extends BaseModel {
     private String md5;
     private int numAtoms;
     private int numClauses;
-    private int ratio;
+    private float ratio;
     private int maxClauseLength;
     private File file;
 
