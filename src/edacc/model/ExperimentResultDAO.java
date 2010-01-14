@@ -61,6 +61,13 @@ public class ExperimentResultDAO {
 
     }
 
+    public static void clearCache() throws SQLException {
+        for (ExperimentResult r: cache.values()) {
+            save(r);
+        }
+        cache.clear();
+    }
+
     private static ExperimentResult getCached(ExperimentResult i) {
         if (cache.containsKey(i)) {
             return cache.get(i);
