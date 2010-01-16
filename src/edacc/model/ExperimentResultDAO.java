@@ -105,5 +105,13 @@ public class ExperimentResultDAO {
         return v;
     }
 
+    public static int getCountByExperimentId(int id) throws SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT COUNT(*) as count FROM " + table + " WHERE Experiment_idExperiment=?");
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        rs.next(); // there will always be a count
+        return rs.getInt("count");
+    }
+
     
 }

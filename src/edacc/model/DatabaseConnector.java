@@ -122,6 +122,9 @@ public class DatabaseConnector {
                 + "PRIMARY KEY (`numNodes`) ) "
                 + "ENGINE = InnoDB");
 
+        // init grid settings so we only have to do updates later on
+        st.addBatch("INSERT INTO gridSettings VALUES (0,0,0)");
+
         /*
          * Table `Experiment`
          */
