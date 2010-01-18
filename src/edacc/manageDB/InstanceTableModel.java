@@ -21,6 +21,11 @@ public class InstanceTableModel extends AbstractTableModel{
         this.instances = new Vector<Instance>();
     }
 
+    public boolean isEmpty(){
+        if(instances.isEmpty()) return true;
+        return false;
+    }
+
     public Vector<Instance> getInstances() {
         return instances;
     }
@@ -31,6 +36,10 @@ public class InstanceTableModel extends AbstractTableModel{
 
     public void clearTable(){
         instances.removeAllElements();
+    }
+
+    public void remove(Instance instance){
+        instances.remove(instance);
     }
 
     public void removeInstances(Vector<Instance> instances){
