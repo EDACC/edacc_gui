@@ -192,6 +192,6 @@ public class ExperimentController {
                 ExperimentResultDAO.createExperimentResult(0, 0, seed, "", 0, 0, c.getId(), activeExperiment.getId(), i.getId());
             }
         }
-
+        ExperimentResultDAO.clearCache();
     }
 }

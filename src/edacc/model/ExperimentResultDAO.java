@@ -61,6 +61,13 @@ public class ExperimentResultDAO {
 
     }
 
+    public static void clearCache() throws SQLException {
+        for (ExperimentResult r: cache.values()) {
+            save(r);
+        }
+        cache.clear();
+    }
+
     private static ExperimentResult getCached(ExperimentResult i) {
         if (cache.containsKey(i)) {
             return cache.get(i);
@@ -96,6 +103,14 @@ public class ExperimentResultDAO {
         }
 
         return v;
+    }
+
+    public static int getCountByExperimentId(int id) throws SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT COUNT(*) as count FROM " + table + " WHERE Experiment_idExperiment=?");
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        rs.next(); // there will always be a count
+        return rs.getInt("count");
     }
 
     

@@ -1,5 +1,7 @@
 package edacc.model;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.Hashtable;
 import java.sql.*;
@@ -17,7 +19,7 @@ public class InstanceDAO {
      * so it can be referenced by related objects
      * @return new Instance object
      */
-     public static Instance createInstance() throws SQLException {
+     public static Instance createInstance() throws SQLException, FileNotFoundException {
         Instance i = new Instance();
         save(i);
         cacheInstance(i);
@@ -38,7 +40,7 @@ public class InstanceDAO {
       * persists an temporary instance object to the database
       * @param instance The temporary instance object to persist
       */
-     public static void saveTempInstance(Instance instance) throws SQLException{
+     public static void saveTempInstance(Instance instance) throws SQLException, FileNotFoundException{
         save(instance);
         cacheInstance(instance);
      }
@@ -46,24 +48,26 @@ public class InstanceDAO {
     /**
      * persists an instance object in the database
      * @param instance The instance object to persist
+     * @throws SQLException if an SQL error occurs while saving the instance.
+     * @throws FileNotFoundException if the file of the instance couldn't be found.
      */
-    public static void save(Instance instance) throws SQLException {
+    public static void save(Instance instance) throws SQLException, FileNotFoundException {
         PreparedStatement ps;
         if (instance.isNew()) {
             // insert query, set ID!
             // TODO insert instance blob
             // insert instance into db
-            final String insertQuery = "INSERT INTO " + table + " (name, md5, numAtoms, numClauses, ratio, maxClauseLength) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)";
+            final String insertQuery = "INSERT INTO " + table + " (name, md5, numAtoms, numClauses, ratio, maxClauseLength, instance) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
         }
         else if (instance.isModified()) {
             // update query
-            final String updateQuery = "UPDATE " + table + " SET name=?, md5=?, numAtoms=?, numClauses=?, ratio=?, maxClauseLength=? " +
+            final String updateQuery = "UPDATE " + table + " SET name=?, md5=?, numAtoms=?, numClauses=?, ratio=?, maxClauseLength=?, instance=? " +
                     "WHERE idInstance=?";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
            
-            ps.setInt(7, instance.getId());
+            ps.setInt(8, instance.getId());
             
         } else
             return;
@@ -74,6 +78,7 @@ public class InstanceDAO {
         ps.setInt(4, instance.getNumClauses());
         ps.setFloat(5, instance.getRatio());
         ps.setInt(6, instance.getMaxClauseLength());
+        ps.setBinaryStream(7, new FileInputStream(instance.getFile()));
         ps.executeUpdate();
 
         // set id
@@ -200,7 +205,7 @@ public class InstanceDAO {
         i.setName("test1234");
         i.setNew();
         i.setMd5("12345");
-        save(i);
+       // save(i);
         cacheInstance(i);
         System.out.println(i.getId());
         db.getConn().close();

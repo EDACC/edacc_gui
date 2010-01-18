@@ -12,6 +12,7 @@ package edacc;
 
 
 import edacc.manageDB.*;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
@@ -357,7 +358,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             manageDBInstances.saveInstances();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
-            "Instances cannot be saved. There is a problem with the Database.",
+            "Instances cannot be saved. There is a problem with the Database: " + ex.getMessage(),
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        } catch (FileNotFoundException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+            "Instances cannot be saved because a file couldn't be found: " + ex.getMessage(),
             "Error",
             JOptionPane.ERROR_MESSAGE);
         }
