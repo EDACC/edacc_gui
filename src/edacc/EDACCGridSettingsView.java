@@ -6,6 +6,12 @@
 
 package edacc;
 
+import edacc.model.GridSettingsDAO;
+import edacc.model.NoConnectionToDBException;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+import org.jdesktop.application.Action;
+
 /**
  *
  * @author Daniel D.
@@ -61,9 +67,12 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         txtMaxJobsInQueue.setText(resourceMap.getString("txtMaxJobsInQueue.text")); // NOI18N
         txtMaxJobsInQueue.setName("txtMaxJobsInQueue"); // NOI18N
 
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCGridSettingsView.class, this);
+        btnOk.setAction(actionMap.get("btnOk")); // NOI18N
         btnOk.setText(resourceMap.getString("btnOk.text")); // NOI18N
         btnOk.setName("btnOk"); // NOI18N
 
+        btnCancel.setAction(actionMap.get("btnCancel")); // NOI18N
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
 
@@ -76,7 +85,7 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(lblMaxJobsInQueue, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblMaxJobsInQueue, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
                             .addComponent(lblNumNodes, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblMaxRuntime, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -114,6 +123,39 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    public void loadSettings() throws SQLException {
+        txtNumNodes.setText(String.valueOf(GridSettingsDAO.getNumNodes()));
+        txtMaxRuntime.setText(String.valueOf(GridSettingsDAO.getMaxRuntime()));
+        txtMaxJobsInQueue.setText(String.valueOf(GridSettingsDAO.getMaxJobsInQueue()));
+    }
+
+    @Action
+    public void btnOk() {
+        try {
+            int numNodes = Integer.parseInt(txtNumNodes.getText());
+            int maxRuntime = Integer.parseInt(txtMaxRuntime.getText());
+            int maxJobsInQueue = Integer.parseInt(txtMaxJobsInQueue.getText());
+            GridSettingsDAO.saveNumNodes(numNodes);
+            GridSettingsDAO.saveMaxJobsInQueue(maxJobsInQueue);
+            GridSettingsDAO.saveMaxRuntime(maxRuntime);
+            this.setVisible(false);
+        }
+        catch (NoConnectionToDBException e) {
+            JOptionPane.showMessageDialog(this, "Couldn't save settings. No connection to database", "No database connection", JOptionPane.ERROR_MESSAGE);
+        }
+        catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error while saving settings: \n" + e.getMessage(), "Error saving settings", JOptionPane.ERROR_MESSAGE);
+        }
+        catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Error saving settings, integers expected", "Integers expected", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    @Action
+    public void btnCancel() {
+        this.setVisible(false);
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -160,7 +160,7 @@ public class EDACCView extends FrameView {
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 631, Short.MAX_VALUE)
+            .add(0, 639, Short.MAX_VALUE)
         );
 
         menuBar.setAutoscrolls(true);
@@ -187,9 +187,11 @@ public class EDACCView extends FrameView {
 
         menuBar.add(fileMenu);
 
+        gridMenu.setAction(actionMap.get("btnGridSettings")); // NOI18N
         gridMenu.setText(resourceMap.getString("gridMenu.text")); // NOI18N
         gridMenu.setName("gridMenu"); // NOI18N
 
+        settingsMenuItem.setAction(actionMap.get("btnGridSettings")); // NOI18N
         settingsMenuItem.setText(resourceMap.getString("settingsMenuItem.text")); // NOI18N
         settingsMenuItem.setName("settingsMenuItem"); // NOI18N
         gridMenu.add(settingsMenuItem);
@@ -341,6 +343,26 @@ public class EDACCView extends FrameView {
             noMode();
         }
     }
+
+    @Action
+    public void btnGridSettings() {
+        if (gridSettings == null) {
+            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+            gridSettings = new EDACCGridSettingsView(mainFrame, true);
+            gridSettings.setLocationRelativeTo(mainFrame);
+        }
+        try {
+            gridSettings.loadSettings();
+            EDACCApp.getApplication().show(gridSettings);
+        }
+        catch (NoConnectionToDBException e) {
+            JOptionPane.showMessageDialog(this.getComponent(), "Couldn't load settings. No connection to database", "No database connection", JOptionPane.ERROR_MESSAGE);
+        }
+        catch (SQLException e) {
+            JOptionPane.showMessageDialog(this.getComponent(), "Error while loading settings: \n" + e.getMessage(), "Error loading settings", JOptionPane.ERROR_MESSAGE);
+        }
+        
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem connectToDBMenuItem;
     private javax.swing.JMenuItem generateDBMenuItem;
@@ -364,4 +386,5 @@ public class EDACCView extends FrameView {
     private int busyIconIndex = 0;
     private JDialog aboutBox;
     private JDialog databaseSettings;
+    private EDACCGridSettingsView gridSettings;
 }
