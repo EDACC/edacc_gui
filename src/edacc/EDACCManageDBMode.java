@@ -656,9 +656,22 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private void btnSaveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveInstancesActionPerformed
         try {
             manageDBInstances.saveInstances();
+             JOptionPane.showMessageDialog(panelManageDBInstances,
+            "The Instances has been added to the Database successful." ,
+            "Info",
+            JOptionPane.INFORMATION_MESSAGE);
+            manageDBInstances.removeAllInstances();
+            tableInstances.updateUI();
+
+        } catch (NoInstancesToSaveException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+            ex.getMessage(),
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
-            "Instances cannot be saved. There is a problem with the Database: " + ex.getMessage(),
+            "Instances cannot be saved. There is a problem with the database." +
+            "The already saved Instances have been deleted from the table.: " + ex.getMessage(),
             "Error",
             JOptionPane.ERROR_MESSAGE);
         } catch (FileNotFoundException ex) {
@@ -667,6 +680,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             "Error",
             JOptionPane.ERROR_MESSAGE);
         }
+
+        
     }//GEN-LAST:event_btnSaveInstancesActionPerformed
 
     private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed

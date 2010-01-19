@@ -8,6 +8,7 @@ import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
+import edacc.model.NoConnectionToDBException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,6 +19,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -45,22 +48,34 @@ public class ManageDBInstances {
      * instance files into the "instance table" of the MangeDBMode.
      * @param 
      */
-    public void addInstances() {
+    public void addInstances(){
         try {
             int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
             File ret = jFileChooserManageDBInstance.getSelectedFile();
             RecursiveFileScanner InstanceScanner = new RecursiveFileScanner("cnf");
             Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
-            main.instanceTableModel.addInstances(buildTempInstances(instanceFiles));
+            String duplicates = "";
+            Vector<Instance> instances = buildTempInstances(instanceFiles);
             if (instanceFiles.isEmpty()) {
                 JOptionPane.showMessageDialog(panelManageDBInstances,
                         "No Instances have been found.",
                         "Error",
                         JOptionPane.WARNING_MESSAGE);
             }
+            main.instanceTableModel.addInstances(instances);
+        } catch (NoConnectionToDBException ex) {
+           JOptionPane.showMessageDialog(panelManageDBInstances,
+                    ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "There is a Problem with the database: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         } catch (NoSuchAlgorithmException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "A problem with the MD5-algorithm has occured.",
+                    "A problem with the MD5-algorithm has occured: " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         } catch (InstanceException ex) {
@@ -70,12 +85,12 @@ public class ManageDBInstances {
                     JOptionPane.ERROR_MESSAGE);
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "Choosen file or directory not found.",
+                    "Choosen file or directory not found: " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "Error reading choosen file or directory.",
+                    "Error reading choosen file or directory: " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -93,29 +108,60 @@ public class ManageDBInstances {
         main.instanceTableModel.removeInstances(rem);
     }
 
+    public void removeAllInstances(){
+        main.instanceTableModel.clearTable();
+
+    }
+
     /**
      * Saves all instances from the instanceTableModel into the Database
+     * @throws SQLException
+     * @throws FileNotFoundException
      */
-    public void saveInstances() throws SQLException, FileNotFoundException {
-        for (Instance i : main.instanceTableModel.getInstances()) {
-            InstanceDAO.saveTempInstance(i);
+    public void saveInstances() throws  FileNotFoundException, NoInstancesToSaveException, SQLException {
+        if(!main.instanceTableModel.isEmpty()){
+            Vector<Instance> saved = new Vector<Instance>();
+            for (Instance i : main.instanceTableModel.getInstances()) {
+                try {
+                    InstanceDAO.saveTempInstance(i);
+                    saved.addElement(i);
+                } catch (SQLException ex) {
+                    main.instanceTableModel.removeInstances(saved);
+                    throw new SQLException(ex.getMessage());
+                }
+            }   
+        }else{
+            throw new NoInstancesToSaveException();
         }
     }
 
     private Vector<Instance> buildTempInstances(Vector<File> instanceFiles)
-            throws InstanceException, FileNotFoundException, NullPointerException, IOException, NoSuchAlgorithmException {
+            throws InstanceException, FileNotFoundException, NullPointerException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException {
         Vector<Instance> instances = new Vector<Instance>();
+        String duplicates = "";
         for (int i = 0; i < instanceFiles.size(); i++) {
+            String md5 = calculateMD5(instanceFiles.get(i));
             InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
-            Instance temp = InstanceDAO.createInstanceTemp();
-            temp.setFile(instanceFiles.get(i));
-            temp.setName(tempInstance.name);
-            temp.setNumAtoms(tempInstance.n);
-            temp.setNumClauses(tempInstance.m);
-            temp.setRatio(tempInstance.r);
-            temp.setMaxClauseLength(tempInstance.k);
-            temp.setMd5(calculateMD5(instanceFiles.get(i)));
-            instances.add(temp);
+            Instance temp = InstanceDAO.createInstanceTemp(md5);
+            if(temp != null){
+                temp.setFile(instanceFiles.get(i));
+                temp.setName(tempInstance.name);
+                temp.setNumAtoms(tempInstance.n);
+                temp.setNumClauses(tempInstance.m);
+                temp.setRatio(tempInstance.r);
+                temp.setMaxClauseLength(tempInstance.k);
+                temp.setMd5(md5);
+                instances.add(temp);
+            }else{
+                duplicates +="; " + instanceFiles.get(i).getAbsolutePath();
+            }
+            
+        }
+        if(!duplicates.equals("")){
+             JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "The following instances are already in the database: " + duplicates,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
         return instances;
     }

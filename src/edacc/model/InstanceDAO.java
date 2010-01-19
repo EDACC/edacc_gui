@@ -31,8 +31,16 @@ public class InstanceDAO {
       *  datebase item
       * @return new Instance object
       */
-     public static Instance createInstanceTemp(){
-        Instance i = new Instance();
+     public static Instance createInstanceTemp(String md5) throws NoConnectionToDBException, SQLException{
+        PreparedStatement ps;
+         final String Query = "SELECT * FROM " + table +" WHERE md5 = ?";
+         ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
+         ps.setString(1, md5);
+         ResultSet rs = ps.executeQuery();
+         if(rs.next()){
+             return null;
+         }
+         Instance i = new Instance();
         return i;
      }
 
