@@ -1,5 +1,6 @@
 package edacc.model;
 
+import java.io.File;
 import java.util.Vector;
 
 
@@ -7,8 +8,14 @@ public class Solver extends BaseModel {
     private int id;
     private String name;
     private String binaryName;
+    private File binaryFile;
     private String description;
     private String md5;
+    private File codeFile;
+    
+    public Solver() {
+        this.setNew();
+    }
 
     public String getBinaryName() {
         return binaryName;
@@ -48,5 +55,21 @@ public class Solver extends BaseModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public File getBinaryFile() {
+        return binaryFile;
+    }
+
+    public void setBinaryFile(File binaryFile) {
+        this.binaryFile = binaryFile;
+    }
+
+    public File getCodeFile() {
+        return codeFile;
+    }
+
+    public void setCodeFile(File codeFile) {
+        this.codeFile = codeFile;
     }
 }

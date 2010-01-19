@@ -97,8 +97,6 @@ public class InstanceDAO {
         }
 
         instance.setSaved();
-
-        instance.setSaved();
     }
 
     private static Instance getCached(Instance i) {

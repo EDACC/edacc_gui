@@ -1,5 +1,7 @@
 package edacc.model;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,27 +20,51 @@ public class SolverDAO {
     protected static final String removeQuery = "DELETE FROM " + table + " WHERE idSolver=?";
     private static final Hashtable<Solver, Solver> cache = new Hashtable<Solver, Solver>();
 
+    
     /**
-     * TODO: implement
-     * @return
+     * persists a (new) solver to database and assigns an id. it also ensures that
+     * the solver is cached.
+     * @param solver The Solver object to persist.
      */
-    public static Solver createSolver() {
-        return null;
+    public static void save(Solver solver) throws SQLException, FileNotFoundException {
+        PreparedStatement ps;
+        if (!solver.isNew())
+            return;
+
+        // insert  into db
+        ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+        ps.setString(1, solver.getName());
+        ps.setString(2, solver.getBinaryName());
+        //TODO uncomment ps.setBinaryStream(3, new FileInputStream(solver.getBinaryFile()));
+        ps.setString(4, solver.getDescription());
+        ps.setString(5, solver.getMd5());
+        //TODO uncomment ps.setBinaryStream(6, new FileInputStream(solver.getCodeFile()));
+        ps.executeUpdate();
+
+        // set id
+        ResultSet rs = ps.getGeneratedKeys();
+        if (rs.next())
+            solver.setId(rs.getInt(1));
+
+        cacheSolver(solver);
+        solver.setSaved();
     }
 
     /**
-     * TODO: implement
-     * @param solver The Solver object to persist
-     */
-    public static void save(Solver solver) throws SQLException {
-    }
-
-    /**
-     * TODO: implement
-     * @param solver
-     * @throws SQLException
+     * Removes a solver from DB and cache. It also ensures that all parameters of a solver are deleted.
+     * TODO delete SolverCOnfigs??
+     * @param solver the solver to remove.
+     * @throws SQLException if an error occurs while executing the SQL query.
      */
     public static void removeSolver(Solver solver) throws SQLException {
+        ParameterDAO.removeParametersOfSolver(solver);
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(removeQuery);
+        ps.setInt(1, solver.getId());
+        ps.executeUpdate();
+
+        if (cache.containsKey(solver))
+            cache.remove(solver);
+        solver.setDeleted();
     }
 
     private static Solver getSolverFromResultset(ResultSet rs) throws SQLException {
