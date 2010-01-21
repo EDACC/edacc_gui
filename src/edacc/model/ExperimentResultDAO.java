@@ -105,12 +105,41 @@ public class ExperimentResultDAO {
         return v;
     }
 
+    /**
+     * returns the number of jobs in the database for the given experiment
+     * @param id experiment id
+     * @return
+     * @throws SQLException
+     */
     public static int getCountByExperimentId(int id) throws SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT COUNT(*) as count FROM " + table + " WHERE Experiment_idExperiment=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         rs.next(); // there will always be a count
         return rs.getInt("count");
+    }
+
+
+    /**
+     * checks the database if a job with the given parameters already exists
+     * @param run
+     * @param solverConfigId
+     * @param InstanceId
+     * @param ExperimentId
+     * @return bool
+     * @throws SQLException
+     */
+    public static boolean jobExists(int run, int solverConfigId, int InstanceId, int ExperimentId) throws SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT COUNT(*) as count FROM " + table  + " " +
+                "WHERE run=? AND SolverConfig_idSolverConfig=? AND Instances_idInstance=? AND Experiment_idExperiment=? ;");
+        st.setInt(1, run);
+        st.setInt(2, solverConfigId);
+        st.setInt(3, InstanceId);
+        st.setInt(4, ExperimentId);
+        ResultSet rs = st.executeQuery();
+        rs.next();
+        return rs.getInt("count") > 0;
+
     }
 
     

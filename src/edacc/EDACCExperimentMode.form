@@ -21,7 +21,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageExperimentPane" max="32767" attributes="0"/>
+              <Component id="manageExperimentPane" pref="1407" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -594,7 +594,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="1" attributes="0">
                               <Component id="btnGenerateJobs" alignment="1" min="-2" max="-2" attributes="0"/>
@@ -618,7 +618,9 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="1182" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="lblNumJobs" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="1115" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -643,7 +645,10 @@
                               <Component id="txtMaxSeeds" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="btnGenerateJobs" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="btnGenerateJobs" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblNumJobs" alignment="3" min="-2" pref="19" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace pref="375" max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -699,6 +704,12 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" resourceKey="txtTimeout.text"/>
                     <Property name="name" type="java.lang.String" value="txtTimeout" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="lblNumJobs">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="lblNumJobs.text"/>
+                    <Property name="name" type="java.lang.String" value="lblNumJobs" noResource="true"/>
                   </Properties>
                 </Component>
               </SubComponents>
