@@ -54,7 +54,6 @@ public class ManageDBInstances {
             File ret = jFileChooserManageDBInstance.getSelectedFile();
             RecursiveFileScanner InstanceScanner = new RecursiveFileScanner("cnf");
             Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
-            String duplicates = "";
             Vector<Instance> instances = buildTempInstances(instanceFiles);
             if (instanceFiles.isEmpty()) {
                 JOptionPane.showMessageDialog(panelManageDBInstances,
@@ -85,12 +84,12 @@ public class ManageDBInstances {
                     JOptionPane.ERROR_MESSAGE);
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "Choosen file or directory not found: " + ex.getMessage(),
+                    "Chosen file or directory not found: " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "Error reading choosen file or directory: " + ex.getMessage(),
+                    "Error reading chosen file or directory: " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }

@@ -17,34 +17,47 @@ public class SolverDAO {
 
     protected static final String table = "Solver";
     protected static final String insertQuery = "INSERT INTO " + table + " (name, binaryName, binary, description, md5, code) VALUES (?,?,?,?,?,?)";
+    protected static final String updateQuery = "UPDATE " + table + " SET name=?, binaryName=?, binary=?, description=?, md5=?, code=? WHERE md5=?";
     protected static final String removeQuery = "DELETE FROM " + table + " WHERE idSolver=?";
     private static final Hashtable<Solver, Solver> cache = new Hashtable<Solver, Solver>();
 
-    
     /**
-     * persists a (new) solver to database and assigns an id. it also ensures that
+     * persists a solver to database and assigns an id. it also ensures that
      * the solver is cached.
      * @param solver The Solver object to persist.
      */
     public static void save(Solver solver) throws SQLException, FileNotFoundException {
         PreparedStatement ps;
-        if (!solver.isNew())
-            return;
+
+        boolean alreadyInDB = false;
 
         // insert  into db
-        ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+        if (solver.isNew() && !(alreadyInDB = solverAlreadyInDB(solver) != null)) {
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+        } else {
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
+            ps.setString(6, solver.getMd5());
+        }
+
         ps.setString(1, solver.getName());
         ps.setString(2, solver.getBinaryName());
-        //TODO uncomment ps.setBinaryStream(3, new FileInputStream(solver.getBinaryFile()));
+        ps.setBinaryStream(3, new FileInputStream(solver.getBinaryFile()));
         ps.setString(4, solver.getDescription());
-        ps.setString(5, solver.getMd5());
-        //TODO uncomment ps.setBinaryStream(6, new FileInputStream(solver.getCodeFile()));
+        ps.setString(5, solver.getName()); //TODO change to getMD5()
+        if (solver.getCodeFile() != null)
+            ps.setBinaryStream(6, new FileInputStream(solver.getCodeFile()));
+        else
+            ps.setBinaryStream(6, null);
+       
         ps.executeUpdate();
 
-        // set id
-        ResultSet rs = ps.getGeneratedKeys();
-        if (rs.next())
-            solver.setId(rs.getInt(1));
+        if (solver.isNew() && !alreadyInDB) {
+            // set id
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                solver.setId(rs.getInt(1));
+            }
+        }
 
         cacheSolver(solver);
         solver.setSaved();
@@ -62,8 +75,9 @@ public class SolverDAO {
         ps.setInt(1, solver.getId());
         ps.executeUpdate();
 
-        if (cache.containsKey(solver))
+        if (cache.containsKey(solver)) {
             cache.remove(solver);
+        }
         solver.setDeleted();
     }
 
@@ -100,7 +114,7 @@ public class SolverDAO {
      * @throws SQLException
      */
     public static Solver getById(int id) throws SQLException {
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM "+table+ " WHERE idSolver=?");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idSolver=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         if (rs.next()) {
@@ -140,5 +154,35 @@ public class SolverDAO {
         }
         rs.close();
         return res;
+    }
+
+    /**
+     * Tests if a solver is already in DB (by MD5) and returns the cached object or
+     * null if solver isn't in DB.
+     * @param s
+     * @return
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     */
+    public static Solver solverAlreadyInDB(Solver s) throws NoConnectionToDBException, SQLException {
+        PreparedStatement ps;
+        final String Query = "SELECT * FROM " + table + " WHERE md5 = ?";
+        ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
+        ps.setString(1, s.getMd5());
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            Solver i = getSolverFromResultset(rs);
+
+            Solver c = getCached(i);
+            if (c != null) {
+                return c;
+            } else {
+                i.setSaved();
+                cacheSolver(i);
+                return i;
+            }
+        }
+        return null;
     }
 }

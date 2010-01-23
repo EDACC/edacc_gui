@@ -27,9 +27,10 @@ public class InstanceDAO {
      }
 
      /**
-      * Instance factory methode for an Instance which is temporary and therfor requires no
-      *  datebase item
-      * @return new Instance object
+      * Instance factory methode for an Instance which is temporary and therfore requires no
+      *  datebase item.
+      * Checks if an instance with this md5 hash is already in DB and returns null in this case.
+      * @return new Instance object or null, if instance with this hash already exists.
       */
      public static Instance createInstanceTemp(String md5) throws NoConnectionToDBException, SQLException{
         PreparedStatement ps;

@@ -147,7 +147,7 @@
                                           <Group type="102" alignment="0" attributes="1">
                                               <Component id="btnSolverAddCode" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace max="32767" attributes="0"/>
-                                              <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                                              <Component id="btnApplySolver" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                           <Component id="jScrollPane3" alignment="0" max="32767" attributes="1"/>
                                           <Component id="tfSolverName" alignment="0" min="-2" pref="274" max="-2" attributes="1"/>
@@ -189,7 +189,7 @@
                               <Component id="jlSolverCode" min="-2" max="-2" attributes="0"/>
                               <Group type="103" alignment="0" groupAlignment="3" attributes="0">
                                   <Component id="btnSolverAddCode" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnApplySolver" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -260,6 +260,9 @@
                     <Property name="text" type="java.lang.String" resourceKey="btnSolverAddBinary.text"/>
                     <Property name="name" type="java.lang.String" value="btnSolverAddBinary" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverAddBinaryActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jlSolverCode">
                   <Properties>
@@ -273,13 +276,13 @@
                     <Property name="name" type="java.lang.String" value="btnSolverAddCode" noResource="true"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JButton" name="jButton1">
+                <Component class="javax.swing.JButton" name="btnApplySolver">
                   <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="addSolver.text"/>
-                    <Property name="name" type="java.lang.String" value="addSolver" noResource="true"/>
+                    <Property name="text" type="java.lang.String" resourceKey="btnApplySolver.text"/>
+                    <Property name="name" type="java.lang.String" value="btnApplySolver" noResource="true"/>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAddSolverActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnApplySolverActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>
@@ -298,6 +301,9 @@
                 <Property name="text" type="java.lang.String" resourceKey="btnNew.text"/>
                 <Property name="name" type="java.lang.String" value="btnNew" noResource="true"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverNewActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnSolverDelete">
               <Properties>
