@@ -20,6 +20,7 @@ import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import java.sql.SQLException;
+import java.util.Vector;
 import javax.swing.border.TitledBorder;
 import org.jdesktop.application.Action;
 
@@ -72,7 +73,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             border.setTitle(title + " (" + number + ")");
         }
     }
-
+    
     /**
      * Assigns all parameter values/selections from entry.
      * @param entry
@@ -111,12 +112,14 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
      * @throws SQLException
      */
     public void saveParameterInstances() throws SQLException {
+        Vector<ParameterInstance> parameterVector = new Vector<ParameterInstance>();
         for (int i = 0; i < solverConfigEntryTableModel.getRowCount(); i++) {
             if ((Boolean) solverConfigEntryTableModel.getValueAt(i, 4)) {
                 Parameter p = (Parameter) solverConfigEntryTableModel.getValueAt(i, 5);
                 ParameterInstance pi = (ParameterInstance) solverConfigEntryTableModel.getValueAt(i, 6);
                 if (pi == null) {
                     pi = ParameterInstanceDAO.createParameterInstance(p.getId(), solverConfiguration.getId(), (String) solverConfigEntryTableModel.getValueAt(i, 2));
+                    parameterVector.add(pi);
                 }
                 if (!pi.getValue().equals((String) solverConfigEntryTableModel.getValueAt(i, 2))) {
                     pi.setValue((String) solverConfigEntryTableModel.getValueAt(i, 2));
@@ -125,6 +128,8 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                 }
             }
         }
+        if (parameterVector.size() > 0)
+            solverConfigEntryTableModel.setParameterInstances(parameterVector);
     }
 
     /** This method is called from within the constructor to
