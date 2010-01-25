@@ -19,7 +19,8 @@ public class SolverConfigurationDAO {
 
     private static final String table = "SolverConfig";
     private static final String deleteQuery = "DELETE FROM " + table + " WHERE idSolverConfig=?";
-    private static final String insertQuery = "INSERT INTO " + table + " (Solver_IdSolver, Experiment_IdExperiment) VALUES (?,?)";
+    private static final String insertQuery = "INSERT INTO " + table + " (Solver_IdSolver, Experiment_IdExperiment, seed_group) VALUES (?,?,?)";
+    private static final String updateQuery = "UPDATE " + table + " SET seed_group=? WHERE idSolverConfig=?";
     private static final Hashtable<SolverConfiguration, SolverConfiguration> cache = new Hashtable<SolverConfiguration, SolverConfiguration>();
 
     private static SolverConfiguration getSolverConfigurationFromResultset(ResultSet rs) throws SQLException {
@@ -27,6 +28,7 @@ public class SolverConfigurationDAO {
         i.setExperiment_id(rs.getInt("Experiment_idExperiment"));
         i.setSolver_id(rs.getInt("Solver_IdSolver"));
         i.setId(rs.getInt("IdSolverConfig"));
+        i.setSeed_group(rs.getInt("seed_group"));
         return i;
     }
 
@@ -56,11 +58,19 @@ public class SolverConfigurationDAO {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             st.setInt(1, i.getSolver_id());
             st.setInt(2, i.getExperiment_id());
+            st.setInt(3, i.getSeed_group());
             st.executeUpdate();
             ResultSet generatedKeys = st.getGeneratedKeys();
             if (generatedKeys.next()) {
                 i.setId(generatedKeys.getInt(1));
             }
+            i.setSaved();
+        }
+        else if (i.isModified()) {
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
+            st.setInt(1, i.getSeed_group());
+            st.setInt(2, i.getId());
+            st.executeUpdate();
             i.setSaved();
         }
     }
@@ -73,10 +83,11 @@ public class SolverConfigurationDAO {
         solverConfig.setDeleted();
     }
 
-    public static SolverConfiguration createSolverConfiguration(int solverId, int experimentId) throws SQLException {
+    public static SolverConfiguration createSolverConfiguration(int solverId, int experimentId, int seed_group) throws SQLException {
         SolverConfiguration i = new SolverConfiguration();
         i.setSolver_id(solverId);
         i.setExperiment_id(experimentId);
+        i.setSeed_group(seed_group);
         save(i);
         cacheSolverConfiguration(i);
         return i;
