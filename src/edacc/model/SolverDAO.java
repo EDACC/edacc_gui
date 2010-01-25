@@ -1,5 +1,6 @@
 package edacc.model;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.sql.PreparedStatement;
@@ -16,8 +17,8 @@ import java.util.LinkedList;
 public class SolverDAO {
 
     protected static final String table = "Solver";
-    protected static final String insertQuery = "INSERT INTO " + table + " (name, binaryName, binary, description, md5, code) VALUES (?,?,?,?,?,?)";
-    protected static final String updateQuery = "UPDATE " + table + " SET name=?, binaryName=?, binary=?, description=?, md5=?, code=? WHERE md5=?";
+    protected static final String insertQuery = "INSERT INTO " + table + " (`name`, `binaryName`, `binary`, `description`, `md5`, `code`) VALUES (?, ?, ?, ?, ?, ?)";
+    protected static final String updateQuery = "UPDATE " + table + " SET `name`=?, `binaryName`=?, `binary`=?, `description`=?, `md5`=?, `code`=? WHERE `md5`=?";
     protected static final String removeQuery = "DELETE FROM " + table + " WHERE idSolver=?";
     private static final Hashtable<Solver, Solver> cache = new Hashtable<Solver, Solver>();
 
@@ -36,19 +37,18 @@ public class SolverDAO {
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
         } else {
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
-            ps.setString(6, solver.getMd5());
+            ps.setString(7, solver.getMd5());
         }
 
         ps.setString(1, solver.getName());
         ps.setString(2, solver.getBinaryName());
         ps.setBinaryStream(3, new FileInputStream(solver.getBinaryFile()));
         ps.setString(4, solver.getDescription());
-        ps.setString(5, solver.getName()); //TODO change to getMD5()
+        ps.setString(5, solver.getMd5());
         if (solver.getCodeFile() != null)
             ps.setBinaryStream(6, new FileInputStream(solver.getCodeFile()));
         else
             ps.setBinaryStream(6, null);
-       
         ps.executeUpdate();
 
         if (solver.isNew() && !alreadyInDB) {
