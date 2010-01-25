@@ -131,6 +131,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                 if (pi != null) {
                     ParameterInstanceDAO.setDeleted(pi);
                     ParameterInstanceDAO.save(pi);
+                    solverConfigEntryTableModel.removeParameterInstance(pi);
                 }
             }
         }
