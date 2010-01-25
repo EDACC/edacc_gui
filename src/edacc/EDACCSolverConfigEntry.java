@@ -126,6 +126,12 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                     ParameterInstanceDAO.setModified(pi);
                     ParameterInstanceDAO.save(pi);
                 }
+            } else {
+                ParameterInstance pi = (ParameterInstance) solverConfigEntryTableModel.getValueAt(i, 6);
+                if (pi != null) {
+                    ParameterInstanceDAO.setDeleted(pi);
+                    ParameterInstanceDAO.save(pi);
+                }
             }
         }
         if (parameterVector.size() > 0)
