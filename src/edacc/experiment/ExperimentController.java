@@ -7,6 +7,7 @@ import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentHasInstance;
 import edacc.model.ExperimentHasInstanceDAO;
+import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
@@ -218,16 +219,18 @@ public class ExperimentController {
 
         int experiments_added = 0;
 
+        Vector<ExperimentResult> experiment_results = new Vector<ExperimentResult>();
+
         // cartesian product
         for (Instance i: listInstances) {
             for (SolverConfiguration c: vsc) {
                 for (int run = 0; run < numRuns; ++run) {
                     if (ExperimentResultDAO.jobExists(run, c.getId(), i.getId(), activeExperiment.getId()) == false) { // skip jobs that already exist
                         if (generateSeeds && linkSeeds) {
-                            ExperimentResultDAO.createExperimentResult(run, 0, linked_seeds.get(new Integer(c.getSeed_group())), "", 0, 0, c.getId(), activeExperiment.getId(), i.getId());
+                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, linked_seeds.get(new Integer(c.getSeed_group())), "", 0, 0, c.getId(), activeExperiment.getId(), i.getId()));
                         }
                         else {
-                            ExperimentResultDAO.createExperimentResult(run, 0, seed, "", 0, 0, c.getId(), activeExperiment.getId(), i.getId());
+                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, seed, "", 0, 0, c.getId(), activeExperiment.getId(), i.getId()));
                         }
                         experiments_added++;
                     }
@@ -235,8 +238,8 @@ public class ExperimentController {
                 
             }
         }
+        ExperimentResultDAO.batchSave(experiment_results);
 
-        ExperimentResultDAO.clearCache();
         return experiments_added;
     }
 
