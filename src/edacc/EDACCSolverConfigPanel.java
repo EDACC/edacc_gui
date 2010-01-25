@@ -93,6 +93,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
      */
     public void replicateEntry(EDACCSolverConfigEntry entry) throws SQLException {
         EDACCSolverConfigEntry repl = new EDACCSolverConfigEntry(SolverDAO.getById(entry.getSolverId()));
+        repl.getSeedGroup().setText(entry.getSeedGroup().getText());
         repl.setParent(this);
         repl.assign(entry);
         GridBagConstraints c = layout.getConstraints(entry);

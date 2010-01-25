@@ -29,7 +29,7 @@ public class ExperimentResult extends BaseModel{
 
     @Override
     public int hashCode() {
-        return 31 + id;
+        return 31 + 3 * id;
     }
 
     @Override

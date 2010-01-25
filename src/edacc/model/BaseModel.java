@@ -16,19 +16,19 @@ abstract class BaseModel {
         persistenceState = PersistenceState.NEW;
     }
 
-    protected void setNew() {
+    public void setNew() {
         this.persistenceState = PersistenceState.NEW;
     }
 
-    protected void setModified() {
+    public void setModified() {
         this.persistenceState = PersistenceState.MODIFIED;
     }
 
-    protected void setSaved() {
+    public void setSaved() {
         this.persistenceState = PersistenceState.SAVED;
     }
 
-    protected void setDeleted() {
+    public void setDeleted() {
         this.persistenceState = PersistenceState.DELETED;
     }
 
