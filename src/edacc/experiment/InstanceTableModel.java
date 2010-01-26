@@ -38,11 +38,12 @@ public class InstanceTableModel extends AbstractTableModel {
             for (int j = 0; j < instances.size(); j++) {
                 if (instances.get(j).getId() == experimentHasInstances.get(i).getInstances_id()) {
                     this.experimentHasInstances[j] = experimentHasInstances.get(i);
-                    this.selected[i] = true;
+                    this.selected[j] = true;
                     break;
                 }
             }
         }
+        this.fireTableDataChanged();
     }
 
     public void setExperimentHasInstance(ExperimentHasInstance e, int row) {

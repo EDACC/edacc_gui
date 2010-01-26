@@ -69,6 +69,9 @@ public class ParameterInstanceDAO {
         }
     }
 
+    public static void setDeleted(ParameterInstance i) {
+        i.setDeleted();
+    }
     public static void removeParameterInstance(ParameterInstance param) throws SQLException {
         param.setDeleted();
         save(param);

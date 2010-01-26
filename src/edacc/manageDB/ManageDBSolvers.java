@@ -10,8 +10,11 @@ import edacc.model.Solver;
 import edacc.model.SolverDAO;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Vector;
+import sun.awt.geom.AreaOp.CAGOp;
 
 /**
  *
@@ -45,8 +48,9 @@ public class ManageDBSolvers {
      * @throws SQLException
      * @throws FileNotFoundException
      */
-    public void saveSolvers() throws SQLException, FileNotFoundException {
+    public void saveSolvers() throws SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException {
         for (Solver s : solverTableModel.getSolvers()) {
+            s.setMd5(Util.calculateMD5(s.getBinaryFile()));
             SolverDAO.save(s);
         }
 

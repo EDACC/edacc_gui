@@ -55,6 +55,14 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
         this.fireTableDataChanged();
     }
 
+    public void removeParameterInstance(ParameterInstance pi) {
+        for (int i = 0; i < parameterInstances.length; i++) {
+            if (parameterInstances[i] == pi) {
+                parameterInstances[i] = null;
+            }
+        }
+    }
+
     public int getRowCount() {
         return parameters.length;
     }
@@ -75,16 +83,22 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int col) {
-        if (col == 4 || col == 2) return true;
+        if (col == 4 || col == 2) {
+            return true;
+        }
         return false;
     }
 
     @Override
     public void setValueAt(Object value, int row, int col) {
-        if (col == 4) selected[row] = (Boolean)value;
-        else if (col == 2) values[row] = (String)value;
+        if (col == 4) {
+            selected[row] = (Boolean) value;
+        } else if (col == 2) {
+            values[row] = (String) value;
+        }
         fireTableCellUpdated(row, col);
     }
+
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
             case 0:

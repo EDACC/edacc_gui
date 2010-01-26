@@ -47,6 +47,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         this(SolverDAO.getById(solverConfiguration.getSolver_id()));
         this.solverConfiguration = solverConfiguration;
         solverConfigEntryTableModel.setParameterInstances(SolverConfigurationDAO.getSolverConfigurationParameters(solverConfiguration));
+        txtSeedGroup.setText(String.valueOf(solverConfiguration.getSeed_group()));
     }
 
     /**
@@ -107,6 +108,10 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         this.parent = parent;
     }
 
+    public javax.swing.JTextField getSeedGroup() {
+        return txtSeedGroup;
+    }
+
     /**
      * Saves all new and modified parameter instances to the database.
      * @throws SQLException
@@ -125,6 +130,13 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                     pi.setValue((String) solverConfigEntryTableModel.getValueAt(i, 2));
                     ParameterInstanceDAO.setModified(pi);
                     ParameterInstanceDAO.save(pi);
+                }
+            } else {
+                ParameterInstance pi = (ParameterInstance) solverConfigEntryTableModel.getValueAt(i, 6);
+                if (pi != null) {
+                    ParameterInstanceDAO.setDeleted(pi);
+                    ParameterInstanceDAO.save(pi);
+                    solverConfigEntryTableModel.removeParameterInstance(pi);
                 }
             }
         }
@@ -145,6 +157,8 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         btnRemove = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         parameterTable = new javax.swing.JTable();
+        lblSeedGroup = new javax.swing.JLabel();
+        txtSeedGroup = new javax.swing.JTextField();
 
         setName("Form"); // NOI18N
 
@@ -165,6 +179,12 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         parameterTable.setName("solverParameters"); // NOI18N
         jScrollPane2.setViewportView(parameterTable);
 
+        lblSeedGroup.setText(resourceMap.getString("lblSeedGroup.text")); // NOI18N
+        lblSeedGroup.setName("lblSeedGroup"); // NOI18N
+
+        txtSeedGroup.setText(resourceMap.getString("txtSeedGroup.text")); // NOI18N
+        txtSeedGroup.setName("txtSeedGroup"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -174,11 +194,15 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(btnReplicate)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 323, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblSeedGroup)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtSeedGroup, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 198, Short.MAX_VALUE)
                         .addComponent(btnRemove))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 485, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -189,7 +213,9 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRemove)
-                    .addComponent(btnReplicate))
+                    .addComponent(btnReplicate)
+                    .addComponent(lblSeedGroup)
+                    .addComponent(txtSeedGroup, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -211,6 +237,8 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     private javax.swing.JButton btnRemove;
     private javax.swing.JButton btnReplicate;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblSeedGroup;
     private javax.swing.JTable parameterTable;
+    private javax.swing.JTextField txtSeedGroup;
     // End of variables declaration//GEN-END:variables
 }

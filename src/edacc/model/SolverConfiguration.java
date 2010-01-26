@@ -4,6 +4,15 @@ public class SolverConfiguration extends BaseModel {
     private int solver_id;
     private int experiment_id;
     private int id;
+    private int seed_group;
+
+    public int getSeed_group() {
+        return seed_group;
+    }
+
+    public void setSeed_group(int seed_group) {
+        this.seed_group = seed_group;
+    }
 
     public int getExperiment_id() {
         return experiment_id;
