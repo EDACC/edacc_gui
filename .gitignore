@@ -1,4 +1,7 @@
 nbproject
 build
-
-
+.metadata
+*.swp
+*~
+*.o
+main.sess

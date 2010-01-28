@@ -1,0 +1,34 @@
+CC=gcc
+CFLAGS=-O2 -W -Wall -Wextra
+
+all: client
+
+clean:
+	rm -f *.o
+	rm -f *~
+	rm -f client
+
+client: client.o log.o signals.o database.o configuration.o dbmgr.o
+	$(CC) $(CFLAGS) *.o -o client `mysql_config --cflags` `mysql_config --libs`
+
+client.o: client.c global.h log.h signals.h database.h
+	$(CC) $(CFLAGS) -c $<
+
+log.o: log.c log.h
+	$(CC) $(CFLAGS) -c $<
+
+signals.o: signals.c signals.h global.h log.h
+	$(CC) $(CFLAGS) -c $<
+
+database.o: database.c database.h global.h log.h
+	$(CC) $(CFLAGS) -c $<
+
+configuration.o: configuration.c configuration.h
+	$(CC) $(CFLAGS) -c $<
+
+dbmrg.o: dbmrg.c dbmrg.h
+	$(CC) $(CFLAGS) -c $<
+
+
+.PHONY: all clean
+
