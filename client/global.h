@@ -41,8 +41,8 @@ typedef struct {
 } experiment;
 
 typedef struct {
-	//Needed for the process handling
-	pid_t pid;
+    //Needed for the process handling
+    pid_t pid;
     // identifies the row in the result table
     int id;
     //int idJob;

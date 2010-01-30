@@ -95,12 +95,7 @@ solver *getSolver(int id, solvers **s) {
     return NULL;
 }
 
-
-status dbFetchExperimentData(
-        int *numRuns,
-        int *timeOut,
-        int *numNodes,
-        instance **in) {
+status dbFetchExperimentData(experiment *e) {
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;

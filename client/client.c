@@ -13,17 +13,31 @@
 #include <signal.h>
 
 
+//The path of the shellscript we're using to execute a solver run
+//and an array for storing it's arguments
 const char* const jobScript="jobScript.sh";
+char* const jobScriptArgs[5]={NULL, NULL, NULL, NULL, NULL};
 
 //An array for keeping track of the jobs we're currently processing
 job* jobs;
 int jobsLen;
 
+//The timeout in seconds for each solver run
+int timeOut;
+
 
 status init() {
-	//TODO: jobsLen should be the number of cores read from the database.
-	jobsLen=5;
-	dbFetchExpInfo();
+	experiment exp;
+	status s;
+
+	s=dbFetchExperimentData(&exp);
+	if(s!=success)
+		return s;
+	jobsLen=e.numNodes;
+	timeOut=e.timeOut;
+
+	//TODO: Create the solver binaries and instance files, verify the md5 sums
+
 	jobs=calloc(jobsLen, sizeof(job));
 	if(jobs==NULL) {
 		return sysError;
@@ -150,7 +164,7 @@ int main() {
 	job* j;
 	pid_t pid;
 
-    read_config();
+	read_config();
 
 	s=init();
 	if(s!=success) {
@@ -182,17 +196,17 @@ int main() {
 				logError("Error in fork(): %s\n", strerror(errno));
 				shutdown(sysError);
 			} else if(pid==0) {
-				//This is the child process
+				//This is the child process.
+				deferSignals(); //Disable the inherited signal handler.
 				s=updateRunning(j);
+				//TODO: Set up the jobScriptArgs array
 				if(s==success) {
-					if(execve(jobScript, NULL, NULL)==-1) {
+					if(execve(jobScript, jobScriptArgs, NULL)==-1) {
 						logError("Error in execve(): %s\n", strerror(errno));
 						s=sysError;
 					}
 				}
-				//Something is seriously wrong. Disable the inherited signal handler
-				//and send the father process a signal indicating the error.
-				deferSignals();
+				//Something is seriously wrong. Send the father process a signal indicating the error.
 				updateError(j);
 				if(s==sysError) {
 					if(kill(getppid(), SIGUSR1)!=0) {
