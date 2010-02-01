@@ -11,7 +11,7 @@ clean:
 client: client.o log.o signals.o database.o configuration.o dbmgr.o
 	$(CC) $(CFLAGS) *.o -o client `mysql_config --cflags` `mysql_config --libs`
 
-client.o: client.c global.h log.h signals.h database.h
+client.o: client.c global.h log.h signals.h database.h configuration.h
 	$(CC) $(CFLAGS) -c $<
 
 log.o: log.c log.h

@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
@@ -26,22 +27,97 @@ int jobsLen;
 int timeOut;
 
 
+status md5Compare(FILE* f, const char* fileName, const char* md5) {
+/*
+	MD5_CTX mdContext;
+	int bytes, i, j;
+	unsigned char data[1024];
+
+	//Calculate the md5sum of f
+	MD5Init(&mdContext);
+	while((bytes = fread(data, 1, 1024, f)) != 0)
+		MD5Update (&mdContext, data, bytes);
+	MD5Final(&mdContext);
+
+	//Compare the md5sum to md5
+	for(i=0; i<16; ++i) {
+		if(mdContext->digest[i] != md5[i]) {
+			logError("The md5 sum of %s is ", fileName);
+			for(j=0; j<16; ++j)
+				logError("%02x", mdContext->digest[i]);
+			logError(". According to the database, the value should be ");
+			for(j=0; j<16; ++j)
+				logError("%02x", md5[i]);
+			return sysError;
+		}
+	}
+*/
+	return success;
+}
+
 status init() {
 	experiment exp;
 	status s;
+	FILE* dst;
+	char instanceName[20];
+	int i;
 
 	s=dbFetchExperimentData(&exp);
 	if(s!=success)
 		return s;
-	jobsLen=e.numNodes;
-	timeOut=e.timeOut;
+	jobsLen=exp.numNodes;
+	timeOut=exp.timeOut;
 
-	//TODO: Create the solver binaries and instance files, verify the md5 sums
+	for(i=0; i<exp.numSolvers; ++i) {
+		//Create the solver binary
+		dst=fopen(exp.solverNames[i], "w+");
+		if(dst==NULL) {
+			logError("Error in fopen(): %s\n", strerror(errno));
+			return sysError;
+		}
+		fwrite(exp.solvers[i], sizeof(char), exp.lengthSolver[i], dst);
+		//Verify the md5 sum
+		rewind(dst);
+		if(md5Compare(dst, exp.solverNames[i], exp.md5Solvers[i])!=success) {
+			fclose(dst);
+			return sysError;
+		}
+		fclose(dst);
+		//Assure the binary is executable
+		if(chmod(exp.solverNames[i], 0111)==-1) {
+			logError("Error in chmod(): %s\n", strerror(errno));
+			return sysError;
+		}
+	}
+
+	for(i=0; i<exp.numInstances; ++i) {
+		//Create the instance file
+		snprintf(instanceName, 20, "%d.cnf", exp.idInstances[i]);
+		dst=fopen(instanceName, "w+");
+		if(dst==NULL) {
+			logError("Error in fopen(): %s\n", strerror(errno));
+			return sysError;
+		}
+		fprintf(dst, "%s", exp.instances[i]);
+		//Verify the md5 sum
+		rewind(dst);
+		if(md5Compare(dst, instanceName, exp.md5Instances[i])!=success) {
+			fclose(dst);
+			return sysError;
+		}
+		fclose(dst);
+		//Assure the file is readable
+		if(chmod(instanceName, 0444)==-1) {
+			logError("Error in chmod(): %s\n", strerror(errno));
+			return sysError;
+		}
+	}
 
 	jobs=calloc(jobsLen, sizeof(job));
 	if(jobs==NULL) {
 		return sysError;
 	}
+
 	return success;
 }
 
