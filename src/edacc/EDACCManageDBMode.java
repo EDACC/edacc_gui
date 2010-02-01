@@ -15,9 +15,9 @@ import edacc.manageDB.*;
 import edacc.model.Solver;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
@@ -744,7 +744,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
     private void btnSolverSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverSaveActionPerformed
         try {
-            manageDBSolvers.saveSolvers();
+           manageDBSolvers.saveSolvers();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
                 "Solvers cannot be saved. There is a problem with the Database: " + ex.getMessage(),
@@ -753,6 +753,16 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
                 "Solvers cannot be saved because a file couldn't be found: " + ex.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                "Solvers cannot be saved because an I/O-Exception occured: " + ex.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        } catch (NoSuchAlgorithmException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                "Solvers cannot be saved because an error occured while calculating md5 sum: " + ex.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
         }
