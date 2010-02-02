@@ -6,6 +6,8 @@
 package edacc.manageDB;
 
 import edacc.model.Parameter;
+import edacc.model.Solver;
+import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 
@@ -17,24 +19,37 @@ public class ParameterTableModel extends AbstractTableModel{
     private final int ORDER = 0;
     private final int NAME = 1;
     private final int PREFIX = 2;
+    private Solver currentSolver;
 
     private String[] colums = {"Order", "Name", "Prefix"};
-    private Vector<Parameter> parameters;
+    private HashMap<Solver, Vector<Parameter>> parameters;
 
     public ParameterTableModel(){
-        parameters = new Vector<Parameter>();
+        parameters = new HashMap<Solver, Vector<Parameter>>();
     }
 
-    public void removeParameter(Vector<Parameter> params){
-        parameters.removeAll(params);
-    }
+    /**
+     * Sets the current solver the user has chosen.
+     * @param solver
+     */
+    public void setCurrentSolver(Solver solver) {
+        this.currentSolver = solver;
+        Vector<Parameter> params = parameters.get(solver);
+        if (params == null) {
+            params = new Vector<Parameter>();
+            parameters.put(solver, params);
+        }
 
+    }
+    
     public void remove(Parameter param){
-        parameters.remove(param);
+        parameters.get(currentSolver).remove(param);
     }
 
     public int getRowCount() {
-        return parameters.size();
+        if (currentSolver == null)
+            return 0;
+        return parameters.get(currentSolver).size();
     }
 
     public int getColumnCount() {
@@ -47,7 +62,7 @@ public class ParameterTableModel extends AbstractTableModel{
     }
 
     public Object getValueAt(int rowIndex, int columIndex) {
-        Parameter p = parameters.get(rowIndex);
+        Parameter p = parameters.get(currentSolver).get(rowIndex);
         switch(columIndex){
             case ORDER:
                 return p.getOrder();
@@ -59,17 +74,54 @@ public class ParameterTableModel extends AbstractTableModel{
         return null;
     }
 
-    public void addParameter(Parameter param){
-        parameters.add(param);
+    /**
+     * Adds a parameter for the current solver. If no current solver is specified,
+     * this method will do nothing!
+     * @param param
+     */
+    public void addParameter(Parameter param) {
+        if (currentSolver == null)
+            return;
+        addParameter(currentSolver, param);
     }
 
-    public Vector<Parameter> getParamters(){
-        return (Vector<Parameter>) parameters.clone();
+    /**
+     * Adds a parameter for a solver.
+     * @param solver
+     * @param param
+     */
+    public void addParameter(Solver solver, Parameter param){
+        Vector<Parameter> params = parameters.get(solver);
+        if (params == null) {
+            params = new Vector<Parameter>();
+            parameters.put(solver, params);
+        }
+
+        params.add(param);
+    }
+
+    /**
+     * returns all parameters of a solver.
+     * @param s
+     * @return
+     */
+    public Vector<Parameter> getParamtersOfSolver(Solver s){
+        return (Vector<Parameter>) parameters.get(s).clone();
+    }
+
+    /**
+     * returns all parameters of the current solver.
+     * @return
+     */
+    public Vector<Parameter> getParamtersOfCurrentSolver(){
+        if (currentSolver == null)
+            return null;
+        return getParamtersOfSolver(currentSolver);
     }
 
     public Parameter getParameter(int rowIndex){
         if(rowIndex >= 0 && rowIndex < parameters.size())
-            return parameters.get(rowIndex);
+            return parameters.get(currentSolver).get(rowIndex);
         else
             return null;
     }

@@ -12,6 +12,7 @@ package edacc;
 
 
 import edacc.manageDB.*;
+import edacc.model.Parameter;
 import edacc.model.Solver;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,18 +38,29 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
      private ManageDBSolvers manageDBSolvers;
      private SolverTableModel solverTableModel;
 
+     private ManageDBParameters manageDBParameters;
+     private ParameterTableModel parameterTableModel;
+
      public EDACCManageDBMode(){
         initComponents();
+
+        // initialize instance table
         manageDBInstances = new ManageDBInstances(this, panelManageDBInstances, jFileChooserManageDBInstance );
         instanceTableModel = new InstanceTableModel();
         tableInstances.setModel(instanceTableModel);
         sorter = new TableRowSorter<InstanceTableModel>(instanceTableModel);
 
+        // initialize solver table
         solverTableModel = new SolverTableModel();
         manageDBSolvers = new ManageDBSolvers(this, solverTableModel);
         tableSolver.setModel(solverTableModel);
         tableSolver.getSelectionModel().addListSelectionListener(new SolverTableSelectionListener(tableSolver, manageDBSolvers));
         showSolverDetails(null);
+
+        // initialize parameter table
+        parameterTableModel = new ParameterTableModel();
+        manageDBParameters = new ManageDBParameters(this, parameterTableModel);
+        tableParameters.setModel(parameterTableModel);
      }
 
      public void addDocumentListener(javax.swing.JTextField tf){
@@ -322,6 +334,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
         btnParametersNew.setText(resourceMap.getString("btnParametersNew.text")); // NOI18N
         btnParametersNew.setName("btnParametersNew"); // NOI18N
+        btnParametersNew.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnParametersNewActionPerformed(evt);
+            }
+        });
 
         btnParametersDelete.setText(resourceMap.getString("btnParametersDelete.text")); // NOI18N
         btnParametersDelete.setName("btnParametersDelete"); // NOI18N
@@ -784,12 +801,19 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                 manageDBSolvers.addSolverBinary(fc.getSelectedFile());
     }//GEN-LAST:event_btnSolverAddBinaryActionPerformed
 
+    private void btnParametersNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnParametersNewActionPerformed
+        manageDBParameters.newParam();
+        tableParameters.updateUI();
+    }//GEN-LAST:event_btnParametersNewActionPerformed
+
     public void showSolverDetails(Solver currentSolver) {
         boolean enabled = false;
         if (currentSolver != null) {
             enabled = true;
             tfSolverName.setText(currentSolver.getName());
             taSolverDescription.setText(currentSolver.getDescription());
+            manageDBParameters.setCurrentSolver(currentSolver);
+            tableParameters.updateUI();
         }
         jlSolverName.setEnabled(enabled);
         jlSolverDescription.setEnabled(enabled);
@@ -800,6 +824,16 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         btnSolverAddBinary.setEnabled(enabled);
         btnSolverAddCode.setEnabled(enabled);
         btnApplySolver.setEnabled(enabled);
+    }
+
+    public void showParameterDetails(Parameter currentParameter) {
+        boolean enabled = false;
+        if (currentParameter != null) {
+            enabled = true;
+            tfParametersName.setText(currentParameter.getName());
+            tfParametersOrder.setText(Integer.toString(currentParameter.getOrder()));
+            tfParametersPrefix.setText(currentParameter.getPrefix());
+        }
     }
 
     private void clearFilter(){
@@ -869,4 +903,5 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private javax.swing.JTextField tfParametersPrefix;
     private javax.swing.JTextField tfSolverName;
     // End of variables declaration//GEN-END:variables
+
 }

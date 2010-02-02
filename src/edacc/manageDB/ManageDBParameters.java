@@ -19,18 +19,33 @@ import java.sql.SQLException;
 public class ManageDBParameters {
 
     private EDACCManageDBMode gui;
-    private ParameterTableModel parmeterTableModel;
-    private Parameter currentParam;
+    private ParameterTableModel parameterTableModel;
+    private Parameter currentParameter;
 
 
     public ManageDBParameters(EDACCManageDBMode gui, ParameterTableModel parameterTableModel){
         this.gui = gui;
-        this.parmeterTableModel = parameterTableModel;
+        this.parameterTableModel = parameterTableModel;
     }
 
     public void saveParameters(Solver s) throws NoConnectionToDBException, SQLException{
-        for(Parameter p : parmeterTableModel.getParamters()){
+        for(Parameter p : parameterTableModel.getParamtersOfSolver(s)){
             ParameterDAO.saveParameterForSolver(s, p);
+        }
+    }
+
+    public void newParam() {
+        parameterTableModel.addParameter(new Parameter());
+    }
+
+    public void setCurrentSolver(Solver currentSolver) {
+        parameterTableModel.setCurrentSolver(currentSolver);
+    }
+
+    void showParameter(int index) {
+        currentParameter = parameterTableModel.getParameter(index);
+        if (currentParameter != null) {
+            gui.showParameterDetails(currentParameter);
         }
     }
 
