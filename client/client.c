@@ -8,15 +8,17 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <stdio.h>
 
 
 //The path of the shellscript we're using to execute a solver run
 //and an array for storing it's arguments
 const char* const jobScript="jobScript.sh";
-char* const jobScriptArgs[5]={NULL, NULL, NULL, NULL, NULL};
+char* jobScriptArgs[6]={NULL, NULL, NULL, NULL, NULL, NULL};
 
 //An array for keeping track of the jobs we're currently processing
 job* jobs;
@@ -29,19 +31,110 @@ int timeOut;
 status init() {
 	experiment exp;
 	status s;
+	const char* const md5FileName="md5sums.txt";
+	const char* const md5CheckScript="md5check.sh";
+	const char* const md5CheckScriptArgs[3]={md5CheckScript, md5FileName, NULL};
+	FILE* dst;
+	FILE* md5File;
+	char instanceName[20];
+	pid_t pid;
+	int i, retval;
 
 	s=dbFetchExperimentData(&exp);
 	if(s!=success)
 		return s;
-	jobsLen=e.numNodes;
-	timeOut=e.timeOut;
+	jobsLen=exp.numNodes;
+	timeOut=exp.timeOut;
 
-	//TODO: Create the solver binaries and instance files, verify the md5 sums
+	//Create a file for saving the md5sums and names of the solver binaries
+	//and the instance files as we receive them from the database.
+	md5File=fopen(md5FileName, "w+");
+	if(md5File==NULL) {
+		logError("Error in fopen(): %s\n", strerror(errno));
+		return sysError;
+	}
+
+	for(i=0; i<exp.numSolvers; ++i) {
+		//Create the solver binary
+		dst=fopen(exp.solverNames[i], "w+");
+		if(dst==NULL) {
+			logError("Error in fopen(): %s\n", strerror(errno));
+			return sysError;
+		}
+		fwrite(exp.solvers[i], sizeof(char), exp.lengthSolver[i], dst);
+		//There's no need to check for errors in fwrite here. If something goes wrong,
+		//we'll get an error in the md5 check anyway.
+		fclose(dst);
+
+		//Assure the binary is executable
+		if(chmod(exp.solverNames[i], 0111)==-1) {
+			logError("Error in chmod(): %s\n", strerror(errno));
+			return sysError;
+		}
+
+		//Write the md5sum and file name of the solver binary to md5file
+		if(fprintf(md5File, "%s  %s\n", exp.md5Solvers[i], exp.solverNames[i])<0) {
+			logError("Unable to write to %s\n", md5FileName);
+			return sysError;
+		}
+	}
+
+	for(i=0; i<exp.numInstances; ++i) {
+		//Create the instance file
+		snprintf(instanceName, 20, "%d.cnf", exp.idInstances[i]);
+		dst=fopen(instanceName, "w+");
+		if(dst==NULL) {
+			logError("Error in fopen(): %s\n", strerror(errno));
+			return sysError;
+		}
+		fprintf(dst, "%s", exp.instances[i]);
+		//There's no need to check for errors in fprintf here. If something goes wrong,
+		//we'll get an error in the md5 check anyway.
+		fclose(dst);
+
+		//Assure the file is readable
+		if(chmod(instanceName, 0444)==-1) {
+			logError("Error in chmod(): %s\n", strerror(errno));
+			return sysError;
+		}
+
+		//Write the md5sum and file name of the instance file to md5file
+		if(fprintf(md5File, "%s  %s\n", exp.md5Instances[i], instanceName)<0) {
+			logError("Unable to write to %s\n", md5FileName);
+			return sysError;
+		}
+	}
+	fclose(md5File);
+
+	//Verify the md5sums of the solver binaries and instance files agains the contents of md5file
+	pid=fork();
+	if(pid==-1) {
+		logError("Error in fork(): %s\n", strerror(errno));
+		return sysError;
+	} else if(pid==0) {
+		//This is the child process. Run the local md5sum program to verify the md5 sums.
+		if(execve(md5CheckScript, md5CheckScriptArgs, NULL)==-1) {
+			logError("Error in execve(): %s\n", strerror(errno));
+			return sysError;
+		}
+	}
+	//This is the parent process. Wait for the md5sum check and interpret the return value.
+	pid=wait(&retval);
+	if(pid==-1){
+		logError("Error in wait(): %s\n", strerror(errno));
+		return sysError;
+	}
+	if(retval!=0) {
+		logError("The md5 sums of the local files don't match the values from the database\n");
+		return sysError;
+	}
+	remove(md5FileName);
 
 	jobs=calloc(jobsLen, sizeof(job));
 	if(jobs==NULL) {
 		return sysError;
 	}
+
 	return success;
 }
 

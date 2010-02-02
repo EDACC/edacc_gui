@@ -21,7 +21,7 @@ char host[VALUELENGTH];
 char username[VALUELENGTH];
 char password[VALUELENGTH];
 char database[VALUELENGTH];
-int experiment;
+//int experiment;
 
 typedef enum {success=0, sysError, dbError} status;
 
@@ -34,10 +34,12 @@ typedef struct {
     //int *lengthInstance;
     char **md5Instances;
     char **instances;
+    int *idInstances;
     int numSolvers;
     int *lengthSolver;
     char **md5Solvers;
     char **solvers;
+    char **solverNames;
 } experiment;
 
 typedef struct {
