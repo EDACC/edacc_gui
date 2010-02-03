@@ -24,19 +24,31 @@ char* jobScriptArgs[6]={NULL, NULL, NULL, NULL, NULL, NULL};
 job* jobs;
 int jobsLen;
 
-//The timeout in seconds for each solver run
-int timeOut;
+//The timeout in seconds for each solver run in string form
+char timeOutStr[20];
 
+
+char* pidToFileName(pid_t pid) {
+	static char fileName[20];
+	snprintf(fileName, 20, "%d.tmp", pid);
+	return fileName;
+}
+
+char* instanceIdToFileName(int id) {
+	static char fileName[20];
+	snprintf(fileName, 20, "%d.cnf", id);
+	return fileName;
+}
 
 status init() {
 	experiment exp;
 	status s;
-	const char* const md5FileName="md5sums.txt";
-	const char* const md5CheckScript="md5check.sh";
-	const char* const md5CheckScriptArgs[3]={md5CheckScript, md5FileName, NULL};
+	char* const md5FileName="md5sums.txt";
+	char* const md5CheckScript="md5check.sh";
+	char* const md5CheckScriptArgs[3]={md5CheckScript, md5FileName, NULL};
 	FILE* dst;
 	FILE* md5File;
-	char instanceName[20];
+	char* instanceName;
 	pid_t pid;
 	int i, retval;
 
@@ -44,7 +56,7 @@ status init() {
 	if(s!=success)
 		return s;
 	jobsLen=exp.numNodes;
-	timeOut=exp.timeOut;
+	snprintf(timeOutStr, 20, "%d", exp.timeOut);
 
 	//Create a file for saving the md5sums and names of the solver binaries
 	//and the instance files as we receive them from the database.
@@ -81,7 +93,7 @@ status init() {
 
 	for(i=0; i<exp.numInstances; ++i) {
 		//Create the instance file
-		snprintf(instanceName, 20, "%d.cnf", exp.idInstances[i]);
+		instanceName=instanceIdToFileName(exp.idInstances[i]);
 		dst=fopen(instanceName, "w+");
 		if(dst==NULL) {
 			logError("Error in fopen(): %s\n", strerror(errno));
@@ -148,31 +160,11 @@ inline int fetchJob(job* j, status* s) {
 	return retval;
 }
 
-inline status updateSuccess(const job* j) {
+inline status update(const job* j) {
 	status retval;
 
 	deferSignals();
-	retval=dbUpdateSuccess(j);
-	resetSignalHandler();
-
-	return retval;
-}
-
-inline status updateError(const job* j) {
-	status retval;
-
-	deferSignals();
-	retval=dbUpdateError(j);
-	resetSignalHandler();
-
-	return retval;
-}
-
-inline status updateRunning(const job* j) {
-	status retval;
-
-	deferSignals();
-	retval=dbUpdateRunning(j);
+	retval=dbUpdate(j);
 	resetSignalHandler();
 
 	return retval;
@@ -190,7 +182,8 @@ void shutdown(status retval) {
 	//Update the database entries of the processes that were still running
 	for(i=0; i<jobsLen; ++i) {
 		if(jobs[i].pid!=0) {
-			updateError(&(jobs[i]));
+			jobs[i].status=-2;
+			update(&(jobs[i]));
 		}
 	}
 
@@ -214,6 +207,15 @@ void signalHandler(int signum) {
 		shutdown(success);
 }
 
+//Process the results of a normally terminated job j
+status processResults(job* j) {
+	char* fileName=pidToFileName(j->pid);
+
+	//TODO: Parse filename, fill j accordingly, append the correct line to j->resultFileName
+
+	return success;
+}
+
 //Wait for cnt child processes to terminate and handle the results
 status handleChildren(int cnt) {
 	int i, retval;
@@ -234,14 +236,19 @@ status handleChildren(int cnt) {
 
 		j->pid=0;
 		if(WIFEXITED(retval) && (WEXITSTATUS(retval)==0)) {
-			//The process terminated successfully
-			s=updateSuccess(j);
+			//The process terminated normally
+			s=processResults(j);
+			if(s!=success) {
+				return s;
+			}
+			s=update(j);
 			if(s!=success) {
 				return s;
 			}
 		} else {
 			//The process terminated abnormally
-			s=updateError(j);
+			j->status=-2;
+			s=update(j);
 			if(s!=success) {
 				return s;
 			}
@@ -291,8 +298,15 @@ int main() {
 			} else if(pid==0) {
 				//This is the child process.
 				deferSignals(); //Disable the inherited signal handler.
-				s=updateRunning(j);
-				//TODO: Set up the jobScriptArgs array
+				//Set the job state to running in the database
+				j->status=0;
+				s=update(j);
+				//Set up the jobScriptArgs array
+				jobScriptArgs[0]=(char*)jobScript;
+				jobScriptArgs[1]=j->solverName;
+				jobScriptArgs[2]=instanceIdToFileName(j->idInstance);
+				jobScriptArgs[3]=pidToFileName(getpid());
+				jobScriptArgs[4]=timeOutStr;
 				if(s==success) {
 					if(execve(jobScript, jobScriptArgs, NULL)==-1) {
 						logError("Error in execve(): %s\n", strerror(errno));
@@ -300,7 +314,8 @@ int main() {
 					}
 				}
 				//Something is seriously wrong. Send the father process a signal indicating the error.
-				updateError(j);
+				j->status=-2;
+				update(j);
 				if(s==sysError) {
 					if(kill(getppid(), SIGUSR1)!=0) {
 						logError("Error in kill(): %s\n", strerror(errno));

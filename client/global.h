@@ -52,7 +52,7 @@ typedef struct {
     // <solvername>_<instance>_<solverconfigid>.cnf
     char *resultFileName; 
     // the status of the run
-    // -1: not started, 0: running, 1: finished normaly by solver, 
+    // -2: an error occured, -1: not started, 0: running, 1: finished normaly by solver,
     // 2: terminated by ulimit maxtime, 3: terminated by ulimit maxmem
     int status;
     // int idSolverConfig;  needed?
