@@ -30,7 +30,7 @@ char timeOutStr[20];
 
 char* pidToFileName(pid_t pid) {
 	static char fileName[20];
-	snprintf(fileName, 20, "%d.tmp", pid);
+	snprintf(fileName, 20, "%ld.tmp", (long)pid);
 	return fileName;
 }
 
