@@ -21,25 +21,25 @@ char host[VALUELENGTH];
 char username[VALUELENGTH];
 char password[VALUELENGTH];
 char database[VALUELENGTH];
-//int experiment;
+int experimentId;
 
 typedef enum {success=0, sysError, dbError} status;
 
 typedef struct {
-    int numNodes;
-    int timeOut;
-    int numInstances;
-    // not needed, because instances are terminated by 
-    // 0x00 manually.
-    //int *lengthInstance;
-    char **md5Instances;
-    char **instances;
-    int *idInstances;
-    int numSolvers;
-    int *lengthSolver;
-    char **md5Solvers;
-    char **solvers;
-    char **solverNames;
+    int numNodes; // number of nodes
+    int timeOut; // timeout for each solver run in seconds
+    int numInstances; // number of used instances
+    char **md5Instances; // md5 sums of instance files
+    // the instances, manually appended with 0x00, 
+    // because column type in table is mediumblob
+    char **instances; 
+    int *idInstances; // the instances ids
+    int numSolvers; // number of used solvers
+    int *lengthSolver; // length of each solver
+    char **md5Solvers; // the md5 sums for each solver
+    // the binary for each solver, NOT terminated by 0x00
+    char **solvers; 
+    char **solverNames; // the names for each solver
 } experiment;
 
 typedef struct {
@@ -47,49 +47,21 @@ typedef struct {
     pid_t pid;
     // identifies the row in the result table
     int id;
-    //int idJob;
-    int seed;
-    char *resultFileName;
-    int SolverConfig_idSolverConfig;
-    int Instances_idInstance;
-    char *solverName;
-    //config *config;
-    char params[256];
-    //instance *instance;
-    int idInstance;
-} job;
-
-
-
-/* Old structs of the previous model 
-typedef struct {
-    int id;
-    char name[64];
-    char *binary;
-} solver;
-
-typedef struct {
-    solver *solver;
-    char params[256];
-} config;
-
-typedef struct {
-    int idJob;
-    int run;
+    // temporary filename for the results of one SolverConfig.
+    // the file pattern is something like: 
+    // <solvername>_<instance>_<solverconfigid>.cnf
+    char *resultFileName; 
+    // the status of the run
+    // -1: not started, 0: running, 1: finished normaly by solver, 
+    // 2: terminated by ulimit maxtime, 3: terminated by ulimit maxmem
     int status;
-    int seed;
-    char *resultFileName;
-    int statusCode;
-    int SolverConfig_idSolverConfig;
-    int Instances_idInstance;
-    config *config;
-    instance *instance;
-} result;
-
-typedef struct {
-    char *instance;
-} instance;
-*/
-    
+    // int idSolverConfig;  needed?
+    int seed;  // saves what seed was used
+    int time; // the runtime of the solver
+    char *solverName; // the used solver for this job. 
+    char params[256]; // the full param string
+    int idInstance; // the id of the used instance
+    int statusCode; // solver return value, when the run is finished
+} job;
 
 #endif

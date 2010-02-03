@@ -20,13 +20,7 @@ status dbFetchExperimentData(experiment *e);
 int dbFetchJob(job* j, status* s);
 
 //Store information about the job j that just started running
-status dbUpdateRunning(const job* j);
-
-//Store the results of the successfully terminated job j
-status dbUpdateSuccess(const job* j);
-
-//Store information about the abnormally terminated job j
-status dbUpdateError(const job* j);
+status dbUpdate(const job* j);
 
 
 #endif

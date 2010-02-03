@@ -211,12 +211,6 @@ status dbFetchExperimentData(experiment *e) {
     return success;
 }
 
-
-
-void dbFetchExpRuns() {
-    sprintf(query, 0);
-}
-
 int dbFetchJob(job* j, status* s) {
 	static int i=0, num=7;
 
@@ -230,14 +224,6 @@ int dbFetchJob(job* j, status* s) {
 	return 1;
 }
 
-status dbUpdateRunning(const job* j) {
-	return success;
-}
-
-status dbUpdateSuccess(const job* j) {
-	return success;
-}
-
-status dbUpdateError(const job* j) {
+status dbUpdate(const job* j) {
 	return success;
 }
