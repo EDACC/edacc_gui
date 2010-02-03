@@ -34,7 +34,7 @@ public class ExperimentController {
     private Vector<Experiment> experiments;
     private Vector<Instance> instances;
     private Vector<Solver> solvers;
-    private static Random rnd =new Random(System.currentTimeMillis());
+    private static RandomNumberGenerator rnd = new JavaRandom();
 
     /**
      * Creates a new experiment Controller

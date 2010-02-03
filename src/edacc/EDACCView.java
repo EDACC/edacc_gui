@@ -338,7 +338,11 @@ public class EDACCView extends FrameView {
             mainPanelLayout.replace(mode, experimentMode);
             mode = experimentMode;
             manageExperimentModeMenuItem.setSelected(true);
-        } catch (SQLException ex) {
+        } catch (NoConnectionToDBException ex) {
+            JOptionPane.showMessageDialog(this.getComponent(), "You have to connect to the database before switching modes", "No database connection", JOptionPane.ERROR_MESSAGE);
+            noMode();
+        }
+        catch (SQLException ex) {
             createDatabaseErrorMessage(ex);
             noMode();
         }

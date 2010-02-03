@@ -16,6 +16,7 @@ import edacc.experiment.InstanceTableModel;
 import edacc.experiment.SolverTableModel;
 import edacc.model.Solver;
 import java.sql.SQLException;
+import javax.swing.JOptionPane;
 import org.jdesktop.application.Action;
 
 /**
@@ -72,8 +73,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         txtExperimentDescription = new javax.swing.JTextArea();
         txtExperimentName = new javax.swing.JTextField();
-        txtExperimentDate = new javax.swing.JTextField();
         btnCreateExperiment = new javax.swing.JButton();
+        txtExperimentDate = new javax.swing.JFormattedTextField();
         panelChooseSolver = new javax.swing.JPanel();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel2 = new javax.swing.JPanel();
@@ -162,11 +163,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
 
         txtExperimentName.setName("txtExperimentName"); // NOI18N
 
-        txtExperimentDate.setName("txtExperimentDate"); // NOI18N
-
         btnCreateExperiment.setAction(actionMap.get("btnCreateExperiment")); // NOI18N
         btnCreateExperiment.setText(resourceMap.getString("btnCreateExperiment.text")); // NOI18N
         btnCreateExperiment.setName("btnCreateExperiment"); // NOI18N
+
+        try {
+            txtExperimentDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("####-##-##")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+        txtExperimentDate.setName("txtExperimentDate"); // NOI18N
 
         javax.swing.GroupLayout pnlNewExperimentLayout = new javax.swing.GroupLayout(pnlNewExperiment);
         pnlNewExperiment.setLayout(pnlNewExperimentLayout);
@@ -179,10 +185,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
                     .addComponent(lblExperimentName)
                     .addComponent(lblExperimentDescription))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlNewExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtExperimentName)
-                    .addComponent(txtExperimentDate)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE))
+                .addGroup(pnlNewExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtExperimentName, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                    .addComponent(txtExperimentDate, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE))
                 .addGap(12, 12, 12)
                 .addComponent(btnCreateExperiment, javax.swing.GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE)
                 .addContainerGap())
@@ -198,14 +204,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
                         .addGroup(pnlNewExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtExperimentName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblExperimentName))
-                        .addGap(8, 8, 8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlNewExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtExperimentDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblExperimentDate))
+                            .addComponent(lblExperimentDate)
+                            .addComponent(txtExperimentDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(10, 10, 10)
                         .addGroup(pnlNewExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblExperimentDescription)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE))))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE))))
                 .addContainerGap())
         );
 
@@ -216,10 +222,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
             .addGroup(panelManageExperimentLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelManageExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 1003, Short.MAX_VALUE)
+                    .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 852, Short.MAX_VALUE)
                     .addGroup(panelManageExperimentLayout.createSequentialGroup()
                         .addComponent(pnlNewExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 154, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnRemoveExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(btnLoadExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -286,7 +292,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 488, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(2, 2, 2)
                         .addComponent(btnSelectAllSolvers)
@@ -294,14 +300,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
                         .addComponent(btnDeselectAllSolvers)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnReverseSolverSelection)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 145, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 63, Short.MAX_VALUE)
                         .addComponent(btnChooseSolvers)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnChooseSolvers)
@@ -331,7 +337,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
             .addGroup(panelChooseSolverLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelChooseSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1003, Short.MAX_VALUE)
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 852, Short.MAX_VALUE)
                     .addComponent(btnSaveSolverConfigurations, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
@@ -339,7 +345,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
             panelChooseSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelChooseSolverLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSaveSolverConfigurations)
                 .addGap(81, 81, 81))
@@ -388,10 +394,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         panelChooseInstances.setLayout(panelChooseInstancesLayout);
         panelChooseInstancesLayout.setHorizontalGroup(
             panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelChooseInstancesLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelChooseInstancesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1003, Short.MAX_VALUE)
+                .addGroup(panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 852, Short.MAX_VALUE)
                     .addGroup(panelChooseInstancesLayout.createSequentialGroup()
                         .addComponent(btnFilterInstances)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -400,7 +406,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
                         .addComponent(btnDeselectAllInstances)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnInvertSelection)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 573, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 339, Short.MAX_VALUE)
                         .addComponent(btnSaveInstances, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -408,15 +414,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
             panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelChooseInstancesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 459, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 484, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnInvertSelection)
                     .addComponent(btnFilterInstances)
                     .addComponent(btnSelectAllInstances)
                     .addComponent(btnDeselectAllInstances)
+                    .addComponent(btnInvertSelection)
                     .addComponent(btnSaveInstances))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         manageExperimentPane.addTab("Instances", panelChooseInstances);
@@ -482,7 +488,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
                                 .addComponent(txtNumRuns)
                                 .addComponent(txtTimeout, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addComponent(chkGenerateSeeds, javax.swing.GroupLayout.Alignment.LEADING)))
-                .addContainerGap(814, Short.MAX_VALUE))
+                .addContainerGap(662, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -507,7 +513,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnGenerateJobs)
                     .addComponent(lblNumJobs, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(328, Short.MAX_VALUE))
+                .addContainerGap(384, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout panelExperimentParamsLayout = new javax.swing.GroupLayout(panelExperimentParams);
@@ -529,7 +535,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1039, Short.MAX_VALUE)
+                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 881, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -574,13 +580,28 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
     @Action
     public void btnLoadExperiment() {
         if (tableExperiments.getSelectedRow() != -1) {
-            try {
-                Integer i = (Integer) expTableModel.getValueAt(tableExperiments.getSelectedRow(), 5);
-                expController.loadExperiment(i.intValue());
-            } catch (SQLException ex) {
-                createDatabaseErrorMessage(ex);
+            if (expController.getActiveExperiment() != null) {
+                if (JOptionPane.showConfirmDialog(this,
+                                "Loading an experiment will make you lose all unsaved changes of the current experiment. Continue loading the experiment?",
+                                "Warning!",
+                                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+                    try {
+                        Integer i = (Integer) expTableModel.getValueAt(tableExperiments.getSelectedRow(), 5);
+                        expController.loadExperiment(i.intValue());
+                    } catch (SQLException ex) {
+                        createDatabaseErrorMessage(ex);
+                    }
+                }
             }
-
+            else
+            {
+                try {
+                    Integer i = (Integer) expTableModel.getValueAt(tableExperiments.getSelectedRow(), 5);
+                    expController.loadExperiment(i.intValue());
+                } catch (SQLException ex) {
+                    createDatabaseErrorMessage(ex);
+                }
+            }
         }
     }
 
@@ -742,7 +763,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
     private javax.swing.JTable tableExperiments;
     private javax.swing.JTable tableInstances;
     private javax.swing.JTable tableSolvers;
-    private javax.swing.JTextField txtExperimentDate;
+    private javax.swing.JFormattedTextField txtExperimentDate;
     private javax.swing.JTextArea txtExperimentDescription;
     private javax.swing.JTextField txtExperimentName;
     private javax.swing.JTextField txtMaxSeeds;
