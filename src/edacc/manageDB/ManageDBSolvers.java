@@ -6,6 +6,7 @@
 package edacc.manageDB;
 
 import edacc.EDACCManageDBMode;
+import edacc.model.NoConnectionToDBException;
 import edacc.model.Solver;
 import edacc.model.SolverDAO;
 import java.io.File;
@@ -32,6 +33,12 @@ public class ManageDBSolvers {
         this.solverTableModel = solverTableModel;
     }
 
+    public void loadSolvers() throws NoConnectionToDBException, SQLException {
+        for (Solver s: SolverDAO.getAll()) {
+            solverTableModel.addSolver(s);
+        }
+    }
+
     public void applySolver(String name, String description) throws NoSolverBinarySpecifiedException {
         //TODO add the remaining fields of a solver like binary...; calculate md5 hash etc.
         if (currentSolver != null) {
@@ -50,7 +57,8 @@ public class ManageDBSolvers {
      */
     public void saveSolvers() throws SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException {
         for (Solver s : solverTableModel.getSolvers()) {
-            s.setMd5(Util.calculateMD5(s.getBinaryFile()));
+            if (s.getBinaryFile() != null)
+                s.setMd5(Util.calculateMD5(s.getBinaryFile()));
             SolverDAO.save(s);
         }
 

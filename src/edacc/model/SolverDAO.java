@@ -28,6 +28,7 @@ public class SolverDAO {
      * @param solver The Solver object to persist.
      */
     public static void save(Solver solver) throws SQLException, FileNotFoundException {
+        if (solver.isSaved()) return;
         PreparedStatement ps;
 
         boolean alreadyInDB = false;

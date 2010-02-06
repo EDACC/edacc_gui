@@ -296,8 +296,6 @@ public class EDACCView extends FrameView {
                         "An error occured while trying to generate the EDACC tables: " + ex.getMessage(),
                         "Error!", JOptionPane.ERROR_MESSAGE);
             }
-        } else {
-                        System.out.println("NO!");
         }
     }
 
@@ -317,9 +315,20 @@ public class EDACCView extends FrameView {
         if (manageExperimentModeMenuItem.isSelected()) {
             manageExperimentModeMenuItem.setSelected(false);
         }
-        mainPanelLayout.replace(mode, manageDBMode);
-        mode = manageDBMode;
-        manageDBModeMenuItem.setSelected(true);
+        
+        try {
+            manageDBMode.initialize();
+            mainPanelLayout.replace(mode, manageDBMode);
+            mode = manageDBMode;
+            manageDBModeMenuItem.setSelected(true);
+        } catch (NoConnectionToDBException ex) {
+            JOptionPane.showMessageDialog(this.getComponent(), "You have to connect to the database before switching modes", "No database connection", JOptionPane.ERROR_MESSAGE);
+            noMode();
+        }
+        catch (SQLException ex) {
+            createDatabaseErrorMessage(ex);
+            noMode();
+        }
     }
 
     @Action

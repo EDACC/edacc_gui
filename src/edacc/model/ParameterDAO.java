@@ -23,10 +23,9 @@ public class ParameterDAO {
      * @param parameter
      */
     public static void saveParameterForSolver(Solver solver, Parameter parameter) throws NoConnectionToDBException, SQLException {
-        System.out.println(solver.getId());
         if (!solver.isSaved())
             return; // TODO do something if solver isn't in db
-
+        if (parameter.isSaved()) return;
         final String insertQuery = "INSERT INTO Parameters (name, prefix, value, Parameters.order, Solver_idSolver) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
         ps.setString(1, parameter.getName());
@@ -67,6 +66,7 @@ public class ParameterDAO {
         while (rs.next()) {
             Parameter i = getParameterFromResultset(rs);
             res.add(i);
+            i.setSaved();
         }
         return res;
     }

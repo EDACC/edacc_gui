@@ -12,7 +12,9 @@ package edacc;
 
 
 import edacc.manageDB.*;
+import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
+import edacc.model.ParameterDAO;
 import edacc.model.Solver;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -64,6 +66,15 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         tableParameters.setModel(parameterTableModel);
 
         tableParameters.getSelectionModel().addListSelectionListener(new ParameterTableSelectionListener(tableParameters, manageDBParameters));
+     }
+
+     void initialize() throws NoConnectionToDBException, SQLException {
+         manageDBSolvers.loadSolvers();
+         for (Solver s: solverTableModel.getSolvers()) {
+             for (Parameter p: ParameterDAO.getParameterFromSolverId(s.getId())) {
+                parameterTableModel.addParameter(s, p);
+             }
+         }
      }
 
      public void addDocumentListener(javax.swing.JTextField tf){
@@ -707,7 +718,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         try {
             manageDBInstances.saveInstances();
              JOptionPane.showMessageDialog(panelManageDBInstances,
-            "The Instances has been added to the Database successful." ,
+            "The Instances have been successfully added to the Database." ,
             "Info",
             JOptionPane.INFORMATION_MESSAGE);
             manageDBInstances.removeAllInstances();
@@ -845,6 +856,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         btnSolverAddBinary.setEnabled(enabled);
         btnSolverAddCode.setEnabled(enabled);
         btnApplySolver.setEnabled(enabled);
+        if (currentSolver != null) {
+            parameterTableModel.setCurrentSolver(currentSolver);
+            parameterTableModel.fireTableDataChanged();
+        }
     }
 
     public void showParameterDetails(Parameter currentParameter) {

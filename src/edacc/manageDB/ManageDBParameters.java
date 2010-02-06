@@ -39,7 +39,7 @@ public class ManageDBParameters {
     }
 
     public void setCurrentSolver(Solver currentSolver) {
-        parameterTableModel.setCurrentSolver(currentSolver);
+        parameterTableModel.setCurrentSolver(currentSolver);      
     }
 
     void showParameter(int index) {

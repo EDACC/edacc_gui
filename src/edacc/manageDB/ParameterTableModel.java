@@ -106,6 +106,7 @@ public class ParameterTableModel extends AbstractTableModel{
      * @return
      */
     public Vector<Parameter> getParamtersOfSolver(Solver s){
+        if (!parameters.containsKey(s)) return new Vector<Parameter>();
         return (Vector<Parameter>) parameters.get(s).clone();
     }
 
@@ -120,7 +121,7 @@ public class ParameterTableModel extends AbstractTableModel{
     }
 
     public Parameter getParameter(int rowIndex){
-        if(rowIndex >= 0 && rowIndex < parameters.size()) {
+        if(rowIndex >= 0 && rowIndex < parameters.get(currentSolver).size()) {
             return parameters.get(currentSolver).get(rowIndex);
         }
         else
