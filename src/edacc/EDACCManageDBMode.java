@@ -75,6 +75,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                 parameterTableModel.addParameter(s, p);
              }
          }
+         manageDBInstances.loadInstances();
      }
 
      public void addDocumentListener(javax.swing.JTextField tf){
@@ -706,7 +707,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     }//GEN-LAST:event_btnAddInstancesActionPerformed
 
     private void btnRemoveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstancesActionPerformed
-        manageDBInstances.removeInstances(tableInstances.getSelectedRows());
+        try {
+            manageDBInstances.removeInstances(tableInstances.getSelectedRows());
+        }
+        catch (Exception e) {}
         tableInstances.updateUI();
     }//GEN-LAST:event_btnRemoveInstancesActionPerformed
 
@@ -721,7 +725,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             "The Instances have been successfully added to the Database." ,
             "Info",
             JOptionPane.INFORMATION_MESSAGE);
-            manageDBInstances.removeAllInstances();
+            //manageDBInstances.removeAllInstances();
             tableInstances.updateUI();
 
         } catch (NoInstancesToSaveException ex) {
@@ -886,6 +890,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
     @Action
     public void btnSaveParam() {
+        if (tableParameters.getSelectedRow() == -1) return;
         Parameter p = parameterTableModel.getParameter(tableParameters.getSelectedRow());
         p.setName(tfParametersName.getText());
         p.setOrder(Integer.parseInt(tfParametersOrder.getText()));

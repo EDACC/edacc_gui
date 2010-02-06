@@ -43,6 +43,12 @@ public class ManageDBInstances {
         this.jFileChooserManageDBInstance = jFileChooserManageDBInstance;
     }
 
+    public void loadInstances() throws NoConnectionToDBException, SQLException {
+        main.instanceTableModel.instances.clear();
+        main.instanceTableModel.addInstances(new Vector<Instance>(InstanceDAO.getAll()));
+        main.instanceTableModel.fireTableDataChanged();
+    }
+
     /**
      * Will open a jFilechooser to select a file or directory to add all containing
      * instance files into the "instance table" of the MangeDBMode.
@@ -99,10 +105,12 @@ public class ManageDBInstances {
      * Delete the given rows from the instanceTableModel
      * @param rows the rows which have to be deleted
      */
-    public void removeInstances(int[] rows) {
+    public void removeInstances(int[] rows) throws NoConnectionToDBException, SQLException {
         Vector<Instance> rem = new Vector<Instance>();
         for (int i = 0; i < rows.length; i++) {
-            rem.add((Instance) main.instanceTableModel.getValueAt(i, 5));
+            Instance ins = (Instance) main.instanceTableModel.getValueAt(i, 5);
+            rem.add(ins);
+            InstanceDAO.delete(ins);
         }
         main.instanceTableModel.removeInstances(rem);
     }

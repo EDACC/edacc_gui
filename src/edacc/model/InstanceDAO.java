@@ -45,6 +45,14 @@ public class InstanceDAO {
         return i;
      }
 
+     public static void delete(Instance i) throws NoConnectionToDBException, SQLException {
+         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM Instances WHERE idInstance=?");
+         ps.setInt(1, i.getId());
+         ps.executeUpdate();
+         cache.remove(i);
+         i.setDeleted();
+     }
+
      /**
       * persists an temporary instance object to the database
       * @param instance The temporary instance object to persist
