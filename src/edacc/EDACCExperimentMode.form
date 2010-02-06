@@ -24,7 +24,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageExperimentPane" pref="881" max="32767" attributes="0"/>
+              <Component id="manageExperimentPane" pref="915" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -68,10 +68,10 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="scrollPaneExperimentsTable" alignment="0" pref="852" max="32767" attributes="0"/>
+                          <Component id="scrollPaneExperimentsTable" alignment="0" pref="879" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="pnlNewExperiment" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <EmptySpace pref="30" max="32767" attributes="0"/>
                               <Component id="btnRemoveExperiment" min="-2" pref="108" max="-2" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="btnLoadExperiment" min="-2" pref="129" max="-2" attributes="0"/>
@@ -191,7 +191,7 @@
                                   <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="lblExperimentDescription" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jScrollPane1" alignment="0" pref="75" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane1" alignment="0" pref="41" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
@@ -279,11 +279,21 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jSplitPane1" alignment="0" pref="852" max="32767" attributes="0"/>
-                          <Component id="btnSaveSolverConfigurations" alignment="1" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="jSplitPane1" alignment="0" pref="879" max="32767" attributes="0"/>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Component id="btnSelectAllSolvers" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btnDeselectAllSolvers" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btnReverseSolverSelection" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="149" max="-2" attributes="0"/>
+                              <Component id="btnChooseSolvers" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace pref="345" max="32767" attributes="0"/>
+                              <Component id="btnSaveSolverConfigurations" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -291,12 +301,18 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Component id="jSplitPane1" pref="416" max="32767" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="btnSaveSolverConfigurations" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="81" max="-2" attributes="0"/>
+                      <Component id="jSplitPane1" pref="465" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="btnSelectAllSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnDeselectAllSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnReverseSolverSelection" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnChooseSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnSaveSolverConfigurations" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -323,37 +339,15 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="1" attributes="0">
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="jScrollPane3" alignment="0" pref="487" max="32767" attributes="0"/>
-                                  <Group type="102" alignment="1" attributes="0">
-                                      <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
-                                      <Component id="btnSelectAllSolvers" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="btnDeselectAllSolvers" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="btnReverseSolverSelection" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace pref="63" max="32767" attributes="0"/>
-                                      <Component id="btnChooseSolvers" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jScrollPane3" pref="488" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="1" attributes="0">
-                              <Component id="jScrollPane3" pref="365" max="32767" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="btnChooseSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="btnDeselectAllSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="btnSelectAllSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="btnReverseSolverSelection" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="jScrollPane3" alignment="0" pref="465" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -380,42 +374,6 @@
                         </Component>
                       </SubComponents>
                     </Container>
-                    <Component class="javax.swing.JButton" name="btnDeselectAllSolvers">
-                      <Properties>
-                        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                          <action class="edacc.EDACCExperimentMode" id="btnDeselectAll" methodName="btnDeselectAll"/>
-                        </Property>
-                        <Property name="text" type="java.lang.String" resourceKey="btnDeselectAllSolvers.text"/>
-                        <Property name="name" type="java.lang.String" value="btnDeselectAllSolvers" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JButton" name="btnChooseSolvers">
-                      <Properties>
-                        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                          <action class="edacc.EDACCExperimentMode" id="btnChooseSolvers" methodName="btnChooseSolvers"/>
-                        </Property>
-                        <Property name="text" type="java.lang.String" resourceKey="btnChooseSolvers.text"/>
-                        <Property name="name" type="java.lang.String" value="btnChooseSolvers" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JButton" name="btnSelectAllSolvers">
-                      <Properties>
-                        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                          <action class="edacc.EDACCExperimentMode" id="btnSelectAllSolvers" methodName="btnSelectAllSolvers"/>
-                        </Property>
-                        <Property name="text" type="java.lang.String" resourceKey="btnSelectAllSolvers.text"/>
-                        <Property name="name" type="java.lang.String" value="btnSelectAllSolvers" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JButton" name="btnReverseSolverSelection">
-                      <Properties>
-                        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                          <action class="edacc.EDACCExperimentMode" id="btnReverseSolverSelection" methodName="btnReverseSolverSelection"/>
-                        </Property>
-                        <Property name="text" type="java.lang.String" resourceKey="btnReverseSolverSelection.text"/>
-                        <Property name="name" type="java.lang.String" value="btnReverseSolverSelection" noResource="true"/>
-                      </Properties>
-                    </Component>
                   </SubComponents>
                 </Container>
                 <Container class="javax.swing.JScrollPane" name="jScrollPane4">
@@ -445,6 +403,42 @@
                 <Property name="name" type="java.lang.String" value="btnSaveSolverConfigurations" noResource="true"/>
               </Properties>
             </Component>
+            <Component class="javax.swing.JButton" name="btnSelectAllSolvers">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                  <action class="edacc.EDACCExperimentMode" id="btnSelectAllSolvers" methodName="btnSelectAllSolvers"/>
+                </Property>
+                <Property name="text" type="java.lang.String" resourceKey="btnSelectAllSolvers.text"/>
+                <Property name="name" type="java.lang.String" value="btnSelectAllSolvers" noResource="true"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="btnDeselectAllSolvers">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                  <action class="edacc.EDACCExperimentMode" id="btnDeselectAll" methodName="btnDeselectAll"/>
+                </Property>
+                <Property name="text" type="java.lang.String" resourceKey="btnDeselectAllSolvers.text"/>
+                <Property name="name" type="java.lang.String" value="btnDeselectAllSolvers" noResource="true"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="btnReverseSolverSelection">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                  <action class="edacc.EDACCExperimentMode" id="btnReverseSolverSelection" methodName="btnReverseSolverSelection"/>
+                </Property>
+                <Property name="text" type="java.lang.String" resourceKey="btnReverseSolverSelection.text"/>
+                <Property name="name" type="java.lang.String" value="btnReverseSolverSelection" noResource="true"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="btnChooseSolvers">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                  <action class="edacc.EDACCExperimentMode" id="btnChooseSolvers" methodName="btnChooseSolvers"/>
+                </Property>
+                <Property name="text" type="java.lang.String" resourceKey="btnChooseSolvers.text"/>
+                <Property name="name" type="java.lang.String" value="btnChooseSolvers" noResource="true"/>
+              </Properties>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JPanel" name="panelChooseInstances">
@@ -465,7 +459,7 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="jScrollPane2" alignment="0" pref="852" max="32767" attributes="0"/>
+                          <Component id="jScrollPane2" alignment="0" pref="879" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="btnFilterInstances" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -474,7 +468,7 @@
                               <Component id="btnDeselectAllInstances" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnInvertSelection" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="339" max="32767" attributes="0"/>
+                              <EmptySpace pref="449" max="32767" attributes="0"/>
                               <Component id="btnSaveInstances" min="-2" pref="100" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -629,7 +623,7 @@
                                   <Component id="chkGenerateSeeds" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="662" max="32767" attributes="0"/>
+                          <EmptySpace pref="690" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -660,7 +654,7 @@
                               <Component id="btnGenerateJobs" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="lblNumJobs" alignment="3" min="-2" pref="19" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="384" max="32767" attributes="0"/>
+                          <EmptySpace pref="328" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>

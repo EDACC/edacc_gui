@@ -7,6 +7,10 @@ public class Parameter extends BaseModel {
     private String value;
     private int order;
 
+    public Parameter() {
+        name = prefix = value = "";
+    }
+
     public int getId() {
         return id;
     }

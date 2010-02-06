@@ -51,12 +51,16 @@ public class SolverDAO {
             ps.setBinaryStream(6, null);
         ps.executeUpdate();
 
+
         if (solver.isNew() && !alreadyInDB) {
             // set id
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
                 solver.setId(rs.getInt(1));
             }
+        }
+        else if (alreadyInDB) {
+            solver.setId(solverAlreadyInDB(solver).getId());
         }
 
         cacheSolver(solver);

@@ -43,7 +43,7 @@ public class ParameterTableModel extends AbstractTableModel{
     }
     
     public void remove(Parameter param){
-        parameters.get(currentSolver).remove(param);
+        //parameters.get(currentSolver).remove(param);
     }
 
     public int getRowCount() {
@@ -120,8 +120,9 @@ public class ParameterTableModel extends AbstractTableModel{
     }
 
     public Parameter getParameter(int rowIndex){
-        if(rowIndex >= 0 && rowIndex < parameters.size())
+        if(rowIndex >= 0 && rowIndex < parameters.size()) {
             return parameters.get(currentSolver).get(rowIndex);
+        }
         else
             return null;
     }
