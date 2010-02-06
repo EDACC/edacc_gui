@@ -34,6 +34,7 @@ public class ManageDBSolvers {
     }
 
     public void loadSolvers() throws NoConnectionToDBException, SQLException {
+        solverTableModel.clear();
         for (Solver s: SolverDAO.getAll()) {
             solverTableModel.addSolver(s);
         }

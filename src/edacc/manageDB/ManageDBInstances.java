@@ -108,7 +108,7 @@ public class ManageDBInstances {
     public void removeInstances(int[] rows) throws NoConnectionToDBException, SQLException {
         Vector<Instance> rem = new Vector<Instance>();
         for (int i = 0; i < rows.length; i++) {
-            Instance ins = (Instance) main.instanceTableModel.getValueAt(i, 5);
+            Instance ins = (Instance) main.instanceTableModel.getValueAt(rows[i], 5);
             rem.add(ins);
             InstanceDAO.delete(ins);
         }

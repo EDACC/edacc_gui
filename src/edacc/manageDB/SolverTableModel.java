@@ -62,6 +62,11 @@ public class SolverTableModel extends AbstractTableModel {
         return (Vector<Solver>) solvers.clone();
     }
 
+    public void clear() {
+        solvers.clear();
+        this.fireTableDataChanged();
+    }
+
     Solver getSolver(int row) {
         if (row >= 0 && row < getRowCount())
             return solvers.get(row);
