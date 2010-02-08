@@ -7,5 +7,11 @@ RES_FILE=$4
 TIMEOUT=$5
 
 ulimit -S -t $TIMEOUT
-/usr/bin/time -a -o "$RES_FILE" -f "%U;%x" "./"$SOLVER "$ARGS" "$INST_FILE" >> "$RES_FILE"
+
+if [ -n "$ARGS" ]; then
+	/usr/bin/time -a -o "$RES_FILE" -f "%U;%x" "./$SOLVER" "$INST_FILE" >> "$RES_FILE"
+else
+	/usr/bin/time -a -o "$RES_FILE" -f "%U;%x" "./$SOLVER" "$ARGS" "$INST_FILE" >> "$RES_FILE"
+fi
+
 exit 0
