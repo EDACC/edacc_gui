@@ -18,7 +18,7 @@
 //The path of the shellscript we're using to execute a solver run
 //and an array for storing it's arguments
 const char* const jobScript="jobScript.sh";
-char* jobScriptArgs[6]={NULL, NULL, NULL, NULL, NULL, NULL};
+char* jobScriptArgs[7]={NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
 //An array for keeping track of the jobs we're currently processing
 job* jobs;
@@ -210,8 +210,58 @@ void signalHandler(int signum) {
 //Process the results of a normally terminated job j
 status processResults(job* j) {
 	char* fileName=pidToFileName(j->pid);
+	FILE* filePtr;
+	FILE* resultFile;
+	int signum, semicolonsToSkip=3, c, dummy;
 
-	//TODO: Parse filename, fill j accordingly, append the correct line to j->resultFileName
+	//Parse the temporary result file of j
+	filePtr=fopen(fileName, "r");
+	if(filePtr==NULL) {
+		logError("Unable to open %s: %s\n", fileName, strerror(errno));
+		return sysError;
+	}
+
+	if(fscanf(filePtr, "Command terminated by signal %d", &signum)==1) {
+		//The solver was terminated by signal signum
+		if(signum==SIGXCPU)
+			j->status=2;
+		else
+			j->status=3;
+	} else {
+		//Skip semicolonsToSkip semicolons.
+		while(semicolonsToSkip>0) {
+			c=getc(filePtr);
+			if(c==(int)';') {
+				--semicolonsToSkip;
+			} else if(c==EOF) {
+				logError("Error parsing %s: Unexpected format\n", fileName);
+				return sysError;
+			}
+		}
+		//Extract the runtime and return value of the solver
+		if(fscanf(filePtr, "%d.%d;%d", &(j->time), &dummy, &(j->statusCode))!=3){
+			logError("Error parsing %s: Unexpected format\n", fileName);
+			return sysError;
+		}
+		j->status=1;
+		//Append the first line of fileName to j->resultFileName
+		rewind(filePtr);
+		resultFile=fopen(j->resultFileName, "a");
+		if(resultFile==NULL) {
+			logError("Unable to open %s: %s\n", j->resultFileName, strerror(errno));
+			return sysError;
+		}
+		do {
+			if((c=getc(filePtr))==EOF || fputc(c, resultFile)==EOF) {
+				logError("An error occured while copying a character from %s to %s\n", fileName, j->resultFileName);
+				return sysError;
+			}
+		} while(c!='\n');
+		fclose(resultFile);
+	}
+
+	fclose(filePtr);
+	remove(fileName);
 
 	return success;
 }
@@ -304,9 +354,10 @@ int main() {
 				//Set up the jobScriptArgs array
 				jobScriptArgs[0]=(char*)jobScript;
 				jobScriptArgs[1]=j->solverName;
-				jobScriptArgs[2]=instanceIdToFileName(j->idInstance);
-				jobScriptArgs[3]=pidToFileName(getpid());
-				jobScriptArgs[4]=timeOutStr;
+				jobScriptArgs[2]=j->params;
+				jobScriptArgs[3]=instanceIdToFileName(j->idInstance);
+				jobScriptArgs[4]=pidToFileName(getpid());
+				jobScriptArgs[5]=timeOutStr;
 				if(s==success) {
 					if(execve(jobScript, jobScriptArgs, NULL)==-1) {
 						logError("Error in execve(): %s\n", strerror(errno));
