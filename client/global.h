@@ -33,7 +33,9 @@ typedef struct {
     // the instances, manually appended with 0x00, 
     // because column type in table is mediumblob
     char **instances; 
-    int *idInstances; // the instances ids
+    char **instanceNames; //the name of the instances
+    /* This is probably not needed anymore
+    int *idInstances; // the instances ids*/
     int numSolvers; // number of used solvers
     int *lengthSolver; // length of each solver
     char **md5Solvers; // the md5 sums for each solver
@@ -60,7 +62,9 @@ typedef struct {
     int time; // the runtime of the solver
     char *solverName; // the used solver for this job. 
     char params[256]; // the full param string
-    int idInstance; // the id of the used instance
+    char *instanceName; //the name of the instance
+    /* This is probably not needed anymore
+    int idInstance; // the id of the used instance*/
     int statusCode; // solver return value, when the run is finished
 } job;
 

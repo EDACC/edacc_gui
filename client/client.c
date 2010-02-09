@@ -34,12 +34,6 @@ char* pidToFileName(pid_t pid) {
 	return fileName;
 }
 
-char* instanceIdToFileName(int id) {
-	static char fileName[20];
-	snprintf(fileName, 20, "%d.cnf", id);
-	return fileName;
-}
-
 status init() {
 	experiment exp;
 	status s;
@@ -48,7 +42,6 @@ status init() {
 	char* const md5CheckScriptArgs[3]={md5CheckScript, md5FileName, NULL};
 	FILE* dst;
 	FILE* md5File;
-	char* instanceName;
 	pid_t pid;
 	int i, retval;
 
@@ -62,7 +55,7 @@ status init() {
 	//and the instance files as we receive them from the database.
 	md5File=fopen(md5FileName, "w+");
 	if(md5File==NULL) {
-		logError("Error in fopen(): %s\n", strerror(errno));
+		logError("Unable to open %s: %s\n", md5FileName, strerror(errno));
 		return sysError;
 	}
 
@@ -70,7 +63,7 @@ status init() {
 		//Create the solver binary
 		dst=fopen(exp.solverNames[i], "w+");
 		if(dst==NULL) {
-			logError("Error in fopen(): %s\n", strerror(errno));
+			logError("Unable to open %s: %s\n", exp.solverNames[i], strerror(errno));
 			return sysError;
 		}
 		fwrite(exp.solvers[i], sizeof(char), exp.lengthSolver[i], dst);
@@ -80,7 +73,7 @@ status init() {
 
 		//Assure the binary is executable
 		if(chmod(exp.solverNames[i], 0111)==-1) {
-			logError("Error in chmod(): %s\n", strerror(errno));
+			logError("Unable to change permissions for %s: %s\n", exp.solverNames[i], strerror(errno));
 			return sysError;
 		}
 
@@ -93,10 +86,9 @@ status init() {
 
 	for(i=0; i<exp.numInstances; ++i) {
 		//Create the instance file
-		instanceName=instanceIdToFileName(exp.idInstances[i]);
-		dst=fopen(instanceName, "w+");
+		dst=fopen(exp.instanceNames[i], "w+");
 		if(dst==NULL) {
-			logError("Error in fopen(): %s\n", strerror(errno));
+			logError("Unable to open %s: %s\n", exp.instanceNames[i], strerror(errno));
 			return sysError;
 		}
 		fprintf(dst, "%s", exp.instances[i]);
@@ -105,13 +97,13 @@ status init() {
 		fclose(dst);
 
 		//Assure the file is readable
-		if(chmod(instanceName, 0444)==-1) {
-			logError("Error in chmod(): %s\n", strerror(errno));
+		if(chmod(exp.instanceNames[i], 0444)==-1) {
+			logError("Unable to change permissions for %s: %s\n", exp.instanceNames[i], strerror(errno));
 			return sysError;
 		}
 
 		//Write the md5sum and file name of the instance file to md5file
-		if(fprintf(md5File, "%s  %s\n", exp.md5Instances[i], instanceName)<0) {
+		if(fprintf(md5File, "%s  %s\n", exp.md5Instances[i], exp.instanceNames[i])<0) {
 			logError("Unable to write to %s\n", md5FileName);
 			return sysError;
 		}
@@ -184,6 +176,7 @@ void shutdown(status retval) {
 		if(jobs[i].pid!=0) {
 			jobs[i].status=-2;
 			update(&(jobs[i]));
+			remove(pidToFileName(jobs[i].pid));
 		}
 	}
 
@@ -284,10 +277,10 @@ status handleChildren(int cnt) {
 		//Point j to the entry in jobs corresponding to the terminated child process
 		for(j=jobs; j->pid!=pid; ++j);
 
-		j->pid=0;
 		if(WIFEXITED(retval) && (WEXITSTATUS(retval)==0)) {
 			//The process terminated normally
 			s=processResults(j);
+			j->pid=0;
 			if(s!=success) {
 				return s;
 			}
@@ -298,6 +291,7 @@ status handleChildren(int cnt) {
 		} else {
 			//The process terminated abnormally
 			j->status=-2;
+			j->pid=0;
 			s=update(j);
 			if(s!=success) {
 				return s;
@@ -355,7 +349,7 @@ int main() {
 				jobScriptArgs[0]=(char*)jobScript;
 				jobScriptArgs[1]=j->solverName;
 				jobScriptArgs[2]=j->params;
-				jobScriptArgs[3]=instanceIdToFileName(j->idInstance);
+				jobScriptArgs[3]=j->instanceName;
 				jobScriptArgs[4]=pidToFileName(getpid());
 				jobScriptArgs[5]=timeOutStr;
 				if(s==success) {
