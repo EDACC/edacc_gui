@@ -19,8 +19,10 @@ const size_t bps=190*1000;
 static inline int lock() {
 	if(sem==NULL) {
 		sem=sem_open(semName, O_CREAT, 0600, 1);
-		if(sem==SEM_FAILED)
+		if(sem==SEM_FAILED) {
+			sem=NULL;
 			return -1;
+		}
 	}
 	return sem_wait(sem);
 }
@@ -200,5 +202,11 @@ int safeFputc(int c, FILE *stream) {
 	}
 
 	return retval;
+}
+
+void safeioUnlink() {
+	if(sem==NULL)
+		return;
+	sem_unlink(semName);
 }
 

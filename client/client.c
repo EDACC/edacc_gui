@@ -168,6 +168,7 @@ void shutdown(status retval) {
 	int i;
 
 	deferSignals();
+	safeioUnlink();
 
 	//Massacre all other processes in the group including any child they might have
 	kill(0, SIGTERM);
