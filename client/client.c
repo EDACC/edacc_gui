@@ -3,6 +3,7 @@
 #include "signals.h"
 #include "database.h"
 #include "configuration.h"
+#include "safeio.h"
 
 #include <unistd.h>
 #include <errno.h>
@@ -53,7 +54,7 @@ status init() {
 
 	//Create a file for saving the md5sums and names of the solver binaries
 	//and the instance files as we receive them from the database.
-	md5File=fopen(md5FileName, "w+");
+	md5File=safeFopen(md5FileName, "w+");
 	if(md5File==NULL) {
 		logError("Unable to open %s: %s\n", md5FileName, strerror(errno));
 		return sysError;
@@ -61,12 +62,12 @@ status init() {
 
 	for(i=0; i<exp.numSolvers; ++i) {
 		//Create the solver binary
-		dst=fopen(exp.solverNames[i], "w+");
+		dst=safeFopen(exp.solverNames[i], "w+");
 		if(dst==NULL) {
 			logError("Unable to open %s: %s\n", exp.solverNames[i], strerror(errno));
 			return sysError;
 		}
-		fwrite(exp.solvers[i], sizeof(char), exp.lengthSolver[i], dst);
+		safeFwrite(exp.solvers[i], sizeof(char), exp.lengthSolver[i], dst);
 		//There's no need to check for errors in fwrite here. If something goes wrong,
 		//we'll get an error in the md5 check anyway.
 		fclose(dst);
@@ -78,7 +79,7 @@ status init() {
 		}
 
 		//Write the md5sum and file name of the solver binary to md5file
-		if(fprintf(md5File, "%s  %s\n", exp.md5Solvers[i], exp.solverNames[i])<0) {
+		if(safeFprintf(md5File, "%s  %s\n", exp.md5Solvers[i], exp.solverNames[i])<0) {
 			logError("Unable to write to %s\n", md5FileName);
 			return sysError;
 		}
@@ -86,12 +87,12 @@ status init() {
 
 	for(i=0; i<exp.numInstances; ++i) {
 		//Create the instance file
-		dst=fopen(exp.instanceNames[i], "w+");
+		dst=safeFopen(exp.instanceNames[i], "w+");
 		if(dst==NULL) {
 			logError("Unable to open %s: %s\n", exp.instanceNames[i], strerror(errno));
 			return sysError;
 		}
-		fprintf(dst, "%s", exp.instances[i]);
+		safeFprintf(dst, "%s", exp.instances[i]);
 		//There's no need to check for errors in fprintf here. If something goes wrong,
 		//we'll get an error in the md5 check anyway.
 		fclose(dst);
@@ -103,7 +104,7 @@ status init() {
 		}
 
 		//Write the md5sum and file name of the instance file to md5file
-		if(fprintf(md5File, "%s  %s\n", exp.md5Instances[i], exp.instanceNames[i])<0) {
+		if(safeFprintf(md5File, "%s  %s\n", exp.md5Instances[i], exp.instanceNames[i])<0) {
 			logError("Unable to write to %s\n", md5FileName);
 			return sysError;
 		}
@@ -205,16 +206,17 @@ status processResults(job* j) {
 	char* fileName=pidToFileName(j->pid);
 	FILE* filePtr;
 	FILE* resultFile;
-	int signum, semicolonsToSkip=3, c, dummy;
+	int signum, semicolonsToSkip=3, c, secFraction;
+	char buf[20];
 
 	//Parse the temporary result file of j
-	filePtr=fopen(fileName, "r");
+	filePtr=safeFopen(fileName, "r");
 	if(filePtr==NULL) {
 		logError("Unable to open %s: %s\n", fileName, strerror(errno));
 		return sysError;
 	}
 
-	if(fscanf(filePtr, "Command terminated by signal %d", &signum)==1) {
+	if(safeFscanf(filePtr, "Command terminated by signal %d", &signum)==1) {
 		//The solver was terminated by signal signum
 		if(signum==SIGXCPU)
 			j->status=2;
@@ -223,7 +225,7 @@ status processResults(job* j) {
 	} else {
 		//Skip semicolonsToSkip semicolons.
 		while(semicolonsToSkip>0) {
-			c=getc(filePtr);
+			c=safeGetc(filePtr);
 			if(c==(int)';') {
 				--semicolonsToSkip;
 			} else if(c==EOF) {
@@ -232,20 +234,24 @@ status processResults(job* j) {
 			}
 		}
 		//Extract the runtime and return value of the solver
-		if(fscanf(filePtr, "%d.%d;%d", &(j->time), &dummy, &(j->statusCode))!=3){
+		if(safeFscanf(filePtr, "%d.%d;%d", &(j->time), &secFraction, &(j->statusCode))!=3){
 			logError("Error parsing %s: Unexpected format\n", fileName);
 			return sysError;
 		}
+		//Round j->time to the nearest second
+		snprintf(buf, 20, "%d", secFraction);
+		if(buf[0]>='5')
+			++(j->time);
 		j->status=1;
 		//Append the first line of fileName to j->resultFileName
 		rewind(filePtr);
-		resultFile=fopen(j->resultFileName, "a");
+		resultFile=safeFopen(j->resultFileName, "a");
 		if(resultFile==NULL) {
 			logError("Unable to open %s: %s\n", j->resultFileName, strerror(errno));
 			return sysError;
 		}
 		do {
-			if((c=getc(filePtr))==EOF || fputc(c, resultFile)==EOF) {
+			if((c=safeGetc(filePtr))==EOF || safeFputc(c, resultFile)==EOF) {
 				logError("An error occured while copying a character from %s to %s\n", fileName, j->resultFileName);
 				return sysError;
 			}
