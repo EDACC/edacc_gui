@@ -45,28 +45,26 @@ FILE* safeFopen(const char* path, const char* mode) {
 
 int safeFprintf(FILE* stream, const char* format, ...) {
 	va_list args;
-	int retval, buflen=1;
-	char* buf;
-	char* formatPtr;
+	int retval;
+	char* buf=NULL;
 
-	//Calculate an upper bound of the length of the expanded format string format
-	for(formatPtr=(char*)format; *formatPtr!='\0'; ++formatPtr) {
-		if(*formatPtr=='%')
-			buflen+=50;
-		else
-			++buflen;
-	}
+	//Use vsnprintf to calculate the length of the expanded format string
+	va_start(args, format);
+	retval=vsnprintf(buf, 0, format, args);
+	va_end(args);
+	if(retval<0)
+		return -1;
 
-	//Allocate the buffer
-	buf=(char*)malloc(buflen);
+	//Allocate a buffer of the correct size
+	buf=(char*)malloc(retval);
 	if(buf==NULL)
 		return -1;
 
-	//Write the expanded format string format to buf
+	//Use vsnprintf to write the expanded format string to buf
 	va_start(args, format);
-	retval=vsnprintf(buf, buflen, format, args);
+	retval=vsnprintf(buf, retval, format, args);
 	va_end(args);
-	if(retval<0 || retval>=buflen) {
+	if(retval<0) {
 		free(buf);
 		return -1;
 	}
@@ -80,7 +78,7 @@ int safeFprintf(FILE* stream, const char* format, ...) {
 
 size_t safeFwrite(const void* ptr, size_t size, size_t nmemb, FILE* stream) {
 	size_t itemsWritten, retval=0, itemsToWrite=bps/size;
-	void* data=(void*)ptr;
+	char* data=(char*)ptr;
 
 	if(lock()!=0)
 		return 0;
@@ -92,7 +90,7 @@ size_t safeFwrite(const void* ptr, size_t size, size_t nmemb, FILE* stream) {
 		itemsWritten=fwrite(data, size, itemsToWrite, stream);
 		retval+=itemsWritten;
 		nmemb-=itemsWritten;
-		data=(char*)data+size;
+		data+=itemsWritten*size;
 		sleep(1);
 	} while(nmemb>0 && itemsWritten==itemsToWrite);
 
@@ -139,6 +137,7 @@ int safeFscanf(FILE* stream, const char* format, ...) {
 		if(itemsRead!=itemsToRead) {
 			free(buf);
 			unlock();
+			fseek(stream, currPos, SEEK_SET);
 			return EOF;
 		}
 		len-=itemsRead;
@@ -147,6 +146,12 @@ int safeFscanf(FILE* stream, const char* format, ...) {
 	} while(len>0);
 
 	if(unlock()!=0) {
+		free(buf);
+		fseek(stream, currPos, SEEK_SET);
+		return EOF;
+	}
+
+	if(fseek(stream, currPos, SEEK_SET)!=0) {
 		free(buf);
 		return EOF;
 	}
