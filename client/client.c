@@ -4,6 +4,7 @@
 #include "database.h"
 #include "configuration.h"
 #include "safeio.h"
+#include "mutex.h"
 
 #include <unistd.h>
 #include <errno.h>
@@ -35,83 +36,60 @@ char* pidToFileName(pid_t pid) {
 	return fileName;
 }
 
-status init() {
-	experiment exp;
-	status s;
+//Test if a file exists
+int fileExists(const char* fileName) {
+	struct stat buf;
+	if(stat(fileName, &buf)==-1 && errno==ENOENT)
+		return 0;
+	return 1;
+}
+
+//Create a file and verify the md5 sum
+status createFile(const char* fileName, const char* content, size_t contentLen, const char* md5sum, mode_t mode) {
+	FILE* dst;
+	FILE* md5File;
 	char* const md5FileName="md5sums.txt";
 	char* const md5CheckScript="md5check.sh";
 	char* const md5CheckScriptArgs[3]={md5CheckScript, md5FileName, NULL};
-	FILE* dst;
-	FILE* md5File;
 	pid_t pid;
-	int i, retval;
+	int retval;
 
-	s=dbFetchExperimentData(&exp);
-	if(s!=success)
-		return s;
-	jobsLen=exp.numNodes;
-	snprintf(timeOutStr, 20, "%d", exp.timeOut);
-
-	//Create a file for saving the md5sums and names of the solver binaries
-	//and the instance files as we receive them from the database.
-	md5File=safeFopen(md5FileName, "w+");
+	//Create a file for saving the md5sum and fileName
+	md5File=fopen(md5FileName, "w+");
 	if(md5File==NULL) {
 		logError("Unable to open %s: %s\n", md5FileName, strerror(errno));
 		return sysError;
 	}
 
-	for(i=0; i<exp.numSolvers; ++i) {
-		//Create the solver binary
-		dst=safeFopen(exp.solverNames[i], "w+");
-		if(dst==NULL) {
-			logError("Unable to open %s: %s\n", exp.solverNames[i], strerror(errno));
-			return sysError;
-		}
-		safeFwrite(exp.solvers[i], sizeof(char), exp.lengthSolver[i], dst);
-		//There's no need to check for errors in fwrite here. If something goes wrong,
-		//we'll get an error in the md5 check anyway.
-		fclose(dst);
-
-		//Assure the binary is executable
-		if(chmod(exp.solverNames[i], 0111)==-1) {
-			logError("Unable to change permissions for %s: %s\n", exp.solverNames[i], strerror(errno));
-			return sysError;
-		}
-
-		//Write the md5sum and file name of the solver binary to md5file
-		if(safeFprintf(md5File, "%s  %s\n", exp.md5Solvers[i], exp.solverNames[i])<0) {
-			logError("Unable to write to %s\n", md5FileName);
-			return sysError;
-		}
+	//Create the file
+	dst=fopen(fileName, "w+");
+	if(dst==NULL) {
+		logError("Unable to open %s: %s\n", fileName, strerror(errno));
+		fclose(md5File);
+		return sysError;
 	}
 
-	for(i=0; i<exp.numInstances; ++i) {
-		//Create the instance file
-		dst=safeFopen(exp.instanceNames[i], "w+");
-		if(dst==NULL) {
-			logError("Unable to open %s: %s\n", exp.instanceNames[i], strerror(errno));
-			return sysError;
-		}
-		safeFprintf(dst, "%s", exp.instances[i]);
-		//There's no need to check for errors in fprintf here. If something goes wrong,
-		//we'll get an error in the md5 check anyway.
-		fclose(dst);
+	//Write the file content. There's no need to check for errors in safeFwrite here;
+	//if something goes wrong, we'll get an error in the md5 check anyway.
+	safeFwrite(content, sizeof(char), contentLen, dst);
+	fclose(dst);
 
-		//Assure the file is readable
-		if(chmod(exp.instanceNames[i], 0444)==-1) {
-			logError("Unable to change permissions for %s: %s\n", exp.instanceNames[i], strerror(errno));
-			return sysError;
-		}
+	//Set the file permissions
+	if(chmod(fileName, mode)==-1) {
+		logError("Unable to change permissions for %s: %s\n", fileName, strerror(errno));
+		fclose(md5File);
+		return sysError;
+	}
 
-		//Write the md5sum and file name of the instance file to md5file
-		if(safeFprintf(md5File, "%s  %s\n", exp.md5Instances[i], exp.instanceNames[i])<0) {
-			logError("Unable to write to %s\n", md5FileName);
-			return sysError;
-		}
+	//Write md5sum and fileName to md5file
+	if(safeFprintf(md5File, "%s  %s\n", md5sum, fileName)<0) {
+		logError("Unable to write to %s\n", md5FileName);
+		fclose(md5File);
+		return sysError;
 	}
 	fclose(md5File);
 
-	//Verify the md5sums of the solver binaries and instance files agains the contents of md5file
+	//Verify the md5sums of the file against the content of md5file
 	pid=fork();
 	if(pid==-1) {
 		logError("Error in fork(): %s\n", strerror(errno));
@@ -130,10 +108,62 @@ status init() {
 		return sysError;
 	}
 	if(retval!=0) {
-		logError("The md5 sums of the local files don't match the values from the database\n");
+		logError("The md5 sum of %s doesn't match\n", fileName);
 		return sysError;
 	}
 	remove(md5FileName);
+
+	return success;
+}
+
+status init() {
+	experiment exp;
+	status s;
+	int i;
+
+	s=dbFetchExperimentData(&exp);
+	if(s!=success)
+		return s;
+	jobsLen=exp.numNodes;
+	snprintf(timeOutStr, 20, "%d", exp.timeOut);
+
+	for(i=0; i<exp.numSolvers; ++i) {
+		//Start a mutual execution lock between several application instances
+		if(lockMutex()!=success)
+			return sysError;
+		//Create the solver binary if it doesn't exist yet
+		if(fileExists(exp.solverNames[i])) {
+			unlockMutex();
+			continue;
+		}
+		if(createFile(exp.solverNames[i], exp.solvers[i], exp.lengthSolver[i],
+		   exp.md5Solvers[i], 0111)!=success                                  ) {
+			unlockMutex();
+			return sysError;
+		}
+		//End the mutual execution lock
+		if(unlockMutex()!=success)
+			return sysError;
+	}
+
+	for(i=0; i<exp.numInstances; ++i) {
+		//Start a mutual execution lock between several application instances
+		if(lockMutex()!=success)
+			return sysError;
+		//Create the instance file if it doesn't exist yet
+		if(fileExists(exp.instanceNames[i])) {
+			unlockMutex();
+			continue;
+		}
+		if(createFile(exp.instanceNames[i], exp.instances[i], strlen(exp.instances[i]),
+		   exp.md5Instances[i], 0444)!=success                                         ) {
+			unlockMutex();
+			return sysError;
+		}
+		//End the mutual execution lock
+		if(unlockMutex()!=success)
+			return sysError;
+	}
 
 	jobs=calloc(jobsLen, sizeof(job));
 	if(jobs==NULL) {
@@ -168,7 +198,7 @@ void shutdown(status retval) {
 	int i;
 
 	deferSignals();
-	safeioUnlink();
+	unrefMutex();
 
 	//Massacre all other processes in the group including any child they might have
 	kill(0, SIGTERM);
@@ -211,7 +241,7 @@ status processResults(job* j) {
 	char buf[20];
 
 	//Parse the temporary result file of j
-	filePtr=safeFopen(fileName, "r");
+	filePtr=fopen(fileName, "r");
 	if(filePtr==NULL) {
 		logError("Unable to open %s: %s\n", fileName, strerror(errno));
 		return sysError;
@@ -246,7 +276,7 @@ status processResults(job* j) {
 		j->status=1;
 		//Append the first line of fileName to j->resultFileName
 		rewind(filePtr);
-		resultFile=safeFopen(j->resultFileName, "a");
+		resultFile=fopen(j->resultFileName, "a");
 		if(resultFile==NULL) {
 			logError("Unable to open %s: %s\n", j->resultFileName, strerror(errno));
 			return sysError;
@@ -314,6 +344,8 @@ int main() {
 	status s;
 	job* j;
 	pid_t pid;
+	solver solv;
+	instance inst;
 
 	read_config();
 
@@ -340,6 +372,40 @@ int main() {
 				}
 				shutdown(s);
 			}
+
+			//Start a mutual execution lock between several application instances
+			if(lockMutex()!=success)
+				shutdown(sysError);
+
+			//Create the solver binary if it doesn't exist yet
+			if(!fileExists(j->solverName)) {
+				s=dbFetchSolver(j->solverName, &solv);
+				if(s!=success) {
+					unlockMutex();
+					shutdown(s);
+				}
+				if(createFile(j->solverName, solv.solver, solv.length, solv.md5, 0111)!=success) {
+					unlockMutex();
+					shutdown(sysError);
+				}
+			}
+
+			//Create the instance file if it doesn't exist yet
+			if(!fileExists(j->instanceName)) {
+				s=dbFetchInstance(j->instanceName, &inst);
+				if(s!=success) {
+					unlockMutex();
+					shutdown(s);
+				}
+				if(createFile(j->instanceName, inst.instance, strlen(inst.instance), inst.md5, 0444)!=success) {
+					unlockMutex();
+					shutdown(sysError);
+				}
+			}
+
+			//End the mutual execution lock
+			if(unlockMutex()!=success)
+				shutdown(sysError);
 
 			//Create a process for processing the job
 			pid=fork();

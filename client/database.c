@@ -227,3 +227,14 @@ int dbFetchJob(job* j, status* s) {
 status dbUpdate(const job* j) {
 	return success;
 }
+
+//Try to fetch the solver named solverName from the database
+status dbFetchSolver(const char* solverName, solver* s) {
+	return success;
+}
+
+//Try to fetch the instance named instanceName from the database
+status dbFetchInstance(const char* instanceName, instance* i) {
+	return success;
+}
+

@@ -1,47 +1,13 @@
 #include "safeio.h"
 
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <semaphore.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <time.h>
 
-//The semaphore used for mutual file access exclusion
-static const char* const semName="clientLock";
-static sem_t* sem=NULL;
-
 //The maximal disk access rate in bytes per seconds
 const size_t bps=190*1000;
-
-static inline int lock() {
-	if(sem==NULL) {
-		sem=sem_open(semName, O_CREAT, 0600, 1);
-		if(sem==SEM_FAILED) {
-			sem=NULL;
-			return -1;
-		}
-	}
-	return sem_wait(sem);
-}
-
-static inline int unlock() {
-	return sem_post(sem);
-}
-
-FILE* safeFopen(const char* path, const char* mode) {
-	FILE* retval;
-
-	if(lock()!=0)
-		return NULL;
-	retval=fopen(path, mode);
-	if(unlock()!=0)
-		return NULL;
-
-	return retval;
-}
 
 int safeFprintf(FILE* stream, const char* format, ...) {
 	va_list args;
@@ -80,9 +46,6 @@ size_t safeFwrite(const void* ptr, size_t size, size_t nmemb, FILE* stream) {
 	size_t itemsWritten, retval=0, itemsToWrite=bps/size;
 	char* data=(char*)ptr;
 
-	if(lock()!=0)
-		return 0;
-
 	//Write at most bps/size bytes per second to stream
 	do {
 		if(nmemb<itemsToWrite)
@@ -93,9 +56,6 @@ size_t safeFwrite(const void* ptr, size_t size, size_t nmemb, FILE* stream) {
 		data+=itemsWritten*size;
 		sleep(1);
 	} while(nmemb>0 && itemsWritten==itemsToWrite);
-
-	if(unlock()!=0)
-		return 0;
 
 	return retval;
 }
@@ -124,11 +84,6 @@ int safeFscanf(FILE* stream, const char* format, ...) {
 	buf[len]='\0';
 	bufptr=buf;
 
-	if(lock()!=0) {
-		free(buf);
-		return EOF;
-	}
-
 	//Read at most bps/sizeof(char) bytes per second into buf
 	do {
 		if(len<itemsToRead)
@@ -136,7 +91,6 @@ int safeFscanf(FILE* stream, const char* format, ...) {
 		itemsRead=fread(bufptr, sizeof(char), itemsToRead, stream);
 		if(itemsRead!=itemsToRead) {
 			free(buf);
-			unlock();
 			fseek(stream, currPos, SEEK_SET);
 			return EOF;
 		}
@@ -144,12 +98,6 @@ int safeFscanf(FILE* stream, const char* format, ...) {
 		bufptr+=itemsRead;
 		sleep(1);
 	} while(len>0);
-
-	if(unlock()!=0) {
-		free(buf);
-		fseek(stream, currPos, SEEK_SET);
-		return EOF;
-	}
 
 	if(fseek(stream, currPos, SEEK_SET)!=0) {
 		free(buf);
@@ -172,17 +120,9 @@ int safeGetc(FILE *stream) {
 	req.tv_sec=0;
 	req.tv_nsec=1000000L/((long)bps/1000L)+1;
 
-	if(lock()!=0) {
-		return EOF;
-	}
 	retval=getc(stream);
-	if(nanosleep(&req, NULL)!=0) {
-		unlock();
+	if(nanosleep(&req, NULL)!=0)
 		return EOF;
-	}
-	if(unlock()!=0) {
-		return EOF;
-	}
 
 	return retval;
 }
@@ -194,24 +134,10 @@ int safeFputc(int c, FILE *stream) {
 	req.tv_sec=0;
 	req.tv_nsec=1000000L/((long)bps/1000L)+1;
 
-	if(lock()!=0) {
-		return EOF;
-	}
 	retval=fputc(c, stream);
-	if(nanosleep(&req, NULL)!=0) {
-		unlock();
+	if(nanosleep(&req, NULL)!=0)
 		return EOF;
-	}
-	if(unlock()!=0) {
-		return EOF;
-	}
-
+	
 	return retval;
-}
-
-void safeioUnlink() {
-	if(sem==NULL)
-		return;
-	sem_unlink(semName);
 }
 

@@ -22,6 +22,12 @@ int dbFetchJob(job* j, status* s);
 //Store information about the job j that just started running
 status dbUpdate(const job* j);
 
+//Try to fetch the solver named solverName from the database
+status dbFetchSolver(const char* solverName, solver* s);
+
+//Try to fetch the instance named instanceName from the database
+status dbFetchInstance(const char* instanceName, instance* i);
+
 
 #endif
 

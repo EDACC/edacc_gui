@@ -68,4 +68,18 @@ typedef struct {
     int statusCode; // solver return value, when the run is finished
 } job;
 
+typedef struct {
+    int length; // length of the solver
+    char *md5; // the md5 sum of the solver
+    // the binary of the solver, NOT terminated by 0x00
+    char *solver; 
+} solver;
+
+typedef struct {
+    char *md5; // md5 sum of the instance file
+    // the instance, manually appended with 0x00, 
+    // because column type in table is mediumblob
+    char *instance;
+} instance;
+
 #endif
