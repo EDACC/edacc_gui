@@ -315,8 +315,14 @@ status handleChildren(int cnt) {
 		for(j=jobs; j->pid!=pid; ++j);
 
 		if(WIFEXITED(retval) && (WEXITSTATUS(retval)==0)) {
-			//The process terminated normally
+			//The process terminated normally.
+			//Start a mutual execution lock between several application instances.
+			if(lockMutex()!=success)
+				return sysError;
 			s=processResults(j);
+			//End the mutual execution lock
+			if(unlockMutex()!=success)
+				return sysError;
 			j->pid=0;
 			if(s!=success) {
 				return s;
