@@ -237,8 +237,8 @@ status processResults(job* j) {
 	char* fileName=pidToFileName(j->pid);
 	FILE* filePtr;
 	FILE* resultFile;
-	int signum, semicolonsToSkip=3, c, secFraction;
-	char buf[20];
+	int signum, semicolonsToSkip=3, c;
+	char secFraction, dummy;
 
 	//Parse the temporary result file of j
 	filePtr=fopen(fileName, "r");
@@ -265,13 +265,12 @@ status processResults(job* j) {
 			}
 		}
 		//Extract the runtime and return value of the solver
-		if(safeFscanf(filePtr, "%d.%d;%d", &(j->time), &secFraction, &(j->statusCode))!=3){
+		if(safeFscanf(filePtr, "%d.%c%c;%d", &(j->time), &secFraction, &dummy, &(j->statusCode))!=4){
 			logError("Error parsing %s: Unexpected format\n", fileName);
 			return sysError;
 		}
 		//Round j->time to the nearest second
-		snprintf(buf, 20, "%d", secFraction);
-		if(buf[0]>='5')
+		if(secFraction>='5')
 			++(j->time);
 		j->status=1;
 		//Append the first line of fileName to j->resultFileName
