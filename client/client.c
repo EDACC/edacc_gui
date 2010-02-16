@@ -472,6 +472,7 @@ int main(int argc, char *argv[]) {
 			fileName=addBasename(j->solverName);
 			if(fileName==NULL) {
 				logError("Error: Out of memory\n");
+				unlockMutex();
 				shutdown(sysError);
 			}
 			if(!fileExists(fileName)) {
@@ -493,6 +494,7 @@ int main(int argc, char *argv[]) {
 			fileName=addBasename(j->instanceName);
 			if(fileName==NULL) {
 				logError("Error: Out of memory\n");
+				unlockMutex();
 				shutdown(sysError);
 			}
 			if(!fileExists(fileName)) {
