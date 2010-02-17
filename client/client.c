@@ -5,6 +5,7 @@
 #include "configuration.h"
 #include "safeio.h"
 #include "mutex.h"
+#include "md5sum.h"
 
 #include <unistd.h>
 #include <errno.h>
@@ -72,87 +73,45 @@ int fileExists(const char* fileName) {
 //Create a file and verify the md5 sum
 status createFile(const char* fileName, const char* content, size_t contentLen, const char* md5sum, mode_t mode) {
 	FILE* dst;
-	FILE* md5File;
-	char* md5FileName;
-	char* md5CheckScript="md5check.sh";
-	char* md5CheckScriptArgs[3];
-	pid_t pid;
-	int retval;
-
-	//Create a file for saving the md5sum and fileName
-	md5FileName=addBasename("md5sums.txt");
-	if(md5FileName==NULL) {
-		logError("Error: Out of memory\n");
-		return sysError;
-	}
-	md5File=fopen(md5FileName, "w+");
-	if(md5File==NULL) {
-		logError("Unable to open %s: %s\n", md5FileName, strerror(errno));
-		free(md5FileName);
-		return sysError;
-	}
+	unsigned char md5Buffer[16];
+	char md5String[33];
+	int i;
+	char* md5StringPtr;
 
 	//Create the file
 	dst=fopen(fileName, "w+");
 	if(dst==NULL) {
 		logError("Unable to open %s: %s\n", fileName, strerror(errno));
-		fclose(md5File);
-		free(md5FileName);
 		return sysError;
 	}
 
 	//Write the file content. There's no need to check for errors in fwrite here;
 	//if something goes wrong, we'll get an error in the md5 check anyway.
 	safeFwrite(content, sizeof(char), contentLen, dst);
+
+	//Verify the md5sum
+	rewind(dst);
+	if(md5_stream(dst, &md5Buffer)!=0) {
+		logError("Error in md5_stream()\n");
+		fclose(dst);
+		return sysError;
+	}
+	for(i=0, md5StringPtr=md5String; i<16; ++i, md5StringPtr+=2)
+		sprintf(md5StringPtr, "%02x", md5Buffer[i]);
+	md5String[32]='\0';
+	if(strcasecmp(md5String, md5sum)!=0) {
+		logError("The md5 sum of %s doesn't match\n", fileName);
+		fclose(dst);
+		return sysError;
+	}
+
 	fclose(dst);
 
 	//Set the file permissions
 	if(chmod(fileName, mode)==-1) {
 		logError("Unable to change permissions for %s: %s\n", fileName, strerror(errno));
-		fclose(md5File);
-		free(md5FileName);
 		return sysError;
 	}
-
-	//Write md5sum and fileName to md5file
-	if(safeFprintf(md5File, "%s  %s\n", md5sum, fileName)<0) {
-		logError("Unable to write to %s\n", md5FileName);
-		fclose(md5File);
-		free(md5FileName);
-		return sysError;
-	}
-	fclose(md5File);
-
-	//Verify the md5sums of the file against the content of md5file
-	pid=fork();
-	if(pid==-1) {
-		logError("Error in fork(): %s\n", strerror(errno));
-		return sysError;
-	} else if(pid==0) {
-		//This is the child process. Run the local md5sum program to verify the md5 sums.
-		md5CheckScriptArgs[0]=md5CheckScript;
-		md5CheckScriptArgs[1]=md5FileName;
-		md5CheckScriptArgs[2]=NULL;
-		if(execve(md5CheckScript, md5CheckScriptArgs, NULL)==-1) {
-			logError("Error in execve(): %s\n", strerror(errno));
-			free(md5FileName);
-			return sysError;
-		}
-	}
-	//This is the parent process. Wait for the md5sum check and interpret the return value.
-	pid=wait(&retval);
-	if(pid==-1){
-		logError("Error in wait(): %s\n", strerror(errno));
-		free(md5FileName);
-		return sysError;
-	}
-	if(retval!=0) {
-		logError("The md5 sum of %s doesn't match\n", fileName);
-		free(md5FileName);
-		return sysError;
-	}
-	remove(md5FileName);
-	free(md5FileName);
 
 	return success;
 }
