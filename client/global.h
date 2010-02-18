@@ -29,7 +29,7 @@ typedef struct {
     int numNodes; // number of nodes
     int timeOut; // timeout for each solver run in seconds
     int numInstances; // number of used instances
-    char **md5Instances; // md5 sums of instance files
+    char *md5Instances[60]; // md5 sums of instance files
     // the instances, manually appended with 0x00, 
     // because column type in table is mediumblob
     char **instances; 
@@ -38,7 +38,7 @@ typedef struct {
     int *idInstances; // the instances ids*/
     int numSolvers; // number of used solvers
     int *lengthSolver; // length of each solver
-    char **md5Solvers; // the md5 sums for each solver
+    char *md5Solvers[60]; // the md5 sums for each solver
     // the binary for each solver, NOT terminated by 0x00
     char **solvers; 
     char **solverNames; // the names for each solver
