@@ -2,7 +2,7 @@
 #include "log.h"
 #include "signals.h"
 #include "database.h"
-//#include "configuration.h"
+#include "configuration.h"
 #include "safeio.h"
 #include "mutex.h"
 #include "md5sum.h"
@@ -473,7 +473,7 @@ int main(int argc, char *argv[]) {
 	instance inst;
 	char* fileName;
 
-	//read_config();
+	read_config();
 
 	s=init(argc, argv);
 	if(s!=success) {
