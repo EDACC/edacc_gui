@@ -9,7 +9,7 @@ clean:
 	rm -f client
 
 client: client.o log.o signals.o safeio.o mutex.o database.o configuration.o dbmgr.o md5sum.o
-	$(CC) $(CFLAGS) *.o -o client -lrt `mysql_config --cflags` `mysql_config --libs`
+	$(CC) $(CFLAGS) *.o -o client -static -pthread `mysql_config --cflags` `mysql_config --libs`
 
 client.o: client.c global.h log.h signals.h database.h configuration.h safeio.h mutex.h md5sum.h
 	$(CC) $(CFLAGS) -c $<

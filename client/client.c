@@ -2,7 +2,7 @@
 #include "log.h"
 #include "signals.h"
 #include "database.h"
-#include "configuration.h"
+//#include "configuration.h"
 #include "safeio.h"
 #include "mutex.h"
 #include "md5sum.h"
@@ -16,12 +16,11 @@
 #include <string.h>
 #include <signal.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 
-//The path of the shellscript we're using to execute a solver run
-//and an array for storing it's arguments
-const char* const jobScript="jobScript.sh";
-char* jobScriptArgs[8]={NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+//This array stores the arguments for a solver run we execute via execve
+char* jobArgs[4]={NULL, NULL, NULL, NULL};
 
 //An array for keeping track of the jobs we're currently processing
 job* jobs;
@@ -33,8 +32,8 @@ char* basename="./";
 //The length of basename without the terminating '\0' character
 int basenameLen;
 
-//The timeout in seconds for each solver run in string form
-char timeOutStr[20];
+//The timeout in seconds for each solver run
+int timeOut;
 
 
 //Returns a unique file name based on pid. The string is located in static memory
@@ -87,7 +86,7 @@ status createFile(const char* fileName, const char* content, size_t contentLen, 
 
 	//Write the file content. There's no need to check for errors in fwrite here;
 	//if something goes wrong, we'll get an error in the md5 check anyway.
-	safeFwrite(content, sizeof(char), contentLen, dst);
+	fwrite(content, sizeof(char), contentLen, dst);
 
 	//Verify the md5sum
 	rewind(dst);
@@ -130,7 +129,7 @@ status init(int argc, char *argv[]) {
 	if(s!=success)
 		return s;
 	jobsLen=exp.numNodes;
-	snprintf(timeOutStr, 20, "%d", exp.timeOut);
+	timeOut=exp.timeOut;
 
 	for(i=0; i<exp.numSolvers; ++i) {
 		//Prepend the solver name with pathname
@@ -286,7 +285,7 @@ status processResults(job* j) {
 		return sysError;
 	}
 
-	if(safeFscanf(filePtr, "Command terminated by signal %d", &signum)==1) {
+	if(fscanf(filePtr, "Command terminated by signal %d", &signum)==1) {
 		//The solver was terminated by signal signum
 		if(signum==SIGXCPU)
 			j->status=2;
@@ -305,7 +304,7 @@ status processResults(job* j) {
 			}
 		}
 		//Extract the runtime and return value of the solver
-		if(safeFscanf(filePtr, "%d.%c%c;%d", &(j->time), &secFraction, &dummy, &(j->statusCode))!=4){
+		if(fscanf(filePtr, "%d.%c%c;%d", &(j->time), &secFraction, &dummy, &(j->statusCode))!=4){
 			logError("Error parsing %s: Unexpected format\n", fileName);
 			free(fileName);
 			return sysError;
@@ -388,6 +387,83 @@ status handleChildren(int cnt) {
 	return success;
 }
 
+//A version of sprintf that sets str to newly allocated memory containing the output string.
+//If the function succeeds (i.e. returns a non-negative value), the memory pointed to by str
+//needs to be freed.
+int sprintfAlloc(char** str, const char* format, ...) {
+	va_list args;
+	int retval;
+
+	//Use vsnprintf to calculate the length of the expanded format string
+	va_start(args, format);
+	retval=vsnprintf(*str, 0, format, args);
+	va_end(args);
+	if(retval<0)
+		return -1;
+
+	//Allocate memory of the correct size and terminate it with '\0'
+	*str=(char*)malloc(retval+1);
+	if(*str==NULL)
+		return -1;
+
+	//Use vsnprintf to write the expanded format string to *str
+	va_start(args, format);
+	retval=vsnprintf(*str, retval+1, format, args);
+	va_end(args);
+	if(retval<0)
+		free(*str);
+
+	return retval;
+}
+
+//Fill jobArgs with the information in j. If the function succeeds, some parts of
+//jobArgs might be set to allocated memory that can be freed with freeJobArg().
+status setJobArgs(const job* j) {
+	char* fileName;
+	char* command;
+	char* solverName;
+	char* instanceName;
+
+	fileName=addBasename(pidToFileName(getpid()));
+	if(fileName==NULL) {
+		logError("Error: Out of memory\n");
+		return sysError;
+	}
+	solverName=addBasename(j->solverName);
+	if(solverName==NULL) {
+		logError("Error: Out of memory\n");
+		free(fileName);
+		return sysError;
+	}
+	instanceName=addBasename(j->instanceName);
+	if(instanceName==NULL) {
+		logError("Error: Out of memory\n");
+		free(fileName);
+		free(solverName);
+		return sysError;
+	}
+	if(sprintfAlloc(&command,
+	                "ulimit -S -t %d && /usr/bin/time -a -o %s -f \"%%U;%%x\" %s %s %s >> %s",
+	                timeOut, fileName, solverName, j->params, instanceName, fileName          ) < 0) {
+		logError("Error in sprintfAlloc()\n");
+		free(fileName);
+		free(solverName);
+		free(instanceName);
+		return sysError;
+	}
+
+	jobArgs[0]="/bin/bash";
+	jobArgs[1]="-c";
+	jobArgs[2]=command;
+	jobArgs[3]=NULL;
+
+	return success;
+}
+
+void freeJobArgs() {
+	free(jobArgs[2]);
+}
+
 int main(int argc, char *argv[]) {
 	int numJobs;
 	status s;
@@ -397,7 +473,7 @@ int main(int argc, char *argv[]) {
 	instance inst;
 	char* fileName;
 
-	read_config();
+	//read_config();
 
 	s=init(argc, argv);
 	if(s!=success) {
@@ -481,22 +557,16 @@ int main(int argc, char *argv[]) {
 				logError("Error in fork(): %s\n", strerror(errno));
 				shutdown(sysError);
 			} else if(pid==0) {
-				//This is the child process.
-				deferSignals(); //Disable the inherited signal handler.
+				//This is the child process. Disable the inherited signal handler.
+				deferSignals();
 				//Set the job state to running in the database
 				j->status=0;
 				s=update(j);
-				//Set up the jobScriptArgs array
-				jobScriptArgs[0]=(char*)jobScript;
-				jobScriptArgs[1]=j->solverName;
-				jobScriptArgs[2]=j->params;
-				jobScriptArgs[3]=j->instanceName;
-				jobScriptArgs[4]=pidToFileName(getpid());
-				jobScriptArgs[5]=timeOutStr;
-				jobScriptArgs[6]=basename;
-				if(s==success) {
-					if(execve(jobScript, jobScriptArgs, NULL)==-1) {
+				//Set up jobArgs and run the command
+				if(s==success && (s=setJobArgs(j))==success) {
+					if(execve("/bin/bash", jobArgs, NULL)==-1) {
 						logError("Error in execve(): %s\n", strerror(errno));
+						freeJobArgs();
 						s=sysError;
 					}
 				}
@@ -516,6 +586,7 @@ int main(int argc, char *argv[]) {
 				exit(sysError);
 			}
 			j->pid=pid;
+
 		}
 
 		//Wait until one child process terminates and handle the result

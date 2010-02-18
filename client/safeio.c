@@ -8,7 +8,7 @@
 
 //The maximal disk access rate in bytes per seconds
 const size_t bps=190*1000;
-
+/*
 int safeFprintf(FILE* stream, const char* format, ...) {
 	va_list args;
 	int retval;
@@ -112,7 +112,7 @@ int safeFscanf(FILE* stream, const char* format, ...) {
 	free(buf);
 	return retval;
 }
-
+*/
 int safeGetc(FILE *stream) {
 	int retval;
 	struct timespec req;

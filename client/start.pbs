@@ -1,0 +1,349 @@
+#!/bin/bash
+#
+# BW-Grid PBS-Torque example script for
+# (1) one serial single core job (only 1 core out of 8 used),
+# (2) 8 serial single core jobs in parallel on one node (8 core of 8 used),
+# (3) one 8-core MPI-parallel job (8 core of 8 used).
+#
+# Changes:
+# V2.2 16.06.08 Switched to 'mpi/mvapich2/1.0.1-intel-10.1'.
+# V2.3 17.06.08 Documentation of local RAM disk '/tmp'.
+# V2.4 18.06.08 Automatic creation of '/tmp/$USER' dirs (if desired).
+# V2.5 20.07.08 Switched to 'mpi/openmpi/1.2.6-intel-10.1'.
+# V2.6 16.08.08 The commands checkjob and tracejob do not work properly.
+# V3.0 09.02.09 Image2: New: '/opt/bwgrid', 'mpi/openmpi/1.2.8-intel-10.1',
+#               120GB local disk /tmp/.
+# V3.1 17.03.09 Run on any bwGRiD location (user should adjust TMP_BASE_DIR,
+#               copy the mpi executable, change the path to the mpi executable,
+#               adjust the 'PBS -l nodes=' statement for the new location)
+#
+# Since each node has 8 cores, even a "serial" job running on only one node
+# can use up to 8 cores. So if you need only 1-core jobs, you can
+# start 8 1-core jobs in parallel within one job-script.
+#
+# The script can be submitted in your *workspace* on node 'themis'
+# via command 'qsub bw-grid-example.pbs'. STDOUT of your
+# jobs can be found in the submit directory *AFTER* your job
+# has finished (filenames like bw-grid-example.pbs.o2751).
+# You can monitor your job with command 'qstat' and delete
+# the job with 'qdel PBS_JOBID'. Qsub returns the PBS_JOBID
+# for the submitted job and qstat diplays the jobids of all jobs.
+# 'qstat -n' displays the nodes were the jobs are running.
+# The commands 'checkjob PBS_JOBID', 'tracejob PBS_JOBID' and
+# 'qstat -f PBS_JOBID' display additional information for your job.
+# Due to permission issues, checkjob and tracejob are not available jet.
+#
+# PLEASE: Before you submit this script, you should allocate a workspace
+# via command 'ws_allocate WORKSPACE_NAME PERIOD_OF_EXISTENCE_IN_DAYS',
+# change to that workspace, copy the job-script to it and submit there.
+# The example script 'bw-grid-example.pbs' operates entirely within
+# that workspace. First it creats a temporary work dir $TMP_WORK_DIR.
+# Then it performs some calculations in it. Small input files
+# can be created "ON-THE-FLY" (see below) within this script or can be
+# accessed directly via PBS_O_WORKDIR.
+#
+# Since the script operates within one workspace, there is no need
+# to copy backward and forward large input and output files.
+# Example: If many jobs share the same large input file (read only),
+# you can create a common subdirectory in your workspace for all jobs:
+# E.g. "$PBS_O_WORKDIR/../common-input-files/" if your pbs-submit
+# directories are all on the same directory level.
+# Necessary output files can be left (compressed) in their TMP_WORK_DIR,
+# if the TMP_WORK_DIR is located within the workspace area.
+#
+# $TMP_WORK_DIR can either be located below /tmp/$USER (a private node-local
+# 120GB harddisk) or below $PBS_O_WORKDIR (which should point somewhere into
+# your workspace area). If your calculation uses some subdirectory of your
+# workspace as TMP_WORK_DIR, please make sure, that your job does not consume
+# to much disk bandwidth (since all jobs share the same workspace server).
+# In addition you might be able to reduce the disk usage of your job
+# by changing to another algorithem (e.g. some memory direct algorithm).
+#
+# PLEASE:
+# * To save disk space delete unnecessary files and compress result files
+#   at the end of your jobs automatically.
+# * Do NOT calculate in your HOME directory. Use a workspace instead.
+# * Use a simple 'cp' command and not 'scp' to copy files within the cluster.
+#
+# Before your script is executed by Torque, the following
+# shell variables are defined by Torque:
+# PBS_O_WORKDIR = Name of dir where you have typed 'qsub bw-grid-example.pbs'.
+# PBS_JOBNAME   = Name of job, default is scriptname,eg 'bw-grid-example.pbs'.
+# PBS_JOBID     = Job-id used by Torque (e.g. qsub returns that job-id).
+# NSLOTS        = Number of (parallel) cores requested for one job (default 1)
+# PBS_NODEFILE  = List of cores(nodenames) for parallel jobs (for $NSLOTS > 1).
+#
+# The following PBS-tags do only work if they are at the beginning of your
+# PBS-script. The PBS-parameter-parser stops at the first line,
+# that does NOT start with an # sign.
+#
+########## BEGIN PBS-HEADER (entries are active, if the line starts with "#PBS")
+#
+#### PBS_JOBNAME: Max 15 chars [a-zA-Z0-9._-], must not start with number.
+#### Default is the file name of the submit script, e.g. 'bw-grid-example.pbs'.
+#    -N my_example_job
+#
+#### OUTPUT: '-j oe' = merge STDERR into STDOUT. After your job has finished,
+#### you can find the STDOUT of your job (files like bw-grid-example.pbs.o2751)
+#### in the same dir, where you have typed 'qsub bw-grid-example.pbs'.
+#### Usually the outputfile is available there *after* your job has finished.
+#PBS -j oe
+#
+#### MAIL: Mail to "-M user@host", if job (a)borts, (b)egin or (e)nds "-m abe"
+#### Please define a valid mail address and activate the line '-M'.
+#PBS    -m ae
+#PBS    -M raffael.bild@uni-ulm.de
+#
+#### MEMORY: ~200MB larger than what your job needs,not more than 14GB per node.
+#### Better stay below 12 GB total memory per node.
+#### Since you always own one or more entire nodes, the flag might not be that
+#### important. BUT: By specifying the required amount of memory you can protect
+#### your jobs from running on nodes with failed memory modules. These nodes
+#### automatically kill the defect module and continue running with less mem.
+#    -l mem=3000mb
+#
+#### PROPERTIES and NUMBER_OF_NODES: See 'pbsnodes -a' for a list of properties.
+#### The node(s) is(are) reserved exclusively for your job. No other user will
+#### get on them. For 4 nodes (32 cores), use '-l nodes=4:bwgrid,pmem=14gb'.
+#PBS -l nodes=4:bwgrid,pmem=14gb
+#    -l nodes=4:bwgrid,pmem=14gb
+#### Details: The statement "-l nodes=4:bwgrid,pmem=14gb" requests 4 nodes with
+#### 1 core on each node (due to the additional memory condition). This works 
+#### on all bwGRiD locations (independent of np=1 in Ulm or np=8). Since the
+#### queuing system allocates 1 core per node only, the script (THIS SCRIPT!)
+#### is responsible to use the nodes efficiently, e.g. via
+####    n_cores=`cat "$PBS_NODEFILE" | sort | uniq | wc -l | awk '{print $1*8}'`
+####    mpiexec -np $n_cores
+#### Many options have been left out in the example.
+#### For details see mpiexec examples below.
+#
+#### CPUTIME: Maximal cummulative cpu-time of job (all cores added together).
+#### WALLTIME: Total real-clock time of job ("stopp-watch time").
+#### See output of 'qstat -q' and 'qstat -Q -f' for time limits.
+#### E.g. '-l cput=8:00:00' sets the CPUTIME to 8 hours.
+#### The required for cput depends on the number of workers.
+#### Therefore (usually): CPUT = WALLTIME * 8 * number_of_nodes
+#PBS -l cput=00:15:00
+#PBS -l walltime=96:00:00
+#### The limits walltime and cput differe from location to location in bwGRiD.
+#
+#### FURTHER REMARKS:
+# * You should not state explicitly a destination queue since the routing
+#   queue 'batch' automatically puts your job into the correct final queue.
+# * If you request more resources than your job requires, you block other
+#   users jobs from starting since some of the resources are consumables.
+#   (Will be introduced later.)
+#
+########## END   PBS-HEADER ##########
+
+
+# -------- NO NEED TO MODIFY THIS SECTION -------------------------------------
+### Basic shell setup:
+# Load system defaults and prepare shell environment, just for the case,
+# that it has not been already done yet. Usually this is not necessary. But it
+# is very annoying, if e.g. a dir is missing in PATH.
+
+echo " "
+echo "Reading in /etc/profile ..."
+echo " "
+if test -e "/etc/profile"; then source "/etc/profile"; fi;
+export LANG="en_US" # Make sure, floats are written with '.' and not with ','.
+unalias cd          # Remove alias cd=chdir, which changes xterm-titles.
+
+# * Serial jobs: Since we want to start 8 serial jobs in parallel later,
+#   it is contraproductive, if MKL tries to use 8x8 cores on one node.
+# * MPI jobs: MPI is responsible for using the cores efficiently. If
+#   the thread-library interferes, it usually gets much worse.
+# Please see MKL documentation on details about these variables:
+# E.g. /opt/bwgrid/compiler/intel/ct_3.1.1/mkl/10.0.3.020/doc/userguide.pdf
+export MKL_NUM_THREADS=1; export OMP_NUM_THREADS=1
+export SSH_OPT="-a -T -x -o BatchMode=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=no"
+
+
+# -------- NO NEED TO MODIFY THIS SECTION -------------------------------------
+### Forground execution abstraction layer:
+# For debugging/convenience: If script is executed in foreground by user and not
+# via Torque (e.g. 'bash bw-grid-example.pbs'), then redefine some Torque vars.
+# STDOUT and STDERR streams are bound to stdout/err of your terminal,
+# e.g. files like bw-grid-example.pbs.o2751 are not created.
+
+if test -z "$PBS_JOBNAME"; then
+  PBS_JOBNAME=`awk '{if($1=="#PBS"&&$2=="-N"){print $3}}' "$0" | sed 's/[^a-zA-Z0-9._-]/_/g'`
+fi
+if test -z "$PBS_JOBNAME"; then
+  PBS_JOBNAME=`awk '{if($1=="#PBS-N")        {print $2}}' "$0" | sed 's/[^a-zA-Z0-9._-]/_/g'`
+fi
+if test -z "$PBS_JOBNAME";   then PBS_JOBNAME="`basename $0`"; fi;
+if test -z "$PBS_JOBID";     then
+  if test ! -e "$HOME/.fg_id"; then echo "1000000" > "$HOME/.fg_id"; fi;
+  fg_id=`cat "$HOME/.fg_id"`
+  let "fg_id = $fg_id + 1"
+  PBS_JOBID="${fg_id}.fg"
+  echo "$fg_id" > "$HOME/.fg_id"
+fi
+if test -z "$PBS_O_WORKDIR"; then PBS_O_WORKDIR="`pwd`";       fi;
+if test -z "$PBS_NODEFILE" -o ! -e "$PBS_NODEFILE"; then
+  export PBS_NODEFILE="${PBS_O_WORKDIR}/${PBS_JOBNAME}.o${PBS_JOBID%%.*}.${HOSTNAME%%.*}.pbs_nodefile"
+  echo "$HOSTNAME" > "$PBS_NODEFILE"
+fi
+if test -z "$NSLOTS"; then NSLOTS=`cat "$PBS_NODEFILE" | wc -l`; fi;
+
+
+# -------- NO NEED TO MODIFY THIS SECTION -------------------------------------
+### Unique JOB_ID and die function for exit in error case:
+
+MY_JOB_ID="${PBS_JOBNAME}.o${PBS_JOBID%%.*}.${HOSTNAME%%.*}.`date +%y%m%d_%H%M%S`"
+do_mpdallexit="false"
+die() {
+  if test "$do_mpdallexit" = "true"; then mpdallexit; fi;
+  echo "END_TIME (error)     = `date +'%y-%m-%d %H:%M:%S %s'`"
+  END_TIME=`date +%s`
+  echo "RUN_TIME (hours)     = "`echo "$START_TIME $END_TIME" | awk '{printf("%.4f",($2-$1)/3600.0)}'`
+  echo "IMPORTANT: No cleanup is done here, since you might need the files for error analysis."
+  echo "IMPORTANT: Therefore please cleanup TMP_WORK_DIR manually."
+  echo "IMPORTANT: TMP_WORK_DIR = $TMP_WORK_DIR"
+  echo "ERROR: $MY_JOB_ID: $HOSTNAME: $*"
+  echo "ERROR: $MY_JOB_ID: $HOSTNAME: $*" 1>&2
+  exit -1
+}
+
+
+# -------- NO NEED TO MODIFY THIS SECTION -------------------------------------
+### Print some initial info to stdout:
+
+echo " "
+echo "START_TIME           = `date +'%y-%m-%d %H:%M:%S %s'`"
+START_TIME=`date +%s`
+echo "HOSTNAME             = $HOSTNAME"
+echo "PBS_JOBNAME          = $PBS_JOBNAME"
+echo "PBS_JOBID            = $PBS_JOBID"
+echo "PBS_O_WORKDIR        = $PBS_O_WORKDIR"
+echo "NSLOTS               = $NSLOTS"
+echo "MY_JOB_ID            = $MY_JOB_ID"
+echo "PBS_NODEFILE         = $PBS_NODEFILE"
+if test -e "$PBS_NODEFILE"; then
+  echo "PBS_NODEFILE (begin) -----------------"
+  cat $PBS_NODEFILE
+  echo "PBS_NODEFILE (end) -----------------"
+else
+  echo "PBS_NODEFILE does not exist."
+fi
+
+
+# -------- NO NEED TO MODIFY THIS SECTION -------------------------------------
+### Create TMP_WORK_DIR and change to it:
+# (a) Here we assume, that you have already created a workspace manually and
+#     that you have submitted the job within that workspace. Therefore your
+#     submit directory PBS_O_WORKDIR is located in some workspace area and
+#     can be use as TMP_BASE_DIR.
+# (b) If you want to reduce the disk-bandwith-network-usage of your job you
+#     can use TMP_BASE_DIR="/tmp/$USER" instead (if your job is suitable for
+#     this: e.g. < 120GB disk usage, etc). If your job is a multi-node mpi job,
+#     you might need to create TMP_BASE_DIR on every node.
+
+#echo " "
+#echo "Creating tmp directory ..."
+#echo " "
+#TMP_BASE_DIR="$PBS_O_WORKDIR" # (a) Store scratch files below PBS_O_WORKDIR.
+#TMP_BASE_DIR="/tmp/$USER"      # (b) Use local disk instead of PBS_O_WORKDIR.
+#TMP_WORK_DIR="$TMP_BASE_DIR/$MY_JOB_ID"
+#echo "TMP_BASE_DIR         = $TMP_BASE_DIR"
+#echo "TMP_WORK_DIR         = $TMP_WORK_DIR"
+#case "$TMP_WORK_DIR" in
+#  (/tmp*) for host in `cat "$PBS_NODEFILE" | sort | uniq`; do
+#             echo "Creating TMP_WORK_DIR '$TMP_WORK_DIR' on host $host ..."
+#             ssh $SSH_OPT $host "mkdir -vp ${TMP_WORK_DIR}" \
+#             || die "$host: Could not create TMP_WORK_DIR '$TMP_WORK_DIR'."
+#          done; wait;; # Just wait for the case of backgrounded ssh's.
+#  (*)     echo "Creating TMP_WORK_DIR '$TMP_WORK_DIR' ..."
+#          mkdir -vp "${TMP_WORK_DIR}" \
+#          || die "Could not create TMP_WORK_DIR '$TMP_WORK_DIR'.";;
+#esac
+#echo "Copying pbs script to TMP_WORK_DIR ..."
+#cp -v "$0" "${TMP_WORK_DIR}/"
+cd "${PBS_O_WORKDIR}" || die "Could not change to PBS_O_WORKDIR '$PBS_O_WORKDIR'."
+echo "Now we are in directory '`pwd`'."
+
+# ---- (2) 8 serial single core jobs in parallel on one node (8 core of 8 used)
+# -------- USERS SHOULD MODIFY THIS SECTION -----------------------------------
+# Example how you could start multiple serial jobs on one node (max 8 useful).
+# Please be aware, that every job needs its own input files, writes its own
+# output files and you should cleanup unnecessary files for each of the jobs.
+# You can create a subdirectory for each of the jobs, if needed.
+# It is VERY useful, if all subjobs run approximately the same time.
+
+$HOME/client "$HOME/" > $HOME/output.txt
+
+echo "Waiting until the jobs have finished ..."
+wait
+sleep 2 # Wait some time for potential stale nfs handles to disappear.
+echo "Example for serial jobs in parallel finished with success."
+
+# -------- USERS SHOULD MODIFY THIS SECTION -----------------------------------
+### Cleanup files and dirs (if not done already):
+# Cleanup and remove all unnecessary scratch files (what to delete here
+# depends on how your executable works and which files you need later).
+# You should delete as many files as possible and keep only necessary files.
+# If you did complex sub-job scripting, you need to do complex cleanup here.
+
+#echo " "
+#echo "Cleaning up ... removing unnecessary scratch data and files ..."
+#echo " "
+#rm -v $INPUT_FILE subjob-*.inp
+# rm -v all-large-files-*.*
+#for subdir in subdir-*; do
+#  if test -e "$subdir"; then rm -rvf "$subdir"; fi;
+#done
+#sleep 2 # Wait some time for potential stale nfs handles to disappear.
+
+
+# -------- NO NEED TO MODIFY THIS SECTION -------------------------------------
+### Compress (and copy back) results (if needed at all):
+# (a) Since TMP_WORK_DIR is already below PBS_O_WORKDIR (which should be within
+#     a workspace area) we do not need to copy any files; we just gzip result.
+# (b) But if TMP_WORK_DIR is below /tmp/, we should create a tgz-archive and
+#     copy that back to PBS_O_WORKDIR.
+
+echo " "
+echo "Compress (and copy back) results ..."
+echo " "
+# case "$TMP_WORK_DIR" in
+#   (/tmp*) parent_dir=`dirname "${TMP_WORK_DIR}"`
+#           work_name=`basename "${TMP_WORK_DIR}"`
+#           echo "parent_dir           = $parent_dir"
+#           echo "work_name            = $work_name"
+#           cd "$parent_dir" || die "Changing to '$parent_dir' failed."
+#           echo "Creating '${work_name}.tgz' ..."
+#           tar -zcvf "${work_name}.tgz" "${work_name}" \
+#           || die "Creation of '${work_name}.tgz' in $parent_dir failed."
+#           # Die does not help too much since the dir is deleted later by PBS.
+#           echo "Copying back '${work_name}.tgz' to '${PBS_O_WORKDIR}/' ..."
+#           cp -v "${work_name}.tgz" "${PBS_O_WORKDIR}/" \
+#           || die "Command 'cp ${work_name}.tgz ${PBS_O_WORKDIR}' failed."
+#           echo "Removing TMP_WORK_DIR '${TMP_WORK_DIR}' ..."
+#           rm -rvf "${TMP_WORK_DIR}" "${TMP_WORK_DIR}.tgz" \
+#           || die "Removal of ${TMP_WORK_DIR} and ${TMP_WORK_DIR}.tgz failed." 
+#           for host in `cat "$PBS_NODEFILE" | sort | uniq`; do
+#              echo "Removing TMP_BASE_DIR '${TMP_BASE_DIR}' on host $host ..."
+#              ssh $SSH_OPT $host "rm -rvf ${TMP_BASE_DIR}" \
+#              || die "$host: Could not remove TMP_BASE_DIR '$TMP_BASE_DIR'."
+#           done; wait;; # Just wait for the case of backgrounded ssh's.
+#   (*)     cd "${TMP_WORK_DIR}/"
+#           # Zipping output files in the submit directory can be problematic,
+#           # since several jobs could collide here (especially if the same job
+#           # has been submitted twice). Therefore we only gzip in TMP_WORK_DIR,
+#           # but not in TMP_BASE_DIR.
+#           gzip * ;;
+# esac
+
+
+# -------- NO NEED TO MODIFY THIS SECTION -------------------------------------
+### Print final timing statistics.
+
+echo " "
+echo "Final timing statistics ..."
+echo " "
+echo "END_TIME (success)   = `date +'%y-%m-%d %H:%M:%S %s'`"
+END_TIME=`date +%s`
+echo "RUN_TIME (hours)     = "`echo "$START_TIME $END_TIME" | awk '{printf("%.4f",($2-$1)/3600.0)}'`
+
