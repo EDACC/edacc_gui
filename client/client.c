@@ -268,7 +268,7 @@ status processResults(job* j) {
 	char* fileName;
 	FILE* filePtr;
 	FILE* resultFile;
-	int signum, semicolonsToSkip=3, c;
+	int signum, pipesToSkip=2, c;
 	char secFraction, dummy;
 
 	fileName=addBasename(pidToFileName(j->pid));
@@ -292,11 +292,11 @@ status processResults(job* j) {
 		else
 			j->status=3;
 	} else {
-		//Skip semicolonsToSkip semicolons.
-		while(semicolonsToSkip>0) {
+		//Skip pipesToSkip '|' characters
+		while(pipesToSkip>0) {
 			c=getc(filePtr);
-			if(c==(int)';') {
-				--semicolonsToSkip;
+			if(c==(int)'|') {
+				--pipesToSkip;
 			} else if(c==EOF) {
 				logError("Error parsing %s: Unexpected format\n", fileName);
 				free(fileName);
@@ -304,7 +304,7 @@ status processResults(job* j) {
 			}
 		}
 		//Extract the runtime and return value of the solver
-		if(fscanf(filePtr, "%d.%c%c;%d", &(j->time), &secFraction, &dummy, &(j->statusCode))!=4){
+		if(fscanf(filePtr, "%d.%c%c|%d", &(j->time), &secFraction, &dummy, &(j->statusCode))!=4){
 			logError("Error parsing %s: Unexpected format\n", fileName);
 			free(fileName);
 			return sysError;
@@ -443,7 +443,7 @@ status setJobArgs(const job* j) {
 		return sysError;
 	}
 	if(sprintfAlloc(&command,
-	                "ulimit -S -t %d && /usr/bin/time -a -o %s -f \"%%U;%%x\" %s %s %s >> %s",
+	                "ulimit -S -t %d && /usr/bin/time -a -o %s -f \"|%%C|%%U|%%x\" %s %s %s >> %s",
 	                timeOut, fileName, solverName, j->params, instanceName, fileName          ) < 0) {
 		logError("Error in sprintfAlloc()\n");
 		free(fileName);
