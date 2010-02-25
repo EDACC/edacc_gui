@@ -1,70 +1,7 @@
+#include <string.h>
 #include "database.h"
 #include "global.h"
 #include "log.h"
-
-/* Old queries */
-
-#define QUERY_RESULT "" \
-"SELECT " \
-"       idJob, " \
-"       run, " \
-"       status, " \
-"       seed, " \
-"       resultFileName, " \
-"       statusCode, " \
-"       SolverConfig_idSolverConfig, " \
-"       Instances_idInstance " \
-"   FROM ExperimentResults " \
-"   WHERE Experiment_idExperiment = %i "
-
-#define QUERY_CONFIGURED_SOLVER "" \
-"SELECT " \
-"       count(Solver_IdSolver) " \
-"   FROM SolverConfig " \
-"   WHERE Experiment_idExperiment = %i " \
-"   GROUP BY Solver_IdSolver "
-
-#define QUERY_CONFIG "" \
-"SELECT " \
-"       sc.Solver_idSolver, " \
-"       scp.value, " \
-"       p.name, " \
-"       p.prefix, " \
-"       p.value, " \
-"       p.order " \
-"   FROM SolverConfig AS sc " \
-"   LEFT JOIN SolverConfig_has_Parameters AS scp " \
-"       ON sc.idSolverConfig = scp.SolverConfig_idSolverConfig " \
-"   LEFT JOIN Parameters AS p " \
-"       ON scp.Parameters_idParameter = p.idParameter " \
-"   WHERE sc.Experiment_idExperiment = %i " \
-"   ORDER BY sc.Solver_idSolver "
-
-#define QUERY_SOLVER "" \
-"SELECT " \
-"       s.idSolver, " \
-"       s.name, " \
-"       s.binary " \
-"   FROM SolverConfig AS sc " \
-"   LEFT JOIN Solver AS s " \
-"       ON sc.Solver_idSolver = s.idSolver " \
-"   WHERE sc.Experiment_idExperiment = %i " \
-"   GROUP BY s.idSolver "
-
-#define QUERY_INSTANCE_OLD "" \
-"SELECT " \
-"       i.idInstance, " \
-"       i.name, " \
-"       i.instance " \
-"   FROM Experiment_has_Instances AS er " \
-"   LEFT JOIN Instances AS i " \
-"       ON er.Instances_idInstance = i.idInstance " \
-"   WHERE er.Experiment_idExperiment = %i "
-
-/* END Old queries */
-
-
-
 
 
 
@@ -79,8 +16,7 @@
 "       numNodes " \
 "   FROM gridSettings "
 
-
-#define QUERY_INSTANCE "" \
+#define QUERY_INSTANCES "" \
 "SELECT " \
 "       i.idInstance, " \
 "       i.name, " \
@@ -92,10 +28,83 @@
 "   WHERE er.Experiment_idExperiment = %i " \
 "   GROUP BY i.idInstance "
 
-solver **solvers = NULL;
-config **configs = NULL;
-result **results = NULL;
-instance **instances = NULL;
+#define QUERY_SOLVERS "" \
+"SELECT " \
+"       s.idSolver, " \
+"       s.name, " \
+"       s.binaryName, " \
+"       s.binary, " \
+"       s.md5 " \
+"   FROM ExperimentResults AS er " \
+"   LEFT JOIN SolverConfig AS sc " \
+"       ON er.SolverConfig_idSolverConfig = sc.idSolverConfig " \
+"   LEFT JOIN Solver AS s " \
+"       ON sc.Solver_idSolver = s.idSolver " \
+"   WHERE er.Experiment_idExperiment = %i " \
+"   GROUP BY s.idSolver "
+
+/* Will be needed for the randomized job pick */
+#define QUERY_EXPERIMENT_JOBS "" \
+"SELECT " \
+"       er.idJob " \
+"   FROM ExperimentResults AS er " \
+"   WHERE Experiment_idExperiment = %i "
+
+
+#define QUERY_JOB "" \
+"SELECT " \
+"       e.idJob, " \
+"       s.name, " \
+"       i.name " \
+"   FROM ExperimentResults AS e " \
+"   LEFT JOIN SolverConfig AS sc " \
+"       ON e.SolverConfig_idSolverConfig = sc.IdSolverConfig " \
+"   LEFT JOIN Solver AS s " \
+"       ON s.idSolver = sc.Solver_idSolver " \
+"   LEFT JOIN Instances AS i " \
+"       ON e.Instances_idInstance = i.idInstance " \
+"   WHERE e.idJob = %i " 
+
+
+#define QUERY_JOB_PARAMS "" \
+"SELECT " \
+"       p.name, " \
+"       p.prefix, " \
+"       p.value, " \
+"       scp.value " \
+"   FROM ExperimentResults AS er " \
+"   LEFT JOIN SolverConfig AS sc " \
+"       ON er.SolverConfig_idSolverConfig = sc.idSolverConfig " \
+"   LEFT JOIN SolverConfig_has_Parameters AS scp " \
+"       ON sc.idSolverConfig = scp.SolverConfig_idSolverConfig " \
+"   LEFT JOIN Parameters AS p " \
+"       ON scp.Parameters_idParameter = p.idParameter " \
+"   WHERE e.idJob = %i "
+
+
+#define UPDATE_JOB "" \
+"UPDATE ExperimentResult SET " \
+"       resultFileName = %s, " \
+"       status = %i, " \
+"       seed = %i, " \
+"       time = %i, " \
+"       statusCode " \
+"   WHERE idJob = %i "
+
+
+#define QUERY_SOLVER "" \
+"SELECT " \
+"       binary, " \
+"       md5 " \
+"   FROM Solver " \
+"   WHERE name = %s "
+
+#define QUERY_INSTANCE "" \
+"SELECT " \
+"       instance, " \
+"       md5 " \
+"   FROM Instances " \
+"   WHERE name = %s "
 
 status dbFetchExperimentData(experiment *e) {
     MYSQL *conn;
@@ -104,25 +113,24 @@ status dbFetchExperimentData(experiment *e) {
 
     char *queryExperimentInfo;
     char *queryGridInfo;
-    char *queryResult;
-    char *queryConfigSolver;
-    char *queryConfig;
     char *querySolver;
+    char *queryInstance;
 
     int numRows;
-    int configuredSolver;
     int lastId;
 
+    int i;
+    unsigned long lengths;
+
     sprintf(queryExperimentInfo, QUERY_EXPERIMENT_INFO, experiment);
-    sprintf(queryResult, QUERY_RESULT, experiment);
-    sprintf(queryConfigSolver, QUERY_CONFIGURED_SOLVER, experiment);
-    sprintf(queryConfig, QUERY_CONFIG, experiment);
-    sprintf(querySolver, QUERY_SOLVER, experiment);
-    sprintf(queryInstance, QUERY_INSTANCE, experiment);
+    sprintf(queryGridInfo, QUERY_GRID_SETTINGS, experiment);
+    sprintf(querySolver, QUERY_SOLVERS, experiment);
+    sprintf(queryInstance, QUERY_INSTANCES, experiment);
 
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
         return dberror;
     }
+
 
     /* fetch experiment information */
     if(mysql_query(conn, queryExperimentInfo) != 0) {
@@ -137,6 +145,21 @@ status dbFetchExperimentData(experiment *e) {
         e->timeOut = row[0];
     }
 
+
+    /* fetch grid information */
+    if(mysql_query(conn, queryGridInfo) != 0) {
+        return dberror;
+    }
+
+    if((res = mysql_store_result(conn)) == NULL) {
+        return dberror;
+    }
+
+    if((row = mysql_fetch_row(res)) != NULL) {
+        e->numNodes = row[0];
+    }
+
+
     /* fetch instances */
     if(mysql_query(conn, queryInstance) != 0) {
         return dberror;
@@ -148,14 +171,21 @@ status dbFetchExperimentData(experiment *e) {
 
     e->numInstances = mysql_num_rows(res);
 
-    if((instances = (instance *)e->numInstances*sizeof(instance))) == NULL) {
-        return dberror;
-    }
-
+    i=0;
     while((row = mysql_fetch_row(res)) != NULL) {
-        e->
-    }
+        lengths = mysql_fetch_lengths(res);
 
+        e->md5Instances[i] = row[3];
+
+        /* Size + 1, to fit the lest nullbyte */
+        e->instances[i] = (char *)calloc(lengths[2]+1,sizeof(char));
+        memcpy(e->instances[i], row[2], lenhths[2]);
+
+        e->instanceNames = (char *)malloc(lengths[1]*sizeof(char));
+        strncpy(e->instanceNames[i], row[1], lengths[1]);
+
+        i++;
+    }
 
 
     /* fetch solver binaries */
@@ -167,91 +197,199 @@ status dbFetchExperimentData(experiment *e) {
         return dberror;
     }
 
-    solvers = (solver *)malloc(mysql_num_rows(res)*sizeof(solver));
+    e->numSolvers = mysql_num_rows(res);
 
+    i=0;
     while((row = mysql_fetch_row(res)) != NULL) {
-        solvers[i] = {row[0], row[1], row[2]};
+        lengths = mysql_fetch_lengths(res);
+
+        e->lengthSolver[i] = lengths[3];
+
+        e->md5Solvers[i] = row[4];
+
+        e->solvers[i] = (char *)malloc(lengths[3]*sizeof(char));
+        memcpy(e->solvers[i], row[3], lengths[3]);
+
+        e->solverNames[i] = (char *)malloc(lengths[2]*sizeof(char));
+        strncpy(e->instanceNames[i], row[2], lengths[2]);
+
+        i++;
     }
-
-
-
-    /* fetch the number of involved binaries in experiment */
-    if(mysql_query(conn, queryConfiguredSolver) != 0) {
-        return dberror;
-    }
-
-    if((res = mysql_store_result(conn)) == NULL) {
-        return dberror;
-    }
-
-    if ((row = mysql_fetch_row(res)) != NULL) {
-        configuredSolver = row[0];
-    } else {
-        return dberror;
-    }
-
-    /* fetch configs */
-    if(mysql_query(conn, queryConfig) != 0) {
-        return dberror;
-    }
-
-    if((res = mysql_store_result(conn)) == NULL) {
-        return dberror;
-    }
-
-    configs = (config *)malloc(configuredSolver*sizeof(config));
-
-    while((row = mysql_fetch_row(res)) != NULL) {
-        results[i] = {row[0], row[1]};
-    }
-
-
-
-    /* fetch results */
-
-
-
 
     mysql_close(conn);
     return success;
 }
 
+/* TODO: Implement the randomized job pick */
 int dbFetchJob(job* j, status* s) {
-	static int i=0, num=7;
+    MYSQL *conn;
+    MYSQL_RES *res;
+    MYSQL_ROW row;
 
-	if(i<num) {
-		++i;
-		*s=success;
-		return 0;
-	}
+    char *queryJob;
+    char *queryJobParams;
 
-	*s=success;
-	return 1;
+    char *params;
+
+    int numRows;
+    int lastId;
+
+    int i;
+    unsigned long lengths;
+
+    sprintf(queryJob, QUERY_JOB, lastId);
+    sprintf(queryJobParams, QUERY_JOB_PARAMS, lastId);
+
+    if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+        return dberror;
+    }
+
+
+    /* fetch job information */
+    if(mysql_query(conn, queryJob) != 0) {
+        return dberror;
+    }
+
+    if((res = mysql_store_result(conn)) == NULL) {
+        return dberror;
+    }
+
+    if((row = mysql_fetch_row(res)) != NULL) {
+        lengths = mysql_fetch_lengths(res);
+
+        j->id = row[0];
+
+        j->solverName = (char *)malloc(lengths[1]*sizeof(char));
+        strncpy(j->solverName, row[1], lengths[1]);
+
+        j->instanceName = (char *)malloc(lengths[2]*sizeof(char));
+        strncpy(j->instanceName, row[2], lengths[2]);
+    }
+
+    /* fetch params information */
+    if(mysql_query(conn, queryJobParams) != 0) {
+        return dberror;
+    }
+
+    if((res = mysql_store_result(conn)) == NULL) {
+        return dberror;
+    }
+
+    
+    params = (char *)calloc(1,sizeof(char));
+
+    while((row = mysql_fetch_row(res)) != NULL) {
+        params = strcat(params, row[1]);
+
+        if(row[3] == NULL) {
+            params = strcat(params, row[2]);
+        } else {
+            params = strcat(params, row[3]);
+        }
+    }
+
+    strcpy(j-params, params);
+
+    mysql_close(conn);
+    return success;
 }
 
 status dbUpdate(const job* j) {
-	return success;
+    MYSQL *conn;
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+
+    char *updateJob;
+
+    sprintf(queryJob, UPDATE_JOB, j->resultFileName, j->status, j->seed, j->time, j->statusCode);
+
+    if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+        return dberror;
+    }
+
+    if(mysql_query(conn, queryJob) != 0) {
+        return dberror;
+    }
+
+    mysql_commit(conn);
+
+    mysql_close(conn);
+    return success;
 }
 
 //Try to fetch the solver named solverName from the database
 status dbFetchSolver(const char* solverName, solver* s) {
-	return success;
+    MYSQL *conn;
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+
+    char *querySolver;
+    unsigned long lengths;
+
+    sprintf(queryJob, QUERY_SOLVER, solverName);
+
+    if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+        return dberror;
+    }
+
+
+    /* fetch job information */
+    if(mysql_query(conn, querySolver) != 0) {
+        return dberror;
+    }
+
+    if((res = mysql_store_result(conn)) == NULL) {
+        return dberror;
+    }
+
+    if((row = mysql_fetch_row(res)) != NULL) {
+        lengths = mysql_fetch_lengths(res);
+
+        s->length = lengths[0];
+        s->md5 = row[1];
+
+        s->solver = (char *)malloc(lengths[0]*sizeof(char));
+        memcpy(s->solver, row[0], lengths[0]);
+    }
+
+    mysql_close(conn);
+    return success;
 }
 
 //Try to fetch the instance named instanceName from the database
 status dbFetchInstance(const char* instanceName, instance* i) {
-	return success;
-}
+    MYSQL *conn;
+    MYSQL_RES *res;
+    MYSQL_ROW row;
 
-solver *getSolver(int id, solvers **s) {
-    int i;
+    char *queryInstance;
+    unsigned long lengths;
 
-    for(i=0, i<length(s), i++) {
-        if (s[i].id = id) {
-            return s[i];
-        }
+    sprintf(queryJob, QUERY_INSTANCE, instanceName);
+
+    if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+        return dberror;
     }
 
-    return NULL;
-}
 
+    /* fetch job information */
+    if(mysql_query(conn, queryInstance) != 0) {
+        return dberror;
+    }
+
+    if((res = mysql_store_result(conn)) == NULL) {
+        return dberror;
+    }
+
+    if((row = mysql_fetch_row(res)) != NULL) {
+        lengths = mysql_fetch_lengths(res);
+
+        i->md5 = row[1];
+
+        i->instance = (char *)calloc(lengths[0]+1,sizeof(char));
+        memcpy(i->instance, row[0], lengths[0]);
+    }
+
+    mysql_close(conn);
+    return success;
+}
