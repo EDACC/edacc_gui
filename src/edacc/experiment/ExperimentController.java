@@ -34,6 +34,7 @@ public class ExperimentController {
     private Vector<Experiment> experiments;
     private Vector<Instance> instances;
     private Vector<Solver> solvers;
+    
     private static RandomNumberGenerator rnd = new JavaRandom();
 
     /**
@@ -89,8 +90,12 @@ public class ExperimentController {
             }
         }
         main.solverConfigPanel.endUpdate();
-
         main.insTableModel.setExperimentHasInstances(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
+
+        if (instances.size() > 0) {
+            main.sorter.setRowFilter(main.rowFilter);
+        }
+
         main.afterExperimentLoaded();
     }
 
@@ -254,5 +259,9 @@ public class ExperimentController {
         catch (Exception e) {
             return 0;
         }
+    }
+
+    public int getNumInstances() {
+        return instances.size();
     }
 }
