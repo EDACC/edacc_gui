@@ -242,19 +242,19 @@ public class ExperimentController {
                         if (generateSeeds && linkSeeds) {
                             Integer seed = linked_seeds.get(new SeedGroup(c.getSeed_group(), i.getId(), run));
                             if (seed != null) {
-                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, seed.intValue(), "", 0, 0, c.getId(), activeExperiment.getId(), i.getId()));
+                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, seed.intValue(), "", 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
                             }
                             else {
                                 Integer new_seed = new Integer(generateSeed(maxSeed));
                                 linked_seeds.put(new SeedGroup(c.getSeed_group(), i.getId(), run), new_seed);
-                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, new_seed.intValue(), "", 0, 0, c.getId(), activeExperiment.getId(), i.getId()));
+                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, new_seed.intValue(), "", 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
                             }
                         }
                         else if (generateSeeds && !linkSeeds){
-                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, generateSeed(maxSeed), "", 0, 0, c.getId(), activeExperiment.getId(), i.getId()));
+                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, generateSeed(maxSeed), "", 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
                         }
                         else {
-                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, "", 0, 0, c.getId(), activeExperiment.getId(), i.getId()));
+                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, 0, "", 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
                         }
                         experiments_added++;
                     }
@@ -286,5 +286,16 @@ public class ExperimentController {
      */
     public int getNumInstances() {
         return instances.size();
+    }
+
+    public void loadJobs() {
+        try {
+            main.jobsTableModel.jobs = ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId());
+            main.jobsTableModel.fireTableDataChanged();
+        }
+        catch (Exception e) {
+            // TODO: shouldn't happen but show message if it does
+        }
+        
     }
 }

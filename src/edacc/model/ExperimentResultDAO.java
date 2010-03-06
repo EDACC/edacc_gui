@@ -39,7 +39,7 @@ public class ExperimentResultDAO {
         DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
     }
 
-    private ExperimentResult getExperimentResultFromResultSet(ResultSet rs) throws SQLException {
+    private static ExperimentResult getExperimentResultFromResultSet(ResultSet rs) throws SQLException {
         ExperimentResult r = new ExperimentResult();
         r.setId(rs.getInt("idJob"));
         r.setRun(rs.getInt("run"));
@@ -97,10 +97,10 @@ public class ExperimentResultDAO {
      * @return ExperimentResults vector
      * @throws SQLException
      */
-    public Vector<ExperimentResult> getAllByExperimentId(int id) throws SQLException {
+    public static Vector<ExperimentResult> getAllByExperimentId(int id) throws SQLException {
         Vector<ExperimentResult> v = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idJob, run, status, seed, time, statusCode, SolverConfig_idSolverConfig, " +
+                "SELECT idJob, run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
                 "Experiment_idExperiment, Instances_idInstance FROM " + table + " " +
                 "WHERE Experiment_idExperiment=?;");
         st.setInt(1, id);

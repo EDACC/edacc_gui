@@ -11,16 +11,19 @@
 package edacc;
 
 import edacc.experiment.ExperimentController;
+import edacc.experiment.ExperimentResultsBrowserTableModel;
 import edacc.experiment.ExperimentTableModel;
 import edacc.experiment.InstanceTableModel;
 import edacc.experiment.InstanceTableModelRowFilter;
 import edacc.experiment.SolverTableModel;
 import edacc.model.Solver;
+import java.awt.Component;
 import java.sql.SQLException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.RowSorter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 import org.jdesktop.application.Action;
 
@@ -34,6 +37,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
     public ExperimentTableModel expTableModel;
     public InstanceTableModel insTableModel;
     public SolverTableModel solTableModel;
+    public ExperimentResultsBrowserTableModel jobsTableModel;
     public EDACCSolverConfigPanel solverConfigPanel;
     public TableRowSorter<InstanceTableModel> sorter;
     public InstanceTableModelRowFilter rowFilter;
@@ -45,19 +49,28 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         manageExperimentPane.setEnabledAt(1, false);
         manageExperimentPane.setEnabledAt(2, false);
         manageExperimentPane.setEnabledAt(3, false);
+        manageExperimentPane.setEnabledAt(4, false);
 
         expController = new ExperimentController(this, solverConfigPanel);
         expTableModel = new ExperimentTableModel();
         insTableModel = new InstanceTableModel();
         solTableModel = new SolverTableModel();
+        jobsTableModel = new ExperimentResultsBrowserTableModel();
+
+        tableJobs.setModel(jobsTableModel);
         tableExperiments.setModel(expTableModel);
         tableInstances.setModel(insTableModel);
         tableSolvers.setModel(solTableModel);
         sorter = new TableRowSorter<InstanceTableModel>(insTableModel);
         rowFilter = new InstanceTableModelRowFilter();
         tableInstances.setRowSorter(sorter);
-    }
+        tableJobs.setDefaultRenderer(Object.class, new EDACCExperimentModeJobsCellRenderer());
+        tableJobs.setDefaultRenderer(String.class, new EDACCExperimentModeJobsCellRenderer());
+        tableJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeJobsCellRenderer());
+        tableJobs.setDefaultRenderer(Float.class, new EDACCExperimentModeJobsCellRenderer());
 
+    }
+    
     public void initialize() throws SQLException {
         expController.initialize();
     }
@@ -116,6 +129,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         txtTimeout = new javax.swing.JTextField();
         lblNumJobs = new javax.swing.JLabel();
         chkLinkSeeds = new javax.swing.JCheckBox();
+        panelJobBrowser = new javax.swing.JPanel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        tableJobs = new javax.swing.JTable();
+        btnRefreshJobs = new javax.swing.JButton();
 
         setName("Form"); // NOI18N
         setPreferredSize(new java.awt.Dimension(500, 591));
@@ -523,6 +540,42 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
 
         manageExperimentPane.addTab("Experiment Parameters", panelExperimentParams);
 
+        panelJobBrowser.setName("panelJobBrowser"); // NOI18N
+        panelJobBrowser.setPreferredSize(new java.awt.Dimension(10000, 10000));
+        panelJobBrowser.setLayout(new java.awt.GridBagLayout());
+
+        jScrollPane6.setName("jScrollPane6"); // NOI18N
+
+        tableJobs.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tableJobs.setName("tableJobs"); // NOI18N
+        jScrollPane6.setViewportView(tableJobs);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        panelJobBrowser.add(jScrollPane6, gridBagConstraints);
+
+        btnRefreshJobs.setAction(actionMap.get("btnRefreshJobs")); // NOI18N
+        btnRefreshJobs.setText(resourceMap.getString("btnRefreshJobs.text")); // NOI18N
+        btnRefreshJobs.setName("btnRefreshJobs"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panelJobBrowser.add(btnRefreshJobs, gridBagConstraints);
+
+        manageExperimentPane.addTab(resourceMap.getString("panelJobBrowser.TabConstraints.tabTitle"), panelJobBrowser); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -543,10 +596,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
 
     private void manageExperimentPaneStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_manageExperimentPaneStateChanged
         if (manageExperimentPane.getSelectedIndex() == 3) {
+            // generate jobs tab
             txtNumRuns.setText(String.valueOf(expController.getActiveExperiment().getNumRuns()));
             txtTimeout.setText(String.valueOf(expController.getActiveExperiment().getTimeOut()));
             chkGenerateSeeds.setSelected(expController.getActiveExperiment().isAutoGeneratedSeeds());
             lblNumJobs.setText(String.valueOf(expController.getNumJobs()) + " jobs in the database");
+        }
+        else if (manageExperimentPane.getSelectedIndex() == 4) {
+            // job browser tab
+            expController.loadJobs();
         }
     }//GEN-LAST:event_manageExperimentPaneStateChanged
     /**
@@ -556,6 +614,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         manageExperimentPane.setEnabledAt(1, true);
         manageExperimentPane.setEnabledAt(2, true);
         manageExperimentPane.setEnabledAt(3, true);
+        manageExperimentPane.setEnabledAt(4, true);
     }
 
     /**
@@ -565,6 +624,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         manageExperimentPane.setEnabledAt(1, false);
         manageExperimentPane.setEnabledAt(2, false);
         manageExperimentPane.setEnabledAt(3, false);
+        manageExperimentPane.setEnabledAt(4, false);
     }
 
     private void createDatabaseErrorMessage(SQLException e) {
@@ -729,6 +789,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         EDACCApp.getApplication().show(dialogFilter);
     }
 
+    @Action
+    public void btnRefreshJobs() {
+        expController.loadJobs();
+        jobsTableModel.fireTableDataChanged();
+    }
+
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -740,6 +806,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
     private javax.swing.JButton btnGenerateJobs;
     private javax.swing.JButton btnInvertSelection;
     private javax.swing.JButton btnLoadExperiment;
+    private javax.swing.JButton btnRefreshJobs;
     private javax.swing.JButton btnRemoveExperiment;
     private javax.swing.JButton btnReverseSolverSelection;
     private javax.swing.JButton btnSaveInstances;
@@ -757,6 +824,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JLabel lblExperimentDescription;
     private javax.swing.JLabel lblExperimentName;
@@ -765,11 +833,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
     private javax.swing.JPanel panelChooseInstances;
     private javax.swing.JPanel panelChooseSolver;
     private javax.swing.JPanel panelExperimentParams;
+    private javax.swing.JPanel panelJobBrowser;
     private javax.swing.JPanel panelManageExperiment;
     private javax.swing.JPanel pnlNewExperiment;
     private javax.swing.JScrollPane scrollPaneExperimentsTable;
     private javax.swing.JTable tableExperiments;
     private javax.swing.JTable tableInstances;
+    private javax.swing.JTable tableJobs;
     private javax.swing.JTable tableSolvers;
     private javax.swing.JTextArea txtExperimentDescription;
     private javax.swing.JTextField txtExperimentName;

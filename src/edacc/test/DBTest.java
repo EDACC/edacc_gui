@@ -7,6 +7,7 @@ package edacc.test;
 
 import edacc.model.*;
 import java.util.LinkedList;
+import java.util.Vector;
 /**
  *
  * @author daniel
@@ -17,7 +18,12 @@ public class DBTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
-        DatabaseConnector.getInstance().connect("localhost", 3306, "root", "EDACC", "affe42" );
+        DatabaseConnector.getInstance().connect("localhost", 3306, "root", "EDACC", "" );
+
+        Vector<ExperimentResult> v = ExperimentResultDAO.getAllByExperimentId(10);
+
+        System.out.println(v.get(0).getId());
+
         /*LinkedList<Instance> l = InstanceDAO.getAll();
         Instance i1 = l.getFirst();
         for (Instance i : l) {
