@@ -70,6 +70,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         manageExperimentPane = new javax.swing.JTabbedPane();
         panelManageExperiment = new javax.swing.JPanel();
@@ -79,13 +80,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         btnLoadExperiment = new javax.swing.JButton();
         pnlNewExperiment = new javax.swing.JPanel();
         lblExperimentName = new javax.swing.JLabel();
-        lblExperimentDate = new javax.swing.JLabel();
         lblExperimentDescription = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtExperimentDescription = new javax.swing.JTextArea();
         txtExperimentName = new javax.swing.JTextField();
         btnCreateExperiment = new javax.swing.JButton();
-        txtExperimentDate = new javax.swing.JFormattedTextField();
         panelChooseSolver = new javax.swing.JPanel();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel2 = new javax.swing.JPanel();
@@ -159,9 +158,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         lblExperimentName.setText(resourceMap.getString("lblExperimentName.text")); // NOI18N
         lblExperimentName.setName("lblExperimentName"); // NOI18N
 
-        lblExperimentDate.setText(resourceMap.getString("lblExperimentDate.text")); // NOI18N
-        lblExperimentDate.setName("lblExperimentDate"); // NOI18N
-
         lblExperimentDescription.setText(resourceMap.getString("lblExperimentDescription.text")); // NOI18N
         lblExperimentDescription.setName("lblExperimentDescription"); // NOI18N
 
@@ -178,13 +174,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         btnCreateExperiment.setText(resourceMap.getString("btnCreateExperiment.text")); // NOI18N
         btnCreateExperiment.setName("btnCreateExperiment"); // NOI18N
 
-        try {
-            txtExperimentDate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("####-##-##")));
-        } catch (java.text.ParseException ex) {
-            ex.printStackTrace();
-        }
-        txtExperimentDate.setName("txtExperimentDate"); // NOI18N
-
         javax.swing.GroupLayout pnlNewExperimentLayout = new javax.swing.GroupLayout(pnlNewExperiment);
         pnlNewExperiment.setLayout(pnlNewExperimentLayout);
         pnlNewExperimentLayout.setHorizontalGroup(
@@ -192,14 +181,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
             .addGroup(pnlNewExperimentLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlNewExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblExperimentDate)
                     .addComponent(lblExperimentName)
                     .addComponent(lblExperimentDescription))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlNewExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtExperimentName, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                    .addComponent(txtExperimentDate, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE))
+                    .addComponent(txtExperimentName, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE))
                 .addGap(12, 12, 12)
                 .addComponent(btnCreateExperiment, javax.swing.GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE)
                 .addContainerGap())
@@ -211,18 +198,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
                     .addGroup(pnlNewExperimentLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(btnCreateExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(pnlNewExperimentLayout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlNewExperimentLayout.createSequentialGroup()
                         .addGroup(pnlNewExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtExperimentName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblExperimentName))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(pnlNewExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblExperimentDate)
-                            .addComponent(txtExperimentDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(10, 10, 10)
                         .addGroup(pnlNewExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblExperimentDescription)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE))))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblExperimentDescription))))
                 .addContainerGap())
         );
 
@@ -233,10 +216,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
             .addGroup(panelManageExperimentLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelManageExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 875, Short.MAX_VALUE)
-                    .addGroup(panelManageExperimentLayout.createSequentialGroup()
+                    .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 855, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManageExperimentLayout.createSequentialGroup()
                         .addComponent(pnlNewExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnRemoveExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(btnLoadExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -249,10 +232,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
                 .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelManageExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pnlNewExperiment, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(panelManageExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(btnLoadExperiment)
-                        .addComponent(btnRemoveExperiment)))
+                        .addComponent(btnRemoveExperiment))
+                    .addComponent(pnlNewExperiment, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -330,7 +313,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelChooseSolverLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelChooseSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 875, Short.MAX_VALUE)
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 855, Short.MAX_VALUE)
                     .addGroup(panelChooseSolverLayout.createSequentialGroup()
                         .addComponent(btnSelectAllSolvers)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -339,7 +322,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
                         .addComponent(btnReverseSolverSelection)
                         .addGap(149, 149, 149)
                         .addComponent(btnChooseSolvers)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 341, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 321, Short.MAX_VALUE)
                         .addComponent(btnSaveSolverConfigurations)))
                 .addContainerGap())
         );
@@ -361,6 +344,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         manageExperimentPane.addTab("Solvers", panelChooseSolver);
 
         panelChooseInstances.setName("panelChooseInstances"); // NOI18N
+        panelChooseInstances.setLayout(new java.awt.GridBagLayout());
 
         jScrollPane2.setName("jScrollPane2"); // NOI18N
 
@@ -378,60 +362,62 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         tableInstances.setName("tableInstances"); // NOI18N
         jScrollPane2.setViewportView(tableInstances);
 
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 12);
+        panelChooseInstances.add(jScrollPane2, gridBagConstraints);
+
         btnInvertSelection.setAction(actionMap.get("btnInvertSelection")); // NOI18N
         btnInvertSelection.setText(resourceMap.getString("btnInvertSelection.text")); // NOI18N
         btnInvertSelection.setName("btnInvertSelection"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 0);
+        panelChooseInstances.add(btnInvertSelection, gridBagConstraints);
 
         btnFilterInstances.setAction(actionMap.get("btnInstanceFilter")); // NOI18N
         btnFilterInstances.setText(resourceMap.getString("btnFilterInstances.text")); // NOI18N
         btnFilterInstances.setName("btnFilterInstances"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(6, 12, 0, 0);
+        panelChooseInstances.add(btnFilterInstances, gridBagConstraints);
 
         btnSelectAllInstances.setAction(actionMap.get("btnSelectAllInstances")); // NOI18N
         btnSelectAllInstances.setText(resourceMap.getString("btnSelectAllInstances.text")); // NOI18N
         btnSelectAllInstances.setName("btnSelectAllInstances"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 0);
+        panelChooseInstances.add(btnSelectAllInstances, gridBagConstraints);
 
         btnDeselectAllInstances.setAction(actionMap.get("btnDeselectAllInstances")); // NOI18N
         btnDeselectAllInstances.setText(resourceMap.getString("btnDeselectAllInstances.text")); // NOI18N
         btnDeselectAllInstances.setName("btnDeselectAllInstances"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 0);
+        panelChooseInstances.add(btnDeselectAllInstances, gridBagConstraints);
 
         btnSaveInstances.setAction(actionMap.get("btnSaveInstances")); // NOI18N
         btnSaveInstances.setText(resourceMap.getString("btnSaveInstances.text")); // NOI18N
         btnSaveInstances.setName("btnSaveInstances"); // NOI18N
-
-        javax.swing.GroupLayout panelChooseInstancesLayout = new javax.swing.GroupLayout(panelChooseInstances);
-        panelChooseInstances.setLayout(panelChooseInstancesLayout);
-        panelChooseInstancesLayout.setHorizontalGroup(
-            panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelChooseInstancesLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 875, Short.MAX_VALUE)
-                    .addGroup(panelChooseInstancesLayout.createSequentialGroup()
-                        .addComponent(btnFilterInstances)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnSelectAllInstances)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnDeselectAllInstances)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnInvertSelection)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 445, Short.MAX_VALUE)
-                        .addComponent(btnSaveInstances, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
-        );
-        panelChooseInstancesLayout.setVerticalGroup(
-            panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelChooseInstancesLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 484, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnFilterInstances)
-                    .addComponent(btnSelectAllInstances)
-                    .addComponent(btnDeselectAllInstances)
-                    .addComponent(btnInvertSelection)
-                    .addComponent(btnSaveInstances))
-                .addContainerGap())
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.ipadx = 56;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
+        panelChooseInstances.add(btnSaveInstances, gridBagConstraints);
 
         manageExperimentPane.addTab("Instances", panelChooseInstances);
 
@@ -496,7 +482,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
                                 .addComponent(txtNumRuns)
                                 .addComponent(txtTimeout, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addComponent(chkGenerateSeeds, javax.swing.GroupLayout.Alignment.LEADING)))
-                .addContainerGap(686, Short.MAX_VALUE))
+                .addContainerGap(666, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -543,7 +529,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 911, Short.MAX_VALUE)
+                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 891, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -616,9 +602,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
     @Action
     public void btnCreateExperiment() {
         try {
-            expController.createExperiment(txtExperimentName.getText(), java.sql.Date.valueOf(txtExperimentDate.getText()), txtExperimentDescription.getText());
-        } catch (IllegalArgumentException ex) {
-            javax.swing.JOptionPane.showMessageDialog(null, "The date format you entered could not be recognized. Expected: yyyy-mm-dd", "Incorrect Date", javax.swing.JOptionPane.ERROR_MESSAGE);
+            expController.createExperiment(txtExperimentName.getText(), txtExperimentDescription.getText());
         } catch (SQLException ex) {
             createDatabaseErrorMessage(ex);
         }
@@ -774,7 +758,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JLabel lblExperimentDate;
     private javax.swing.JLabel lblExperimentDescription;
     private javax.swing.JLabel lblExperimentName;
     private javax.swing.JLabel lblNumJobs;
@@ -788,7 +771,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
     private javax.swing.JTable tableExperiments;
     private javax.swing.JTable tableInstances;
     private javax.swing.JTable tableSolvers;
-    private javax.swing.JFormattedTextField txtExperimentDate;
     private javax.swing.JTextArea txtExperimentDescription;
     private javax.swing.JTextField txtExperimentName;
     private javax.swing.JTextField txtMaxSeeds;

@@ -91,5 +91,25 @@ public class ExperimentResultDAO {
 
     }
 
+    /**
+     * returns all jobs of the given Experiment
+     * @param id
+     * @return ExperimentResults vector
+     * @throws SQLException
+     */
+    public Vector<ExperimentResult> getAllByExperimentId(int id) throws SQLException {
+        Vector<ExperimentResult> v = new Vector<ExperimentResult>();
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT idJob, run, status, seed, time, statusCode, SolverConfig_idSolverConfig, " +
+                "Experiment_idExperiment, Instances_idInstance FROM " + table + " " +
+                "WHERE Experiment_idExperiment=?;");
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            v.add(getExperimentResultFromResultSet(rs));
+        }
+        return v;
+    }
+
     
 }

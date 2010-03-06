@@ -23,7 +23,8 @@ import java.util.Vector;
 import java.util.Random;
 
 /**
- *
+ * Experiment design more controller class, handles requests by the GUI
+ * for creating, removing, loading, etc. experiments
  * @author daniel
  */
 public class ExperimentController {
@@ -114,17 +115,34 @@ public class ExperimentController {
         initialize();
     }
 
+    /**
+     * returns a reference to the currently loaded experiment or null, if none
+     * @return active experiment reference
+     */
     public Experiment getActiveExperiment() {
         return activeExperiment;
     }
 
+    /**
+     * unloads the currently loaded experiment, i.e. sets activeExperiment to null
+     * and calls UI functions to disable the experiment design tabs
+     */
     public void unloadExperiment() {
         activeExperiment = null;
         main.afterExperimentUnloaded();
     }
 
-    public void createExperiment(String name, Date date, String description) throws SQLException {
-        ExperimentDAO.createExperiment(name, date, description);
+    /**
+     * invoked by the UI to create a new experiment, also calls initialize to load
+     * instances and solvers
+     * @param name
+     * @param date
+     * @param description
+     * @throws SQLException
+     */
+    public void createExperiment(String name, String description) throws SQLException {
+        java.util.Date d = new java.util.Date();
+        ExperimentDAO.createExperiment(name, new Date(d.getTime()), description);
         initialize();
     }
 
@@ -157,6 +175,10 @@ public class ExperimentController {
         SolverConfigurationDAO.saveAll();
     }
 
+    /**
+     * saves the instances selection of the currently loaded experiment
+     * @throws SQLException
+     */
     public void saveExperimentHasInstances() throws SQLException {
         for (int i = 0; i < main.insTableModel.getRowCount(); i++) {
             if ((Boolean) main.insTableModel.getValueAt(i, 5)) {
@@ -175,8 +197,9 @@ public class ExperimentController {
 
 
     /**
-     * method used for auto seed generation
-     * @return
+     * method used for auto seed generation, uses the random number generator
+     * referenced by this.rnd
+     * @return integer between 0 and max inclusively
      */
     private int generateSeed(int max) {
         return rnd.nextInt(max+1);
@@ -206,36 +229,32 @@ public class ExperimentController {
 
         // get solver configurations of this experiment
         Vector<SolverConfiguration> vsc = SolverConfigurationDAO.getSolverConfigurationByExperimentId(activeExperiment.getId());
-        
-        int seed = 0;
-        Hashtable<Integer, Integer> linked_seeds = new Hashtable<Integer, Integer>();
-        if (generateSeeds) {
-            if (linkSeeds) {
-                for (SolverConfiguration c: vsc) {
-                    if (!linked_seeds.containsKey(new Integer(c.getSeed_group()))) {
-                        linked_seeds.put(new Integer(c.getSeed_group()), new Integer(generateSeed(maxSeed)));
-                    }
-                }
-            }
-            else {
-                seed = generateSeed(maxSeed);
-            }
-        }
 
         int experiments_added = 0;
-
+        Hashtable<SeedGroup, Integer> linked_seeds = new Hashtable<SeedGroup, Integer>();
         Vector<ExperimentResult> experiment_results = new Vector<ExperimentResult>();
-
+        
         // cartesian product
         for (Instance i: listInstances) {
             for (SolverConfiguration c: vsc) {
                 for (int run = 0; run < numRuns; ++run) {
                     if (ExperimentResultDAO.jobExists(run, c.getId(), i.getId(), activeExperiment.getId()) == false) { // skip jobs that already exist
                         if (generateSeeds && linkSeeds) {
-                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, linked_seeds.get(new Integer(c.getSeed_group())), "", 0, 0, c.getId(), activeExperiment.getId(), i.getId()));
+                            Integer seed = linked_seeds.get(new SeedGroup(c.getSeed_group(), i.getId(), run));
+                            if (seed != null) {
+                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, seed.intValue(), "", 0, 0, c.getId(), activeExperiment.getId(), i.getId()));
+                            }
+                            else {
+                                Integer new_seed = new Integer(generateSeed(maxSeed));
+                                linked_seeds.put(new SeedGroup(c.getSeed_group(), i.getId(), run), new_seed);
+                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, new_seed.intValue(), "", 0, 0, c.getId(), activeExperiment.getId(), i.getId()));
+                            }
+                        }
+                        else if (generateSeeds && !linkSeeds){
+                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, generateSeed(maxSeed), "", 0, 0, c.getId(), activeExperiment.getId(), i.getId()));
                         }
                         else {
-                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, seed, "", 0, 0, c.getId(), activeExperiment.getId(), i.getId()));
+                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, "", 0, 0, c.getId(), activeExperiment.getId(), i.getId()));
                         }
                         experiments_added++;
                     }
@@ -261,6 +280,10 @@ public class ExperimentController {
         }
     }
 
+    /**
+     * returns the number of instances shown in the instance selection tab
+     * @return
+     */
     public int getNumInstances() {
         return instances.size();
     }
