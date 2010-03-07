@@ -664,7 +664,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
     public void btnCreateExperiment() {
         try {
             long currentTime = System.currentTimeMillis();
-            expController.createExperiment(txtExperimentName.getText(), new java.sql.Date(currentTime - (currentTime % 86400000)), txtExperimentDescription.getText());
+            expController.createExperiment(txtExperimentName.getText(), txtExperimentDescription.getText());
         } catch (SQLException ex) {
             createDatabaseErrorMessage(ex);
         }
