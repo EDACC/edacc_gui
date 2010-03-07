@@ -69,7 +69,10 @@ public class InstanceTableModel extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int col) {
-        return getValueAt(0, col).getClass();
+        if (this.getRowCount() == 0)
+            return this.getClass();
+        else
+            return getValueAt(0, col).getClass();
     }
 
     @Override
