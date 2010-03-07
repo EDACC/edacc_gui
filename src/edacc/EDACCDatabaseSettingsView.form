@@ -32,21 +32,21 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                          <Group type="102" alignment="0" attributes="1">
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
                               <Component id="lblPassword" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtPassword" max="32767" attributes="0"/>
+                              <Component id="txtPassword" pref="188" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="1">
                               <Component id="lblUsername" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtUsername" max="32767" attributes="0"/>
+                              <Component id="txtUsername" pref="188" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="1">
                               <Component id="lblDatabase" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtDatabase" max="32767" attributes="0"/>
+                              <Component id="txtDatabase" pref="188" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="lblHostname" min="-2" max="-2" attributes="0"/>
@@ -66,7 +66,7 @@
                   </Group>
                   <Component id="chkSSL" alignment="0" min="-2" pref="268" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -92,8 +92,8 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="txtPassword" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblPassword" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
+                  <Component id="txtPassword" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="chkSSL" min="-2" max="-2" attributes="0"/>
@@ -198,12 +198,6 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="txtPassword">
-      <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="txtPassword.text"/>
-        <Property name="name" type="java.lang.String" value="txtPassword" noResource="true"/>
-      </Properties>
-    </Component>
     <Component class="javax.swing.JTextField" name="txtPort">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="txtPort.text"/>
@@ -232,6 +226,12 @@
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="chkSSL.text"/>
         <Property name="name" type="java.lang.String" value="chkSSL" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JPasswordField" name="txtPassword">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="txtPassword.text"/>
+        <Property name="name" type="java.lang.String" value="txtPassword" noResource="true"/>
       </Properties>
     </Component>
   </SubComponents>
