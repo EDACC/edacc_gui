@@ -19,10 +19,7 @@ import edacc.experiment.SolverTableModel;
 import edacc.model.AlreadyRunningTaskException;
 import edacc.model.Solver;
 import edacc.model.Tasks;
-import java.awt.Component;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -781,7 +778,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             Tasks.startTask("generateJobs", new Class[] {int.class, int.class, boolean.class, int.class, boolean.class, edacc.model.Tasks.class}, new Object[] {numRuns, timeout, generateSeeds, maxSeed, linkSeeds, null}, expController, this, 0);
         }
         catch (AlreadyRunningTaskException ex) {
-            Logger.getLogger(EDACCExperimentMode.class.getName()).log(Level.SEVERE, null, ex);
+            javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage());
         }        catch (NumberFormatException e) {
             javax.swing.JOptionPane.showMessageDialog(null, "Expected integers for number of runs, timeout and max seed", "invalid data", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
@@ -866,11 +863,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             int added_experiments = (Integer)result;
             lblNumJobs.setText(String.valueOf(expController.getNumJobs()) + " jobs in the database");
             javax.swing.JOptionPane.showMessageDialog(null, "Added " + added_experiments + " new jobs", "Jobs added", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            btnGenerateJobs.setEnabled(true);
+            manageExperimentPane.setEnabled(true);
         }
     }
 
     public void onTaskStart(int id) {
-
+        if (id == 0) {
+            btnGenerateJobs.setEnabled(false);
+            manageExperimentPane.setEnabled(false);
+        }
     }
 
     public void onTaskFailed(int id, Throwable e) {
@@ -878,6 +880,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             if (e instanceof SQLException) {
                 createDatabaseErrorMessage((SQLException)e);
             }
+            btnGenerateJobs.setEnabled(true);
+            manageExperimentPane.setEnabled(true);
         }
     }
 }

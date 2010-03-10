@@ -7,6 +7,7 @@ import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
 import java.awt.Component;
 import java.sql.SQLException;
+import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jdesktop.application.Action;
@@ -16,6 +17,7 @@ import org.jdesktop.application.FrameView;
 import org.jdesktop.application.TaskMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Observer;
 import javax.swing.Timer;
 import javax.swing.Icon;
 import javax.swing.JDialog;
@@ -25,7 +27,7 @@ import javax.swing.JOptionPane;
 /**
  * The application's main frame.
  */
-public class EDACCView extends FrameView {
+public class EDACCView extends FrameView implements Observer {
 
     private EDACCExperimentMode experimentMode;
     private EDACCManageDBMode manageDBMode;
@@ -37,6 +39,8 @@ public class EDACCView extends FrameView {
         super(app);
 
         initComponents();
+
+        DatabaseConnector.getInstance().addObserver(this);
 
         // status bar initialization - message timeout, idle icon and busy animation, etc
         ResourceMap resourceMap = getResourceMap();
@@ -134,6 +138,7 @@ public class EDACCView extends FrameView {
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         connectToDBMenuItem = new javax.swing.JMenuItem();
+        disconnectMenuItem = new javax.swing.JMenuItem();
         generateDBMenuItem = new javax.swing.JMenuItem();
         javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
         gridMenu = new javax.swing.JMenu();
@@ -176,8 +181,15 @@ public class EDACCView extends FrameView {
         connectToDBMenuItem.setName("connectToDBMenuItem"); // NOI18N
         fileMenu.add(connectToDBMenuItem);
 
+        disconnectMenuItem.setAction(actionMap.get("btnDisconnect")); // NOI18N
+        disconnectMenuItem.setText(resourceMap.getString("disconnectMenuItem.text")); // NOI18N
+        disconnectMenuItem.setEnabled(false);
+        disconnectMenuItem.setName("disconnectMenuItem"); // NOI18N
+        fileMenu.add(disconnectMenuItem);
+
         generateDBMenuItem.setAction(actionMap.get("btnGenerateTables")); // NOI18N
         generateDBMenuItem.setText(resourceMap.getString("generateDBMenuItem.text")); // NOI18N
+        generateDBMenuItem.setEnabled(false);
         generateDBMenuItem.setName("generateDBMenuItem"); // NOI18N
         fileMenu.add(generateDBMenuItem);
 
@@ -276,6 +288,15 @@ public class EDACCView extends FrameView {
             databaseSettings.setLocationRelativeTo(mainFrame);
         }
         EDACCApp.getApplication().show(databaseSettings);
+    }
+
+    @Action
+    public void btnDisconnect() {
+        try {
+            DatabaseConnector.getInstance().disconnect();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "An error occured while closing the database connection: \n" + ex.getMessage(), "Couldn't close database connection", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     @Action
@@ -378,6 +399,7 @@ public class EDACCView extends FrameView {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem connectToDBMenuItem;
+    private javax.swing.JMenuItem disconnectMenuItem;
     private javax.swing.JMenuItem generateDBMenuItem;
     private javax.swing.JMenu gridMenu;
     private javax.swing.JMenuItem jMenuItem1;
@@ -400,4 +422,20 @@ public class EDACCView extends FrameView {
     private JDialog aboutBox;
     private JDialog databaseSettings;
     private EDACCGridSettingsView gridSettings;
+
+    public void update(Observable o, Object arg) {
+        // watch connection state
+        updateConnectionStateView();
+    }
+
+    /**
+     * Updates the GUI components which are sensitive on the DB connection state.
+     */
+    private void updateConnectionStateView() {
+        boolean state = DatabaseConnector.getInstance().isConnected();
+        connectToDBMenuItem.setEnabled(!state);
+        disconnectMenuItem.setEnabled(state);
+        generateDBMenuItem.setEnabled(state);
+        noMode();
+    }
 }
