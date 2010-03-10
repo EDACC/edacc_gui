@@ -90,7 +90,7 @@
                               <Component id="btnSolverDelete" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="btnSolverRefresh" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="500" max="32767" attributes="0"/>
+                              <EmptySpace pref="498" max="32767" attributes="0"/>
                               <Component id="btnSolverSave" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -146,7 +146,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jScrollPane2" alignment="0" pref="423" max="32767" attributes="1"/>
+                              <Component id="jScrollPane2" alignment="0" pref="458" max="32767" attributes="1"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="jlSolverDescription" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -243,6 +243,10 @@
                     <Property name="text" type="java.lang.String" resourceKey="tfSolverName.text"/>
                     <Property name="name" type="java.lang.String" value="tfSolverName" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="solverChangedOnFocusLost"/>
+                    <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="solverChangedOnKey"/>
+                  </Events>
                 </Component>
                 <Container class="javax.swing.JScrollPane" name="jScrollPane3">
                   <Properties>
@@ -260,6 +264,10 @@
                         <Property name="rows" type="int" value="5"/>
                         <Property name="name" type="java.lang.String" value="taSolverDescription" noResource="true"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="solverChangedOnFocusLost"/>
+                        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="solverChangedOnKey"/>
+                      </Events>
                     </Component>
                   </SubComponents>
                 </Container>
@@ -289,6 +297,9 @@
                     <Property name="text" type="java.lang.String" resourceKey="btnSolverAddCode.text"/>
                     <Property name="name" type="java.lang.String" value="btnSolverAddCode" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverAddCodeActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnApplySolver">
                   <Properties>
@@ -361,7 +372,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jScrollPane4" alignment="1" pref="348" max="32767" attributes="0"/>
+                              <Component id="jScrollPane4" alignment="1" pref="367" max="32767" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="btnParametersCancel" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -400,7 +411,7 @@
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
-                          <Component id="jScrollPane4" pref="267" max="32767" attributes="0"/>
+                          <Component id="jScrollPane4" pref="252" max="32767" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jlParametersName" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -554,7 +565,7 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="jScrollPane1" alignment="0" pref="627" max="32767" attributes="1"/>
+                          <Component id="jScrollPane1" alignment="0" pref="623" max="32767" attributes="1"/>
                           <Component id="panelFilter" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="panelButtons" alignment="0" max="32767" attributes="1"/>
                       </Group>
@@ -566,7 +577,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="284" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="286" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="panelButtons" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -746,7 +757,7 @@
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
-                          <EmptySpace pref="37" max="32767" attributes="0"/>
+                          <EmptySpace pref="38" max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="tfInstanceFilterNumAtomsMax" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -917,7 +928,7 @@
                           <Component id="btnRefreshTableInstances" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="btnFilter" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="195" max="32767" attributes="0"/>
+                          <EmptySpace pref="127" max="32767" attributes="0"/>
                           <Component id="btnCancel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="btnSaveInstances" min="-2" max="-2" attributes="0"/>

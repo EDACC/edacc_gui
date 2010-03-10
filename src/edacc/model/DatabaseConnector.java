@@ -131,7 +131,7 @@ public class DatabaseConnector extends Observable {
         st.addBatch("DROP TABLE IF EXISTS `instanceClass` ;");
         st.addBatch("CREATE  TABLE IF NOT EXISTS `instanceClass` (  `idinstanceClass` INT NOT NULL ,"
                 + "  `name` VARCHAR(60) NULL ,"
-                + "  `description` TEXT NULL COMMENT 'teh description should contain the source-url of the instances\nfor example: ' ,"
+                + "  `description` TEXT NULL COMMENT 'the description should contain the source-url of the instances' ,"
                 + "  `source` TINYINT(1) NOT NULL COMMENT 'tells if the class is a source class. ' ,"
                 + "  PRIMARY KEY (`idinstanceClass`) ,"
                 + "  UNIQUE INDEX `name` (`name` ASC) )ENGINE = InnoDB"

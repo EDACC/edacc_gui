@@ -14,8 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.Vector;
-import sun.awt.geom.AreaOp.CAGOp;
 
 /**
  *
@@ -26,13 +24,17 @@ public class ManageDBSolvers {
     private EDACCManageDBMode gui;
     private SolverTableModel solverTableModel;
     private Solver currentSolver;
-    private File lastBinaryLocation;
 
     public ManageDBSolvers(EDACCManageDBMode gui, SolverTableModel solverTableModel) {
         this.gui = gui;
         this.solverTableModel = solverTableModel;
     }
 
+    /**
+     * Loads all solvers from the DB and adds it to the Solver table.
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     */
     public void loadSolvers() throws NoConnectionToDBException, SQLException {
         solverTableModel.clear();
         for (Solver s: SolverDAO.getAll()) {
@@ -40,11 +42,13 @@ public class ManageDBSolvers {
         }
     }
 
-    public void applySolver(String name, String description) throws NoSolverBinarySpecifiedException {
-        //TODO add the remaining fields of a solver like binary...; calculate md5 hash etc.
+    /**
+     * Applies the name and the description of a solver.
+     * @param name
+     * @param description
+     */
+    public void applySolver(String name, String description) {
         if (currentSolver != null) {
-            if (currentSolver.getBinaryFile() == null)
-                throw new NoSolverBinarySpecifiedException();
             currentSolver.setName(name);
             currentSolver.setDescription(description);
         }
@@ -56,10 +60,8 @@ public class ManageDBSolvers {
      * @throws SQLException
      * @throws FileNotFoundException
      */
-    public void saveSolvers() throws SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException {
+    public void saveSolvers() throws SQLException, FileNotFoundException {
         for (Solver s : solverTableModel.getSolvers()) {
-            if (s.getBinaryFile() != null)
-                s.setMd5(Util.calculateMD5(s.getBinaryFile()));
             SolverDAO.save(s);
         }
 
@@ -77,18 +79,23 @@ public class ManageDBSolvers {
         }
     }
 
-    /**
-     *
-     * @return the last location from where the user added a solver binary or null
-     * if no last location is known.
-     */
-    public File getLastBinaryLocation() {
-        return lastBinaryLocation;
-    }
-
-    public void addSolverBinary(File binary) {
+    public void addSolverBinary(File binary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException, SolverAlreadyInDBException {
+        if (!binary.exists())
+           throw new FileNotFoundException("Couldn't find file \"" + binary.getName() + "\".");
         currentSolver.setBinaryFile(binary);
         currentSolver.setBinaryName(binary.getName());
-        lastBinaryLocation = binary.getParentFile();
+        currentSolver.setMd5(Util.calculateMD5(binary));
+        if (SolverDAO.solverAlreadyInDB(currentSolver) != null) {
+            currentSolver.setBinaryFile(null);
+            currentSolver.setBinaryName(null);
+            currentSolver.setMd5(null);
+            throw new SolverAlreadyInDBException();
+        }
+    }
+
+    public void addSolverCode(File code) throws FileNotFoundException {
+        if (!code.exists())
+           throw new FileNotFoundException("Couldn't find file \"" + code.getName() + "\".");
+        currentSolver.setCodeFile(code);
     }
 }

@@ -436,6 +436,5 @@ public class EDACCView extends FrameView implements Observer {
         connectToDBMenuItem.setEnabled(!state);
         disconnectMenuItem.setEnabled(state);
         generateDBMenuItem.setEnabled(state);
-        noMode();
     }
 }

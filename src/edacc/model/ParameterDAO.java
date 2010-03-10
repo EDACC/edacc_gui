@@ -71,6 +71,12 @@ public class ParameterDAO {
         return res;
     }
 
+    /**
+     * Deletes all parameters of a solver.
+     * @param solver
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     */
     public static void removeParametersOfSolver(Solver solver) throws NoConnectionToDBException, SQLException {
         final String query = "DELETE FROM Parameters WHERE Solver_idSolver=?";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
