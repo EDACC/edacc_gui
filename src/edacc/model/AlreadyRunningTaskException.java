@@ -7,7 +7,7 @@ package edacc.model;
  */
 public class AlreadyRunningTaskException extends Exception {
     public AlreadyRunningTaskException() {
-        this("Application busy. Please wait until last task is completed.");
+        this("Application busy. Please wait until current task has been completed.");
     }
 
     public AlreadyRunningTaskException(String msg) {
