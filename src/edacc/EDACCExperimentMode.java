@@ -205,9 +205,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
                     .addGroup(pnlNewExperimentLayout.createSequentialGroup()
                         .addComponent(txtExperimentName, javax.swing.GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE)
                         .addGap(192, 192, 192))
-                    .addGroup(pnlNewExperimentLayout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 437, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnCreateExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -241,7 +239,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
                         .addComponent(btnRemoveExperiment)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnLoadExperiment))
-                    .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE)
+                    .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 660, Short.MAX_VALUE)
                     .addComponent(pnlNewExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
@@ -333,7 +331,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelChooseSolverLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelChooseSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE)
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 654, Short.MAX_VALUE)
                     .addGroup(panelChooseSolverLayout.createSequentialGroup()
                         .addComponent(btnSelectAllSolvers)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -342,7 +340,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
                         .addComponent(btnReverseSolverSelection)
                         .addGap(149, 149, 149)
                         .addComponent(btnChooseSolvers)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 151, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 120, Short.MAX_VALUE)
                         .addComponent(btnSaveSolverConfigurations)))
                 .addContainerGap())
         );
@@ -502,7 +500,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
                                 .addComponent(txtNumRuns)
                                 .addComponent(txtTimeout, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addComponent(chkGenerateSeeds, javax.swing.GroupLayout.Alignment.LEADING)))
-                .addContainerGap(496, Short.MAX_VALUE))
+                .addContainerGap(465, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -545,7 +543,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
 
         panelJobBrowser.setName("panelJobBrowser"); // NOI18N
         panelJobBrowser.setPreferredSize(new java.awt.Dimension(10000, 10000));
-        panelJobBrowser.setLayout(new java.awt.GridBagLayout());
 
         jScrollPane6.setName("jScrollPane6"); // NOI18N
 
@@ -563,19 +560,29 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
         tableJobs.setName("tableJobs"); // NOI18N
         jScrollPane6.setViewportView(tableJobs);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        panelJobBrowser.add(jScrollPane6, gridBagConstraints);
-
         btnRefreshJobs.setAction(actionMap.get("btnRefreshJobs")); // NOI18N
         btnRefreshJobs.setText(resourceMap.getString("btnRefreshJobs.text")); // NOI18N
         btnRefreshJobs.setName("btnRefreshJobs"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panelJobBrowser.add(btnRefreshJobs, gridBagConstraints);
+
+        javax.swing.GroupLayout panelJobBrowserLayout = new javax.swing.GroupLayout(panelJobBrowser);
+        panelJobBrowser.setLayout(panelJobBrowserLayout);
+        panelJobBrowserLayout.setHorizontalGroup(
+            panelJobBrowserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelJobBrowserLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnRefreshJobs)
+                .addContainerGap(606, Short.MAX_VALUE))
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
+        );
+        panelJobBrowserLayout.setVerticalGroup(
+            panelJobBrowserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelJobBrowserLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 459, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnRefreshJobs)
+                .addContainerGap())
+        );
 
         manageExperimentPane.addTab(resourceMap.getString("panelJobBrowser.TabConstraints.tabTitle"), panelJobBrowser); // NOI18N
 
@@ -585,7 +592,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 721, Short.MAX_VALUE)
+                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 690, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(

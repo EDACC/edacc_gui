@@ -29,7 +29,9 @@ public class EDACCExperimentModeJobsCellRenderer extends DefaultTableCellRendere
             case -2: // error
                 comp.setBackground(Color.red); break;
             case -1: // waiting
-                comp.setBackground(Color.blue); break;
+                comp.setBackground(Color.cyan);
+              //  comp.setBackground(Color.blue);
+                break;
             case 0: // running
                 comp.setBackground(Color.orange); break;
             case 1: // finished
