@@ -10,22 +10,17 @@ import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.NoConnectionToDBException;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
+import javax.swing.RowFilter.ComparisonType;
 
 /**
  *
@@ -173,28 +168,33 @@ public class ManageDBInstances {
         return instances;
     }
 
-    /**
-     * Creates filters with the given values and adds them to the sorter of EDACCManageDBMode
-     * @param name
-     * @param numOfAtoms
-     * @param numOfClauses
-     * @param ratio
-     * @param maxClauseLength
-     */
-    public void newFilter(String name, String numOfAtoms, String numOfClauses, String ratio, String maxClauseLength) {
+/**
+ * Creates and add a andFilter with the given values to the sorter of EDACCManageDBMode
+ * @param name
+ * @param numOfAtomsMin
+ * @param numOfAtomsMax
+ * @param numOfClausesMin
+ * @param numOfClausesMax
+ * @param ratioMin
+ * @param ratioMax
+ * @param maxClauseLengthMin
+ * @param maxClauseLengthMax
+ */
+    public void newFilter(String name, String numOfAtomsMin, String numOfAtomsMax, String numOfClausesMin,
+            String numOfClausesMax, String ratioMin, String ratioMax, String maxClauseLengthMin,
+            String maxClauseLengthMax) {
         Vector<RowFilter<Object, Object>> filters = new Vector<RowFilter<Object, Object>>();
-        try {
-            filters.add(RowFilter.regexFilter(name, 0));
-            filters.add(RowFilter.regexFilter(numOfAtoms, 1));
-            filters.add(RowFilter.regexFilter(numOfClauses, 2));
-            filters.add(RowFilter.regexFilter(ratio, 3));
-            filters.add(RowFilter.regexFilter(maxClauseLength, 4));
-        } catch (java.util.regex.PatternSyntaxException e) {
-            return;
-        }
+        filters.add(RowFilter.regexFilter(name, 0));
+        if(!numOfAtomsMin.isEmpty())filters.add(RowFilter.numberFilter(ComparisonType.AFTER, Integer.parseInt(numOfAtomsMin), 1));
+        if(!numOfAtomsMax.isEmpty()) filters.add(RowFilter.numberFilter(ComparisonType.BEFORE, Integer.parseInt(numOfAtomsMax), 1));
+        if(!numOfClausesMin.isEmpty())filters.add(RowFilter.numberFilter(ComparisonType.AFTER, Integer.parseInt(numOfClausesMin), 2));
+        if(!numOfClausesMax.isEmpty())filters.add(RowFilter.numberFilter(ComparisonType.BEFORE, Integer.parseInt(numOfClausesMax), 2));
+        if(!ratioMin.isEmpty())filters.add(RowFilter.numberFilter(ComparisonType.AFTER, Float.parseFloat(ratioMin), 3));
+        if(!ratioMax.isEmpty())filters.add(RowFilter.numberFilter(ComparisonType.BEFORE, Float.parseFloat(ratioMax), 3));
+        if(!maxClauseLengthMin.isEmpty())filters.add(RowFilter.numberFilter(ComparisonType.AFTER, Integer.parseInt(maxClauseLengthMin), 4));
+        if(!maxClauseLengthMax.isEmpty())filters.add(RowFilter.numberFilter(ComparisonType.BEFORE, Integer.parseInt(maxClauseLengthMax), 4));
         RowFilter<Object, Object> filter = RowFilter.andFilter(filters);
         main.sorter.setRowFilter(filter);
-
     }
 
     /**
