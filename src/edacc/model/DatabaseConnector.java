@@ -1,12 +1,14 @@
 package edacc.model;
 
 import java.sql.*;
+import java.util.Observable;
 
 /**
- * singleton class handling the database connection
+ * singleton class handling the database connection.
+ * It is possible to get a notification of a change of the connection state by adding an Observer to this class.
  * @author daniel
  */
-public class DatabaseConnector {
+public class DatabaseConnector extends Observable {
 
     private static DatabaseConnector instance = null;
     private Connection conn;
@@ -21,6 +23,16 @@ public class DatabaseConnector {
         return instance;
     }
 
+    /**
+     * Creates a connection to a specified DB.
+     * @param hostname the hostname of the DB server.
+     * @param port the port of the DB server.
+     * @param username the username of the DB user.
+     * @param database the name of the database containing the EDACC tables.
+     * @param password the password of the DB user.
+     * @throws ClassNotFoundException if the driver couldn't be found.
+     * @throws SQLException if an error occurs while trying to establish the connection.
+     */
     public void connect(String hostname, int port, String username, String database, String password) throws ClassNotFoundException, SQLException {
         if (conn != null) {
             conn.close();
@@ -32,19 +44,49 @@ public class DatabaseConnector {
             throw e;
         } catch (SQLException e) {
             throw e;
+        } finally {
+            // inform Observers of changed connection state
+            this.setChanged();
+            this.notifyObservers();
         }
+    }
 
+    /**
+     * Closes an existing connection. If no connection exists, this method does nothing.
+     * @throws SQLException if an error occurs while trying to close the connection.
+     */
+    public void disconnect() throws SQLException {
+        if (conn != null) {
+            conn.close();
+            this.setChanged();
+            this.notifyObservers();
+        }
     }
 
     public Connection getConn() throws NoConnectionToDBException {
         try {
-            if (conn == null || !conn.isValid(10)) {
+            if (!isConnected()) {
+                // inform Obeservers of lost connection
+                this.setChanged();
+                this.notifyObservers();
                 throw new NoConnectionToDBException();
             }
             return conn;
         } catch (SQLException e) {
             conn = null;
             throw new NoConnectionToDBException();
+        }
+    }
+
+    /**
+     *
+     * @return if a valid connection exists.
+     */
+    public boolean isConnected() {
+        try {
+            return conn != null && conn.isValid(10);
+        } catch (SQLException ex) {
+            return false;
         }
     }
 
