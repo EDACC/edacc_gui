@@ -7,6 +7,7 @@ package edacc.manageDB;
 import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
 import edacc.model.Instance;
+import edacc.model.InstanceAlreadyInDBException;
 import edacc.model.InstanceDAO;
 import edacc.model.NoConnectionToDBException;
 import java.io.File;
@@ -55,7 +56,7 @@ public class ManageDBInstances {
             File ret = jFileChooserManageDBInstance.getSelectedFile();
             RecursiveFileScanner InstanceScanner = new RecursiveFileScanner("cnf");
             Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
-            Vector<Instance> instances = buildTempInstances(instanceFiles);
+            Vector<Instance> instances = buildInstances(instanceFiles);
             if (instanceFiles.isEmpty()) {
                 JOptionPane.showMessageDialog(panelManageDBInstances,
                         "No Instances have been found.",
@@ -115,53 +116,27 @@ public class ManageDBInstances {
 
     }
 
-    /**
-     * Saves all instances from the instanceTableModel into the Database
-     * @throws SQLException
-     * @throws FileNotFoundException
-     */
-    public void saveInstances() throws  FileNotFoundException, NoInstancesToSaveException, SQLException {
-        if(!main.instanceTableModel.isEmpty()){
-            Vector<Instance> saved = new Vector<Instance>();
-            for (Instance i : main.instanceTableModel.getInstances()) {
-                try {
-                    InstanceDAO.saveTempInstance(i);
-                    saved.addElement(i);
-                } catch (SQLException ex) {
-                    main.instanceTableModel.removeInstances(saved);
-                    throw new SQLException(ex.getMessage());
-                }
-            }   
-        }else{
-            throw new NoInstancesToSaveException();
-        }
-    }
-
-    private Vector<Instance> buildTempInstances(Vector<File> instanceFiles)
+    private Vector<Instance> buildInstances(Vector<File> instanceFiles)
             throws InstanceException, FileNotFoundException, NullPointerException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException {
         Vector<Instance> instances = new Vector<Instance>();
-        String duplicates = "";
+        String duplicatesDB = "";
         for (int i = 0; i < instanceFiles.size(); i++) {
-            String md5 = calculateMD5(instanceFiles.get(i));
-            InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
-            Instance temp = InstanceDAO.createInstanceTemp(md5);
-            if(temp != null){
-                temp.setFile(instanceFiles.get(i));
-                temp.setName(tempInstance.name);
-                temp.setNumAtoms(tempInstance.n);
-                temp.setNumClauses(tempInstance.m);
-                temp.setRatio(tempInstance.r);
-                temp.setMaxClauseLength(tempInstance.k);
-                temp.setMd5(md5);
+            try {
+                String md5 = calculateMD5(instanceFiles.get(i));
+                InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
+                Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, tempInstance.n,
+                        tempInstance.m, tempInstance.r, tempInstance.k, md5);{
                 instances.add(temp);
-            }else{
-                duplicates +="; " + instanceFiles.get(i).getAbsolutePath();
+                InstanceDAO.save(temp);
+                }
+            } catch (InstanceAlreadyInDBException ex) {
+                duplicatesDB += "\n " + instanceFiles.get(i).getAbsolutePath();
             }
             
         }
-        if(!duplicates.equals("")){
+        if(!duplicatesDB.equals("")){
              JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "The following instances are already in the database: " + duplicates,
+                    "The following instances are already in the database: " + duplicatesDB,
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
