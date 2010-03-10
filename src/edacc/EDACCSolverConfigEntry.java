@@ -25,8 +25,9 @@ import javax.swing.border.TitledBorder;
 import org.jdesktop.application.Action;
 
 /**
- *
+ * A simple JPanel which represents a Solver Configuration in the GUI.
  * @author simon
+ * @see edacc.EDACCSolverConfigPanel
  */
 public class EDACCSolverConfigEntry extends javax.swing.JPanel {
 
@@ -67,6 +68,10 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         this.solverConfiguration = null;
     }
 
+    /**
+     * Sets the number in the title.
+     * @param number
+     */
     public void setTitleNumber(int number) {
         if (number == 1) {
             border.setTitle(title);

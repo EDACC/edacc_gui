@@ -20,8 +20,9 @@ import java.awt.GridBagLayout;
 import java.sql.SQLException;
 
 /**
- *
+ * A JPanel which serves as container for EDACCSolverConfigEntry objects.
  * @author simon
+ * @see edacc.EDACCSolverConfigEntry
  */
 public class EDACCSolverConfigPanel extends javax.swing.JPanel {
 
@@ -55,7 +56,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
     }
 
     /**
-     * Generates a new entry for a solver.
+     * Generates a new EDACCSolverConfigEntry for a solver.
      * @param o Solver
      */
     public void addSolver(Object o) {
@@ -74,7 +75,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
     }
 
     /**
-     * Generates a new entry for a solver configuration.
+     * Generates a new EDACCSolverConfigEntry for a solver configuration.
      * @param solverConfiguration
      * @throws SQLException
      */
@@ -87,7 +88,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
     }
 
     /**
-     * Copies an entry and adds it after that entry.
+     * Copies an EDACCSolverConfigEntry and adds it after that entry.
      * @param entry
      * @throws SQLException
      */
@@ -116,7 +117,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
     }
 
     /**
-     * Removes an entry. If the solver configuration exists in the database
+     * Removes an EDACCSolverConfigEntry. If the solver configuration exists in the database
      * it is marked as deleted.
      * @param entry
      */
@@ -129,7 +130,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
     }
 
     /**
-     * Removes every entry which was generated with this solver.
+     * Removes every EDACCSolverConfigEntry which was generated with this solver.
      * @param o solver to be removed
      */
     public void removeSolver(Object o) {
@@ -148,7 +149,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
     }
 
     /**
-     * Returns true if a solver configuration exists with this solverId
+     * Returns true if a EDACCSolverConfigEntry exists with this solverId
      * @param solverId
      * @return
      */
