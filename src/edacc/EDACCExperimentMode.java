@@ -16,9 +16,13 @@ import edacc.experiment.ExperimentTableModel;
 import edacc.experiment.InstanceTableModel;
 import edacc.experiment.InstanceTableModelRowFilter;
 import edacc.experiment.SolverTableModel;
+import edacc.model.AlreadyRunningTaskException;
 import edacc.model.Solver;
+import edacc.model.Tasks;
 import java.awt.Component;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -31,7 +35,7 @@ import org.jdesktop.application.Action;
  *
  * @author simon
  */
-public class EDACCExperimentMode extends javax.swing.JPanel {
+public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTaskEvents {
 
     public ExperimentController expController;
     public ExperimentTableModel expTableModel;
@@ -766,22 +770,20 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
     }
 
     @Action
-    public void btnGenerateJobs() {
+    public void btnGenerateJobs()  {
         try {
             int numRuns = Integer.parseInt(txtNumRuns.getText());
             int timeout = Integer.parseInt(txtTimeout.getText());
             boolean generateSeeds = chkGenerateSeeds.isSelected();
             boolean linkSeeds = chkLinkSeeds.isSelected();
             int maxSeed = Integer.parseInt(txtMaxSeeds.getText());
-            int added_experiments = expController.generateJobs(numRuns, timeout, generateSeeds, maxSeed, linkSeeds);
-            lblNumJobs.setText(String.valueOf(expController.getNumJobs()) + " jobs in the database");
-            javax.swing.JOptionPane.showMessageDialog(null, "Added " + added_experiments + " new jobs", "Jobs added", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            //int added_experiments = expController.generateJobs(numRuns, timeout, generateSeeds, maxSeed, linkSeeds);
+            Tasks.startTask("generateJobs", new Class[] {int.class, int.class, boolean.class, int.class, boolean.class, edacc.model.Tasks.class}, new Object[] {numRuns, timeout, generateSeeds, maxSeed, linkSeeds, null}, expController, this, 0);
         }
-        catch (NumberFormatException e) {
+        catch (AlreadyRunningTaskException ex) {
+            Logger.getLogger(EDACCExperimentMode.class.getName()).log(Level.SEVERE, null, ex);
+        }        catch (NumberFormatException e) {
             javax.swing.JOptionPane.showMessageDialog(null, "Expected integers for number of runs, timeout and max seed", "invalid data", javax.swing.JOptionPane.ERROR_MESSAGE);
-        }
-        catch (SQLException ex) {
-            createDatabaseErrorMessage(ex);
         }
     }
 
@@ -858,4 +860,24 @@ public class EDACCExperimentMode extends javax.swing.JPanel {
     private javax.swing.JTextField txtNumRuns;
     private javax.swing.JTextField txtTimeout;
     // End of variables declaration//GEN-END:variables
+
+    public void onTaskSuccessful(int id, Object result) {
+        if (id == 0) {
+            int added_experiments = (Integer)result;
+            lblNumJobs.setText(String.valueOf(expController.getNumJobs()) + " jobs in the database");
+            javax.swing.JOptionPane.showMessageDialog(null, "Added " + added_experiments + " new jobs", "Jobs added", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    public void onTaskStart(int id) {
+
+    }
+
+    public void onTaskFailed(int id, Throwable e) {
+        if (id == 0) {
+            if (e instanceof SQLException) {
+                createDatabaseErrorMessage((SQLException)e);
+            }
+        }
+    }
 }
