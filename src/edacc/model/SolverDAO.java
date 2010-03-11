@@ -28,7 +28,9 @@ public class SolverDAO {
      * @param solver The Solver object to persist.
      */
     public static void save(Solver solver) throws SQLException, FileNotFoundException {
-        if (solver.isSaved()) return;
+        if (solver.isSaved()) {
+            return;
+        }
         PreparedStatement ps;
 
         boolean alreadyInDB = false;
@@ -43,15 +45,15 @@ public class SolverDAO {
 
         ps.setString(1, solver.getName());
         ps.setString(2, solver.getBinaryName());
-        if (solver.getBinaryFile() == null)
-            ; // TODO add reaction to missing solver binary
+        if (solver.getBinaryFile() == null); // TODO add reaction to missing solver binary
         ps.setBinaryStream(3, new FileInputStream(solver.getBinaryFile()));
         ps.setString(4, solver.getDescription());
         ps.setString(5, solver.getMd5());
-        if (solver.getCodeFile() != null)
+        if (solver.getCodeFile() != null) {
             ps.setBinaryStream(6, new FileInputStream(solver.getCodeFile()));
-        else
+        } else {
             ps.setBinaryStream(6, null);
+        }
         ps.executeUpdate();
 
 
@@ -61,8 +63,7 @@ public class SolverDAO {
             if (rs.next()) {
                 solver.setId(rs.getInt(1));
             }
-        }
-        else if (alreadyInDB) {
+        } else if (alreadyInDB) {
             solver.setId(solverAlreadyInDB(solver).getId());
         }
 
@@ -75,16 +76,34 @@ public class SolverDAO {
      * TODO delete SolverCOnfigs??
      * @param solver the solver to remove.
      * @throws SQLException if an error occurs while executing the SQL query.
+     * @throws SolverIsInExperimentException if the solver is used in an experiment. In this case you have to remove the experiment first.
+     * @throws SolverNotInDBException if the solver is not persisted in the db. In this case, the object will be marked as "deleted" but nothing will be done to the cache or db.
      */
-    public static void removeSolver(Solver solver) throws SQLException {
+    public static void removeSolver(Solver solver) throws SolverIsInExperimentException, SQLException, SolverNotInDBException {
+        if (solver.isNew()) {
+            solver.setDeleted();
+            throw new SolverNotInDBException(solver);
+        }
+
+        // don't remove solver if it is used in an experiment
+        if (isInExperiment(solver)) {
+            throw new SolverIsInExperimentException(solver);
+        }
+
+        // remove also the parameters of the solver
         ParameterDAO.removeParametersOfSolver(solver);
+
+        // now remove the solver from the db
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(removeQuery);
         ps.setInt(1, solver.getId());
         ps.executeUpdate();
 
+        // finally remove it from the cache if cached
         if (cache.containsKey(solver)) {
             cache.remove(solver);
         }
+
+        // mark the object as deleted
         solver.setDeleted();
     }
 
@@ -191,5 +210,13 @@ public class SolverDAO {
             }
         }
         return null;
+    }
+
+    private static boolean isInExperiment(Solver solver) throws NoConnectionToDBException, SQLException {
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+
+        ResultSet rs = st.executeQuery("SELECT s.idSolver FROM " + table + " AS s JOIN SolverConfig as sc ON "
+                + "s.idSolver = sc.Solver_idSolver WHERE idSolver = " + solver.getId());
+        return rs.next();
     }
 }

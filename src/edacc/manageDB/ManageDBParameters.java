@@ -49,4 +49,11 @@ public class ManageDBParameters {
         }
     }
 
+    /**
+     * removes the parameters of the current solver.
+     */
+    public void removeParameters() {
+        parameterTableModel.removeParametersOfSolver(parameterTableModel.getCurrentSolver());
+    }
+
 }

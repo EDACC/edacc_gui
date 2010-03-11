@@ -5,15 +5,19 @@
 
 package edacc.manageDB;
 
+import edacc.model.SolverIsInExperimentException;
 import edacc.EDACCManageDBMode;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Solver;
 import edacc.model.SolverDAO;
+import edacc.model.SolverNotInDBException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -97,5 +101,21 @@ public class ManageDBSolvers {
         if (!code.exists())
            throw new FileNotFoundException("Couldn't find file \"" + code.getName() + "\".");
         currentSolver.setCodeFile(code);
+    }
+
+    /**
+     * Removes the current solver from the solver table model.
+     * If it is persisted in the db, it will also remove it from the db.
+     * @throws SolverIsInExperimentException if the solver is used in an experiment.
+     * @throws SQLException if an SQL error occurs while deleting the solver.
+     */
+    public void removeSolver() throws SolverIsInExperimentException, SQLException {
+        try {
+            SolverDAO.removeSolver(currentSolver);
+        } catch (SolverNotInDBException ex) {
+            // if the solver isn't in the db, just remove it from the table model
+        } finally {
+            solverTableModel.removeSolver(currentSolver);
+        }
     }
 }

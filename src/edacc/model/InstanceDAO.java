@@ -238,7 +238,6 @@ public class InstanceDAO {
                 
         ResultSet rs = st.executeQuery("SELECT i.idInstance FROM " + table + " AS i JOIN Experiment_has_Instances as ei ON " +
                 "i.idInstance = ei.Instances_idInstance WHERE idInstance = "+ id);
-       if(rs.next()) return true;
-       else return false;
+       return rs.next();
     }
 }

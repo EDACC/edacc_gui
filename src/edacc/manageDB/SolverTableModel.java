@@ -67,10 +67,18 @@ public class SolverTableModel extends AbstractTableModel {
         this.fireTableDataChanged();
     }
 
-    Solver getSolver(int row) {
+    public Solver getSolver(int row) {
         if (row >= 0 && row < getRowCount())
             return solvers.get(row);
         else
             return null;
+    }
+
+    public void removeSolver(int index) {
+        solvers.remove(index);
+    }
+
+    public void removeSolver(Solver solver) {
+        solvers.remove(solver);
     }
 }

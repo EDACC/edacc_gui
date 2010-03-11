@@ -41,6 +41,13 @@ public class ParameterTableModel extends AbstractTableModel{
         }
 
     }
+
+    /**
+     * @return the current solver.
+     */
+    public Solver getCurrentSolver() {
+        return currentSolver;
+    }
     
     public void remove(Parameter param){
         //parameters.get(currentSolver).remove(param);
@@ -128,4 +135,11 @@ public class ParameterTableModel extends AbstractTableModel{
             return null;
     }
 
+    /**
+     * Removes all parameters of the given solver from the table model.
+     * @param s
+     */
+    public void removeParametersOfSolver(Solver s) {
+        parameters.remove(s);
+    }
 }

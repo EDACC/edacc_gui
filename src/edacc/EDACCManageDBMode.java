@@ -10,12 +10,12 @@
  */
 package edacc;
 
-
 import edacc.manageDB.*;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.Solver;
+import edacc.model.SolverIsInExperimentException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -36,21 +36,19 @@ import org.jdesktop.application.Action;
  */
 public class EDACCManageDBMode extends javax.swing.JPanel {
 
-     public ManageDBInstances manageDBInstances;
-     public InstanceTableModel instanceTableModel;
-     public TableRowSorter<InstanceTableModel> sorter;
+    public ManageDBInstances manageDBInstances;
+    public InstanceTableModel instanceTableModel;
+    public TableRowSorter<InstanceTableModel> sorter;
+    private ManageDBSolvers manageDBSolvers;
+    private SolverTableModel solverTableModel;
+    private ManageDBParameters manageDBParameters;
+    private ParameterTableModel parameterTableModel;
 
-     private ManageDBSolvers manageDBSolvers;
-     private SolverTableModel solverTableModel;
-
-     private ManageDBParameters manageDBParameters;
-     private ParameterTableModel parameterTableModel;
-
-     public EDACCManageDBMode(){
+    public EDACCManageDBMode() {
         initComponents();
 
         // initialize instance table
-        manageDBInstances = new ManageDBInstances(this, panelManageDBInstances, jFileChooserManageDBInstance );
+        manageDBInstances = new ManageDBInstances(this, panelManageDBInstances, jFileChooserManageDBInstance);
         instanceTableModel = new InstanceTableModel();
         tableInstances.setModel(instanceTableModel);
         tableInstances.setDefaultRenderer(Object.class, new InstanceTableCellRenderer());
@@ -69,35 +67,38 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         tableParameters.setModel(parameterTableModel);
 
         tableParameters.getSelectionModel().addListSelectionListener(new ParameterTableSelectionListener(tableParameters, manageDBParameters));
-     }
+    }
 
-     void initialize() throws NoConnectionToDBException, SQLException {
-         manageDBSolvers.loadSolvers();
-         for (Solver s: solverTableModel.getSolvers()) {
-             for (Parameter p: ParameterDAO.getParameterFromSolverId(s.getId())) {
+    void initialize() throws NoConnectionToDBException, SQLException {
+        manageDBSolvers.loadSolvers();
+        for (Solver s : solverTableModel.getSolvers()) {
+            for (Parameter p : ParameterDAO.getParameterFromSolverId(s.getId())) {
                 parameterTableModel.addParameter(s, p);
-             }
-         }
-         manageDBInstances.loadInstances();
-     }
+            }
+        }
+        manageDBInstances.loadInstances();
+    }
 
-     public void addDocumentListener(javax.swing.JTextField tf){
+    public void addDocumentListener(javax.swing.JTextField tf) {
         tf.getDocument().addDocumentListener(
                 new DocumentListener() {
+
                     public void changedUpdate(DocumentEvent e) {
-                        manageDBInstances.newFilter(tfInstanceFilterName.getText(), 
+                        manageDBInstances.newFilter(tfInstanceFilterName.getText(),
                                 tfInstanceFilterNumAtomsMin.getText(), tfInstanceFilterNumAtomsMax.getText(),
                                 tfInstanceFilterNumClausesMin.getText(), tfInstanceFilterNumClausesMax.getText(),
                                 tfInstanceFilterRatioMin.getText(), tfInstanceFilterRatioMax.getText(),
                                 tfInstanceFilterMaxClauseLengthMin.getText(), tfInstanceFilterMaxClauseLengthMax.getText());
                     }
+
                     public void insertUpdate(DocumentEvent e) {
-                       manageDBInstances.newFilter(tfInstanceFilterName.getText(),
+                        manageDBInstances.newFilter(tfInstanceFilterName.getText(),
                                 tfInstanceFilterNumAtomsMin.getText(), tfInstanceFilterNumAtomsMax.getText(),
                                 tfInstanceFilterNumClausesMin.getText(), tfInstanceFilterNumClausesMax.getText(),
                                 tfInstanceFilterRatioMin.getText(), tfInstanceFilterRatioMax.getText(),
                                 tfInstanceFilterMaxClauseLengthMin.getText(), tfInstanceFilterMaxClauseLengthMax.getText());
                     }
+
                     public void removeUpdate(DocumentEvent e) {
                         manageDBInstances.newFilter(tfInstanceFilterName.getText(),
                                 tfInstanceFilterNumAtomsMin.getText(), tfInstanceFilterNumAtomsMax.getText(),
@@ -106,9 +107,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                                 tfInstanceFilterMaxClauseLengthMin.getText(), tfInstanceFilterMaxClauseLengthMax.getText());
                     }
                 });
-     }
+    }
 
-     /** This method is called from within the constructor to
+    /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
@@ -321,6 +322,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
         btnSolverDelete.setText(resourceMap.getString("btnSolverDelete.text")); // NOI18N
         btnSolverDelete.setName("btnSolverDelete"); // NOI18N
+        btnSolverDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolverDeleteActionPerformed(evt);
+            }
+        });
 
         btnSolverRefresh.setText(resourceMap.getString("btnSolverRefresh.text")); // NOI18N
         btnSolverRefresh.setName("btnSolverRefresh"); // NOI18N
@@ -805,8 +811,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private void btnRemoveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstancesActionPerformed
         try {
             manageDBInstances.removeInstances(tableInstances.getSelectedRows());
+        } catch (Exception e) {
         }
-        catch (Exception e) {}
         tableInstances.updateUI();
     }//GEN-LAST:event_btnRemoveInstancesActionPerformed
 
@@ -815,8 +821,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     }//GEN-LAST:event_btnRefreshTableInstancesActionPerformed
 
     private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
-        if(panelFilter.isVisible())clearFilter();
-        else{
+        if (panelFilter.isVisible()) {
+            clearFilter();
+        } else {
             tableInstances.setRowSorter(sorter);
             addDocumentListener(tfInstanceFilterName);
             addDocumentListener(tfInstanceFilterNumAtomsMin);
@@ -836,26 +843,25 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     }//GEN-LAST:event_panelFilterComponentAdded
 
     private void tfInstanceFilterNameInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_tfInstanceFilterNameInputMethodTextChanged
-
     }//GEN-LAST:event_tfInstanceFilterNameInputMethodTextChanged
 
     private void btnSolverSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverSaveActionPerformed
         try {
-           manageDBSolvers.saveSolvers();
+            manageDBSolvers.saveSolvers();
             for (Solver s : solverTableModel.getSolvers()) {
                 manageDBParameters.saveParameters(s);
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
-                "Solvers cannot be saved. There is a problem with the Database: " + ex.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+                    "Solvers cannot be saved. There is a problem with the Database: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
-                "Solvers cannot be saved because a file couldn't be found: " + ex.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-        } 
+                    "Solvers cannot be saved because a file couldn't be found: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnSolverSaveActionPerformed
 
     private void btnSolverNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverNewActionPerformed
@@ -863,7 +869,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         tableSolver.getSelectionModel().setSelectionInterval(tableSolver.getRowCount() - 1, tableSolver.getRowCount() - 1);
         tableSolver.updateUI();
     }//GEN-LAST:event_btnSolverNewActionPerformed
-
     JFileChooser binaryFileChooser;
     private void btnSolverAddBinaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverAddBinaryActionPerformed
         try {
@@ -875,14 +880,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             }
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
-                "The binary of the solver couldn't be found: " + ex.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+                    "The binary of the solver couldn't be found: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
-                "An error occured while adding the binary of the solver: " + ex.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+                    "An error occured while adding the binary of the solver: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
         tableSolver.updateUI();
     }//GEN-LAST:event_btnSolverAddBinaryActionPerformed
@@ -892,8 +897,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         tableParameters.getSelectionModel().setSelectionInterval(tableParameters.getRowCount() - 1, tableParameters.getRowCount() - 1);
         tableParameters.updateUI();
     }//GEN-LAST:event_btnParametersNewActionPerformed
-
-
 
     /**
      * Handles the key pressed events of the textfields "solver name" and "solver description".
@@ -910,7 +913,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         manageDBSolvers.applySolver(tfSolverName.getText(), taSolverDescription.getText());
         tableSolver.updateUI();
     }
-
     private JFileChooser codeFileChooser;
     private void btnSolverAddCodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverAddCodeActionPerformed
         try {
@@ -922,9 +924,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             }
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
-                "The code of the solver couldn't be found: " + ex.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+                    "The code of the solver couldn't be found: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
         tableSolver.updateUI();
     }//GEN-LAST:event_btnSolverAddCodeActionPerformed
@@ -936,6 +938,20 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private void solverChangedOnFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_solverChangedOnFocusLost
         solverChanged();
     }//GEN-LAST:event_solverChangedOnFocusLost
+
+    private void btnSolverDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverDeleteActionPerformed
+        try {
+            manageDBSolvers.removeSolver();
+            manageDBParameters.removeParameters();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "A solver couldn't be removed: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        tableSolver.updateUI();
+        tableParameters.updateUI();
+    }//GEN-LAST:event_btnSolverDeleteActionPerformed
 
     public void showSolverDetails(Solver currentSolver) {
         boolean enabled = false;
@@ -970,27 +986,29 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         }
     }
 
-    private void clearFilter(){
-       if(panelFilter.isVisible()){
-           manageDBInstances.removeFilter(tableInstances);
-           panelFilter.setVisible(false);
-           tfInstanceFilterName.setText("");
-           tfInstanceFilterNumAtomsMin.setText("");
-           tfInstanceFilterNumClausesMin.setText("");
-           tfInstanceFilterRatioMin.setText("");
-           tfInstanceFilterMaxClauseLengthMin.setText("");
+    private void clearFilter() {
+        if (panelFilter.isVisible()) {
+            manageDBInstances.removeFilter(tableInstances);
+            panelFilter.setVisible(false);
+            tfInstanceFilterName.setText("");
+            tfInstanceFilterNumAtomsMin.setText("");
+            tfInstanceFilterNumClausesMin.setText("");
+            tfInstanceFilterRatioMin.setText("");
+            tfInstanceFilterMaxClauseLengthMin.setText("");
         }
     }
 
     @Action
     public void btnSaveParam() {
-        if (tableParameters.getSelectedRow() == -1) return;
+        if (tableParameters.getSelectedRow() == -1) {
+            return;
+        }
         Parameter p = parameterTableModel.getParameter(tableParameters.getSelectedRow());
         p.setName(tfParametersName.getText());
         p.setOrder(Integer.parseInt(tfParametersOrder.getText()));
         p.setPrefix(tfParametersPrefix.getText());
         parameterTableModel.fireTableDataChanged();
-    }   
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddInstances;
     private javax.swing.JButton btnFilter;
@@ -1057,5 +1075,4 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private javax.swing.JTextField tfParametersPrefix;
     private javax.swing.JTextField tfSolverName;
     // End of variables declaration//GEN-END:variables
-
 }
