@@ -9,6 +9,7 @@ import edacc.EDACCManageDBMode;
 import edacc.model.Instance;
 import edacc.model.InstanceAlreadyInDBException;
 import edacc.model.InstanceDAO;
+import edacc.model.InstanceIsInExperimentException;
 import edacc.model.NoConnectionToDBException;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,6 +17,8 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -38,7 +41,11 @@ public class ManageDBInstances {
         this.panelManageDBInstances = panelManageDBInstances;
         this.jFileChooserManageDBInstance = jFileChooserManageDBInstance;
     }
-
+    /**
+     * Load all instances from the database into the instancetable
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     */
     public void loadInstances() throws NoConnectionToDBException, SQLException {
         main.instanceTableModel.instances.clear();
         main.instanceTableModel.addInstances(new Vector<Instance>(InstanceDAO.getAll()));
@@ -98,20 +105,33 @@ public class ManageDBInstances {
     }
 
     /**
-     * Delete the given rows from the instanceTableModel
+     * Remove the given rows from the instanceTableModel
      * @param rows the rows which have to be deleted
      */
     public void removeInstances(int[] rows) throws NoConnectionToDBException, SQLException {
         Vector<Instance> rem = new Vector<Instance>();
+        Vector<Instance> notRem = new Vector<Instance>();
         for (int i = 0; i < rows.length; i++) {
             Instance ins = (Instance) main.instanceTableModel.getValueAt(rows[i], 5);
-            rem.add(ins);
-            InstanceDAO.delete(ins);
+            try {
+                InstanceDAO.delete(ins);
+                rem.add(ins);
+            } catch (InstanceIsInExperimentException ex) {
+                notRem.add(ins);
+            }
         }
         main.instanceTableModel.removeInstances(rem);
+        if(!notRem.isEmpty()){
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+             "Some of the selected instances couldn't be removed, because they are containing to a experiment.",
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        }
     }
-
-    public void removeAllInstances(){
+    /**
+     * Removes all instances from the instancetable
+     */
+    public void removeAllInstancesFromTable(){
         main.instanceTableModel.clearTable();
 
     }

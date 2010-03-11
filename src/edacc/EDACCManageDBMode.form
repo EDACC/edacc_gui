@@ -90,7 +90,7 @@
                               <Component id="btnSolverDelete" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="btnSolverRefresh" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="500" max="32767" attributes="0"/>
+                              <EmptySpace pref="532" max="32767" attributes="0"/>
                               <Component id="btnSolverSave" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -303,7 +303,6 @@
             </Container>
             <Component class="javax.swing.JButton" name="btnSolverCancel">
               <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="btnCancel.text"/>
                 <Property name="name" type="java.lang.String" value="btnCancel" noResource="true"/>
               </Properties>
               <Events>
