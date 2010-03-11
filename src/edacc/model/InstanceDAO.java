@@ -1,5 +1,6 @@
 package edacc.model;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
@@ -13,37 +14,38 @@ import java.sql.*;
 public class InstanceDAO {
     protected static final String table = "Instances";
     private static final Hashtable<Instance, Instance> cache = new Hashtable<Instance, Instance>();
-
     /**
      * Instance factory method, ensures that the created instance is persisted and assigned an ID
-     * so it can be referenced by related objects
+     * so it can be referenced by related objects. Checks if the instance is already in the Datebase.
+     * @param md5
      * @return new Instance object
+     * @throws SQLException, FileNotFoundException, InstanceAlreadyInDBException
      */
-     public static Instance createInstance() throws SQLException, FileNotFoundException {
-        Instance i = new Instance();
-        save(i);
-        cacheInstance(i);
-        return i;
-     }
-
-     /**
-      * Instance factory methode for an Instance which is temporary and therfore requires no
-      *  datebase item.
-      * Checks if an instance with this md5 hash is already in DB and returns null in this case.
-      * @return new Instance object or null, if instance with this hash already exists.
-      */
-     public static Instance createInstanceTemp(String md5) throws NoConnectionToDBException, SQLException{
-        PreparedStatement ps;
+     public static Instance createInstance(File file, String name, int numAtoms, int numClauses ,
+             float ratio, int maxClauseLength, String md5) throws SQLException, FileNotFoundException,
+             InstanceAlreadyInDBException {
+         PreparedStatement ps;
          final String Query = "SELECT * FROM " + table +" WHERE md5 = ?";
          ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
          ps.setString(1, md5);
          ResultSet rs = ps.executeQuery();
          if(rs.next()){
-             return null;
+            throw new InstanceAlreadyInDBException();
          }
          Instance i = new Instance();
+        i.setFile(file);
+        i.setName(name);
+        i.setNumAtoms(numAtoms);
+        i.setNumClauses(numClauses);
+        i.setRatio(ratio);
+        i.setMaxClauseLength(maxClauseLength);
+        i.setMd5(md5);
+        save(i);
+        cacheInstance(i);
         return i;
      }
+
+
 
      public static void delete(Instance i) throws NoConnectionToDBException, SQLException {
          PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM Instances WHERE idInstance=?");
@@ -51,15 +53,6 @@ public class InstanceDAO {
          ps.executeUpdate();
          cache.remove(i);
          i.setDeleted();
-     }
-
-     /**
-      * persists an temporary instance object to the database
-      * @param instance The temporary instance object to persist
-      */
-     public static void saveTempInstance(Instance instance) throws SQLException, FileNotFoundException{
-        save(instance);
-        cacheInstance(instance);
      }
 
     /**

@@ -864,34 +864,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     }//GEN-LAST:event_btnRefreshTableInstancesActionPerformed
 
     private void btnSaveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveInstancesActionPerformed
-        try {
-            manageDBInstances.saveInstances();
-             JOptionPane.showMessageDialog(panelManageDBInstances,
-            "The Instances have been successfully added to the Database." ,
-            "Info",
-            JOptionPane.INFORMATION_MESSAGE);
-            //manageDBInstances.removeAllInstances();
-            tableInstances.updateUI();
-
-        } catch (NoInstancesToSaveException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-            ex.getMessage(),
-            "Error",
-            JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-            "Instances cannot be saved. There is a problem with the database." +
-            "The already saved Instances have been deleted from the table.: " + ex.getMessage(),
-            "Error",
-            JOptionPane.ERROR_MESSAGE);
-        } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-            "Instances cannot be saved because a file couldn't be found: " + ex.getMessage(),
-            "Error",
-            JOptionPane.ERROR_MESSAGE);
-        }
-
-        
+     
     }//GEN-LAST:event_btnSaveInstancesActionPerformed
 
     private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
