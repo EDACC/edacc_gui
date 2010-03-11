@@ -47,12 +47,15 @@ public class InstanceDAO {
 
 
 
-     public static void delete(Instance i) throws NoConnectionToDBException, SQLException {
-         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM Instances WHERE idInstance=?");
-         ps.setInt(1, i.getId());
-         ps.executeUpdate();
-         cache.remove(i);
-         i.setDeleted();
+     public static void delete(Instance i) throws NoConnectionToDBException, SQLException, InstanceIsInExperimentException {
+         if(!IsInAnyExperiment(i.getId())){
+             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM Instances WHERE idInstance=?");
+             ps.setInt(1, i.getId());
+             ps.executeUpdate();
+             cache.remove(i);
+             i.setDeleted();
+         } else throw new InstanceIsInExperimentException();
+
      }
 
     /**
