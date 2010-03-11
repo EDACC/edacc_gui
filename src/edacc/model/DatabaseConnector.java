@@ -129,7 +129,7 @@ public class DatabaseConnector extends Observable {
                 + "  ON UPDATE CASCADE)"
                 + "  ENGINE = InnoDB;");
         st.addBatch("DROP TABLE IF EXISTS `instanceClass` ;");
-        st.addBatch("CREATE  TABLE IF NOT EXISTS `instanceClass` (  `idinstanceClass` INT NOT NULL ,"
+        st.addBatch("CREATE  TABLE IF NOT EXISTS `instanceClass` (  `idinstanceClass` INT NOT NULL AUTO_INCREMENT,"
                 + "  `name` VARCHAR(60) NULL ,"
                 + "  `description` TEXT NULL COMMENT 'the description should contain the source-url of the instances' ,"
                 + "  `source` TINYINT(1) NOT NULL COMMENT 'tells if the class is a source class. ' ,"
@@ -145,9 +145,8 @@ public class DatabaseConnector extends Observable {
                 + "  `numClauses` INT NULL ,"
                 + "  `ratio` FLOAT NULL ,"
                 + "  `maxClauseLength` INT NULL ,"
-                + "  `instanceClass_idinstanceClass` INT NOT NULL ,"
-                + "  PRIMARY KEY (`idInstance`,"
-                + " `instanceClass_idinstanceClass`) ,"
+                + "  `instanceClass_idinstanceClass` INT NULL ,"
+                + "  PRIMARY KEY (`idInstance`) ,"
                 + "  UNIQUE INDEX `name` (`name` ASC) ,"
                 + "  INDEX `fk_Instances_instanceClass1` (`instanceClass_idinstanceClass` ASC) ,"
                 + "  CONSTRAINT `fk_Instances_instanceClass1`    FOREIGN KEY (`instanceClass_idinstanceClass` )    REFERENCES `instanceClass` (`idinstanceClass` )    "
@@ -277,20 +276,6 @@ public class DatabaseConnector extends Observable {
                 + "  CONSTRAINT `fk_Experiment_has_gridQueue_gridQueue1`    "
                 + "  FOREIGN KEY (`gridQueue_idgridQueue` )    "
                 + "  REFERENCES `gridQueue` (`idgridQueue` )    "
-                + "  ON DELETE CASCADE    "
-                + "  ON UPDATE CASCADE)"
-                + "  ENGINE = InnoDB;");
-        st.addBatch("DROP TABLE IF EXISTS `Instances_has_instanceClass` ;");
-        st.addBatch("CREATE  TABLE IF NOT EXISTS `Instances_has_instanceClass` (  `Instances_idInstance` INT NOT NULL ,"
-                + "  `instanceClass_idinstanceClass` INT NOT NULL ,"
-                + "  PRIMARY KEY (`Instances_idInstance`,"
-                + " `instanceClass_idinstanceClass`) ,"
-                + "  INDEX `fk_Instances_has_instanceClass_Instances1` (`Instances_idInstance` ASC) ,"
-                + "  INDEX `fk_Instances_has_instanceClass_instanceClass1` (`instanceClass_idinstanceClass` ASC) ,"
-                + "  CONSTRAINT `fk_Instances_has_instanceClass_Instances1`    FOREIGN KEY (`Instances_idInstance` )    REFERENCES `Instances` (`idInstance` )    "
-                + "  ON DELETE CASCADE   "
-                + "  ON UPDATE CASCADE,"
-                + "  CONSTRAINT `fk_Instances_has_instanceClass_instanceClass1`    FOREIGN KEY (`instanceClass_idinstanceClass` )    REFERENCES `instanceClass` (`idinstanceClass` )    "
                 + "  ON DELETE CASCADE    "
                 + "  ON UPDATE CASCADE)"
                 + "  ENGINE = InnoDB;");
