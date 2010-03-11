@@ -51,6 +51,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         manageDBInstances = new ManageDBInstances(this, panelManageDBInstances, jFileChooserManageDBInstance );
         instanceTableModel = new InstanceTableModel();
         tableInstances.setModel(instanceTableModel);
+        tableInstances.setDefaultRenderer(Object.class, new InstanceTableCellRenderer());
         sorter = new TableRowSorter<InstanceTableModel>(instanceTableModel);
 
         // initialize solver table
