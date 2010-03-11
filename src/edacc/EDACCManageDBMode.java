@@ -180,8 +180,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         btnRemoveInstances = new javax.swing.JButton();
         btnRefreshTableInstances = new javax.swing.JButton();
         btnFilter = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
-        btnSaveInstances = new javax.swing.JButton();
 
         jFileChooserManageDBInstance.setFileSelectionMode(javax.swing.JFileChooser.FILES_AND_DIRECTORIES);
         jFileChooserManageDBInstance.setName("jFileChooserManageDBInstance"); // NOI18N
@@ -726,27 +724,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             }
         });
 
-        btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnCancel.setName("btnCancel"); // NOI18N
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
-            }
-        });
-
-        btnSaveInstances.setText(resourceMap.getString("btnSaveInstances.text")); // NOI18N
-        btnSaveInstances.setName("btnSaveInstances"); // NOI18N
-        btnSaveInstances.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveInstancesActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout panelButtonsLayout = new javax.swing.GroupLayout(panelButtons);
         panelButtons.setLayout(panelButtonsLayout);
         panelButtonsLayout.setHorizontalGroup(
             panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelButtonsLayout.createSequentialGroup()
+            .addGroup(panelButtonsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnAddInstances)
                 .addGap(10, 10, 10)
@@ -755,11 +737,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                 .addComponent(btnRefreshTableInstances)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnFilter)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 195, Short.MAX_VALUE)
-                .addComponent(btnCancel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnSaveInstances)
-                .addContainerGap())
+                .addContainerGap(337, Short.MAX_VALUE))
         );
         panelButtonsLayout.setVerticalGroup(
             panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -769,9 +747,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                     .addComponent(btnRemoveInstances)
                     .addComponent(btnRefreshTableInstances)
                     .addComponent(btnFilter)
-                    .addComponent(btnAddInstances)
-                    .addComponent(btnSaveInstances)
-                    .addComponent(btnCancel))
+                    .addComponent(btnAddInstances))
                 .addContainerGap())
         );
 
@@ -836,10 +812,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         tableInstances.updateUI();
     }//GEN-LAST:event_btnRefreshTableInstancesActionPerformed
 
-    private void btnSaveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveInstancesActionPerformed
-     
-    }//GEN-LAST:event_btnSaveInstancesActionPerformed
-
     private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
         if(panelFilter.isVisible())clearFilter();
         else{
@@ -864,16 +836,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private void tfInstanceFilterNameInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_tfInstanceFilterNameInputMethodTextChanged
 
     }//GEN-LAST:event_tfInstanceFilterNameInputMethodTextChanged
-
-    private void btnSolverCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverCancelActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnSolverCancelActionPerformed
-
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        instanceTableModel.clearTable();
-        clearFilter();
-        tableInstances.updateUI();
-    }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnApplySolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplySolverActionPerformed
         try {
@@ -937,6 +899,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         tableParameters.updateUI();
     }//GEN-LAST:event_btnParametersNewActionPerformed
 
+    private void btnSolverCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverCancelActionPerformed
+        // TODO add your handling code here:
+}//GEN-LAST:event_btnSolverCancelActionPerformed
+
     public void showSolverDetails(Solver currentSolver) {
         boolean enabled = false;
         if (currentSolver != null) {
@@ -995,7 +961,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddInstances;
     private javax.swing.JButton btnApplySolver;
-    private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnFilter;
     private javax.swing.JButton btnParametersCancel;
     private javax.swing.JButton btnParametersDelete;
@@ -1003,7 +968,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private javax.swing.JButton btnParametersRefresh;
     private javax.swing.JButton btnRefreshTableInstances;
     private javax.swing.JButton btnRemoveInstances;
-    private javax.swing.JButton btnSaveInstances;
     private javax.swing.JButton btnSaveParam;
     private javax.swing.JButton btnSolverAddBinary;
     private javax.swing.JButton btnSolverAddCode;
