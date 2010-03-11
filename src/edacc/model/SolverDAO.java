@@ -43,6 +43,8 @@ public class SolverDAO {
 
         ps.setString(1, solver.getName());
         ps.setString(2, solver.getBinaryName());
+        if (solver.getBinaryFile() == null)
+            ; // TODO add reaction to missing solver binary
         ps.setBinaryStream(3, new FileInputStream(solver.getBinaryFile()));
         ps.setString(4, solver.getDescription());
         ps.setString(5, solver.getMd5());
