@@ -24,11 +24,12 @@ public class InstanceTableCellRenderer extends DefaultTableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-         Component cell = super.getTableCellRendererComponent
-           (table, value, isSelected, hasFocus, row, column);
+         Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+         
          Instance instance = (Instance) ((InstanceTableModel)table.getModel()).getValueAt(row, 5);
         try {
-            if (InstanceDAO.IsInAnyExperiment(instance.getId())) {
+            if(isSelected)cell.setBackground(Color.blue);
+            else if (InstanceDAO.IsInAnyExperiment(instance.getId())) {
                 cell.setBackground(Color.orange);
             }
             else cell.setBackground(Color.white);
