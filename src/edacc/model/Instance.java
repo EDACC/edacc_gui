@@ -12,10 +12,10 @@ public class Instance extends BaseModel {
     @Override
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof Instance) {
-            Instance o = (Instance)obj;
-            return (o.name.equals(name) && o.maxClauseLength == maxClauseLength &&
-                    o.md5.equals(md5) && o.numAtoms == numAtoms && o.numClauses == numClauses &&
-                    o.ratio == ratio && o.id == id);
+            Instance o = (Instance) obj;
+            return (o.name.equals(name) && o.maxClauseLength == maxClauseLength
+                    && o.md5.equals(md5) && o.numAtoms == numAtoms && o.numClauses == numClauses
+                    && o.ratio == ratio && o.id == id);
         }
         return false;
     }
@@ -90,6 +90,14 @@ public class Instance extends BaseModel {
     public void setFile(File file) {
         this.file = file;
     }
+
+    public InstanceClass getInstanceClass() {
+        return instanceClass;
+    }
+
+    public void setInstanceClass(InstanceClass instanceClass) {
+        this.instanceClass = instanceClass;
+    }
     private int id;
     private String name;
     private String md5;
@@ -98,6 +106,5 @@ public class Instance extends BaseModel {
     private float ratio;
     private int maxClauseLength;
     private File file;
-
-
+    private InstanceClass instanceClass;
 }

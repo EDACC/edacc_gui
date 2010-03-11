@@ -67,17 +67,17 @@ public class InstanceDAO {
             // insert query, set ID!
             // TODO insert instance blob
             // insert instance into db
-            final String insertQuery = "INSERT INTO " + table + " (name, md5, numAtoms, numClauses, ratio, maxClauseLength, instance) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            final String insertQuery = "INSERT INTO " + table + " (name, md5, numAtoms, numClauses, ratio, maxClauseLength, instance, instanceClass_idinstanceClass) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
         }
         else if (instance.isModified()) {
             // update query
-            final String updateQuery = "UPDATE " + table + " SET name=?, md5=?, numAtoms=?, numClauses=?, ratio=?, maxClauseLength=?, instance=? " +
+            final String updateQuery = "UPDATE " + table + " SET name=?, md5=?, numAtoms=?, numClauses=?, ratio=?, maxClauseLength=?, instance=?, instanceClass_idinstanceClass=? " +
                     "WHERE idInstance=?";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
            
-            ps.setInt(8, instance.getId());
+            ps.setInt(9, instance.getId());
             
         } else
             return;
@@ -89,6 +89,11 @@ public class InstanceDAO {
         ps.setFloat(5, instance.getRatio());
         ps.setInt(6, instance.getMaxClauseLength());
         ps.setBinaryStream(7, new FileInputStream(instance.getFile()));
+        if (instance.getInstanceClass() != null)
+            ps.setInt(8, instance.getInstanceClass().getInstanceClassID());
+        else
+            ps.setNull(8, Types.INTEGER);
+
         ps.executeUpdate();
 
         // set id
@@ -120,7 +125,7 @@ public class InstanceDAO {
      * @throws SQLException
      */
     public static Instance getById(int id) throws SQLException {
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idInstance, maxClauseLength, md5, name, numAtoms, numClauses, ratio FROM " + table + " WHERE idInstance=?");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idInstance, maxClauseLength, md5, name, numAtoms, numClauses, ratio, instanceClass_idinstanceClass FROM " + table + " WHERE idInstance=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         Instance i = new Instance();
@@ -132,6 +137,11 @@ public class InstanceDAO {
             i.setNumAtoms(rs.getInt("numAtoms"));
             i.setNumClauses(rs.getInt("numClauses"));
             i.setRatio(rs.getInt("ratio"));
+            Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
+            if (idInstanceClass == null)
+                i.setInstanceClass(null);
+            else
+                i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
             Instance c = getCached(i);
             if (c != null) return c;
@@ -152,7 +162,7 @@ public class InstanceDAO {
     public static LinkedList<Instance> getAll() throws SQLException {
         // return linked list with all instances
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        ResultSet rs = st.executeQuery("SELECT idInstance, maxClauseLength, md5, name, numAtoms, numClauses, ratio FROM " + table);
+        ResultSet rs = st.executeQuery("SELECT idInstance, maxClauseLength, md5, name, numAtoms, numClauses, ratio, instanceClass_idinstanceClass FROM " + table);
         LinkedList<Instance> res = new LinkedList<Instance>();
         while (rs.next()) {
             Instance i = new Instance();
@@ -163,7 +173,12 @@ public class InstanceDAO {
             i.setNumAtoms(rs.getInt("numAtoms"));
             i.setNumClauses(rs.getInt("numClauses"));
             i.setRatio(rs.getInt("ratio"));
-            
+            Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
+            if (idInstanceClass == null)
+                i.setInstanceClass(null);
+            else
+                i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
+
             Instance c = getCached(i);
             if (c != null) res.add(c);
             else {
@@ -178,7 +193,7 @@ public class InstanceDAO {
 
     public static LinkedList<Instance> getAllByExperimentId(int id) throws SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT i.idInstance, i.maxClauseLength, i.md5, i.name, i.numAtoms, i.numClauses, i.ratio FROM " + table + " as i JOIN Experiment_has_Instances as ei ON " +
+                "SELECT i.idInstance, i.maxClauseLength, i.md5, i.name, i.numAtoms, i.numClauses, i.ratio, i.instanceClass_idinstanceClass FROM " + table + " as i JOIN Experiment_has_Instances as ei ON " +
                 "i.idInstance = ei.Instances_idInstance WHERE ei.Experiment_idExperiment = ?"
                 );
         st.setInt(1, id);
@@ -193,6 +208,11 @@ public class InstanceDAO {
             i.setNumAtoms(rs.getInt("i.numAtoms"));
             i.setNumClauses(rs.getInt("i.numClauses"));
             i.setRatio(rs.getInt("i.ratio"));
+            Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
+            if (idInstanceClass == null)
+                i.setInstanceClass(null);
+            else
+                i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
             Instance c = getCached(i);
             if (c != null) res.add(c);
@@ -216,22 +236,9 @@ public class InstanceDAO {
     public static boolean IsInAnyExperiment(int id) throws NoConnectionToDBException, SQLException{
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
                 
-        ResultSet rs = st.executeQuery("SELECT i.idInstance FROM instances as i JOIN Experiment_has_Instances as ei ON " +
+        ResultSet rs = st.executeQuery("SELECT i.idInstance FROM " + table + " AS i JOIN Experiment_has_Instances as ei ON " +
                 "i.idInstance = ei.Instances_idInstance WHERE idInstance = "+ id);
        if(rs.next()) return true;
        else return false;
-    }
-
-    public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        DatabaseConnector db = DatabaseConnector.getInstance();
-        db.connect("localhost", 3306, "root", "EDACC", "sopra");
-        Instance i = new Instance();
-        i.setName("test1234");
-        i.setNew();
-        i.setMd5("12345");
-       // save(i);
-        cacheInstance(i);
-        System.out.println(i.getId());
-        db.getConn().close();
     }
 }
