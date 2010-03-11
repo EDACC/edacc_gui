@@ -53,6 +53,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         manageDBInstances = new ManageDBInstances(this, panelManageDBInstances, jFileChooserManageDBInstance );
         instanceTableModel = new InstanceTableModel();
         tableInstances.setModel(instanceTableModel);
+        tableInstances.setDefaultRenderer(Object.class, new InstanceTableCellRenderer());
         sorter = new TableRowSorter<InstanceTableModel>(instanceTableModel);
 
         // initialize solver table
@@ -118,39 +119,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
         jFileChooserManageDBInstance = new javax.swing.JFileChooser();
         manageDBPane = new javax.swing.JTabbedPane();
-        panelManageDBSolver = new javax.swing.JPanel();
-        panelSolver = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tableSolver = new javax.swing.JTable();
-        jlSolverName = new javax.swing.JLabel();
-        jlSolverDescription = new javax.swing.JLabel();
-        tfSolverName = new javax.swing.JTextField();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        taSolverDescription = new javax.swing.JTextArea();
-        jlSolverBinary = new javax.swing.JLabel();
-        btnSolverAddBinary = new javax.swing.JButton();
-        jlSolverCode = new javax.swing.JLabel();
-        btnSolverAddCode = new javax.swing.JButton();
-        btnApplySolver = new javax.swing.JButton();
-        btnSolverCancel = new javax.swing.JButton();
-        btnSolverNew = new javax.swing.JButton();
-        btnSolverDelete = new javax.swing.JButton();
-        btnSolverRefresh = new javax.swing.JButton();
-        btnSolverSave = new javax.swing.JButton();
-        panelParameters = new javax.swing.JPanel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        tableParameters = new javax.swing.JTable();
-        jlParametersName = new javax.swing.JLabel();
-        tfParametersName = new javax.swing.JTextField();
-        jlParametersPrefix = new javax.swing.JLabel();
-        tfParametersPrefix = new javax.swing.JTextField();
-        jlParametersOrder = new javax.swing.JLabel();
-        tfParametersOrder = new javax.swing.JTextField();
-        btnParametersCancel = new javax.swing.JButton();
-        btnParametersNew = new javax.swing.JButton();
-        btnParametersDelete = new javax.swing.JButton();
-        btnParametersRefresh = new javax.swing.JButton();
-        btnSaveParam = new javax.swing.JButton();
         panelManageDBInstances = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tableInstances = new javax.swing.JTable();
@@ -182,8 +150,38 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         btnRemoveInstances = new javax.swing.JButton();
         btnRefreshTableInstances = new javax.swing.JButton();
         btnFilter = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
-        btnSaveInstances = new javax.swing.JButton();
+        panelManageDBSolver = new javax.swing.JPanel();
+        panelSolver = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tableSolver = new javax.swing.JTable();
+        jlSolverName = new javax.swing.JLabel();
+        jlSolverDescription = new javax.swing.JLabel();
+        tfSolverName = new javax.swing.JTextField();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        taSolverDescription = new javax.swing.JTextArea();
+        jlSolverBinary = new javax.swing.JLabel();
+        btnSolverAddBinary = new javax.swing.JButton();
+        jlSolverCode = new javax.swing.JLabel();
+        btnSolverAddCode = new javax.swing.JButton();
+        btnApplySolver = new javax.swing.JButton();
+        btnSolverNew = new javax.swing.JButton();
+        btnSolverDelete = new javax.swing.JButton();
+        btnSolverRefresh = new javax.swing.JButton();
+        btnSolverSave = new javax.swing.JButton();
+        panelParameters = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tableParameters = new javax.swing.JTable();
+        jlParametersName = new javax.swing.JLabel();
+        tfParametersName = new javax.swing.JTextField();
+        jlParametersPrefix = new javax.swing.JLabel();
+        tfParametersPrefix = new javax.swing.JTextField();
+        jlParametersOrder = new javax.swing.JLabel();
+        tfParametersOrder = new javax.swing.JTextField();
+        btnParametersCancel = new javax.swing.JButton();
+        btnParametersNew = new javax.swing.JButton();
+        btnParametersDelete = new javax.swing.JButton();
+        btnParametersRefresh = new javax.swing.JButton();
+        btnSaveParam = new javax.swing.JButton();
 
         jFileChooserManageDBInstance.setFileSelectionMode(javax.swing.JFileChooser.FILES_AND_DIRECTORIES);
         jFileChooserManageDBInstance.setName("jFileChooserManageDBInstance"); // NOI18N
@@ -194,336 +192,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         manageDBPane.setName("manageDBPane"); // NOI18N
         manageDBPane.setPreferredSize(new java.awt.Dimension(10005, 10026));
         manageDBPane.setRequestFocusEnabled(false);
-
-        panelManageDBSolver.setName("panelManageDBSolver"); // NOI18N
-
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCManageDBMode.class);
-        panelSolver.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("panelSolver.border.title"))); // NOI18N
-        panelSolver.setName("panelSolver"); // NOI18N
-
-        jScrollPane2.setName("jScrollPane2"); // NOI18N
-
-        tableSolver.setName("tableSolver"); // NOI18N
-        jScrollPane2.setViewportView(tableSolver);
-
-        jlSolverName.setText(resourceMap.getString("jlSolverName.text")); // NOI18N
-        jlSolverName.setName("jlSolverName"); // NOI18N
-
-        jlSolverDescription.setText(resourceMap.getString("jlSolverDescription.text")); // NOI18N
-        jlSolverDescription.setName("jlSolverDescription"); // NOI18N
-
-        tfSolverName.setText(resourceMap.getString("tfSolverName.text")); // NOI18N
-        tfSolverName.setName("tfSolverName"); // NOI18N
-        tfSolverName.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                solverChangedOnFocusLost(evt);
-            }
-        });
-        tfSolverName.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                solverChangedOnKey(evt);
-            }
-        });
-
-        jScrollPane3.setName("jScrollPane3"); // NOI18N
-
-        taSolverDescription.setColumns(20);
-        taSolverDescription.setRows(5);
-        taSolverDescription.setName("taSolverDescription"); // NOI18N
-        taSolverDescription.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                solverChangedOnFocusLost(evt);
-            }
-        });
-        taSolverDescription.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                solverChangedOnKey(evt);
-            }
-        });
-        jScrollPane3.setViewportView(taSolverDescription);
-
-        jlSolverBinary.setText(resourceMap.getString("jlSolverBinary.text")); // NOI18N
-        jlSolverBinary.setName("jlSolverBinary"); // NOI18N
-
-        btnSolverAddBinary.setText(resourceMap.getString("btnSolverAddBinary.text")); // NOI18N
-        btnSolverAddBinary.setName("btnSolverAddBinary"); // NOI18N
-        btnSolverAddBinary.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSolverAddBinaryActionPerformed(evt);
-            }
-        });
-
-        jlSolverCode.setText(resourceMap.getString("jlSolverCode.text")); // NOI18N
-        jlSolverCode.setName("jlSolverCode"); // NOI18N
-
-        btnSolverAddCode.setText(resourceMap.getString("btnSolverAddCode.text")); // NOI18N
-        btnSolverAddCode.setName("btnSolverAddCode"); // NOI18N
-        btnSolverAddCode.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSolverAddCodeActionPerformed(evt);
-            }
-        });
-
-        btnApplySolver.setText(resourceMap.getString("btnApplySolver.text")); // NOI18N
-        btnApplySolver.setName("btnApplySolver"); // NOI18N
-        btnApplySolver.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnApplySolverActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout panelSolverLayout = new javax.swing.GroupLayout(panelSolver);
-        panelSolver.setLayout(panelSolverLayout);
-        panelSolverLayout.setHorizontalGroup(
-            panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelSolverLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
-                    .addGroup(panelSolverLayout.createSequentialGroup()
-                        .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jlSolverDescription)
-                            .addComponent(jlSolverName)
-                            .addComponent(jlSolverBinary)
-                            .addComponent(jlSolverCode))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnSolverAddBinary)
-                            .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelSolverLayout.createSequentialGroup()
-                                    .addComponent(btnSolverAddCode)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnApplySolver))
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(tfSolverName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 55, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        panelSolverLayout.setVerticalGroup(
-            panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSolverLayout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jlSolverName)
-                    .addComponent(tfSolverName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jlSolverDescription)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelSolverLayout.createSequentialGroup()
-                        .addGap(9, 9, 9)
-                        .addComponent(jlSolverBinary))
-                    .addGroup(panelSolverLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnSolverAddBinary)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jlSolverCode)
-                    .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnSolverAddCode)
-                        .addComponent(btnApplySolver)))
-                .addContainerGap())
-        );
-
-        btnSolverCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnSolverCancel.setName("btnCancel"); // NOI18N
-        btnSolverCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSolverCancelActionPerformed(evt);
-            }
-        });
-
-        btnSolverNew.setText(resourceMap.getString("btnNew.text")); // NOI18N
-        btnSolverNew.setName("btnNew"); // NOI18N
-        btnSolverNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSolverNewActionPerformed(evt);
-            }
-        });
-
-        btnSolverDelete.setText(resourceMap.getString("btnSolverDelete.text")); // NOI18N
-        btnSolverDelete.setName("btnSolverDelete"); // NOI18N
-
-        btnSolverRefresh.setText(resourceMap.getString("btnSolverRefresh.text")); // NOI18N
-        btnSolverRefresh.setName("btnSolverRefresh"); // NOI18N
-
-        btnSolverSave.setText(resourceMap.getString("btnSolverSave.text")); // NOI18N
-        btnSolverSave.setName("btnSolverSave"); // NOI18N
-        btnSolverSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSolverSaveActionPerformed(evt);
-            }
-        });
-
-        panelParameters.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("panelParameters.border.title"))); // NOI18N
-        panelParameters.setName("panelParameters"); // NOI18N
-
-        jScrollPane4.setName("jScrollPane4"); // NOI18N
-
-        tableParameters.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tableParameters.setName("tableParameters"); // NOI18N
-        jScrollPane4.setViewportView(tableParameters);
-
-        jlParametersName.setText(resourceMap.getString("jlParametersName.text")); // NOI18N
-        jlParametersName.setName("jlParametersName"); // NOI18N
-
-        tfParametersName.setText(resourceMap.getString("tfParametersName.text")); // NOI18N
-        tfParametersName.setName("tfParametersName"); // NOI18N
-
-        jlParametersPrefix.setText(resourceMap.getString("jlParametersPrefix.text")); // NOI18N
-        jlParametersPrefix.setName("jlParametersPrefix"); // NOI18N
-
-        tfParametersPrefix.setText(resourceMap.getString("tfParametersPrefix.text")); // NOI18N
-        tfParametersPrefix.setName("tfParametersPrefix"); // NOI18N
-
-        jlParametersOrder.setText(resourceMap.getString("jlParametersOrder.text")); // NOI18N
-        jlParametersOrder.setName("jlParametersOrder"); // NOI18N
-
-        tfParametersOrder.setText(resourceMap.getString("tfParametersOrder.text")); // NOI18N
-        tfParametersOrder.setName("tfParametersOrder"); // NOI18N
-
-        btnParametersCancel.setText(resourceMap.getString("btnParametersCancel.text")); // NOI18N
-        btnParametersCancel.setName("btnParametersCancel"); // NOI18N
-
-        btnParametersNew.setText(resourceMap.getString("btnParametersNew.text")); // NOI18N
-        btnParametersNew.setName("btnParametersNew"); // NOI18N
-        btnParametersNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnParametersNewActionPerformed(evt);
-            }
-        });
-
-        btnParametersDelete.setText(resourceMap.getString("btnParametersDelete.text")); // NOI18N
-        btnParametersDelete.setName("btnParametersDelete"); // NOI18N
-
-        btnParametersRefresh.setText(resourceMap.getString("btnParametersRefresh.text")); // NOI18N
-        btnParametersRefresh.setName("btnParametersRefresh"); // NOI18N
-
-        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCManageDBMode.class, this);
-        btnSaveParam.setAction(actionMap.get("btnSaveParam")); // NOI18N
-        btnSaveParam.setText(resourceMap.getString("btnSaveParam.text")); // NOI18N
-        btnSaveParam.setName("btnSaveParam"); // NOI18N
-
-        javax.swing.GroupLayout panelParametersLayout = new javax.swing.GroupLayout(panelParameters);
-        panelParameters.setLayout(panelParametersLayout);
-        panelParametersLayout.setHorizontalGroup(
-            panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelParametersLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE)
-                    .addGroup(panelParametersLayout.createSequentialGroup()
-                        .addComponent(btnParametersCancel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnParametersNew)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnParametersDelete)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnParametersRefresh))
-                    .addGroup(panelParametersLayout.createSequentialGroup()
-                        .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panelParametersLayout.createSequentialGroup()
-                                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jlParametersPrefix)
-                                    .addComponent(jlParametersName))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(tfParametersName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(tfParametersOrder, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
-                                        .addComponent(tfParametersPrefix))))
-                            .addComponent(jlParametersOrder))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnSaveParam)))
-                .addContainerGap())
-        );
-        panelParametersLayout.setVerticalGroup(
-            panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelParametersLayout.createSequentialGroup()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jlParametersName)
-                    .addComponent(tfParametersName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jlParametersPrefix)
-                    .addComponent(tfParametersPrefix, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jlParametersOrder)
-                    .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(tfParametersOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnSaveParam)))
-                .addGap(18, 18, 18)
-                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnParametersCancel)
-                    .addComponent(btnParametersNew)
-                    .addComponent(btnParametersDelete)
-                    .addComponent(btnParametersRefresh))
-                .addContainerGap())
-        );
-
-        javax.swing.GroupLayout panelManageDBSolverLayout = new javax.swing.GroupLayout(panelManageDBSolver);
-        panelManageDBSolver.setLayout(panelManageDBSolverLayout);
-        panelManageDBSolverLayout.setHorizontalGroup(
-            panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelManageDBSolverLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelManageDBSolverLayout.createSequentialGroup()
-                        .addComponent(panelSolver, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(panelParameters, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(panelManageDBSolverLayout.createSequentialGroup()
-                        .addComponent(btnSolverCancel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnSolverNew)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnSolverDelete)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnSolverRefresh)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 498, Short.MAX_VALUE)
-                        .addComponent(btnSolverSave)))
-                .addContainerGap())
-        );
-        panelManageDBSolverLayout.setVerticalGroup(
-            panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelManageDBSolverLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelParameters, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelSolver, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelManageDBSolverLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnSolverCancel)
-                            .addComponent(btnSolverNew)
-                            .addComponent(btnSolverDelete)
-                            .addComponent(btnSolverRefresh))
-                        .addGap(134, 134, 134))
-                    .addGroup(panelManageDBSolverLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnSolverSave)
-                        .addContainerGap())))
-        );
-
-        panelParameters.getAccessibleContext().setAccessibleName(resourceMap.getString("panelParameters.AccessibleContext.accessibleName")); // NOI18N
-
-        manageDBPane.addTab("Solvers", panelManageDBSolver);
 
         panelManageDBInstances.setName("panelManageDBInstances"); // NOI18N
         panelManageDBInstances.setPreferredSize(new java.awt.Dimension(500, 471));
@@ -545,6 +213,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         ));
         tableInstances.setName("tableInstances"); // NOI18N
         jScrollPane1.setViewportView(tableInstances);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCManageDBMode.class);
         tableInstances.getColumnModel().getColumn(0).setHeaderValue(resourceMap.getString("tableInstances.columnModel.title0")); // NOI18N
         tableInstances.getColumnModel().getColumn(1).setHeaderValue(resourceMap.getString("tableInstances.columnModel.title1")); // NOI18N
         tableInstances.getColumnModel().getColumn(2).setHeaderValue(resourceMap.getString("tableInstances.columnModel.title2")); // NOI18N
@@ -753,27 +422,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             }
         });
 
-        btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnCancel.setName("btnCancel"); // NOI18N
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
-            }
-        });
-
-        btnSaveInstances.setText(resourceMap.getString("btnSaveInstances.text")); // NOI18N
-        btnSaveInstances.setName("btnSaveInstances"); // NOI18N
-        btnSaveInstances.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveInstancesActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout panelButtonsLayout = new javax.swing.GroupLayout(panelButtons);
         panelButtons.setLayout(panelButtonsLayout);
         panelButtonsLayout.setHorizontalGroup(
             panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelButtonsLayout.createSequentialGroup()
+            .addGroup(panelButtonsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnAddInstances)
                 .addGap(10, 10, 10)
@@ -782,11 +435,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                 .addComponent(btnRefreshTableInstances)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnFilter)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 127, Short.MAX_VALUE)
-                .addComponent(btnCancel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnSaveInstances)
-                .addContainerGap())
+                .addContainerGap(288, Short.MAX_VALUE))
         );
         panelButtonsLayout.setVerticalGroup(
             panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -796,9 +445,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                     .addComponent(btnRemoveInstances)
                     .addComponent(btnRefreshTableInstances)
                     .addComponent(btnFilter)
-                    .addComponent(btnAddInstances)
-                    .addComponent(btnSaveInstances)
-                    .addComponent(btnCancel))
+                    .addComponent(btnAddInstances))
                 .addContainerGap())
         );
 
@@ -827,6 +474,324 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         );
 
         manageDBPane.addTab("Instances", panelManageDBInstances);
+
+        panelManageDBSolver.setName("panelManageDBSolver"); // NOI18N
+
+        panelSolver.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("panelSolver.border.title"))); // NOI18N
+        panelSolver.setName("panelSolver"); // NOI18N
+
+        jScrollPane2.setName("jScrollPane2"); // NOI18N
+
+        tableSolver.setName("tableSolver"); // NOI18N
+        jScrollPane2.setViewportView(tableSolver);
+
+        jlSolverName.setText(resourceMap.getString("jlSolverName.text")); // NOI18N
+        jlSolverName.setName("jlSolverName"); // NOI18N
+
+        jlSolverDescription.setText(resourceMap.getString("jlSolverDescription.text")); // NOI18N
+        jlSolverDescription.setName("jlSolverDescription"); // NOI18N
+
+        tfSolverName.setText(resourceMap.getString("tfSolverName.text")); // NOI18N
+        tfSolverName.setName("tfSolverName"); // NOI18N
+        tfSolverName.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                solverChangedOnFocusLost(evt);
+            }
+        });
+        tfSolverName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                solverChangedOnKey(evt);
+            }
+        });
+
+        jScrollPane3.setName("jScrollPane3"); // NOI18N
+
+        taSolverDescription.setColumns(20);
+        taSolverDescription.setRows(5);
+        taSolverDescription.setName("taSolverDescription"); // NOI18N
+        taSolverDescription.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                solverChangedOnFocusLost(evt);
+            }
+        });
+        taSolverDescription.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                solverChangedOnKey(evt);
+            }
+        });
+        jScrollPane3.setViewportView(taSolverDescription);
+
+        jlSolverBinary.setText(resourceMap.getString("jlSolverBinary.text")); // NOI18N
+        jlSolverBinary.setName("jlSolverBinary"); // NOI18N
+
+        btnSolverAddBinary.setText(resourceMap.getString("btnSolverAddBinary.text")); // NOI18N
+        btnSolverAddBinary.setName("btnSolverAddBinary"); // NOI18N
+        btnSolverAddBinary.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolverAddBinaryActionPerformed(evt);
+            }
+        });
+
+        jlSolverCode.setText(resourceMap.getString("jlSolverCode.text")); // NOI18N
+        jlSolverCode.setName("jlSolverCode"); // NOI18N
+
+        btnSolverAddCode.setText(resourceMap.getString("btnSolverAddCode.text")); // NOI18N
+        btnSolverAddCode.setName("btnSolverAddCode"); // NOI18N
+        btnSolverAddCode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolverAddCodeActionPerformed(evt);
+            }
+        });
+
+        btnApplySolver.setText(resourceMap.getString("btnApplySolver.text")); // NOI18N
+        btnApplySolver.setName("btnApplySolver"); // NOI18N
+        btnApplySolver.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnApplySolverActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panelSolverLayout = new javax.swing.GroupLayout(panelSolver);
+        panelSolver.setLayout(panelSolverLayout);
+        panelSolverLayout.setHorizontalGroup(
+            panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelSolverLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
+                    .addGroup(panelSolverLayout.createSequentialGroup()
+                        .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jlSolverDescription)
+                            .addComponent(jlSolverName)
+                            .addComponent(jlSolverBinary)
+                            .addComponent(jlSolverCode))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnSolverAddBinary)
+                            .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelSolverLayout.createSequentialGroup()
+                                    .addComponent(btnSolverAddCode)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnApplySolver))
+                                .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(tfSolverName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 55, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        panelSolverLayout.setVerticalGroup(
+            panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSolverLayout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jlSolverName)
+                    .addComponent(tfSolverName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jlSolverDescription)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelSolverLayout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addComponent(jlSolverBinary))
+                    .addGroup(panelSolverLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSolverAddBinary)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jlSolverCode)
+                    .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnSolverAddCode)
+                        .addComponent(btnApplySolver)))
+                .addContainerGap())
+        );
+
+        btnSolverNew.setText(resourceMap.getString("btnNew.text")); // NOI18N
+        btnSolverNew.setName("btnNew"); // NOI18N
+        btnSolverNew.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolverNewActionPerformed(evt);
+            }
+        });
+
+        btnSolverDelete.setText(resourceMap.getString("btnSolverDelete.text")); // NOI18N
+        btnSolverDelete.setName("btnSolverDelete"); // NOI18N
+
+        btnSolverRefresh.setText(resourceMap.getString("btnSolverRefresh.text")); // NOI18N
+        btnSolverRefresh.setName("btnSolverRefresh"); // NOI18N
+
+        btnSolverSave.setText(resourceMap.getString("btnSolverSave.text")); // NOI18N
+        btnSolverSave.setName("btnSolverSave"); // NOI18N
+        btnSolverSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolverSaveActionPerformed(evt);
+            }
+        });
+
+        panelParameters.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("panelParameters.border.title"))); // NOI18N
+        panelParameters.setName("panelParameters"); // NOI18N
+
+        jScrollPane4.setName("jScrollPane4"); // NOI18N
+
+        tableParameters.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tableParameters.setName("tableParameters"); // NOI18N
+        jScrollPane4.setViewportView(tableParameters);
+
+        jlParametersName.setText(resourceMap.getString("jlParametersName.text")); // NOI18N
+        jlParametersName.setName("jlParametersName"); // NOI18N
+
+        tfParametersName.setText(resourceMap.getString("tfParametersName.text")); // NOI18N
+        tfParametersName.setName("tfParametersName"); // NOI18N
+
+        jlParametersPrefix.setText(resourceMap.getString("jlParametersPrefix.text")); // NOI18N
+        jlParametersPrefix.setName("jlParametersPrefix"); // NOI18N
+
+        tfParametersPrefix.setText(resourceMap.getString("tfParametersPrefix.text")); // NOI18N
+        tfParametersPrefix.setName("tfParametersPrefix"); // NOI18N
+
+        jlParametersOrder.setText(resourceMap.getString("jlParametersOrder.text")); // NOI18N
+        jlParametersOrder.setName("jlParametersOrder"); // NOI18N
+
+        tfParametersOrder.setText(resourceMap.getString("tfParametersOrder.text")); // NOI18N
+        tfParametersOrder.setName("tfParametersOrder"); // NOI18N
+
+        btnParametersCancel.setText(resourceMap.getString("btnParametersCancel.text")); // NOI18N
+        btnParametersCancel.setName("btnParametersCancel"); // NOI18N
+
+        btnParametersNew.setText(resourceMap.getString("btnParametersNew.text")); // NOI18N
+        btnParametersNew.setName("btnParametersNew"); // NOI18N
+        btnParametersNew.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnParametersNewActionPerformed(evt);
+            }
+        });
+
+        btnParametersDelete.setText(resourceMap.getString("btnParametersDelete.text")); // NOI18N
+        btnParametersDelete.setName("btnParametersDelete"); // NOI18N
+
+        btnParametersRefresh.setText(resourceMap.getString("btnParametersRefresh.text")); // NOI18N
+        btnParametersRefresh.setName("btnParametersRefresh"); // NOI18N
+
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCManageDBMode.class, this);
+        btnSaveParam.setAction(actionMap.get("btnSaveParam")); // NOI18N
+        btnSaveParam.setText(resourceMap.getString("btnSaveParam.text")); // NOI18N
+        btnSaveParam.setName("btnSaveParam"); // NOI18N
+
+        javax.swing.GroupLayout panelParametersLayout = new javax.swing.GroupLayout(panelParameters);
+        panelParameters.setLayout(panelParametersLayout);
+        panelParametersLayout.setHorizontalGroup(
+            panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelParametersLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE)
+                    .addGroup(panelParametersLayout.createSequentialGroup()
+                        .addComponent(btnParametersCancel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnParametersNew)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnParametersDelete)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnParametersRefresh))
+                    .addGroup(panelParametersLayout.createSequentialGroup()
+                        .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panelParametersLayout.createSequentialGroup()
+                                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jlParametersPrefix)
+                                    .addComponent(jlParametersName))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(tfParametersName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(tfParametersOrder, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+                                        .addComponent(tfParametersPrefix))))
+                            .addComponent(jlParametersOrder))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSaveParam)))
+                .addContainerGap())
+        );
+        panelParametersLayout.setVerticalGroup(
+            panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelParametersLayout.createSequentialGroup()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jlParametersName)
+                    .addComponent(tfParametersName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jlParametersPrefix)
+                    .addComponent(tfParametersPrefix, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jlParametersOrder)
+                    .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(tfParametersOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnSaveParam)))
+                .addGap(18, 18, 18)
+                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnParametersCancel)
+                    .addComponent(btnParametersNew)
+                    .addComponent(btnParametersDelete)
+                    .addComponent(btnParametersRefresh))
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout panelManageDBSolverLayout = new javax.swing.GroupLayout(panelManageDBSolver);
+        panelManageDBSolver.setLayout(panelManageDBSolverLayout);
+        panelManageDBSolverLayout.setHorizontalGroup(
+            panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelManageDBSolverLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelManageDBSolverLayout.createSequentialGroup()
+                        .addComponent(panelSolver, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(panelParameters, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(panelManageDBSolverLayout.createSequentialGroup()
+                        .addComponent(btnSolverNew)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSolverDelete)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSolverRefresh)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 597, Short.MAX_VALUE)
+                        .addComponent(btnSolverSave)))
+                .addContainerGap())
+        );
+        panelManageDBSolverLayout.setVerticalGroup(
+            panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelManageDBSolverLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panelParameters, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelSolver, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelManageDBSolverLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSolverSave)
+                        .addContainerGap())
+                    .addGroup(panelManageDBSolverLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnSolverNew)
+                            .addComponent(btnSolverDelete)
+                            .addComponent(btnSolverRefresh))
+                        .addContainerGap())))
+        );
+
+        panelParameters.getAccessibleContext().setAccessibleName(resourceMap.getString("panelParameters.AccessibleContext.accessibleName")); // NOI18N
+
+        manageDBPane.addTab("Solvers", panelManageDBSolver);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -863,10 +828,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         tableInstances.updateUI();
     }//GEN-LAST:event_btnRefreshTableInstancesActionPerformed
 
-    private void btnSaveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveInstancesActionPerformed
-     
-    }//GEN-LAST:event_btnSaveInstancesActionPerformed
-
     private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
         if(panelFilter.isVisible())clearFilter();
         else{
@@ -891,16 +852,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private void tfInstanceFilterNameInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_tfInstanceFilterNameInputMethodTextChanged
 
     }//GEN-LAST:event_tfInstanceFilterNameInputMethodTextChanged
-
-    private void btnSolverCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverCancelActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnSolverCancelActionPerformed
-
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        instanceTableModel.clearTable();
-        clearFilter();
-        tableInstances.updateUI();
-    }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnApplySolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplySolverActionPerformed
         //try {
@@ -1069,7 +1020,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddInstances;
     private javax.swing.JButton btnApplySolver;
-    private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnFilter;
     private javax.swing.JButton btnParametersCancel;
     private javax.swing.JButton btnParametersDelete;
@@ -1077,11 +1027,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private javax.swing.JButton btnParametersRefresh;
     private javax.swing.JButton btnRefreshTableInstances;
     private javax.swing.JButton btnRemoveInstances;
-    private javax.swing.JButton btnSaveInstances;
     private javax.swing.JButton btnSaveParam;
     private javax.swing.JButton btnSolverAddBinary;
     private javax.swing.JButton btnSolverAddCode;
-    private javax.swing.JButton btnSolverCancel;
     private javax.swing.JButton btnSolverDelete;
     private javax.swing.JButton btnSolverNew;
     private javax.swing.JButton btnSolverRefresh;

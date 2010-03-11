@@ -206,6 +206,22 @@ public class InstanceDAO {
         return res;
     }
 
+    /**
+     * @author rretz
+     * retrieves instances from the database.
+     * @return Hashtable with all instances which belong to a experiment.
+     * @throws NoConnectionToDBException if no connection to database exists.
+     * @throws SQLException if an SQL error occurs while reading the instances from the database.
+     */
+    public static boolean IsInAnyExperiment(int id) throws NoConnectionToDBException, SQLException{
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+                
+        ResultSet rs = st.executeQuery("SELECT i.idInstance FROM instances as i JOIN Experiment_has_Instances as ei ON " +
+                "i.idInstance = ei.Instances_idInstance WHERE idInstance = "+ id);
+       if(rs.next()) return true;
+       else return false;
+    }
+
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
         DatabaseConnector db = DatabaseConnector.getInstance();
         db.connect("localhost", 3306, "root", "EDACC", "sopra");
