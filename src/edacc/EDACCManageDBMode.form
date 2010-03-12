@@ -88,11 +88,8 @@
                               <Component id="btnSolverDelete" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnSolverRefresh" min="-2" max="-2" attributes="0"/>
-<<<<<<< HEAD
-                              <EmptySpace pref="532" max="32767" attributes="0"/>
-=======
                               <EmptySpace pref="597" max="32767" attributes="0"/>
->>>>>>> 230a2f109ae573e20eb386a0d22d2d4751269c91
+
                               <Component id="btnSolverSave" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -297,7 +294,6 @@
                 </Component>
               </SubComponents>
             </Container>
-<<<<<<< HEAD
             <Component class="javax.swing.JButton" name="btnSolverCancel">
               <Properties>
                 <Property name="name" type="java.lang.String" value="btnCancel" noResource="true"/>
@@ -306,8 +302,7 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverCancelActionPerformed"/>
               </Events>
             </Component>
-=======
->>>>>>> 230a2f109ae573e20eb386a0d22d2d4751269c91
+
             <Component class="javax.swing.JButton" name="btnSolverNew">
               <Properties>
                 <Property name="text" type="java.lang.String" resourceKey="btnNew.text"/>
