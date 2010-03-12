@@ -15,7 +15,6 @@ import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.Solver;
-import edacc.model.SolverIsInExperimentException;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import javax.swing.JFileChooser;
