@@ -231,4 +231,10 @@ public class ManageDBInstances {
            output.close();
         }
     }
+
+    public void SelectAllInstanceClass() {
+        for(int i = 0; i < main.instanceClassTableModel.getRowCount(); i++){
+            main.instanceClassTableModel.setSelected(i);
+        }
+    }
 }
