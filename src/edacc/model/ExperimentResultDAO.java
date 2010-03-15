@@ -88,7 +88,27 @@ public class ExperimentResultDAO {
         ResultSet rs = st.executeQuery();
         rs.next();
         return rs.getInt("count") > 0;
+    }
 
+    /**
+     * returns the seed value of the job specified by the given parameters
+     * @param run
+     * @param solverConfigId
+     * @param InstanceId
+     * @param ExperimentId
+     * @return bool
+     * @throws SQLException
+     */
+    public static int getSeedValue(int run, int solverConfigId, int InstanceId, int ExperimentId) throws SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT seed FROM " + table  + " " +
+                "WHERE run=? AND SolverConfig_idSolverConfig=? AND Instances_idInstance=? AND Experiment_idExperiment=? ;");
+        st.setInt(1, run);
+        st.setInt(2, solverConfigId);
+        st.setInt(3, InstanceId);
+        st.setInt(4, ExperimentId);
+        ResultSet rs = st.executeQuery();
+        rs.next();
+        return rs.getInt("seed");
     }
 
     /**
