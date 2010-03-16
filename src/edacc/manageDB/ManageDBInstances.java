@@ -10,8 +10,11 @@ import edacc.EDACCManageDBMode;
 import edacc.model.InstaceNotInDBException;
 import edacc.model.Instance;
 import edacc.model.InstanceAlreadyInDBException;
+import edacc.model.InstanceClass;
+import edacc.model.InstanceClassDAO;
 import edacc.model.InstanceDAO;
 import edacc.model.InstanceIsInExperimentException;
+import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.NoConnectionToDBException;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,6 +24,8 @@ import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -231,10 +236,26 @@ public class ManageDBInstances {
            output.close();
         }
     }
-
+    /**
+     * Sets all checkboxes of the instanceclass table true.
+     */
     public void SelectAllInstanceClass() {
         for(int i = 0; i < main.instanceClassTableModel.getRowCount(); i++){
             main.instanceClassTableModel.setSelected(i);
         }
+    }
+
+    public void RemoveInstanceClass(int[] selectedRows) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance {
+        InstanceClass instanceClass;
+        Boolean fail = false;
+        for(int i = 0; i < selectedRows.length; i++){
+           instanceClass = (InstanceClass) main.instanceClassTableModel.getValueAt(selectedRows[i], 4);
+            try {
+                InstanceClassDAO.delete(instanceClass);
+            } catch (InstanceSourceClassHasInstance ex) {
+                fail = true;
+            }
+        }
+        if(fail) throw new InstanceSourceClassHasInstance();
     }
 }

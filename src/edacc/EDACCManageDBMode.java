@@ -12,6 +12,7 @@ package edacc;
 
 import edacc.manageDB.*;
 import edacc.model.InstaceNotInDBException;
+import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
@@ -561,6 +562,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
         btnRemoveInstanceClass.setText(resourceMap.getString("btnRemoveInstanceClass.text")); // NOI18N
         btnRemoveInstanceClass.setName("btnRemoveInstanceClass"); // NOI18N
+        btnRemoveInstanceClass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveInstanceClassActionPerformed(evt);
+            }
+        });
 
         btnSelectAllInstanceClasses.setText(resourceMap.getString("btnSelectAllInstanceClasses.text")); // NOI18N
         btnSelectAllInstanceClasses.setName("btnSelectAllInstanceClasses"); // NOI18N
@@ -1141,8 +1147,30 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     }//GEN-LAST:event_btnExportInstancesActionPerformed
 
     private void btnSelectAllInstanceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstanceClassesActionPerformed
-        this.manageDBInstances.SelectAllInstanceClass();
+        manageDBInstances.SelectAllInstanceClass();
     }//GEN-LAST:event_btnSelectAllInstanceClassesActionPerformed
+
+    private void btnRemoveInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstanceClassActionPerformed
+        try {
+            manageDBInstances.RemoveInstanceClass(tableInstanceClass.getSelectedRows());
+        } catch (NoConnectionToDBException ex) {
+             JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "No connection to database: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+           JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "SQL-Exception: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } catch (InstanceSourceClassHasInstance ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "Some of the selected classes couldn't be removed, because they are sourceclasses and" +
+                    "contain still any instances." ,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnRemoveInstanceClassActionPerformed
 
     public void showSolverDetails(Solver currentSolver) {
         boolean enabled = false;

@@ -6,9 +6,6 @@ package edacc.model;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Hashtable;
@@ -58,8 +55,15 @@ public class InstanceClassDAO {
         return i;
     }
 
-    public static void delete(InstanceClass i) throws NoConnectionToDBException, SQLException {
-        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM table WHERE idinstanceClass=?");
+    public static void delete(InstanceClass i) throws NoConnectionToDBException, SQLException, InstanceSourceClassHasInstance {
+        PreparedStatement ps;
+        if(i.isSource()){
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM instances WHERE instanceClass_idinstanceClass = ?");
+            ps.setInt(1, i.getInstanceClassID());
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) throw new InstanceSourceClassHasInstance();
+        }
+        ps = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM table WHERE idinstanceClass=?");
         ps.setInt(1, i.getInstanceClassID());
         ps.executeUpdate();
         cache.remove(i);
