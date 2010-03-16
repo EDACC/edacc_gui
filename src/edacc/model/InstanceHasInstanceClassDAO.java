@@ -144,9 +144,9 @@ public class InstanceHasInstanceClassDAO {
      * @param instanceClass
      * @return
      */
-    public static Vector<Instance> getInstanceClassElements(InstanceClass instanceClass) {
+    public static Vector<Instance> getInstanceClassElements(InstanceClass instanceClass) throws SQLException {
         Vector<Instance> elements = new Vector<Instance>();
-        Vector<InstanceHasInstanceClass> relation = new Vector<InstanceHasInstanceClass>();
+        Vector<InstanceHasInstanceClass> relation = getInstanceHasInstanceClassByInstanceClassId(instanceClass.getInstanceClassID());
         for (InstanceHasInstanceClass el : relation) {
             elements.add(el.getInstance());
         }
@@ -160,7 +160,7 @@ public class InstanceHasInstanceClassDAO {
      */
     public static Vector<InstanceClass> getInstanceClassElements(Instance instance) {
         Vector<InstanceClass> elements = new Vector<InstanceClass>();
-        Vector<InstanceHasInstanceClass> relation = new Vector<InstanceHasInstanceClass>();
+        Vector<InstanceHasInstanceClass> relation = getInstanceHasInstanceClassByInstanceId(instance.getId());
         for (InstanceHasInstanceClass el : relation) {
             elements.add(el.getInstanceClass());
         }
