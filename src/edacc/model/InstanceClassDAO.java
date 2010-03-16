@@ -24,13 +24,6 @@ public class InstanceClassDAO {
     private static final Hashtable<InstanceClass, InstanceClass> cache = new Hashtable<InstanceClass, InstanceClass>();
 
     /**
-     * Instance factory method, ensures that the created instance is persisted and assigned an ID
-     * so it can be referenced by related objects. Checks if the instance is already in the Datebase.
-     * @param md5
-     * @return new Instance object
-     * @throws SQLException, FileNotFoundException, InstanceAlreadyInDBException
-     */
-    /**
      * InstanceClass factory method, ensures that the created instance class is persisted and assigned an ID
      * so it can be referenced by related objects. Checks if the instance class is already in the Datebase.
      * @param name
