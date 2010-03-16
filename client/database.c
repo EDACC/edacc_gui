@@ -1,4 +1,5 @@
 #include <string.h>
+#include <time.h>
 #include "database.h"
 #include "global.h"
 #include "log.h"
@@ -83,7 +84,7 @@
 
 
 #define UPDATE_JOB "" \
-"UPDATE ExperimentResult SET " \
+"UPDATE ExperimentResults SET " \
 "       resultFileName = %s, " \
 "       status = %i, " \
 "       seed = %i, " \
@@ -105,6 +106,12 @@
 "       md5 " \
 "   FROM Instances " \
 "   WHERE name = %s "
+
+#define QUERY_EXPERIMENT_JOBS "" \
+"SELECT " \
+"       id " \
+"   FROM ExperimentResults " \
+"   WHERE Experiment_idExperiment = %i "
 
 status dbFetchExperimentData(experiment *e) {
     MYSQL *conn;
@@ -148,9 +155,11 @@ status dbFetchExperimentData(experiment *e) {
 
     /* fetch grid information */
     if(mysql_query(conn, queryGridInfo) != 0) {
+        mysql_free_result(res);
         return dberror;
     }
 
+    mysql_free_result(res);
     if((res = mysql_store_result(conn)) == NULL) {
         return dberror;
     }
@@ -162,24 +171,42 @@ status dbFetchExperimentData(experiment *e) {
 
     /* fetch instances */
     if(mysql_query(conn, queryInstance) != 0) {
+        mysql_free_result(res);
         return dberror;
     }
 
+    mysql_free_result(res);
     if((res = mysql_store_result(conn)) == NULL) {
         return dberror;
     }
 
     e->numInstances = mysql_num_rows(res);
 
+    if((e->md5Instances = malloc(e->numInstances*sizeof(char *))) == NULL) {
+        mysql_free_result(res);
+        return sysError;
+    }
+
+    if((e->instances = malloc(e->numInstances*sizeof(char *))) == NULL) {
+        mysql_free_result(res);
+        return sysError;
+    }
+
+    if((e->instanceNames = malloc(e->numInstances*sizeof(char *))) == NULL) {
+        mysql_free_result(res);
+        return sysError;
+    }
+
     i=0;
     while((row = mysql_fetch_row(res)) != NULL) {
-        lengths = mysql_fetch_lengths(res);
+        lengths = mysql_fetch_lengths(row);
 
+        e->md5Instances[i] = (char *)malloc(60*sizeof(char));
         e->md5Instances[i] = row[3];
 
         /* Size + 1, to fit the lest nullbyte */
         e->instances[i] = (char *)calloc(lengths[2]+1,sizeof(char));
-        memcpy(e->instances[i], row[2], lenhths[2]);
+        memcpy(e->instances[i], row[2], lengths[2]);
 
         e->instanceNames = (char *)malloc(lengths[1]*sizeof(char));
         strncpy(e->instanceNames[i], row[1], lengths[1]);
@@ -188,16 +215,39 @@ status dbFetchExperimentData(experiment *e) {
     }
 
 
+
     /* fetch solver binaries */
     if(mysql_query(conn, querySolver) != 0) {
+        mysql_free_result(res);
         return dberror;
     }
 
+    mysql_free_result(res);
     if((res = mysql_store_result(conn)) == NULL) {
         return dberror;
     }
 
     e->numSolvers = mysql_num_rows(res);
+
+    if((e->lengthSolvers = malloc(e->numSolvers*sizeof(char *))) == NULL) {
+        mysql_free_result(res);
+        return sysError;
+    }
+
+    if((e->md5Solvers = malloc(e->numSolvers*sizeof(char *))) == NULL) {
+        mysql_free_result(res);
+        return sysError;
+    }
+
+    if((e->solvers = malloc(e->numSolvers*sizeof(char *))) == NULL) {
+        mysql_free_result(res);
+        return sysError;
+    }
+
+    if((e->solverNames = malloc(e->numSolvers*sizeof(char *))) == NULL) {
+        mysql_free_result(res);
+        return sysError;
+    }
 
     i=0;
     while((row = mysql_fetch_row(res)) != NULL) {
@@ -205,6 +255,7 @@ status dbFetchExperimentData(experiment *e) {
 
         e->lengthSolver[i] = lengths[3];
 
+        e->md5Solvers[i] = (char *)malloc(60*sizeof(char));
         e->md5Solvers[i] = row[4];
 
         e->solvers[i] = (char *)malloc(lengths[3]*sizeof(char));
@@ -216,8 +267,35 @@ status dbFetchExperimentData(experiment *e) {
         i++;
     }
 
+    mysql_free_result(res);
     mysql_close(conn);
     return success;
+}
+
+void freeExperimentData(experiment e) {
+    int i;
+
+    for(i=0; i<e->numInstances; i++) {
+        free(e->md5Instances[i]);
+        free(e->instances[i]);
+        free(e->instanceName[i]);
+    }
+
+    for(i=0; i<e->numSolvers; i++) {
+        free(e->lengthSolver[i]);
+        free(e->md5Solvers[i]);
+        free(e->solvers[i]);
+        free(e->solverName[i]);
+    }
+
+    free(e->md5Instances);
+    free(e->instances);
+    free(e->instanceName);
+
+    free(e->lengthSolver);
+    free(e->md5Solvers);
+    free(e->solvers);
+    free(e->solverName);
 }
 
 /* TODO: Implement the randomized job pick */
@@ -226,6 +304,7 @@ int dbFetchJob(job* j, status* s) {
     MYSQL_RES *res;
     MYSQL_ROW row;
 
+    char *queryExpJob;
     char *queryJob;
     char *queryJobParams;
 
@@ -237,22 +316,44 @@ int dbFetchJob(job* j, status* s) {
     int i;
     unsigned long lengths;
 
-    sprintf(queryJob, QUERY_JOB, lastId);
-    sprintf(queryJobParams, QUERY_JOB_PARAMS, lastId);
 
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
         return dberror;
     }
 
+    sprintf(queryExpJob, QUERY_EXPERIMENT_JOB, experimentId);
 
-    /* fetch job information */
-    if(mysql_query(conn, queryJob) != 0) {
+    /* fetch the id's of the experiment jobs */
+    if(mysql_query(conn, queryExpJob) != 0) {
         return dberror;
     }
 
     if((res = mysql_store_result(conn)) == NULL) {
         return dberror;
     }
+
+    i = mysql_num_rows(res);
+    srand(time());
+    mysql_data_seek(res, rand() % i);
+
+    if((row = mysql_fetch_row(res)) != NULL) {
+        lastid = row[0];
+    }
+
+    sprintf(queryJob, QUERY_JOB, lastId);
+    sprintf(queryJobParams, QUERY_JOB_PARAMS, lastId);
+
+    /* fetch job information */
+    if(mysql_query(conn, queryJob) != 0) {
+        mysql_free_result(res);
+        return dberror;
+    }
+
+    mysql_free_result(res);
+    if((res = mysql_store_result(conn)) == NULL) {
+        return dberror;
+    }
+
 
     if((row = mysql_fetch_row(res)) != NULL) {
         lengths = mysql_fetch_lengths(res);
@@ -268,9 +369,11 @@ int dbFetchJob(job* j, status* s) {
 
     /* fetch params information */
     if(mysql_query(conn, queryJobParams) != 0) {
+        mysql_free_result(res);
         return dberror;
     }
 
+    mysql_free_result(res);
     if((res = mysql_store_result(conn)) == NULL) {
         return dberror;
     }
@@ -290,9 +393,17 @@ int dbFetchJob(job* j, status* s) {
 
     strcpy(j-params, params);
 
+    mysql_free_result(res);
     mysql_close(conn);
     return success;
 }
+
+void freeJob(job *j) {
+    free(resultFileName);
+    free(solverName);
+    free(instanceName);
+}
+
 
 status dbUpdate(const job* j) {
     MYSQL *conn;
@@ -356,6 +467,10 @@ status dbFetchSolver(const char* solverName, solver* s) {
     return success;
 }
 
+void freeSolver(solver* s) {
+    free(s->solver);
+}
+
 //Try to fetch the instance named instanceName from the database
 status dbFetchInstance(const char* instanceName, instance* i) {
     MYSQL *conn;
@@ -392,4 +507,8 @@ status dbFetchInstance(const char* instanceName, instance* i) {
 
     mysql_close(conn);
     return success;
+}
+
+void freeInstance(instance *i) {
+    free(i->instance);
 }

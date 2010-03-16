@@ -9,6 +9,7 @@
 //Try to fetch all neede information about the experiment
 //we want to execute from the database.
 status dbFetchExperimentData(experiment *e);
+void freeExperimentData(experiment *e);
 
 //Try to fetch a new job for processing from the database.
 //If all goes well, the function returns zero.
@@ -18,6 +19,7 @@ status dbFetchExperimentData(experiment *e);
 // - sysError if an error in a system function occured
 // - dbError if an error in the database occured.
 int dbFetchJob(job* j, status* s);
+void freeJob(job *j);
 
 //Store information about the job j that just started running
 status dbUpdate(const job* j);
@@ -28,6 +30,8 @@ status dbFetchSolver(const char* solverName, solver* s);
 //Try to fetch the instance named instanceName from the database
 status dbFetchInstance(const char* instanceName, instance* i);
 
+void freeSolver(solver *s);
+void freeInstance(instance *s);
 
 #endif
 
