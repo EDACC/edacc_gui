@@ -2,16 +2,16 @@
 #define SAFEIO_H
 
 #include <stdio.h>
+#include <stdarg.h>
 
-//Wrapper functions for the corresponding functions defined in stdio.h
+//A version of sprintf that sets str to newly allocated memory containing the output string.
+//If the function succeeds (i.e. returns a non-negative value), the memory pointed to by str
+//needs to be freed.
+int sprintfAlloc(char** str, const char* format, ...);
+
+//Below are some wrapper functions for the corresponding functions defined in stdio.h
 //with limited disk access rate
-/*
-int safeFprintf(FILE* stream, const char* format, ...);
 
-size_t safeFwrite(const void* ptr, size_t size, size_t nmemb, FILE* stream);
-
-int safeFscanf(FILE* stream, const char* format, ...);
-*/
 int safeGetc(FILE *stream);
 
 int safeFputc(int c, FILE *stream);
