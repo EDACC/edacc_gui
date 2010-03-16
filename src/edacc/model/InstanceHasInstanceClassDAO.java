@@ -99,7 +99,7 @@ public class InstanceHasInstanceClassDAO {
         save(i);
     }
 
-    public static Vector<InstanceHasInstanceClass> getInstanceHasInstanceClassByInstanceClassId(int id) throws SQLException, InstanceClassMustBeSourceException {
+    private static Vector<InstanceHasInstanceClass> getInstanceHasInstanceClassByInstanceClassId(int id) throws SQLException, InstanceClassMustBeSourceException {
         Vector<InstanceHasInstanceClass> res = new Vector<InstanceHasInstanceClass>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE instanceClass_idinstanceClass=?");
         st.setInt(1, id);
@@ -117,5 +117,53 @@ public class InstanceHasInstanceClassDAO {
             }
         }
         return res;
+    }
+
+     private static Vector<InstanceHasInstanceClass> getInstanceHasInstanceClassByInstanceId(int id) throws SQLException, InstanceClassMustBeSourceException {
+        Vector<InstanceHasInstanceClass> res = new Vector<InstanceHasInstanceClass>();
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE instanceClass_idinstanceClass=?");
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            InstanceHasInstanceClass i = getInstanceHasInstanceClassFromResultset(rs);
+
+            InstanceHasInstanceClass c = getCached(i);
+            if (c != null) {
+                res.add(c);
+            } else {
+                i.setSaved();
+                cacheInstanceHasInstanceClass(i);
+                res.add(i);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Returns all persisted instances of an already persisted user defined instance class.
+     * @param instanceClass
+     * @return
+     */
+    public static Vector<Instance> getInstanceClassElements(InstanceClass instanceClass) {
+        Vector<Instance> elements = new Vector<Instance>();
+        Vector<InstanceHasInstanceClass> relation = new Vector<InstanceHasInstanceClass>();
+        for (InstanceHasInstanceClass el : relation) {
+            elements.add(el.getInstance());
+        }
+        return elements;
+    }
+
+    /**
+     * Returns all persisted instance classes of an already persisted instance.
+     * @param instanceClass
+     * @return
+     */
+    public static Vector<InstanceClass> getInstanceClassElements(Instance instance) {
+        Vector<InstanceClass> elements = new Vector<InstanceClass>();
+        Vector<InstanceHasInstanceClass> relation = new Vector<InstanceHasInstanceClass>();
+        for (InstanceHasInstanceClass el : relation) {
+            elements.add(el.getInstanceClass());
+        }
+        return elements;
     }
 }
