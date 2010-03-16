@@ -5,11 +5,13 @@
 
 package edacc.model;
 
+import java.sql.SQLException;
+
 /**
  *
  * @author dgall
  */
-class InstanceClassMustBeSourceException extends Exception {
+public class InstanceClassMustBeSourceException extends SQLException {
 
     public InstanceClassMustBeSourceException() {
         super("The source instance class must have the source flag set on true!");

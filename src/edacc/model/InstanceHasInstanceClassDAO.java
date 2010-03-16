@@ -40,7 +40,7 @@ public class InstanceHasInstanceClassDAO {
      * @return a new InstanceHasInstanceClass object. It won't check the cache!
      * @throws SQLException
      */
-    private static InstanceHasInstanceClass getInstanceHasInstanceClassFromResultset(ResultSet rs) throws SQLException {
+    private static InstanceHasInstanceClass getInstanceHasInstanceClassFromResultset(ResultSet rs) throws SQLException, InstanceClassMustBeSourceException {
         int idInstance = rs.getInt("Instances_idInstance");
         int idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
         // get the Instance and InstanceClass objects from the DB
@@ -99,7 +99,7 @@ public class InstanceHasInstanceClassDAO {
         save(i);
     }
 
-    public static Vector<InstanceHasInstanceClass> getInstanceHasInstanceClassByInstanceClassId(int id) throws SQLException {
+    public static Vector<InstanceHasInstanceClass> getInstanceHasInstanceClassByInstanceClassId(int id) throws SQLException, InstanceClassMustBeSourceException {
         Vector<InstanceHasInstanceClass> res = new Vector<InstanceHasInstanceClass>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE instanceClass_idinstanceClass=?");
         st.setInt(1, id);
