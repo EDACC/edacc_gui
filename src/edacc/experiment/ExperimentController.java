@@ -234,9 +234,31 @@ public class ExperimentController {
         Hashtable<SeedGroup, Integer> linked_seeds = new Hashtable<SeedGroup, Integer>();
         Vector<ExperimentResult> experiment_results = new Vector<ExperimentResult>();
         
+
+
+        if (generateSeeds && linkSeeds) {
+            // first pass over already existing jobs to accumulate existing linked seeds
+            for (Instance i: listInstances) {
+                for (SolverConfiguration c: vsc) {
+                    for (int run = 0; run < numRuns; ++run) {
+                        task.setStatus("Preparing job generation");
+                        if (ExperimentResultDAO.jobExists(run, c.getId(), i.getId(), activeExperiment.getId())) {
+                            // use the already existing jobs to populate the seed group hash table so jobs of newly added solver configs use
+                            // the same seeds as already existing jobs
+                            int seed = ExperimentResultDAO.getSeedValue(run, c.getId(), i.getId(), activeExperiment.getId());
+                            SeedGroup sg = new SeedGroup(c.getSeed_group(), i.getId(), run);
+                            if (!linked_seeds.contains(sg)) {
+                                linked_seeds.put(sg, new Integer(seed));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
         int elements = listInstances.size() * vsc.size() * numRuns;
         int done = 1;
-
         // cartesian product
         for (Instance i: listInstances) {
             for (SolverConfiguration c: vsc) {
@@ -244,7 +266,8 @@ public class ExperimentController {
                     task.setTaskProgress((float)done / (float)elements);
                     task.setStatus("Adding Job " + done + " of " + elements);
 
-                    if (ExperimentResultDAO.jobExists(run, c.getId(), i.getId(), activeExperiment.getId()) == false) { // skip jobs that already exist
+                    // check if job already exists
+                    if (ExperimentResultDAO.jobExists(run, c.getId(), i.getId(), activeExperiment.getId()) == false) {
                         if (generateSeeds && linkSeeds) {
                             Integer seed = linked_seeds.get(new SeedGroup(c.getSeed_group(), i.getId(), run));
                             if (seed != null) {

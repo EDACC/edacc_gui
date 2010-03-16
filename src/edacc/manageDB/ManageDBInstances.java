@@ -4,8 +4,10 @@
  */
 package edacc.manageDB;
 
+import com.mysql.jdbc.Blob;
 import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
+import edacc.model.InstaceNotInDBException;
 import edacc.model.Instance;
 import edacc.model.InstanceAlreadyInDBException;
 import edacc.model.InstanceDAO;
@@ -13,12 +15,12 @@ import edacc.model.InstanceIsInExperimentException;
 import edacc.model.NoConnectionToDBException;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -35,11 +37,13 @@ public class ManageDBInstances {
     EDACCManageDBMode main;
     JPanel panelManageDBInstances;
     JFileChooser jFileChooserManageDBInstance;
+    JFileChooser jFileChooserManageDBExportInstance;
 
-    public ManageDBInstances(EDACCManageDBMode main, JPanel panelManageDBInstances, JFileChooser jFileChooserManageDBInstance) {
+    public ManageDBInstances(EDACCManageDBMode main, JPanel panelManageDBInstances, JFileChooser jFileChooserManageDBInstance,  JFileChooser jFileChooserManageDBExportInstance) {
         this.main = main;
         this.panelManageDBInstances = panelManageDBInstances;
         this.jFileChooserManageDBInstance = jFileChooserManageDBInstance;
+        this.jFileChooserManageDBExportInstance = jFileChooserManageDBExportInstance;
     }
     /**
      * Load all instances from the database into the instancetable
@@ -201,5 +205,30 @@ public class ManageDBInstances {
 
     public String calculateMD5(File file) throws FileNotFoundException, IOException, NoSuchAlgorithmException {
         return Util.calculateMD5(file);
+    }
+    /**
+     * Writes the selected instances binarys into the choosen Directory.
+     * @param rows rows of the selected instances
+     * @throws IOException
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws InstaceNotInDBException
+     */
+    public void exportInstances(int[] rows) throws IOException, NoConnectionToDBException, SQLException, InstaceNotInDBException{
+        int returnVal = jFileChooserManageDBExportInstance.showOpenDialog(panelManageDBInstances);
+        String path = jFileChooserManageDBExportInstance.getSelectedFile().getAbsolutePath();
+        Instance temp;
+        for(int i = 0; i < rows.length; i++){
+           temp =    (Instance) main.instanceTableModel.getValueAt(rows[i], 5);
+           FileOutputStream output = new FileOutputStream(path + System.getProperty("file.separator") + temp.getName());
+           Blob blob = (Blob) InstanceDAO.getBinary(temp.getId());
+           InputStream input = blob.getBinaryStream();
+           byte[] buffer = new byte[1];
+           while (input.read(buffer) > 0) {
+                output.write(buffer);
+           }
+           input.close();
+           output.close();
+        }
     }
 }

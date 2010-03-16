@@ -8,6 +8,12 @@
         <Property name="name" type="java.lang.String" value="jFileChooserManageDBInstance" noResource="true"/>
       </Properties>
     </Component>
+    <Component class="javax.swing.JFileChooser" name="jFileChooserManageDBExportInstance">
+      <Properties>
+        <Property name="fileSelectionMode" type="int" value="1"/>
+        <Property name="name" type="java.lang.String" value="jFileChooserManageDBExportInstance" noResource="true"/>
+      </Properties>
+    </Component>
   </NonVisualComponents>
   <Properties>
     <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
@@ -32,7 +38,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="652" max="32767" attributes="0"/>
+              <Component id="manageDBPane" pref="1074" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -88,11 +94,7 @@
                               <Component id="btnSolverDelete" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnSolverRefresh" min="-2" max="-2" attributes="0"/>
-<<<<<<< HEAD
-                              <EmptySpace pref="532" max="32767" attributes="0"/>
-=======
-                              <EmptySpace pref="597" max="32767" attributes="0"/>
->>>>>>> 230a2f109ae573e20eb386a0d22d2d4751269c91
+                              <EmptySpace pref="793" max="32767" attributes="0"/>
                               <Component id="btnSolverSave" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -108,22 +110,16 @@
                           <Component id="panelParameters" max="32767" attributes="1"/>
                           <Component id="panelSolver" alignment="0" min="-2" max="-2" attributes="1"/>
                       </Group>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="btnSolverSave" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="btnSolverNew" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="btnSolverDelete" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="btnSolverRefresh" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnSolverSave" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                              <Component id="btnSolverNew" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnSolverDelete" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnSolverRefresh" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -160,11 +156,11 @@
                                       <Component id="btnSolverAddBinary" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Group type="103" alignment="0" groupAlignment="1" attributes="0">
                                           <Component id="btnSolverAddCode" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="jScrollPane3" alignment="0" pref="274" max="32767" attributes="1"/>
+                                          <Component id="jScrollPane3" alignment="0" pref="291" max="32767" attributes="1"/>
                                           <Component id="tfSolverName" alignment="0" min="-2" pref="274" max="-2" attributes="1"/>
                                       </Group>
                                   </Group>
-                                  <EmptySpace pref="55" max="32767" attributes="0"/>
+                                  <EmptySpace pref="73" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -297,17 +293,6 @@
                 </Component>
               </SubComponents>
             </Container>
-<<<<<<< HEAD
-            <Component class="javax.swing.JButton" name="btnSolverCancel">
-              <Properties>
-                <Property name="name" type="java.lang.String" value="btnCancel" noResource="true"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverCancelActionPerformed"/>
-              </Events>
-            </Component>
-=======
->>>>>>> 230a2f109ae573e20eb386a0d22d2d4751269c91
             <Component class="javax.swing.JButton" name="btnSolverNew">
               <Properties>
                 <Property name="text" type="java.lang.String" resourceKey="btnNew.text"/>
@@ -362,7 +347,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jScrollPane4" alignment="1" pref="367" max="32767" attributes="0"/>
+                              <Component id="jScrollPane4" alignment="1" pref="523" max="32767" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="btnParametersCancel" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -401,7 +386,7 @@
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
-                          <Component id="jScrollPane4" pref="308" max="32767" attributes="0"/>
+                          <Component id="jScrollPane4" pref="315" max="32767" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jlParametersName" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -555,9 +540,9 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="jScrollPane1" alignment="0" pref="887" max="32767" attributes="1"/>
-                          <Component id="panelFilter" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="panelButtons" alignment="0" max="32767" attributes="1"/>
+                          <Component id="jScrollPane1" alignment="0" pref="1049" max="32767" attributes="1"/>
+                          <Component id="panelFilterInstances" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="panelButtonsInstances" alignment="0" max="32767" attributes="1"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -567,11 +552,11 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="286" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="283" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="panelButtons" min="-2" max="-2" attributes="0"/>
+                      <Component id="panelButtonsInstances" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="panelFilter" min="-2" max="-2" attributes="0"/>
+                      <Component id="panelFilterInstances" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -637,19 +622,19 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Container class="javax.swing.JPanel" name="panelFilter">
+            <Container class="javax.swing.JPanel" name="panelFilterInstances">
               <Properties>
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
                     <TitledBorder title="Filter">
-                      <Property name="titleX" resourceKey="panelFilter.border.title"/>
+                      <Property name="titleX" resourceKey="panelFilterInstances.border.title"/>
                     </TitledBorder>
                   </Border>
                 </Property>
-                <Property name="name" type="java.lang.String" value="panelFilter" noResource="true"/>
+                <Property name="name" type="java.lang.String" value="panelFilterInstances" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="componentAdded" listener="java.awt.event.ContainerListener" parameters="java.awt.event.ContainerEvent" handler="panelFilterComponentAdded"/>
+                <EventHandler event="componentAdded" listener="java.awt.event.ContainerListener" parameters="java.awt.event.ContainerEvent" handler="panelFilterInstancesComponentAdded"/>
               </Events>
 
               <Layout>
@@ -744,7 +729,7 @@
                               <Component id="tfInstanceFilterMaxClauseLengthMin" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace pref="12" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace pref="38" max="32767" attributes="0"/>
@@ -901,9 +886,9 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Container class="javax.swing.JPanel" name="panelButtons">
+            <Container class="javax.swing.JPanel" name="panelButtonsInstances">
               <Properties>
-                <Property name="name" type="java.lang.String" value="panelButtons" noResource="true"/>
+                <Property name="name" type="java.lang.String" value="panelButtonsInstances" noResource="true"/>
               </Properties>
 
               <Layout>
@@ -917,8 +902,10 @@
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="btnRefreshTableInstances" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="btnFilter" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="552" max="32767" attributes="0"/>
+                          <Component id="btnFilterInstances" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="btnExportInstances" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="684" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -929,8 +916,9 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="btnRemoveInstances" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="btnRefreshTableInstances" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="btnFilter" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnFilterInstances" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="btnAddInstances" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnExportInstances" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -965,13 +953,22 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRefreshTableInstancesActionPerformed"/>
                   </Events>
                 </Component>
-                <Component class="javax.swing.JButton" name="btnFilter">
+                <Component class="javax.swing.JButton" name="btnFilterInstances">
                   <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="btnFilter.text"/>
-                    <Property name="name" type="java.lang.String" value="btnFilter" noResource="true"/>
+                    <Property name="text" type="java.lang.String" resourceKey="btnFilterInstances.text"/>
+                    <Property name="name" type="java.lang.String" value="btnFilterInstances" noResource="true"/>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnFilterActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnFilterInstancesActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnExportInstances">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnExportInstances.text"/>
+                    <Property name="name" type="java.lang.String" value="btnExportInstances" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnExportInstancesActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>

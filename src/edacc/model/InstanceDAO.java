@@ -3,6 +3,7 @@ package edacc.model;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.Hashtable;
 import java.sql.*;
@@ -242,5 +243,25 @@ public class InstanceDAO {
         ResultSet rs = st.executeQuery("SELECT i.idInstance FROM " + table + " AS i JOIN Experiment_has_Instances as ei ON " +
                 "i.idInstance = ei.Instances_idInstance WHERE idInstance = "+ id);
        return rs.next();
+    }
+    /**
+     * @author rretz
+     * Get the binary of a instance with the given id as a Blob from the database.
+     * @param id
+     * @return Blob of the instance binary.
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws InstaceNotInDBException
+     */
+    public static Blob getBinary(int id) throws NoConnectionToDBException, SQLException, InstaceNotInDBException {
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+
+        ResultSet rs = st.executeQuery("SELECT i.instance FROM instances AS i WHERE i.idInstance = " + id);
+        if(rs.next()){
+           return rs.getBlob("instance");
+        }
+        else{
+            throw new InstaceNotInDBException();
+        }
     }
 }
