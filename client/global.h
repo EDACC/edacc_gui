@@ -64,6 +64,7 @@ typedef struct {
     char *solverName; // the used solver for this job. 
     char params[256]; // the full param string
     char *instanceName; //the name of the instance
+    char *resultFile; // the output of the solver (stdout and stderr)
     /* This is probably not needed anymore
     int idInstance; // the id of the used instance*/
     int statusCode; // solver return value, when the run is finished

@@ -281,7 +281,11 @@ status processResults(job* j) {
 	char* fileName;
 	FILE* filePtr;
 	FILE* resultFile;
-	int signum, pipesToSkip=2, c;
+	int signum, c;
+	long outputLen;
+
+	//Set the status to -2 in case anything goes wrong in this function
+	j->status=-2;
 
 	fileName=addBasename(pidToFileName(j->pid));
 	if(fileName==NULL) {
@@ -304,17 +308,43 @@ status processResults(job* j) {
 		else
 			j->status=3;
 	} else {
-		//Skip pipesToSkip '|' characters
-		while(pipesToSkip>0) {
+		//Extract the solver output
+		do {
 			c=getc(filePtr);
-			if(c==(int)'|') {
-				--pipesToSkip;
-			} else if(c==EOF) {
+			if(c==EOF) {
 				logError("Error parsing %s: Unexpected format\n", fileName);
 				free(fileName);
 				return sysError;
 			}
+		} while(c!=(int)'|');
+		outputLen=ftell(filePtr);
+		if(outputLen==-1) {
+			logError("Error in ftell(): %s\n", strerror(errno));
+			free(fileName);
+			return sysError;
 		}
+		j->resultFile=malloc(outputLen);
+		if(j->resultFile==NULL) {
+			logError("Error: Out of memory\n");
+			free(fileName);
+			return sysError;
+		}
+		rewind(filePtr);
+		if(fscanf(filePtr, "%s|", j->resultFile)==EOF){
+			logError("Error reading %s: %s\n", fileName, strerror(errno));
+			free(fileName);
+			return sysError;
+		}
+		j->resultFile[outputLen-1]='\0';
+		//Skip the file content until the next '|' character
+		do {
+			c=getc(filePtr);
+			if(c==EOF) {
+				logError("Error parsing %s: Unexpected format\n", fileName);
+				free(fileName);
+				return sysError;
+			}
+		} while(c!=(int)'|');
 		//Extract the runtime and return value of the solver
 		if(fscanf(filePtr, "%f|%d", &(j->time), &(j->statusCode))!=2){
 			logError("Error parsing %s: Unexpected format\n", fileName);
@@ -365,34 +395,39 @@ status handleChildren(int cnt) {
 		//Point j to the entry in jobs corresponding to the terminated child process
 		for(j=jobs; j->pid!=pid; ++j);
 
+		j->pid=0;
 		if(WIFEXITED(retval) && (WEXITSTATUS(retval)==0)) {
 			//The process terminated normally.
 			//Start a mutual execution lock between several application instances.
-			if(lockMutex()!=success)
+			if(lockMutex()!=success) {
+				freeJob(j);
 				return sysError;
+			}
 			s=processResults(j);
 			//End the mutual execution lock
-			if(unlockMutex()!=success)
+			if(unlockMutex()!=success) {
+				freeJob(j);
 				return sysError;
-			j->pid=0;
+			}
 			if(s!=success) {
+				update(j);
+				freeJob(j);
 				return s;
 			}
 			s=update(j);
+			freeJob(j);
 			if(s!=success) {
 				return s;
 			}
 		} else {
 			//The process terminated abnormally
 			j->status=-2;
-			j->pid=0;
 			s=update(j);
+			freeJob(j);
 			if(s!=success) {
 				return s;
 			}
 		}
-		//Free all dynamically allocated memory from j
-		freeJob(j);
 	}
 
 	return success;
