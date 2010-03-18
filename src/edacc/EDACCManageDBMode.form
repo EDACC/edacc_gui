@@ -38,7 +38,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="1074" max="32767" attributes="0"/>
+              <Component id="manageDBPane" pref="907" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -47,7 +47,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="569" max="32767" attributes="0"/>
+              <Component id="manageDBPane" pref="567" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -80,22 +80,14 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="panelSolverButtons" alignment="0" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="panelSolver" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="panelParameters" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="btnSolverNew" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="btnSolverDelete" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="btnSolverRefresh" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="793" max="32767" attributes="0"/>
-                              <Component id="btnSolverSave" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -108,18 +100,10 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="panelParameters" max="32767" attributes="1"/>
-                          <Component id="panelSolver" alignment="0" min="-2" max="-2" attributes="1"/>
+                          <Component id="panelSolver" alignment="0" max="32767" attributes="1"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="btnSolverSave" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Group type="103" alignment="0" groupAlignment="3" attributes="0">
-                              <Component id="btnSolverNew" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="btnSolverDelete" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="btnSolverRefresh" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="panelSolverButtons" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -143,7 +127,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jScrollPane2" alignment="0" pref="458" max="32767" attributes="1"/>
+                              <Component id="jScrollPane2" alignment="0" pref="510" max="32767" attributes="1"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="jlSolverDescription" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -170,7 +154,7 @@
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
-                          <Component id="jScrollPane2" pref="193" max="32767" attributes="0"/>
+                          <Component id="jScrollPane2" pref="245" max="32767" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jlSolverName" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -293,39 +277,6 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Component class="javax.swing.JButton" name="btnSolverNew">
-              <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="btnNew.text"/>
-                <Property name="name" type="java.lang.String" value="btnNew" noResource="true"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverNewActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="javax.swing.JButton" name="btnSolverDelete">
-              <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="btnSolverDelete.text"/>
-                <Property name="name" type="java.lang.String" value="btnSolverDelete" noResource="true"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverDeleteActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="javax.swing.JButton" name="btnSolverRefresh">
-              <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="btnSolverRefresh.text"/>
-                <Property name="name" type="java.lang.String" value="btnSolverRefresh" noResource="true"/>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JButton" name="btnSolverSave">
-              <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="btnSolverSave.text"/>
-                <Property name="name" type="java.lang.String" value="btnSolverSave" noResource="true"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverSaveActionPerformed"/>
-              </Events>
-            </Component>
             <Container class="javax.swing.JPanel" name="panelParameters">
               <Properties>
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -347,37 +298,29 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jScrollPane4" alignment="1" pref="523" max="32767" attributes="0"/>
+                              <Component id="jScrollPane4" alignment="1" pref="306" max="32767" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="btnParametersCancel" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
                                   <Component id="btnParametersNew" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="btnParametersDelete" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="btnParametersRefresh" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="jlParametersPrefix" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              <Component id="jlParametersName" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                                              <Component id="tfParametersName" alignment="0" min="-2" pref="243" max="-2" attributes="0"/>
-                                              <Group type="103" alignment="0" groupAlignment="0" attributes="0">
-                                                  <Component id="tfParametersOrder" alignment="0" pref="243" max="32767" attributes="0"/>
-                                                  <Component id="tfParametersPrefix" alignment="0" max="32767" attributes="0"/>
-                                              </Group>
-                                          </Group>
-                                      </Group>
-                                      <Component id="jlParametersOrder" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jlParametersPrefix" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jlParametersName" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="btnSaveParam" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                      <Component id="tfParametersName" alignment="0" min="-2" pref="243" max="-2" attributes="0"/>
+                                      <Group type="103" alignment="0" groupAlignment="0" attributes="0">
+                                          <Component id="tfParametersOrder" alignment="0" pref="243" max="32767" attributes="0"/>
+                                          <Component id="tfParametersPrefix" alignment="0" max="32767" attributes="0"/>
+                                      </Group>
+                                  </Group>
                               </Group>
+                              <Component id="jlParametersOrder" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -386,7 +329,7 @@
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
-                          <Component id="jScrollPane4" pref="315" max="32767" attributes="0"/>
+                          <Component id="jScrollPane4" pref="306" max="32767" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jlParametersName" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -400,14 +343,10 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="1" attributes="0">
                               <Component id="jlParametersOrder" min="-2" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="tfParametersOrder" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="btnSaveParam" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="tfParametersOrder" alignment="1" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="btnParametersCancel" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="btnParametersNew" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="btnParametersDelete" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="btnParametersRefresh" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -479,12 +418,6 @@
                     <Property name="name" type="java.lang.String" value="tfParametersOrder" noResource="true"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JButton" name="btnParametersCancel">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="btnParametersCancel.text"/>
-                    <Property name="name" type="java.lang.String" value="btnParametersCancel" noResource="true"/>
-                  </Properties>
-                </Component>
                 <Component class="javax.swing.JButton" name="btnParametersNew">
                   <Properties>
                     <Property name="text" type="java.lang.String" resourceKey="btnParametersNew.text"/>
@@ -499,21 +432,93 @@
                     <Property name="text" type="java.lang.String" resourceKey="btnParametersDelete.text"/>
                     <Property name="name" type="java.lang.String" value="btnParametersDelete" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnParametersDeleteActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnParametersRefresh">
                   <Properties>
                     <Property name="text" type="java.lang.String" resourceKey="btnParametersRefresh.text"/>
                     <Property name="name" type="java.lang.String" value="btnParametersRefresh" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnParametersRefreshActionPerformed"/>
+                  </Events>
                 </Component>
-                <Component class="javax.swing.JButton" name="btnSaveParam">
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="panelSolverButtons">
+              <Properties>
+                <Property name="name" type="java.lang.String" value="panelSolverButtons" noResource="true"/>
+              </Properties>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnSolverNew" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnSolverDelete" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnSolverRefresh" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="497" max="32767" attributes="0"/>
+                          <Component id="btnSolverSaveToDB" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="btnSolverNew" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnSolverDelete" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnSolverRefresh" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnSolverSaveToDB" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JButton" name="btnSolverRefresh">
                   <Properties>
-                    <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                      <action class="edacc.EDACCManageDBMode" id="btnSaveParam" methodName="btnSaveParam"/>
-                    </Property>
-                    <Property name="text" type="java.lang.String" resourceKey="btnSaveParam.text"/>
-                    <Property name="name" type="java.lang.String" value="btnSaveParam" noResource="true"/>
+                    <Property name="text" type="java.lang.String" resourceKey="btnSolverRefresh.text"/>
+                    <Property name="name" type="java.lang.String" value="btnSolverRefresh" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverRefreshActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnSolverDelete">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnSolverDelete.text"/>
+                    <Property name="name" type="java.lang.String" value="btnSolverDelete" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverDeleteActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnSolverNew">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnNew.text"/>
+                    <Property name="name" type="java.lang.String" value="btnNew" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverNewActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnSolverSaveToDB">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnSolverSaveToDB.text"/>
+                    <Property name="name" type="java.lang.String" value="btnSolverSaveToDB" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverSaveToDBActionPerformed"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>
@@ -540,7 +545,7 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="jScrollPane1" alignment="0" pref="1049" max="32767" attributes="1"/>
+                          <Component id="jScrollPane1" alignment="0" pref="878" max="32767" attributes="1"/>
                           <Component id="panelFilterInstances" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="panelButtonsInstances" alignment="0" max="32767" attributes="1"/>
                       </Group>
@@ -552,7 +557,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="283" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="290" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="panelButtonsInstances" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -905,7 +910,7 @@
                           <Component id="btnFilterInstances" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="btnExportInstances" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="684" max="32767" attributes="0"/>
+                          <EmptySpace pref="431" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
