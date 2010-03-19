@@ -77,10 +77,8 @@ public class ManageDBSolvers {
     }
 
     public void showSolver(int index) {
-        currentSolver = solverTableModel.getSolver(index);
-        if (currentSolver != null) {
-            gui.showSolverDetails(currentSolver);
-        }
+        currentSolver = solverTableModel.getSolver(index); // will be null if no solver selected!
+        gui.showSolverDetails(currentSolver);
     }
 
     public void addSolverBinary(File binary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException, SolverAlreadyInDBException {
@@ -114,8 +112,7 @@ public class ManageDBSolvers {
             SolverDAO.removeSolver(currentSolver);
         } catch (SolverNotInDBException ex) {
             // if the solver isn't in the db, just remove it from the table model
-        } finally {
-            solverTableModel.removeSolver(currentSolver);
-        }
+        } 
+        solverTableModel.removeSolver(currentSolver);
     }
 }

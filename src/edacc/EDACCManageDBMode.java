@@ -63,15 +63,15 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         solverTableModel = new SolverTableModel();
         manageDBSolvers = new ManageDBSolvers(this, solverTableModel);
         tableSolver.setModel(solverTableModel);
-        tableSolver.getSelectionModel().addListSelectionListener(new SolverTableSelectionListener(tableSolver, manageDBSolvers));
-        showSolverDetails(null);
 
         // initialize parameter table
         parameterTableModel = new ParameterTableModel();
         manageDBParameters = new ManageDBParameters(this, parameterTableModel);
         tableParameters.setModel(parameterTableModel);
 
+        tableSolver.getSelectionModel().addListSelectionListener(new SolverTableSelectionListener(tableSolver, manageDBSolvers));
         tableParameters.getSelectionModel().addListSelectionListener(new ParameterTableSelectionListener(tableParameters, manageDBParameters));
+        showSolverDetails(null);
     }
 
     void initialize() throws NoConnectionToDBException, SQLException {
@@ -1119,6 +1119,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         try {
             manageDBSolvers.removeSolver();
             manageDBParameters.removeParameters();
+            tableSolver.getSelectionModel().clearSelection();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
                     "A solver couldn't be removed: " + ex.getMessage(),
@@ -1207,6 +1208,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             enabled = true;
             tfSolverName.setText(currentSolver.getName());
             taSolverDescription.setText(currentSolver.getDescription());
+            manageDBParameters.setCurrentSolver(currentSolver);
+            tableParameters.updateUI();
+        } else {
+            tfSolverName.setText("");
+            taSolverDescription.setText("");
             manageDBParameters.setCurrentSolver(currentSolver);
             tableParameters.updateUI();
         }

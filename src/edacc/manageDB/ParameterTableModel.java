@@ -34,6 +34,8 @@ public class ParameterTableModel extends AbstractTableModel{
      */
     public void setCurrentSolver(Solver solver) {
         this.currentSolver = solver;
+        if (currentSolver == null)
+            return;
         Vector<Parameter> params = parameters.get(solver);
         if (params == null) {
             params = new Vector<Parameter>();
@@ -50,7 +52,7 @@ public class ParameterTableModel extends AbstractTableModel{
     }
     
     public void remove(Parameter param){
-        //parameters.get(currentSolver).remove(param);
+        parameters.get(currentSolver).remove(param);
     }
 
     public int getRowCount() {
