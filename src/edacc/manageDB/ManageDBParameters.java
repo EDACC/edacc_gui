@@ -54,6 +54,7 @@ public class ManageDBParameters {
      */
     public void removeParameters() {
         parameterTableModel.removeParametersOfSolver(parameterTableModel.getCurrentSolver());
+        currentParameter = null;
     }
 
 }

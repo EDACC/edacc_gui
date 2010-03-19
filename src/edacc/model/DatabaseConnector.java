@@ -145,8 +145,8 @@ public class DatabaseConnector extends Observable {
                 + "  `numClauses` INT NULL ,"
                 + "  `ratio` FLOAT NULL ,"
                 + "  `maxClauseLength` INT NULL ,"
-                + "  `instanceClass_idinstanceClass` INT NULL ,"
-                + "  PRIMARY KEY (`idInstance`) ,"
+                + "  `instanceClass_idinstanceClass` INT NOT NULL ,"
+                + "  PRIMARY KEY (`idInstance`, `instanceClass_idinstanceClass`) ,"
                 + "  UNIQUE INDEX `name` (`name` ASC) ,"
                 + "  INDEX `fk_Instances_instanceClass1` (`instanceClass_idinstanceClass` ASC) ,"
                 + "  CONSTRAINT `fk_Instances_instanceClass1`    FOREIGN KEY (`instanceClass_idinstanceClass` )    REFERENCES `instanceClass` (`idinstanceClass` )    "
@@ -279,6 +279,26 @@ public class DatabaseConnector extends Observable {
                 + "  ON DELETE CASCADE    "
                 + "  ON UPDATE CASCADE)"
                 + "  ENGINE = InnoDB;");
+
+        st.addBatch("DROP TABLE IF EXISTS `Instances_has_instanceClass`");
+        st.addBatch("CREATE  TABLE IF NOT EXISTS `EDACC`.`Instances_has_instanceClass` ("
+                + "  `Instances_idInstance` INT NOT NULL , "
+                + "  `instanceClass_idinstanceClass` INT NOT NULL , "
+                + "  PRIMARY KEY (`Instances_idInstance`, `instanceClass_idinstanceClass`) , "
+                + "  INDEX `fk_Instances_has_instanceClass_Instances1` (`Instances_idInstance` ASC) ,"
+                + "  INDEX `fk_Instances_has_instanceClass_instanceClass1` (`instanceClass_idinstanceClass` ASC) ,"
+                + "  CONSTRAINT `fk_Instances_has_instanceClass_Instances1`"
+                + "  FOREIGN KEY (`Instances_idInstance` )"
+                + "  REFERENCES `EDACC`.`Instances` (`idInstance` )"
+                + "  ON DELETE CASCADE"
+                + "  ON UPDATE CASCADE,"
+                + "  CONSTRAINT `fk_Instances_has_instanceClass_instanceClass1`"
+                + "  FOREIGN KEY (`instanceClass_idinstanceClass` )"
+                + "  REFERENCES `EDACC`.`instanceClass` (`idinstanceClass` )"
+                + "  ON DELETE CASCADE"
+                + "  ON UPDATE CASCADE)"
+                + "  ENGINE = InnoDB;");
+
         st.addBatch("SET SQL_MODE=@OLD_SQL_MODE;");
         st.addBatch("SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;");
         st.addBatch("SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;");
