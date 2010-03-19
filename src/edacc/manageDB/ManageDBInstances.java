@@ -12,6 +12,8 @@ import edacc.model.Instance;
 import edacc.model.InstanceAlreadyInDBException;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassDAO;
+import edacc.model.InstanceClassMustBeSourceException;
+
 import edacc.model.InstanceDAO;
 import edacc.model.InstanceIsInExperimentException;
 import edacc.model.InstanceSourceClassHasInstance;
@@ -55,7 +57,7 @@ public class ManageDBInstances {
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    public void loadInstances() throws NoConnectionToDBException, SQLException {
+    public void loadInstances() throws NoConnectionToDBException, SQLException, InstanceClassMustBeSourceException {
         main.instanceTableModel.instances.clear();
         main.instanceTableModel.addInstances(new Vector<Instance>(InstanceDAO.getAll()));
         main.instanceTableModel.fireTableDataChanged();

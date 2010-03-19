@@ -11,17 +11,17 @@
 package edacc;
 
 import edacc.manageDB.*;
-import edacc.model.InstaceNotInDBException;
-import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.Solver;
+<<<<<<< HEAD
+import edacc.model.SolverIsInExperimentException;
+import java.io.File;
+=======
+>>>>>>> 8806586b52e20243c73c5017e091c7510e6d62bc
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
@@ -37,7 +37,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
     public ManageDBInstances manageDBInstances;
     public InstanceTableModel instanceTableModel;
-    public InstanceClassTableModel instanceClassTableModel;
     public TableRowSorter<InstanceTableModel> sorter;
     private ManageDBSolvers manageDBSolvers;
     private SolverTableModel solverTableModel;
@@ -48,16 +47,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         initComponents();
 
         // initialize instance table
-        manageDBInstances = new ManageDBInstances(this, panelManageDBInstances, 
-                jFileChooserManageDBInstance, jFileChooserManageDBExportInstance);
+        manageDBInstances = new ManageDBInstances(this, panelManageDBInstances, jFileChooserManageDBInstance);
         instanceTableModel = new InstanceTableModel();
         tableInstances.setModel(instanceTableModel);
         tableInstances.setDefaultRenderer(Object.class, new InstanceTableCellRenderer());
         sorter = new TableRowSorter<InstanceTableModel>(instanceTableModel);
-
-        // initialize instance class table
-        instanceClassTableModel = new InstanceClassTableModel();
-        tableInstanceClass.setModel(instanceClassTableModel);
 
         // initialize solver table
         solverTableModel = new SolverTableModel();
@@ -124,7 +118,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private void initComponents() {
 
         jFileChooserManageDBInstance = new javax.swing.JFileChooser();
-        jFileChooserManageDBExportInstance = new javax.swing.JFileChooser();
         manageDBPane = new javax.swing.JTabbedPane();
         panelManageDBSolver = new javax.swing.JPanel();
         panelSolver = new javax.swing.JPanel();
@@ -139,6 +132,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         btnSolverAddBinary = new javax.swing.JButton();
         jlSolverCode = new javax.swing.JLabel();
         btnSolverAddCode = new javax.swing.JButton();
+        btnSolverNew = new javax.swing.JButton();
+        btnSolverDelete = new javax.swing.JButton();
+        btnSolverRefresh = new javax.swing.JButton();
+        btnSolverSave = new javax.swing.JButton();
         panelParameters = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tableParameters = new javax.swing.JTable();
@@ -148,26 +145,15 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         tfParametersPrefix = new javax.swing.JTextField();
         jlParametersOrder = new javax.swing.JLabel();
         tfParametersOrder = new javax.swing.JTextField();
+        btnParametersCancel = new javax.swing.JButton();
         btnParametersNew = new javax.swing.JButton();
         btnParametersDelete = new javax.swing.JButton();
         btnParametersRefresh = new javax.swing.JButton();
-        panelSolverButtons = new javax.swing.JPanel();
-        btnSolverRefresh = new javax.swing.JButton();
-        btnSolverDelete = new javax.swing.JButton();
-        btnSolverNew = new javax.swing.JButton();
-        btnSolverSaveToDB = new javax.swing.JButton();
+        btnSaveParam = new javax.swing.JButton();
         panelManageDBInstances = new javax.swing.JPanel();
-        panelInstanceClass = new javax.swing.JPanel();
-        panelInstanceClassTable = new javax.swing.JScrollPane();
-        tableInstanceClass = new javax.swing.JTable();
-        panelButtonsInstanceClass = new javax.swing.JPanel();
-        btnNewInstanceClass = new javax.swing.JButton();
-        btnRemoveInstanceClass = new javax.swing.JButton();
-        btnSelectAllInstanceClasses = new javax.swing.JButton();
-        panelInstance = new javax.swing.JPanel();
-        panelInstanceTable = new javax.swing.JScrollPane();
+        jScrollPane1 = new javax.swing.JScrollPane();
         tableInstances = new javax.swing.JTable();
-        panelFilterInstances = new javax.swing.JPanel();
+        panelFilter = new javax.swing.JPanel();
         jlInstanceFilterName = new javax.swing.JLabel();
         tfInstanceFilterName = new javax.swing.JTextField();
         tfInstanceFilterNumAtomsMin = new javax.swing.JTextField();
@@ -190,20 +176,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        panelButtonsInstances = new javax.swing.JPanel();
+        panelButtons = new javax.swing.JPanel();
         btnAddInstances = new javax.swing.JButton();
         btnRemoveInstances = new javax.swing.JButton();
         btnRefreshTableInstances = new javax.swing.JButton();
-        btnFilterInstances = new javax.swing.JButton();
-        btnExportInstances = new javax.swing.JButton();
-        btnAddToClass = new javax.swing.JButton();
-        btnRemoveFromClass = new javax.swing.JButton();
+        btnFilter = new javax.swing.JButton();
 
         jFileChooserManageDBInstance.setFileSelectionMode(javax.swing.JFileChooser.FILES_AND_DIRECTORIES);
         jFileChooserManageDBInstance.setName("jFileChooserManageDBInstance"); // NOI18N
-
-        jFileChooserManageDBExportInstance.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
-        jFileChooserManageDBExportInstance.setName("jFileChooserManageDBExportInstance"); // NOI18N
 
         setName("Form"); // NOI18N
         setPreferredSize(new java.awt.Dimension(500, 591));
@@ -288,7 +268,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             .addGroup(panelSolverLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 510, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
                     .addGroup(panelSolverLayout.createSequentialGroup()
                         .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jlSolverDescription)
@@ -300,15 +280,15 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                             .addComponent(btnSolverAddBinary)
                             .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addComponent(btnSolverAddCode, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
+                                .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
                                 .addComponent(tfSolverName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 73, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 55, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         panelSolverLayout.setVerticalGroup(
             panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSolverLayout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jlSolverName)
@@ -331,6 +311,33 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                 .addContainerGap())
         );
 
+        btnSolverNew.setText(resourceMap.getString("btnNew.text")); // NOI18N
+        btnSolverNew.setName("btnNew"); // NOI18N
+        btnSolverNew.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolverNewActionPerformed(evt);
+            }
+        });
+
+        btnSolverDelete.setText(resourceMap.getString("btnSolverDelete.text")); // NOI18N
+        btnSolverDelete.setName("btnSolverDelete"); // NOI18N
+        btnSolverDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolverDeleteActionPerformed(evt);
+            }
+        });
+
+        btnSolverRefresh.setText(resourceMap.getString("btnSolverRefresh.text")); // NOI18N
+        btnSolverRefresh.setName("btnSolverRefresh"); // NOI18N
+
+        btnSolverSave.setText(resourceMap.getString("btnSolverSave.text")); // NOI18N
+        btnSolverSave.setName("btnSolverSave"); // NOI18N
+        btnSolverSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolverSaveActionPerformed(evt);
+            }
+        });
+
         panelParameters.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("panelParameters.border.title"))); // NOI18N
         panelParameters.setName("panelParameters"); // NOI18N
 
@@ -348,7 +355,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             }
         ));
         tableParameters.setName("tableParameters"); // NOI18N
-        tableParameters.setPreferredSize(new java.awt.Dimension(150, 64));
         jScrollPane4.setViewportView(tableParameters);
 
         jlParametersName.setText(resourceMap.getString("jlParametersName.text")); // NOI18N
@@ -369,6 +375,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         tfParametersOrder.setText(resourceMap.getString("tfParametersOrder.text")); // NOI18N
         tfParametersOrder.setName("tfParametersOrder"); // NOI18N
 
+        btnParametersCancel.setText(resourceMap.getString("btnParametersCancel.text")); // NOI18N
+        btnParametersCancel.setName("btnParametersCancel"); // NOI18N
+
         btnParametersNew.setText(resourceMap.getString("btnParametersNew.text")); // NOI18N
         btnParametersNew.setName("btnParametersNew"); // NOI18N
         btnParametersNew.addActionListener(new java.awt.event.ActionListener() {
@@ -379,19 +388,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
         btnParametersDelete.setText(resourceMap.getString("btnParametersDelete.text")); // NOI18N
         btnParametersDelete.setName("btnParametersDelete"); // NOI18N
-        btnParametersDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnParametersDeleteActionPerformed(evt);
-            }
-        });
 
         btnParametersRefresh.setText(resourceMap.getString("btnParametersRefresh.text")); // NOI18N
         btnParametersRefresh.setName("btnParametersRefresh"); // NOI18N
-        btnParametersRefresh.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnParametersRefreshActionPerformed(evt);
-            }
-        });
+
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCManageDBMode.class, this);
+        btnSaveParam.setAction(actionMap.get("btnSaveParam")); // NOI18N
+        btnSaveParam.setText(resourceMap.getString("btnSaveParam.text")); // NOI18N
+        btnSaveParam.setName("btnSaveParam"); // NOI18N
 
         javax.swing.GroupLayout panelParametersLayout = new javax.swing.GroupLayout(panelParameters);
         panelParameters.setLayout(panelParametersLayout);
@@ -400,9 +404,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             .addGroup(panelParametersLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 770, Short.MAX_VALUE)
-
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE)
                     .addGroup(panelParametersLayout.createSequentialGroup()
+                        .addComponent(btnParametersCancel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnParametersNew)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnParametersDelete)
@@ -410,21 +415,25 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                         .addComponent(btnParametersRefresh))
                     .addGroup(panelParametersLayout.createSequentialGroup()
                         .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jlParametersPrefix)
-                            .addComponent(jlParametersName))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(tfParametersName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(tfParametersOrder, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
-                                .addComponent(tfParametersPrefix))))
-                    .addComponent(jlParametersOrder))
+                            .addGroup(panelParametersLayout.createSequentialGroup()
+                                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jlParametersPrefix)
+                                    .addComponent(jlParametersName))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(tfParametersName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(tfParametersOrder, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+                                        .addComponent(tfParametersPrefix))))
+                            .addComponent(jlParametersOrder))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSaveParam)))
                 .addContainerGap())
         );
         panelParametersLayout.setVerticalGroup(
             panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelParametersLayout.createSequentialGroup()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jlParametersName)
@@ -436,85 +445,27 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jlParametersOrder)
-                    .addComponent(tfParametersOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(tfParametersOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnSaveParam)))
                 .addGap(18, 18, 18)
                 .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnParametersCancel)
                     .addComponent(btnParametersNew)
                     .addComponent(btnParametersDelete)
                     .addComponent(btnParametersRefresh))
                 .addContainerGap())
         );
 
-        panelSolverButtons.setName("panelSolverButtons"); // NOI18N
-
-        btnSolverRefresh.setText(resourceMap.getString("btnSolverRefresh.text")); // NOI18N
-        btnSolverRefresh.setName("btnSolverRefresh"); // NOI18N
-        btnSolverRefresh.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSolverRefreshActionPerformed(evt);
-            }
-        });
-
-        btnSolverDelete.setText(resourceMap.getString("btnSolverDelete.text")); // NOI18N
-        btnSolverDelete.setName("btnSolverDelete"); // NOI18N
-        btnSolverDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSolverDeleteActionPerformed(evt);
-            }
-        });
-
-        btnSolverNew.setText(resourceMap.getString("btnNew.text")); // NOI18N
-        btnSolverNew.setName("btnNew"); // NOI18N
-        btnSolverNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSolverNewActionPerformed(evt);
-            }
-        });
-
-        btnSolverSaveToDB.setText(resourceMap.getString("btnSolverSaveToDB.text")); // NOI18N
-        btnSolverSaveToDB.setName("btnSolverSaveToDB"); // NOI18N
-        btnSolverSaveToDB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSolverSaveToDBActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout panelSolverButtonsLayout = new javax.swing.GroupLayout(panelSolverButtons);
-        panelSolverButtons.setLayout(panelSolverButtonsLayout);
-        panelSolverButtonsLayout.setHorizontalGroup(
-            panelSolverButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelSolverButtonsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btnSolverNew)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSolverDelete)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSolverRefresh)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 497, Short.MAX_VALUE)
-                .addComponent(btnSolverSaveToDB)
-                .addContainerGap())
-        );
-        panelSolverButtonsLayout.setVerticalGroup(
-            panelSolverButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelSolverButtonsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelSolverButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSolverNew)
-                    .addComponent(btnSolverDelete)
-                    .addComponent(btnSolverRefresh)
-                    .addComponent(btnSolverSaveToDB))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
         javax.swing.GroupLayout panelManageDBSolverLayout = new javax.swing.GroupLayout(panelManageDBSolver);
         panelManageDBSolver.setLayout(panelManageDBSolverLayout);
         panelManageDBSolverLayout.setHorizontalGroup(
             panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManageDBSolverLayout.createSequentialGroup()
+            .addGroup(panelManageDBSolverLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelManageDBSolverLayout.createSequentialGroup()
-                        .addComponent(panelSolver, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(panelSolver, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(panelParameters, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(panelManageDBSolverLayout.createSequentialGroup()
@@ -523,9 +474,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                         .addComponent(btnSolverDelete)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSolverRefresh)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 1040, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 597, Short.MAX_VALUE)
                         .addComponent(btnSolverSave)))
-                .addGap(0, 0, 0))
+                .addContainerGap())
         );
         panelManageDBSolverLayout.setVerticalGroup(
             panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -533,18 +484,19 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(panelParameters, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(panelManageDBSolverLayout.createSequentialGroup()
-                        .addComponent(panelSolver, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(52, 52, 52)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(panelSolver, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnSolverSave)
-                    .addGroup(panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnSolverNew)
-                        .addComponent(btnSolverDelete)
-                        .addComponent(btnSolverRefresh)))
-                .addContainerGap())
-
+                    .addGroup(panelManageDBSolverLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSolverSave)
+                        .addContainerGap())
+                    .addGroup(panelManageDBSolverLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnSolverNew)
+                            .addComponent(btnSolverDelete)
+                            .addComponent(btnSolverRefresh))
+                        .addContainerGap())))
         );
 
         panelParameters.getAccessibleContext().setAccessibleName(resourceMap.getString("panelParameters.AccessibleContext.accessibleName")); // NOI18N
@@ -554,105 +506,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         panelManageDBInstances.setName("panelManageDBInstances"); // NOI18N
         panelManageDBInstances.setPreferredSize(new java.awt.Dimension(500, 471));
 
-        panelInstanceClass.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("panelInstanceClass.border.title"))); // NOI18N
-        panelInstanceClass.setName("panelInstanceClass"); // NOI18N
-
-        panelInstanceClassTable.setName("panelInstanceClassTable"); // NOI18N
-
-        tableInstanceClass.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
-            },
-            new String [] {
-                "Class", "Select"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Boolean.class
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
-        tableInstanceClass.setName("tableInstanceClass"); // NOI18N
-        panelInstanceClassTable.setViewportView(tableInstanceClass);
-        tableInstanceClass.getColumnModel().getColumn(0).setHeaderValue(resourceMap.getString("tableInstanceClass.columnModel.title0")); // NOI18N
-        tableInstanceClass.getColumnModel().getColumn(1).setHeaderValue(resourceMap.getString("tableInstanceClass.columnModel.title1")); // NOI18N
-
-        panelButtonsInstanceClass.setName("panelButtonsInstanceClass"); // NOI18N
-
-        btnNewInstanceClass.setText(resourceMap.getString("btnNewInstanceClass.text")); // NOI18N
-        btnNewInstanceClass.setName("btnNewInstanceClass"); // NOI18N
-
-        btnRemoveInstanceClass.setText(resourceMap.getString("btnRemoveInstanceClass.text")); // NOI18N
-        btnRemoveInstanceClass.setName("btnRemoveInstanceClass"); // NOI18N
-        btnRemoveInstanceClass.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRemoveInstanceClassActionPerformed(evt);
-            }
-        });
-
-        btnSelectAllInstanceClasses.setText(resourceMap.getString("btnSelectAllInstanceClasses.text")); // NOI18N
-        btnSelectAllInstanceClasses.setName("btnSelectAllInstanceClasses"); // NOI18N
-        btnSelectAllInstanceClasses.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSelectAllInstanceClassesActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout panelButtonsInstanceClassLayout = new javax.swing.GroupLayout(panelButtonsInstanceClass);
-        panelButtonsInstanceClass.setLayout(panelButtonsInstanceClassLayout);
-        panelButtonsInstanceClassLayout.setHorizontalGroup(
-            panelButtonsInstanceClassLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelButtonsInstanceClassLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btnNewInstanceClass)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnRemoveInstanceClass)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnSelectAllInstanceClasses)
-                .addContainerGap(248, Short.MAX_VALUE))
-        );
-        panelButtonsInstanceClassLayout.setVerticalGroup(
-            panelButtonsInstanceClassLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelButtonsInstanceClassLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(panelButtonsInstanceClassLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnNewInstanceClass)
-                    .addComponent(btnRemoveInstanceClass)
-                    .addComponent(btnSelectAllInstanceClasses))
-                .addContainerGap())
-        );
-
-        javax.swing.GroupLayout panelInstanceClassLayout = new javax.swing.GroupLayout(panelInstanceClass);
-        panelInstanceClass.setLayout(panelInstanceClassLayout);
-        panelInstanceClassLayout.setHorizontalGroup(
-            panelInstanceClassLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelInstanceClassLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelInstanceClassLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelButtonsInstanceClass, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelInstanceClassTable, javax.swing.GroupLayout.DEFAULT_SIZE, 477, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        panelInstanceClassLayout.setVerticalGroup(
-            panelInstanceClassLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelInstanceClassLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(panelInstanceClassTable, javax.swing.GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE)
-                .addGap(11, 11, 11)
-                .addComponent(panelButtonsInstanceClass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-
-        panelInstance.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("panelInstance.border.border.title")))); // NOI18N
-        panelInstance.setName("panelInstance"); // NOI18N
-        panelInstance.setPreferredSize(new java.awt.Dimension(663, 596));
-
-        panelInstanceTable.setName("panelInstanceTable"); // NOI18N
+        jScrollPane1.setName("jScrollPane1"); // NOI18N
 
         tableInstances.setAutoCreateRowSorter(true);
         tableInstances.setModel(new javax.swing.table.DefaultTableModel(
@@ -667,20 +521,19 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                 "Name", "numAtoms", "numClauses", "ratio", "maxClauseLength"
             }
         ));
-        tableInstances.setMaximumSize(new java.awt.Dimension(2147483647, 8000));
         tableInstances.setName("tableInstances"); // NOI18N
-        panelInstanceTable.setViewportView(tableInstances);
+        jScrollPane1.setViewportView(tableInstances);
         tableInstances.getColumnModel().getColumn(0).setHeaderValue(resourceMap.getString("tableInstances.columnModel.title0")); // NOI18N
         tableInstances.getColumnModel().getColumn(1).setHeaderValue(resourceMap.getString("tableInstances.columnModel.title1")); // NOI18N
         tableInstances.getColumnModel().getColumn(2).setHeaderValue(resourceMap.getString("tableInstances.columnModel.title2")); // NOI18N
         tableInstances.getColumnModel().getColumn(3).setHeaderValue(resourceMap.getString("tableInstances.columnModel.title3")); // NOI18N
         tableInstances.getColumnModel().getColumn(4).setHeaderValue(resourceMap.getString("tableInstances.columnModel.title4")); // NOI18N
 
-        panelFilterInstances.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("panelFilterInstances.border.title"))); // NOI18N
-        panelFilterInstances.setName("panelFilterInstances"); // NOI18N
-        panelFilterInstances.addContainerListener(new java.awt.event.ContainerAdapter() {
+        panelFilter.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("panelFilter.border.title"))); // NOI18N
+        panelFilter.setName("panelFilter"); // NOI18N
+        panelFilter.addContainerListener(new java.awt.event.ContainerAdapter() {
             public void componentAdded(java.awt.event.ContainerEvent evt) {
-                panelFilterInstancesComponentAdded(evt);
+                panelFilterComponentAdded(evt);
             }
         });
 
@@ -689,10 +542,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
         tfInstanceFilterName.setName("tfInstanceFilterName"); // NOI18N
         tfInstanceFilterName.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
             public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
                 tfInstanceFilterNameInputMethodTextChanged(evt);
-            }
-            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
             }
         });
 
@@ -748,99 +601,103 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         jLabel9.setText(resourceMap.getString("jLabel9.text")); // NOI18N
         jLabel9.setName("jLabel9"); // NOI18N
 
-        javax.swing.GroupLayout panelFilterInstancesLayout = new javax.swing.GroupLayout(panelFilterInstances);
-        panelFilterInstances.setLayout(panelFilterInstancesLayout);
-        panelFilterInstancesLayout.setHorizontalGroup(
-            panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelFilterInstancesLayout.createSequentialGroup()
+        javax.swing.GroupLayout panelFilterLayout = new javax.swing.GroupLayout(panelFilter);
+        panelFilter.setLayout(panelFilterLayout);
+        panelFilterLayout.setHorizontalGroup(
+            panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelFilterLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(panelFilterInstancesLayout.createSequentialGroup()
+                .addGroup(panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(panelFilterLayout.createSequentialGroup()
                         .addComponent(jlInstanceFilterNumAtoms)
                         .addGap(50, 50, 50)
                         .addComponent(jLabel1))
                     .addComponent(jlInstanceFilterName, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(panelFilterInstancesLayout.createSequentialGroup()
+                    .addGroup(panelFilterLayout.createSequentialGroup()
                         .addComponent(jlInstanceFilterNumClauses)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel3))
-                    .addGroup(panelFilterInstancesLayout.createSequentialGroup()
+                    .addGroup(panelFilterLayout.createSequentialGroup()
                         .addComponent(jlInstanceFilterRatio, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel4))
-                    .addGroup(panelFilterInstancesLayout.createSequentialGroup()
+                    .addGroup(panelFilterLayout.createSequentialGroup()
                         .addComponent(jlInstanceFilterMaxClauseLength)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel5)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tfInstanceFilterNumAtomsMin, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfInstanceFilterNumClausesMin, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfInstanceFilterMaxClauseLengthMin, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfInstanceFilterRatioMin, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelFilterLayout.createSequentialGroup()
+                        .addGroup(panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(tfInstanceFilterNumAtomsMin, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfInstanceFilterNumClausesMin, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfInstanceFilterMaxClauseLengthMin, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfInstanceFilterRatioMin, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(30, 30, 30)
+                        .addGroup(panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel9))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(tfInstanceFilterNumAtomsMax, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfInstanceFilterRatioMax, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfInstanceFilterMaxClauseLengthMax, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfInstanceFilterNumClausesMax, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(tfInstanceFilterName, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel7)
-                    .addComponent(jLabel9))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tfInstanceFilterNumAtomsMax, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfInstanceFilterRatioMax, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfInstanceFilterMaxClauseLengthMax, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfInstanceFilterNumClausesMax, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
-        panelFilterInstancesLayout.setVerticalGroup(
-            panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelFilterInstancesLayout.createSequentialGroup()
+        panelFilterLayout.setVerticalGroup(
+            panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelFilterLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tfInstanceFilterName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jlInstanceFilterName))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tfInstanceFilterNumAtomsMin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
                     .addComponent(jlInstanceFilterNumAtoms))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tfInstanceFilterNumClausesMin, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jlInstanceFilterNumClauses)
                     .addComponent(jLabel3))
                 .addGap(8, 8, 8)
-                .addGroup(panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jlInstanceFilterRatio)
-                    .addGroup(panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addGroup(panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(tfInstanceFilterRatioMin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel4)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jlInstanceFilterMaxClauseLength)
                     .addComponent(tfInstanceFilterMaxClauseLengthMin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5)))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelFilterInstancesLayout.createSequentialGroup()
-                .addContainerGap(37, Short.MAX_VALUE)
-                .addGroup(panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelFilterLayout.createSequentialGroup()
+                .addContainerGap(38, Short.MAX_VALUE)
+                .addGroup(panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(tfInstanceFilterNumAtomsMax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tfInstanceFilterNumClausesMax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6))
                 .addGap(8, 8, 8)
-                .addGroup(panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tfInstanceFilterRatioMax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFilterInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(panelFilterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tfInstanceFilterMaxClauseLengthMax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9)))
+                    .addComponent(jLabel9))
+                .addContainerGap())
         );
 
-        panelButtonsInstances.setName("panelButtonsInstances"); // NOI18N
+        panelButtons.setName("panelButtons"); // NOI18N
 
         btnAddInstances.setText(resourceMap.getString("btnAddInstances.text")); // NOI18N
         btnAddInstances.setName("btnAddInstances"); // NOI18N
@@ -866,113 +723,62 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             }
         });
 
-        btnFilterInstances.setText(resourceMap.getString("btnFilterInstances.text")); // NOI18N
-        btnFilterInstances.setName("btnFilterInstances"); // NOI18N
-        btnFilterInstances.addActionListener(new java.awt.event.ActionListener() {
+        btnFilter.setText(resourceMap.getString("btnFilter.text")); // NOI18N
+        btnFilter.setName("btnFilter"); // NOI18N
+        btnFilter.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnFilterInstancesActionPerformed(evt);
+                btnFilterActionPerformed(evt);
             }
         });
 
-        btnExportInstances.setText(resourceMap.getString("btnExportInstances.text")); // NOI18N
-        btnExportInstances.setName("btnExportInstances"); // NOI18N
-        btnExportInstances.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnExportInstancesActionPerformed(evt);
-            }
-        });
-
-        btnAddToClass.setText(resourceMap.getString("btnAddToClass.text")); // NOI18N
-        btnAddToClass.setName("btnAddToClass"); // NOI18N
-
-        btnRemoveFromClass.setText(resourceMap.getString("btnRemoveFromClass.text")); // NOI18N
-        btnRemoveFromClass.setName("btnRemoveFromClass"); // NOI18N
-
-        javax.swing.GroupLayout panelButtonsInstancesLayout = new javax.swing.GroupLayout(panelButtonsInstances);
-        panelButtonsInstances.setLayout(panelButtonsInstancesLayout);
-        panelButtonsInstancesLayout.setHorizontalGroup(
-            panelButtonsInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelButtonsInstancesLayout.createSequentialGroup()
+        javax.swing.GroupLayout panelButtonsLayout = new javax.swing.GroupLayout(panelButtons);
+        panelButtons.setLayout(panelButtonsLayout);
+        panelButtonsLayout.setHorizontalGroup(
+            panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelButtonsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnAddInstances)
                 .addGap(10, 10, 10)
                 .addComponent(btnRemoveInstances)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnRefreshTableInstances)
-                .addGap(10, 10, 10)
-                .addComponent(btnFilterInstances)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnExportInstances)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnAddToClass)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnRemoveFromClass)
-                .addContainerGap(58, Short.MAX_VALUE))
-
+                .addComponent(btnFilter)
+                .addContainerGap(552, Short.MAX_VALUE))
         );
-        panelButtonsInstancesLayout.setVerticalGroup(
-            panelButtonsInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelButtonsInstancesLayout.createSequentialGroup()
+        panelButtonsLayout.setVerticalGroup(
+            panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelButtonsLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(panelButtonsInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(panelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRemoveInstances)
-                    .addComponent(btnFilterInstances)
-                    .addComponent(btnAddInstances)
-                    .addComponent(btnExportInstances)
-                    .addComponent(btnAddToClass)
-                    .addComponent(btnRemoveFromClass)
-                    .addComponent(btnRefreshTableInstances))
+                    .addComponent(btnRefreshTableInstances)
+                    .addComponent(btnFilter)
+                    .addComponent(btnAddInstances))
                 .addContainerGap())
-        );
-
-        javax.swing.GroupLayout panelInstanceLayout = new javax.swing.GroupLayout(panelInstance);
-        panelInstance.setLayout(panelInstanceLayout);
-        panelInstanceLayout.setHorizontalGroup(
-            panelInstanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelInstanceLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelInstanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelInstanceLayout.createSequentialGroup()
-                        .addComponent(panelInstanceTable, javax.swing.GroupLayout.PREFERRED_SIZE, 653, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
-                    .addGroup(panelInstanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(panelInstanceLayout.createSequentialGroup()
-                            .addComponent(panelButtonsInstances, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGap(26, 26, 26))
-                        .addGroup(panelInstanceLayout.createSequentialGroup()
-                            .addComponent(panelFilterInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addContainerGap(349, Short.MAX_VALUE)))))
-        );
-        panelInstanceLayout.setVerticalGroup(
-            panelInstanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelInstanceLayout.createSequentialGroup()
-                .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelButtonsInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(11, 11, 11)
-                .addComponent(panelFilterInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout panelManageDBInstancesLayout = new javax.swing.GroupLayout(panelManageDBInstances);
         panelManageDBInstances.setLayout(panelManageDBInstancesLayout);
         panelManageDBInstancesLayout.setHorizontalGroup(
             panelManageDBInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelManageDBInstancesLayout.createSequentialGroup()
-                .addComponent(panelInstance, javax.swing.GroupLayout.DEFAULT_SIZE, 713, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(panelInstanceClass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManageDBInstancesLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelManageDBInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 887, Short.MAX_VALUE)
+                    .addComponent(panelFilter, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(panelButtons, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelManageDBInstancesLayout.setVerticalGroup(
             panelManageDBInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManageDBInstancesLayout.createSequentialGroup()
-                .addGroup(panelManageDBInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(panelManageDBInstancesLayout.createSequentialGroup()
-                        .addGap(11, 11, 11)
-                        .addComponent(panelInstanceClass, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(panelInstance, javax.swing.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE))
-
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -982,17 +788,17 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manageDBPane, javax.swing.GroupLayout.PREFERRED_SIZE, 1259, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-
+                .addComponent(manageDBPane, javax.swing.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addComponent(manageDBPane, javax.swing.GroupLayout.DEFAULT_SIZE, 573, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(manageDBPane, javax.swing.GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -1013,8 +819,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         tableInstances.updateUI();
     }//GEN-LAST:event_btnRefreshTableInstancesActionPerformed
 
-    private void btnFilterInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterInstancesActionPerformed
-        if (panelFilterInstances.isVisible()) {
+    private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
+        if (panelFilter.isVisible()) {
             clearFilter();
         } else {
             tableInstances.setRowSorter(sorter);
@@ -1027,18 +833,18 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             addDocumentListener(tfInstanceFilterRatioMax);
             addDocumentListener(tfInstanceFilterMaxClauseLengthMin);
             addDocumentListener(tfInstanceFilterMaxClauseLengthMax);
-            panelFilterInstances.setVisible(true);
+            panelFilter.setVisible(true);
         }
-    }//GEN-LAST:event_btnFilterInstancesActionPerformed
+    }//GEN-LAST:event_btnFilterActionPerformed
 
-    private void panelFilterInstancesComponentAdded(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_panelFilterInstancesComponentAdded
-        panelFilterInstances.setVisible(false);
-    }//GEN-LAST:event_panelFilterInstancesComponentAdded
+    private void panelFilterComponentAdded(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_panelFilterComponentAdded
+        panelFilter.setVisible(false);
+    }//GEN-LAST:event_panelFilterComponentAdded
 
     private void tfInstanceFilterNameInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_tfInstanceFilterNameInputMethodTextChanged
     }//GEN-LAST:event_tfInstanceFilterNameInputMethodTextChanged
 
-    private void btnSolverSaveToDBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverSaveToDBActionPerformed
+    private void btnSolverSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverSaveActionPerformed
         try {
             manageDBSolvers.saveSolvers();
             for (Solver s : solverTableModel.getSolvers()) {
@@ -1055,7 +861,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_btnSolverSaveToDBActionPerformed
+    }//GEN-LAST:event_btnSolverSaveActionPerformed
 
     private void btnSolverNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverNewActionPerformed
         manageDBSolvers.newSolver();
@@ -1146,78 +952,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         tableParameters.updateUI();
     }//GEN-LAST:event_btnSolverDeleteActionPerformed
 
-    private void btnExportInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportInstancesActionPerformed
-        try {
-            if(tableInstances.getSelectedRowCount() == 0){
-                 JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "No instances are selected: " ,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            }
-            else manageDBInstances.exportInstances(tableInstances.getSelectedRows());
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "The instances couldn't be written: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (NoConnectionToDBException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "No connection to database: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "SQL-Exception: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (InstaceNotInDBException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "There is a problem with the data consistency ",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnExportInstancesActionPerformed
-
-
-    private void btnSelectAllInstanceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstanceClassesActionPerformed
-        manageDBInstances.SelectAllInstanceClass();
-    }//GEN-LAST:event_btnSelectAllInstanceClassesActionPerformed
-
-    private void btnRemoveInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstanceClassActionPerformed
-        try {
-            manageDBInstances.RemoveInstanceClass(tableInstanceClass.getSelectedRows());
-        } catch (NoConnectionToDBException ex) {
-             JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "No connection to database: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-           JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "SQL-Exception: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (InstanceSourceClassHasInstance ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "Some of the selected classes couldn't be removed, because they are sourceclasses and" +
-                    "contain still any instances." ,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnRemoveInstanceClassActionPerformed
-
-    private void btnParametersDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnParametersDeleteActionPerformed
-        manageDBParameters.removeParameters();
-        tableParameters.updateUI();
-    }//GEN-LAST:event_btnParametersDeleteActionPerformed
-
-    private void btnSolverRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverRefreshActionPerformed
-        tableSolver.updateUI();
-    }//GEN-LAST:event_btnSolverRefreshActionPerformed
-
-    private void btnParametersRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnParametersRefreshActionPerformed
-        tableParameters.updateUI();
-    }//GEN-LAST:event_btnParametersRefreshActionPerformed
-
     public void showSolverDetails(Solver currentSolver) {
         boolean enabled = false;
         if (currentSolver != null) {
@@ -1252,9 +986,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     }
 
     private void clearFilter() {
-        if (panelFilterInstances.isVisible()) {
+        if (panelFilter.isVisible()) {
             manageDBInstances.removeFilter(tableInstances);
-            panelFilterInstances.setVisible(false);
+            panelFilter.setVisible(false);
             tfInstanceFilterName.setText("");
             tfInstanceFilterNumAtomsMin.setText("");
             tfInstanceFilterNumClausesMin.setText("");
@@ -1276,27 +1010,20 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddInstances;
-    private javax.swing.JButton btnAddToClass;
-    private javax.swing.JButton btnExportInstances;
-    private javax.swing.JButton btnFilterInstances;
-    private javax.swing.JButton btnNewInstanceClass;
+    private javax.swing.JButton btnFilter;
     private javax.swing.JButton btnParametersCancel;
     private javax.swing.JButton btnParametersDelete;
     private javax.swing.JButton btnParametersNew;
     private javax.swing.JButton btnParametersRefresh;
     private javax.swing.JButton btnRefreshTableInstances;
-    private javax.swing.JButton btnRemoveFromClass;
-    private javax.swing.JButton btnRemoveInstanceClass;
     private javax.swing.JButton btnRemoveInstances;
     private javax.swing.JButton btnSaveParam;
-    private javax.swing.JButton btnSelectAllInstanceClasses;
     private javax.swing.JButton btnSolverAddBinary;
     private javax.swing.JButton btnSolverAddCode;
     private javax.swing.JButton btnSolverDelete;
     private javax.swing.JButton btnSolverNew;
     private javax.swing.JButton btnSolverRefresh;
-    private javax.swing.JButton btnSolverSaveToDB;
-    private javax.swing.JFileChooser jFileChooserManageDBExportInstance;
+    private javax.swing.JButton btnSolverSave;
     private javax.swing.JFileChooser jFileChooserManageDBInstance;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -1306,6 +1033,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
@@ -1322,20 +1050,13 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private javax.swing.JLabel jlSolverDescription;
     private javax.swing.JLabel jlSolverName;
     private javax.swing.JTabbedPane manageDBPane;
-    private javax.swing.JPanel panelButtonsInstanceClass;
-    private javax.swing.JPanel panelButtonsInstances;
-    private javax.swing.JPanel panelFilterInstances;
-    private javax.swing.JPanel panelInstance;
-    private javax.swing.JPanel panelInstanceClass;
-    private javax.swing.JScrollPane panelInstanceClassTable;
-    private javax.swing.JScrollPane panelInstanceTable;
+    private javax.swing.JPanel panelButtons;
+    private javax.swing.JPanel panelFilter;
     private javax.swing.JPanel panelManageDBInstances;
     private javax.swing.JPanel panelManageDBSolver;
     private javax.swing.JPanel panelParameters;
     private javax.swing.JPanel panelSolver;
-    private javax.swing.JPanel panelSolverButtons;
     private javax.swing.JTextArea taSolverDescription;
-    private javax.swing.JTable tableInstanceClass;
     private javax.swing.JTable tableInstances;
     private javax.swing.JTable tableParameters;
     private javax.swing.JTable tableSolver;

@@ -128,7 +128,7 @@ public class InstanceDAO {
      * @return the instance specified by its id
      * @throws SQLException
      */
-    public static Instance getById(int id) throws SQLException {
+    public static Instance getById(int id) throws SQLException, InstanceClassMustBeSourceException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idInstance, maxClauseLength, md5, name, numAtoms, numClauses, ratio, instanceClass_idinstanceClass FROM " + table + " WHERE idInstance=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
@@ -142,10 +142,7 @@ public class InstanceDAO {
             i.setNumClauses(rs.getInt("numClauses"));
             i.setRatio(rs.getInt("ratio"));
             Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
-            if (idInstanceClass == null)
-                i.setInstanceClass(null);
-            else
-                i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
+            i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
             Instance c = getCached(i);
             if (c != null) return c;
@@ -163,7 +160,7 @@ public class InstanceDAO {
      * @return all instances in a List
      * @throws SQLException
      */
-    public static LinkedList<Instance> getAll() throws SQLException {
+    public static LinkedList<Instance> getAll() throws SQLException, InstanceClassMustBeSourceException {
         // return linked list with all instances
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
         ResultSet rs = st.executeQuery("SELECT idInstance, maxClauseLength, md5, name, numAtoms, numClauses, ratio, instanceClass_idinstanceClass FROM " + table);
@@ -178,10 +175,7 @@ public class InstanceDAO {
             i.setNumClauses(rs.getInt("numClauses"));
             i.setRatio(rs.getInt("ratio"));
             Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
-            if (idInstanceClass == null)
-                i.setInstanceClass(null);
-            else
-                i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
+            i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
             Instance c = getCached(i);
             if (c != null) res.add(c);
@@ -195,7 +189,7 @@ public class InstanceDAO {
         return res;
     }
 
-    public static LinkedList<Instance> getAllByExperimentId(int id) throws SQLException {
+    public static LinkedList<Instance> getAllByExperimentId(int id) throws SQLException, InstanceClassMustBeSourceException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT i.idInstance, i.maxClauseLength, i.md5, i.name, i.numAtoms, i.numClauses, i.ratio, i.instanceClass_idinstanceClass FROM " + table + " as i JOIN Experiment_has_Instances as ei ON " +
                 "i.idInstance = ei.Instances_idInstance WHERE ei.Experiment_idExperiment = ?"
@@ -213,10 +207,7 @@ public class InstanceDAO {
             i.setNumClauses(rs.getInt("i.numClauses"));
             i.setRatio(rs.getInt("i.ratio"));
             Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
-            if (idInstanceClass == null)
-                i.setInstanceClass(null);
-            else
-                i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
+            i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
             Instance c = getCached(i);
             if (c != null) res.add(c);

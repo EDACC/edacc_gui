@@ -21,7 +21,6 @@ import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Vector;
-import java.util.Random;
 
 /**
  * Experiment design more controller class, handles requests by the GUI

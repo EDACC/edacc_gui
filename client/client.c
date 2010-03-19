@@ -128,7 +128,7 @@ status init(int argc, char *argv[]) {
 	s=dbFetchExperimentData(&exp);
 	if(s!=success)
 		return s;
-	jobsLen=exp.numNodes;
+	jobsLen=exp.numCPUs;
 	timeOut=exp.timeOut;
 
 	for(i=0; i<exp.numSolvers; ++i) {
@@ -136,11 +136,13 @@ status init(int argc, char *argv[]) {
 		fileName=addBasename(exp.solverNames[i]);
 		if(fileName==NULL) {
 			logError("Error: Out of memory\n");
+			freeExperimentData(&exp);
 			return sysError;
 		}
 		//Start a mutual execution lock between several application instances
 		if(lockMutex()!=success) {
 			free(fileName);
+			freeExperimentData(&exp);
 			return sysError;
 		}
 		//Create the solver binary if it doesn't exist yet
@@ -153,12 +155,15 @@ status init(int argc, char *argv[]) {
 		   exp.md5Solvers[i], 0111)!=success                                  ) {
 			free(fileName);
 			unlockMutex();
+			freeExperimentData(&exp);
 			return sysError;
 		}
 		free(fileName);
 		//End the mutual execution lock
-		if(unlockMutex()!=success)
+		if(unlockMutex()!=success) {
+			freeExperimentData(&exp);
 			return sysError;
+		}
 	}
 
 	for(i=0; i<exp.numInstances; ++i) {
@@ -166,11 +171,13 @@ status init(int argc, char *argv[]) {
 		fileName=addBasename(exp.instanceNames[i]);
 		if(fileName==NULL) {
 			logError("Error: Out of memory\n");
+			freeExperimentData(&exp);
 			return sysError;
 		}
 		//Start a mutual execution lock between several application instances
 		if(lockMutex()!=success) {
 			free(fileName);
+			freeExperimentData(&exp);
 			return sysError;
 		}
 		//Create the instance file if it doesn't exist yet
@@ -183,13 +190,18 @@ status init(int argc, char *argv[]) {
 		   exp.md5Instances[i], 0444)!=success                                         ) {
 			free(fileName);
 			unlockMutex();
+			freeExperimentData(&exp);
 			return sysError;
 		}
 		free(fileName);
 		//End the mutual execution lock
-		if(unlockMutex()!=success)
+		if(unlockMutex()!=success) {
+			freeExperimentData(&exp);
 			return sysError;
+		}
 	}
+
+	freeExperimentData(&exp);
 
 	jobs=calloc(jobsLen, sizeof(job));
 	if(jobs==NULL) {
@@ -247,6 +259,7 @@ void shutdown(status retval) {
 	for(i=0; i<jobsLen; ++i) {
 		if(jobs[i].pid!=0) {
 			waitpid(jobs[i].pid, NULL, 0);
+			freeJob(&(jobs[i]));
 		}
 	}
 
@@ -268,8 +281,11 @@ status processResults(job* j) {
 	char* fileName;
 	FILE* filePtr;
 	FILE* resultFile;
-	int signum, pipesToSkip=2, c;
-	char secFraction, dummy;
+	int signum, c;
+	long outputLen;
+
+	//Set the status to -2 in case anything goes wrong in this function
+	j->status=-2;
 
 	fileName=addBasename(pidToFileName(j->pid));
 	if(fileName==NULL) {
@@ -292,26 +308,49 @@ status processResults(job* j) {
 		else
 			j->status=3;
 	} else {
-		//Skip pipesToSkip '|' characters
-		while(pipesToSkip>0) {
+		//Extract the solver output
+		do {
 			c=getc(filePtr);
-			if(c==(int)'|') {
-				--pipesToSkip;
-			} else if(c==EOF) {
+			if(c==EOF) {
 				logError("Error parsing %s: Unexpected format\n", fileName);
 				free(fileName);
 				return sysError;
 			}
+		} while(c!=(int)'|');
+		outputLen=ftell(filePtr);
+		if(outputLen==-1) {
+			logError("Error in ftell(): %s\n", strerror(errno));
+			free(fileName);
+			return sysError;
 		}
+		j->resultFile=malloc(outputLen);
+		if(j->resultFile==NULL) {
+			logError("Error: Out of memory\n");
+			free(fileName);
+			return sysError;
+		}
+		rewind(filePtr);
+		if(fscanf(filePtr, "%s|", j->resultFile)==EOF){
+			logError("Error reading %s: %s\n", fileName, strerror(errno));
+			free(fileName);
+			return sysError;
+		}
+		j->resultFile[outputLen-1]='\0';
+		//Skip the file content until the next '|' character
+		do {
+			c=getc(filePtr);
+			if(c==EOF) {
+				logError("Error parsing %s: Unexpected format\n", fileName);
+				free(fileName);
+				return sysError;
+			}
+		} while(c!=(int)'|');
 		//Extract the runtime and return value of the solver
-		if(fscanf(filePtr, "%d.%c%c|%d", &(j->time), &secFraction, &dummy, &(j->statusCode))!=4){
+		if(fscanf(filePtr, "%f|%d", &(j->time), &(j->statusCode))!=2){
 			logError("Error parsing %s: Unexpected format\n", fileName);
 			free(fileName);
 			return sysError;
 		}
-		//Round j->time to the nearest second
-		if(secFraction>='5')
-			++(j->time);
 		j->status=1;
 		//Append the first line of fileName to j->resultFileName
 		rewind(filePtr);
@@ -356,28 +395,35 @@ status handleChildren(int cnt) {
 		//Point j to the entry in jobs corresponding to the terminated child process
 		for(j=jobs; j->pid!=pid; ++j);
 
+		j->pid=0;
 		if(WIFEXITED(retval) && (WEXITSTATUS(retval)==0)) {
 			//The process terminated normally.
 			//Start a mutual execution lock between several application instances.
-			if(lockMutex()!=success)
+			if(lockMutex()!=success) {
+				freeJob(j);
 				return sysError;
+			}
 			s=processResults(j);
 			//End the mutual execution lock
-			if(unlockMutex()!=success)
+			if(unlockMutex()!=success) {
+				freeJob(j);
 				return sysError;
-			j->pid=0;
+			}
 			if(s!=success) {
+				update(j);
+				freeJob(j);
 				return s;
 			}
 			s=update(j);
+			freeJob(j);
 			if(s!=success) {
 				return s;
 			}
 		} else {
 			//The process terminated abnormally
 			j->status=-2;
-			j->pid=0;
 			s=update(j);
+			freeJob(j);
 			if(s!=success) {
 				return s;
 			}
@@ -385,35 +431,6 @@ status handleChildren(int cnt) {
 	}
 
 	return success;
-}
-
-//A version of sprintf that sets str to newly allocated memory containing the output string.
-//If the function succeeds (i.e. returns a non-negative value), the memory pointed to by str
-//needs to be freed.
-int sprintfAlloc(char** str, const char* format, ...) {
-	va_list args;
-	int retval;
-
-	//Use vsnprintf to calculate the length of the expanded format string
-	va_start(args, format);
-	retval=vsnprintf(*str, 0, format, args);
-	va_end(args);
-	if(retval<0)
-		return -1;
-
-	//Allocate memory of the correct size and terminate it with '\0'
-	*str=(char*)malloc(retval+1);
-	if(*str==NULL)
-		return -1;
-
-	//Use vsnprintf to write the expanded format string to *str
-	va_start(args, format);
-	retval=vsnprintf(*str, retval+1, format, args);
-	va_end(args);
-	if(retval<0)
-		free(*str);
-
-	return retval;
 }
 
 //Fill jobArgs with the information in j. If the function succeeds, some parts of
@@ -520,8 +537,10 @@ int main(int argc, char *argv[]) {
 				if(createFile(fileName, solv.solver, solv.length, solv.md5, 0111)!=success) {
 					unlockMutex();
 					free(fileName);
+					freeSolver(&solv);
 					shutdown(sysError);
 				}
+				freeSolver(&solv);
 			}
 			free(fileName);
 
@@ -542,8 +561,10 @@ int main(int argc, char *argv[]) {
 				if(createFile(fileName, inst.instance, strlen(inst.instance), inst.md5, 0444)!=success) {
 					unlockMutex();
 					free(fileName);
+					freeInstance(&inst);
 					shutdown(sysError);
 				}
+				freeInstance(&inst);
 			}
 			free(fileName);
 

@@ -13,6 +13,8 @@ int read_config() {
 
     if((conf = fopen("./config", "r")) == NULL) {
         printf("could not read config file\n");
+        free(key);
+        free(value);
         return 1;
     }
 
@@ -28,12 +30,17 @@ int read_config() {
         } else if(strcmp(key, "database") == 0) {
             strcpy(database, value);
         } else if(strcmp(key, "experiment") == 0) {
-            experiment = atoi(value);
+            experimentId = atoi(value);
         } else {
             printf("unknown option %s\n", key);
         }
+        
+        free(lineptr);
     }
 
     fclose(conf);
+
+    free(key);
+    free(value);
     return 1;
 }
