@@ -22,6 +22,7 @@ char username[VALUELENGTH];
 char password[VALUELENGTH];
 char database[VALUELENGTH];
 int experimentId;
+int gridQueueId;
 
 typedef enum {success=0, sysError, dbError} status;
 

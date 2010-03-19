@@ -31,6 +31,8 @@ int read_config() {
             strcpy(database, value);
         } else if(strcmp(key, "experiment") == 0) {
             experimentId = atoi(value);
+        } else if(strcmp(key, "gridQueue") == 0) {
+            gridQueueId = atoi(value);
         } else {
             printf("unknown option %s\n", key);
         }

@@ -3,3 +3,4 @@ username = foo
 password = bar
 database = EDACC
 experiment = 20
+gridQueue = 1
