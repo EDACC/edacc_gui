@@ -9,7 +9,7 @@ package edacc.model;
  *
  * @author dgall
  */
-class InstanceClassAlreadyInDBException extends Exception {
+public class InstanceClassAlreadyInDBException extends Exception {
 
     public InstanceClassAlreadyInDBException() {
         super("Instance class already in DB!");

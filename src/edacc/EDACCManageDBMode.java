@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -41,14 +42,16 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private SolverTableModel solverTableModel;
     private ManageDBParameters manageDBParameters;
     private ParameterTableModel parameterTableModel;
-    private EDACCCreateInstanceClassDialog createInstanceClassDialog;
+    public EDACCCreateInstanceClassDialog createInstanceClassDialog;
 
     public EDACCManageDBMode() {
         initComponents();
 
-        // initialize instance table
+        
         manageDBInstances = new ManageDBInstances(this, panelManageDBInstances, 
                 jFileChooserManageDBInstance, jFileChooserManageDBExportInstance);
+        
+        // initialize instance table
         instanceTableModel = new InstanceTableModel();
         tableInstances.setModel(instanceTableModel);
         tableInstances.setDefaultRenderer(Object.class, new InstanceTableCellRenderer());
@@ -81,6 +84,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             }
         }
         manageDBInstances.loadInstances();
+        manageDBInstances.loadInstaceClasses();
     }
 
     public void addDocumentListener(javax.swing.JTextField tf) {
@@ -1201,11 +1205,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     }//GEN-LAST:event_btnParametersRefreshActionPerformed
 
     private void btnNewInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewInstanceClassActionPerformed
-        if(createInstanceClassDialog == null){
-            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            createInstanceClassDialog = new EDACCCreateInstanceClassDialog(mainFrame, true, this);
-            createInstanceClassDialog.setLocationRelativeTo(mainFrame);
-        }
+        manageDBInstances.addInstanceClasses();
+        tableInstanceClass.updateUI();
     }//GEN-LAST:event_btnNewInstanceClassActionPerformed
 
 

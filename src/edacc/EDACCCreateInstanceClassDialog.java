@@ -11,16 +11,24 @@
 
 package edacc;
 
+import edacc.manageDB.InstanceClassTableModel;
+import edacc.model.InstanceClass;
+import edacc.model.InstanceClassAlreadyInDBException;
+import edacc.model.InstanceClassDAO;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Lea Fetzer
  */
 public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
-
+     InstanceClassTableModel tableModel;
     /** Creates new form EDACCCreateInstanceClassDialog */
-    public EDACCCreateInstanceClassDialog(java.awt.Frame parent, boolean modal) {
+    public EDACCCreateInstanceClassDialog(java.awt.Frame parent, boolean modal, InstanceClassTableModel tableModel) {
         super(parent, modal);
         initComponents();
+        this.tableModel = tableModel;
     }
 
     /** This method is called from within the constructor to
@@ -48,6 +56,7 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCCreateInstanceClassDialog.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setAlwaysOnTop(true);
+        setMinimumSize(new java.awt.Dimension(400, 300));
         setName("Form"); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
@@ -58,8 +67,8 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.ipadx = 150;
-        gridBagConstraints.ipady = 50;
+        gridBagConstraints.ipadx = 1;
+        gridBagConstraints.ipady = 1;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
         getContentPane().add(jTextArea1, gridBagConstraints);
 
@@ -123,6 +132,11 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
 
         jButtonCreate.setText(resourceMap.getString("jButtonCreate.text")); // NOI18N
         jButtonCreate.setName("jButtonCreate"); // NOI18N
+        jButtonCreate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCreateActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -131,6 +145,11 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
 
         jButtonCancel.setText(resourceMap.getString("jButtonCancel.text")); // NOI18N
         jButtonCancel.setName("jButtonCancel"); // NOI18N
+        jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCancelActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -140,22 +159,50 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                EDACCCreateInstanceClassDialog dialog = new EDACCCreateInstanceClassDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+    private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelActionPerformed
+         this.dispose();
+    }//GEN-LAST:event_jButtonCancelActionPerformed
+
+    private void jButtonCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCreateActionPerformed
+       if(jTextFieldName.getText().isEmpty()){
+        JOptionPane.showMessageDialog(this,
+                    "Please enter a instace class name." ,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+       }else if(jTextArea1.getText().isEmpty()){
+        JOptionPane.showMessageDialog(this,
+                    "Please enter a description of the instance class",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+       }else if(SourceOrUserClass.getSelection() == null){
+        JOptionPane.showMessageDialog(this,
+                    "Please choos if the new instance class is a source class oder a user class." ,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+       }else{
+           
+                try {
+                    InstanceClass ret;
+                    if(jRadioButtonSourceClass.isSelected()){
+                        ret = InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), jTextArea1.getText(), true);
+                     }else ret =  InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), jTextArea1.getText(), false);
+                    tableModel.addClass(ret);
+                    this.dispose();
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(this,
+                    "There is a Problem with the database: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+                } catch (InstanceClassAlreadyInDBException ex) {
+                    JOptionPane.showMessageDialog(this,
+                    "Instance class is already in the system.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+                }
+          
+       }
+    }//GEN-LAST:event_jButtonCreateActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup SourceOrUserClass;
