@@ -57,4 +57,9 @@ public class ManageDBParameters {
         currentParameter = null;
     }
 
+    public void removeParameter(Parameter param) {
+        parameterTableModel.remove(param);
+        currentParameter = null;
+    }
+
 }

@@ -58,7 +58,10 @@ public class ParameterTableModel extends AbstractTableModel{
     public int getRowCount() {
         if (currentSolver == null)
             return 0;
-        return parameters.get(currentSolver).size();
+        Vector<Parameter> params = parameters.get(currentSolver);
+        if (params == null)
+            return 0;
+        return params.size();
     }
 
     public int getColumnCount() {

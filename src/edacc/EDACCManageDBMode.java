@@ -291,7 +291,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             .addGroup(panelSolverLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 690, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 709, Short.MAX_VALUE)
                     .addGroup(panelSolverLayout.createSequentialGroup()
                         .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jlSolverDescription)
@@ -303,15 +303,15 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                             .addComponent(btnSolverAddBinary)
                             .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addComponent(btnSolverAddCode, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE)
+                                .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
                                 .addComponent(tfSolverName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 190, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 182, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         panelSolverLayout.setVerticalGroup(
             panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSolverLayout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jlSolverName)
@@ -359,18 +359,48 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
         tfParametersName.setText(resourceMap.getString("tfParametersName.text")); // NOI18N
         tfParametersName.setName("tfParametersName"); // NOI18N
+        tfParametersName.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                parameterChangedOnFocusLost(evt);
+            }
+        });
+        tfParametersName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                parameterChangedOnKeyPressed(evt);
+            }
+        });
 
         jlParametersPrefix.setText(resourceMap.getString("jlParametersPrefix.text")); // NOI18N
         jlParametersPrefix.setName("jlParametersPrefix"); // NOI18N
 
         tfParametersPrefix.setText(resourceMap.getString("tfParametersPrefix.text")); // NOI18N
         tfParametersPrefix.setName("tfParametersPrefix"); // NOI18N
+        tfParametersPrefix.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                parameterChangedOnFocusLost(evt);
+            }
+        });
+        tfParametersPrefix.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                parameterChangedOnKeyPressed(evt);
+            }
+        });
 
         jlParametersOrder.setText(resourceMap.getString("jlParametersOrder.text")); // NOI18N
         jlParametersOrder.setName("jlParametersOrder"); // NOI18N
 
         tfParametersOrder.setText(resourceMap.getString("tfParametersOrder.text")); // NOI18N
         tfParametersOrder.setName("tfParametersOrder"); // NOI18N
+        tfParametersOrder.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                parameterChangedOnFocusLost(evt);
+            }
+        });
+        tfParametersOrder.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                parameterChangedOnKeyPressed(evt);
+            }
+        });
 
         btnParametersNew.setText(resourceMap.getString("btnParametersNew.text")); // NOI18N
         btnParametersNew.setName("btnParametersNew"); // NOI18N
@@ -403,7 +433,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             .addGroup(panelParametersLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
                     .addGroup(panelParametersLayout.createSequentialGroup()
                         .addComponent(btnParametersNew)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -492,7 +522,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                 .addComponent(btnSolverDelete)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSolverRefresh)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 940, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 889, Short.MAX_VALUE)
                 .addComponent(btnSolverSaveToDB)
                 .addContainerGap())
         );
@@ -627,7 +657,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(panelInstanceClassLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(panelButtonsInstanceClass, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelInstanceClassTable, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE))
+                    .addComponent(panelInstanceClassTable, javax.swing.GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelInstanceClassLayout.setVerticalGroup(
@@ -898,7 +928,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                 .addComponent(btnAddToClass)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRemoveFromClass)
-                .addContainerGap(42, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelButtonsInstancesLayout.setVerticalGroup(
             panelButtonsInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -931,12 +961,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                             .addGap(26, 26, 26))
                         .addGroup(panelInstanceLayout.createSequentialGroup()
                             .addComponent(panelFilterInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addContainerGap(333, Short.MAX_VALUE)))))
+                            .addContainerGap(293, Short.MAX_VALUE)))))
         );
         panelInstanceLayout.setVerticalGroup(
             panelInstanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelInstanceLayout.createSequentialGroup()
-                .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
+                .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelButtonsInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(11, 11, 11)
@@ -1193,7 +1223,13 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     }//GEN-LAST:event_btnRemoveInstanceClassActionPerformed
 
     private void btnParametersDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnParametersDeleteActionPerformed
-        manageDBParameters.removeParameters();
+        if (tableParameters.getSelectedRow() == -1) {
+            return;
+        }
+        Parameter p = parameterTableModel.getParameter(tableParameters.getSelectedRow());
+        manageDBParameters.removeParameter(p);
+        tableParameters.clearSelection();
+        showParameterDetails(null);
         tableParameters.updateUI();
     }//GEN-LAST:event_btnParametersDeleteActionPerformed
 
@@ -1210,6 +1246,29 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         tableInstanceClass.updateUI();
     }//GEN-LAST:event_btnNewInstanceClassActionPerformed
 
+    private void parameterChangedOnKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_parameterChangedOnKeyPressed
+        parameterChanged();
+    }//GEN-LAST:event_parameterChangedOnKeyPressed
+
+    private void parameterChangedOnFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_parameterChangedOnFocusLost
+        parameterChanged();
+    }//GEN-LAST:event_parameterChangedOnFocusLost
+
+    private void parameterChanged() {
+        if (tableParameters.getSelectedRow() == -1) {
+            return;
+        }
+        Parameter p = parameterTableModel.getParameter(tableParameters.getSelectedRow());
+        p.setName(tfParametersName.getText());
+        try {
+            p.setOrder(Integer.parseInt(tfParametersOrder.getText()));
+        } catch (NumberFormatException e) {
+            if (!tfParametersOrder.getText().equals(""))
+                tfParametersOrder.setText(Integer.toString(p.getOrder()));
+        }
+        p.setPrefix(tfParametersPrefix.getText());
+        tableParameters.updateUI();
+    }
 
     public void showSolverDetails(Solver currentSolver) {
         boolean enabled = false;
@@ -1237,6 +1296,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             parameterTableModel.setCurrentSolver(currentSolver);
             parameterTableModel.fireTableDataChanged();
         }
+        btnParametersNew.setEnabled(enabled);
+        btnParametersDelete.setEnabled(enabled);
+        btnParametersRefresh.setEnabled(enabled);
+        tableParameters.getSelectionModel().clearSelection();
+        showParameterDetails(null);
     }
 
     public void showParameterDetails(Parameter currentParameter) {
@@ -1247,6 +1311,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             tfParametersOrder.setText(Integer.toString(currentParameter.getOrder()));
             tfParametersPrefix.setText(currentParameter.getPrefix());
         }
+        tfParametersName.setEnabled(enabled);
+        tfParametersPrefix.setEnabled(enabled);
+        tfParametersOrder.setEnabled(enabled);
     }
 
     private void clearFilter() {
