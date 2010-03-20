@@ -1,5 +1,6 @@
 #include <string.h>
 #include <time.h>
+#include <stdio.h>
 #include "database.h"
 #include "global.h"
 #include "log.h"
@@ -89,7 +90,7 @@
 "       resultFileName = %s, " \
 "       status = %i, " \
 "       seed = %i, " \
-"       time = %i, " \
+"       time = %d, " \
 "       statusCode " \
 "   WHERE idJob = %i "
 
@@ -109,17 +110,17 @@
 "   WHERE name = %s "
 
 status dbFetchExperimentData(experiment *e) {
-    MYSQL *conn;
+    MYSQL *conn = NULL;
     MYSQL_RES *res;
     MYSQL_ROW row;
 
-    char *queryExperimentInfo;
-    char *queryGridInfo;
-    char *querySolver;
-    char *queryInstance;
+    char *queryExperimentInfo = NULL;
+    char *queryGridInfo = NULL;
+    char *querySolver = NULL;
+    char *queryInstance = NULL;
 
-    int numRows;
-    int lastId;
+    //int numRows;
+    //int lastId;
 
     int i;
     unsigned long *lengths;
@@ -153,7 +154,7 @@ status dbFetchExperimentData(experiment *e) {
     }
 
     if((row = mysql_fetch_row(res)) != NULL) {
-        e->timeOut = row[0];
+        e->timeOut = atoi(row[0]);
     }
 
 
@@ -169,7 +170,7 @@ status dbFetchExperimentData(experiment *e) {
     }
 
     if((row = mysql_fetch_row(res)) != NULL) {
-        e->numCPUs = row[0];
+        e->numCPUs = atoi(row[0]);
     }
 
 
@@ -203,7 +204,7 @@ status dbFetchExperimentData(experiment *e) {
 
     i=0;
     while((row = mysql_fetch_row(res)) != NULL) {
-        lengths = mysql_fetch_lengths(row);
+        lengths = mysql_fetch_lengths(res);
 
         e->md5Instances[i] = (char *)malloc(60*sizeof(char));
         e->md5Instances[i] = row[3];
@@ -212,7 +213,7 @@ status dbFetchExperimentData(experiment *e) {
         e->instances[i] = (char *)calloc(lengths[2]+1,sizeof(char));
         memcpy(e->instances[i], row[2], lengths[2]);
 
-        e->instanceNames = (char *)malloc(lengths[1]*sizeof(char));
+        e->instanceNames[i] = (char *)malloc(lengths[1]*sizeof(char*));
         strncpy(e->instanceNames[i], row[1], lengths[1]);
 
         i++;
@@ -294,19 +295,11 @@ void freeExperimentData(experiment *e) {
     }
 
     for(i=0; i<e->numSolvers; i++) {
-        if(e->lengthSolver[i] != NULL) {
-            free(e->lengthSolver[i]);
-        }
-
-        if(e->lengthSolver[i] != NULL) {
+        if(e->md5Solvers[i] != NULL) {
             free(e->md5Solvers[i]);
         }
         
-        if(e->lengthSolver[i] != NULL) {
-            free(e->solvers[i]);
-        }
-
-        if(e->lengthSolver[i] != NULL) {
+        if(e->solverNames[i] != NULL) {
             free(e->solverNames[i]);
         }
     }
@@ -342,18 +335,18 @@ void freeExperimentData(experiment *e) {
 }
 
 int dbFetchJob(job* j, status* s) {
-    MYSQL *conn;
+    MYSQL *conn = NULL;
     MYSQL_RES *res;
     MYSQL_ROW row;
 
-    char *queryExpJob;
-    char *queryJob;
-    char *queryJobParams;
+    char *queryExpJob = NULL;
+    char *queryJob = NULL;
+    char *queryJobParams = NULL;
 
-    char *params;
+    char *params = NULL;
 
     //int numRows;
-    int lastId;
+    int lastId = 0;
 
     int i;
     unsigned long *lengths;
@@ -382,7 +375,7 @@ int dbFetchJob(job* j, status* s) {
     mysql_data_seek(res, rand() % i);
 
     if((row = mysql_fetch_row(res)) != NULL) {
-        lastId = row[0];
+        lastId = atoi(row[0]);
     }
 
     sprintf(queryJob, QUERY_JOB, lastId);
@@ -403,7 +396,7 @@ int dbFetchJob(job* j, status* s) {
     if((row = mysql_fetch_row(res)) != NULL) {
         lengths = mysql_fetch_lengths(res);
 
-        j->id = row[0];
+        j->id = atoi(row[0]);
 
         j->solverName = (char *)malloc(lengths[1]*sizeof(char));
         strncpy(j->solverName, row[1], lengths[1]);
@@ -459,12 +452,12 @@ void freeJob(job *j) {
 
 
 status dbUpdate(const job* j) {
-    MYSQL *conn;
+    MYSQL *conn = NULL;
     //MYSQL_RES *res;
     //MYSQL_ROW row;
 
-    char *updateJob;
-    char *queryJob;
+    //char *updateJob;
+    char *queryJob = NULL;
 
     sprintf(queryJob, UPDATE_JOB, j->resultFileName, j->status, j->seed, j->time, j->statusCode);
 
@@ -484,12 +477,12 @@ status dbUpdate(const job* j) {
 
 //Try to fetch the solver named solverName from the database
 status dbFetchSolver(const char* solverName, solver* s) {
-    MYSQL *conn;
+    MYSQL *conn = NULL;
     MYSQL_RES *res;
     MYSQL_ROW row;
 
-    char *querySolver;
-    char *queryJob;
+    char *querySolver = NULL;
+    char *queryJob = NULL;
     unsigned long *lengths;
 
     sprintf(queryJob, QUERY_SOLVER, solverName);
@@ -530,11 +523,11 @@ void freeSolver(solver* s) {
 
 //Try to fetch the instance named instanceName from the database
 status dbFetchInstance(const char* instanceName, instance* i) {
-    MYSQL *conn;
+    MYSQL *conn = NULL;
     MYSQL_RES *res;
     MYSQL_ROW row;
 
-    char *queryInstance;
+    char *queryInstance = NULL;
     unsigned long *lengths;
 
     sprintf(queryInstance, QUERY_INSTANCE, instanceName);
