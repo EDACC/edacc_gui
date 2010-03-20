@@ -5,6 +5,8 @@
 package edacc.manageDB;
 
 import com.mysql.jdbc.Blob;
+import edacc.EDACCApp;
+import edacc.EDACCCreateInstanceClassDialog;
 import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
 import edacc.model.InstaceNotInDBException;
@@ -26,9 +28,8 @@ import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -46,7 +47,8 @@ public class ManageDBInstances {
     JFileChooser jFileChooserManageDBInstance;
     JFileChooser jFileChooserManageDBExportInstance;
 
-    public ManageDBInstances(EDACCManageDBMode main, JPanel panelManageDBInstances, JFileChooser jFileChooserManageDBInstance,  JFileChooser jFileChooserManageDBExportInstance) {
+    public ManageDBInstances(EDACCManageDBMode main, JPanel panelManageDBInstances, 
+            JFileChooser jFileChooserManageDBInstance,  JFileChooser jFileChooserManageDBExportInstance ) {
         this.main = main;
         this.panelManageDBInstances = panelManageDBInstances;
         this.jFileChooserManageDBInstance = jFileChooserManageDBInstance;
@@ -63,11 +65,17 @@ public class ManageDBInstances {
         main.instanceTableModel.fireTableDataChanged();
     }
 
+    public void loadInstaceClasses() throws SQLException{
+        main.instanceClassTableModel.classes.clear();
+        main.instanceClassTableModel.classSelect.clear();
+        main.instanceClassTableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAll()));
+    }
+
     /**
      * Will open a jFilechooser to select a file or directory to add all containing
      * instance files into the "instance table" of the MangeDBMode.
-     * @param 
      */
+
     public void addInstances(){
         try {
             int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
@@ -243,7 +251,7 @@ public class ManageDBInstances {
      */
     public void SelectAllInstanceClass() {
         for(int i = 0; i < main.instanceClassTableModel.getRowCount(); i++){
-            main.instanceClassTableModel.setSelected(i);
+            main.instanceClassTableModel.setInstanceClassSelected(i);
         }
     }
 
@@ -259,5 +267,14 @@ public class ManageDBInstances {
             }
         }
         if(fail) throw new InstanceSourceClassHasInstance();
+    }
+
+    public void addInstanceClasses() {
+        if(main.createInstanceClassDialog == null){
+            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+            main.createInstanceClassDialog = new EDACCCreateInstanceClassDialog(mainFrame, true, main.instanceClassTableModel);
+            main.createInstanceClassDialog.setLocationRelativeTo(mainFrame);
+        }
+        EDACCApp.getApplication().show(main.createInstanceClassDialog);
     }
 }

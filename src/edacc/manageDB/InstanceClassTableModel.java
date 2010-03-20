@@ -38,7 +38,7 @@ public class InstanceClassTableModel extends AbstractTableModel{
 
     @Override
     public Class getColumnClass(int column){
-        if(column == 2 || column == 3) return boolean.class;
+        if(column == 2 || column == 3) return Boolean.class;
         return String.class;
     }
 
@@ -71,10 +71,10 @@ public class InstanceClassTableModel extends AbstractTableModel{
     }
 
     public void addClasses (Vector <InstanceClass> classes){
-        this.classes.addAll(classes);
         for(int i = 0; i < classes.size(); i++){
             this.classSelect.add(false);
         }
+        this.classes.addAll(classes);
     }
 
     public void removeClass(int row){
@@ -82,8 +82,17 @@ public class InstanceClassTableModel extends AbstractTableModel{
         this.classSelect.remove(row);
     }
 
-    public void setSelected(int row){
+    public void setInstanceClassSelected(int row){
         this.classSelect.add(row, true);
     }
+
+     public void setValueAt(Object value, int row, int col) {
+        if(col == 3){
+            classSelect.set(row, (Boolean) value);
+        }
+        fireTableCellUpdated(row, col);
+
+    }
+
 
 }

@@ -157,7 +157,7 @@ public class InstanceClassDAO {
     public static LinkedList<InstanceClass> getAll() throws SQLException {
         // return linked list with all instances
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        ResultSet rs = st.executeQuery("SELECT idInstance, maxClauseLength, md5, name, numAtoms, numClauses, ratio FROM " + table);
+        ResultSet rs = st.executeQuery("SELECT idInstanceClass, name, description, source FROM " + table);
         LinkedList<InstanceClass> res = new LinkedList<InstanceClass>();
         while (rs.next()) {
             InstanceClass i = new InstanceClass();
