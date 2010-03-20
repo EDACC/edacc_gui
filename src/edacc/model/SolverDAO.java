@@ -1,8 +1,13 @@
 package edacc.model;
 
+import edacc.manageDB.NoSolverBinarySpecifiedException;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,7 +23,9 @@ public class SolverDAO {
 
     protected static final String table = "Solver";
     protected static final String insertQuery = "INSERT INTO " + table + " (`name`, `binaryName`, `binary`, `description`, `md5`, `code`) VALUES (?, ?, ?, ?, ?, ?)";
-    protected static final String updateQuery = "UPDATE " + table + " SET `name`=?, `binaryName`=?, `binary`=?, `description`=?, `md5`=?, `code`=? WHERE `md5`=?";
+    protected static final String updateQueryBin = "UPDATE " + table + " SET `binaryName`=?, `binary`=? WHERE `md5`=?";
+    protected static final String updateQueryCode = "UPDATE " + table + " SET `code`=? WHERE `md5`=?";
+    protected static final String updateQuery = "UPDATE " + table + " SET `name`=?, `description`=?, `md5`=? WHERE `md5`=?";
     protected static final String removeQuery = "DELETE FROM " + table + " WHERE idSolver=?";
     private static final Hashtable<Solver, Solver> cache = new Hashtable<Solver, Solver>();
 
@@ -27,10 +34,15 @@ public class SolverDAO {
      * the solver is cached.
      * @param solver The Solver object to persist.
      */
-    public static void save(Solver solver) throws SQLException, FileNotFoundException {
+    public static void save(Solver solver) throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException {
         if (solver.isSaved()) {
             return;
         }
+
+        // new solvers without binary aren't allowed
+        if (solver.isNew() && solver.getBinaryFile() == null)
+            throw new NoSolverBinarySpecifiedException();
+
         PreparedStatement ps;
 
         boolean alreadyInDB = false;
@@ -38,25 +50,41 @@ public class SolverDAO {
         // insert  into db
         if (solver.isNew() && !(alreadyInDB = solverAlreadyInDB(solver) != null)) {
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
-        } else {
-            ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
-            ps.setString(7, solver.getMd5());
-        }
-
-        ps.setString(1, solver.getName());
-        ps.setString(2, solver.getBinaryName());
-        if (solver.getBinaryFile() == null); // TODO add reaction to missing solver binary
-        ps.setBinaryStream(3, new FileInputStream(solver.getBinaryFile()));
-        ps.setString(4, solver.getDescription());
-        ps.setString(5, solver.getMd5());
-        if (solver.getCodeFile() != null) {
+            ps.setString(1, solver.getName());
+            ps.setString(2, solver.getBinaryName());
+            ps.setBinaryStream(3, new FileInputStream(solver.getBinaryFile()));
+            ps.setString(4, solver.getDescription());
+            ps.setString(5, solver.getMd5());
             ps.setBinaryStream(6, new FileInputStream(solver.getCodeFile()));
+            ps.executeUpdate();
         } else {
-            ps.setBinaryStream(6, null);
+            // if solver already in DB, then update it
+            // first update the basic data
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
+            ps.setString(1, solver.getName());
+            ps.setString(2, solver.getDescription());
+            ps.setString(3, solver.getMd5());
+            ps.setString(4, solver.getMd5());
+            ps.executeUpdate();
+            // then update the solver binary if necessary
+            if (solver.getBinaryFile() != null) { // if binary is null, don't update the solver binary
+                ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQueryBin);
+                ps.setString(1, solver.getBinaryName());
+                ps.setBinaryStream(2, new FileInputStream(solver.getBinaryFile()));
+                ps.setString(3, solver.getMd5());
+                ps.executeUpdate();
+            }
+
+            // update the code if necessary
+            if (solver.getCodeFile() != null) { // if code is null, don't update the code (at the moment code can't be deleted)
+                ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQueryCode);
+                ps.setBinaryStream(1, new FileInputStream(solver.getCodeFile()));
+                ps.setString(2, solver.getMd5());
+                ps.executeUpdate();
+            }
         }
-        ps.executeUpdate();
 
-
+        // set id if solver is new (id is assigned by the db automatically)
         if (solver.isNew() && !alreadyInDB) {
             // set id
             ResultSet rs = ps.getGeneratedKeys();
@@ -218,5 +246,30 @@ public class SolverDAO {
         ResultSet rs = st.executeQuery("SELECT s.idSolver FROM " + table + " AS s JOIN SolverConfig as sc ON "
                 + "s.idSolver = sc.Solver_idSolver WHERE idSolver = " + solver.getId());
         return rs.next();
+    }
+
+    /**
+     * Copies the binary file of a solver to a temporary location on the file system
+     * and returns a File reference on it.
+     * @param s
+     * @return
+     */
+    public static File getBinaryFileOfSolver(Solver s) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `binary` FROM " + table + " WHERE md5=?");
+        ps.setString(1, s.getMd5());
+        ResultSet rs = ps.executeQuery();
+        File f = null;
+        if (rs.next()) {
+            f = new File(s.getBinaryName());
+            FileOutputStream out = new FileOutputStream(f);
+            InputStream in = rs.getBinaryStream("binary");
+            int data;
+            while ((data = in.read()) > -1) {
+                out.write(data);
+            }
+            out.close();
+            in.close();
+        }
+        return f;
     }
 }

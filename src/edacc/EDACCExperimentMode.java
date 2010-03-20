@@ -19,7 +19,11 @@ import edacc.experiment.SolverTableModel;
 import edacc.model.AlreadyRunningTaskException;
 import edacc.model.Solver;
 import edacc.model.Tasks;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -803,6 +807,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             Tasks.startTask("generateJobs", new Class[] {int.class, int.class, boolean.class, int.class, boolean.class, edacc.model.Tasks.class}, new Object[] {numRuns, timeout, generateSeeds, maxSeed, linkSeeds, null}, expController, this, 0);
             lblCurNumRuns.setText("currently: " + txtNumRuns.getText());
             lblCurTimeout.setText("currently: " + txtTimeout.getText());
+            try {
+                // Generate zip archive
+                expController.generatePackage();
+            } catch (FileNotFoundException ex) {
+                System.out.println(ex);
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
         }
         catch (AlreadyRunningTaskException ex) {
             javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage());

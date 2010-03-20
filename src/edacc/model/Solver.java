@@ -56,7 +56,7 @@ public class Solver extends BaseModel {
         this.name = name;
     }
     
-    public File getBinaryFile() {
+    protected File getBinaryFile() {
         return binaryFile;
     }
 
@@ -64,7 +64,7 @@ public class Solver extends BaseModel {
         this.binaryFile = binaryFile;
     }
 
-    public File getCodeFile() {
+    protected File getCodeFile() {
         return codeFile;
     }
 

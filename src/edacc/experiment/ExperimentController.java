@@ -16,11 +16,17 @@ import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import edacc.model.Tasks;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Vector;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Experiment design more controller class, handles requests by the GUI
@@ -326,5 +332,16 @@ public class ExperimentController {
             // TODO: shouldn't happen but show message if it does
         }
         
+    }
+
+    /**
+     * Generates a ZIP archive with the necessary files for the grid.
+     */
+    public void generatePackage() throws FileNotFoundException, IOException {
+        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(activeExperiment.getDate().toString() + " - " + activeExperiment.getName()));
+        final String fileSep = System.getProperty("file.separator");
+        ZipEntry entry;
+
+        zos.close();
     }
 }
