@@ -5,6 +5,7 @@
 package edacc.manageDB;
 
 import com.mysql.jdbc.Blob;
+import edacc.EDACCAddNewInstanceSelectClassDialog;
 import edacc.EDACCApp;
 import edacc.EDACCCreateInstanceClassDialog;
 import edacc.manageDB.InstanceParser.*;
@@ -78,6 +79,14 @@ public class ManageDBInstances {
 
     public void addInstances(){
         try {
+          /*  Object input = new Object();
+            if(main.addInstanceDialog == null){
+                JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+                main.addInstanceDialog = new EDACCAddNewInstanceSelectClassDialog(mainFrame, true, input);
+                main.addInstanceDialog.setLocationRelativeTo(mainFrame);
+            }
+        EDACCApp.getApplication().show(main.addInstanceDialog);*/
+            
             int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
             File ret = jFileChooserManageDBInstance.getSelectedFile();
             RecursiveFileScanner InstanceScanner = new RecursiveFileScanner("cnf");

@@ -20,7 +20,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Lea Fetzer
+ * @author rretz
  */
 public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
      InstanceClassTableModel tableModel;

@@ -5,7 +5,7 @@
 
 /*
  * EDACCManageDBMode.java
- *
+ * @author
  * Created on 03.01.2010, 16:02:23
  */
 package edacc;
@@ -43,6 +43,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private ManageDBParameters manageDBParameters;
     private ParameterTableModel parameterTableModel;
     public EDACCCreateInstanceClassDialog createInstanceClassDialog;
+    public EDACCAddNewInstanceSelectClassDialog addInstanceDialog;
 
     public EDACCManageDBMode() {
         initComponents();
