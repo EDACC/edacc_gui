@@ -1,0 +1,1222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <NonVisualComponents>
+    <Component class="javax.swing.JFileChooser" name="jFileChooserManageDBInstance">
+      <Properties>
+        <Property name="fileSelectionMode" type="int" value="2"/>
+        <Property name="name" type="java.lang.String" value="jFileChooserManageDBInstance" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JFileChooser" name="jFileChooserManageDBExportInstance">
+      <Properties>
+        <Property name="fileSelectionMode" type="int" value="1"/>
+        <Property name="name" type="java.lang.String" value="jFileChooserManageDBExportInstance" noResource="true"/>
+      </Properties>
+    </Component>
+  </NonVisualComponents>
+  <Properties>
+    <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
+    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+      <Dimension value="[500, 591]"/>
+    </Property>
+  </Properties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="2"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="manageDBPane" min="-2" pref="1259" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+              <Component id="manageDBPane" pref="573" max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Container class="javax.swing.JTabbedPane" name="manageDBPane">
+      <Properties>
+        <Property name="name" type="java.lang.String" value="manageDBPane" noResource="true"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[10005, 10026]"/>
+        </Property>
+        <Property name="requestFocusEnabled" type="boolean" value="false"/>
+      </Properties>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
+      <SubComponents>
+        <Container class="javax.swing.JPanel" name="panelManageDBSolver">
+          <Properties>
+            <Property name="name" type="java.lang.String" value="panelManageDBSolver" noResource="true"/>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Solvers">
+                <Property name="tabTitle" type="java.lang.String" value="Solvers"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="panelSolverButtons" alignment="0" max="32767" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="panelSolver" max="32767" attributes="0"/>
+                              <EmptySpace min="-2" max="-2" attributes="0"/>
+                              <Component id="panelParameters" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace min="0" pref="0" max="0" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="panelParameters" max="32767" attributes="1"/>
+                          <Component id="panelSolver" alignment="0" max="32767" attributes="1"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="panelSolverButtons" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Container class="javax.swing.JPanel" name="panelSolver">
+              <Properties>
+                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                  <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                    <TitledBorder title="Solver">
+                      <Property name="titleX" resourceKey="panelSolver.border.title"/>
+                    </TitledBorder>
+                  </Border>
+                </Property>
+                <Property name="name" type="java.lang.String" value="panelSolver" noResource="true"/>
+              </Properties>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+<<<<<<< HEAD
+                              <Component id="jScrollPane2" alignment="0" pref="690" max="32767" attributes="1"/>
+=======
+                              <Component id="jScrollPane2" alignment="0" pref="692" max="32767" attributes="1"/>
+>>>>>>> a29a08b11985ef4d8edef71775adc5e4caf3f8e3
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="jlSolverDescription" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jlSolverName" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jlSolverBinary" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jlSolverCode" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="btnSolverAddBinary" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Group type="103" alignment="0" groupAlignment="1" attributes="0">
+                                          <Component id="btnSolverAddCode" alignment="0" min="-2" max="-2" attributes="0"/>
+<<<<<<< HEAD
+                                          <Component id="jScrollPane3" alignment="0" pref="407" max="32767" attributes="1"/>
+                                          <Component id="tfSolverName" alignment="0" min="-2" pref="274" max="-2" attributes="1"/>
+                                      </Group>
+                                  </Group>
+                                  <EmptySpace pref="189" max="32767" attributes="0"/>
+=======
+                                          <Component id="jScrollPane3" alignment="0" pref="390" max="32767" attributes="1"/>
+                                          <Component id="tfSolverName" alignment="0" min="-2" pref="274" max="-2" attributes="1"/>
+                                      </Group>
+                                  </Group>
+                                  <EmptySpace pref="173" max="32767" attributes="0"/>
+>>>>>>> a29a08b11985ef4d8edef71775adc5e4caf3f8e3
+                              </Group>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="1" attributes="0">
+<<<<<<< HEAD
+                          <Component id="jScrollPane2" pref="229" max="32767" attributes="0"/>
+=======
+                          <Component id="jScrollPane2" pref="241" max="32767" attributes="0"/>
+>>>>>>> a29a08b11985ef4d8edef71775adc5e4caf3f8e3
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="jlSolverName" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="tfSolverName" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jlSolverDescription" min="-2" max="-2" attributes="0"/>
+                              <Component id="jScrollPane3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
+                                  <Component id="jlSolverBinary" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="btnSolverAddBinary" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jlSolverCode" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnSolverAddCode" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Container class="javax.swing.JScrollPane" name="jScrollPane2">
+                  <Properties>
+                    <Property name="name" type="java.lang.String" value="jScrollPane2" noResource="true"/>
+                  </Properties>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+                  <SubComponents>
+                    <Component class="javax.swing.JTable" name="tableSolver">
+                      <Properties>
+                        <Property name="name" type="java.lang.String" value="tableSolver" noResource="true"/>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+                <Component class="javax.swing.JLabel" name="jlSolverName">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="jlSolverName.text"/>
+                    <Property name="name" type="java.lang.String" value="jlSolverName" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlSolverDescription">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="jlSolverDescription.text"/>
+                    <Property name="name" type="java.lang.String" value="jlSolverDescription" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JTextField" name="tfSolverName">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="tfSolverName.text"/>
+                    <Property name="name" type="java.lang.String" value="tfSolverName" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="solverChangedOnFocusLost"/>
+                    <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="solverChangedOnKey"/>
+                  </Events>
+                </Component>
+                <Container class="javax.swing.JScrollPane" name="jScrollPane3">
+                  <Properties>
+                    <Property name="name" type="java.lang.String" value="jScrollPane3" noResource="true"/>
+                  </Properties>
+                  <AuxValues>
+                    <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+                  </AuxValues>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+                  <SubComponents>
+                    <Component class="javax.swing.JTextArea" name="taSolverDescription">
+                      <Properties>
+                        <Property name="columns" type="int" value="20"/>
+                        <Property name="rows" type="int" value="5"/>
+                        <Property name="name" type="java.lang.String" value="taSolverDescription" noResource="true"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="solverChangedOnFocusLost"/>
+                        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="solverChangedOnKey"/>
+                      </Events>
+                    </Component>
+                  </SubComponents>
+                </Container>
+                <Component class="javax.swing.JLabel" name="jlSolverBinary">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="jlSolverBinary.text"/>
+                    <Property name="name" type="java.lang.String" value="jlSolverBinary" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnSolverAddBinary">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnSolverAddBinary.text"/>
+                    <Property name="name" type="java.lang.String" value="btnSolverAddBinary" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverAddBinaryActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlSolverCode">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="jlSolverCode.text"/>
+                    <Property name="name" type="java.lang.String" value="jlSolverCode" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnSolverAddCode">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnSolverAddCode.text"/>
+                    <Property name="name" type="java.lang.String" value="btnSolverAddCode" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverAddCodeActionPerformed"/>
+                  </Events>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="panelParameters">
+              <Properties>
+                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                  <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                    <TitledBorder title="Parameters">
+                      <Property name="titleX" resourceKey="panelParameters.border.title"/>
+                    </TitledBorder>
+                  </Border>
+                </Property>
+                <Property name="name" type="java.lang.String" value="panelParameters" noResource="true"/>
+              </Properties>
+              <AccessibilityProperties>
+                <Property name="AccessibleContext.accessibleName" type="java.lang.String" resourceKey="panelParameters.AccessibleContext.accessibleName"/>
+              </AccessibilityProperties>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+<<<<<<< HEAD
+                              <Component id="jScrollPane4" alignment="1" pref="486" max="32767" attributes="0"/>
+=======
+                              <Component id="jScrollPane4" alignment="1" pref="488" max="32767" attributes="0"/>
+>>>>>>> a29a08b11985ef4d8edef71775adc5e4caf3f8e3
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="btnParametersNew" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="btnParametersDelete" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="btnParametersRefresh" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="jlParametersPrefix" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jlParametersName" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                      <Component id="tfParametersName" alignment="0" min="-2" pref="243" max="-2" attributes="0"/>
+                                      <Group type="103" alignment="0" groupAlignment="0" attributes="0">
+                                          <Component id="tfParametersOrder" alignment="0" pref="243" max="32767" attributes="0"/>
+                                          <Component id="tfParametersPrefix" alignment="0" max="32767" attributes="0"/>
+                                      </Group>
+                                  </Group>
+                              </Group>
+                              <Component id="jlParametersOrder" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="1" attributes="0">
+                          <Component id="jScrollPane4" pref="306" max="32767" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="jlParametersName" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="tfParametersName" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="jlParametersPrefix" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="tfParametersPrefix" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Component id="jlParametersOrder" min="-2" max="-2" attributes="0"/>
+                              <Component id="tfParametersOrder" alignment="1" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="btnParametersNew" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnParametersDelete" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnParametersRefresh" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Container class="javax.swing.JScrollPane" name="jScrollPane4">
+                  <Properties>
+                    <Property name="name" type="java.lang.String" value="jScrollPane4" noResource="true"/>
+                  </Properties>
+                  <AuxValues>
+                    <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+                  </AuxValues>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+                  <SubComponents>
+                    <Component class="javax.swing.JTable" name="tableParameters">
+                      <Properties>
+                        <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
+                          <Table columnCount="4" rowCount="4">
+                            <Column editable="true" title="Title 1" type="java.lang.Object"/>
+                            <Column editable="true" title="Title 2" type="java.lang.Object"/>
+                            <Column editable="true" title="Title 3" type="java.lang.Object"/>
+                            <Column editable="true" title="Title 4" type="java.lang.Object"/>
+                          </Table>
+                        </Property>
+                        <Property name="name" type="java.lang.String" value="tableParameters" noResource="true"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[150, 64]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+                <Component class="javax.swing.JLabel" name="jlParametersName">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="jlParametersName.text"/>
+                    <Property name="name" type="java.lang.String" value="jlParametersName" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JTextField" name="tfParametersName">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="tfParametersName.text"/>
+                    <Property name="name" type="java.lang.String" value="tfParametersName" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlParametersPrefix">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="jlParametersPrefix.text"/>
+                    <Property name="name" type="java.lang.String" value="jlParametersPrefix" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JTextField" name="tfParametersPrefix">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="tfParametersPrefix.text"/>
+                    <Property name="name" type="java.lang.String" value="tfParametersPrefix" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jlParametersOrder">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="jlParametersOrder.text"/>
+                    <Property name="name" type="java.lang.String" value="jlParametersOrder" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JTextField" name="tfParametersOrder">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="tfParametersOrder.text"/>
+                    <Property name="name" type="java.lang.String" value="tfParametersOrder" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnParametersNew">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnParametersNew.text"/>
+                    <Property name="name" type="java.lang.String" value="btnParametersNew" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnParametersNewActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnParametersDelete">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnParametersDelete.text"/>
+                    <Property name="name" type="java.lang.String" value="btnParametersDelete" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnParametersDeleteActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnParametersRefresh">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnParametersRefresh.text"/>
+                    <Property name="name" type="java.lang.String" value="btnParametersRefresh" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnParametersRefreshActionPerformed"/>
+                  </Events>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="panelSolverButtons">
+              <Properties>
+                <Property name="name" type="java.lang.String" value="panelSolverButtons" noResource="true"/>
+              </Properties>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnSolverNew" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnSolverDelete" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnSolverRefresh" min="-2" max="-2" attributes="0"/>
+<<<<<<< HEAD
+                          <EmptySpace pref="940" max="32767" attributes="0"/>
+=======
+                          <EmptySpace pref="889" max="32767" attributes="0"/>
+>>>>>>> a29a08b11985ef4d8edef71775adc5e4caf3f8e3
+                          <Component id="btnSolverSaveToDB" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="btnSolverNew" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnSolverDelete" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnSolverRefresh" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnSolverSaveToDB" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JButton" name="btnSolverRefresh">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnSolverRefresh.text"/>
+                    <Property name="name" type="java.lang.String" value="btnSolverRefresh" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverRefreshActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnSolverDelete">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnSolverDelete.text"/>
+                    <Property name="name" type="java.lang.String" value="btnSolverDelete" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverDeleteActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnSolverNew">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnNew.text"/>
+                    <Property name="name" type="java.lang.String" value="btnNew" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverNewActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnSolverSaveToDB">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnSolverSaveToDB.text"/>
+                    <Property name="name" type="java.lang.String" value="btnSolverSaveToDB" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverSaveToDBActionPerformed"/>
+                  </Events>
+                </Component>
+              </SubComponents>
+            </Container>
+          </SubComponents>
+        </Container>
+        <Container class="javax.swing.JPanel" name="panelManageDBInstances">
+          <Properties>
+            <Property name="name" type="java.lang.String" value="panelManageDBInstances" noResource="true"/>
+            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[500, 471]"/>
+            </Property>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Instances">
+                <Property name="tabTitle" type="java.lang.String" value="Instances"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="panelInstance" pref="713" max="32767" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="panelInstanceClass" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Group type="102" attributes="0">
+                              <EmptySpace min="11" pref="11" max="11" attributes="0"/>
+                              <Component id="panelInstanceClass" max="32767" attributes="0"/>
+                          </Group>
+                          <Component id="panelInstance" alignment="1" pref="534" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Container class="javax.swing.JPanel" name="panelInstanceClass">
+              <Properties>
+                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                  <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                    <TitledBorder title="Instance classes">
+                      <Property name="titleX" resourceKey="panelInstanceClass.border.title"/>
+                    </TitledBorder>
+                  </Border>
+                </Property>
+                <Property name="name" type="java.lang.String" value="panelInstanceClass" noResource="true"/>
+              </Properties>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="panelButtonsInstanceClass" alignment="1" max="32767" attributes="2"/>
+                              <Component id="panelInstanceClassTable" alignment="0" pref="517" max="32767" attributes="2"/>
+                          </Group>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <Component id="panelInstanceClassTable" pref="426" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="11" max="-2" attributes="1"/>
+                          <Component id="panelButtonsInstanceClass" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Container class="javax.swing.JScrollPane" name="panelInstanceClassTable">
+                  <Properties>
+                    <Property name="name" type="java.lang.String" value="panelInstanceClassTable" noResource="true"/>
+                  </Properties>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+                  <SubComponents>
+                    <Component class="javax.swing.JTable" name="tableInstanceClass">
+                      <Properties>
+                        <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
+                          <Table columnCount="2" rowCount="4">
+                            <Column editable="true" title="Class" type="java.lang.String"/>
+                            <Column editable="true" title="Select" type="java.lang.Boolean"/>
+                          </Table>
+                        </Property>
+                        <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
+                          <TableColumnModel selectionModel="0">
+                            <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                              <Title resourceKey="tableInstanceClass.columnModel.title0"/>
+                              <Editor/>
+                              <Renderer/>
+                            </Column>
+                            <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                              <Title resourceKey="tableInstanceClass.columnModel.title1"/>
+                              <Editor/>
+                              <Renderer/>
+                            </Column>
+                          </TableColumnModel>
+                        </Property>
+                        <Property name="name" type="java.lang.String" value="tableInstanceClass" noResource="true"/>
+                        <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
+                          <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+                <Container class="javax.swing.JPanel" name="panelButtonsInstanceClass">
+                  <Properties>
+                    <Property name="name" type="java.lang.String" value="panelButtonsInstanceClass" noResource="true"/>
+                  </Properties>
+
+                  <Layout>
+                    <DimensionLayout dim="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btnNewInstanceClass" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="btnRemoveInstanceClass" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="btnSelectAllInstanceClasses" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace pref="248" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                    </DimensionLayout>
+                    <DimensionLayout dim="1">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="1" attributes="0">
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="btnNewInstanceClass" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnRemoveInstanceClass" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnSelectAllInstanceClasses" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                    </DimensionLayout>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="javax.swing.JButton" name="btnNewInstanceClass">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="btnNewInstanceClass.text"/>
+                        <Property name="name" type="java.lang.String" value="btnNewInstanceClass" noResource="true"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnNewInstanceClassActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="btnRemoveInstanceClass">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="btnRemoveInstanceClass.text"/>
+                        <Property name="name" type="java.lang.String" value="btnRemoveInstanceClass" noResource="true"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRemoveInstanceClassActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="btnSelectAllInstanceClasses">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="btnSelectAllInstanceClasses.text"/>
+                        <Property name="name" type="java.lang.String" value="btnSelectAllInstanceClasses" noResource="true"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSelectAllInstanceClassesActionPerformed"/>
+                      </Events>
+                    </Component>
+                  </SubComponents>
+                </Container>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="panelInstance">
+              <Properties>
+                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                  <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                    <TitledBorder>
+                      <Border PropertyName="innerBorder" info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                        <TitledBorder title="Instances">
+                          <Property name="titleX" resourceKey="panelInstance.border.border.title"/>
+                        </TitledBorder>
+                      </Border>
+                    </TitledBorder>
+                  </Border>
+                </Property>
+                <Property name="name" type="java.lang.String" value="panelInstance" noResource="true"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[663, 596]"/>
+                </Property>
+              </Properties>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="panelInstanceTable" min="-2" pref="653" max="-2" attributes="2"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="103" alignment="0" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="panelButtonsInstances" max="32767" attributes="1"/>
+                                      <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="panelFilterInstances" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace pref="309" max="32767" attributes="0"/>
+                                  </Group>
+                              </Group>
+                          </Group>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="1" attributes="0">
+                          <Component id="panelInstanceTable" pref="276" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="panelButtonsInstances" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
+                          <Component id="panelFilterInstances" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Container class="javax.swing.JScrollPane" name="panelInstanceTable">
+                  <Properties>
+                    <Property name="name" type="java.lang.String" value="panelInstanceTable" noResource="true"/>
+                  </Properties>
+                  <AuxValues>
+                    <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+                  </AuxValues>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+                  <SubComponents>
+                    <Component class="javax.swing.JTable" name="tableInstances">
+                      <Properties>
+                        <Property name="autoCreateRowSorter" type="boolean" value="true"/>
+                        <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
+                          <Table columnCount="5" rowCount="5">
+                            <Column editable="true" title="Name" type="java.lang.Object"/>
+                            <Column editable="true" title="numAtoms" type="java.lang.Object"/>
+                            <Column editable="true" title="numClauses" type="java.lang.Object"/>
+                            <Column editable="true" title="ratio" type="java.lang.Object"/>
+                            <Column editable="true" title="maxClauseLength" type="java.lang.Object"/>
+                          </Table>
+                        </Property>
+                        <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
+                          <TableColumnModel selectionModel="0">
+                            <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                              <Title resourceKey="tableInstances.columnModel.title0"/>
+                              <Editor/>
+                              <Renderer/>
+                            </Column>
+                            <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                              <Title resourceKey="tableInstances.columnModel.title1"/>
+                              <Editor/>
+                              <Renderer/>
+                            </Column>
+                            <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                              <Title resourceKey="tableInstances.columnModel.title2"/>
+                              <Editor/>
+                              <Renderer/>
+                            </Column>
+                            <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                              <Title resourceKey="tableInstances.columnModel.title3"/>
+                              <Editor/>
+                              <Renderer/>
+                            </Column>
+                            <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                              <Title resourceKey="tableInstances.columnModel.title4"/>
+                              <Editor/>
+                              <Renderer/>
+                            </Column>
+                          </TableColumnModel>
+                        </Property>
+                        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[2147483647, 8000]"/>
+                        </Property>
+                        <Property name="name" type="java.lang.String" value="tableInstances" noResource="true"/>
+                        <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
+                          <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+                <Container class="javax.swing.JPanel" name="panelFilterInstances">
+                  <Properties>
+                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                      <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                        <TitledBorder title="Filter">
+                          <Property name="titleX" resourceKey="panelFilterInstances.border.title"/>
+                        </TitledBorder>
+                      </Border>
+                    </Property>
+                    <Property name="name" type="java.lang.String" value="panelFilterInstances" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="componentAdded" listener="java.awt.event.ContainerListener" parameters="java.awt.event.ContainerEvent" handler="panelFilterInstancesComponentAdded"/>
+                  </Events>
+
+                  <Layout>
+                    <DimensionLayout dim="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Component id="jlInstanceFilterNumAtoms" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
+                                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="jlInstanceFilterName" alignment="0" min="-2" pref="43" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="1">
+                                      <Component id="jlInstanceFilterNumClauses" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="32767" attributes="0"/>
+                                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="1">
+                                      <Component id="jlInstanceFilterRatio" min="-2" pref="43" max="-2" attributes="0"/>
+                                      <EmptySpace max="32767" attributes="0"/>
+                                      <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="1">
+                                      <Component id="jlInstanceFilterMaxClauseLength" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="32767" attributes="0"/>
+                                      <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="tfInstanceFilterNumAtomsMin" min="-2" pref="78" max="-2" attributes="0"/>
+                                  <Component id="tfInstanceFilterNumClausesMin" min="-2" pref="78" max="-2" attributes="0"/>
+                                  <Component id="tfInstanceFilterMaxClauseLengthMin" min="-2" pref="78" max="-2" attributes="0"/>
+                                  <Component id="tfInstanceFilterRatioMin" min="-2" pref="78" max="-2" attributes="0"/>
+                                  <Component id="tfInstanceFilterName" min="-2" pref="78" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="1" attributes="0">
+                                  <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="tfInstanceFilterNumAtomsMax" min="-2" pref="78" max="-2" attributes="0"/>
+                                  <Component id="tfInstanceFilterRatioMax" min="-2" pref="78" max="-2" attributes="0"/>
+                                  <Component id="tfInstanceFilterMaxClauseLengthMax" min="-2" pref="78" max="-2" attributes="0"/>
+                                  <Component id="tfInstanceFilterNumClausesMax" alignment="0" min="-2" pref="78" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                    </DimensionLayout>
+                    <DimensionLayout dim="1">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="tfInstanceFilterName" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jlInstanceFilterName" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="tfInstanceFilterNumAtomsMin" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jlInstanceFilterNumAtoms" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="tfInstanceFilterNumClausesMin" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
+                                  <Component id="jlInstanceFilterNumClauses" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="1" attributes="0">
+                                  <Component id="jlInstanceFilterRatio" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" alignment="1" groupAlignment="3" attributes="0">
+                                      <Component id="tfInstanceFilterRatioMin" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="jlInstanceFilterMaxClauseLength" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="tfInstanceFilterMaxClauseLengthMin" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Group type="102" alignment="1" attributes="0">
+                              <EmptySpace pref="38" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="tfInstanceFilterNumAtomsMax" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="tfInstanceFilterNumClausesMax" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="tfInstanceFilterRatioMax" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="tfInstanceFilterMaxClauseLengthMax" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                      </Group>
+                    </DimensionLayout>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="javax.swing.JLabel" name="jlInstanceFilterName">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jlInstanceFilterName.text"/>
+                        <Property name="name" type="java.lang.String" value="jlInstanceFilterName" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JTextField" name="tfInstanceFilterName">
+                      <Properties>
+                        <Property name="name" type="java.lang.String" value="tfInstanceFilterName" noResource="true"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="inputMethodTextChanged" listener="java.awt.event.InputMethodListener" parameters="java.awt.event.InputMethodEvent" handler="tfInstanceFilterNameInputMethodTextChanged"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JTextField" name="tfInstanceFilterNumAtomsMin">
+                      <Properties>
+                        <Property name="name" type="java.lang.String" value="tfInstanceFilterNumAtomsMin" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jlInstanceFilterNumAtoms">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jlInstanceFilterNumAtoms.text"/>
+                        <Property name="name" type="java.lang.String" value="jlInstanceFilterNumAtoms" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jlInstanceFilterNumClauses">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jlInstanceFilterNumClauses.text"/>
+                        <Property name="name" type="java.lang.String" value="jlInstanceFilterNumClauses" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JTextField" name="tfInstanceFilterNumClausesMin">
+                      <Properties>
+                        <Property name="name" type="java.lang.String" value="tfInstanceFilterNumClausesMin" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jlInstanceFilterRatio">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jlInstanceFilterRatio.text"/>
+                        <Property name="name" type="java.lang.String" value="jlInstanceFilterRatio" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JTextField" name="tfInstanceFilterRatioMin">
+                      <Properties>
+                        <Property name="name" type="java.lang.String" value="tfInstanceFilterRatioMin" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JTextField" name="tfInstanceFilterMaxClauseLengthMin">
+                      <Properties>
+                        <Property name="name" type="java.lang.String" value="tfInstanceFilterMaxClauseLengthMin" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jlInstanceFilterMaxClauseLength">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jlInstanceFilterMaxClauseLength.text"/>
+                        <Property name="name" type="java.lang.String" value="jlInstanceFilterMaxClauseLength" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JTextField" name="tfInstanceFilterNumAtomsMax">
+                      <Properties>
+                        <Property name="name" type="java.lang.String" value="tfInstanceFilterNumAtomsMax" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JTextField" name="tfInstanceFilterNumClausesMax">
+                      <Properties>
+                        <Property name="name" type="java.lang.String" value="tfInstanceFilterNumClausesMax" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JTextField" name="tfInstanceFilterRatioMax">
+                      <Properties>
+                        <Property name="name" type="java.lang.String" value="tfInstanceFilterRatioMax" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JTextField" name="tfInstanceFilterMaxClauseLengthMax">
+                      <Properties>
+                        <Property name="name" type="java.lang.String" value="tfInstanceFilterMaxClauseLengthMax" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jLabel1">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jLabel1.text"/>
+                        <Property name="name" type="java.lang.String" value="jLabel1" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jLabel2">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jLabel2.text"/>
+                        <Property name="name" type="java.lang.String" value="jLabel2" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jLabel3">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jLabel3.text"/>
+                        <Property name="name" type="java.lang.String" value="jLabel3" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jLabel4">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jLabel4.text"/>
+                        <Property name="name" type="java.lang.String" value="jLabel4" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jLabel5">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jLabel5.text"/>
+                        <Property name="name" type="java.lang.String" value="jLabel5" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jLabel6">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jLabel6.text"/>
+                        <Property name="name" type="java.lang.String" value="jLabel6" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jLabel7">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jLabel7.text"/>
+                        <Property name="name" type="java.lang.String" value="jLabel7" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jLabel9">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jLabel9.text"/>
+                        <Property name="name" type="java.lang.String" value="jLabel9" noResource="true"/>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+                <Container class="javax.swing.JPanel" name="panelButtonsInstances">
+                  <Properties>
+                    <Property name="name" type="java.lang.String" value="panelButtonsInstances" noResource="true"/>
+                  </Properties>
+
+                  <Layout>
+                    <DimensionLayout dim="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btnAddInstances" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                              <Component id="btnRemoveInstances" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="btnRefreshTableInstances" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                              <Component id="btnFilterInstances" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="btnExportInstances" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btnAddToClass" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btnRemoveFromClass" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                    </DimensionLayout>
+                    <DimensionLayout dim="1">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="1" attributes="0">
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="btnRemoveInstances" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnFilterInstances" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnAddInstances" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnExportInstances" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnAddToClass" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnRemoveFromClass" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnRefreshTableInstances" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                    </DimensionLayout>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="javax.swing.JButton" name="btnAddInstances">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="btnAddInstances.text"/>
+                        <Property name="name" type="java.lang.String" value="btnAddInstances" noResource="true"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAddInstancesActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="btnRemoveInstances">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="btnRemoveInstances.text"/>
+                        <Property name="name" type="java.lang.String" value="btnRemoveInstances" noResource="true"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRemoveInstancesActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="btnRefreshTableInstances">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="btnRefreshTableInstances.text"/>
+                        <Property name="name" type="java.lang.String" value="btnRefreshTableInstances" noResource="true"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRefreshTableInstancesActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="btnFilterInstances">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="btnFilterInstances.text"/>
+                        <Property name="name" type="java.lang.String" value="btnFilterInstances" noResource="true"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnFilterInstancesActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="btnExportInstances">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="btnExportInstances.text"/>
+                        <Property name="name" type="java.lang.String" value="btnExportInstances" noResource="true"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnExportInstancesActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="btnAddToClass">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="btnAddToClass.text"/>
+                        <Property name="name" type="java.lang.String" value="btnAddToClass" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="btnRemoveFromClass">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="btnRemoveFromClass.text"/>
+                        <Property name="name" type="java.lang.String" value="btnRemoveFromClass" noResource="true"/>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+              </SubComponents>
+            </Container>
+          </SubComponents>
+        </Container>
+      </SubComponents>
+    </Container>
+  </SubComponents>
+</Form>

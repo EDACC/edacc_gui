@@ -150,6 +150,40 @@ public class InstanceClassDAO {
     }
 
     /**
+     * 
+     * @author rretz
+     * 
+     * @return
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     */
+    public static LinkedList<InstanceClass> getAllSourceClass() throws NoConnectionToDBException, SQLException{
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+        ResultSet rs = st.executeQuery("SELECT idInstanceClass, name, description, source FROM " + table +
+                " WHERE source = 1");
+        LinkedList<InstanceClass> res = new LinkedList<InstanceClass>();
+        while (rs.next()) {
+            InstanceClass i = new InstanceClass();
+            i.setInstanceClassID(rs.getInt("idinstanceClass"));
+            i.setName(rs.getString("name"));
+            i.setDescription(rs.getString("description"));
+            i.setSource(rs.getBoolean("source"));
+
+            InstanceClass c = getCached(i);
+
+            if (c != null) {
+                res.add(c);
+            } else {
+                i.setSaved();
+                cacheInstanceClass(i);
+                res.add(i);
+            }
+        }
+        rs.close();
+        return res;
+    }
+
+    /**
      * retrieves all instance classes from the database
      * @return all instance classes in a List
      * @throws SQLException
