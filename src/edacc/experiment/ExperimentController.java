@@ -344,13 +344,28 @@ public class ExperimentController {
         ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(activeExperiment.getDate().toString() + " - " + activeExperiment.getName() + ".zip"));
         final String fileSep = System.getProperty("file.separator");
         ZipEntry entry;
+
+        // add solvers to zip file
         Vector<Solver> solvers = ExperimentDAO.getSolversInExperiment(activeExperiment);
-        System.out.println("len: " + solvers.size());
         for (Solver s : solvers) {
-            System.out.println("solver " + s.getBinaryName());
             File bin = SolverDAO.getBinaryFileOfSolver(s);
             FileInputStream in = new FileInputStream(bin);
             entry = new ZipEntry("solvers" + fileSep + s.getBinaryName());
+            zos.putNextEntry(entry);
+            int data;
+            while ((data = in.read()) > -1) {
+                zos.write(data);
+            }
+            zos.closeEntry();
+            in.close();
+        }
+
+        // add instances to zip file
+        LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
+        for (Instance i : instances) {
+            File f = InstanceDAO.getBinaryFileOfInstance(i);
+            FileInputStream in = new FileInputStream(f);
+            entry = new ZipEntry("instances" + fileSep + i.getId() + "_" + i.getName());
             zos.putNextEntry(entry);
             int data;
             while ((data = in.read()) > -1) {
