@@ -159,4 +159,25 @@ public class ExperimentDAO {
     public static void setModified(Experiment e) {
         e.setModified();
     }
+
+    /**
+     * returns all solvers used in an experiment.
+     * @param e
+     * @return
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     */
+    public static Vector<Solver> getSolversInExperiment(Experiment e) throws NoConnectionToDBException, SQLException {
+        final String query = "SELECT Solver_idSolver FROM SolverConfig WHERE Experiment_idExperiment=?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, e.getId());
+        ResultSet rs = ps.executeQuery();
+        Vector<Solver> solvers = new Vector<Solver>();
+        while (rs.next()) {
+            int id = rs.getInt("Solver_idSolver");
+            Solver s = SolverDAO.getById(id);
+            solvers.add(s);
+        }
+        return solvers;
+    }
 }
