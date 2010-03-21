@@ -64,12 +64,10 @@ public class ManageDBSolvers {
      * @throws SQLException
      * @throws FileNotFoundException
      */
-    public void saveSolvers() throws SQLException, FileNotFoundException {
+    public void saveSolvers() throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException {
         for (Solver s : solverTableModel.getSolvers()) {
-            //SolverDAO.save(s);
+            SolverDAO.save(s);
         }
-
-        // TODO save parameters of solver!
     }
 
     public void newSolver() {
