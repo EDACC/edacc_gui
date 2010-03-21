@@ -79,13 +79,13 @@ public class ManageDBInstances {
 
     public void addInstances(){
         try {
-          /*  Object input = new Object();
+            Object input = new Object();
             if(main.addInstanceDialog == null){
                 JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
                 main.addInstanceDialog = new EDACCAddNewInstanceSelectClassDialog(mainFrame, true, input);
                 main.addInstanceDialog.setLocationRelativeTo(mainFrame);
             }
-        EDACCApp.getApplication().show(main.addInstanceDialog);*/
+        EDACCApp.getApplication().show(main.addInstanceDialog);
             
             int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
             File ret = jFileChooserManageDBInstance.getSelectedFile();
@@ -271,6 +271,8 @@ public class ManageDBInstances {
            instanceClass = (InstanceClass) main.instanceClassTableModel.getValueAt(selectedRows[i], 4);
             try {
                 InstanceClassDAO.delete(instanceClass);
+                main.instanceClassTableModel.classes.remove(instanceClass);
+                main.instanceClassTableModel.classSelect.remove(i);
             } catch (InstanceSourceClassHasInstance ex) {
                 fail = true;
             }

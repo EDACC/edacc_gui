@@ -56,7 +56,7 @@ public class InstanceClassDAO {
             ResultSet rs = ps.executeQuery();
             if(rs.next()) throw new InstanceSourceClassHasInstance();
         }
-        ps = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM table WHERE idinstanceClass=?");
+        ps = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM " + table + " WHERE idinstanceClass=?");
         ps.setInt(1, i.getInstanceClassID());
         ps.executeUpdate();
         cache.remove(i);

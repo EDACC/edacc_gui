@@ -66,7 +66,7 @@ public class ManageDBSolvers {
      */
     public void saveSolvers() throws SQLException, FileNotFoundException {
         for (Solver s : solverTableModel.getSolvers()) {
-            SolverDAO.save(s);
+            //SolverDAO.save(s);
         }
 
         // TODO save parameters of solver!

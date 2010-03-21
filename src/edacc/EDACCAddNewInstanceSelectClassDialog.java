@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
  */
 public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     Object input;
+    AddInstanceInstanceClassTabelModel tableModel;
 
     /** Creates new form EDACCAddNewInstanceSelectClassDialog */
     public EDACCAddNewInstanceSelectClassDialog(java.awt.Frame parent, boolean modal, Object input) throws NoConnectionToDBException, SQLException {
@@ -32,9 +33,9 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         initComponents();
         this.input = input;
         //Filling the table with all instance source class
-        AddInstanceInstanceClassTabelModel tableModel = new AddInstanceInstanceClassTabelModel();
-        jTableInstanceClass.setModel(tableModel);
+        tableModel = new AddInstanceInstanceClassTabelModel();
         tableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllSourceClass()));
+        jTableInstanceClass.setModel(tableModel);
     }
 
     /** This method is called from within the constructor to
@@ -57,11 +58,12 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         jButtonCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAddNewInstanceSelectClassDialog.class);
+        setTitle(resourceMap.getString("AddNewInstanceSelectClass.title")); // NOI18N
+        setName("AddNewInstanceSelectClass"); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         buttonGroupAutomaticOrManuel.add(jRadioButtonAutomatic);
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAddNewInstanceSelectClassDialog.class);
         jRadioButtonAutomatic.setText(resourceMap.getString("jRadioButtonAutomatic.text")); // NOI18N
         jRadioButtonAutomatic.setName("jRadioButtonAutomatic"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -169,7 +171,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
                     JOptionPane.ERROR_MESSAGE);
             }else{
                 int row = jTableInstanceClass.getSelectedRow();
-                this.input = (InstanceClass)jTableInstanceClass.getValueAt(row, 2);
+                this.input = tableModel.getValueAt(row, 2);
                 this.dispose();
             }
 
@@ -179,7 +181,8 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButtonOkActionPerformed
 
     private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelActionPerformed
-        input = null;
+        int row = jTableInstanceClass.getSelectedRow();
+        input = jTableInstanceClass.getValueAt(row, 1);
         this.dispose();
     }//GEN-LAST:event_jButtonCancelActionPerformed
 

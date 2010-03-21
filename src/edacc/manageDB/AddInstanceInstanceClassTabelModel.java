@@ -36,13 +36,13 @@ public class AddInstanceInstanceClassTabelModel extends AbstractTableModel {
             case 1:
                 return classes.get(rowIndex).getDescription();
             case 2:
-                return classes.get(rowIndex);
+                return classes.get(rowIndex).getName();
             default:
                 return "";
         }
     }
 
-    public void addClasses (Vector <InstanceClass> classes){
+    public void addClasses(Vector<InstanceClass> classes){
         this.classes.addAll(classes);
     }
 

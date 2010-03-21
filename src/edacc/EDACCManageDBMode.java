@@ -1204,6 +1204,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private void btnRemoveInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstanceClassActionPerformed
         try {
             manageDBInstances.RemoveInstanceClass(tableInstanceClass.getSelectedRows());
+            tableInstanceClass.updateUI();
         } catch (NoConnectionToDBException ex) {
              JOptionPane.showMessageDialog(panelManageDBInstances,
                     "No connection to database: " + ex.getMessage(),
