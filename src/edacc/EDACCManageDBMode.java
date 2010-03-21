@@ -1072,6 +1072,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                     "Solvers cannot be saved because a file couldn't be found: " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
+        } catch (NoSolverBinarySpecifiedException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "You have to specify a binary file for all solvers!",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnSolverSaveToDBActionPerformed
 
