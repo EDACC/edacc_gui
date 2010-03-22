@@ -236,4 +236,30 @@ public class InstanceClassDAO {
         rs.close();
         return res;
     }
+
+    public static LinkedList<InstanceClass> getAllUserClass() throws NoConnectionToDBException, SQLException {
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+        ResultSet rs = st.executeQuery("SELECT idInstanceClass, name, description, source FROM " + table +
+                " WHERE source = 0");
+        LinkedList<InstanceClass> res = new LinkedList<InstanceClass>();
+        while (rs.next()) {
+            InstanceClass i = new InstanceClass();
+            i.setInstanceClassID(rs.getInt("idinstanceClass"));
+            i.setName(rs.getString("name"));
+            i.setDescription(rs.getString("description"));
+            i.setSource(rs.getBoolean("source"));
+
+            InstanceClass c = getCached(i);
+
+            if (c != null) {
+                res.add(c);
+            } else {
+                i.setSaved();
+                cacheInstanceClass(i);
+                res.add(i);
+            }
+        }
+        rs.close();
+        return res;
+    }
 }

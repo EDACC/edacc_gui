@@ -5,6 +5,7 @@
 package edacc.manageDB;
 
 import com.mysql.jdbc.Blob;
+import edacc.EDACCAddInstanceToInstanceClass;
 import edacc.EDACCAddNewInstanceSelectClassDialog;
 import edacc.EDACCApp;
 import edacc.EDACCCreateInstanceClassDialog;
@@ -19,6 +20,7 @@ import edacc.model.InstanceClassDAO;
 import edacc.model.InstanceClassMustBeSourceException;
 
 import edacc.model.InstanceDAO;
+import edacc.model.InstanceHasInstanceClassDAO;
 import edacc.model.InstanceIsInExperimentException;
 import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.NoConnectionToDBException;
@@ -422,6 +424,44 @@ public class ManageDBInstances {
      */
     private String autogenerateInstanceClassName(String root, File instanceFile) {
         return instanceFile.getAbsolutePath().substring(root.length()+1 , instanceFile.getParent().length());
+    }
+
+    public void addInstancesToClass(int[] selectedRows){
+        try {
+            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+            EDACCAddInstanceToInstanceClass addInstanceToClass = new EDACCAddInstanceToInstanceClass(mainFrame, true);
+            addInstanceToClass.setLocationRelativeTo(mainFrame);
+            EDACCApp.getApplication().show(addInstanceToClass);
+            InstanceClass input = addInstanceToClass.getInput();
+            if (input != null) {
+                if (input.isSource()) {
+                    for (int i = 0; i < selectedRows.length; i++) {
+                        Instance temp = (Instance) main.instanceTableModel.getValueAt(selectedRows[i], 5);
+                        temp.setInstanceClass(input);
+                        temp.setModified();
+                        InstanceDAO.save(temp);
+                    }
+                } else {
+                    for (int i = 0; i < selectedRows.length; i++) {
+                        Instance temp = (Instance) main.instanceTableModel.getValueAt(selectedRows[i], 5);
+                        InstanceHasInstanceClassDAO.createInstanceHasInstance(temp, input);
+                    }
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoConnectionToDBException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                    ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "There is a Problem with the database: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
     }
 
 }

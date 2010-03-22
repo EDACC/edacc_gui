@@ -26,7 +26,7 @@ public class InstanceHasInstanceClassDAO {
      * InstanceHasInstanceClass factory method, ensures that the created experiment is persisted.
      * @return new InstanceHasInstanceClass object
      */
-    public static InstanceHasInstanceClass createExperimentHasInstance(Instance instance, InstanceClass instanceClass) throws SQLException {
+    public static InstanceHasInstanceClass createInstanceHasInstance(Instance instance, InstanceClass instanceClass) throws SQLException {
         InstanceHasInstanceClass i = new InstanceHasInstanceClass(instance, instanceClass);
         i.setNew();
         save(i);

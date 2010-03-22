@@ -159,7 +159,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         this.input = new InstanceClass();
         if(buttonGroupAutomaticOrManuel.getSelection() == null){
             JOptionPane.showMessageDialog(this,
-                    "Please choos if the new instance class is a source class oder a user class." ,
+                    "Please choose if the new instance class is a source class oder a user class." ,
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
        }else {
