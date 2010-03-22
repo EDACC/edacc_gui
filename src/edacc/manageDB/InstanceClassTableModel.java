@@ -5,8 +5,15 @@
 
 package edacc.manageDB;
 
+import edacc.model.Instance;
 import edacc.model.InstanceClass;
+import edacc.model.InstanceDAO;
+import edacc.model.NoConnectionToDBException;
+import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -17,10 +24,13 @@ public class InstanceClassTableModel extends AbstractTableModel{
      private String[] columns = {"Name", "Description", "Source", "Select"};
      protected Vector <InstanceClass> classes;
      protected Vector <Boolean> classSelect;
+     protected JTable instanceTable;
 
-    public InstanceClassTableModel(){
+
+    public InstanceClassTableModel(JTable instanceTable) {
         this.classes = new Vector <InstanceClass>();
         this.classSelect = new Vector <Boolean>();
+        this.instanceTable = instanceTable;
     }
 
     public int getRowCount() {
@@ -89,9 +99,36 @@ public class InstanceClassTableModel extends AbstractTableModel{
      public void setValueAt(Object value, int row, int col) {
         if(col == 3){
             classSelect.set(row, (Boolean) value);
+            try {
+                changeInstanceTable();
+            } catch (NoConnectionToDBException ex) {
+                Logger.getLogger(InstanceClassTableModel.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(InstanceClassTableModel.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         fireTableCellUpdated(row, col);
 
+    }
+
+    public Vector<InstanceClass> getAllChoosen(){
+        Vector<InstanceClass> choosen = new Vector<InstanceClass>();
+        for(int i = 0; i < classes.size(); i++){
+            if(classSelect.get(i)){
+                choosen.add(classes.get(i));
+            }
+        }
+        return choosen;
+    }
+    private void changeInstanceTable() throws NoConnectionToDBException, SQLException {
+        ((InstanceTableModel)instanceTable.getModel()).clearTable();
+        Vector<InstanceClass> choosen = getAllChoosen();
+        if(!choosen.isEmpty()){
+            ((InstanceTableModel)instanceTable.getModel()).addInstances(new Vector<Instance>
+                 (InstanceDAO.getAllByInstanceClasses(getAllChoosen())));
+        }
+        
+        instanceTable.updateUI();
     }
 
 

@@ -14,6 +14,7 @@ import edacc.model.InstaceNotInDBException;
 import edacc.model.Instance;
 import edacc.model.InstanceAlreadyInDBException;
 import edacc.model.InstanceClass;
+import edacc.model.InstanceClassAlreadyInDBException;
 import edacc.model.InstanceClassDAO;
 import edacc.model.InstanceClassMustBeSourceException;
 
@@ -29,6 +30,8 @@ import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -66,7 +69,7 @@ public class ManageDBInstances {
         main.instanceTableModel.fireTableDataChanged();
     }
 
-    public void loadInstaceClasses() throws SQLException{
+    public void loadInstanceClasses() throws SQLException{
         main.instanceClassTableModel.classes.clear();
         main.instanceClassTableModel.classSelect.clear();
         main.instanceClassTableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAll()));
@@ -77,28 +80,46 @@ public class ManageDBInstances {
      * instance files into the "instance table" of the MangeDBMode.
      */
 
-    public void addInstances(){
+    public void addInstances() {
         try {
-            Object input = new Object();
+            //Starts the dialog at which the user has to choose a instance source class or the autogeneration.
             if(main.addInstanceDialog == null){
                 JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-                main.addInstanceDialog = new EDACCAddNewInstanceSelectClassDialog(mainFrame, true, input);
+                main.addInstanceDialog = new EDACCAddNewInstanceSelectClassDialog(mainFrame, true);
                 main.addInstanceDialog.setLocationRelativeTo(mainFrame);
             }
-        EDACCApp.getApplication().show(main.addInstanceDialog);
-            
-            int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
-            File ret = jFileChooserManageDBInstance.getSelectedFile();
-            RecursiveFileScanner InstanceScanner = new RecursiveFileScanner("cnf");
-            Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
-            Vector<Instance> instances = buildInstances(instanceFiles);
-            if (instanceFiles.isEmpty()) {
-                JOptionPane.showMessageDialog(panelManageDBInstances,
-                        "No Instances have been found.",
-                        "Error",
-                        JOptionPane.WARNING_MESSAGE);
+            EDACCApp.getApplication().show(main.addInstanceDialog);
+
+            InstanceClass input = main.addInstanceDialog.getInput();
+            main.addInstanceDialog.dispose();
+            //if the user doesn't cancel the dialog above, the fileChooser is shown.
+            if(input != null){
+                int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
+                File ret = jFileChooserManageDBInstance.getSelectedFile();
+                RecursiveFileScanner InstanceScanner = new RecursiveFileScanner("cnf");
+                Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
+                
+                if (instanceFiles.isEmpty()){
+                    JOptionPane.showMessageDialog(panelManageDBInstances,
+                            "No Instances have been found.",
+                            "Error",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+
+                if(input.getName().equals("")){
+                    Vector<Instance> instances;
+ 
+                        instances = buildInstancesAutogenerateClass(instanceFiles, ret);
+
+                    main.instanceTableModel.addInstances(instances);
+                }else{
+                    Vector<Instance> instances = buildInstancesGivenClass(instanceFiles, (InstanceClass)input);
+                    main.instanceTableModel.addInstances(instances);
+                    loadInstanceClasses();
+                }     
             }
-            main.instanceTableModel.addInstances(instances);
+        } catch (NullPointerException ex) {
+                        Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoConnectionToDBException ex) {
            JOptionPane.showMessageDialog(panelManageDBInstances,
                     ex.getMessage(),
@@ -164,7 +185,7 @@ public class ManageDBInstances {
 
     }
 
-    private Vector<Instance> buildInstances(Vector<File> instanceFiles)
+    /*private Vector<Instance> buildInstances(Vector<File> instanceFiles)
             throws InstanceException, FileNotFoundException, NullPointerException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException {
         Vector<Instance> instances = new Vector<Instance>();
         String duplicatesDB = "";
@@ -189,7 +210,7 @@ public class ManageDBInstances {
                     JOptionPane.ERROR_MESSAGE);
         }
         return instances;
-    }
+    }*/
 
 /**
  * Creates and add a andFilter with the given values to the sorter of EDACCManageDBMode
@@ -288,4 +309,114 @@ public class ManageDBInstances {
         }
         EDACCApp.getApplication().show(main.createInstanceClassDialog);
     }
+
+    /**
+     * Builds the instances of the given files with the instance source class which was choosen by the
+     * User.
+     * @param instanceFiles
+     * @param instanceClass
+     * @return Vector<Instance> of the instances of the from files.
+     * @throws FileNotFoundException
+     * @throws NullPointerException
+     * @throws NullPointerException
+     * @throws IOException
+     * @throws InstanceException
+     * @throws NoSuchAlgorithmException
+     * @throws SQLException
+     */
+    private Vector<Instance> buildInstancesGivenClass(Vector<File> instanceFiles, InstanceClass instanceClass)
+            throws FileNotFoundException, NullPointerException, NullPointerException, IOException,
+            InstanceException, NoSuchAlgorithmException, SQLException {
+
+        Vector<Instance> instances = new Vector<Instance>();
+        String duplicatesDB = "";
+
+        for (int i = 0; i < instanceFiles.size(); i++) {
+
+            try {
+                String md5 = calculateMD5(instanceFiles.get(i));
+                InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
+                Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, tempInstance.n,
+                        tempInstance.m, tempInstance.r, tempInstance.k, md5, instanceClass);{
+                instances.add(temp);
+                InstanceDAO.save(temp);
+                }
+            } catch (InstanceAlreadyInDBException ex) {
+                duplicatesDB += "\n " + instanceFiles.get(i).getAbsolutePath();
+            }
+
+        }
+
+        if(!duplicatesDB.equals("")){
+             JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "The following instances are already in the database: " + duplicatesDB,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        
+        return instances;
+    }
+
+    /**
+     * Builds the instances of the given files and autogenerates the instance source classes.
+     * If a autogenerated instance source class already exists, the existing is used.
+     * @param instanceFiles
+     * @param ret
+     * @return Vector<Instance> with all generated instances.
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     * @throws NullPointerException
+     * @throws InstanceException
+     * @throws SQLException
+     */
+    private Vector<Instance> buildInstancesAutogenerateClass(Vector<File> instanceFiles, File ret) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, InstanceException, SQLException {
+        
+        Vector<Instance> instances = new Vector<Instance>();
+        String duplicatesDB = "";
+        InstanceClass instanceClass;
+
+        for (int i = 0; i < instanceFiles.size(); i++) {
+            try {
+                String name = autogenerateInstanceClassName(ret.getParent(), instanceFiles.get(i));
+                try {
+                    instanceClass = InstanceClassDAO.createInstanceClass(name, "Autogernerated instance source class", true);
+                } catch (InstanceClassAlreadyInDBException ex) {
+                    instanceClass = InstanceClassDAO.getByName(name);
+                }
+                String md5 = calculateMD5(instanceFiles.get(i));
+                InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
+                Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, tempInstance.n, tempInstance.m, tempInstance.r, tempInstance.k, md5, instanceClass);
+                {
+                    instances.add(temp);
+                    InstanceDAO.save(temp);
+                }
+            } catch (InstanceAlreadyInDBException ex) {
+                Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+
+        if(!duplicatesDB.equals("")){
+             JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "The following instances are already in the database: " + duplicatesDB,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
+        return instances;
+     
+    }
+
+    /**
+     * Autogenerates the instance source class name. The name is generated by using the path of the file from
+     * the choosenDirectory down to the parent directory of the instance as the name.
+     * @param root
+     * @param instanceFile
+     * @return
+     */
+    private String autogenerateInstanceClassName(String root, File instanceFile) {
+        return instanceFile.getAbsolutePath().substring(root.length()+1 , instanceFile.getParent().length());
+    }
+
 }

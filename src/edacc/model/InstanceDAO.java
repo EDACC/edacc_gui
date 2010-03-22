@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.Hashtable;
 import java.sql.*;
+import java.util.Vector;
 
 /**
  * data access object for the Instance class
@@ -23,7 +24,7 @@ public class InstanceDAO {
      * @throws SQLException, FileNotFoundException, InstanceAlreadyInDBException
      */
      public static Instance createInstance(File file, String name, int numAtoms, int numClauses ,
-             float ratio, int maxClauseLength, String md5) throws SQLException, FileNotFoundException,
+             float ratio, int maxClauseLength, String md5, InstanceClass instanceClass) throws SQLException, FileNotFoundException,
              InstanceAlreadyInDBException {
          PreparedStatement ps;
          final String Query = "SELECT * FROM " + table +" WHERE md5 = ?";
@@ -41,6 +42,7 @@ public class InstanceDAO {
         i.setRatio(ratio);
         i.setMaxClauseLength(maxClauseLength);
         i.setMd5(md5);
+        i.setInstanceClass(instanceClass);
         save(i);
         cacheInstance(i);
         return i;
@@ -254,5 +256,48 @@ public class InstanceDAO {
         else{
             throw new InstaceNotInDBException();
         }
+    }
+
+    public static LinkedList<Instance> getAllByInstanceClasses(Vector<InstanceClass> allChoosen) throws NoConnectionToDBException, SQLException {
+
+        if(!allChoosen.isEmpty()){
+            
+            String query = "SELECT i.idInstance, i.maxClauseLength, i.md5, i.name, i.numAtoms, i.numClauses," +
+                " i.ratio, i.instanceClass_idinstanceClass FROM " + table + " as i " +
+                " LEFT JOIN instances_has_instanceclass as ii ON i.idInstance = ii.Instances_idInstance " +
+                " WHERE (i.instanceClass_idinstanceClass = " + allChoosen.get(0).getInstanceClassID() + 
+                " AND i.instanceClass_idinstanceClass = " + allChoosen.get(0).getInstanceClassID() + ")";
+            for(int i = 1; i < allChoosen.size(); i++){
+                query += " OR (i.instanceClass_idinstanceClass = " +  allChoosen.get(i).getInstanceClassID() + 
+                         " AND i.instanceClass_idinstanceClass = " + allChoosen.get(i).getInstanceClassID() + ")" ;
+            }
+            Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+            ResultSet rs = st.executeQuery(query);
+            LinkedList<Instance> res = new LinkedList<Instance>();
+            while (rs.next()) {
+                Instance i = new Instance();
+                i.setId(rs.getInt("i.idInstance"));
+                i.setMaxClauseLength(rs.getInt("i.maxClauseLength"));
+                i.setMd5(rs.getString("i.md5"));
+                i.setName(rs.getString("i.name"));
+                i.setNumAtoms(rs.getInt("i.numAtoms"));
+                i.setNumClauses(rs.getInt("i.numClauses"));
+                i.setRatio(rs.getInt("i.ratio"));
+                Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
+                i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
+
+                Instance c = getCached(i);
+                if (c != null) res.add(c);
+                else {
+                    i.setSaved();
+                    cacheInstance(i);
+                    res.add(i);
+                }
+            }
+            rs.close();
+            return res;
+        }
+        
+        return null;
     }
 }

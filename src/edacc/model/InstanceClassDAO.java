@@ -149,6 +149,29 @@ public class InstanceClassDAO {
         return null;
     }
 
+    public static InstanceClass getByName(String name) throws NoConnectionToDBException, SQLException{
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass, name, description, source FROM " + table + " WHERE name=?");
+        st.setString(1, name);
+        ResultSet rs = st.executeQuery();
+        InstanceClass i = new InstanceClass();
+        if (rs.next()) {
+            i.setInstanceClassID(rs.getInt("idinstanceClass"));
+            i.setName(rs.getString("name"));
+            i.setDescription(rs.getString("description"));
+            i.setSource(rs.getBoolean("source"));
+
+            InstanceClass c = getCached(i);
+            if (c != null) {
+                return c;
+            } else {
+                i.setSaved();
+                cacheInstanceClass(i);
+                return i;
+            }
+        }
+        return null;
+    }
+
     /**
      * 
      * @author rretz

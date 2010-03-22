@@ -36,7 +36,7 @@ public class AddInstanceInstanceClassTabelModel extends AbstractTableModel {
             case 1:
                 return classes.get(rowIndex).getDescription();
             case 2:
-                return classes.get(rowIndex).getName();
+                return classes.get(rowIndex);
             default:
                 return "";
         }

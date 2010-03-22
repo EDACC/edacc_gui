@@ -24,14 +24,13 @@ import javax.swing.JOptionPane;
  * @author rretz
  */
 public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
-    Object input;
+    InstanceClass input;
     AddInstanceInstanceClassTabelModel tableModel;
 
     /** Creates new form EDACCAddNewInstanceSelectClassDialog */
-    public EDACCAddNewInstanceSelectClassDialog(java.awt.Frame parent, boolean modal, Object input) throws NoConnectionToDBException, SQLException {
+    public EDACCAddNewInstanceSelectClassDialog(java.awt.Frame parent, boolean modal) throws NoConnectionToDBException, SQLException {
         super(parent, modal);
         initComponents();
-        this.input = input;
         //Filling the table with all instance source class
         tableModel = new AddInstanceInstanceClassTabelModel();
         tableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllSourceClass()));
@@ -152,8 +151,12 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+/**
+ * Modifies the input object according to the user inputs, checks them and close the jDialog.
+ * @param evt jButtonOk clicked
+ */
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
+        this.input = new InstanceClass();
         if(buttonGroupAutomaticOrManuel.getSelection() == null){
             JOptionPane.showMessageDialog(this,
                     "Please choos if the new instance class is a source class oder a user class." ,
@@ -161,8 +164,8 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
                     JOptionPane.ERROR_MESSAGE);
        }else {
           if(jRadioButtonAutomatic.isSelected()){
-            this.input = true;
-            this.dispose();
+            this.input.setName("");
+            this.setVisible(false);
           }else{
             if(jTableInstanceClass.getSelectedRow() == -1){
                 JOptionPane.showMessageDialog(this,
@@ -171,21 +174,26 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
                     JOptionPane.ERROR_MESSAGE);
             }else{
                 int row = jTableInstanceClass.getSelectedRow();
-                this.input = tableModel.getValueAt(row, 2);
-                this.dispose();
+                this.input = (InstanceClass) tableModel.getValueAt(row, 2);
+                this.setVisible(false);
             }
 
           }
        }
         
     }//GEN-LAST:event_jButtonOkActionPerformed
-
+    /**
+     * Modifies the input object to null and close the jDialog.
+     * @param evt jButtonCancel clicked
+     */
     private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelActionPerformed
-        int row = jTableInstanceClass.getSelectedRow();
-        input = jTableInstanceClass.getValueAt(row, 1);
-        this.dispose();
+        input = null;
+        this.setVisible(false);
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
+    public InstanceClass getInput(){
+        return input;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroupAutomaticOrManuel;
