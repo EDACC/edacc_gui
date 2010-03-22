@@ -3,10 +3,10 @@
  *
  * Created on Nov 26, 2009, 7:54:46 PM
  */
-
 package edacc;
 
 import edacc.model.DatabaseConnector;
+import java.awt.event.KeyEvent;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
@@ -77,6 +77,11 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
 
         txtHostname.setText(resourceMap.getString("txtHostname.text")); // NOI18N
         txtHostname.setName("txtHostname"); // NOI18N
+        txtHostname.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtHostnameKeyPressed(evt);
+            }
+        });
 
         lblDatabase.setLabelFor(txtDatabase);
         lblDatabase.setText(resourceMap.getString("lblDatabase.text")); // NOI18N
@@ -85,6 +90,11 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
 
         txtDatabase.setText(resourceMap.getString("txtDatabase.text")); // NOI18N
         txtDatabase.setName("txtDatabase"); // NOI18N
+        txtDatabase.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtDatabaseKeyPressed(evt);
+            }
+        });
 
         lblUsername.setLabelFor(txtUsername);
         lblUsername.setText(resourceMap.getString("lblUsername.text")); // NOI18N
@@ -93,6 +103,11 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
 
         txtUsername.setText(resourceMap.getString("txtUsername.text")); // NOI18N
         txtUsername.setName("txtUsername"); // NOI18N
+        txtUsername.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtUsernameKeyPressed(evt);
+            }
+        });
 
         lblPassword.setLabelFor(txtPassword);
         lblPassword.setText(resourceMap.getString("lblPassword.text")); // NOI18N
@@ -101,6 +116,11 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
 
         txtPort.setText(resourceMap.getString("txtPort.text")); // NOI18N
         txtPort.setName("txtPort"); // NOI18N
+        txtPort.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtPortKeyPressed(evt);
+            }
+        });
 
         lblPort.setLabelFor(txtPort);
         lblPort.setText(resourceMap.getString("lblPort.text")); // NOI18N
@@ -114,6 +134,11 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
 
         txtPassword.setText(resourceMap.getString("txtPassword.text")); // NOI18N
         txtPassword.setName("txtPassword"); // NOI18N
+        txtPassword.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtPasswordKeyPressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -192,16 +217,52 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         try {
             DatabaseConnector.getInstance().connect(txtHostname.getText(), Integer.parseInt(txtPort.getText()), txtUsername.getText(), txtDatabase.getText(), txtPassword.getText());
             this.setVisible(false);
-        }
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             JOptionPane.showMessageDialog(this, "Couldn't find the MySQL jdbc driver Connector-J. Make sure it's in your Java class path", "Database driver not found", JOptionPane.ERROR_MESSAGE);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Couldn't connect to the database: \n\n" + e.getMessage(), "Connection error", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_btnConnectActionPerformed
 
+    private void txtHostnameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtHostnameKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            txtHostname.select(0, 0);
+            txtPort.requestFocus();
+            txtPort.selectAll();
+        }
+    }//GEN-LAST:event_txtHostnameKeyPressed
+
+    private void txtPortKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPortKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            txtPort.select(0, 0);
+            txtDatabase.requestFocus();
+            txtDatabase.selectAll();
+        }
+    }//GEN-LAST:event_txtPortKeyPressed
+
+    private void txtDatabaseKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDatabaseKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            txtDatabase.select(0, 0);
+            txtUsername.requestFocus();
+            txtUsername.selectAll();
+        }
+    }//GEN-LAST:event_txtDatabaseKeyPressed
+
+    private void txtUsernameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUsernameKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            txtUsername.select(0, 0);
+            txtPassword.requestFocus();
+            txtPassword.selectAll();
+        }
+    }//GEN-LAST:event_txtUsernameKeyPressed
+
+    private void txtPasswordKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPasswordKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
+        {
+            btnConnectActionPerformed(null);
+        }
+    }//GEN-LAST:event_txtPasswordKeyPressed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnConnect;
@@ -217,5 +278,4 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
     private javax.swing.JTextField txtPort;
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
-
 }

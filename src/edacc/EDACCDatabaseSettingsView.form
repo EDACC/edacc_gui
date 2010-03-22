@@ -149,6 +149,9 @@
         <Property name="text" type="java.lang.String" resourceKey="txtHostname.text"/>
         <Property name="name" type="java.lang.String" value="txtHostname" noResource="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtHostnameKeyPressed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lblDatabase">
       <Properties>
@@ -167,6 +170,9 @@
         <Property name="text" type="java.lang.String" resourceKey="txtDatabase.text"/>
         <Property name="name" type="java.lang.String" value="txtDatabase" noResource="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtDatabaseKeyPressed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lblUsername">
       <Properties>
@@ -185,6 +191,9 @@
         <Property name="text" type="java.lang.String" resourceKey="txtUsername.text"/>
         <Property name="name" type="java.lang.String" value="txtUsername" noResource="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtUsernameKeyPressed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lblPassword">
       <Properties>
@@ -203,6 +212,9 @@
         <Property name="text" type="java.lang.String" resourceKey="txtPort.text"/>
         <Property name="name" type="java.lang.String" value="txtPort" noResource="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtPortKeyPressed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lblPort">
       <Properties>
@@ -233,6 +245,9 @@
         <Property name="text" type="java.lang.String" resourceKey="txtPassword.text"/>
         <Property name="name" type="java.lang.String" value="txtPassword" noResource="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtPasswordKeyPressed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
