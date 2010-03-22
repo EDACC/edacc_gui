@@ -10,6 +10,7 @@ import edacc.model.InstanceClass;
 import edacc.model.InstanceDAO;
 import edacc.model.NoConnectionToDBException;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -132,12 +133,12 @@ public class InstanceClassTableModel extends AbstractTableModel{
         }
         return choosen;
     }
-    private void changeInstanceTable() throws NoConnectionToDBException, SQLException {
+    public void changeInstanceTable() throws NoConnectionToDBException, SQLException {
         ((InstanceTableModel)instanceTable.getModel()).clearTable();
         Vector<InstanceClass> choosen = getAllChoosen();
         if(!choosen.isEmpty()){
-            ((InstanceTableModel)instanceTable.getModel()).addInstances(new Vector<Instance>
-                 (InstanceDAO.getAllByInstanceClasses(getAllChoosen())));
+            LinkedList<Instance> test = InstanceDAO.getAllByInstanceClasses(getAllChoosen());
+            ((InstanceTableModel)instanceTable.getModel()).addInstances(new Vector<Instance>(test));
         }
         
         instanceTable.updateUI();

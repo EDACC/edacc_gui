@@ -910,6 +910,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
         btnRemoveFromClass.setText(resourceMap.getString("btnRemoveFromClass.text")); // NOI18N
         btnRemoveFromClass.setName("btnRemoveFromClass"); // NOI18N
+        btnRemoveFromClass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveFromClassActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelButtonsInstancesLayout = new javax.swing.GroupLayout(panelButtonsInstances);
         panelButtonsInstances.setLayout(panelButtonsInstancesLayout);
@@ -1287,6 +1292,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private void btnAddToClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddToClassActionPerformed
         manageDBInstances.addInstancesToClass(tableInstances.getSelectedRows());
     }//GEN-LAST:event_btnAddToClassActionPerformed
+
+    private void btnRemoveFromClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveFromClassActionPerformed
+        manageDBInstances.RemoveInstanceFromInstanceClass( tableInstances.getSelectedRows() );
+    }//GEN-LAST:event_btnRemoveFromClassActionPerformed
 
     private void parameterChanged() {
         if (tableParameters.getSelectedRow() == -1) {

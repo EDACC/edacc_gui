@@ -20,6 +20,7 @@ import edacc.model.InstanceClassDAO;
 import edacc.model.InstanceClassMustBeSourceException;
 
 import edacc.model.InstanceDAO;
+import edacc.model.InstanceHasInstanceClass;
 import edacc.model.InstanceHasInstanceClassDAO;
 import edacc.model.InstanceIsInExperimentException;
 import edacc.model.InstanceSourceClassHasInstance;
@@ -122,7 +123,8 @@ public class ManageDBInstances {
                     Vector<Instance> instances = buildInstancesGivenClass(instanceFiles, (InstanceClass)input);
                     main.instanceTableModel.addInstances(instances);
                     loadInstanceClasses();
-                }     
+                }
+                main.instanceClassTableModel.changeInstanceTable();
             }
         } catch (NullPointerException ex) {
                         Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
@@ -157,6 +159,7 @@ public class ManageDBInstances {
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
+
     }
 
     /**
@@ -447,6 +450,7 @@ public class ManageDBInstances {
                         InstanceHasInstanceClassDAO.createInstanceHasInstance(temp, input);
                     }
                 }
+                main.instanceClassTableModel.changeInstanceTable();
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
@@ -462,6 +466,47 @@ public class ManageDBInstances {
                     JOptionPane.ERROR_MESSAGE);
         }
 
+    }
+
+    public void RemoveInstanceFromInstanceClass(int[] selectedRowsInstance){
+        Vector<InstanceClass> instanceClass = main.instanceClassTableModel.getAllChoosen();
+        Boolean isSource = false;
+        try {
+            for(int i = 0; i < selectedRowsInstance.length; i++){
+                Instance tempInstance = (Instance) main.instanceTableModel.getValueAt(i, 5);
+                for(int j = 0; j < instanceClass.size(); j++){
+                    InstanceClass tempInstanceClass = instanceClass.get(j);
+                    if(tempInstanceClass.isSource()){
+                       isSource = true;
+                    }else{
+                            InstanceHasInstanceClass rem = InstanceHasInstanceClassDAO.getInstanceHasInstanceClass(tempInstanceClass, tempInstance);
+                            if (rem != null) {
+                                InstanceHasInstanceClassDAO.removeInstanceHasInstanceClass(rem);
+                            }
+
+                    }
+                }
+            }
+            if(isSource){
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "Some of the choosen instance classes are source classes, " +
+                    "the selected instances couldn't removed from them.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+            main.instanceClassTableModel.changeInstanceTable();
+
+        } catch (NoConnectionToDBException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                ex.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+       } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                "There is a Problem with the database: " + ex.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+       }
     }
 
 }

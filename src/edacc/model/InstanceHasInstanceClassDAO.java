@@ -166,4 +166,19 @@ public class InstanceHasInstanceClassDAO {
         }
         return elements;
     }
+
+    public static InstanceHasInstanceClass getInstanceHasInstanceClass(InstanceClass tempInstanceClass,
+            Instance tempInstance) throws NoConnectionToDBException, SQLException {
+        String query = "SELECT * FROM " + table + " WHERE instanceClass_idinstanceClass=? " +
+                "AND Instances_idInstance = ?";
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        st.setInt(1, tempInstanceClass.getInstanceClassID());
+        st.setInt(2, tempInstance.getId());
+        ResultSet rs = st.executeQuery();
+        if(rs.next()) {
+            InstanceHasInstanceClass i = getInstanceHasInstanceClassFromResultset(rs);
+            return i;
+        }
+        return null;
+    }
 }

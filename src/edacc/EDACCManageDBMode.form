@@ -1195,6 +1195,9 @@
                         <Property name="text" type="java.lang.String" resourceKey="btnRemoveFromClass.text"/>
                         <Property name="name" type="java.lang.String" value="btnRemoveFromClass" noResource="true"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRemoveFromClassActionPerformed"/>
+                      </Events>
                     </Component>
                   </SubComponents>
                 </Container>
