@@ -183,13 +183,11 @@ public class EDACCView extends FrameView implements Observer {
 
         disconnectMenuItem.setAction(actionMap.get("btnDisconnect")); // NOI18N
         disconnectMenuItem.setText(resourceMap.getString("disconnectMenuItem.text")); // NOI18N
-        disconnectMenuItem.setEnabled(false);
         disconnectMenuItem.setName("disconnectMenuItem"); // NOI18N
         fileMenu.add(disconnectMenuItem);
 
         generateDBMenuItem.setAction(actionMap.get("btnGenerateTables")); // NOI18N
         generateDBMenuItem.setText(resourceMap.getString("generateDBMenuItem.text")); // NOI18N
-        generateDBMenuItem.setEnabled(false);
         generateDBMenuItem.setName("generateDBMenuItem"); // NOI18N
         fileMenu.add(generateDBMenuItem);
 

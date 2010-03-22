@@ -11,6 +11,7 @@ import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.Solver;
 import java.sql.SQLException;
+import java.util.Vector;
 
 /**
  *
@@ -26,6 +27,18 @@ public class ManageDBParameters {
     public ManageDBParameters(EDACCManageDBMode gui, ParameterTableModel parameterTableModel){
         this.gui = gui;
         this.parameterTableModel = parameterTableModel;
+    }
+
+    /**
+     * Loads all parameters of the given solvers to the parameter table model.
+     * @param solvers
+     */
+    public void loadParametersOfSolvers(Vector<Solver> solvers) throws SQLException {
+        for (Solver s : solvers) {
+            for (Parameter p : ParameterDAO.getParameterFromSolverId(s.getId())) {
+                parameterTableModel.addParameter(s, p);
+            }
+        }
     }
 
     public void saveParameters(Solver s) throws NoConnectionToDBException, SQLException{

@@ -20,6 +20,8 @@ import edacc.model.Solver;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -48,10 +50,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     public EDACCManageDBMode() {
         initComponents();
 
-        
-        manageDBInstances = new ManageDBInstances(this, panelManageDBInstances, 
+
+        manageDBInstances = new ManageDBInstances(this, panelManageDBInstances,
                 jFileChooserManageDBInstance, jFileChooserManageDBExportInstance);
-        
+
         // initialize instance table
         instanceTableModel = new InstanceTableModel();
         tableInstances.setModel(instanceTableModel);
@@ -79,11 +81,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
     void initialize() throws NoConnectionToDBException, SQLException {
         manageDBSolvers.loadSolvers();
-        for (Solver s : solverTableModel.getSolvers()) {
-            for (Parameter p : ParameterDAO.getParameterFromSolverId(s.getId())) {
-                parameterTableModel.addParameter(s, p);
-            }
-        }
+        manageDBParameters.loadParametersOfSolvers(solverTableModel.getSolvers());
         manageDBInstances.loadInstanceClasses();
     }
 
@@ -1170,13 +1168,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
     private void btnExportInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportInstancesActionPerformed
         try {
-            if(tableInstances.getSelectedRowCount() == 0){
-                 JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "No instances are selected: " ,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            if (tableInstances.getSelectedRowCount() == 0) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "No instances are selected: ",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } else {
+                manageDBInstances.exportInstances(tableInstances.getSelectedRows());
             }
-            else manageDBInstances.exportInstances(tableInstances.getSelectedRows());
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
                     "The instances couldn't be written: " + ex.getMessage(),
@@ -1210,19 +1209,19 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             manageDBInstances.RemoveInstanceClass(tableInstanceClass.getSelectedRows());
             tableInstanceClass.updateUI();
         } catch (NoConnectionToDBException ex) {
-             JOptionPane.showMessageDialog(panelManageDBInstances,
+            JOptionPane.showMessageDialog(panelManageDBInstances,
                     "No connection to database: " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
-           JOptionPane.showMessageDialog(panelManageDBInstances,
+            JOptionPane.showMessageDialog(panelManageDBInstances,
                     "SQL-Exception: " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         } catch (InstanceSourceClassHasInstance ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "Some of the selected classes couldn't be removed, because they are sourceclasses and" +
-                    "contain still any instances." ,
+                    "Some of the selected classes couldn't be removed, because they are sourceclasses and"
+                    + "contain still any instances.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -1240,7 +1239,27 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     }//GEN-LAST:event_btnParametersDeleteActionPerformed
 
     private void btnSolverRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverRefreshActionPerformed
-        tableSolver.updateUI();
+        if (JOptionPane.showConfirmDialog(this,
+                "This will reload all data from DB. You are going to lose all your unsaved changes. Do you wish to continue?",
+                "Warning!",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+            try {
+                manageDBSolvers.loadSolvers();
+                manageDBParameters.loadParametersOfSolvers(solverTableModel.getSolvers());
+                tableSolver.updateUI();
+                tableParameters.updateUI();
+            } catch (NoConnectionToDBException ex) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "No connection to database: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "SQL-Exception while refreshing tables: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_btnSolverRefreshActionPerformed
 
     private void btnParametersRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnParametersRefreshActionPerformed
@@ -1269,8 +1288,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         try {
             p.setOrder(Integer.parseInt(tfParametersOrder.getText()));
         } catch (NumberFormatException e) {
-            if (!tfParametersOrder.getText().equals(""))
+            if (!tfParametersOrder.getText().equals("")) {
                 tfParametersOrder.setText(Integer.toString(p.getOrder()));
+            }
         }
         p.setPrefix(tfParametersPrefix.getText());
         tableParameters.updateUI();
@@ -1316,6 +1336,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             tfParametersName.setText(currentParameter.getName());
             tfParametersOrder.setText(Integer.toString(currentParameter.getOrder()));
             tfParametersPrefix.setText(currentParameter.getPrefix());
+        } else {
+            tfParametersName.setText("");
+            tfParametersOrder.setText("");
+            tfParametersPrefix.setText("");
         }
         tfParametersName.setEnabled(enabled);
         tfParametersPrefix.setEnabled(enabled);
