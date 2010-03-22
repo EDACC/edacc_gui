@@ -75,17 +75,21 @@ public class InstanceDAO {
             // insert query, set ID!
             // TODO insert instance blob
             // insert instance into db
-            final String insertQuery = "INSERT INTO " + table + " (name, md5, numAtoms, numClauses, ratio, maxClauseLength, instance, instanceClass_idinstanceClass) " +
+            final String insertQuery = "INSERT INTO " + table + " (name, md5, numAtoms, numClauses, ratio, maxClauseLength, instanceClass_idinstanceClass, instance) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+            if (instance.getFile() != null)
+                ps.setBinaryStream(8, new FileInputStream(instance.getFile()));
+            else
+                ps.setNull(8, Types.INTEGER);
         }
         else if (instance.isModified()) {
             // update query
-            final String updateQuery = "UPDATE " + table + " SET name=?, md5=?, numAtoms=?, numClauses=?, ratio=?, maxClauseLength=?, instance=?, instanceClass_idinstanceClass=? " +
+            final String updateQuery = "UPDATE " + table + " SET name=?, md5=?, numAtoms=?, numClauses=?, ratio=?, maxClauseLength=?, instanceClass_idinstanceClass=? " +
                     "WHERE idInstance=?";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
            
-            ps.setInt(9, instance.getId());
+            ps.setInt(8, instance.getId());
             
         } else
             return;
@@ -96,11 +100,10 @@ public class InstanceDAO {
         ps.setInt(4, instance.getNumClauses());
         ps.setFloat(5, instance.getRatio());
         ps.setInt(6, instance.getMaxClauseLength());
-        ps.setBinaryStream(7, new FileInputStream(instance.getFile()));
         if (instance.getInstanceClass() != null)
-            ps.setInt(8, instance.getInstanceClass().getInstanceClassID());
+            ps.setInt(7, instance.getInstanceClass().getInstanceClassID());
         else
-            ps.setNull(8, Types.INTEGER);
+            ps.setNull(7, Types.INTEGER);
 
         ps.executeUpdate();
 
@@ -110,7 +113,7 @@ public class InstanceDAO {
             if (rs.next())
                 instance.setId(rs.getInt(1));
         }
-
+       
         instance.setSaved();
     }
 
