@@ -255,7 +255,7 @@ public class SolverDAO {
      * @return
      */
     public static File getBinaryFileOfSolver(Solver s) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
-        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `binary` FROM " + table + " WHERE id=?");
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `binary` FROM " + table + " WHERE idSolver=?");
         ps.setInt(1, s.getId());
         ResultSet rs = ps.executeQuery();
         File f = null;
