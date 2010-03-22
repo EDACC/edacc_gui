@@ -25,6 +25,7 @@ public class InstanceClassTableModel extends AbstractTableModel{
      protected Vector <InstanceClass> classes;
      protected Vector <Boolean> classSelect;
      protected JTable instanceTable;
+     protected Boolean all = false;
 
 
     public InstanceClassTableModel(JTable instanceTable) {
@@ -93,9 +94,20 @@ public class InstanceClassTableModel extends AbstractTableModel{
     }
 
     public void setInstanceClassSelected(int row){
-        this.classSelect.add(row, true);
+        if(!all){
+            setValueAt(true, row, 3 );
+        }
+        else {
+            setValueAt(false, row, 3);
+        }
+
     }
 
+    public void setAll(){
+        if(all) all = false;
+        else all = true;
+    }
+    
      public void setValueAt(Object value, int row, int col) {
         if(col == 3){
             classSelect.set(row, (Boolean) value);

@@ -94,11 +94,15 @@ public class ManageDBInstances {
             main.addInstanceDialog.dispose();
             //if the user doesn't cancel the dialog above, the fileChooser is shown.
             if(input != null){
+                
+                //When the user choos autogenerate only directorys can be choosen, else files and directorys.
+                if(input.getName().equals("")) jFileChooserManageDBInstance.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                else jFileChooserManageDBInstance.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+
                 int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
                 File ret = jFileChooserManageDBInstance.getSelectedFile();
                 RecursiveFileScanner InstanceScanner = new RecursiveFileScanner("cnf");
                 Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
-                
                 if (instanceFiles.isEmpty()){
                     JOptionPane.showMessageDialog(panelManageDBInstances,
                             "No Instances have been found.",
@@ -283,6 +287,7 @@ public class ManageDBInstances {
         for(int i = 0; i < main.instanceClassTableModel.getRowCount(); i++){
             main.instanceClassTableModel.setInstanceClassSelected(i);
         }
+        main.instanceClassTableModel.setAll();
     }
 
     public void RemoveInstanceClass(int[] selectedRows) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance {

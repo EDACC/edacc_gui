@@ -84,7 +84,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                 parameterTableModel.addParameter(s, p);
             }
         }
-        manageDBInstances.loadInstances();
         manageDBInstances.loadInstanceClasses();
     }
 
@@ -1203,6 +1202,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
     private void btnSelectAllInstanceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstanceClassesActionPerformed
         manageDBInstances.SelectAllInstanceClass();
+
     }//GEN-LAST:event_btnSelectAllInstanceClassesActionPerformed
 
     private void btnRemoveInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstanceClassActionPerformed

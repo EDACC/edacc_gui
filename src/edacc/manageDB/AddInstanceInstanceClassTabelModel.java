@@ -29,6 +29,11 @@ public class AddInstanceInstanceClassTabelModel extends AbstractTableModel {
         return columns.length;
     }
 
+    @Override
+    public String getColumnName(int column){
+        return columns[column];
+    }
+
     public Object getValueAt(int rowIndex, int columnIndex) {
          switch (columnIndex) {
             case 0:
