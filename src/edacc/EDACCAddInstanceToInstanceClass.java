@@ -37,7 +37,7 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
         //Initiate the instance source class table
         AddInstanceInstanceClassTabelModel userTableModel = new AddInstanceInstanceClassTabelModel();
         jTableUserClass.setModel(userTableModel);
-        sourceTableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllUserClass()));
+        userTableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllUserClass()));
     }
 
     public InstanceClass getInput(){
