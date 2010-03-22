@@ -3,6 +3,8 @@ package edacc.model;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.Hashtable;
@@ -258,6 +260,13 @@ public class InstanceDAO {
         }
     }
 
+    /**
+     * 
+     * @param allChoosen
+     * @return all instances from the database which have one of the given instance classes and returns them.
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     */
     public static LinkedList<Instance> getAllByInstanceClasses(Vector<InstanceClass> allChoosen) throws NoConnectionToDBException, SQLException {
 
         if(!allChoosen.isEmpty()){
@@ -299,5 +308,30 @@ public class InstanceDAO {
         }
         
         return null;
+    }
+    
+    /**
+     * Copies the binary file of an instance to a temporary location on the file system
+     * and returns a File reference on it.
+     * @param s
+     * @return
+     */
+    public static File getBinaryFileOfInstance(Instance i) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `instance` FROM " + table + " WHERE id=?");
+        ps.setInt(1, i.getId());
+        ResultSet rs = ps.executeQuery();
+        File f = null;
+        if (rs.next()) {
+            f = new File(i.getId() + "_" + i.getName());
+            FileOutputStream out = new FileOutputStream(f);
+            InputStream in = rs.getBinaryStream("instance");
+            int data;
+            while ((data = in.read()) > -1) {
+                out.write(data);
+            }
+            out.close();
+            in.close();
+        }
+        return f;
     }
 }

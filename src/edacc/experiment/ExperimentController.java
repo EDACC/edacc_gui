@@ -11,11 +11,14 @@ import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
+import edacc.model.NoConnectionToDBException;
 import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import edacc.model.Tasks;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -337,10 +340,40 @@ public class ExperimentController {
     /**
      * Generates a ZIP archive with the necessary files for the grid.
      */
-    public void generatePackage() throws FileNotFoundException, IOException {
-        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(activeExperiment.getDate().toString() + " - " + activeExperiment.getName()));
+    public void generatePackage() throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException {
+        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(activeExperiment.getDate().toString() + " - " + activeExperiment.getName() + ".zip"));
         final String fileSep = System.getProperty("file.separator");
         ZipEntry entry;
+
+        // add solvers to zip file
+        Vector<Solver> solvers = ExperimentDAO.getSolversInExperiment(activeExperiment);
+        for (Solver s : solvers) {
+            File bin = SolverDAO.getBinaryFileOfSolver(s);
+            FileInputStream in = new FileInputStream(bin);
+            entry = new ZipEntry("solvers" + fileSep + s.getBinaryName());
+            zos.putNextEntry(entry);
+            int data;
+            while ((data = in.read()) > -1) {
+                zos.write(data);
+            }
+            zos.closeEntry();
+            in.close();
+        }
+
+        // add instances to zip file
+        LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
+        for (Instance i : instances) {
+            File f = InstanceDAO.getBinaryFileOfInstance(i);
+            FileInputStream in = new FileInputStream(f);
+            entry = new ZipEntry("instances" + fileSep + i.getId() + "_" + i.getName());
+            zos.putNextEntry(entry);
+            int data;
+            while ((data = in.read()) > -1) {
+                zos.write(data);
+            }
+            zos.closeEntry();
+            in.close();
+        }
 
         zos.close();
     }

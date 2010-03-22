@@ -83,7 +83,7 @@ public class Instance extends BaseModel {
         file = null;
     }
 
-    public File getFile() {
+    protected File getFile() {
         return file;
     }
 
