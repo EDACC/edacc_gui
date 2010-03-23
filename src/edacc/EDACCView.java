@@ -109,6 +109,7 @@ public class EDACCView extends FrameView implements Observer {
                 mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(noMode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
 
         mode = noMode;
+        updateConnectionStateView();
     }
 
     private void createDatabaseErrorMessage(SQLException e) {
