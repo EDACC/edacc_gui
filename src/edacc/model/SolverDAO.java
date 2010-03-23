@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.Hashtable;
 import java.util.LinkedList;
 
@@ -55,7 +56,10 @@ public class SolverDAO {
             ps.setBinaryStream(3, new FileInputStream(solver.getBinaryFile()));
             ps.setString(4, solver.getDescription());
             ps.setString(5, solver.getMd5());
-            ps.setBinaryStream(6, new FileInputStream(solver.getCodeFile()));
+            if (solver.getCodeFile() != null)
+                ps.setBinaryStream(6, new FileInputStream(solver.getCodeFile()));
+            else
+                ps.setNull(6, Types.BLOB);
             ps.executeUpdate();
         } else {
             // if solver already in DB, then update it
@@ -249,18 +253,16 @@ public class SolverDAO {
     }
 
     /**
-     * Copies the binary file of a solver to a temporary location on the file system
-     * and returns a File reference on it.
+     * Copies the binary file of a solver to a specified location on the file system.
      * @param s
+     * @param f the file where the binary shall be stored
      * @return
      */
-    public static File getBinaryFileOfSolver(Solver s) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+    public static void getBinaryFileOfSolver(Solver s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `binary` FROM " + table + " WHERE idSolver=?");
         ps.setInt(1, s.getId());
         ResultSet rs = ps.executeQuery();
-        File f = null;
         if (rs.next()) {
-            f = new File(s.getBinaryName());
             FileOutputStream out = new FileOutputStream(f);
             InputStream in = rs.getBinaryStream("binary");
             int data;
@@ -270,6 +272,21 @@ public class SolverDAO {
             out.close();
             in.close();
         }
+    }
+
+    /**
+     * Copies the binary file of a solver to a temporary location on the file system
+     * and returns a File reference on it.
+     * @param s
+     * @return
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static File getBinaryFileOfSolver(Solver s) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        File f = new File(s.getBinaryName());
+        getBinaryFileOfSolver(s, f);
         return f;
     }
 }

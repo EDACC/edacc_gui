@@ -137,6 +137,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         chkLinkSeeds = new javax.swing.JCheckBox();
         lblCurNumRuns = new javax.swing.JLabel();
         lblCurTimeout = new javax.swing.JLabel();
+        btnGeneratePackage = new javax.swing.JButton();
         panelJobBrowser = new javax.swing.JPanel();
         jScrollPane6 = new javax.swing.JScrollPane();
         tableJobs = new javax.swing.JTable();
@@ -247,7 +248,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                         .addComponent(btnRemoveExperiment)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnLoadExperiment))
-                    .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
+                    .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 657, Short.MAX_VALUE)
                     .addComponent(pnlNewExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
@@ -339,7 +340,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelChooseSolverLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelChooseSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 657, Short.MAX_VALUE)
                     .addGroup(panelChooseSolverLayout.createSequentialGroup()
                         .addComponent(btnSelectAllSolvers)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -348,7 +349,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                         .addComponent(btnReverseSolverSelection)
                         .addGap(149, 149, 149)
                         .addComponent(btnChooseSolvers)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 96, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                         .addComponent(btnSaveSolverConfigurations)))
                 .addContainerGap())
         );
@@ -492,6 +493,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         lblCurTimeout.setText(resourceMap.getString("lblCurTimeout.text")); // NOI18N
         lblCurTimeout.setName("lblCurTimeout"); // NOI18N
 
+        btnGeneratePackage.setText(resourceMap.getString("generatePackage.text")); // NOI18N
+        btnGeneratePackage.setActionCommand(resourceMap.getString("generatePackage.actionCommand")); // NOI18N
+        btnGeneratePackage.setName("generatePackage"); // NOI18N
+        btnGeneratePackage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGeneratePackage(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -499,10 +509,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnGenerateJobs)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblNumJobs))
                     .addComponent(chkLinkSeeds)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -522,8 +528,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblCurTimeout)
-                            .addComponent(lblCurNumRuns))))
-                .addContainerGap(434, Short.MAX_VALUE))
+                            .addComponent(lblCurNumRuns)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(btnGeneratePackage, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnGenerateJobs, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblNumJobs)))
+                .addContainerGap(362, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -552,7 +564,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                             .addComponent(btnGenerateJobs)
                             .addComponent(lblNumJobs, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(lblCurTimeout))
-                .addContainerGap(384, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnGeneratePackage)
+                .addContainerGap(347, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout panelExperimentParamsLayout = new javax.swing.GroupLayout(panelExperimentParams);
@@ -598,8 +612,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             .addGroup(panelJobBrowserLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnRefreshJobs)
-                .addContainerGap(660, Short.MAX_VALUE))
-            .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 753, Short.MAX_VALUE)
+                .addContainerGap(588, Short.MAX_VALUE))
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 681, Short.MAX_VALUE)
         );
         panelJobBrowserLayout.setVerticalGroup(
             panelJobBrowserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -619,7 +633,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 758, Short.MAX_VALUE)
+                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 686, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -648,6 +662,21 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             expController.loadJobs();
         }
     }//GEN-LAST:event_manageExperimentPaneStateChanged
+
+    private void btnGeneratePackage(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGeneratePackage
+        try {
+                // Generate zip archive
+                expController.generatePackage();
+            } catch (FileNotFoundException ex) {
+                System.out.println(ex);
+            } catch (IOException ex) {
+                System.out.println(ex);
+            } catch (NoConnectionToDBException ex){
+                System.out.println(ex);
+            } catch (SQLException ex){
+                System.out.println(ex);
+            }
+    }//GEN-LAST:event_btnGeneratePackage
     /**
      * Method to be called after an experiment is loaded.
      */
@@ -808,18 +837,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             Tasks.startTask("generateJobs", new Class[] {int.class, int.class, boolean.class, int.class, boolean.class, edacc.model.Tasks.class}, new Object[] {numRuns, timeout, generateSeeds, maxSeed, linkSeeds, null}, expController, this, 0);
             lblCurNumRuns.setText("currently: " + txtNumRuns.getText());
             lblCurTimeout.setText("currently: " + txtTimeout.getText());
-            try {
-                // Generate zip archive
-                expController.generatePackage();
-            } catch (FileNotFoundException ex) {
-                System.out.println(ex);
-            } catch (IOException ex) {
-                System.out.println(ex);
-            } catch (NoConnectionToDBException ex){
-                System.out.println(ex);
-            } catch (SQLException ex){
-                System.out.println(ex);
-            }
         }
         catch (AlreadyRunningTaskException ex) {
             javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage());
@@ -858,6 +875,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     private javax.swing.JButton btnDeselectAllSolvers;
     private javax.swing.JButton btnFilterInstances;
     private javax.swing.JButton btnGenerateJobs;
+    private javax.swing.JButton btnGeneratePackage;
     private javax.swing.JButton btnInvertSelection;
     private javax.swing.JButton btnLoadExperiment;
     private javax.swing.JButton btnRefreshJobs;
