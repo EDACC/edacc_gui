@@ -17,6 +17,7 @@ import edacc.experiment.InstanceTableModel;
 import edacc.experiment.InstanceTableModelRowFilter;
 import edacc.experiment.SolverTableModel;
 import edacc.model.AlreadyRunningTaskException;
+import edacc.model.NoConnectionToDBException;
 import edacc.model.Solver;
 import edacc.model.Tasks;
 import java.io.FileNotFoundException;
@@ -813,6 +814,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             } catch (FileNotFoundException ex) {
                 System.out.println(ex);
             } catch (IOException ex) {
+                System.out.println(ex);
+            } catch (NoConnectionToDBException ex){
+                System.out.println(ex);
+            } catch (SQLException ex){
                 System.out.println(ex);
             }
         }
