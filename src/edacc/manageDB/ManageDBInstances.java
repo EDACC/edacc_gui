@@ -257,6 +257,14 @@ public class ManageDBInstances {
         table.setRowSorter(null);
     }
 
+    /**
+     *
+     * @param file
+     * @return md5sum of the given File
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     */
     public String calculateMD5(File file) throws FileNotFoundException, IOException, NoSuchAlgorithmException {
         return Util.calculateMD5(file);
     }
@@ -295,6 +303,13 @@ public class ManageDBInstances {
         main.instanceClassTableModel.setAll();
     }
 
+    /**
+     * Removes the selected instance classes.
+     * @param selectedRows The instance classes to remove.
+     * @throws SQLException
+     * @throws NoConnectionToDBException
+     * @throws InstanceSourceClassHasInstance if one of the selected classes are a source class which has a refernce to an Instance.
+     */
     public void RemoveInstanceClass(int[] selectedRows) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance {
         InstanceClass instanceClass;
         Boolean fail = false;
@@ -311,6 +326,9 @@ public class ManageDBInstances {
         if(fail) throw new InstanceSourceClassHasInstance();
     }
 
+    /**
+     * Opens a EDACCCreateInstanceClassDialog to create a new instance class.
+     */
     public void addInstanceClasses() {
         if(main.createInstanceClassDialog == null){
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
@@ -429,6 +447,11 @@ public class ManageDBInstances {
         return instanceFile.getAbsolutePath().substring(root.length()+1 , instanceFile.getParent().length());
     }
 
+    /**
+     * Adds the selected instances to a new instance user class or changes their instance source class.
+     * This is decided by the user in the EDACCAddInstanceToInstanceClass Dialog.
+     * @param selectedRows The rows of the selected instances
+     */
     public void addInstancesToClass(int[] selectedRows){
         try {
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
@@ -468,6 +491,11 @@ public class ManageDBInstances {
 
     }
 
+    /**
+     * Removes the choosen instances from the selected instance classes in the instanceClasstable.
+     * If one of the selected instance classes is a source class a error message will occur.
+     * @param selectedRowsInstance
+     */
     public void RemoveInstanceFromInstanceClass(int[] selectedRowsInstance){
         Vector<InstanceClass> instanceClass = main.instanceClassTableModel.getAllChoosen();
         Boolean isSource = false;

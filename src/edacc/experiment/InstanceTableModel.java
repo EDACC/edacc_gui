@@ -52,6 +52,7 @@ public class InstanceTableModel extends AbstractTableModel {
 
     public InstanceTableModel() {
         this.instances = new Vector<Instance>();
+        this.selected = new Boolean[0];
     }
 
     public int getRowCount() {
@@ -112,4 +113,10 @@ public class InstanceTableModel extends AbstractTableModel {
         }
     }
 
+    public void clearTable(){
+        instances.clear();
+        for (int i = 0; i < selected.length; i++) {
+            selected[i] = false;
+        }
+    }
 }
