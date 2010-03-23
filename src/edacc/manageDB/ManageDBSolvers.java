@@ -5,6 +5,7 @@
 
 package edacc.manageDB;
 
+import edacc.model.MD5CheckFailedException;
 import edacc.model.SolverIsInExperimentException;
 import edacc.EDACCManageDBMode;
 import edacc.model.NoConnectionToDBException;
@@ -112,5 +113,20 @@ public class ManageDBSolvers {
             // if the solver isn't in the db, just remove it from the table model
         } 
         solverTableModel.removeSolver(currentSolver);
+    }
+
+    /**
+     * Exports the binary of a solver to the file system.
+     * @param s The solver to be exported
+     * @param f The location where the binary shall be stored. If it is a directory,
+     * the binaryName field of the solver will be used as filename.
+     */
+    public void exportSolver(Solver s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException, MD5CheckFailedException {
+        if (f.isDirectory())
+            f = new File(f.getAbsolutePath() + System.getProperty("file.separator") + s.getBinaryName());
+        SolverDAO.getBinaryFileOfSolver(s, f);
+        String md5File = Util.calculateMD5(f);
+        if (!md5File.equals(s.getMd5()))
+            throw new MD5CheckFailedException("The exported solver binary of solver \"" + s.getName() + "\" seems to be corrupt!");
     }
 }
