@@ -10,6 +10,8 @@ import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.Instance;
+import edacc.model.InstanceClass;
+import edacc.model.InstanceClassDAO;
 import edacc.model.InstanceDAO;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Solver;
@@ -44,6 +46,7 @@ public class ExperimentController {
     private Vector<Experiment> experiments;
     private Vector<Instance> instances;
     private Vector<Solver> solvers;
+    private Vector<InstanceClass> instanceClasses;
     
     private static RandomNumberGenerator rnd = new JavaRandom();
 
@@ -58,7 +61,7 @@ public class ExperimentController {
     }
 
     /**
-     * Initializes the experiment controller. Loads the experiments and the instances.
+     * Initializes the experiment controller. Loads the experiments and the instances classes.
      * @throws SQLException
      */
     public void initialize() throws SQLException {
@@ -67,10 +70,17 @@ public class ExperimentController {
         experiments = v;
         main.expTableModel.setExperiments(experiments);
 
-        Vector<Instance> vi = new Vector<Instance>();
+        instances = new Vector<Instance>();
+        /*Vector<Instance> vi = new Vector<Instance>();
         vi.addAll(InstanceDAO.getAll());
         instances = vi;
-        main.insTableModel.setInstances(instances);
+        main.insTableModel.setInstances(instances);*/
+
+        Vector<InstanceClass> vic = new Vector<InstanceClass>();
+        vic.addAll(InstanceClassDAO.getAll());
+        instanceClasses = vic;
+        main.instanceClassModel.addClasses(instanceClasses);
+
     }
 
     /**
@@ -376,5 +386,13 @@ public class ExperimentController {
         }
 
         zos.close();
+    }
+
+    void addInstancesToVector(Vector<Instance> instances) {
+        this.instances.addAll(instances);
+    }
+
+    void removeAllInstancesFromVector() {
+        this.instances.clear();
     }
 }
