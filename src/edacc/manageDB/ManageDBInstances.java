@@ -120,6 +120,7 @@ public class ManageDBInstances {
                         instances = buildInstancesAutogenerateClass(instanceFiles, ret);
 
                     main.instanceTableModel.addInstances(instances);
+                    loadInstanceClasses();
                 }else{
                     Vector<Instance> instances = buildInstancesGivenClass(instanceFiles, (InstanceClass)input);
                     main.instanceTableModel.addInstances(instances);

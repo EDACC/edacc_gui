@@ -71,10 +71,6 @@ public class ExperimentController {
         main.expTableModel.setExperiments(experiments);
 
         instances = new Vector<Instance>();
-        /*Vector<Instance> vi = new Vector<Instance>();
-        vi.addAll(InstanceDAO.getAll());
-        instances = vi;
-        main.insTableModel.setInstances(instances);*/
 
         Vector<InstanceClass> vic = new Vector<InstanceClass>();
         vic.addAll(InstanceClassDAO.getAll());
