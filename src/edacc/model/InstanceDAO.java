@@ -16,7 +16,7 @@ import java.util.Vector;
  * @author daniel
  */
 public class InstanceDAO {
-    protected static final String table = "Instances";
+    protected static final String table = "instances";
     private static final Hashtable<Instance, Instance> cache = new Hashtable<Instance, Instance>();
     /**
      * Instance factory method, ensures that the created instance is persisted and assigned an ID
