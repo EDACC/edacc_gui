@@ -492,6 +492,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
         btnSelectAllInstanceClasses.setText(resourceMap.getString("btnSelectAllInstanceClasses.text")); // NOI18N
         btnSelectAllInstanceClasses.setName("btnSelectAllInstanceClasses"); // NOI18N
+        btnSelectAllInstanceClasses.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelectAllInstanceClassesActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -500,6 +505,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
         btnDeselectAllInstnaceClasses.setText(resourceMap.getString("btnDeselectAllInstnaceClasses.text")); // NOI18N
         btnDeselectAllInstnaceClasses.setName("btnDeselectAllInstnaceClasses"); // NOI18N
+        btnDeselectAllInstnaceClasses.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeselectAllInstnaceClassesActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -512,7 +522,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         panelChooseInstances.setLayout(panelChooseInstancesLayout);
         panelChooseInstancesLayout.setHorizontalGroup(
             panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 694, Short.MAX_VALUE)
+            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 717, Short.MAX_VALUE)
         );
         panelChooseInstancesLayout.setVerticalGroup(
             panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -750,6 +760,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 System.out.println(ex);
             }
     }//GEN-LAST:event_btnGeneratePackage
+
+    private void btnSelectAllInstanceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstanceClassesActionPerformed
+        expController.selectAllInstanceClasses();
+    }//GEN-LAST:event_btnSelectAllInstanceClassesActionPerformed
+
+    private void btnDeselectAllInstnaceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeselectAllInstnaceClassesActionPerformed
+       expController.deselectAllInstanceClasses();
+    }//GEN-LAST:event_btnDeselectAllInstnaceClassesActionPerformed
     /**
      * Method to be called after an experiment is loaded.
      */

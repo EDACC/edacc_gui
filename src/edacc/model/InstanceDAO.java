@@ -337,4 +337,20 @@ public class InstanceDAO {
         }
         return f;
     }
+
+    public static void getBinaryFileOfInstance(Instance s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `instance` FROM " + table + " WHERE idInstance=?");
+        ps.setInt(1, s.getId());
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            FileOutputStream out = new FileOutputStream(f);
+            InputStream in = rs.getBinaryStream("instance");
+            int data;
+            while ((data = in.read()) > -1) {
+                out.write(data);
+            }
+            out.close();
+            in.close();
+        }
+    }
 }
