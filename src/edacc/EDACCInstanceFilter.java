@@ -153,7 +153,7 @@ public class EDACCInstanceFilter extends javax.swing.JDialog {
 
         txtAtomsLow.setText(resourceMap.getString("txtAtomsLow.text")); // NOI18N
         txtAtomsLow.setName("txtAtomsLow"); // NOI18N
-        txtAtomsLow.setPreferredSize(new java.awt.Dimension(80, 27));
+        txtAtomsLow.setPreferredSize(new java.awt.Dimension(80, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -162,7 +162,7 @@ public class EDACCInstanceFilter extends javax.swing.JDialog {
 
         txtAtomsHigh.setText(resourceMap.getString("txtAtomsHigh.text")); // NOI18N
         txtAtomsHigh.setName("txtAtomsHigh"); // NOI18N
-        txtAtomsHigh.setPreferredSize(new java.awt.Dimension(80, 27));
+        txtAtomsHigh.setPreferredSize(new java.awt.Dimension(80, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 2;

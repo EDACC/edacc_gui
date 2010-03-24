@@ -294,7 +294,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jScrollPane1" alignment="0" pref="433" max="32767" attributes="0"/>
+                              <Component id="jScrollPane1" alignment="0" pref="429" max="32767" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="btnParametersNew" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -473,7 +473,7 @@
                           <Component id="btnSolverRefresh" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnSolverExport" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="767" max="32767" attributes="0"/>
+                          <EmptySpace pref="837" max="32767" attributes="0"/>
                           <Component id="btnSolverSaveToDB" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -755,15 +755,9 @@
                                   <Component id="panelInstanceTable" min="-2" pref="653" max="-2" attributes="2"/>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
-                              <Group type="103" alignment="0" groupAlignment="0" attributes="0">
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="panelButtonsInstances" max="32767" attributes="1"/>
-                                      <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="panelFilterInstances" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace pref="333" max="32767" attributes="0"/>
-                                  </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="panelButtonsInstances" max="32767" attributes="1"/>
+                                  <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -775,8 +769,7 @@
                           <Component id="panelInstanceTable" pref="266" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="panelButtonsInstances" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
-                          <Component id="panelFilterInstances" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="179" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -794,7 +787,6 @@
                   <SubComponents>
                     <Component class="javax.swing.JTable" name="tableInstances">
                       <Properties>
-                        <Property name="autoCreateRowSorter" type="boolean" value="true"/>
                         <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                           <Table columnCount="5" rowCount="5">
                             <Column editable="true" title="Name" type="java.lang.Object"/>
@@ -840,264 +832,6 @@
                         <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
                           <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
                         </Property>
-                      </Properties>
-                    </Component>
-                  </SubComponents>
-                </Container>
-                <Container class="javax.swing.JPanel" name="panelFilterInstances">
-                  <Properties>
-                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                      <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                        <TitledBorder title="Filter">
-                          <Property name="titleX" resourceKey="panelFilterInstances.border.title"/>
-                        </TitledBorder>
-                      </Border>
-                    </Property>
-                    <Property name="name" type="java.lang.String" value="panelFilterInstances" noResource="true"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="componentAdded" listener="java.awt.event.ContainerListener" parameters="java.awt.event.ContainerEvent" handler="panelFilterInstancesComponentAdded"/>
-                  </Events>
-
-                  <Layout>
-                    <DimensionLayout dim="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <Component id="jlInstanceFilterNumAtoms" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
-                                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Component id="jlInstanceFilterName" alignment="0" min="-2" pref="43" max="-2" attributes="0"/>
-                                  <Group type="102" alignment="0" attributes="1">
-                                      <Component id="jlInstanceFilterNumClauses" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="32767" attributes="0"/>
-                                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" alignment="0" attributes="1">
-                                      <Component id="jlInstanceFilterRatio" min="-2" pref="43" max="-2" attributes="0"/>
-                                      <EmptySpace max="32767" attributes="0"/>
-                                      <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" alignment="0" attributes="1">
-                                      <Component id="jlInstanceFilterMaxClauseLength" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="32767" attributes="0"/>
-                                      <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="tfInstanceFilterNumAtomsMin" min="-2" pref="78" max="-2" attributes="0"/>
-                                  <Component id="tfInstanceFilterNumClausesMin" min="-2" pref="78" max="-2" attributes="0"/>
-                                  <Component id="tfInstanceFilterMaxClauseLengthMin" min="-2" pref="78" max="-2" attributes="0"/>
-                                  <Component id="tfInstanceFilterRatioMin" min="-2" pref="78" max="-2" attributes="0"/>
-                                  <Component id="tfInstanceFilterName" min="-2" pref="78" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="tfInstanceFilterNumAtomsMax" min="-2" pref="78" max="-2" attributes="0"/>
-                                  <Component id="tfInstanceFilterRatioMax" min="-2" pref="78" max="-2" attributes="0"/>
-                                  <Component id="tfInstanceFilterMaxClauseLengthMax" min="-2" pref="78" max="-2" attributes="0"/>
-                                  <Component id="tfInstanceFilterNumClausesMax" alignment="0" min="-2" pref="78" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="32767" attributes="0"/>
-                          </Group>
-                      </Group>
-                    </DimensionLayout>
-                    <DimensionLayout dim="1">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="tfInstanceFilterName" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jlInstanceFilterName" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="tfInstanceFilterNumAtomsMin" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jlInstanceFilterNumAtoms" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="tfInstanceFilterNumClausesMin" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
-                                  <Component id="jlInstanceFilterNumClauses" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="jlInstanceFilterRatio" min="-2" max="-2" attributes="0"/>
-                                  <Group type="103" alignment="1" groupAlignment="3" attributes="0">
-                                      <Component id="tfInstanceFilterRatioMin" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="jlInstanceFilterMaxClauseLength" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="tfInstanceFilterMaxClauseLengthMin" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                          <Group type="102" alignment="1" attributes="0">
-                              <EmptySpace pref="38" max="32767" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="tfInstanceFilterNumAtomsMax" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="tfInstanceFilterNumClausesMax" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="tfInstanceFilterRatioMax" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="tfInstanceFilterMaxClauseLengthMax" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                      </Group>
-                    </DimensionLayout>
-                  </Layout>
-                  <SubComponents>
-                    <Component class="javax.swing.JLabel" name="jlInstanceFilterName">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="jlInstanceFilterName.text"/>
-                        <Property name="name" type="java.lang.String" value="jlInstanceFilterName" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JTextField" name="tfInstanceFilterName">
-                      <Properties>
-                        <Property name="name" type="java.lang.String" value="tfInstanceFilterName" noResource="true"/>
-                      </Properties>
-                      <Events>
-                        <EventHandler event="inputMethodTextChanged" listener="java.awt.event.InputMethodListener" parameters="java.awt.event.InputMethodEvent" handler="tfInstanceFilterNameInputMethodTextChanged"/>
-                      </Events>
-                    </Component>
-                    <Component class="javax.swing.JTextField" name="tfInstanceFilterNumAtomsMin">
-                      <Properties>
-                        <Property name="name" type="java.lang.String" value="tfInstanceFilterNumAtomsMin" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JLabel" name="jlInstanceFilterNumAtoms">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="jlInstanceFilterNumAtoms.text"/>
-                        <Property name="name" type="java.lang.String" value="jlInstanceFilterNumAtoms" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JLabel" name="jlInstanceFilterNumClauses">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="jlInstanceFilterNumClauses.text"/>
-                        <Property name="name" type="java.lang.String" value="jlInstanceFilterNumClauses" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JTextField" name="tfInstanceFilterNumClausesMin">
-                      <Properties>
-                        <Property name="name" type="java.lang.String" value="tfInstanceFilterNumClausesMin" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JLabel" name="jlInstanceFilterRatio">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="jlInstanceFilterRatio.text"/>
-                        <Property name="name" type="java.lang.String" value="jlInstanceFilterRatio" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JTextField" name="tfInstanceFilterRatioMin">
-                      <Properties>
-                        <Property name="name" type="java.lang.String" value="tfInstanceFilterRatioMin" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JTextField" name="tfInstanceFilterMaxClauseLengthMin">
-                      <Properties>
-                        <Property name="name" type="java.lang.String" value="tfInstanceFilterMaxClauseLengthMin" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JLabel" name="jlInstanceFilterMaxClauseLength">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="jlInstanceFilterMaxClauseLength.text"/>
-                        <Property name="name" type="java.lang.String" value="jlInstanceFilterMaxClauseLength" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JTextField" name="tfInstanceFilterNumAtomsMax">
-                      <Properties>
-                        <Property name="name" type="java.lang.String" value="tfInstanceFilterNumAtomsMax" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JTextField" name="tfInstanceFilterNumClausesMax">
-                      <Properties>
-                        <Property name="name" type="java.lang.String" value="tfInstanceFilterNumClausesMax" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JTextField" name="tfInstanceFilterRatioMax">
-                      <Properties>
-                        <Property name="name" type="java.lang.String" value="tfInstanceFilterRatioMax" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JTextField" name="tfInstanceFilterMaxClauseLengthMax">
-                      <Properties>
-                        <Property name="name" type="java.lang.String" value="tfInstanceFilterMaxClauseLengthMax" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JLabel" name="jLabel1">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="jLabel1.text"/>
-                        <Property name="name" type="java.lang.String" value="jLabel1" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JLabel" name="jLabel2">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="jLabel2.text"/>
-                        <Property name="name" type="java.lang.String" value="jLabel2" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JLabel" name="jLabel3">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="jLabel3.text"/>
-                        <Property name="name" type="java.lang.String" value="jLabel3" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JLabel" name="jLabel4">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="jLabel4.text"/>
-                        <Property name="name" type="java.lang.String" value="jLabel4" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JLabel" name="jLabel5">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="jLabel5.text"/>
-                        <Property name="name" type="java.lang.String" value="jLabel5" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JLabel" name="jLabel6">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="jLabel6.text"/>
-                        <Property name="name" type="java.lang.String" value="jLabel6" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JLabel" name="jLabel7">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="jLabel7.text"/>
-                        <Property name="name" type="java.lang.String" value="jLabel7" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JLabel" name="jLabel9">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="jLabel9.text"/>
-                        <Property name="name" type="java.lang.String" value="jLabel9" noResource="true"/>
                       </Properties>
                     </Component>
                   </SubComponents>
