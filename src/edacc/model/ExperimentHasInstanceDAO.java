@@ -31,11 +31,10 @@ public class ExperimentHasInstanceDAO {
         i.setInstances_id(instances_id);
         i.setNew();
         save(i);
-        cacheExperimentHasInstance(i);
         return i;
     }
 
-    public static ExperimentHasInstance getExperimentHasInstanceFromResultset(ResultSet rs) throws SQLException {
+    private static ExperimentHasInstance getExperimentHasInstanceFromResultset(ResultSet rs) throws SQLException {
         ExperimentHasInstance i = new ExperimentHasInstance();
         i.setId(rs.getInt(1));
         i.setExperiment_id(rs.getInt(2));
@@ -59,6 +58,7 @@ public class ExperimentHasInstanceDAO {
                 i.setId(generatedKeys.getInt(1));
             }
             i.setSaved();
+            cacheExperimentHasInstance(i);
         }
         
     }

@@ -46,7 +46,6 @@ public class InstanceDAO {
         i.setMd5(md5);
         i.setInstanceClass(instanceClass);
         save(i);
-        cacheInstance(i);
         return i;
      }
 
@@ -81,7 +80,7 @@ public class InstanceDAO {
             if (instance.getFile() != null)
                 ps.setBinaryStream(8, new FileInputStream(instance.getFile()));
             else
-                ps.setNull(8, Types.INTEGER);
+                ps.setNull(8, Types.BLOB);
         }
         else if (instance.isModified()) {
             // update query
@@ -115,6 +114,7 @@ public class InstanceDAO {
         }
        
         instance.setSaved();
+        cacheInstance(instance);
     }
 
     private static Instance getCached(Instance i) {
