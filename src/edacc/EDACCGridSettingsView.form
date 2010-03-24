@@ -32,58 +32,36 @@
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="btnOk" min="-2" pref="89" max="-2" attributes="0"/>
                   </Group>
-                  <Group type="102" alignment="1" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="lblPBSScript" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="-2" pref="124" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="lblNumCPUs" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              <Component id="lblNumNodes" alignment="0" min="-2" pref="164" max="-2" attributes="1"/>
-                                          </Group>
-                                          <EmptySpace pref="162" max="32767" attributes="0"/>
-                                      </Group>
-                                      <Group type="102" attributes="0">
-                                          <Component id="lblMaxJobsInQueue" pref="314" max="32767" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                      </Group>
-                                      <Group type="102" attributes="0">
-                                          <Component id="lblWallTime" pref="314" max="32767" attributes="1"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                      </Group>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Component id="lblAvailNodes" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" pref="193" max="-2" attributes="0"/>
-                                      </Group>
-                                  </Group>
-                              </Group>
-                              <Component id="lblLocation" min="-2" max="-2" attributes="0"/>
-                              <Component id="lblName" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="lblDescription" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="251" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="lblPBSScript" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lblName" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lblLocation" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lblNumNodes" alignment="0" min="-2" pref="164" max="-2" attributes="1"/>
+                                  <Component id="lblNumCPUs" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="70" max="-2" attributes="0"/>
                           </Group>
+                          <Component id="lblMaxJobsInQueue" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblWallTime" alignment="0" min="-2" pref="73" max="-2" attributes="1"/>
+                          <Component id="lblAvailNodes" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblDescription" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="txtLocation" alignment="1" pref="223" max="32767" attributes="0"/>
-                          <Component id="txtAvailNodes" alignment="1" pref="223" max="32767" attributes="0"/>
-                          <Component id="txtWalltime" alignment="1" pref="223" max="32767" attributes="1"/>
-                          <Component id="txtNumCPUs" alignment="1" pref="223" max="32767" attributes="0"/>
-                          <Component id="txtMaxJobsInQueue" alignment="1" pref="223" max="32767" attributes="0"/>
-                          <Component id="btnAdd" alignment="0" pref="223" max="32767" attributes="0"/>
-                          <Component id="txtNumNodes" alignment="1" pref="223" max="32767" attributes="1"/>
-                          <Component id="txtName" alignment="1" pref="223" max="32767" attributes="0"/>
-                          <Group type="102" alignment="1" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jScrollPane1" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                      <EmptySpace min="-2" pref="60" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="btnAdd" max="32767" attributes="1"/>
+                          <Component id="txtName" alignment="0" max="32767" attributes="1"/>
+                          <Component id="txtLocation" alignment="0" max="32767" attributes="1"/>
+                          <Component id="txtNumNodes" alignment="0" max="32767" attributes="1"/>
+                          <Component id="txtNumCPUs" alignment="0" max="32767" attributes="1"/>
+                          <Component id="txtWalltime" alignment="0" max="32767" attributes="1"/>
+                          <Component id="txtAvailNodes" alignment="0" max="32767" attributes="1"/>
+                          <Component id="txtMaxJobsInQueue" alignment="0" max="32767" attributes="1"/>
+                          <Component id="jScrollPane1" alignment="0" max="32767" attributes="1"/>
                       </Group>
+                      <EmptySpace pref="16" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -98,47 +76,52 @@
                   <Component id="txtName" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblName" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="txtLocation" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblLocation" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="txtNumNodes" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblNumNodes" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="txtNumCPUs" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblNumCPUs" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="txtWalltime" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblWallTime" alignment="3" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Component id="txtWalltime" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="txtAvailNodes" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblAvailNodes" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="lblWallTime" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblAvailNodes" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtAvailNodes" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblMaxJobsInQueue" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txtMaxJobsInQueue" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblMaxJobsInQueue" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="lblDescription" min="-2" max="-2" attributes="0"/>
                   <Component id="jScrollPane1" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblDescription" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblPBSScript" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnAdd" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblPBSScript" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="35" max="32767" attributes="0"/>
+              <EmptySpace pref="30" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnCancel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnOk" alignment="3" min="-2" max="-2" attributes="0"/>
