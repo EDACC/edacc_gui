@@ -123,7 +123,6 @@ public class DatabaseConnector extends Observable {
                 + "  `Solver_idSolver` INT NOT NULL ,"
                 + "  PRIMARY KEY (`idParameter`) ,"
                 + "  INDEX `fk_Parameters_Solver` (`Solver_idSolver` ASC) ,"
-                + "  UNIQUE INDEX `order` (`order` ASC) ,"
                 + "  CONSTRAINT `fk_Parameters_Solver`    FOREIGN KEY (`Solver_idSolver` )    REFERENCES `Solver` (`idSolver` )    "
                 + "  ON DELETE CASCADE    "
                 + "  ON UPDATE CASCADE)"
@@ -306,12 +305,5 @@ public class DatabaseConnector extends Observable {
 
 
         st.executeBatch();
-    }
-
-    public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        DatabaseConnector db = DatabaseConnector.getInstance();
-        db.connect("localhost", 3306, "  Root", "  EDACCtest", "sopra");
-        db.createDBSchema();
-        db.conn.close();
     }
 }
