@@ -12,6 +12,7 @@ import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.GridQueue;
+import edacc.model.GridQueueDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassDAO;
@@ -358,33 +359,45 @@ public class ExperimentController {
         Vector<Solver> solvers = ExperimentDAO.getSolversInExperiment(activeExperiment);
         for (Solver s : solvers) {
             File bin = SolverDAO.getBinaryFileOfSolver(s);
-            FileInputStream in = new FileInputStream(bin);
             entry = new ZipEntry("solvers" + fileSep + s.getBinaryName());
-            zos.putNextEntry(entry);
-            int data;
-            while ((data = in.read()) > -1) {
-                zos.write(data);
-            }
-            zos.closeEntry();
-            in.close();
+            addFileToZIP(bin, entry, zos);
         }
 
         // add instances to zip file
         LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
         for (Instance i : instances) {
             File f = InstanceDAO.getBinaryFileOfInstance(i);
-            FileInputStream in = new FileInputStream(f);
             entry = new ZipEntry("instances" + fileSep + i.getId() + "_" + i.getName());
-            zos.putNextEntry(entry);
-            int data;
-            while ((data = in.read()) > -1) {
-                zos.write(data);
-            }
-            zos.closeEntry();
-            in.close();
+            addFileToZIP(f, entry, zos);
         }
 
+        // add PBS script
+        // TODO extend to multiple queue support
+        Vector<ExperimentHasGridQueue> eqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(activeExperiment);
+        ExperimentHasGridQueue eq = eqs.get(eqs.size() - 1);
+        GridQueue q = GridQueueDAO.getById(eq.getIdGridQueue());
+        File f = GridQueueDAO.getPBS(q);
+        entry = new ZipEntry("start_client.pbs");
+        addFileToZIP(f, entry, zos);
         zos.close();
+    }
+
+    /**
+     * Adds a file to an open zip file.
+     * @param f the location of the file to be added.
+     * @param entry the zip entry to be created.
+     * @param zos the open ZIPOutputStream of the zip file.
+     */
+    private void addFileToZIP(File f, ZipEntry entry, ZipOutputStream zos) throws FileNotFoundException, IOException {
+        FileInputStream in = new FileInputStream(f);
+        zos.putNextEntry(entry);
+        int data;
+        while ((data = in.read()) > -1) {
+            zos.write(data);
+        }
+        zos.closeEntry();
+        in.close();
+
     }
 
     /**

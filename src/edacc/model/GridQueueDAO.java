@@ -5,8 +5,12 @@
 package edacc.model;
 
 import com.mysql.jdbc.NotImplemented;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -258,5 +262,45 @@ public class GridQueueDAO {
         "i.idInstance = ei.Instances_idInstance WHERE idInstance = "+ id);
         return rs.next();*/
         throw new NotImplemented();
+    }
+
+    /**
+     * Copies the PBS Script of the specified queue to a temporary location.
+     * @param q
+     * @return
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static File getPBS(GridQueue q) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        File f = new File("tmp/start_client.pbs");
+        getPBS(q, f);
+        return f;
+    }
+
+    /**
+     * Copies the PBS Script of the specified queue to a specified place on the filesystem.
+     * @param q
+     * @param f
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static void getPBS(GridQueue q, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `genericPBSScript` FROM " + table + " WHERE idgridQueue=?");
+        ps.setInt(1, q.getId());
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            FileOutputStream out = new FileOutputStream(f);
+            InputStream in = rs.getBinaryStream("binary");
+            int data;
+            while ((data = in.read()) > -1) {
+                out.write(data);
+            }
+            out.close();
+            in.close();
+        }
     }
 }
