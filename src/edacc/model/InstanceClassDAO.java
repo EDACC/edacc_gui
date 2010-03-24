@@ -51,7 +51,7 @@ public class InstanceClassDAO {
     public static void delete(InstanceClass i) throws NoConnectionToDBException, SQLException, InstanceSourceClassHasInstance {
         PreparedStatement ps;
         if(i.isSource()){
-            ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM instances WHERE instanceClass_idinstanceClass = ?");
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM Instances WHERE instanceClass_idinstanceClass = ?");
             ps.setInt(1, i.getInstanceClassID());
             ResultSet rs = ps.executeQuery();
             if(rs.next()) throw new InstanceSourceClassHasInstance();
