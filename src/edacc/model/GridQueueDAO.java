@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package edacc.model;
 
 import com.mysql.jdbc.NotImplemented;
@@ -55,19 +54,18 @@ public class GridQueueDAO {
 //        cacheInstance(i);
 //        return i;
 //     }
+    public static void delete(GridQueue q) throws NoConnectionToDBException, SQLException, InstanceIsInExperimentException {
+        if (!isInAnyExperiment(q)) {
+            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM " + table + " WHERE idgridQueue=?");
+            ps.setInt(1, q.getId());
+            ps.executeUpdate();
+            cache.remove(q);
+            q.setDeleted();
+        } else {
+            throw new InstanceIsInExperimentException();
+        }
 
-
-
-     public static void delete(GridQueue q) throws NoConnectionToDBException, SQLException, InstanceIsInExperimentException {
-         if(!isInAnyExperiment(q)){
-             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM " + table + " WHERE idgridQueue=?");
-             ps.setInt(1, q.getId());
-             ps.executeUpdate();
-             cache.remove(q);
-             q.setDeleted();
-         } else throw new InstanceIsInExperimentException();
-
-     }
+    }
 
     /**
      * persists a grid queue object in the database
@@ -81,24 +79,25 @@ public class GridQueueDAO {
             // insert query, set ID!
             // TODO insert instance blob
             // insert instance into db
-            final String insertQuery = "INSERT INTO " + table + " (name, location, numNodes, numCPUs, wallTime, availNodes, maxJobsQueue, description, genericPBSScript) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            final String insertQuery = "INSERT INTO " + table + " (name, location, numNodes, numCPUs, wallTime, availNodes, maxJobsQueue, description, genericPBSScript) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
-            if (q.getGenericPBSScript() != null)
+            if (q.getGenericPBSScript() != null) {
                 ps.setBinaryStream(9, new FileInputStream(q.getGenericPBSScript()));
-            else
+            } else {
                 ps.setNull(9, Types.BLOB);
-        }
-        else if (q.isModified()) {
+            }
+        } else if (q.isModified()) {
             // update query
-            final String updateQuery = "UPDATE " + table + " SET name=?, location=?, numNodes=?, numCPUs=?, wallTime=?, availNodes=?, maxJobsQueue=?, description=? " +
-                    "WHERE idgridQueue=?";
+            final String updateQuery = "UPDATE " + table + " SET name=?, location=?, numNodes=?, numCPUs=?, wallTime=?, availNodes=?, maxJobsQueue=?, description=? "
+                    + "WHERE idgridQueue=?";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
 
             ps.setInt(9, q.getId());
 
-        } else
+        } else {
             return;
+        }
 
         ps.setString(1, q.getName());
         ps.setString(2, q.getLocation());
@@ -114,8 +113,9 @@ public class GridQueueDAO {
         // set id
         if (q.isNew()) {
             ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next())
+            if (rs.next()) {
                 q.setId(rs.getInt(1));
+            }
         }
 
         // update PBS script if necessary
@@ -135,13 +135,17 @@ public class GridQueueDAO {
     private static GridQueue getCached(GridQueue i) {
         if (cache.containsKey(i)) {
             return cache.get(i);
+        } else {
+            return null;
         }
-        else return null;
     }
 
     private static void cacheQueue(GridQueue i) {
-        if (cache.containsKey(i)) return;
-        else cache.put(i, i);
+        if (cache.containsKey(i)) {
+            return;
+        } else {
+            cache.put(i, i);
+        }
     }
 
     /**
@@ -166,8 +170,9 @@ public class GridQueueDAO {
             q.setDescription(rs.getString("description"));
 
             GridQueue c = getCached(q);
-            if (c != null) return c;
-            else {
+            if (c != null) {
+                return c;
+            } else {
                 q.setSaved();
                 cacheQueue(q);
                 return q;
@@ -175,19 +180,16 @@ public class GridQueueDAO {
         }
         return null;
     }
-    
-    public static Vector<GridQueue> getAllByExperiment(Experiment e) throws SQLException {
+
+    public static Vector<GridQueue> getAll() throws NoConnectionToDBException, SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT * FROM " + table + " as q JOIN Experiment_has_gridQueue as eq ON " +
-                "q.idgridQueue = eq.gridQueue_idgridQueue WHERE eq.Experiment_idExperiment = ?"
-                );
-        st.setInt(1, e.getId());
+                "SELECT * FROM " + table);
         ResultSet rs = st.executeQuery();
         Vector<GridQueue> res = new Vector<GridQueue>();
         while (rs.next()) {
             GridQueue q = new GridQueue();
-            q.setId(rs.getInt("i.id"));
             q.setId(rs.getInt("idgridQueue"));
+            q.setName(rs.getString("name"));
             q.setLocation(rs.getString("location"));
             q.setNumNodes(rs.getInt("numNodes"));
             q.setNumCPUs(rs.getInt("numCPUs"));
@@ -197,8 +199,41 @@ public class GridQueueDAO {
             q.setDescription(rs.getString("description"));
 
             GridQueue c = getCached(q);
-            if (c != null) res.add(c);
-            else {
+            if (c != null) {
+                res.add(c);
+            } else {
+                q.setSaved();
+                cacheQueue(q);
+                res.add(q);
+            }
+        }
+        rs.close();
+        return res;
+    }
+
+    public static Vector<GridQueue> getAllByExperiment(Experiment e) throws SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT * FROM " + table + " as q JOIN Experiment_has_gridQueue as eq ON "
+                + "q.idgridQueue = eq.gridQueue_idgridQueue WHERE eq.Experiment_idExperiment = ?");
+        st.setInt(1, e.getId());
+        ResultSet rs = st.executeQuery();
+        Vector<GridQueue> res = new Vector<GridQueue>();
+        while (rs.next()) {
+            GridQueue q = new GridQueue();
+            q.setId(rs.getInt("idgridQueue"));
+            q.setName(rs.getString("name"));
+            q.setLocation(rs.getString("location"));
+            q.setNumNodes(rs.getInt("numNodes"));
+            q.setNumCPUs(rs.getInt("numCPUs"));
+            q.setWalltime(rs.getInt("walltime"));
+            q.setAvailNodes(rs.getInt("availNodes"));
+            q.setMaxJobsQueue(rs.getInt("maxJobsQueue"));
+            q.setDescription(rs.getString("description"));
+
+            GridQueue c = getCached(q);
+            if (c != null) {
+                res.add(c);
+            } else {
                 q.setSaved();
                 cacheQueue(q);
                 res.add(q);
@@ -216,12 +251,12 @@ public class GridQueueDAO {
      * @throws NoConnectionToDBException if no connection to database exists.
      * @throws SQLException if an SQL error occurs while reading the instances from the database.
      */
-    public static boolean isInAnyExperiment(GridQueue q) throws NoConnectionToDBException, SQLException{
+    public static boolean isInAnyExperiment(GridQueue q) throws NoConnectionToDBException, SQLException {
         /*Statement st = DatabaseConnector.getInstance().getConn().createStatement();
 
         ResultSet rs = st.executeQuery("SELECT i.idInstance FROM " + table + " AS i JOIN Experiment_has_Instances as ei ON " +
-                "i.idInstance = ei.Instances_idInstance WHERE idInstance = "+ id);
-       return rs.next();*/
+        "i.idInstance = ei.Instances_idInstance WHERE idInstance = "+ id);
+        return rs.next();*/
         throw new NotImplemented();
     }
 }

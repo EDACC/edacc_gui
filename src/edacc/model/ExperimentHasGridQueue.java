@@ -14,6 +14,12 @@ public class ExperimentHasGridQueue extends BaseModel {
     private int idExperiment;
     private int idGridQueue;
 
+    protected ExperimentHasGridQueue(int idExperiment, int idGridQueue) {
+        this.idExperiment = idExperiment;
+        this.idGridQueue = idGridQueue;
+        this.setNew();
+    }
+
     public int getIdExperiment() {
         return idExperiment;
     }

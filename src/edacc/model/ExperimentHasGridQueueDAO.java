@@ -22,11 +22,21 @@ public class ExperimentHasGridQueueDAO {
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE Experiment_idExperiment=? AND gridQueue_idgridQueue=?";
     private static final Hashtable<ExperimentHasGridQueue, ExperimentHasGridQueue> cache = new Hashtable<ExperimentHasGridQueue, ExperimentHasGridQueue>();
 
+    /**
+     * Factory method for building a ExperimentHasGridQueue object.
+     * This method persists the created object in the DB automatically.
+     * @return
+     * @throws SQLException
+     */
+    public static ExperimentHasGridQueue createExperimentHasGridQueue(Experiment e, GridQueue q) throws SQLException {
+        ExperimentHasGridQueue eq = new ExperimentHasGridQueue(e.getId(), q.getId());
+        save(eq);
+        cacheExperimentHasGridQueue(eq);
+        return eq;
+    }
+
     private static ExperimentHasGridQueue getExperimentHasGridQueueFromResultset(ResultSet rs) throws SQLException {
-        ExperimentHasGridQueue q = new ExperimentHasGridQueue();
-        q.setIdExperiment(rs.getInt("Experiment_idExperiment"));
-        q.setIdGridQueue(rs.getInt("gridQueue_idgridQueue"));
-        return q;
+        return new ExperimentHasGridQueue(rs.getInt("Experiment_idExperiment"), rs.getInt("gridQueue_idgridQueue"));
     }
 
     private static void save(ExperimentHasGridQueue q) throws SQLException {
@@ -87,5 +97,25 @@ public class ExperimentHasGridQueueDAO {
             }
         }
         return res;
+    }
+
+    public static ExperimentHasGridQueue getByExpAndQueue(Experiment e, GridQueue q) throws NoConnectionToDBException, SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Experiment_idExperiment=? AND gridQueue_idgridQueue=?");
+        st.setInt(1, e.getId());
+        st.setInt(2, q.getId());
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            ExperimentHasGridQueue eq = getExperimentHasGridQueueFromResultset(rs);
+
+            ExperimentHasGridQueue c = getCached(eq);
+            if (c != null) {
+                return c;
+            } else {
+                q.setSaved();
+                cacheExperimentHasGridQueue(eq);
+                return eq;
+            }
+        }
+        return null;
     }
 }

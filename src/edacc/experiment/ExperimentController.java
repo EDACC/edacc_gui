@@ -5,10 +5,13 @@ import edacc.EDACCSolverConfigEntry;
 import edacc.EDACCSolverConfigPanel;
 import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
+import edacc.model.ExperimentHasGridQueue;
+import edacc.model.ExperimentHasGridQueueDAO;
 import edacc.model.ExperimentHasInstance;
 import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
+import edacc.model.GridQueue;
 import edacc.model.Instance;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassDAO;
@@ -386,6 +389,19 @@ public class ExperimentController {
         }
 
         zos.close();
+    }
+
+    /**
+     * Assigns a gridQueue to the active experiment.
+     * This means: It creates a new ExperimentHasGridQueue object and persists it in the db.
+     * @param q
+     * @throws SQLException
+     */
+    public void assignQueueToExperiment(GridQueue q) throws SQLException {
+        // check if assignment already exists
+        if (ExperimentHasGridQueueDAO.getByExpAndQueue(activeExperiment, q) != null)
+            return;
+        ExperimentHasGridQueue eq = ExperimentHasGridQueueDAO.createExperimentHasGridQueue(activeExperiment, q);
     }
 
     void addInstancesToVector(Vector<Instance> instances) {
