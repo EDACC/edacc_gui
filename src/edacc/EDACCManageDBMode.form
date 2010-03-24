@@ -125,7 +125,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jScrollPane2" alignment="0" pref="747" max="32767" attributes="1"/>
+                              <Component id="jScrollPane2" alignment="0" pref="782" max="32767" attributes="1"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="jlSolverDescription" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -152,7 +152,7 @@
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
-                          <Component id="jScrollPane2" pref="229" max="32767" attributes="0"/>
+                          <Component id="jScrollPane2" pref="241" max="32767" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jlSolverName" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -215,7 +215,7 @@
                   </Properties>
                   <Events>
                     <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="solverChangedOnFocusLost"/>
-                    <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="solverChangedOnKey"/>
+                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="solverChangedOnKey"/>
                   </Events>
                 </Component>
                 <Container class="javax.swing.JScrollPane" name="jScrollPane3">
@@ -236,7 +236,7 @@
                       </Properties>
                       <Events>
                         <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="solverChangedOnFocusLost"/>
-                        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="solverChangedOnKey"/>
+                        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="solverChangedOnKey"/>
                       </Events>
                     </Component>
                   </SubComponents>
@@ -295,6 +295,7 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="jScrollPane1" alignment="0" pref="429" max="32767" attributes="0"/>
+
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="btnParametersNew" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -326,7 +327,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane1" pref="302" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" pref="300" max="32767" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jlParametersName" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -367,7 +368,7 @@
                   </Properties>
                   <Events>
                     <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="parameterChangedOnFocusLost"/>
-                    <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="parameterChangedOnKeyPressed"/>
+                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="parameterChangedOnKeyReleased"/>
                   </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jlParametersPrefix">
@@ -383,7 +384,7 @@
                   </Properties>
                   <Events>
                     <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="parameterChangedOnFocusLost"/>
-                    <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="parameterChangedOnKeyPressed"/>
+                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="parameterChangedOnKeyReleased"/>
                   </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jlParametersOrder">
@@ -399,7 +400,7 @@
                   </Properties>
                   <Events>
                     <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="parameterChangedOnFocusLost"/>
-                    <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="parameterChangedOnKeyPressed"/>
+                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="parameterChangedOnKeyReleased"/>
                   </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnParametersNew">
@@ -606,7 +607,7 @@
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="panelButtonsInstanceClass" alignment="1" max="32767" attributes="2"/>
-                              <Component id="panelInstanceClassTable" alignment="0" pref="677" max="32767" attributes="2"/>
+                              <Component id="panelInstanceClassTable" alignment="0" pref="717" max="32767" attributes="2"/>
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -766,7 +767,7 @@
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
-                          <Component id="panelInstanceTable" pref="266" max="32767" attributes="0"/>
+                          <Component id="panelInstanceTable" pref="276" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="panelButtonsInstances" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" pref="179" max="-2" attributes="0"/>
@@ -859,7 +860,7 @@
                               <Component id="btnAddToClass" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnRemoveFromClass" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="42" max="32767" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>

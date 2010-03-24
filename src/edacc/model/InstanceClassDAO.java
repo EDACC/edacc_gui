@@ -44,7 +44,6 @@ public class InstanceClassDAO {
         i.setDescription(description);
         i.setSource(source);
         save(i);
-        cacheInstanceClass(i);
         return i;
     }
 
@@ -102,6 +101,7 @@ public class InstanceClassDAO {
         }
 
         instanceClass.setSaved();
+        cacheInstanceClass(instanceClass);
     }
 
     private static InstanceClass getCached(InstanceClass i) {
