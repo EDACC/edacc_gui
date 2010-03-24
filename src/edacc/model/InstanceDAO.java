@@ -276,7 +276,7 @@ public class InstanceDAO {
             
             String query = "SELECT i.idInstance, i.maxClauseLength, i.md5, i.name, i.numAtoms, i.numClauses," +
                 " i.ratio, i.instanceClass_idinstanceClass FROM " + table + " as i " +
-                " LEFT JOIN instances_has_instanceclass as ii ON i.idInstance = ii.Instances_idInstance " +
+                " LEFT JOIN Instances_has_instanceClass as ii ON i.idInstance = ii.Instances_idInstance " +
                 " WHERE i.instanceClass_idinstanceClass = " + allChoosen.get(0).getInstanceClassID() + 
                 " OR ii.instanceClass_idinstanceClass = " + allChoosen.get(0).getInstanceClassID() ;
             for(int i = 1; i < allChoosen.size(); i++){
