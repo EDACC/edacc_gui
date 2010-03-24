@@ -7,11 +7,14 @@ package edacc.experiment;
 
 import edacc.experiment.InstanceTableModel;
 import edacc.manageDB.InstanceClassTableModel;
+import edacc.model.ExperimentHasInstance;
+import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceDAO;
 import edacc.model.NoConnectionToDBException;
 import java.sql.SQLException;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -135,8 +138,20 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel{
         expController.removeAllInstancesFromVector();
         Vector<InstanceClass> choosen = getAllChoosen();
         if(!choosen.isEmpty()){
-            LinkedList<Instance> temp = InstanceDAO.getAllByInstanceClasses(getAllChoosen());
-            ((InstanceTableModel)instanceTable.getModel()).setInstances(new Vector<Instance>(temp));
+            int expId = expController.getActiveExperiment().getId();
+            Vector<Instance> temp = new Vector<Instance> (InstanceDAO.getAllByInstanceClasses(getAllChoosen()));
+            Vector<ExperimentHasInstance> vExpHasInst = ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(expId);
+            Hashtable<Integer, ExperimentHasInstance> expHasInst = new Hashtable();
+
+            for(int i = 0; i < vExpHasInst.size(); i++ ){
+                expHasInst.put(vExpHasInst.get(i).getInstances_id(), vExpHasInst.get(i));
+            }
+
+            for(int i = 0; i < temp.size(); i++){
+                if(expHasInst.containsKey(temp.get(i).getId())){                  
+                     ((InstanceTableModel)instanceTable.getModel()).setInstancesAndExperimentHasInstance(temp.get(i), expHasInst.get(temp.get(i).getId()));
+                }else ((InstanceTableModel)instanceTable.getModel()).setInstancesWithoutExp(temp.get(i));
+            }
             expController.addInstancesToVector(new Vector<Instance>(temp));
         }
 
