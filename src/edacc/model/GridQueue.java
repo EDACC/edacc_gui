@@ -24,6 +24,10 @@ public class GridQueue extends BaseModel {
     private String description;
     private File genericPBSScript;
 
+    public GridQueue() {
+        this.setNew();
+    }
+
     public int getAvailNodes() {
         return availNodes;
     }
