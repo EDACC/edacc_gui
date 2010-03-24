@@ -38,6 +38,7 @@ int read_config() {
         }
         
         free(lineptr);
+        lineptr = NULL;
     }
 
     fclose(conf);
