@@ -24,6 +24,7 @@ import edacc.model.InstanceHasInstanceClass;
 import edacc.model.InstanceHasInstanceClassDAO;
 import edacc.model.InstanceIsInExperimentException;
 import edacc.model.InstanceSourceClassHasInstance;
+import edacc.model.MD5CheckFailedException;
 import edacc.model.NoConnectionToDBException;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -276,21 +277,20 @@ public class ManageDBInstances {
      * @throws SQLException
      * @throws InstaceNotInDBException
      */
-    public void exportInstances(int[] rows) throws IOException, NoConnectionToDBException, SQLException, InstaceNotInDBException{
+    public void exportInstances(int[] rows) throws IOException, NoConnectionToDBException, SQLException, 
+            InstaceNotInDBException, FileNotFoundException, MD5CheckFailedException,
+            NoSuchAlgorithmException{
+
         int returnVal = jFileChooserManageDBExportInstance.showOpenDialog(panelManageDBInstances);
         String path = jFileChooserManageDBExportInstance.getSelectedFile().getAbsolutePath();
         Instance temp;
         for(int i = 0; i < rows.length; i++){
            temp =    (Instance) main.instanceTableModel.getValueAt(rows[i], 5);
-           FileOutputStream output = new FileOutputStream(path + System.getProperty("file.separator") + temp.getName());
-           Blob blob = (Blob) InstanceDAO.getBinary(temp.getId());
-           InputStream input = blob.getBinaryStream();
-           byte[] buffer = new byte[1];
-           while (input.read(buffer) > 0) {
-                output.write(buffer);
-           }
-           input.close();
-           output.close();
+           File f = new File(path + System.getProperty("file.separator") + temp.getName());
+           InstanceDAO.getBinaryFileOfInstance(temp, f);
+           String md5File = Util.calculateMD5(f);
+           if (!md5File.equals(temp.getMd5()))
+                throw new MD5CheckFailedException("The exported solver binary of solver \"" + temp.getName() + "\" seems to be corrupt!");         
         }
     }
     /**

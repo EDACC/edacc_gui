@@ -13,12 +13,14 @@ package edacc;
 import edacc.manageDB.*;
 import edacc.model.InstaceNotInDBException;
 import edacc.model.InstanceSourceClassHasInstance;
+import edacc.model.MD5CheckFailedException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.Solver;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1195,7 +1197,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                         "No instances are selected: ",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
-            } else {
+            } else {              
                 manageDBInstances.exportInstances(tableInstances.getSelectedRows());
             }
         } catch (IOException ex) {
@@ -1216,6 +1218,16 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         } catch (InstaceNotInDBException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
                     "There is a problem with the data consistency ",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } catch (MD5CheckFailedException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                    ex,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } catch (NoSuchAlgorithmException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "An error occured while exporting solver binary: " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }

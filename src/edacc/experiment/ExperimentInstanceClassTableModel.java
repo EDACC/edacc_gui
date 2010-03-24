@@ -28,7 +28,6 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel{
      protected Vector <InstanceClass> classes;
      protected Vector <Boolean> classSelect;
      protected JTable instanceTable;
-     protected Boolean all = false;
      protected ExperimentController expController;
 
 
@@ -103,19 +102,9 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel{
     }
 
     public void setInstanceClassSelected(int row){
-        if(!all){
             setValueAt(true, row, 3 );
-        }
-        else {
-            setValueAt(false, row, 3);
-        }
-
     }
 
-    public void setAll(){
-        if(all) all = false;
-        else all = true;
-    }
 
      public void setValueAt(Object value, int row, int col) {
         if(col == 3){
@@ -152,6 +141,10 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel{
         }
 
         instanceTable.updateUI();
+    }
+
+    void setInstanceClassDeselected(int row) {
+        setValueAt(false, row, 3 );
     }
 
 }

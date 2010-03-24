@@ -4,6 +4,7 @@
 #include "database.h"
 #include "global.h"
 #include "log.h"
+#include "safeio.h"
 
 
 
@@ -69,29 +70,30 @@
 "   WHERE e.idJob = %i " 
 
 
-#define QUERY_JOB_PARAMS "" \
-"SELECT " \
-"       p.name, " \
-"       p.prefix, " \
-"       p.value, " \
-"       scp.value " \
-"   FROM ExperimentResults AS er " \
-"   LEFT JOIN SolverConfig AS sc " \
-"       ON er.SolverConfig_idSolverConfig = sc.idSolverConfig " \
-"   LEFT JOIN SolverConfig_has_Parameters AS scp " \
+#define QUERY_JOB_PARAMS ""                                      \
+"SELECT "                                                        \
+"       p.name, "                                                \
+"       p.prefix, "                                              \
+"       p.value, "                                               \
+"       scp.value "                                              \
+"   FROM ExperimentResults AS er "                               \
+"   LEFT JOIN SolverConfig AS sc "                               \
+"       ON er.SolverConfig_idSolverConfig = sc.idSolverConfig "  \
+"   LEFT JOIN SolverConfig_has_Parameters AS scp "               \
 "       ON sc.idSolverConfig = scp.SolverConfig_idSolverConfig " \
-"   LEFT JOIN Parameters AS p " \
-"       ON scp.Parameters_idParameter = p.idParameter " \
+"   LEFT JOIN Parameters AS p "                                  \
+"       ON scp.Parameters_idParameter = p.idParameter "          \
 "   WHERE e.idJob = %i "
 
 
-#define UPDATE_JOB "" \
+#define UPDATE_JOB ""           \
 "UPDATE ExperimentResults SET " \
-"       resultFileName = %s, " \
-"       status = %i, " \
-"       seed = %i, " \
-"       time = %d, " \
-"       statusCode " \
+"       resultFileName = %s, "  \
+"       status = %i, "          \
+"       seed = %i, "            \
+"       time = %d, "            \
+"       statusCode = %i, "      \
+"       resultFile = %s "       \
 "   WHERE idJob = %i "
 
 
@@ -111,7 +113,7 @@
 
 status dbFetchExperimentData(experiment *e) {
     MYSQL *conn = NULL;
-    MYSQL_RES *res;
+    MYSQL_RES *res = NULL;
     MYSQL_ROW row;
 
     char *queryExperimentInfo = NULL;
@@ -123,7 +125,7 @@ status dbFetchExperimentData(experiment *e) {
     //int lastId;
 
     int i;
-    unsigned long *lengths;
+    unsigned long *lengths = NULL;
 
     e->md5Instances = NULL;
     e->instances = NULL;
@@ -134,10 +136,10 @@ status dbFetchExperimentData(experiment *e) {
     e->solvers = NULL;
     e->solverNames = NULL;
 
-    sprintf(queryExperimentInfo, QUERY_EXPERIMENT_INFO, experimentId);
-    sprintf(queryGridInfo, QUERY_GRID_SETTINGS, gridQueueId);
-    sprintf(querySolver, QUERY_SOLVERS, experimentId);
-    sprintf(queryInstance, QUERY_INSTANCES, experimentId);
+    sprintfAlloc(&queryExperimentInfo, QUERY_EXPERIMENT_INFO, experimentId);
+    sprintfAlloc(&queryGridInfo, QUERY_GRID_SETTINGS, gridQueueId);
+    sprintfAlloc(&querySolver, QUERY_SOLVERS, experimentId);
+    sprintfAlloc(&queryInstance, QUERY_INSTANCES, experimentId);
 
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
         return dbError;
@@ -336,7 +338,7 @@ void freeExperimentData(experiment *e) {
 
 int dbFetchJob(job* j, status* s) {
     MYSQL *conn = NULL;
-    MYSQL_RES *res;
+    MYSQL_RES *res = NULL;
     MYSQL_ROW row;
 
     char *queryExpJob = NULL;
@@ -349,7 +351,7 @@ int dbFetchJob(job* j, status* s) {
     int lastId = 0;
 
     int i;
-    unsigned long *lengths;
+    unsigned long *lengths = NULL;
 
     j->solverName = NULL;
     j->resultFile = NULL;
@@ -359,7 +361,7 @@ int dbFetchJob(job* j, status* s) {
         return dbError;
     }
 
-    sprintf(queryExpJob, QUERY_EXPERIMENT_JOBS, experimentId);
+    sprintfAlloc(&queryExpJob, QUERY_EXPERIMENT_JOBS, experimentId);
 
     /* fetch the id's of the experiment jobs */
     if(mysql_query(conn, queryExpJob) != 0) {
@@ -378,8 +380,8 @@ int dbFetchJob(job* j, status* s) {
         lastId = atoi(row[0]);
     }
 
-    sprintf(queryJob, QUERY_JOB, lastId);
-    sprintf(queryJobParams, QUERY_JOB_PARAMS, lastId);
+    sprintfAlloc(&queryJob, QUERY_JOB, lastId);
+    sprintfAlloc(&queryJobParams, QUERY_JOB_PARAMS, lastId);
 
     /* fetch job information */
     if(mysql_query(conn, queryJob) != 0) {
@@ -459,7 +461,13 @@ status dbUpdate(const job* j) {
     //char *updateJob;
     char *queryJob = NULL;
 
-    sprintf(queryJob, UPDATE_JOB, j->resultFileName, j->status, j->seed, j->time, j->statusCode);
+    sprintfAlloc(&queryJob, UPDATE_JOB, 
+            j->resultFileName, 
+            j->status, 
+            j->seed, 
+            j->time, 
+            j->statusCode, 
+            j->resultFile);
 
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
         return dbError;
@@ -478,14 +486,14 @@ status dbUpdate(const job* j) {
 //Try to fetch the solver named solverName from the database
 status dbFetchSolver(const char* solverName, solver* s) {
     MYSQL *conn = NULL;
-    MYSQL_RES *res;
+    MYSQL_RES *res = NULL;
     MYSQL_ROW row;
 
     char *querySolver = NULL;
     char *queryJob = NULL;
-    unsigned long *lengths;
+    unsigned long *lengths = NULL;
 
-    sprintf(queryJob, QUERY_SOLVER, solverName);
+    sprintfAlloc(&queryJob, QUERY_SOLVER, solverName);
 
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
         return dbError;
@@ -530,7 +538,7 @@ status dbFetchInstance(const char* instanceName, instance* i) {
     char *queryInstance = NULL;
     unsigned long *lengths;
 
-    sprintf(queryInstance, QUERY_INSTANCE, instanceName);
+    sprintfAlloc(&queryInstance, QUERY_INSTANCE, instanceName);
 
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
         return dbError;

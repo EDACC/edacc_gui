@@ -395,4 +395,16 @@ public class ExperimentController {
     void removeAllInstancesFromVector() {
         this.instances.clear();
     }
+
+    public void selectAllInstanceClasses() {
+        for(int i = 0; i < main.instanceClassModel.getRowCount(); i++){
+            main.instanceClassModel.setInstanceClassSelected(i);
+        }
+    }
+
+    public void deselectAllInstanceClasses() {
+        for(int i = 0; i < main.instanceClassModel.getRowCount(); i++){
+            main.instanceClassModel.setInstanceClassDeselected(i);
+        }
+    }
 }
