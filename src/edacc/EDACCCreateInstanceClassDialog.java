@@ -56,13 +56,14 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCCreateInstanceClassDialog.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setAlwaysOnTop(true);
-        setMinimumSize(new java.awt.Dimension(400, 300));
+        setMinimumSize(new java.awt.Dimension(224, 190));
         setName("Form"); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(3);
-        jTextArea1.setTabSize(5);
+        jTextArea1.setColumns(1);
+        jTextArea1.setRows(4);
+        jTextArea1.setTabSize(1);
+        jTextArea1.setMaximumSize(new java.awt.Dimension(100, 76));
         jTextArea1.setName("jTextArea1"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -86,7 +87,6 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 100;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
         getContentPane().add(jTextFieldName, gridBagConstraints);
@@ -153,7 +153,7 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
+        gridBagConstraints.insets = new java.awt.Insets(10, 0, 10, 0);
         getContentPane().add(jButtonCancel, gridBagConstraints);
 
         pack();
