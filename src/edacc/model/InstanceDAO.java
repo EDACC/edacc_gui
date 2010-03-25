@@ -328,7 +328,7 @@ public class InstanceDAO {
     /**
      * Copies the binary file of an instance to a temporary location on the file system
      * and returns a File reference on it.
-     * @param s
+     * @param i
      * @return
      */
     public static File getBinaryFileOfInstance(Instance i) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
@@ -339,9 +339,18 @@ public class InstanceDAO {
         return f;
     }
 
-    public static void getBinaryFileOfInstance(Instance s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+    /**
+     * Copies the binary file of an instance to a specified location on the filesystem.
+     * @param i
+     * @param f
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static void getBinaryFileOfInstance(Instance i, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `instance` FROM " + table + " WHERE idInstance=?");
-        ps.setInt(1, s.getId());
+        ps.setInt(1, i.getId());
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
             FileOutputStream out = new FileOutputStream(f);
