@@ -1,5 +1,6 @@
 package edacc.experiment;
 
+import edacc.EDACCApp;
 import edacc.EDACCExperimentMode;
 import edacc.EDACCSolverConfigEntry;
 import edacc.EDACCSolverConfigPanel;
@@ -29,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Hashtable;
@@ -37,6 +39,7 @@ import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+import javax.swing.JFileChooser;
 
 /**
  * Experiment design more controller class, handles requests by the GUI
@@ -339,16 +342,23 @@ public class ExperimentController {
 
     }
 
+    private JFileChooser packageFileChooser;
     /**
      * Generates a ZIP archive with the necessary files for the grid.
      */
-    public void generatePackage() throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException {
-        File zipFile = new File(activeExperiment.getDate().toString() + " - " + activeExperiment.getName() + ".zip");
+    public void generatePackage() throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException {
+        final String fileSep = System.getProperty("file.separator");
+        if (packageFileChooser == null) {
+            packageFileChooser = new JFileChooser();
+            packageFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        }
+        if (packageFileChooser.showDialog(main, "Select Package Location") != JFileChooser.APPROVE_OPTION)
+            return;
+        File zipFile = new File(packageFileChooser.getSelectedFile().getAbsolutePath() + fileSep + activeExperiment.getDate().toString() + " - " + activeExperiment.getName() + ".zip");
         if (zipFile.exists()) {
             zipFile.delete();
         }
         ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile));
-        final String fileSep = System.getProperty("file.separator");
         ZipEntry entry;
 
         // add solvers to zip file
@@ -381,6 +391,13 @@ public class ExperimentController {
 
         // add run script
         addRunScript(zos, q);
+
+        // add client binary
+       addClient(zos);
+
+        // add empty result library
+        entry = new ZipEntry("result" + fileSep + "~");
+        zos.putNextEntry(entry);
 
         zos.close();
 
@@ -492,5 +509,21 @@ public class ExperimentController {
         zos.putNextEntry(entry);
         zos.write(sRun.getBytes());
         zos.closeEntry();
+    }
+
+    private void addClient(ZipOutputStream zos) throws IOException, ClientBinaryNotFoundException {
+        InputStream in = EDACCApp.class.getClassLoader().getResourceAsStream("client");
+        if (in == null)
+            throw new ClientBinaryNotFoundException();
+        ZipEntry entry = new ZipEntry("client");
+        zos.putNextEntry(entry);
+
+        int data;
+
+        while ((data = in.read()) > -1) {
+            zos.write(data);
+        }
+        zos.closeEntry();
+        in.close();
     }
 }
