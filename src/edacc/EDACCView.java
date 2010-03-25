@@ -295,6 +295,8 @@ public class EDACCView extends FrameView implements Observer {
             DatabaseConnector.getInstance().disconnect();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "An error occured while closing the database connection: \n" + ex.getMessage(), "Couldn't close database connection", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            noMode();
         }
     }
 
@@ -315,6 +317,8 @@ public class EDACCView extends FrameView implements Observer {
                 JOptionPane.showMessageDialog(mode,
                         "An error occured while trying to generate the EDACC tables: " + ex.getMessage(),
                         "Error!", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                noMode();
             }
         }
     }

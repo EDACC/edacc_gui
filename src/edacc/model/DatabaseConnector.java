@@ -113,6 +113,9 @@ public class DatabaseConnector extends Observable {
                 + "  FOREIGN_KEY_CHECKS=0;");
         st.addBatch("SET @OLD_SQL_MODE=@@SQL_MODE,"
                 + " SQL_MODE='TRADITIONAL';");
+        st.addBatch("DROP DATABASE `" + database + "`");
+        st.addBatch("CREATE DATABASE `" + database + "`");
+        st.addBatch("USE `" + database + "`");
         st.addBatch("CREATE  TABLE IF NOT EXISTS `Solver` (  `idSolver` INT NOT NULL AUTO_INCREMENT ,"
                 + "  `name` VARCHAR(60) NOT NULL COMMENT 'The solvername has to be unique!' ,"
                 + "  `binaryName` VARCHAR(100) NOT NULL ,"

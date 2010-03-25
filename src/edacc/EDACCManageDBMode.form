@@ -38,7 +38,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="1269" max="32767" attributes="0"/>
+              <Component id="manageDBPane" pref="1257" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -78,12 +78,12 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jSplitPane2" alignment="0" pref="1264" max="32767" attributes="0"/>
+                  <Component id="jSplitPane2" alignment="0" pref="1252" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jSplitPane2" alignment="0" pref="545" max="32767" attributes="0"/>
+                  <Component id="jSplitPane2" alignment="0" pref="546" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -121,7 +121,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jScrollPane1" alignment="0" pref="413" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane1" alignment="0" pref="299" max="32767" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="btnParametersNew" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
@@ -153,7 +153,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jScrollPane1" pref="367" max="32767" attributes="0"/>
+                              <Component id="jScrollPane1" pref="371" max="32767" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="jlParametersName" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -297,14 +297,14 @@
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <EmptySpace pref="20" max="32767" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
                               <Component id="panelSolverButtons" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="panelSolver" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <EmptySpace pref="79" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -452,7 +452,7 @@
                         <DimensionLayout dim="1">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="1" attributes="0">
-                                  <Component id="jScrollPane2" pref="216" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane2" pref="227" max="32767" attributes="0"/>
                                   <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="jlSolverName" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -597,12 +597,12 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jSplitPane1" alignment="0" pref="1264" max="32767" attributes="0"/>
+                  <Component id="jSplitPane1" alignment="0" pref="1252" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jSplitPane1" alignment="0" pref="545" max="32767" attributes="0"/>
+                  <Component id="jSplitPane1" alignment="0" pref="546" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -639,7 +639,7 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="panelButtonsInstanceClass" alignment="1" max="32767" attributes="2"/>
-                                  <Component id="panelInstanceClassTable" alignment="0" pref="512" max="32767" attributes="2"/>
+                                  <Component id="panelInstanceClassTable" alignment="0" pref="497" max="32767" attributes="2"/>
                               </Group>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -649,7 +649,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="panelInstanceClassTable" pref="446" max="32767" attributes="0"/>
+                              <Component id="panelInstanceClassTable" pref="447" max="32767" attributes="0"/>
                               <EmptySpace min="-2" pref="11" max="-2" attributes="1"/>
                               <Component id="panelButtonsInstanceClass" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -709,7 +709,7 @@
                                   <Component id="btnRemoveInstanceClass" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="btnSelectAllInstanceClasses" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="283" max="32767" attributes="0"/>
+                                  <EmptySpace pref="228" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -804,7 +804,7 @@
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="panelInstanceTable" pref="454" max="32767" attributes="0"/>
+                              <Component id="panelInstanceTable" pref="456" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="panelButtonsInstances" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -896,7 +896,7 @@
                                   <Component id="btnAddToClass" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="btnRemoveFromClass" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="62" max="32767" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
