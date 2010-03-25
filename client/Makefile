@@ -8,6 +8,8 @@ clean:
 	rm -f *~
 	rm -f client
 	rm -f log
+	rm -f sparrow
+	rm -f testinstance
 
 # Static build causes many problems. The most serious problem is, that the default glibc 
 # can only be dynamical linked, so mysql may won't work.

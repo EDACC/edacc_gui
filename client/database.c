@@ -112,6 +112,35 @@
 "   WHERE name = %s "
 
 
+/* status dbFetchExperimentData_test(experiment *e) {
+ *     MYSQL *conn;
+ *     //MYSQL_RES *res;
+ *     //MYSQL_ROW row;
+ * 
+ *     if (mysql_library_init(0, NULL, NULL)) {
+ *         printf("could not initialize MySQL library\n");
+ *         return dbError;
+ *     }
+ * 
+ *     conn = mysql_init(NULL);
+ * 
+ *     printf("%s, %s, %s, %s\n", host, username, password, database);
+ *     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+ *         printf("could not establish mysql connection!\n");
+ *         return dbError;
+ *     }
+ *     printf("connected!\n");
+ * 
+ * 
+ *     // closing the connection causes the client to stop without any message.
+ *     mysql_close(conn);
+ *     printf("disconnected!\n");
+ *     mysql_library_end();
+ *     return success;
+ * }
+ */
+
+
 status dbFetchExperimentData(experiment *e) {
     MYSQL *conn;
     MYSQL_RES *res;
@@ -122,28 +151,6 @@ status dbFetchExperimentData(experiment *e) {
         return dbError;
     }
 
-    conn = mysql_init(NULL);
-
-    printf("%s, %s, %s, %s\n", host, username, password, database);
-    if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
-        printf("could not establish mysql connection!\n");
-        return dbError;
-    }
-    printf("connected!\n");
-
-
-    // closing the connection causes the client to stop without any message.
-    mysql_close(conn);
-    printf("disconnected!\n");
-    mysql_library_end();
-    return success;
-}
-
-
-status dbFetchExperimentData_org(experiment *e) {
-    MYSQL *conn;
-    MYSQL_RES *res;
-    MYSQL_ROW row;
 
     char *queryExperimentInfo = NULL;
     char *queryGridInfo = NULL;
@@ -164,6 +171,8 @@ status dbFetchExperimentData_org(experiment *e) {
     e->md5Solvers = NULL;
     e->solvers = NULL;
     e->solverNames = NULL;
+
+    e->id=experimentId;
 
     sprintfAlloc(&queryExperimentInfo, QUERY_EXPERIMENT_INFO, experimentId);
     sprintfAlloc(&queryGridInfo, QUERY_GRID_SETTINGS, gridQueueId);
@@ -220,7 +229,6 @@ status dbFetchExperimentData_org(experiment *e) {
     }
 
     e->numInstances = mysql_num_rows(res);
-    printf("numInstances: %i\n", e->numInstances);
 
     if((e->md5Instances = malloc(e->numInstances*sizeof(char *))) == NULL) {
         mysql_free_result(res);
@@ -242,7 +250,6 @@ status dbFetchExperimentData_org(experiment *e) {
         lengths = mysql_fetch_lengths(res);
 
         e->md5Instances[i] = malloc(60*sizeof(char));
-        //e->md5Instances[i] = row[3];
         strncpy(e->md5Instances[i], row[3], 60);
 
         /* Size + 1, to fit the lest nullbyte */
@@ -251,10 +258,6 @@ status dbFetchExperimentData_org(experiment *e) {
 
         e->instanceNames[i] = calloc(lengths[1],sizeof(char*));
         strncpy(e->instanceNames[i], row[1], lengths[1]);
-
-        printf("length instance name: %i\n", lengths[1]);
-        printf("instance name: %s\n", row[1]);
-        printf("copied instance name: %s\n", e->instanceNames[i]);
 
         i++;
     }
@@ -273,7 +276,6 @@ status dbFetchExperimentData_org(experiment *e) {
     }
 
     e->numSolvers = mysql_num_rows(res);
-    printf("numSolvers: %i\n", e->numSolvers);
 
     if((e->lengthSolver = malloc(e->numSolvers*sizeof(char *))) == NULL) {
         mysql_free_result(res);
@@ -302,32 +304,23 @@ status dbFetchExperimentData_org(experiment *e) {
         e->lengthSolver[i] = lengths[3];
 
         e->md5Solvers[i] = (char *)malloc(60*sizeof(char));
-        //e->md5Solvers[i] = row[4];
         strncpy(e->md5Solvers[i], row[4], 60);
 
         e->solvers[i] = (char *)malloc(lengths[3]*sizeof(char));
         memcpy(e->solvers[i], row[3], lengths[3]);
 
-        printf("length solver name: %i\n", lengths[2]);
-        printf("solver name: %s\n", row[2]);
         if((e->solverNames[i] = calloc(lengths[2],sizeof(char))) == NULL) {
             mysql_free_result(res);
             return sysError;
         }
         strncpy(e->solverNames[i], row[2], lengths[2]);
-        //strcpy(e->solverNames[i], "sparaow");
 
-        printf("copied solver name: %s\n", e->solverNames[i]);
         i++;
     }
 
-    printf("copied timeOut: %i\n", e->timeOut);
-    printf("copied numCPUs: %i\n", e->numCPUs);
     mysql_free_result(res);
-    printf("got here\n");
-    // closing the connection causes the client to stop without any message.
     mysql_close(conn);
-    printf("and here\n");
+    mysql_library_end();
     return success;
 }
 
@@ -412,18 +405,21 @@ int dbFetchJob(job* j, status* s) {
     conn = mysql_init(NULL);
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
         printf("could not establish mysql connection!\n");
-        return dbError;
+        *s = dbError;
+        return 1;
     }
 
     sprintfAlloc(&queryExpJob, QUERY_EXPERIMENT_JOBS, experimentId);
 
     /* fetch the id's of the experiment jobs */
     if(mysql_query(conn, queryExpJob) != 0) {
-        return dbError;
+        *s = dbError;
+        return 1;
     }
 
     if((res = mysql_store_result(conn)) == NULL) {
-        return dbError;
+        *s = dbError;
+        return 1;
     }
 
     i = mysql_num_rows(res);
@@ -440,12 +436,14 @@ int dbFetchJob(job* j, status* s) {
     /* fetch job information */
     if(mysql_query(conn, queryJob) != 0) {
         mysql_free_result(res);
-        return dbError;
+        *s = dbError;
+        return 1;
     }
 
     mysql_free_result(res);
     if((res = mysql_store_result(conn)) == NULL) {
-        return dbError;
+        *s = dbError;
+        return 1;
     }
 
 
@@ -464,12 +462,14 @@ int dbFetchJob(job* j, status* s) {
     /* fetch params information */
     if(mysql_query(conn, queryJobParams) != 0) {
         mysql_free_result(res);
-        return dbError;
+        *s = dbError;
+        return 1;
     }
 
     mysql_free_result(res);
     if((res = mysql_store_result(conn)) == NULL) {
-        return dbError;
+        *s = dbError;
+        return 1;
     }
 
     
@@ -490,7 +490,8 @@ int dbFetchJob(job* j, status* s) {
     free(params);
     mysql_free_result(res);
     mysql_close(conn);
-    return success;
+    *s = success;
+    return 0;
 }
 
 void freeJob(job *j) {
