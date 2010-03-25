@@ -1,6 +1,7 @@
 #include "configuration.h"
+#include "global.h"
 
-int read_config() {
+status read_config() {
     char *lineptr = NULL;
     size_t len = 0;
     int read;
@@ -8,14 +9,15 @@ int read_config() {
 
     char *key;
     char *value;
-    key = (char *)malloc(64);
-    value = (char *)malloc(64);
+    key = (char *)malloc(64*sizeof(char));
+    value = (char *)malloc(64*sizeof(char));
+
 
     if((conf = fopen("./config", "r")) == NULL) {
         printf("could not read config file\n");
         free(key);
         free(value);
-        return 1;
+        return sysError;
     }
 
     while((read = getline(&lineptr, &len, conf)) != -1) {
@@ -31,10 +33,11 @@ int read_config() {
             strcpy(database, value);
         } else if(strcmp(key, "experiment") == 0) {
             experimentId = atoi(value);
-        } else if(strcmp(key, "gridQueue") == 0) {
+        } else if(strcmp(key, "gridqueue") == 0) {
             gridQueueId = atoi(value);
         } else {
-            printf("unknown option %s\n", key);
+            printf("unknownn option %s\n", key);
+            return sysError;
         }
         
         free(lineptr);
@@ -45,5 +48,5 @@ int read_config() {
 
     free(key);
     free(value);
-    return 1;
+    return success;
 }

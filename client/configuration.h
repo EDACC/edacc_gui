@@ -7,6 +7,6 @@
 #include <string.h>
 #include "global.h"
 
-int read_config();
+status read_config();
 
 #endif

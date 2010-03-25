@@ -111,6 +111,46 @@
 "   FROM Instances " \
 "   WHERE name = %s "
 
+status dbFetchExperimentData_test(experiment *e) {
+    MYSQL *conn;
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+
+    char *queryExperimentInfo = NULL;
+    char *queryGridInfo = NULL;
+    char *querySolver = NULL;
+    char *queryInstance = NULL;
+
+    int i;
+    unsigned long *lengths = NULL;
+
+    e->md5Instances = NULL;
+    e->instances = NULL;
+    e->instanceNames = NULL;
+
+    e->lengthSolver = NULL;
+    e->md5Solvers = NULL;
+    e->solvers = NULL;
+    e->solverNames = NULL;
+
+    sprintfAlloc(&queryExperimentInfo, QUERY_EXPERIMENT_INFO, experimentId);
+    sprintfAlloc(&queryGridInfo, QUERY_GRID_SETTINGS, gridQueueId);
+    sprintfAlloc(&querySolver, QUERY_SOLVERS, experimentId);
+    sprintfAlloc(&queryInstance, QUERY_INSTANCES, experimentId);
+
+
+    conn = mysql_init(NULL);
+    //printf("%s, %s, %s, %s\n", host, username, password, database);
+    if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+        printf("could not establish mysql connection!\n");
+        return dbError;
+    }
+    //printf("connected to mysql!");
+
+    mysql_close(conn);
+    return success;
+}
+
 status dbFetchExperimentData(experiment *e) {
     MYSQL *conn = NULL;
     MYSQL_RES *res = NULL;
@@ -141,7 +181,10 @@ status dbFetchExperimentData(experiment *e) {
     sprintfAlloc(&querySolver, QUERY_SOLVERS, experimentId);
     sprintfAlloc(&queryInstance, QUERY_INSTANCES, experimentId);
 
+    conn = mysql_init(NULL);
+
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+        printf("could not establish mysql connection!\n");
         return dbError;
     }
 
@@ -188,6 +231,7 @@ status dbFetchExperimentData(experiment *e) {
     }
 
     e->numInstances = mysql_num_rows(res);
+    printf("numInstances: %i\n", e->numInstances);
 
     if((e->md5Instances = malloc(e->numInstances*sizeof(char *))) == NULL) {
         mysql_free_result(res);
@@ -208,15 +252,20 @@ status dbFetchExperimentData(experiment *e) {
     while((row = mysql_fetch_row(res)) != NULL) {
         lengths = mysql_fetch_lengths(res);
 
-        e->md5Instances[i] = (char *)malloc(60*sizeof(char));
-        e->md5Instances[i] = row[3];
+        e->md5Instances[i] = malloc(60*sizeof(char));
+        //e->md5Instances[i] = row[3];
+        strncpy(e->md5Instances[i], row[3], 60);
 
         /* Size + 1, to fit the lest nullbyte */
-        e->instances[i] = (char *)calloc(lengths[2]+1,sizeof(char));
+        e->instances[i] = calloc(lengths[2]+1,sizeof(char));
         memcpy(e->instances[i], row[2], lengths[2]);
 
-        e->instanceNames[i] = (char *)malloc(lengths[1]*sizeof(char*));
+        e->instanceNames[i] = calloc(lengths[1],sizeof(char*));
         strncpy(e->instanceNames[i], row[1], lengths[1]);
+
+        printf("length instance name: %i\n", lengths[1]);
+        printf("instance name: %s\n", row[1]);
+        printf("copied instance name: %s\n", e->instanceNames[i]);
 
         i++;
     }
@@ -235,6 +284,7 @@ status dbFetchExperimentData(experiment *e) {
     }
 
     e->numSolvers = mysql_num_rows(res);
+    printf("numSolvers: %i\n", e->numSolvers);
 
     if((e->lengthSolver = malloc(e->numSolvers*sizeof(char *))) == NULL) {
         mysql_free_result(res);
@@ -263,19 +313,32 @@ status dbFetchExperimentData(experiment *e) {
         e->lengthSolver[i] = lengths[3];
 
         e->md5Solvers[i] = (char *)malloc(60*sizeof(char));
-        e->md5Solvers[i] = row[4];
+        //e->md5Solvers[i] = row[4];
+        strncpy(e->md5Solvers[i], row[4], 60);
 
         e->solvers[i] = (char *)malloc(lengths[3]*sizeof(char));
         memcpy(e->solvers[i], row[3], lengths[3]);
 
-        e->solverNames[i] = (char *)malloc(lengths[2]*sizeof(char));
-        strncpy(e->instanceNames[i], row[2], lengths[2]);
+        printf("length solver name: %i\n", lengths[2]);
+        printf("solver name: %s\n", row[2]);
+        if((e->solverNames[i] = calloc(lengths[2],sizeof(char))) == NULL) {
+            mysql_free_result(res);
+            return sysError;
+        }
+        strncpy(e->solverNames[i], row[2], lengths[2]);
+        //strcpy(e->solverNames[i], "sparaow");
 
+        printf("copied solver name: %s\n", e->solverNames[i]);
         i++;
     }
 
+    printf("copied timeOut: %i\n", e->timeOut);
+    printf("copied numCPUs: %i\n", e->numCPUs);
     mysql_free_result(res);
-    mysql_close(conn);
+    printf("got here\n");
+    // closing the connection causes the client to stop without any message.
+    //mysql_close(conn);
+    printf("and here\n");
     return success;
 }
 
@@ -357,7 +420,9 @@ int dbFetchJob(job* j, status* s) {
     j->resultFile = NULL;
 
 
+    conn = mysql_init(NULL);
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+        printf("could not establish mysql connection!\n");
         return dbError;
     }
 
@@ -433,6 +498,7 @@ int dbFetchJob(job* j, status* s) {
 
     strcpy(j->params, params);
 
+    free(params);
     mysql_free_result(res);
     mysql_close(conn);
     return success;
@@ -469,7 +535,9 @@ status dbUpdate(const job* j) {
             j->statusCode, 
             j->resultFile);
 
+    conn = mysql_init(NULL);
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+        printf("could not establish mysql connection!\n");
         return dbError;
     }
 
@@ -495,6 +563,7 @@ status dbFetchSolver(const char* solverName, solver* s) {
 
     sprintfAlloc(&queryJob, QUERY_SOLVER, solverName);
 
+    conn = mysql_init(NULL);
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
         return dbError;
     }
@@ -540,7 +609,9 @@ status dbFetchInstance(const char* instanceName, instance* i) {
 
     sprintfAlloc(&queryInstance, QUERY_INSTANCE, instanceName);
 
+    conn = mysql_init(NULL);
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+        printf("could not establish mysql connection!\n");
         return dbError;
     }
 

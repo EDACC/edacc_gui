@@ -1,6 +1,6 @@
 host = localhost
-username = foo
-password = bar
+username = boris
+password = bobo
 database = EDACC
-experiment = 20
-gridQueue = 1
+experiment = 1
+gridqueue = 0
