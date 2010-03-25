@@ -13,6 +13,12 @@ public class DatabaseConnector extends Observable {
     private static DatabaseConnector instance = null;
     private Connection conn;
 
+    private String hostname;
+    private int port;
+    private String database;
+    private String username;
+    private String password;
+
     private DatabaseConnector() {
     }
 
@@ -38,6 +44,11 @@ public class DatabaseConnector extends Observable {
             conn.close();
         }
         try {
+            this.hostname = hostname;
+            this.port = port;
+            this.username = username;
+            this.password = password;
+            this.database = database;
             Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?user=" + username + "&password=" + password);
         } catch (ClassNotFoundException e) {
@@ -123,7 +134,6 @@ public class DatabaseConnector extends Observable {
                 + "  `Solver_idSolver` INT NOT NULL ,"
                 + "  PRIMARY KEY (`idParameter`) ,"
                 + "  INDEX `fk_Parameters_Solver` (`Solver_idSolver` ASC) ,"
-                + "  UNIQUE INDEX `order` (`order` ASC) ,"
                 + "  CONSTRAINT `fk_Parameters_Solver`    FOREIGN KEY (`Solver_idSolver` )    REFERENCES `Solver` (`idSolver` )    "
                 + "  ON DELETE CASCADE    "
                 + "  ON UPDATE CASCADE)"
@@ -251,7 +261,7 @@ public class DatabaseConnector extends Observable {
                 + "  ON UPDATE CASCADE)"
                 + "  ENGINE = InnoDB;");
         st.addBatch("DROP TABLE IF EXISTS `gridQueue` ;");
-        st.addBatch("CREATE  TABLE IF NOT EXISTS `gridQueue` (  `idgridQueue` INT NOT NULL ,"
+        st.addBatch("CREATE  TABLE IF NOT EXISTS `gridQueue` (  `idgridQueue` INT NOT NULL AUTO_INCREMENT,"
                 + "  `name` VARCHAR(60) NOT NULL ,"
                 + "  `location` VARCHAR(60) NOT NULL ,"
                 + "  `numNodes` INT NULL COMMENT 'how many nodes are in the queue' ,"
@@ -281,7 +291,7 @@ public class DatabaseConnector extends Observable {
                 + "  ENGINE = InnoDB;");
 
         st.addBatch("DROP TABLE IF EXISTS `Instances_has_instanceClass`");
-        st.addBatch("CREATE  TABLE IF NOT EXISTS `EDACC`.`Instances_has_instanceClass` ("
+        st.addBatch("CREATE  TABLE IF NOT EXISTS `Instances_has_instanceClass` ("
                 + "  `Instances_idInstance` INT NOT NULL , "
                 + "  `instanceClass_idinstanceClass` INT NOT NULL , "
                 + "  PRIMARY KEY (`Instances_idInstance`, `instanceClass_idinstanceClass`) , "
@@ -308,10 +318,23 @@ public class DatabaseConnector extends Observable {
         st.executeBatch();
     }
 
-    public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        DatabaseConnector db = DatabaseConnector.getInstance();
-        db.connect("localhost", 3306, "  Root", "  EDACCtest", "sopra");
-        db.createDBSchema();
-        db.conn.close();
+    public String getDatabase() {
+        return database;
+    }
+
+    public String getHostname() {
+        return hostname;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

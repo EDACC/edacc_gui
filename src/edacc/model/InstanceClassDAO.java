@@ -44,14 +44,13 @@ public class InstanceClassDAO {
         i.setDescription(description);
         i.setSource(source);
         save(i);
-        cacheInstanceClass(i);
         return i;
     }
 
     public static void delete(InstanceClass i) throws NoConnectionToDBException, SQLException, InstanceSourceClassHasInstance {
         PreparedStatement ps;
         if(i.isSource()){
-            ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM instances WHERE instanceClass_idinstanceClass = ?");
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM Instances WHERE instanceClass_idinstanceClass = ?");
             ps.setInt(1, i.getInstanceClassID());
             ResultSet rs = ps.executeQuery();
             if(rs.next()) throw new InstanceSourceClassHasInstance();
@@ -102,6 +101,7 @@ public class InstanceClassDAO {
         }
 
         instanceClass.setSaved();
+        cacheInstanceClass(instanceClass);
     }
 
     private static InstanceClass getCached(InstanceClass i) {

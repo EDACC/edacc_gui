@@ -27,23 +27,41 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="lblMaxJobsInQueue" alignment="0" pref="226" max="32767" attributes="0"/>
-                          <Component id="lblNumNodes" alignment="0" min="-2" pref="164" max="-2" attributes="1"/>
-                          <Component id="lblMaxRuntime" alignment="0" pref="226" max="32767" attributes="1"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="txtMaxRuntime" pref="79" max="32767" attributes="1"/>
-                          <Component id="txtNumNodes" alignment="0" pref="79" max="32767" attributes="1"/>
-                          <Component id="txtMaxJobsInQueue" alignment="0" pref="79" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="btnCancel" min="-2" pref="87" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="btnOk" min="-2" pref="89" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="lblPBSScript" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lblName" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lblLocation" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lblNumNodes" alignment="0" min="-2" pref="164" max="-2" attributes="1"/>
+                                  <Component id="lblNumCPUs" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="70" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="lblMaxJobsInQueue" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblWallTime" alignment="0" min="-2" pref="73" max="-2" attributes="1"/>
+                          <Component id="lblAvailNodes" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblDescription" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="60" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="btnAdd" max="32767" attributes="1"/>
+                          <Component id="txtName" alignment="0" max="32767" attributes="1"/>
+                          <Component id="txtLocation" alignment="0" max="32767" attributes="1"/>
+                          <Component id="txtNumNodes" alignment="0" max="32767" attributes="1"/>
+                          <Component id="txtNumCPUs" alignment="0" max="32767" attributes="1"/>
+                          <Component id="txtWalltime" alignment="0" max="32767" attributes="1"/>
+                          <Component id="txtAvailNodes" alignment="0" max="32767" attributes="1"/>
+                          <Component id="txtMaxJobsInQueue" alignment="0" max="32767" attributes="1"/>
+                          <Component id="jScrollPane1" alignment="0" max="32767" attributes="1"/>
+                      </Group>
+                      <EmptySpace pref="16" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -55,23 +73,58 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblNumNodes" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtNumNodes" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtName" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblName" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblMaxRuntime" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtMaxRuntime" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtLocation" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblLocation" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="txtNumNodes" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblNumNodes" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="txtNumCPUs" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblNumCPUs" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Component id="txtWalltime" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="txtAvailNodes" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblAvailNodes" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="lblWallTime" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="txtMaxJobsInQueue" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblMaxJobsInQueue" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblMaxJobsInQueue" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtMaxJobsInQueue" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jScrollPane1" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblDescription" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="17" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="btnOk" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnAdd" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblPBSScript" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="30" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnCancel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnOk" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -88,13 +141,13 @@
         <Property name="name" type="java.lang.String" value="lblNumNodes" noResource="true"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblMaxRuntime">
+    <Component class="javax.swing.JLabel" name="lblWallTime">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="txtMaxRuntime"/>
+          <ComponentRef name="txtWalltime"/>
         </Property>
-        <Property name="text" type="java.lang.String" resourceKey="lblMaxRuntime.text"/>
-        <Property name="name" type="java.lang.String" value="lblMaxRuntime" noResource="true"/>
+        <Property name="text" type="java.lang.String" resourceKey="lblWallTime.text"/>
+        <Property name="name" type="java.lang.String" value="lblWallTime" noResource="true"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txtNumNodes">
@@ -103,10 +156,10 @@
         <Property name="name" type="java.lang.String" value="txtNumNodes" noResource="true"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="txtMaxRuntime">
+    <Component class="javax.swing.JTextField" name="txtWalltime">
       <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="txtMaxRuntime.text"/>
-        <Property name="name" type="java.lang.String" value="txtMaxRuntime" noResource="true"/>
+        <Property name="text" type="java.lang.String" resourceKey="txtWalltime.text"/>
+        <Property name="name" type="java.lang.String" value="txtWalltime" noResource="true"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblMaxJobsInQueue">
@@ -142,5 +195,105 @@
         <Property name="name" type="java.lang.String" value="btnCancel" noResource="true"/>
       </Properties>
     </Component>
+    <Component class="javax.swing.JLabel" name="lblPBSScript">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lblPBSScript.text"/>
+        <Property name="name" type="java.lang.String" value="lblPBSScript" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnAdd">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="btnPBSScript.text"/>
+        <Property name="name" type="java.lang.String" value="btnPBSScript" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAdd"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblName">
+      <Properties>
+        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txtName"/>
+        </Property>
+        <Property name="text" type="java.lang.String" resourceKey="lblName.text"/>
+        <Property name="name" type="java.lang.String" value="lblName" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblLocation">
+      <Properties>
+        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txtLocation"/>
+        </Property>
+        <Property name="text" type="java.lang.String" resourceKey="lblLocation.text"/>
+        <Property name="name" type="java.lang.String" value="lblLocation" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtName">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="txtName.text"/>
+        <Property name="name" type="java.lang.String" value="txtName" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtLocation">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="txtLocation.text"/>
+        <Property name="name" type="java.lang.String" value="txtLocation" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblNumCPUs">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lblNumCPUs.text"/>
+        <Property name="name" type="java.lang.String" value="lblNumCPUs" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtNumCPUs">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="txtNumCPUs.text"/>
+        <Property name="name" type="java.lang.String" value="txtNumCPUs" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblAvailNodes">
+      <Properties>
+        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txtAvailNodes"/>
+        </Property>
+        <Property name="text" type="java.lang.String" resourceKey="lblAvailNodes.text"/>
+        <Property name="name" type="java.lang.String" value="lblAvailNodes" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtAvailNodes">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="txtAvailNodes.text"/>
+        <Property name="name" type="java.lang.String" value="txtAvailNodes" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblDescription">
+      <Properties>
+        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="taDescription"/>
+        </Property>
+        <Property name="text" type="java.lang.String" resourceKey="lblDescription.text"/>
+        <Property name="name" type="java.lang.String" value="lblDescription" noResource="true"/>
+      </Properties>
+    </Component>
+    <Container class="javax.swing.JScrollPane" name="jScrollPane1">
+      <Properties>
+        <Property name="name" type="java.lang.String" value="jScrollPane1" noResource="true"/>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+      </AuxValues>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+      <SubComponents>
+        <Component class="javax.swing.JTextArea" name="taDescription">
+          <Properties>
+            <Property name="columns" type="int" value="20"/>
+            <Property name="rows" type="int" value="5"/>
+            <Property name="name" type="java.lang.String" value="taDescription" noResource="true"/>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
   </SubComponents>
 </Form>

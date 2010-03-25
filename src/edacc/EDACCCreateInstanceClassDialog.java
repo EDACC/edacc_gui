@@ -42,7 +42,6 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
         java.awt.GridBagConstraints gridBagConstraints;
 
         SourceOrUserClass = new javax.swing.ButtonGroup();
-        jTextArea1 = new javax.swing.JTextArea();
         jLabelName = new javax.swing.JLabel();
         jTextFieldName = new javax.swing.JTextField();
         jLabelDescription = new javax.swing.JLabel();
@@ -51,26 +50,16 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
         jLabelTitle = new javax.swing.JLabel();
         jButtonCreate = new javax.swing.JButton();
         jButtonCancel = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCCreateInstanceClassDialog.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setAlwaysOnTop(true);
-        setMinimumSize(new java.awt.Dimension(400, 300));
+        setMinimumSize(new java.awt.Dimension(224, 190));
         setName("Form"); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
-
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(3);
-        jTextArea1.setTabSize(5);
-        jTextArea1.setName("jTextArea1"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.ipadx = 1;
-        gridBagConstraints.ipady = 1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
-        getContentPane().add(jTextArea1, gridBagConstraints);
 
         jLabelName.setText(resourceMap.getString("jLabelName.text")); // NOI18N
         jLabelName.setName("jLabelName"); // NOI18N
@@ -88,6 +77,7 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 100;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
         getContentPane().add(jTextFieldName, gridBagConstraints);
 
@@ -153,8 +143,26 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
+        gridBagConstraints.insets = new java.awt.Insets(10, 0, 10, 0);
         getContentPane().add(jButtonCancel, gridBagConstraints);
+
+        jScrollPane1.setName("jScrollPane1"); // NOI18N
+
+        jTextArea1.setColumns(1);
+        jTextArea1.setLineWrap(true);
+        jTextArea1.setRows(4);
+        jTextArea1.setTabSize(1);
+        jTextArea1.setMaximumSize(new java.awt.Dimension(100, 76));
+        jTextArea1.setName("jTextArea1"); // NOI18N
+        jScrollPane1.setViewportView(jTextArea1);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
+        getContentPane().add(jScrollPane1, gridBagConstraints);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -213,6 +221,7 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabelTitle;
     private javax.swing.JRadioButton jRadioButtonSourceClass;
     private javax.swing.JRadioButton jRadioButtonUserClass;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextFieldName;
     // End of variables declaration//GEN-END:variables

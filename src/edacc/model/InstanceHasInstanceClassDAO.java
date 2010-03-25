@@ -30,7 +30,6 @@ public class InstanceHasInstanceClassDAO {
         InstanceHasInstanceClass i = new InstanceHasInstanceClass(instance, instanceClass);
         i.setNew();
         save(i);
-        cacheInstanceHasInstanceClass(i);
         return i;
     }
 
@@ -69,6 +68,7 @@ public class InstanceHasInstanceClassDAO {
             st.setInt(2, i.getInstanceClass().getInstanceClassID());
             st.executeUpdate();
             i.setSaved();
+            cacheInstanceHasInstanceClass(i);
         }
 
     }

@@ -4,11 +4,11 @@
  */
 package edacc.manageDB;
 
-import com.mysql.jdbc.Blob;
 import edacc.EDACCAddInstanceToInstanceClass;
 import edacc.EDACCAddNewInstanceSelectClassDialog;
 import edacc.EDACCApp;
 import edacc.EDACCCreateInstanceClassDialog;
+import edacc.EDACCManageDBInstanceFilter;
 import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
 import edacc.model.InstaceNotInDBException;
@@ -24,12 +24,11 @@ import edacc.model.InstanceHasInstanceClass;
 import edacc.model.InstanceHasInstanceClassDAO;
 import edacc.model.InstanceIsInExperimentException;
 import edacc.model.InstanceSourceClassHasInstance;
+import edacc.model.MD5CheckFailedException;
 import edacc.model.NoConnectionToDBException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Vector;
@@ -53,13 +52,16 @@ public class ManageDBInstances {
     JPanel panelManageDBInstances;
     JFileChooser jFileChooserManageDBInstance;
     JFileChooser jFileChooserManageDBExportInstance;
+    JTable tableInstances;
 
     public ManageDBInstances(EDACCManageDBMode main, JPanel panelManageDBInstances, 
-            JFileChooser jFileChooserManageDBInstance,  JFileChooser jFileChooserManageDBExportInstance ) {
+            JFileChooser jFileChooserManageDBInstance,  JFileChooser jFileChooserManageDBExportInstance,
+            JTable tableInstances) {
         this.main = main;
         this.panelManageDBInstances = panelManageDBInstances;
         this.jFileChooserManageDBInstance = jFileChooserManageDBInstance;
         this.jFileChooserManageDBExportInstance = jFileChooserManageDBExportInstance;
+        this.tableInstances = tableInstances;
     }
     /**
      * Load all instances from the database into the instancetable
@@ -119,6 +121,7 @@ public class ManageDBInstances {
                         instances = buildInstancesAutogenerateClass(instanceFiles, ret);
 
                     main.instanceTableModel.addInstances(instances);
+                    loadInstanceClasses();
                 }else{
                     Vector<Instance> instances = buildInstancesGivenClass(instanceFiles, (InstanceClass)input);
                     main.instanceTableModel.addInstances(instances);
@@ -221,35 +224,6 @@ public class ManageDBInstances {
         return instances;
     }*/
 
-/**
- * Creates and add a andFilter with the given values to the sorter of EDACCManageDBMode
- * @param name
- * @param numOfAtomsMin
- * @param numOfAtomsMax
- * @param numOfClausesMin
- * @param numOfClausesMax
- * @param ratioMin
- * @param ratioMax
- * @param maxClauseLengthMin
- * @param maxClauseLengthMax
- */
-    public void newFilter(String name, String numOfAtomsMin, String numOfAtomsMax, String numOfClausesMin,
-            String numOfClausesMax, String ratioMin, String ratioMax, String maxClauseLengthMin,
-            String maxClauseLengthMax) {
-        Vector<RowFilter<Object, Object>> filters = new Vector<RowFilter<Object, Object>>();
-        filters.add(RowFilter.regexFilter(name, 0));
-        if(!numOfAtomsMin.isEmpty())filters.add(RowFilter.numberFilter(ComparisonType.AFTER, Integer.parseInt(numOfAtomsMin), 1));
-        if(!numOfAtomsMax.isEmpty()) filters.add(RowFilter.numberFilter(ComparisonType.BEFORE, Integer.parseInt(numOfAtomsMax), 1));
-        if(!numOfClausesMin.isEmpty())filters.add(RowFilter.numberFilter(ComparisonType.AFTER, Integer.parseInt(numOfClausesMin), 2));
-        if(!numOfClausesMax.isEmpty())filters.add(RowFilter.numberFilter(ComparisonType.BEFORE, Integer.parseInt(numOfClausesMax), 2));
-        if(!ratioMin.isEmpty())filters.add(RowFilter.numberFilter(ComparisonType.AFTER, Float.parseFloat(ratioMin), 3));
-        if(!ratioMax.isEmpty())filters.add(RowFilter.numberFilter(ComparisonType.BEFORE, Float.parseFloat(ratioMax), 3));
-        if(!maxClauseLengthMin.isEmpty())filters.add(RowFilter.numberFilter(ComparisonType.AFTER, Integer.parseInt(maxClauseLengthMin), 4));
-        if(!maxClauseLengthMax.isEmpty())filters.add(RowFilter.numberFilter(ComparisonType.BEFORE, Integer.parseInt(maxClauseLengthMax), 4));
-        RowFilter<Object, Object> filter = RowFilter.andFilter(filters);
-        main.sorter.setRowFilter(filter);
-    }
-
     /**
      * Removes the Filter of the given JTable
      */
@@ -276,21 +250,20 @@ public class ManageDBInstances {
      * @throws SQLException
      * @throws InstaceNotInDBException
      */
-    public void exportInstances(int[] rows) throws IOException, NoConnectionToDBException, SQLException, InstaceNotInDBException{
+    public void exportInstances(int[] rows) throws IOException, NoConnectionToDBException, SQLException, 
+            InstaceNotInDBException, FileNotFoundException, MD5CheckFailedException,
+            NoSuchAlgorithmException{
+
         int returnVal = jFileChooserManageDBExportInstance.showOpenDialog(panelManageDBInstances);
         String path = jFileChooserManageDBExportInstance.getSelectedFile().getAbsolutePath();
         Instance temp;
         for(int i = 0; i < rows.length; i++){
            temp =    (Instance) main.instanceTableModel.getValueAt(rows[i], 5);
-           FileOutputStream output = new FileOutputStream(path + System.getProperty("file.separator") + temp.getName());
-           Blob blob = (Blob) InstanceDAO.getBinary(temp.getId());
-           InputStream input = blob.getBinaryStream();
-           byte[] buffer = new byte[1];
-           while (input.read(buffer) > 0) {
-                output.write(buffer);
-           }
-           input.close();
-           output.close();
+           File f = new File(path + System.getProperty("file.separator") + temp.getName());
+           InstanceDAO.getBinaryFileOfInstance(temp, f);
+           String md5File = Util.calculateMD5(f);
+           if (!md5File.equals(temp.getMd5()))
+                throw new MD5CheckFailedException("The exported solver binary of solver \"" + temp.getName() + "\" seems to be corrupt!");         
         }
     }
     /**
@@ -420,7 +393,7 @@ public class ManageDBInstances {
                     InstanceDAO.save(temp);
                 }
             } catch (InstanceAlreadyInDBException ex) {
-                Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+                duplicatesDB += "\n " + instanceFiles.get(i).getAbsolutePath();
             }
 
         }
@@ -535,6 +508,25 @@ public class ManageDBInstances {
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
        }
+    }
+
+    public void addFilter() {
+        if(main.instanceFilter == null){
+            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+            main.instanceFilter = new EDACCManageDBInstanceFilter(mainFrame,true);
+            main.instanceFilter.setLocationRelativeTo(mainFrame);
+        }
+        EDACCApp.getApplication().show(main.instanceFilter);
+
+        Vector<RowFilter<Object, Object>> filters  = main.instanceFilter.getFilter();
+        if(filters.isEmpty()){
+            removeFilter(tableInstances);
+        }
+        else{
+            main.sorter.setRowFilter(RowFilter.andFilter(filters));
+            tableInstances.setRowSorter(main.sorter);
+            main.instanceTableModel.fireTableDataChanged();
+        }
     }
 
 }

@@ -168,7 +168,7 @@ public class ExperimentDAO {
      * @throws SQLException
      */
     public static Vector<Solver> getSolversInExperiment(Experiment e) throws NoConnectionToDBException, SQLException {
-        final String query = "SELECT Solver_idSolver FROM SolverConfig WHERE Experiment_idExperiment=?";
+        final String query = "SELECT DISTINCT Solver_idSolver FROM SolverConfig WHERE Experiment_idExperiment=?";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.setInt(1, e.getId());
         ResultSet rs = ps.executeQuery();
