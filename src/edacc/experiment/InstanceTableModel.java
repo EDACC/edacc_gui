@@ -50,6 +50,7 @@ public class InstanceTableModel extends AbstractTableModel {
     public InstanceTableModel() {
         this.instances = new Vector<Instance>();
         this.selected = new Vector<Boolean>();
+        this.experimentHasInstances = new Vector<ExperimentHasInstance>();
     }
 
     public int getRowCount() {
@@ -81,8 +82,8 @@ public class InstanceTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int col) {
-        if (col == 5) selected.add(col, (Boolean)value);
-        fireTableCellUpdated(row, col);
+        if (col == 5)selected.set(row, (Boolean) value);
+        this.fireTableCellUpdated(row, col);
     }
 
 
@@ -114,17 +115,20 @@ public class InstanceTableModel extends AbstractTableModel {
         instances.clear();
         experimentHasInstances.clear();
         selected.clear();
+        this.fireTableDataChanged();
     }
 
     public void setInstancesAndExperimentHasInstance(Instance instance, ExperimentHasInstance expHasInst){
         instances.add(instance);
         experimentHasInstances.add(expHasInst);
         selected.add(Boolean.TRUE);
+        this.fireTableDataChanged();
     }
 
     public void setInstancesWithoutExp(Instance instance){
         instances.add(instance);
         experimentHasInstances.add(null);
         selected.add(Boolean.FALSE);
+        this.fireTableDataChanged();
     }
 }

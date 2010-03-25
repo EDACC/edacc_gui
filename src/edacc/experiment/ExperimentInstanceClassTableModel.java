@@ -154,8 +154,6 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel{
             }
             expController.addInstancesToVector(new Vector<Instance>(temp));
         }
-
-        instanceTable.updateUI();
     }
 
     void setInstanceClassDeselected(int row) {
