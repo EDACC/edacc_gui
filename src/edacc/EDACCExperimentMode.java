@@ -19,11 +19,8 @@ import edacc.experiment.InstanceTableModelRowFilter;
 import edacc.experiment.SolverTableModel;
 import edacc.manageDB.ManageDBGridQueues;
 import edacc.model.AlreadyRunningTaskException;
-import edacc.model.NoConnectionToDBException;
 import edacc.model.Solver;
 import edacc.model.Tasks;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.SQLException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -752,14 +749,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         try {
             // Generate zip archive
             expController.generatePackage();
-        } catch (FileNotFoundException ex) {
-            System.out.println(ex);
-        } catch (IOException ex) {
-            System.out.println(ex);
-        } catch (NoConnectionToDBException ex) {
-            System.out.println(ex);
-        } catch (SQLException ex) {
-            System.out.println(ex);
+        } catch (Exception ex) {
+            javax.swing.JOptionPane.showMessageDialog(null, "There was an error while creating the package: " + ex, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnGeneratePackage
 
