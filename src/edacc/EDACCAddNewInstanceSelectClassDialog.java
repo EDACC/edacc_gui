@@ -68,6 +68,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 5, 10);
         getContentPane().add(jRadioButtonAutomatic, gridBagConstraints);
 
@@ -77,6 +78,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 10, 5, 10);
         getContentPane().add(jRadioButtonChoose, gridBagConstraints);
 
