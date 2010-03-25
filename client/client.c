@@ -232,7 +232,7 @@ inline status update(const job* j) {
 }
 
 //Abort all running process and terminate the application with exit code retval
-void shutdown(status retval) {
+void exitClient(status retval) {
 	char* fileName;
 	int i;
 
@@ -269,11 +269,11 @@ void shutdown(status retval) {
 
 void signalHandler(int signum) {
 	if(signum==SIGUSR1)
-		shutdown(sysError);
+		exitClient(sysError);
 	else if(signum==SIGUSR2)
-		shutdown(dbError);
+		exitClient(dbError);
 	else
-		shutdown(success);
+		exitClient(success);
 }
 
 //Process the results of a normally terminated job j
@@ -490,7 +490,10 @@ int main_org(int argc, char *argv[]) {
 	instance inst;
 	char* fileName;
 
-	read_config();
+	s=read_config();
+	if(s!=success) {
+		exit(s);
+	}
 
 	s=init(argc, argv);
 	if(s!=success) {
@@ -513,32 +516,32 @@ int main_org(int argc, char *argv[]) {
 					//Wait until all child processes have terminated.
 					s=handleChildren(numJobs);
 				}
-				shutdown(s);
+				exitClient(s);
 			}
 
 			//Start a mutual execution lock between several application instances
 			if(lockMutex()!=success)
-				shutdown(sysError);
+				exitClient(sysError);
 
 			//Create the solver binary if it doesn't exist yet
 			fileName=addBasename(j->solverName);
 			if(fileName==NULL) {
 				logError("Error: Out of memory\n");
 				unlockMutex();
-				shutdown(sysError);
+				exitClient(sysError);
 			}
 			if(!fileExists(fileName)) {
 				s=dbFetchSolver(j->solverName, &solv);
 				if(s!=success) {
 					unlockMutex();
 					free(fileName);
-					shutdown(s);
+					exitClient(s);
 				}
 				if(createFile(fileName, solv.solver, solv.length, solv.md5, 0111)!=success) {
 					unlockMutex();
 					free(fileName);
 					freeSolver(&solv);
-					shutdown(sysError);
+					exitClient(sysError);
 				}
 				freeSolver(&solv);
 			}
@@ -549,20 +552,20 @@ int main_org(int argc, char *argv[]) {
 			if(fileName==NULL) {
 				logError("Error: Out of memory\n");
 				unlockMutex();
-				shutdown(sysError);
+				exitClient(sysError);
 			}
 			if(!fileExists(fileName)) {
 				s=dbFetchInstance(j->instanceName, &inst);
 				if(s!=success) {
 					unlockMutex();
 					free(fileName);
-					shutdown(s);
+					exitClient(s);
 				}
 				if(createFile(fileName, inst.instance, strlen(inst.instance), inst.md5, 0444)!=success) {
 					unlockMutex();
 					free(fileName);
 					freeInstance(&inst);
-					shutdown(sysError);
+					exitClient(sysError);
 				}
 				freeInstance(&inst);
 			}
@@ -570,13 +573,13 @@ int main_org(int argc, char *argv[]) {
 
 			//End the mutual execution lock
 			if(unlockMutex()!=success)
-				shutdown(sysError);
+				exitClient(sysError);
 
 			//Create a process for processing the job
 			pid=fork();
 			if(pid==-1) {
 				logError("Error in fork(): %s\n", strerror(errno));
-				shutdown(sysError);
+				exitClient(sysError);
 			} else if(pid==0) {
 				//This is the child process. Disable the inherited signal handler.
 				deferSignals();
@@ -613,7 +616,7 @@ int main_org(int argc, char *argv[]) {
 		//Wait until one child process terminates and handle the result
 		s=handleChildren(1);
 		if(s!=success) {
-			shutdown(s);
+			exitClient(s);
 		}
 	}
 

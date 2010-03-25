@@ -17,10 +17,10 @@ int maxRuntime;
 int maxJobsInQueue;
 
 /* config file values */
-char host[VALUELENGTH];
-char username[VALUELENGTH];
-char password[VALUELENGTH];
-char database[VALUELENGTH];
+char *host;
+char *username;
+char *password;
+char *database;
 int experimentId;
 int gridQueueId;
 
