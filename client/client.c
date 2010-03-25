@@ -642,10 +642,12 @@ int main(int argc, char *argv[]) {
  * 
  * 	setSignalHandler(signalHandler);
  */
-    printf("id: %i, numcpus: %i, timeout: %i, numinstances: %i,"\
-            "instancename 1: %s, numsolvers: %i, solvername 1: %s\n",
-            exp.id, exp.numCPUs, exp.timeOut, exp.numInstances, 
-            exp.instanceNames[0], exp.numSolvers, exp.solverNames[0]);
+
+/*     printf("id: %i, numcpus: %i, timeout: %i, numinstances: %i,"\
+ *             "instancename 1: %s, numsolvers: %i, solvername 1: %s\n",
+ *             exp.id, exp.numCPUs, exp.timeOut, exp.numInstances, 
+ *             exp.instanceNames[0], exp.numSolvers, exp.solverNames[0]);
+ */
 
     return 1;
 }

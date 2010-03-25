@@ -111,49 +111,38 @@
 "   FROM Instances " \
 "   WHERE name = %s "
 
-status dbFetchExperimentData_test(experiment *e) {
+
+status dbFetchExperimentData(experiment *e) {
     MYSQL *conn;
     MYSQL_RES *res;
     MYSQL_ROW row;
 
-    char *queryExperimentInfo = NULL;
-    char *queryGridInfo = NULL;
-    char *querySolver = NULL;
-    char *queryInstance = NULL;
-
-    int i;
-    unsigned long *lengths = NULL;
-
-    e->md5Instances = NULL;
-    e->instances = NULL;
-    e->instanceNames = NULL;
-
-    e->lengthSolver = NULL;
-    e->md5Solvers = NULL;
-    e->solvers = NULL;
-    e->solverNames = NULL;
-
-    sprintfAlloc(&queryExperimentInfo, QUERY_EXPERIMENT_INFO, experimentId);
-    sprintfAlloc(&queryGridInfo, QUERY_GRID_SETTINGS, gridQueueId);
-    sprintfAlloc(&querySolver, QUERY_SOLVERS, experimentId);
-    sprintfAlloc(&queryInstance, QUERY_INSTANCES, experimentId);
-
+    if (mysql_library_init(0, NULL, NULL)) {
+        printf("could not initialize MySQL library\n");
+        return dbError;
+    }
 
     conn = mysql_init(NULL);
-    //printf("%s, %s, %s, %s\n", host, username, password, database);
+
+    printf("%s, %s, %s, %s\n", host, username, password, database);
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
         printf("could not establish mysql connection!\n");
         return dbError;
     }
-    //printf("connected to mysql!");
+    printf("connected!\n");
 
+
+    // closing the connection causes the client to stop without any message.
     mysql_close(conn);
+    printf("disconnected!\n");
+    mysql_library_end();
     return success;
 }
 
-status dbFetchExperimentData(experiment *e) {
-    MYSQL *conn = NULL;
-    MYSQL_RES *res = NULL;
+
+status dbFetchExperimentData_org(experiment *e) {
+    MYSQL *conn;
+    MYSQL_RES *res;
     MYSQL_ROW row;
 
     char *queryExperimentInfo = NULL;
@@ -183,7 +172,7 @@ status dbFetchExperimentData(experiment *e) {
 
     conn = mysql_init(NULL);
 
-    if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+    if(mysql_real_connect(conn, host, username, password, database, 0, NULL, 0) == NULL) {
         printf("could not establish mysql connection!\n");
         return dbError;
     }
@@ -337,7 +326,7 @@ status dbFetchExperimentData(experiment *e) {
     mysql_free_result(res);
     printf("got here\n");
     // closing the connection causes the client to stop without any message.
-    //mysql_close(conn);
+    mysql_close(conn);
     printf("and here\n");
     return success;
 }
