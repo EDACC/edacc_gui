@@ -19,6 +19,7 @@ import edacc.experiment.InstanceTableModelRowFilter;
 import edacc.experiment.SolverTableModel;
 import edacc.manageDB.ManageDBGridQueues;
 import edacc.model.AlreadyRunningTaskException;
+import edacc.model.GridQueue;
 import edacc.model.Solver;
 import edacc.model.Tasks;
 import java.sql.SQLException;
@@ -922,12 +923,17 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
             // TODO assignment of more than one queue/write extra method!
             // assign the default queue to this experiment
-            expController.assignQueueToExperiment(ManageDBGridQueues.getInstance().getDefaultQueue()); // TODO not very nice; will be changed
+            GridQueue q = ManageDBGridQueues.getInstance().getDefaultQueue(); // TODO not very nice; will be changed
+            if (q == null)
+                throw new Exception("You have to specify the grid settings first!");
+            expController.assignQueueToExperiment(q);
         } catch (AlreadyRunningTaskException ex) {
             javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage());
         } catch (NumberFormatException ex) {
             javax.swing.JOptionPane.showMessageDialog(null, "Expected integers for number of runs, timeout and max seed", "invalid data", javax.swing.JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
+            javax.swing.JOptionPane.showMessageDialog(null, "An error occured while assigning a grid queue to the experiment: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
             javax.swing.JOptionPane.showMessageDialog(null, "An error occured while assigning a grid queue to the experiment: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }
