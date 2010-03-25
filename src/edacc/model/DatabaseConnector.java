@@ -13,6 +13,12 @@ public class DatabaseConnector extends Observable {
     private static DatabaseConnector instance = null;
     private Connection conn;
 
+    private String hostname;
+    private int port;
+    private String database;
+    private String username;
+    private String password;
+
     private DatabaseConnector() {
     }
 
@@ -38,6 +44,11 @@ public class DatabaseConnector extends Observable {
             conn.close();
         }
         try {
+            this.hostname = hostname;
+            this.port = port;
+            this.username = username;
+            this.password = password;
+            this.database = database;
             Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?user=" + username + "&password=" + password);
         } catch (ClassNotFoundException e) {
@@ -305,5 +316,25 @@ public class DatabaseConnector extends Observable {
 
 
         st.executeBatch();
+    }
+
+    public String getDatabase() {
+        return database;
+    }
+
+    public String getHostname() {
+        return hostname;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

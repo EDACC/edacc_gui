@@ -3,6 +3,7 @@ package edacc.experiment;
 import edacc.EDACCExperimentMode;
 import edacc.EDACCSolverConfigEntry;
 import edacc.EDACCSolverConfigPanel;
+import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentHasGridQueue;
@@ -51,7 +52,6 @@ public class ExperimentController {
     private Vector<Instance> instances;
     private Vector<Solver> solvers;
     private Vector<InstanceClass> instanceClasses;
-    
     private static RandomNumberGenerator rnd = new JavaRandom();
 
     /**
@@ -176,16 +176,14 @@ public class ExperimentController {
             int seed_group = 0;
             try {
                 seed_group = Integer.valueOf(entry.getSeedGroup().getText());
-            }
-            catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 seed_group = 0;
                 entry.getSeedGroup().setText("0");
                 javax.swing.JOptionPane.showMessageDialog(null, "Seed groups have to be integers, defaulted to 0", "Expected integer for seed groups", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
             if (entry.getSolverConfiguration() == null) {
                 entry.setSolverConfiguration(SolverConfigurationDAO.createSolverConfiguration(entry.getSolverId(), activeExperiment.getId(), seed_group));
-            }
-            else {
+            } else {
                 entry.getSolverConfiguration().setSeed_group(seed_group);
                 entry.getSolverConfiguration().setModified();
             }
@@ -214,14 +212,13 @@ public class ExperimentController {
         }
     }
 
-
     /**
      * method used for auto seed generation, uses the random number generator
      * referenced by this.rnd
      * @return integer between 0 and max inclusively
      */
     private int generateSeed(int max) {
-        return rnd.nextInt(max+1);
+        return rnd.nextInt(max + 1);
     }
 
     /**
@@ -251,13 +248,13 @@ public class ExperimentController {
         int experiments_added = 0;
         Hashtable<SeedGroup, Integer> linked_seeds = new Hashtable<SeedGroup, Integer>();
         Vector<ExperimentResult> experiment_results = new Vector<ExperimentResult>();
-        
+
 
 
         if (generateSeeds && linkSeeds) {
             // first pass over already existing jobs to accumulate existing linked seeds
-            for (Instance i: listInstances) {
-                for (SolverConfiguration c: vsc) {
+            for (Instance i : listInstances) {
+                for (SolverConfiguration c : vsc) {
                     for (int run = 0; run < numRuns; ++run) {
                         task.setStatus("Preparing job generation");
                         if (ExperimentResultDAO.jobExists(run, c.getId(), i.getId(), activeExperiment.getId())) {
@@ -278,10 +275,10 @@ public class ExperimentController {
         int elements = listInstances.size() * vsc.size() * numRuns;
         int done = 1;
         // cartesian product
-        for (Instance i: listInstances) {
-            for (SolverConfiguration c: vsc) {
+        for (Instance i : listInstances) {
+            for (SolverConfiguration c : vsc) {
                 for (int run = 0; run < numRuns; ++run) {
-                    task.setTaskProgress((float)done / (float)elements);
+                    task.setTaskProgress((float) done / (float) elements);
                     task.setStatus("Adding Job " + done + " of " + elements);
 
                     // check if job already exists
@@ -290,24 +287,21 @@ public class ExperimentController {
                             Integer seed = linked_seeds.get(new SeedGroup(c.getSeed_group(), i.getId(), run));
                             if (seed != null) {
                                 experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, seed.intValue(), "", 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
-                            }
-                            else {
+                            } else {
                                 Integer new_seed = new Integer(generateSeed(maxSeed));
                                 linked_seeds.put(new SeedGroup(c.getSeed_group(), i.getId(), run), new_seed);
                                 experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, new_seed.intValue(), "", 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
                             }
-                        }
-                        else if (generateSeeds && !linkSeeds){
+                        } else if (generateSeeds && !linkSeeds) {
                             experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, generateSeed(maxSeed), "", 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
-                        }
-                        else {
+                        } else {
                             experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, 0, "", 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
                         }
                         experiments_added++;
                     }
                     done++;
                 }
-                
+
             }
         }
         ExperimentResultDAO.batchSave(experiment_results);
@@ -322,8 +316,7 @@ public class ExperimentController {
     public int getNumJobs() {
         try {
             return ExperimentResultDAO.getCountByExperimentId(activeExperiment.getId());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return 0;
         }
     }
@@ -340,18 +333,21 @@ public class ExperimentController {
         try {
             main.jobsTableModel.jobs = ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId());
             main.jobsTableModel.fireTableDataChanged();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // TODO: shouldn't happen but show message if it does
         }
-        
+
     }
 
     /**
      * Generates a ZIP archive with the necessary files for the grid.
      */
     public void generatePackage() throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException {
-        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(activeExperiment.getDate().toString() + " - " + activeExperiment.getName() + ".zip"));
+        File zipFile = new File(activeExperiment.getDate().toString() + " - " + activeExperiment.getName() + ".zip");
+        if (zipFile.exists()) {
+            zipFile.delete();
+        }
+        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile));
         final String fileSep = System.getProperty("file.separator");
         ZipEntry entry;
 
@@ -379,7 +375,31 @@ public class ExperimentController {
         File f = GridQueueDAO.getPBS(q);
         entry = new ZipEntry("start_client.pbs");
         addFileToZIP(f, entry, zos);
+
+        // add configuration File
+        addConfigurationFile(zos, activeExperiment, q);
+
+        // add run script
+        addRunScript(zos, q);
+
         zos.close();
+
+        // delete tmp directory
+        deleteDirectory(new File("tmp"));
+    }
+
+    private boolean deleteDirectory(File dir) {
+        if (dir.exists()) {
+            File[] files = dir.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].isDirectory()) {
+                    deleteDirectory(files[i]);
+                } else {
+                    files[i].delete();
+                }
+            }
+        }
+        return (dir.delete());
     }
 
     /**
@@ -391,13 +411,14 @@ public class ExperimentController {
     private void addFileToZIP(File f, ZipEntry entry, ZipOutputStream zos) throws FileNotFoundException, IOException {
         FileInputStream in = new FileInputStream(f);
         zos.putNextEntry(entry);
+
         int data;
+
         while ((data = in.read()) > -1) {
             zos.write(data);
         }
         zos.closeEntry();
         in.close();
-
     }
 
     /**
@@ -408,8 +429,9 @@ public class ExperimentController {
      */
     public void assignQueueToExperiment(GridQueue q) throws SQLException {
         // check if assignment already exists
-        if (ExperimentHasGridQueueDAO.getByExpAndQueue(activeExperiment, q) != null)
+        if (ExperimentHasGridQueueDAO.getByExpAndQueue(activeExperiment, q) != null) {
             return;
+        }
         ExperimentHasGridQueue eq = ExperimentHasGridQueueDAO.createExperimentHasGridQueue(activeExperiment, q);
     }
 
@@ -422,14 +444,53 @@ public class ExperimentController {
     }
 
     public void selectAllInstanceClasses() {
-        for(int i = 0; i < main.instanceClassModel.getRowCount(); i++){
+        for (int i = 0; i
+                < main.instanceClassModel.getRowCount(); i++) {
             main.instanceClassModel.setInstanceClassSelected(i);
         }
     }
 
     public void deselectAllInstanceClasses() {
-        for(int i = 0; i < main.instanceClassModel.getRowCount(); i++){
+        for (int i = 0; i
+                < main.instanceClassModel.getRowCount(); i++) {
             main.instanceClassModel.setInstanceClassDeselected(i);
         }
+    }
+
+    private void addConfigurationFile(ZipOutputStream zos, Experiment activeExperiment, GridQueue activeQueue) throws IOException {
+        // generate content of config file
+        String sConf = "host = $host\n"
+                + "username = $user\n"
+                + "password = $pwd\n"
+                + "database = $db\n"
+                + "experiment = $exp\n"
+                + "gridQueue = $q\n";
+        DatabaseConnector con = DatabaseConnector.getInstance();
+        sConf = sConf.replace("$host", con.getHostname());
+        sConf = sConf.replace("$user", con.getUsername());
+        sConf = sConf.replace("$pwd", con.getPassword());
+        sConf = sConf.replace("$db", con.getDatabase());
+        sConf = sConf.replace("$exp", String.valueOf(activeExperiment.getId()));
+        sConf = sConf.replace("$q", String.valueOf(activeQueue.getId()));
+
+        // write file into zip archive
+        ZipEntry entry = new ZipEntry("config");
+        zos.putNextEntry(entry);
+        zos.write(sConf.getBytes());
+        zos.closeEntry();
+    }
+
+    private void addRunScript(ZipOutputStream zos, GridQueue q) throws IOException {
+        String sRun = "#!/bin/bash\n"
+                + "for (( i = 1; i < " + q.getNumNodes() + "; i++ ))\n"
+                + "do\n"
+                + "    qsub start_client.pbs\n"
+                + "done\n";
+
+        // write file into zip archive
+        ZipEntry entry = new ZipEntry("run.sh");
+        zos.putNextEntry(entry);
+        zos.write(sRun.getBytes());
+        zos.closeEntry();
     }
 }

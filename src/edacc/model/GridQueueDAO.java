@@ -294,7 +294,7 @@ public class GridQueueDAO {
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
             FileOutputStream out = new FileOutputStream(f);
-            InputStream in = rs.getBinaryStream("binary");
+            InputStream in = rs.getBinaryStream("genericPBSScript");
             int data;
             while ((data = in.read()) > -1) {
                 out.write(data);

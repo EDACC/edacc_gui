@@ -16,8 +16,10 @@ import java.util.Vector;
  * @author daniel
  */
 public class InstanceDAO {
-    protected static final String table = "instances";
+
+    protected static final String table = "Instances";
     private static final Hashtable<Instance, Instance> cache = new Hashtable<Instance, Instance>();
+
     /**
      * Instance factory method, ensures that the created instance is persisted and assigned an ID
      * so it can be referenced by related objects. Checks if the instance is already in the Datebase.
@@ -25,18 +27,18 @@ public class InstanceDAO {
      * @return new Instance object
      * @throws SQLException, FileNotFoundException, InstanceAlreadyInDBException
      */
-     public static Instance createInstance(File file, String name, int numAtoms, int numClauses ,
-             float ratio, int maxClauseLength, String md5, InstanceClass instanceClass) throws SQLException, FileNotFoundException,
-             InstanceAlreadyInDBException {
-         PreparedStatement ps;
-         final String Query = "SELECT * FROM " + table +" WHERE md5 = ?";
-         ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
-         ps.setString(1, md5);
-         ResultSet rs = ps.executeQuery();
-         if(rs.next()){
+    public static Instance createInstance(File file, String name, int numAtoms, int numClauses,
+            float ratio, int maxClauseLength, String md5, InstanceClass instanceClass) throws SQLException, FileNotFoundException,
+            InstanceAlreadyInDBException {
+        PreparedStatement ps;
+        final String Query = "SELECT * FROM " + table + " WHERE md5 = ?";
+        ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
+        ps.setString(1, md5);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
             throw new InstanceAlreadyInDBException();
-         }
-         Instance i = new Instance();
+        }
+        Instance i = new Instance();
         i.setFile(file);
         i.setName(name);
         i.setNumAtoms(numAtoms);
@@ -47,20 +49,20 @@ public class InstanceDAO {
         i.setInstanceClass(instanceClass);
         save(i);
         return i;
-     }
+    }
 
+    public static void delete(Instance i) throws NoConnectionToDBException, SQLException, InstanceIsInExperimentException {
+        if (!IsInAnyExperiment(i.getId())) {
+            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM Instances WHERE idInstance=?");
+            ps.setInt(1, i.getId());
+            ps.executeUpdate();
+            cache.remove(i);
+            i.setDeleted();
+        } else {
+            throw new InstanceIsInExperimentException();
+        }
 
-
-     public static void delete(Instance i) throws NoConnectionToDBException, SQLException, InstanceIsInExperimentException {
-         if(!IsInAnyExperiment(i.getId())){
-             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM Instances WHERE idInstance=?");
-             ps.setInt(1, i.getId());
-             ps.executeUpdate();
-             cache.remove(i);
-             i.setDeleted();
-         } else throw new InstanceIsInExperimentException();
-
-     }
+    }
 
     /**
      * persists an instance object in the database
@@ -74,24 +76,25 @@ public class InstanceDAO {
             // insert query, set ID!
             // TODO insert instance blob
             // insert instance into db
-            final String insertQuery = "INSERT INTO " + table + " (name, md5, numAtoms, numClauses, ratio, maxClauseLength, instanceClass_idinstanceClass, instance) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            final String insertQuery = "INSERT INTO " + table + " (name, md5, numAtoms, numClauses, ratio, maxClauseLength, instanceClass_idinstanceClass, instance) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
-            if (instance.getFile() != null)
+            if (instance.getFile() != null) {
                 ps.setBinaryStream(8, new FileInputStream(instance.getFile()));
-            else
+            } else {
                 ps.setNull(8, Types.BLOB);
-        }
-        else if (instance.isModified()) {
+            }
+        } else if (instance.isModified()) {
             // update query
-            final String updateQuery = "UPDATE " + table + " SET name=?, md5=?, numAtoms=?, numClauses=?, ratio=?, maxClauseLength=?, instanceClass_idinstanceClass=? " +
-                    "WHERE idInstance=?";
+            final String updateQuery = "UPDATE " + table + " SET name=?, md5=?, numAtoms=?, numClauses=?, ratio=?, maxClauseLength=?, instanceClass_idinstanceClass=? "
+                    + "WHERE idInstance=?";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
-           
+
             ps.setInt(8, instance.getId());
-            
-        } else
+
+        } else {
             return;
+        }
 
         ps.setString(1, instance.getName());
         ps.setString(2, instance.getMd5());
@@ -99,20 +102,22 @@ public class InstanceDAO {
         ps.setInt(4, instance.getNumClauses());
         ps.setFloat(5, instance.getRatio());
         ps.setInt(6, instance.getMaxClauseLength());
-        if (instance.getInstanceClass() != null)
+        if (instance.getInstanceClass() != null) {
             ps.setInt(7, instance.getInstanceClass().getInstanceClassID());
-        else
+        } else {
             ps.setNull(7, Types.INTEGER);
+        }
 
         ps.executeUpdate();
 
         // set id
         if (instance.isNew()) {
             ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next())
+            if (rs.next()) {
                 instance.setId(rs.getInt(1));
+            }
         }
-       
+
         instance.setSaved();
         cacheInstance(instance);
     }
@@ -120,13 +125,17 @@ public class InstanceDAO {
     private static Instance getCached(Instance i) {
         if (cache.containsKey(i)) {
             return cache.get(i);
+        } else {
+            return null;
         }
-        else return null;
     }
 
     private static void cacheInstance(Instance i) {
-        if (cache.containsKey(i)) return;
-        else cache.put(i, i);
+        if (cache.containsKey(i)) {
+            return;
+        } else {
+            cache.put(i, i);
+        }
     }
 
     /**
@@ -152,8 +161,9 @@ public class InstanceDAO {
             i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
             Instance c = getCached(i);
-            if (c != null) return c;
-            else {
+            if (c != null) {
+                return c;
+            } else {
                 i.setSaved();
                 cacheInstance(i);
                 return i;
@@ -185,8 +195,9 @@ public class InstanceDAO {
             i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
             Instance c = getCached(i);
-            if (c != null) res.add(c);
-            else {
+            if (c != null) {
+                res.add(c);
+            } else {
                 i.setSaved();
                 cacheInstance(i);
                 res.add(i);
@@ -198,9 +209,8 @@ public class InstanceDAO {
 
     public static LinkedList<Instance> getAllByExperimentId(int id) throws SQLException, InstanceClassMustBeSourceException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT i.idInstance, i.maxClauseLength, i.md5, i.name, i.numAtoms, i.numClauses, i.ratio, i.instanceClass_idinstanceClass FROM " + table + " as i JOIN Experiment_has_Instances as ei ON " +
-                "i.idInstance = ei.Instances_idInstance WHERE ei.Experiment_idExperiment = ?"
-                );
+                "SELECT DISTINCT i.idInstance, i.maxClauseLength, i.md5, i.name, i.numAtoms, i.numClauses, i.ratio, i.instanceClass_idinstanceClass FROM " + table + " as i JOIN Experiment_has_Instances as ei ON "
+                + "i.idInstance = ei.Instances_idInstance WHERE ei.Experiment_idExperiment = ?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         LinkedList<Instance> res = new LinkedList<Instance>();
@@ -217,8 +227,9 @@ public class InstanceDAO {
             i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
             Instance c = getCached(i);
-            if (c != null) res.add(c);
-            else {
+            if (c != null) {
+                res.add(c);
+            } else {
                 i.setSaved();
                 cacheInstance(i);
                 res.add(i);
@@ -235,13 +246,14 @@ public class InstanceDAO {
      * @throws NoConnectionToDBException if no connection to database exists.
      * @throws SQLException if an SQL error occurs while reading the instances from the database.
      */
-    public static boolean IsInAnyExperiment(int id) throws NoConnectionToDBException, SQLException{
+    public static boolean IsInAnyExperiment(int id) throws NoConnectionToDBException, SQLException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-                
-        ResultSet rs = st.executeQuery("SELECT i.idInstance FROM " + table + " AS i JOIN Experiment_has_Instances as ei ON " +
-                "i.idInstance = ei.Instances_idInstance WHERE idInstance = "+ id);
-       return rs.next();
+
+        ResultSet rs = st.executeQuery("SELECT i.idInstance FROM " + table + " AS i JOIN Experiment_has_Instances as ei ON "
+                + "i.idInstance = ei.Instances_idInstance WHERE idInstance = " + id);
+        return rs.next();
     }
+
     /**
      * @author rretz
      * Get the binary of a instance with the given id as a Blob from the database.
@@ -255,10 +267,9 @@ public class InstanceDAO {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
 
         ResultSet rs = st.executeQuery("SELECT i.instance FROM instances AS i WHERE i.idInstance = " + id);
-        if(rs.next()){
-           return rs.getBlob("instance");
-        }
-        else{
+        if (rs.next()) {
+            return rs.getBlob("instance");
+        } else {
             throw new InstaceNotInDBException();
         }
     }
@@ -272,16 +283,16 @@ public class InstanceDAO {
      */
     public static LinkedList<Instance> getAllByInstanceClasses(Vector<InstanceClass> allChoosen) throws NoConnectionToDBException, SQLException {
 
-        if(!allChoosen.isEmpty()){
-            
-            String query = "SELECT i.idInstance, i.maxClauseLength, i.md5, i.name, i.numAtoms, i.numClauses," +
-                " i.ratio, i.instanceClass_idinstanceClass FROM " + table + " as i " +
-                " LEFT JOIN Instances_has_instanceClass as ii ON i.idInstance = ii.Instances_idInstance " +
-                " WHERE i.instanceClass_idinstanceClass = " + allChoosen.get(0).getInstanceClassID() + 
-                " OR ii.instanceClass_idinstanceClass = " + allChoosen.get(0).getInstanceClassID() ;
-            for(int i = 1; i < allChoosen.size(); i++){
-                query += " OR i.instanceClass_idinstanceClass = " +  allChoosen.get(i).getInstanceClassID() + 
-                         " OR ii.instanceClass_idinstanceClass = " + allChoosen.get(i).getInstanceClassID()  ;
+        if (!allChoosen.isEmpty()) {
+
+            String query = "SELECT i.idInstance, i.maxClauseLength, i.md5, i.name, i.numAtoms, i.numClauses,"
+                    + " i.ratio, i.instanceClass_idinstanceClass FROM " + table + " as i "
+                    + " LEFT JOIN Instances_has_instanceClass as ii ON i.idInstance = ii.Instances_idInstance "
+                    + " WHERE i.instanceClass_idinstanceClass = " + allChoosen.get(0).getInstanceClassID()
+                    + " OR ii.instanceClass_idinstanceClass = " + allChoosen.get(0).getInstanceClassID();
+            for (int i = 1; i < allChoosen.size(); i++) {
+                query += " OR i.instanceClass_idinstanceClass = " + allChoosen.get(i).getInstanceClassID()
+                        + " OR ii.instanceClass_idinstanceClass = " + allChoosen.get(i).getInstanceClassID();
             }
             Statement st = DatabaseConnector.getInstance().getConn().createStatement();
             ResultSet rs = st.executeQuery(query);
@@ -299,8 +310,9 @@ public class InstanceDAO {
                 i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
                 Instance c = getCached(i);
-                if (c != null) res.add(c);
-                else {
+                if (c != null) {
+                    res.add(c);
+                } else {
                     i.setSaved();
                     cacheInstance(i);
                     res.add(i);
@@ -309,10 +321,10 @@ public class InstanceDAO {
             rs.close();
             return res;
         }
-        
+
         return null;
     }
-    
+
     /**
      * Copies the binary file of an instance to a temporary location on the file system
      * and returns a File reference on it.
@@ -320,26 +332,15 @@ public class InstanceDAO {
      * @return
      */
     public static File getBinaryFileOfInstance(Instance i) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
-        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `instance` FROM " + table + " WHERE idInstance=?");
-        ps.setInt(1, i.getId());
-        ResultSet rs = ps.executeQuery();
-        File f = null;
-        if (rs.next()) {
-            f = new File(i.getId() + "_" + i.getName());
-            FileOutputStream out = new FileOutputStream(f);
-            InputStream in = rs.getBinaryStream("instance");
-            int data;
-            while ((data = in.read()) > -1) {
-                out.write(data);
-            }
-            out.close();
-            in.close();
-        }
+        File f = new File("tmp" + System.getProperty("file.separator") + i.getId() + "_" + i.getName());
+        // create missing directories
+        f.getParentFile().mkdirs();
+        getBinaryFileOfInstance(i, f);
         return f;
     }
 
     public static void getBinaryFileOfInstance(Instance s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
-         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `instance` FROM " + table + " WHERE idInstance=?");
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `instance` FROM " + table + " WHERE idInstance=?");
         ps.setInt(1, s.getId());
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
