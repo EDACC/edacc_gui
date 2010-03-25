@@ -932,7 +932,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             if (codeFileChooser == null) {
                 codeFileChooser = new JFileChooser();
             }
-            if (codeFileChooser.showDialog(this, "Add Solver Code") == JFileChooser.APPROVE_OPTION) {
+            if (codeFileChooser.showDialog(this, "Choose Code") == JFileChooser.APPROVE_OPTION) {
                 manageDBSolvers.addSolverCode(codeFileChooser.getSelectedFile());
             }
         } catch (FileNotFoundException ex) {
