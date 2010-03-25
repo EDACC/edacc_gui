@@ -261,7 +261,7 @@ public class DatabaseConnector extends Observable {
                 + "  ON UPDATE CASCADE)"
                 + "  ENGINE = InnoDB;");
         st.addBatch("DROP TABLE IF EXISTS `gridQueue` ;");
-        st.addBatch("CREATE  TABLE IF NOT EXISTS `gridQueue` (  `idgridQueue` INT NOT NULL ,"
+        st.addBatch("CREATE  TABLE IF NOT EXISTS `gridQueue` (  `idgridQueue` INT NOT NULL AUTO_INCREMENT,"
                 + "  `name` VARCHAR(60) NOT NULL ,"
                 + "  `location` VARCHAR(60) NOT NULL ,"
                 + "  `numNodes` INT NULL COMMENT 'how many nodes are in the queue' ,"
@@ -291,7 +291,7 @@ public class DatabaseConnector extends Observable {
                 + "  ENGINE = InnoDB;");
 
         st.addBatch("DROP TABLE IF EXISTS `Instances_has_instanceClass`");
-        st.addBatch("CREATE  TABLE IF NOT EXISTS `EDACC`.`Instances_has_instanceClass` ("
+        st.addBatch("CREATE  TABLE IF NOT EXISTS `Instances_has_instanceClass` ("
                 + "  `Instances_idInstance` INT NOT NULL , "
                 + "  `instanceClass_idinstanceClass` INT NOT NULL , "
                 + "  PRIMARY KEY (`Instances_idInstance`, `instanceClass_idinstanceClass`) , "
