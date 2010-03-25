@@ -70,6 +70,16 @@ public class ManageDBParameters {
         currentParameter = null;
     }
 
+    /**
+     * Removes the parameters of a specified solver.
+     * @param s
+     */
+    public void removeParameters(Solver s) {
+        parameterTableModel.removeParametersOfSolver(s);
+        if (s == parameterTableModel.getCurrentSolver())
+            currentParameter = null;
+    }
+
     public void removeParameter(Parameter param) {
         parameterTableModel.remove(param);
         currentParameter = null;

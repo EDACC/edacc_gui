@@ -22,6 +22,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -81,7 +85,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         tableSolver.getSelectionModel().addListSelectionListener(new SolverTableSelectionListener(tableSolver, manageDBSolvers));
         tableParameters.getSelectionModel().addListSelectionListener(new ParameterTableSelectionListener(tableParameters, manageDBParameters));
         showSolverDetails(null);
-        
+
     }
 
     void initialize() throws NoConnectionToDBException, SQLException {
@@ -89,7 +93,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         manageDBParameters.loadParametersOfSolvers(solverTableModel.getSolvers());
         manageDBInstances.loadInstanceClasses();
     }
-
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -263,7 +266,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         panelSolverLayout.setVerticalGroup(
             panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSolverLayout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jlSolverName)
@@ -383,7 +386,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             .addGroup(panelParametersLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE)
                     .addGroup(panelParametersLayout.createSequentialGroup()
                         .addComponent(btnParametersNew)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -407,7 +410,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelParametersLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jlParametersName)
@@ -483,7 +486,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                 .addComponent(btnSolverRefresh)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSolverExport)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 837, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 767, Short.MAX_VALUE)
                 .addComponent(btnSolverSaveToDB)
                 .addContainerGap())
         );
@@ -735,7 +738,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                 .addComponent(btnAddToClass)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRemoveFromClass)
-                .addContainerGap(42, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelButtonsInstancesLayout.setVerticalGroup(
             panelButtonsInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -769,7 +772,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         panelInstanceLayout.setVerticalGroup(
             panelInstanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelInstanceLayout.createSequentialGroup()
-                .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
+                .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelButtonsInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(179, 179, 179))
@@ -936,20 +939,28 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     }//GEN-LAST:event_solverChangedOnFocusLost
 
     private void btnSolverDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverDeleteActionPerformed
-        try {
-            manageDBSolvers.removeSolver();
-            manageDBParameters.removeParameters();
-            tableSolver.getSelectionModel().clearSelection();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "A solver couldn't be removed: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-        tableSolver.updateUI();
-        tableParameters.updateUI();
-    }//GEN-LAST:event_btnSolverDeleteActionPerformed
+        int[] rows = tableSolver.getSelectedRows();
+        LinkedList<Solver> selectedSolvers = new LinkedList<Solver>();
+        for (int i : rows)
+            selectedSolvers.add(solverTableModel.getSolver(i));
 
+        while (!selectedSolvers.isEmpty()) { // are there remaining solvers to delete?
+            try {
+                Solver s = selectedSolvers.removeFirst();
+                manageDBSolvers.removeSolver(s);
+                manageDBParameters.removeParameters(s);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this,
+                        "An error occured while deleting a solver: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } finally {
+                tableSolver.getSelectionModel().clearSelection();
+                tableSolver.updateUI();
+                tableParameters.updateUI();
+            }
+        }
+    }//GEN-LAST:event_btnSolverDeleteActionPerformed
     private void btnExportInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportInstancesActionPerformed
         try {
             if (tableInstances.getSelectedRowCount() == 0) {
@@ -957,7 +968,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                         "No instances are selected: ",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
-            } else {              
+            } else {
                 manageDBInstances.exportInstances(tableInstances.getSelectedRows());
             }
         } catch (IOException ex) {
@@ -995,7 +1006,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
     private void btnSelectAllInstanceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstanceClassesActionPerformed
         manageDBInstances.SelectAllInstanceClass();
-
     }//GEN-LAST:event_btnSelectAllInstanceClassesActionPerformed
 
     private void btnRemoveInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstanceClassActionPerformed
@@ -1028,7 +1038,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         Parameter p = parameterTableModel.getParameter(tableParameters.getSelectedRow());
         manageDBParameters.removeParameter(p);
         tableParameters.clearSelection();
-        showParameterDetails(null);
+        showParameterDetails(
+                null);
         tableParameters.updateUI();
     }//GEN-LAST:event_btnParametersDeleteActionPerformed
 
@@ -1064,15 +1075,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         manageDBInstances.addInstanceClasses();
         tableInstanceClass.updateUI();
     }//GEN-LAST:event_btnNewInstanceClassActionPerformed
-
     private void parameterChangedOnFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_parameterChangedOnFocusLost
         parameterChanged();
     }//GEN-LAST:event_parameterChangedOnFocusLost
-
     private void btnAddToClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddToClassActionPerformed
         manageDBInstances.addInstancesToClass(tableInstances.getSelectedRows());
     }//GEN-LAST:event_btnAddToClassActionPerformed
-
     private void btnRemoveFromClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveFromClassActionPerformed
         manageDBInstances.RemoveInstanceFromInstanceClass(tableInstances.getSelectedRows());
     }//GEN-LAST:event_btnRemoveFromClassActionPerformed
@@ -1082,19 +1090,22 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             exportFileChooser = new JFileChooser();
             exportFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         }
-        try {
-            if (exportFileChooser.showDialog(this, "Export Solver to Directory") == JFileChooser.APPROVE_OPTION) {
-                if (tableSolver.getSelectedRow() > -1) {
-                    manageDBSolvers.exportSolver(solverTableModel.getSolver(tableSolver.getSelectedRow()), exportFileChooser.getSelectedFile());
-                    System.out.println("Selected: " + exportFileChooser.getSelectedFile());
+
+        if (exportFileChooser.showDialog(this, "Export Solvers to Directory") == JFileChooser.APPROVE_OPTION) {
+            int[] rows = tableSolver.getSelectedRows();
+
+            for (int i : rows) {
+                try {
+                    manageDBSolvers.exportSolver(solverTableModel.getSolver(i), exportFileChooser.getSelectedFile());
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this,
+                            "An error occured while exporting solver binary of solver \"" + solverTableModel.getSolver(i).getName() + "\": " + ex.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "An error occured while exporting solver binary: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
         }
+
     }//GEN-LAST:event_btnExport
 
     private void parameterChangedOnKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_parameterChangedOnKeyReleased
@@ -1103,11 +1114,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
 
     private void parameterChanged() {
         final int selectedRow = tableParameters.getSelectedRow();
+
         if (selectedRow == -1) {
             return;
         }
         Parameter p = parameterTableModel.getParameter(selectedRow);
         p.setName(tfParametersName.getText());
+
+
         try {
             p.setOrder(Integer.parseInt(tfParametersOrder.getText()));
         } catch (NumberFormatException e) {
@@ -1117,10 +1131,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         }
         p.setPrefix(tfParametersPrefix.getText());
         tableParameters.updateUI();
+
+
     }
 
     public void showSolverDetails(Solver currentSolver) {
         boolean enabled = false;
+
+
         if (currentSolver != null) {
             enabled = true;
             tfSolverName.setText(currentSolver.getName());
@@ -1141,6 +1159,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         taSolverDescription.setEnabled(enabled);
         btnSolverAddBinary.setEnabled(enabled);
         btnSolverAddCode.setEnabled(enabled);
+
+
         if (currentSolver != null) {
             parameterTableModel.setCurrentSolver(currentSolver);
             parameterTableModel.fireTableDataChanged();
@@ -1149,11 +1169,13 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         btnParametersDelete.setEnabled(enabled);
         btnParametersRefresh.setEnabled(enabled);
         tableParameters.getSelectionModel().clearSelection();
-        showParameterDetails(null);
+        showParameterDetails(
+                null);
     }
 
     public void showParameterDetails(Parameter currentParameter) {
         boolean enabled = false;
+
         if (currentParameter != null) {
             enabled = true;
             tfParametersName.setText(currentParameter.getName());
@@ -1168,7 +1190,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         tfParametersPrefix.setEnabled(enabled);
         tfParametersOrder.setEnabled(enabled);
     }
-
 
     @Action
     public void btnSaveParam() {

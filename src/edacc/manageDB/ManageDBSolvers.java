@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package edacc.manageDB;
 
 import edacc.model.MD5CheckFailedException;
@@ -42,7 +41,7 @@ public class ManageDBSolvers {
      */
     public void loadSolvers() throws NoConnectionToDBException, SQLException {
         solverTableModel.clear();
-        for (Solver s: SolverDAO.getAll()) {
+        for (Solver s : SolverDAO.getAll()) {
             solverTableModel.addSolver(s);
         }
     }
@@ -81,8 +80,9 @@ public class ManageDBSolvers {
     }
 
     public void addSolverBinary(File binary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException, SolverAlreadyInDBException {
-        if (!binary.exists())
-           throw new FileNotFoundException("Couldn't find file \"" + binary.getName() + "\".");
+        if (!binary.exists()) {
+            throw new FileNotFoundException("Couldn't find file \"" + binary.getName() + "\".");
+        }
         currentSolver.setBinaryFile(binary);
         currentSolver.setBinaryName(binary.getName());
         currentSolver.setMd5(Util.calculateMD5(binary));
@@ -95,8 +95,9 @@ public class ManageDBSolvers {
     }
 
     public void addSolverCode(File code) throws FileNotFoundException {
-        if (!code.exists())
-           throw new FileNotFoundException("Couldn't find file \"" + code.getName() + "\".");
+        if (!code.exists()) {
+            throw new FileNotFoundException("Couldn't find file \"" + code.getName() + "\".");
+        }
         currentSolver.setCodeFile(code);
     }
 
@@ -107,12 +108,24 @@ public class ManageDBSolvers {
      * @throws SQLException if an SQL error occurs while deleting the solver.
      */
     public void removeSolver() throws SolverIsInExperimentException, SQLException {
+        removeSolver(currentSolver);
+
+        solverTableModel.removeSolver(currentSolver);
+    }
+
+    /**
+     * Removes the specified solver from the solver table model.
+     * If it is persisted in the db, it will also remove it from the db.
+     * @throws SolverIsInExperimentException if the solver is used in an experiment.
+     * @throws SQLException if an SQL error occurs while deleting the solver.
+     */
+    public void removeSolver(Solver s) throws SolverIsInExperimentException, SQLException {
         try {
-            SolverDAO.removeSolver(currentSolver);
+            SolverDAO.removeSolver(s);
         } catch (SolverNotInDBException ex) {
             // if the solver isn't in the db, just remove it from the table model
-        } 
-        solverTableModel.removeSolver(currentSolver);
+        }
+        solverTableModel.removeSolver(s);
     }
 
     /**
@@ -122,11 +135,13 @@ public class ManageDBSolvers {
      * the binaryName field of the solver will be used as filename.
      */
     public void exportSolver(Solver s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException, MD5CheckFailedException {
-        if (f.isDirectory())
+        if (f.isDirectory()) {
             f = new File(f.getAbsolutePath() + System.getProperty("file.separator") + s.getBinaryName());
+        }
         SolverDAO.getBinaryFileOfSolver(s, f);
         String md5File = Util.calculateMD5(f);
-        if (!md5File.equals(s.getMd5()))
+        if (!md5File.equals(s.getMd5())) {
             throw new MD5CheckFailedException("The exported solver binary of solver \"" + s.getName() + "\" seems to be corrupt!");
+        }
     }
 }
