@@ -481,7 +481,7 @@ void freeJobArgs() {
 	free(jobArgs[2]);
 }
 
-int main(int argc, char *argv[]) {
+int main_org(int argc, char *argv[]) {
 	int numJobs;
 	status s;
 	job* j;
@@ -619,5 +619,34 @@ int main(int argc, char *argv[]) {
 
 	//Avoid compiler warnings
 	return success;
+}
+
+int main(int argc, char *argv[]) {
+	int numJobs;
+	status s;
+	job* j;
+	pid_t pid;
+	solver solv;
+	instance inst;
+	char* fileName;
+    experiment exp;
+
+	read_config();
+
+    printf("fetching experiment data\n");
+    s=dbFetchExperimentData(&exp);
+/* 	s=init(argc, argv);
+ * 	if(s!=success) {
+ * 		exit(s);
+ * 	}
+ * 
+ * 	setSignalHandler(signalHandler);
+ */
+    printf("id: %i, numcpus: %i, timeout: %i, numinstances: %i,"\
+            "instancename 1: %s, numsolvers: %i, solvername 1: %s\n",
+            exp.id, exp.numCPUs, exp.timeOut, exp.numInstances, 
+            exp.instanceNames[0], exp.numSolvers, exp.solverNames[0]);
+
+    return 1;
 }
 
