@@ -481,7 +481,7 @@ public class ExperimentController {
                 + "password = $pwd\n"
                 + "database = $db\n"
                 + "experiment = $exp\n"
-                + "gridQueue = $q\n";
+                + "gridqueue = $q\n";
         DatabaseConnector con = DatabaseConnector.getInstance();
         sConf = sConf.replace("$host", con.getHostname());
         sConf = sConf.replace("$user", con.getUsername());
