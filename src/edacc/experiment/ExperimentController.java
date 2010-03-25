@@ -512,7 +512,7 @@ public class ExperimentController {
     }
 
     private void addClient(ZipOutputStream zos) throws IOException, ClientBinaryNotFoundException {
-        InputStream in = EDACCApp.class.getClassLoader().getResourceAsStream("client");
+        InputStream in = EDACCApp.class.getClassLoader().getResourceAsStream("edacc/resources/client");
         if (in == null)
             throw new ClientBinaryNotFoundException();
         ZipEntry entry = new ZipEntry("client");
