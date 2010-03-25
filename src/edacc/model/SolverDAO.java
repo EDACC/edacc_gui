@@ -285,7 +285,9 @@ public class SolverDAO {
      * @throws IOException
      */
     public static File getBinaryFileOfSolver(Solver s) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
-        File f = new File("tmp/" + s.getBinaryName());
+        File f = new File("tmp" + System.getProperty("file.separator") + s.getBinaryName());
+        // create missing direcotries
+        f.getParentFile().mkdirs();
         getBinaryFileOfSolver(s, f);
         return f;
     }
