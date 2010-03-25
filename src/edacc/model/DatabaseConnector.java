@@ -12,7 +12,6 @@ public class DatabaseConnector extends Observable {
 
     private static DatabaseConnector instance = null;
     private Connection conn;
-
     private String hostname;
     private int port;
     private String database;
@@ -123,7 +122,8 @@ public class DatabaseConnector extends Observable {
                 + "  `code` MEDIUMBLOB NULL ,"
                 + "  PRIMARY KEY (`idSolver`) ,"
                 + "  UNIQUE INDEX `name` (`name` ASC) ,"
-                + "  UNIQUE INDEX `md5` (`md5` ASC) )ENGINE = InnoDBDEFAULT CHARACTER SET = latin1"
+                + "  UNIQUE INDEX `md5` (`md5` ASC) )ENGINE = InnoDB"
+                + "  DEFAULT CHARACTER SET = latin1"
                 + "  COLLATE = latin1_german1_ci;");
         st.addBatch("DROP TABLE IF EXISTS `Parameters` ;");
         st.addBatch("CREATE  TABLE IF NOT EXISTS `Parameters` (  `idParameter` INT NOT NULL AUTO_INCREMENT ,"
