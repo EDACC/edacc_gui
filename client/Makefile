@@ -35,7 +35,7 @@ mutex.o: mutex.c mutex.h
 database.o: database.c database.h global.h log.h
 	$(CC) $(CFLAGS) -c $<
 
-configuration.o: configuration.c configuration.h log.h
+configuration.o: configuration.c configuration.h log.h safeio.h
 	$(CC) $(CFLAGS) -c $<
 
 dbmrg.o: dbmrg.c dbmrg.h

@@ -1,11 +1,55 @@
 #include "configuration.h"
 #include "log.h"
 #include "global.h"
+#include "safeio.h"
+
+//Sets *lineptr to newly allocated memory containing the next line in stream.
+//*lineptr is '\0' terminated and includes the newline character, if one was found.
+//On error or on EOF condition, the function returns -1. Otherwise, the return value is 0.
+int readLine(char **lineptr, FILE *stream) {
+    int c;
+    long start, end;
+    char *nextPos;
+
+    //Set start resp. end to the current offset in stream resp. the offset
+    //of the next '\n' character or EOF in stream
+    start=ftell(stream);
+    if(start==-1)
+        return -1;
+    do {
+        if((c=safeGetc(stream))==EOF)
+            break;
+    } while(c!='\n');
+    end=ftell(stream);
+    if(end==-1 || end==start) {
+        return -1;
+    }
+
+    //Allocate memory of the correct size
+    *lineptr=(char*)calloc(end-start+1, 1);
+    if(*lineptr==NULL)
+        return -1;
+    nextPos=*lineptr;
+
+    //Copy the line from stream to *lineptr
+    if(fseek(stream, start, SEEK_SET)==-1) {
+        free(*lineptr);
+        return -1;
+    }
+    for(;;) {
+        if((c=safeGetc(stream))==EOF)
+            break;
+        *nextPos=(char)c;
+        if(c=='\n')
+            break;
+        ++nextPos;
+    }
+
+    return 0;
+}
 
 status read_config() {
-    char *lineptr = NULL;
-    size_t len = 0;
-    int read;
+    char *lineptr;
     FILE *conf;
     char *key=NULL;
     char *value=NULL;
@@ -17,25 +61,19 @@ status read_config() {
         return sysError;
     }
 
-    while((read = getline(&lineptr, &len, conf)) != -1) {
+    while(readLine(&lineptr, conf) != -1) {
         //Terminate both the key and value substrings with '\0' within lineptr
-        //and set the key resp. value pointer to the beginning of the corresponding sunstring
+        //and set the key resp. value pointer to the beginning of the corresponding substring
         key=lineptr;
-        for(value=lineptr; *value!=' '; ++value) {
+        for(value=lineptr; *value!=' ' && *value!='='; ++value) {
             if(*value=='\0') {
-                logError("config file malformed\n");
-                fclose(conf);
-                free(lineptr);
-                return sysError;
+                goto DONE;
             }
         }
         *value='\0';
         for(++value; *value=='=' || *value==' '; ++value) {
             if(*value=='\0') {
-                logError("config file malformed\n");
-                fclose(conf);
-                free(lineptr);
-                return sysError;
+                goto DONE;
             }
         }
         for(end=value; *end!='\0' && *end!='\n'; ++end);
@@ -43,9 +81,7 @@ status read_config() {
         valueLen=strlen(value);
         keyLen=strlen(key);
         if(valueLen==0 || keyLen==0) {
-            free(lineptr);
-            lineptr=NULL;
-            continue;
+            goto DONE;
         }
 
         if(strcmp(key, "host") == 0) {
@@ -94,9 +130,9 @@ status read_config() {
             free(lineptr);
             return sysError;
         }
-        
+
+        DONE:
         free(lineptr);
-        lineptr = NULL;
     }
 
     fclose(conf);
