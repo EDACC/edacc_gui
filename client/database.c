@@ -83,7 +83,7 @@
 "       ON sc.idSolverConfig = scp.SolverConfig_idSolverConfig " \
 "   LEFT JOIN Parameters AS p "                                  \
 "       ON scp.Parameters_idParameter = p.idParameter "          \
-"   WHERE e.idJob = %i "
+"   WHERE er.idJob = %i "
 
 
 #define UPDATE_JOB ""           \
@@ -182,7 +182,7 @@ status dbFetchExperimentData(experiment *e) {
     conn = mysql_init(NULL);
 
     if(mysql_real_connect(conn, host, username, password, database, 0, NULL, 0) == NULL) {
-        printf("could not establish mysql connection!\n");
+        logError("could not establish mysql connection!\n");
         return dbError;
     }
 
@@ -469,6 +469,7 @@ int dbFetchJob(job* j, status* s) {
     mysql_free_result(res);
     if((res = mysql_store_result(conn)) == NULL) {
         *s = dbError;
+        logError("No params found for job %i.\n", lastId);
         return 1;
     }
 

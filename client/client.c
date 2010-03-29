@@ -492,13 +492,16 @@ int main(int argc, char *argv[]) {
 
 	s=read_config();
 	if(s!=success) {
+        logError("Couldn't read config successfully.");
 		exit(s);
 	}
 
 	s=init(argc, argv);
 	if(s!=success) {
+        logError("Couldn't init successfully, for experiment %i.\n", experimentId);
 		exit(s);
 	}
+
 
 	setSignalHandler(signalHandler);
 
@@ -518,12 +521,15 @@ int main(int argc, char *argv[]) {
 				}
 				exitClient(s);
 			}
+            printf("job successfully loaded.\n");
 
 			//Start a mutual execution lock between several application instances
 			if(lockMutex()!=success)
+                printf("no lock mutex\n");
 				exitClient(sysError);
 
 			//Create the solver binary if it doesn't exist yet
+            printf("creating solver binary ...\n");
 			fileName=addBasename(j->solverName);
 			if(fileName==NULL) {
 				logError("Error: Out of memory\n");
@@ -531,6 +537,7 @@ int main(int argc, char *argv[]) {
 				exitClient(sysError);
 			}
 			if(!fileExists(fileName)) {
+                printf("file doesn't exist\n");
 				s=dbFetchSolver(j->solverName, &solv);
 				if(s!=success) {
 					unlockMutex();
@@ -624,33 +631,34 @@ int main(int argc, char *argv[]) {
 	return success;
 }
 
-int main_test(int argc, char *argv[]) {
-	int numJobs;
-	status s;
-	job* j;
-	pid_t pid;
-	solver solv;
-	instance inst;
-	char* fileName;
-    experiment exp;
-
-	read_config();
-
-    s=dbFetchExperimentData(&exp);
-/* 	s=init(argc, argv);
+/* int main_test(int argc, char *argv[]) {
+ * 	int numJobs;
+ * 	status s;
+ * 	job* j;
+ * 	pid_t pid;
+ * 	solver solv;
+ * 	instance inst;
+ * 	char* fileName;
+ *     experiment exp;
+ * 
+ * 	read_config();
+ * 
+ *     s=dbFetchExperimentData(&exp);
+ * 	s=init(argc, argv);
  * 	if(s!=success) {
  * 		exit(s);
  * 	}
  * 
  * 	setSignalHandler(signalHandler);
+ * 
+ * 
+ *     printf("id: %i, numcpus: %i, timeout: %i, numinstances: %i,"\
+ *             "instancename 1: %s, numsolvers: %i, solvername 1: %s\n",
+ *             exp.id, exp.numCPUs, exp.timeOut, exp.numInstances, 
+ *             exp.instanceNames[0], exp.numSolvers, exp.solverNames[0]);
+ * 
+ * 
+ *     return 1;
+ * }
  */
-
-    printf("id: %i, numcpus: %i, timeout: %i, numinstances: %i,"\
-            "instancename 1: %s, numsolvers: %i, solvername 1: %s\n",
-            exp.id, exp.numCPUs, exp.timeOut, exp.numInstances, 
-            exp.instanceNames[0], exp.numSolvers, exp.solverNames[0]);
-
-
-    return 1;
-}
 
