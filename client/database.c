@@ -60,7 +60,8 @@
 "SELECT " \
 "       e.idJob, " \
 "       s.binaryName, " \
-"       i.name " \
+"       i.name, " \
+"       e.resultFileName " \
 "   FROM ExperimentResults AS e " \
 "   LEFT JOIN SolverConfig AS sc " \
 "       ON e.SolverConfig_idSolverConfig = sc.IdSolverConfig " \
@@ -69,22 +70,6 @@
 "   LEFT JOIN Instances AS i " \
 "       ON e.Instances_idInstance = i.idInstance " \
 "   WHERE e.idJob = %i " 
-
-
-#define QUERY_JOB_PARAMS_OLD ""                                      \
-"SELECT "                                                        \
-"       p.name, "                                                \
-"       p.prefix, "                                              \
-"       p.value, "                                               \
-"       scp.value "                                              \
-"   FROM ExperimentResults AS er "                               \
-"   LEFT JOIN SolverConfig AS sc "                               \
-"       ON er.SolverConfig_idSolverConfig = sc.idSolverConfig "  \
-"   LEFT JOIN SolverConfig_has_Parameters AS scp "               \
-"       ON sc.idSolverConfig = scp.SolverConfig_idSolverConfig " \
-"   LEFT JOIN Parameters AS p "                                  \
-"       ON scp.Parameters_idParameter = p.idParameter "          \
-"   WHERE er.idJob = %i "
 
 
 #define QUERY_JOB_PARAMS "" \
@@ -480,7 +465,7 @@ int dbFetchJob(job* j, status* s) {
 
         j->id = atoi(row[0]);
 
-        j->solverName = (char *)calloc(lengths[1],sizeof(char));
+        j->solverName = (char *)calloc(lengths[1]+1,sizeof(char));
         strncpy(j->solverName, row[1], lengths[1]);
         //printf("row[1]: %s\n", row[1]);
         //printf("j->solverName: %s\n", j->solverName);
@@ -488,6 +473,9 @@ int dbFetchJob(job* j, status* s) {
         j->instanceName = (char *)calloc(lengths[2]+1,sizeof(char));
         strncpy(j->instanceName, row[2], lengths[2]);
         //printf("length: %i\nrow[2]: %s\nj->instanceName: %s\n", lengths[2], row[2],j->instanceName);
+       
+        j->resultFileName = (char *)calloc(lengths[3]+1,sizeof(char));
+        strncpy(j->resultFileName, row[3], lengths[3]);
     }
 
     /* fetch params information */
