@@ -529,6 +529,8 @@ int main(int argc, char *argv[]) {
 				}
 				exitClient(s);
 			}
+            j->status=0;
+            s=update(j);
             //printf("job successfully loaded.\n");
 
 			//Start a mutual execution lock between several application instances

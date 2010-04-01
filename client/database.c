@@ -52,7 +52,8 @@
 "SELECT " \
 "       idJob " \
 "   FROM ExperimentResults " \
-"   WHERE Experiment_idExperiment = %i "
+"   WHERE (status = -1 OR status = -2) " \
+"      AND Experiment_idExperiment = %i "
 
 
 #define QUERY_JOB "" \
@@ -107,12 +108,12 @@
 
 #define UPDATE_JOB ""           \
 "UPDATE ExperimentResults SET " \
-"       resultFileName = %s, "  \
+"       resultFileName = '%s', "  \
 "       status = %i, "          \
 "       seed = %i, "            \
 "       time = %f, "            \
 "       statusCode = %i, "      \
-"       resultFile = %s "       \
+"       resultFile = '%s' "       \
 "   WHERE idJob = %i "
 
 
@@ -121,14 +122,14 @@
 "       binary, " \
 "       md5 " \
 "   FROM Solver " \
-"   WHERE name = %s "
+"   WHERE name = '%s' "
 
 #define QUERY_INSTANCE "" \
 "SELECT " \
 "       instance, " \
 "       md5 " \
 "   FROM Instances " \
-"   WHERE name = %s "
+"   WHERE name = '%s' "
 
 
 /* status dbFetchExperimentData_test(experiment *e) {
@@ -433,15 +434,23 @@ int dbFetchJob(job* j, status* s) {
     /* fetch the id's of the experiment jobs */
     if(mysql_query(conn, queryExpJob) != 0) {
         *s = dbError;
+        printf("error\n");
         return 1;
     }
 
     if((res = mysql_store_result(conn)) == NULL) {
         *s = dbError;
+        printf("error\n");
         return 1;
     }
 
     i = mysql_num_rows(res);
+
+    if(i==0) {
+        mysql_free_result(res);
+        *s = success;
+        return 1;
+    }
     srand(clock());
     mysql_data_seek(res, rand() % i);
 
@@ -548,13 +557,14 @@ status dbUpdate(const job* j) {
     char *queryJob = NULL;
 
 
-    printf("this job resultfilename is: %s,", j->resultFileName);
-    printf("this job status is: %i,", j->status);
-    printf("this job seed is: %i,", j->seed);
-    printf("this job time is: %f,", j->time);
-    printf("this job statuc code is: %i,", j->statusCode);
-    printf("this job result file is: %s,", j->resultFile);
-    printf("this job id is: %i\n", j->id);
+/*     printf("this job resultfilename is: %s,", j->resultFileName);
+ *     printf("this job status is: %i,", j->status);
+ *     printf("this job seed is: %i,", j->seed);
+ *     printf("this job time is: %f,", j->time);
+ *     printf("this job statuc code is: %i,", j->statusCode);
+ *     printf("this job result file is: %s,", j->resultFile);
+ *     printf("this job id is: %i\n", j->id);
+ */
 
     sprintfAlloc(&queryJob, UPDATE_JOB, 
             j->resultFileName, 
@@ -574,7 +584,7 @@ status dbUpdate(const job* j) {
     }
 
     if(mysql_query(conn, queryJob) != 0) {
-        printf("query error\n");
+        printf("db update query error, message: %s\n", mysql_error(conn));
         return dbError;
     }
 
