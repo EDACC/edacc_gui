@@ -58,7 +58,7 @@
 #define QUERY_JOB "" \
 "SELECT " \
 "       e.idJob, " \
-"       s.name, " \
+"       s.binaryName, " \
 "       i.name " \
 "   FROM ExperimentResults AS e " \
 "   LEFT JOIN SolverConfig AS sc " \
@@ -70,7 +70,7 @@
 "   WHERE e.idJob = %i " 
 
 
-#define QUERY_JOB_PARAMS ""                                      \
+#define QUERY_JOB_PARAMS_OLD ""                                      \
 "SELECT "                                                        \
 "       p.name, "                                                \
 "       p.prefix, "                                              \
@@ -84,6 +84,25 @@
 "   LEFT JOIN Parameters AS p "                                  \
 "       ON scp.Parameters_idParameter = p.idParameter "          \
 "   WHERE er.idJob = %i "
+
+
+#define QUERY_JOB_PARAMS "" \
+"SELECT " \
+"       p.name, " \
+"       p.prefix, " \
+"       p.value, " \
+"       scp.value " \
+"   FROM ExperimentResults AS er " \
+"   LEFT JOIN SolverConfig AS sc " \
+"       ON er.SolverConfig_idSolverConfig = sc.idSolverConfig " \
+"   LEFT JOIN Solver AS s " \
+"       ON sc.Solver_idSolver = s.idSolver " \
+"   LEFT JOIN Parameters AS p " \
+"       ON p.Solver_idSolver = s.idSolver " \
+"   LEFT JOIN SolverConfig_has_Parameters AS scp " \
+"       ON p.idParameter = scp.Parameters_idParameter " \
+"   WHERE er.idJob = %i "
+
 
 
 #define UPDATE_JOB ""           \
@@ -452,11 +471,14 @@ int dbFetchJob(job* j, status* s) {
 
         j->id = atoi(row[0]);
 
-        j->solverName = (char *)malloc(lengths[1]*sizeof(char));
+        j->solverName = (char *)calloc(lengths[1],sizeof(char));
         strncpy(j->solverName, row[1], lengths[1]);
+        //printf("row[1]: %s\n", row[1]);
+        //printf("j->solverName: %s\n", j->solverName);
 
-        j->instanceName = (char *)malloc(lengths[2]*sizeof(char));
+        j->instanceName = (char *)calloc(lengths[2]+1,sizeof(char));
         strncpy(j->instanceName, row[2], lengths[2]);
+        //printf("length: %i\nrow[2]: %s\nj->instanceName: %s\n", lengths[2], row[2],j->instanceName);
     }
 
     /* fetch params information */
@@ -474,19 +496,26 @@ int dbFetchJob(job* j, status* s) {
     }
 
     
-    params = (char *)calloc(1,sizeof(char));
+    params = (char *)calloc(256,sizeof(char));
 
     while((row = mysql_fetch_row(res)) != NULL) {
-        params = strcat(params, row[1]);
+        //printf("row[0]: %s, row[1]: %s, row[2]: %s, row[3]: %s\n", row[0], row[1], row[2], row[3]);
+        if(strcmp(row[2],"")!=0) {
+            params = strcat(params, row[1]);
+            params = strcat(params, row[0]);
+            params = strcat(params, " ");
 
-        if(row[3] == NULL) {
-            params = strcat(params, row[2]);
-        } else {
-            params = strcat(params, row[3]);
+            if(row[3] == NULL) {
+                params = strcat(params, row[2]);
+            } else {
+                params = strcat(params, row[3]);
+            }
+            params = strcat(params, " ");
         }
     }
 
     strcpy(j->params, params);
+    //printf("j->params: %s\n", j->params);
 
     free(params);
     mysql_free_result(res);
@@ -609,10 +638,12 @@ status dbFetchInstance(const char* instanceName, instance* i) {
 
     /* fetch job information */
     if(mysql_query(conn, queryInstance) != 0) {
+        printf("Query error. Message: %s\n", mysql_error(conn));
         return dbError;
     }
 
-    if((res = mysql_store_result(conn)) == NULL) {
+    if((res = mysql_store_result(conn)) == NULL) { 
+        printf("NULL result.\n");
         return dbError;
     }
 

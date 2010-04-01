@@ -80,7 +80,7 @@ status createFile(const char* fileName, const char* content, size_t contentLen, 
 	//Create the file
 	dst=fopen(fileName, "w+");
 	if(dst==NULL) {
-		logError("Unable to open %s: %s\n", fileName, strerror(errno));
+		logError("(1) Unable to open %s: %s\n", fileName, strerror(errno));
 		return sysError;
 	}
 
@@ -286,6 +286,7 @@ status processResults(job* j) {
 
 	//Set the status to -2 in case anything goes wrong in this function
 	j->status=-2;
+    //printf("%i\n", j->pid);
 
 	fileName=addBasename(pidToFileName(j->pid));
 	if(fileName==NULL) {
@@ -296,7 +297,7 @@ status processResults(job* j) {
 	//Parse the temporary result file of j
 	filePtr=fopen(fileName, "r");
 	if(filePtr==NULL) {
-		logError("Unable to open %s: %s\n", fileName, strerror(errno));
+		logError("(3) Unable to open %s: %s\n", fileName, strerror(errno));
 		free(fileName);
 		return sysError;
 	}
@@ -356,7 +357,7 @@ status processResults(job* j) {
 		rewind(filePtr);
 		resultFile=fopen(j->resultFileName, "a");
 		if(resultFile==NULL) {
-			logError("Unable to open %s: %s\n", j->resultFileName, strerror(errno));
+			logError("(2) Unable to open %s: %s\n", j->resultFileName, strerror(errno));
 			free(fileName);
 			return sysError;
 		}
@@ -395,15 +396,17 @@ status handleChildren(int cnt) {
 		//Point j to the entry in jobs corresponding to the terminated child process
 		for(j=jobs; j->pid!=pid; ++j);
 
-		j->pid=0;
+		//j->pid=0;
 		if(WIFEXITED(retval) && (WEXITSTATUS(retval)==0)) {
 			//The process terminated normally.
 			//Start a mutual execution lock between several application instances.
 			if(lockMutex()!=success) {
 				freeJob(j);
+		        j->pid=0;
 				return sysError;
 			}
 			s=processResults(j);
+		    j->pid=0;
 			//End the mutual execution lock
 			if(unlockMutex()!=success) {
 				freeJob(j);
@@ -420,6 +423,7 @@ status handleChildren(int cnt) {
 				return s;
 			}
 		} else {
+		    j->pid=0;
 			//The process terminated abnormally
 			j->status=-2;
 			s=update(j);
@@ -468,6 +472,7 @@ status setJobArgs(const job* j) {
 		free(instanceName);
 		return sysError;
 	}
+    printf("command: %s\n", command);
 
 	jobArgs[0]="/bin/bash";
 	jobArgs[1]="-c";
@@ -489,6 +494,8 @@ int main(int argc, char *argv[]) {
 	solver solv;
 	instance inst;
 	char* fileName;
+    char *t;
+
 
 	s=read_config();
 	if(s!=success) {
@@ -521,15 +528,15 @@ int main(int argc, char *argv[]) {
 				}
 				exitClient(s);
 			}
-            printf("job successfully loaded.\n");
+            //printf("job successfully loaded.\n");
 
 			//Start a mutual execution lock between several application instances
 			if(lockMutex()!=success)
-                printf("no lock mutex\n");
 				exitClient(sysError);
 
+
 			//Create the solver binary if it doesn't exist yet
-            printf("creating solver binary ...\n");
+            //printf("creating solver binary %s ...\n", j->solverName);
 			fileName=addBasename(j->solverName);
 			if(fileName==NULL) {
 				logError("Error: Out of memory\n");
@@ -537,7 +544,7 @@ int main(int argc, char *argv[]) {
 				exitClient(sysError);
 			}
 			if(!fileExists(fileName)) {
-                printf("file doesn't exist\n");
+                //printf("file doesn't exist\n");
 				s=dbFetchSolver(j->solverName, &solv);
 				if(s!=success) {
 					unlockMutex();
@@ -595,6 +602,10 @@ int main(int argc, char *argv[]) {
 				s=update(j);
 				//Set up jobArgs and run the command
 				if(s==success && (s=setJobArgs(j))==success) {
+/*                     for(t = jobArgs; t!=NULL; ++t) {
+ *                         printf("jobArgs: %s\n", t);
+ *                     }
+ */
 					if(execve("/bin/bash", jobArgs, NULL)==-1) {
 						logError("Error in execve(): %s\n", strerror(errno));
 						freeJobArgs();
