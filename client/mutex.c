@@ -107,3 +107,10 @@ void unrefMutex() {
 	}
 }
 
+void cleanMutex() {
+	sem_close(mutex);
+	sem_unlink(mutexName);
+	sem_close(refCnt); 
+	sem_unlink(refCntName);
+}
+

@@ -16,5 +16,11 @@ status unlockMutex();
 //called anymore.
 void unrefMutex();
 
+//This function is for debugging. If after a crash of the application any of the
+//functions above make problems, this function can be called in order to remove
+//anything that might have been left in the system from the errorneous run.
+//Hopefully, the functions above should work again afterwards ;)
+void cleanMutex();
+
 #endif
 
