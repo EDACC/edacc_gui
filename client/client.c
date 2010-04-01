@@ -413,6 +413,7 @@ status handleChildren(int cnt) {
 				return sysError;
 			}
 			if(s!=success) {
+			    j->status=-2;
 				update(j);
 				freeJob(j);
 				return s;

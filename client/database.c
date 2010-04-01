@@ -110,7 +110,7 @@
 "       resultFileName = %s, "  \
 "       status = %i, "          \
 "       seed = %i, "            \
-"       time = %d, "            \
+"       time = %f, "            \
 "       statusCode = %i, "      \
 "       resultFile = %s "       \
 "   WHERE idJob = %i "
@@ -547,13 +547,25 @@ status dbUpdate(const job* j) {
     //char *updateJob;
     char *queryJob = NULL;
 
+
+    printf("this job resultfilename is: %s,", j->resultFileName);
+    printf("this job status is: %i,", j->status);
+    printf("this job seed is: %i,", j->seed);
+    printf("this job time is: %f,", j->time);
+    printf("this job statuc code is: %i,", j->statusCode);
+    printf("this job result file is: %s,", j->resultFile);
+    printf("this job id is: %i\n", j->id);
+
     sprintfAlloc(&queryJob, UPDATE_JOB, 
             j->resultFileName, 
             j->status, 
             j->seed, 
             j->time, 
             j->statusCode, 
-            j->resultFile);
+            j->resultFile,
+            j->id);
+
+    printf("queryJob: %s\n", queryJob);
 
     conn = mysql_init(NULL);
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
@@ -562,6 +574,7 @@ status dbUpdate(const job* j) {
     }
 
     if(mysql_query(conn, queryJob) != 0) {
+        printf("query error\n");
         return dbError;
     }
 
