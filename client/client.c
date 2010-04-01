@@ -279,6 +279,7 @@ void signalHandler(int signum) {
 //Process the results of a normally terminated job j
 status processResults(job* j) {
 	char* fileName;
+	char* resultFilePtr;
 	FILE* filePtr;
 	FILE* resultFile;
 	int signum, c;
@@ -286,7 +287,6 @@ status processResults(job* j) {
 
 	//Set the status to -2 in case anything goes wrong in this function
 	j->status=-2;
-    //printf("%i\n", j->pid);
 
 	fileName=addBasename(pidToFileName(j->pid));
 	if(fileName==NULL) {
@@ -297,7 +297,7 @@ status processResults(job* j) {
 	//Parse the temporary result file of j
 	filePtr=fopen(fileName, "r");
 	if(filePtr==NULL) {
-		logError("(3) Unable to open %s: %s\n", fileName, strerror(errno));
+		logError("Unable to open %s: %s\n", fileName, strerror(errno));
 		free(fileName);
 		return sysError;
 	}
@@ -331,12 +331,17 @@ status processResults(job* j) {
 			return sysError;
 		}
 		rewind(filePtr);
-		if(fscanf(filePtr, "%s|", j->resultFile)==EOF){
-			logError("Error reading %s: %s\n", fileName, strerror(errno));
-			free(fileName);
-			return sysError;
-		}
-		j->resultFile[outputLen-1]='\0';
+		resultFilePtr=j->resultFile;
+		do {
+			c=getc(filePtr);
+			if(c==EOF) {
+				logError("Error parsing %s: Unexpected format\n", fileName);
+				free(fileName);
+				return sysError;
+			}
+			*resultFilePtr=(char)c;
+		} while(c!=(int)'|');
+		*resultFilePtr='\0';
 		//Skip the file content until the next '|' character
 		do {
 			c=getc(filePtr);
@@ -352,22 +357,28 @@ status processResults(job* j) {
 			free(fileName);
 			return sysError;
 		}
+		j->resultFile[outputLen-1]='\0';
 		j->status=1;
-		//Append the first line of fileName to j->resultFileName
+		//Append the content of fileName to j->resultFileName
 		rewind(filePtr);
 		resultFile=fopen(j->resultFileName, "a");
 		if(resultFile==NULL) {
-			logError("(2) Unable to open %s: %s\n", j->resultFileName, strerror(errno));
+			logError("Unable to open %s: %s\n", j->resultFileName, strerror(errno));
 			free(fileName);
 			return sysError;
 		}
-		do {
-			if((c=safeGetc(filePtr))==EOF || safeFputc(c, resultFile)==EOF) {
+		while((c=safeGetc(filePtr))!=EOF) {
+			if(safeFputc(c, resultFile)==EOF) {
 				logError("An error occured while copying a character from %s to %s\n", fileName, j->resultFileName);
 				free(fileName);
 				return sysError;
 			}
-		} while(c!='\n');
+		}
+		if(safeFputc((int)'\n', resultFile)==EOF) {
+			logError("An error occured while writing a character to %s\n", j->resultFileName);
+			free(fileName);
+			return sysError;
+		}
 		fclose(resultFile);
 	}
 
@@ -384,6 +395,7 @@ status handleChildren(int cnt) {
 	status s;
 	job* j;
 	pid_t pid;
+	char *fileName;
 
 	for(i=0; i<cnt; ++i) {
 		//Wait until a child process terminates
@@ -396,24 +408,23 @@ status handleChildren(int cnt) {
 		//Point j to the entry in jobs corresponding to the terminated child process
 		for(j=jobs; j->pid!=pid; ++j);
 
-		//j->pid=0;
 		if(WIFEXITED(retval) && (WEXITSTATUS(retval)==0)) {
 			//The process terminated normally.
 			//Start a mutual execution lock between several application instances.
 			if(lockMutex()!=success) {
 				freeJob(j);
-		        j->pid=0;
+				j->pid=0;
 				return sysError;
 			}
 			s=processResults(j);
-		    j->pid=0;
+			j->pid=0;
 			//End the mutual execution lock
 			if(unlockMutex()!=success) {
 				freeJob(j);
 				return sysError;
 			}
 			if(s!=success) {
-			    j->status=-2;
+				j->status=-2;
 				update(j);
 				freeJob(j);
 				return s;
@@ -424,11 +435,20 @@ status handleChildren(int cnt) {
 				return s;
 			}
 		} else {
-		    j->pid=0;
 			//The process terminated abnormally
+			fileName=addBasename(pidToFileName(j->pid));
+			j->pid=0;
 			j->status=-2;
 			s=update(j);
 			freeJob(j);
+			if(fileName==NULL) {
+				logError("Error: Out of memory\n");
+				if(s==success)
+					s=sysError;
+				return s;
+			}
+			remove(fileName);
+			free(fileName);
 			if(s!=success) {
 				return s;
 			}
@@ -495,7 +515,6 @@ int main(int argc, char *argv[]) {
 	solver solv;
 	instance inst;
 	char* fileName;
-    char *t;
 
 
 	s=read_config();
@@ -519,9 +538,15 @@ int main(int argc, char *argv[]) {
 			//Point j to a free slot in the jobs array
 			for(j=jobs; j->pid!=0; ++j);
 
+			//Start a mutual execution lock between several application instances
+			if(lockMutex()!=success) {
+				exitClient(sysError);
+			}
+
 			//Try to load a job from the database and write it to j
 			if(fetchJob(j, &s)!=0) {
 				//Unable to retrieve a job from the database
+				unlockMutex();
 				if(s==success) {
 					//No error occured, but there's no job left in the database.
 					//Wait until all child processes have terminated.
@@ -529,14 +554,14 @@ int main(int argc, char *argv[]) {
 				}
 				exitClient(s);
 			}
-            j->status=0;
-            s=update(j);
-            //printf("job successfully loaded.\n");
 
-			//Start a mutual execution lock between several application instances
-			if(lockMutex()!=success)
-				exitClient(sysError);
-
+			//Set the job state to running in the database
+			j->status=0;
+			s=update(j);
+			if(s!=success) {
+				unlockMutex();
+				exitClient(s);
+			}
 
 			//Create the solver binary if it doesn't exist yet
             //printf("creating solver binary %s ...\n", j->solverName);
@@ -544,6 +569,8 @@ int main(int argc, char *argv[]) {
 			if(fileName==NULL) {
 				logError("Error: Out of memory\n");
 				unlockMutex();
+				j->status=-2;
+				s=update(j);
 				exitClient(sysError);
 			}
 			if(!fileExists(fileName)) {
@@ -552,12 +579,16 @@ int main(int argc, char *argv[]) {
 				if(s!=success) {
 					unlockMutex();
 					free(fileName);
+					j->status=-2;
+					s=update(j);
 					exitClient(s);
 				}
 				if(createFile(fileName, solv.solver, solv.length, solv.md5, 0111)!=success) {
 					unlockMutex();
 					free(fileName);
 					freeSolver(&solv);
+					j->status=-2;
+					s=update(j);
 					exitClient(sysError);
 				}
 				freeSolver(&solv);
@@ -569,6 +600,8 @@ int main(int argc, char *argv[]) {
 			if(fileName==NULL) {
 				logError("Error: Out of memory\n");
 				unlockMutex();
+				j->status=-2;
+				s=update(j);
 				exitClient(sysError);
 			}
 			if(!fileExists(fileName)) {
@@ -576,12 +609,16 @@ int main(int argc, char *argv[]) {
 				if(s!=success) {
 					unlockMutex();
 					free(fileName);
+					j->status=-2;
+					s=update(j);
 					exitClient(s);
 				}
 				if(createFile(fileName, inst.instance, strlen(inst.instance), inst.md5, 0444)!=success) {
 					unlockMutex();
 					free(fileName);
 					freeInstance(&inst);
+					j->status=-2;
+					s=update(j);
 					exitClient(sysError);
 				}
 				freeInstance(&inst);
@@ -589,20 +626,22 @@ int main(int argc, char *argv[]) {
 			free(fileName);
 
 			//End the mutual execution lock
-			if(unlockMutex()!=success)
+			if(unlockMutex()!=success) {
+				j->status=-2;
+				s=update(j);
 				exitClient(sysError);
+			}
 
 			//Create a process for processing the job
 			pid=fork();
 			if(pid==-1) {
 				logError("Error in fork(): %s\n", strerror(errno));
+				j->status=-2;
+				s=update(j);
 				exitClient(sysError);
 			} else if(pid==0) {
 				//This is the child process. Disable the inherited signal handler.
 				deferSignals();
-				//Set the job state to running in the database
-				j->status=0;
-				s=update(j);
 				//Set up jobArgs and run the command
 				if(s==success && (s=setJobArgs(j))==success) {
 /*                     for(t = jobArgs; t!=NULL; ++t) {
@@ -631,7 +670,6 @@ int main(int argc, char *argv[]) {
 				exit(sysError);
 			}
 			j->pid=pid;
-
 		}
 
 		//Wait until one child process terminates and handle the result
