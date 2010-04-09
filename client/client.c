@@ -20,17 +20,17 @@
 
 
 //This array stores the arguments for a solver run we execute via execve
-char* jobArgs[4]={NULL, NULL, NULL, NULL};
+static char* jobArgs[4]={NULL, NULL, NULL, NULL};
 
 //An array for keeping track of the jobs we're currently processing
-job* jobs;
-int jobsLen;
+static job* jobs;
+static int jobsLen;
 
 //The path where we want to create solvers, instances and temporary files
-char* basename="./";
+static char* basename="./";
 
 //The length of basename without the terminating '\0' character
-int basenameLen;
+static int basenameLen;
 
 //The timeout in seconds for each solver run
 int timeOut;
@@ -47,7 +47,7 @@ char* pidToFileName(pid_t pid) {
 //Prepend fileName by basename. On success, the function returns a pointer
 //to the string in newly allocated memory that needs to be freed.
 //If the memory allocation fails, the return value is NULL.
-char* addBasename(const char* fileName) {
+char* prependBasename(const char* fileName) {
 	char* str;
 	int fileNameLen=strlen(fileName);
 
@@ -133,7 +133,7 @@ status init(int argc, char *argv[]) {
 
 	for(i=0; i<exp.numSolvers; ++i) {
 		//Prepend the solver name with pathname
-		fileName=addBasename(exp.solverNames[i]);
+		fileName=prependBasename(exp.solverNames[i]);
 		if(fileName==NULL) {
 			logError("Error: Out of memory\n");
 			freeExperimentData(&exp);
@@ -168,7 +168,7 @@ status init(int argc, char *argv[]) {
 
 	for(i=0; i<exp.numInstances; ++i) {
 		//Prepend the instance name with pathname
-		fileName=addBasename(exp.instanceNames[i]);
+		fileName=prependBasename(exp.instanceNames[i]);
 		if(fileName==NULL) {
 			logError("Error: Out of memory\n");
 			freeExperimentData(&exp);
@@ -247,7 +247,7 @@ void exitClient(status retval) {
 		if(jobs[i].pid!=0) {
 			jobs[i].status=-2;
 			update(&(jobs[i]));
-			fileName=addBasename(pidToFileName(jobs[i].pid));
+			fileName=prependBasename(pidToFileName(jobs[i].pid));
 			if(fileName!=NULL) {
 				remove(fileName);
 				free(fileName);
@@ -288,7 +288,7 @@ status processResults(job* j) {
 	//Set the status to -2 in case anything goes wrong in this function
 	j->status=-2;
 
-	fileName=addBasename(pidToFileName(j->pid));
+	fileName=prependBasename(pidToFileName(j->pid));
 	if(fileName==NULL) {
 		logError("Error: Out of memory\n");
 		return sysError;
@@ -436,7 +436,7 @@ status handleChildren(int cnt) {
 			}
 		} else {
 			//The process terminated abnormally
-			fileName=addBasename(pidToFileName(j->pid));
+			fileName=prependBasename(pidToFileName(j->pid));
 			j->pid=0;
 			j->status=-2;
 			s=update(j);
@@ -466,18 +466,18 @@ status setJobArgs(const job* j) {
 	char* solverName;
 	char* instanceName;
 
-	fileName=addBasename(pidToFileName(getpid()));
+	fileName=prependBasename(pidToFileName(getpid()));
 	if(fileName==NULL) {
 		logError("Error: Out of memory\n");
 		return sysError;
 	}
-	solverName=addBasename(j->solverName);
+	solverName=prependBasename(j->solverName);
 	if(solverName==NULL) {
 		logError("Error: Out of memory\n");
 		free(fileName);
 		return sysError;
 	}
-	instanceName=addBasename(j->instanceName);
+	instanceName=prependBasename(j->instanceName);
 	if(instanceName==NULL) {
 		logError("Error: Out of memory\n");
 		free(fileName);
@@ -565,7 +565,7 @@ int main(int argc, char *argv[]) {
 
 			//Create the solver binary if it doesn't exist yet
             //printf("creating solver binary %s ...\n", j->solverName);
-			fileName=addBasename(j->solverName);
+			fileName=prependBasename(j->solverName);
 			if(fileName==NULL) {
 				logError("Error: Out of memory\n");
 				unlockMutex();
@@ -596,7 +596,7 @@ int main(int argc, char *argv[]) {
 			free(fileName);
 
 			//Create the instance file if it doesn't exist yet
-			fileName=addBasename(j->instanceName);
+			fileName=prependBasename(j->instanceName);
 			if(fileName==NULL) {
 				logError("Error: Out of memory\n");
 				unlockMutex();
