@@ -5,7 +5,7 @@
 #include <time.h>
 
 //The maximal disk access rate in bytes per seconds for safeGetc and safeFputc
-const size_t bps=190*1000;
+const long bps=190*1000;
 
 int sprintfAlloc(char** str, const char* format, ...) {
 	va_list args;
@@ -38,7 +38,7 @@ int safeGetc(FILE *stream) {
 	struct timespec req;
 
 	req.tv_sec=0;
-	req.tv_nsec=1000000L/((long)bps/1000L)+1;
+	req.tv_nsec=1000000L/((long)bps/1000L)+1L;
 
 	retval=getc(stream);
 	if(nanosleep(&req, NULL)!=0)
@@ -52,7 +52,7 @@ int safeFputc(int c, FILE *stream) {
 	struct timespec req;
 
 	req.tv_sec=0;
-	req.tv_nsec=1000000L/((long)bps/1000L)+1;
+	req.tv_nsec=1000000L/((long)bps/1000L)+1L;
 
 	retval=fputc(c, stream);
 	if(nanosleep(&req, NULL)!=0)
