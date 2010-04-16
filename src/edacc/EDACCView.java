@@ -110,6 +110,7 @@ public class EDACCView extends FrameView implements Observer {
 
         mode = noMode;
         updateConnectionStateView();
+        btnConnectToDB();
     }
 
     private void createDatabaseErrorMessage(SQLException e) {
@@ -287,6 +288,7 @@ public class EDACCView extends FrameView implements Observer {
             databaseSettings.setLocationRelativeTo(mainFrame);
         }
         EDACCApp.getApplication().show(databaseSettings);
+       manageDBMode();
     }
 
     @Action
@@ -332,10 +334,10 @@ public class EDACCView extends FrameView implements Observer {
 
     @Action
     public void manageDBMode() {
-        if (!manageDBModeMenuItem.isSelected()) {
+        /**if (!manageDBModeMenuItem.isSelected()) {
             noMode();
             return;
-        }
+        }*/
         if (manageExperimentModeMenuItem.isSelected()) {
             manageExperimentModeMenuItem.setSelected(false);
         }
