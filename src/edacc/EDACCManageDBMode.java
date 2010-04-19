@@ -1148,7 +1148,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
                     manageDBSolvers.exportSolverCode(solverTableModel.getSolver(i), exportFileChooser.getSelectedFile());
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(this,
-                            "An error occured while exporting solver binary of solver \"" + solverTableModel.getSolver(i).getName() + "\": " + ex.getMessage(),
+                            "An error occured while exporting solver \"" + solverTableModel.getSolver(i).getName() + "\": " + ex.getMessage(),
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }

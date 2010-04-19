@@ -26,9 +26,9 @@ public class SolverDAO {
 
     protected static final String table = "Solver";
     protected static final String insertQuery = "INSERT INTO " + table + " (`name`, `binaryName`, `binary`, `description`, `md5`, `code`) VALUES (?, ?, ?, ?, ?, ?)";
-    protected static final String updateQueryBin = "UPDATE " + table + " SET `binaryName`=?, `binary`=? WHERE `md5`=?";
-    protected static final String updateQueryCode = "UPDATE " + table + " SET `code`=? WHERE `md5`=?";
-    protected static final String updateQuery = "UPDATE " + table + " SET `name`=?, `description`=?, `md5`=? WHERE `md5`=?";
+    protected static final String updateQueryBin = "UPDATE " + table + " SET `binaryName`=?, `binary`=? WHERE `idSolver`=?";
+    protected static final String updateQueryCode = "UPDATE " + table + " SET `code`=? WHERE `idSolver`=?";
+    protected static final String updateQuery = "UPDATE " + table + " SET `name`=?, `description`=?, `md5`=? WHERE `idSolver`=?";
     protected static final String removeQuery = "DELETE FROM " + table + " WHERE idSolver=?";
     private static final Hashtable<Solver, Solver> cache = new Hashtable<Solver, Solver>();
 
@@ -38,9 +38,9 @@ public class SolverDAO {
      * @param solver The Solver object to persist.
      */
     public static void save(Solver solver) throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, IOException {
-        if (solver.isSaved()) {
-            return;
-        }
+        //if (solver.isSaved()) {
+        //    return;
+        //}
 
         // new solvers without binary aren't allowed
         if (solver.isNew() && solver.getBinaryFile() == null)
@@ -48,10 +48,10 @@ public class SolverDAO {
 
         PreparedStatement ps;
 
-        boolean alreadyInDB = false;
+        boolean alreadyInDB = solverAlreadyInDB(solver) != null;
 
         // insert  into db
-        if (solver.isNew() && !(alreadyInDB = solverAlreadyInDB(solver) != null)) {
+        if (solver.isNew() && !alreadyInDB) {
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setString(1, solver.getName());
             ps.setString(2, solver.getBinaryName());
@@ -73,14 +73,14 @@ public class SolverDAO {
             ps.setString(1, solver.getName());
             ps.setString(2, solver.getDescription());
             ps.setString(3, solver.getMd5());
-            ps.setString(4, solver.getMd5());
+            ps.setInt(4, solver.getId());
             ps.executeUpdate();
             // then update the solver binary if necessary
             if (solver.getBinaryFile() != null) { // if binary is null, don't update the solver binary
                 ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQueryBin);
                 ps.setString(1, solver.getBinaryName());
                 ps.setBinaryStream(2, new FileInputStream(solver.getBinaryFile()));
-                ps.setString(3, solver.getMd5());
+                ps.setInt(3, solver.getId());
                 ps.executeUpdate();
             }
 
@@ -90,7 +90,7 @@ public class SolverDAO {
                 // zip up directory
                 ByteArrayOutputStream zipped = Util.zipDirectoryToByteStream(solver.getCodeFile());
                 ps.setBinaryStream(1, new ByteArrayInputStream(zipped.toByteArray()));
-                ps.setString(2, solver.getMd5());
+                ps.setInt(2, solver.getId());
                 ps.executeUpdate();
             }
         }
@@ -313,10 +313,13 @@ public class SolverDAO {
         ps.setInt(1, s.getId());
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
+            InputStream in = rs.getBinaryStream("code");
+            if (in == null) return;
+
             // open temporary file to write the zip file to
             File tmp = new File("tmp" + System.getProperty("file.seperator") + s.getId() + ".zip.tmp");
             FileOutputStream out = new FileOutputStream(tmp);
-            InputStream in = rs.getBinaryStream("code");
+            
             
             byte[] buffer = new byte[8192];
             int read;
