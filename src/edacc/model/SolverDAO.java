@@ -15,6 +15,8 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import edacc.manageDB.Util;
+import java.io.ByteArrayOutputStream;
 
 /**
  *
@@ -35,7 +37,7 @@ public class SolverDAO {
      * the solver is cached.
      * @param solver The Solver object to persist.
      */
-    public static void save(Solver solver) throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException {
+    public static void save(Solver solver) throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, IOException {
         if (solver.isSaved()) {
             return;
         }
@@ -56,8 +58,11 @@ public class SolverDAO {
             ps.setBinaryStream(3, new FileInputStream(solver.getBinaryFile()));
             ps.setString(4, solver.getDescription());
             ps.setString(5, solver.getMd5());
-            if (solver.getCodeFile() != null)
-                ps.setBinaryStream(6, new FileInputStream(solver.getCodeFile()));
+            if (solver.getCodeFile() != null && solver.getCodeFile().isDirectory()) { // only accept directories (enforced by UI)
+                // zip up directory
+                ByteArrayOutputStream zipped = Util.zipDirectoryToByteStream(solver.getCodeFile());
+                ps.setBinaryStream(6, new ByteArrayInputStream(zipped.toByteArray()));
+            }
             else
                 ps.setNull(6, Types.BLOB);
             ps.executeUpdate();
@@ -82,7 +87,9 @@ public class SolverDAO {
             // update the code if necessary
             if (solver.getCodeFile() != null) { // if code is null, don't update the code (at the moment code can't be deleted)
                 ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQueryCode);
-                ps.setBinaryStream(1, new FileInputStream(solver.getCodeFile()));
+                // zip up directory
+                ByteArrayOutputStream zipped = Util.zipDirectoryToByteStream(solver.getCodeFile());
+                ps.setBinaryStream(1, new ByteArrayInputStream(zipped.toByteArray()));
                 ps.setString(2, solver.getMd5());
                 ps.executeUpdate();
             }
@@ -290,5 +297,38 @@ public class SolverDAO {
         f.getParentFile().mkdirs();
         getBinaryFileOfSolver(s, f);
         return f;
+    }
+
+    /**
+     * Exports the code of the solver s to the directory specified by f
+     * @param s solver
+     * @param f File referencing a directory on the filesystem
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static void exportSolverCode(Solver s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `code` FROM " + table + " WHERE idSolver=?");
+        ps.setInt(1, s.getId());
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            // open temporary file to write the zip file to
+            File tmp = new File("tmp" + System.getProperty("file.seperator") + s.getId() + ".zip.tmp");
+            FileOutputStream out = new FileOutputStream(tmp);
+            InputStream in = rs.getBinaryStream("code");
+            
+            byte[] buffer = new byte[8192];
+            int read;
+            while (-1 != (read = in.read(buffer))) {
+                out.write(buffer, 0, read);
+            }
+            out.close();
+            in.close();
+
+            Util.unzip(tmp, f);
+            tmp.delete(); // delete temporary file
+        }
+        rs.close();
     }
 }
