@@ -35,6 +35,8 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         tableModel = new AddInstanceInstanceClassTabelModel();
         tableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllSourceClass()));
         jTableInstanceClass.setModel(tableModel);
+        
+
     }
 
     /** This method is called from within the constructor to
@@ -45,42 +47,63 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         buttonGroupAutomaticOrManuel = new javax.swing.ButtonGroup();
-        jRadioButtonAutomatic = new javax.swing.JRadioButton();
-        jRadioButtonChoose = new javax.swing.JRadioButton();
-        jScrollPaneInstanceTable = new javax.swing.JScrollPane();
-        jTableInstanceClass = new javax.swing.JTable();
         jPanelButtons = new javax.swing.JPanel();
         jButtonOk = new javax.swing.JButton();
         jButtonCancel = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPaneInstanceTable = new javax.swing.JScrollPane();
+        jTableInstanceClass = new javax.swing.JTable();
+        jRadioButtonChoose = new javax.swing.JRadioButton();
+        jRadioButtonAutomatic = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAddNewInstanceSelectClassDialog.class);
         setTitle(resourceMap.getString("AddNewInstanceSelectClass.title")); // NOI18N
+        setMinimumSize(new java.awt.Dimension(400, 400));
         setName("AddNewInstanceSelectClass"); // NOI18N
-        getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        buttonGroupAutomaticOrManuel.add(jRadioButtonAutomatic);
-        jRadioButtonAutomatic.setText(resourceMap.getString("jRadioButtonAutomatic.text")); // NOI18N
-        jRadioButtonAutomatic.setName("jRadioButtonAutomatic"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 5, 10);
-        getContentPane().add(jRadioButtonAutomatic, gridBagConstraints);
+        jPanelButtons.setName("jPanelButtons"); // NOI18N
 
-        buttonGroupAutomaticOrManuel.add(jRadioButtonChoose);
-        jRadioButtonChoose.setText(resourceMap.getString("jRadioButtonChoose.text")); // NOI18N
-        jRadioButtonChoose.setName("jRadioButtonChoose"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 10, 5, 10);
-        getContentPane().add(jRadioButtonChoose, gridBagConstraints);
+        jButtonOk.setText(resourceMap.getString("jButtonOk.text")); // NOI18N
+        jButtonOk.setName("jButtonOk"); // NOI18N
+        jButtonOk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonOkActionPerformed(evt);
+            }
+        });
+
+        jButtonCancel.setText(resourceMap.getString("jButtonCancel.text")); // NOI18N
+        jButtonCancel.setName("jButtonCancel"); // NOI18N
+        jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCancelActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanelButtonsLayout = new javax.swing.GroupLayout(jPanelButtons);
+        jPanelButtons.setLayout(jPanelButtonsLayout);
+        jPanelButtonsLayout.setHorizontalGroup(
+            jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelButtonsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButtonOk)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 211, Short.MAX_VALUE)
+                .addComponent(jButtonCancel)
+                .addContainerGap())
+        );
+        jPanelButtonsLayout.setVerticalGroup(
+            jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelButtonsLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonOk)
+                    .addComponent(jButtonCancel)))
+        );
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel1.setName("jPanel1"); // NOI18N
 
         jScrollPaneInstanceTable.setName("jScrollPaneInstanceTable"); // NOI18N
         jScrollPaneInstanceTable.setPreferredSize(new java.awt.Dimension(375, 125));
@@ -110,46 +133,58 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         jTableInstanceClass.getColumnModel().getColumn(0).setHeaderValue(resourceMap.getString("jTableInstanceClass.columnModel.title0")); // NOI18N
         jTableInstanceClass.getColumnModel().getColumn(1).setHeaderValue(resourceMap.getString("jTableInstanceClass.columnModel.title1")); // NOI18N
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        getContentPane().add(jScrollPaneInstanceTable, gridBagConstraints);
+        buttonGroupAutomaticOrManuel.add(jRadioButtonChoose);
+        jRadioButtonChoose.setText(resourceMap.getString("jRadioButtonChoose.text")); // NOI18N
+        jRadioButtonChoose.setName("jRadioButtonChoose"); // NOI18N
 
-        jPanelButtons.setName("jPanelButtons"); // NOI18N
-        jPanelButtons.setLayout(new java.awt.GridBagLayout());
+        buttonGroupAutomaticOrManuel.add(jRadioButtonAutomatic);
+        jRadioButtonAutomatic.setText(resourceMap.getString("jRadioButtonAutomatic.text")); // NOI18N
+        jRadioButtonAutomatic.setName("jRadioButtonAutomatic"); // NOI18N
 
-        jButtonOk.setText(resourceMap.getString("jButtonOk.text")); // NOI18N
-        jButtonOk.setName("jButtonOk"); // NOI18N
-        jButtonOk.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonOkActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        jPanelButtons.add(jButtonOk, gridBagConstraints);
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jRadioButtonAutomatic, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
+                    .addComponent(jRadioButtonChoose, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
+                    .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jRadioButtonAutomatic)
+                .addGap(10, 10, 10)
+                .addComponent(jRadioButtonChoose)
+                .addGap(15, 15, 15)
+                .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
-        jButtonCancel.setText(resourceMap.getString("jButtonCancel.text")); // NOI18N
-        jButtonCancel.setName("jButtonCancel"); // NOI18N
-        jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonCancelActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        jPanelButtons.add(jButtonCancel, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 10);
-        getContentPane().add(jPanelButtons, gridBagConstraints);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanelButtons, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanelButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -201,6 +236,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     private javax.swing.ButtonGroup buttonGroupAutomaticOrManuel;
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonOk;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanelButtons;
     private javax.swing.JRadioButton jRadioButtonAutomatic;
     private javax.swing.JRadioButton jRadioButtonChoose;
