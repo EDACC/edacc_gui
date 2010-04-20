@@ -64,7 +64,7 @@ public class ManageDBSolvers {
      * @throws SQLException
      * @throws FileNotFoundException
      */
-    public void saveSolvers() throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException {
+    public void saveSolvers() throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, IOException {
         for (Solver s : solverTableModel.getSolvers()) {
             SolverDAO.save(s);
         }
@@ -143,5 +143,19 @@ public class ManageDBSolvers {
         if (!md5File.equals(s.getMd5())) {
             throw new MD5CheckFailedException("The exported solver binary of solver \"" + s.getName() + "\" seems to be corrupt!");
         }
+    }
+
+    /** Exports the code of a solver.
+     * Creates a subdirectory in the directory specified by f named
+     * SolverName_code
+     * @param s solver, which code is to be exported
+     * @param f File specifiying the directory the code should be exported to
+     */
+    public void exportSolverCode(Solver s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        if (f.isDirectory()) {
+            f = new File(f.getAbsolutePath() + System.getProperty("file.separator") + s.getName() + "_code");
+        }
+        else return;
+        SolverDAO.exportSolverCode(s, f);
     }
 }

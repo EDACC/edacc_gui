@@ -15,6 +15,8 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import edacc.manageDB.Util;
+import java.io.ByteArrayOutputStream;
 
 /**
  *
@@ -24,9 +26,9 @@ public class SolverDAO {
 
     protected static final String table = "Solver";
     protected static final String insertQuery = "INSERT INTO " + table + " (`name`, `binaryName`, `binary`, `description`, `md5`, `code`) VALUES (?, ?, ?, ?, ?, ?)";
-    protected static final String updateQueryBin = "UPDATE " + table + " SET `binaryName`=?, `binary`=? WHERE `md5`=?";
-    protected static final String updateQueryCode = "UPDATE " + table + " SET `code`=? WHERE `md5`=?";
-    protected static final String updateQuery = "UPDATE " + table + " SET `name`=?, `description`=?, `md5`=? WHERE `md5`=?";
+    protected static final String updateQueryBin = "UPDATE " + table + " SET `binaryName`=?, `binary`=? WHERE `idSolver`=?";
+    protected static final String updateQueryCode = "UPDATE " + table + " SET `code`=? WHERE `idSolver`=?";
+    protected static final String updateQuery = "UPDATE " + table + " SET `name`=?, `description`=?, `md5`=? WHERE `idSolver`=?";
     protected static final String removeQuery = "DELETE FROM " + table + " WHERE idSolver=?";
     private static final Hashtable<Solver, Solver> cache = new Hashtable<Solver, Solver>();
 
@@ -35,10 +37,10 @@ public class SolverDAO {
      * the solver is cached.
      * @param solver The Solver object to persist.
      */
-    public static void save(Solver solver) throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException {
-        if (solver.isSaved()) {
-            return;
-        }
+    public static void save(Solver solver) throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, IOException {
+        //if (solver.isSaved()) {
+        //    return;
+        //}
 
         // new solvers without binary aren't allowed
         if (solver.isNew() && solver.getBinaryFile() == null)
@@ -46,18 +48,21 @@ public class SolverDAO {
 
         PreparedStatement ps;
 
-        boolean alreadyInDB = false;
+        boolean alreadyInDB = solverAlreadyInDB(solver) != null;
 
         // insert  into db
-        if (solver.isNew() && !(alreadyInDB = solverAlreadyInDB(solver) != null)) {
+        if (solver.isNew() && !alreadyInDB) {
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setString(1, solver.getName());
             ps.setString(2, solver.getBinaryName());
             ps.setBinaryStream(3, new FileInputStream(solver.getBinaryFile()));
             ps.setString(4, solver.getDescription());
             ps.setString(5, solver.getMd5());
-            if (solver.getCodeFile() != null)
-                ps.setBinaryStream(6, new FileInputStream(solver.getCodeFile()));
+            if (solver.getCodeFile() != null && solver.getCodeFile().isDirectory()) { // only accept directories (enforced by UI)
+                // zip up directory
+                ByteArrayOutputStream zipped = Util.zipDirectoryToByteStream(solver.getCodeFile());
+                ps.setBinaryStream(6, new ByteArrayInputStream(zipped.toByteArray()));
+            }
             else
                 ps.setNull(6, Types.BLOB);
             ps.executeUpdate();
@@ -68,22 +73,24 @@ public class SolverDAO {
             ps.setString(1, solver.getName());
             ps.setString(2, solver.getDescription());
             ps.setString(3, solver.getMd5());
-            ps.setString(4, solver.getMd5());
+            ps.setInt(4, solver.getId());
             ps.executeUpdate();
             // then update the solver binary if necessary
             if (solver.getBinaryFile() != null) { // if binary is null, don't update the solver binary
                 ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQueryBin);
                 ps.setString(1, solver.getBinaryName());
                 ps.setBinaryStream(2, new FileInputStream(solver.getBinaryFile()));
-                ps.setString(3, solver.getMd5());
+                ps.setInt(3, solver.getId());
                 ps.executeUpdate();
             }
 
             // update the code if necessary
             if (solver.getCodeFile() != null) { // if code is null, don't update the code (at the moment code can't be deleted)
                 ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQueryCode);
-                ps.setBinaryStream(1, new FileInputStream(solver.getCodeFile()));
-                ps.setString(2, solver.getMd5());
+                // zip up directory
+                ByteArrayOutputStream zipped = Util.zipDirectoryToByteStream(solver.getCodeFile());
+                ps.setBinaryStream(1, new ByteArrayInputStream(zipped.toByteArray()));
+                ps.setInt(2, solver.getId());
                 ps.executeUpdate();
             }
         }
@@ -290,5 +297,41 @@ public class SolverDAO {
         f.getParentFile().mkdirs();
         getBinaryFileOfSolver(s, f);
         return f;
+    }
+
+    /**
+     * Exports the code of the solver s to the directory specified by f
+     * @param s solver
+     * @param f File referencing a directory on the filesystem
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static void exportSolverCode(Solver s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `code` FROM " + table + " WHERE idSolver=?");
+        ps.setInt(1, s.getId());
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            InputStream in = rs.getBinaryStream("code");
+            if (in == null) return;
+
+            // open temporary file to write the zip file to
+            File tmp = new File("tmp" + System.getProperty("file.seperator") + s.getId() + ".zip.tmp");
+            FileOutputStream out = new FileOutputStream(tmp);
+            
+            
+            byte[] buffer = new byte[8192];
+            int read;
+            while (-1 != (read = in.read(buffer))) {
+                out.write(buffer, 0, read);
+            }
+            out.close();
+            in.close();
+
+            Util.unzip(tmp, f);
+            tmp.delete(); // delete temporary file
+        }
+        rs.close();
     }
 }
