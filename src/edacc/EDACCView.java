@@ -275,7 +275,7 @@ public class EDACCView extends FrameView implements Observer {
                 .add(3, 3, 3))
         );
 
-        setComponent(manageDBModeMenuItem);
+        setComponent(mainPanel);
         setMenuBar(menuBar);
         setStatusBar(statusPanel);
     }// </editor-fold>//GEN-END:initComponents
