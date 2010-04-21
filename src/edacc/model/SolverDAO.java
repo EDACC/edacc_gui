@@ -184,7 +184,7 @@ public class SolverDAO {
      */
     public static LinkedList<Solver> getAll() throws SQLException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM " + table);
+        ResultSet rs = st.executeQuery("SELECT idSolver, name, binaryName, description, md5 FROM " + table);
         LinkedList<Solver> res = new LinkedList<Solver>();
         while (rs.next()) {
             Solver c = cache.getCached(rs.getInt("idSolver"));
@@ -211,7 +211,7 @@ public class SolverDAO {
      */
     public static Solver solverAlreadyInDB(Solver s) throws NoConnectionToDBException, SQLException {
         PreparedStatement ps;
-        final String Query = "SELECT * FROM " + table + " WHERE md5 = ?";
+        final String Query = "SELECT idSolver, name, binaryName, description, md5 FROM " + table + " WHERE md5 = ?";
         ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
         ps.setString(1, s.getMd5());
         ResultSet rs = ps.executeQuery();
