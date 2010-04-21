@@ -2,7 +2,7 @@ package edacc.model;
 
 import java.io.File;
 
-public class Instance extends BaseModel {
+public class Instance extends BaseModel implements IntegerPKModel {
 
     @Override
     public int hashCode() {

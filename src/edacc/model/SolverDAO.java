@@ -30,7 +30,7 @@ public class SolverDAO {
     protected static final String updateQueryCode = "UPDATE " + table + " SET `code`=? WHERE `idSolver`=?";
     protected static final String updateQuery = "UPDATE " + table + " SET `name`=?, `description`=?, `md5`=? WHERE `idSolver`=?";
     protected static final String removeQuery = "DELETE FROM " + table + " WHERE idSolver=?";
-    private static final Hashtable<Solver, Solver> cache = new Hashtable<Solver, Solver>();
+    private static final ObjectCache<Solver> cache = new ObjectCache<Solver>();
 
     /**
      * persists a solver to database and assigns an id. it also ensures that
@@ -106,7 +106,7 @@ public class SolverDAO {
             solver.setId(solverAlreadyInDB(solver).getId());
         }
 
-        cacheSolver(solver);
+        cache.cache(solver);
         solver.setSaved();
     }
 
@@ -138,9 +138,7 @@ public class SolverDAO {
         ps.executeUpdate();
 
         // finally remove it from the cache if cached
-        if (cache.containsKey(solver)) {
-            cache.remove(solver);
-        }
+        cache.remove(solver);
 
         // mark the object as deleted
         solver.setDeleted();
@@ -155,23 +153,7 @@ public class SolverDAO {
         i.setMd5(rs.getString("md5"));
         return i;
     }
-
-    private static Solver getCached(Solver i) {
-        if (cache.containsKey(i)) {
-            return cache.get(i);
-        } else {
-            return null;
-        }
-    }
-
-    private static void cacheSolver(Solver i) {
-        if (cache.containsKey(i)) {
-            return;
-        } else {
-            cache.put(i, i);
-        }
-    }
-
+    
     /**
      * retrieves an solver from the database
      * @param id the id of the solver to be retrieved
@@ -179,20 +161,18 @@ public class SolverDAO {
      * @throws SQLException
      */
     public static Solver getById(int id) throws SQLException {
+        Solver c = cache.getCached(id);
+        if (c != null) return c;
+
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idSolver=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         if (rs.next()) {
             Solver i = getSolverFromResultset(rs);
 
-            Solver c = getCached(i);
-            if (c != null) {
-                return c;
-            } else {
-                i.setSaved();
-                cacheSolver(i);
-                return i;
-            }
+            i.setSaved();
+            cache.cache(i);
+            return i;
         }
         return null;
     }
@@ -207,15 +187,15 @@ public class SolverDAO {
         ResultSet rs = st.executeQuery("SELECT * FROM " + table);
         LinkedList<Solver> res = new LinkedList<Solver>();
         while (rs.next()) {
-            Solver i = getSolverFromResultset(rs);
-            Solver c = getCached(i);
-            if (c != null) {
-                res.add(c);
-            } else {
+            Solver c = cache.getCached(rs.getInt("idSolver"));
+            if (c != null) res.add(c);
+            else {
+                Solver i = getSolverFromResultset(rs);
                 i.setSaved();
-                cacheSolver(i);
+                cache.cache(i);
                 res.add(i);
             }
+
         }
         rs.close();
         return res;
@@ -237,14 +217,14 @@ public class SolverDAO {
         ResultSet rs = ps.executeQuery();
 
         if (rs.next()) {
-            Solver i = getSolverFromResultset(rs);
-
-            Solver c = getCached(i);
+            Solver c = cache.getCached(rs.getInt("idSolver"));
             if (c != null) {
                 return c;
-            } else {
+            }
+            else {
+                Solver i = getSolverFromResultset(rs);
                 i.setSaved();
-                cacheSolver(i);
+                cache.cache(i);
                 return i;
             }
         }
@@ -317,7 +297,7 @@ public class SolverDAO {
             if (in == null) return;
 
             // open temporary file to write the zip file to
-            File tmp = new File("tmp" + System.getProperty("file.seperator") + s.getId() + ".zip.tmp");
+            File tmp = new File("tmp" + System.getProperty("file.separator") + s.getId() + ".zip.tmp");
             FileOutputStream out = new FileOutputStream(tmp);
             
             

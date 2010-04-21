@@ -18,11 +18,11 @@ import java.util.Vector;
 public class InstanceDAO {
 
     protected static final String table = "Instances";
-    private static final Hashtable<Instance, Instance> cache = new Hashtable<Instance, Instance>();
+    private static final ObjectCache<Instance> cache = new ObjectCache<Instance>();
 
     /**
-     * Instance factory method, ensures that the created instance is persisted and assigned an ID
-     * so it can be referenced by related objects. Checks if the instance is already in the Datebase.
+     * Instance factory method. Checks if the instance is already in the Datebase and if so,
+     * throws an InstanceAlreadyInDBException
      * @param md5
      * @return new Instance object
      * @throws SQLException, FileNotFoundException, InstanceAlreadyInDBException
@@ -47,7 +47,6 @@ public class InstanceDAO {
         i.setMaxClauseLength(maxClauseLength);
         i.setMd5(md5);
         i.setInstanceClass(instanceClass);
-        save(i);
         return i;
     }
 
@@ -116,26 +115,10 @@ public class InstanceDAO {
             if (rs.next()) {
                 instance.setId(rs.getInt(1));
             }
+            cache.cache(instance);
         }
 
         instance.setSaved();
-        cacheInstance(instance);
-    }
-
-    private static Instance getCached(Instance i) {
-        if (cache.containsKey(i)) {
-            return cache.get(i);
-        } else {
-            return null;
-        }
-    }
-
-    private static void cacheInstance(Instance i) {
-        if (cache.containsKey(i)) {
-            return;
-        } else {
-            cache.put(i, i);
-        }
     }
 
     /**
@@ -145,6 +128,9 @@ public class InstanceDAO {
      * @throws SQLException
      */
     public static Instance getById(int id) throws SQLException, InstanceClassMustBeSourceException {
+        Instance c = cache.getCached(id);
+        if (c != null) return c;
+
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idInstance, maxClauseLength, md5, name, numAtoms, numClauses, ratio, instanceClass_idinstanceClass FROM " + table + " WHERE idInstance=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
@@ -160,14 +146,9 @@ public class InstanceDAO {
             Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
             i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
-            Instance c = getCached(i);
-            if (c != null) {
-                return c;
-            } else {
-                i.setSaved();
-                cacheInstance(i);
-                return i;
-            }
+            i.setSaved();
+            cache.cache(i);
+            return i;
         }
         return null;
     }
@@ -194,12 +175,12 @@ public class InstanceDAO {
             Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
             i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
-            Instance c = getCached(i);
+            Instance c = cache.getCached(i.getId());
             if (c != null) {
                 res.add(c);
             } else {
                 i.setSaved();
-                cacheInstance(i);
+                cache.cache(i);
                 res.add(i);
             }
         }
@@ -226,12 +207,12 @@ public class InstanceDAO {
             Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
             i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
-            Instance c = getCached(i);
+            Instance c = cache.getCached(i.getId());
             if (c != null) {
                 res.add(c);
             } else {
                 i.setSaved();
-                cacheInstance(i);
+                cache.cache(i);
                 res.add(i);
             }
         }
@@ -249,8 +230,7 @@ public class InstanceDAO {
     public static boolean IsInAnyExperiment(int id) throws NoConnectionToDBException, SQLException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
 
-        ResultSet rs = st.executeQuery("SELECT i.idInstance FROM " + table + " AS i JOIN Experiment_has_Instances as ei ON "
-                + "i.idInstance = ei.Instances_idInstance WHERE idInstance = " + id);
+        ResultSet rs = st.executeQuery("SELECT idEI FROM Experiment_has_Instances WHERE Instances_idInstance = " + id + " LIMIT 1;");
         return rs.next();
     }
 
@@ -308,12 +288,12 @@ public class InstanceDAO {
                 Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
                 i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
-                Instance c = getCached(i);
+                Instance c = cache.getCached(i.getId());
                 if (c != null) {
                     res.add(c);
                 } else {
                     i.setSaved();
-                    cacheInstance(i);
+                    cache.cache(i);
                     res.add(i);
                 }
             }

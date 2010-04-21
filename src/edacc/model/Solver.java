@@ -3,7 +3,7 @@ package edacc.model;
 import java.io.File;
 
 
-public class Solver extends BaseModel {
+public class Solver extends BaseModel implements IntegerPKModel {
     private int id;
     private String name;
     private String binaryName;

@@ -9,7 +9,7 @@ package edacc.model;
  *
  * @author simon
  */
-public class ExperimentHasInstance extends BaseModel {
+public class ExperimentHasInstance extends BaseModel implements IntegerPKModel {
     private int id;
     private int experiment_id;
     private int instances_id;

@@ -2,7 +2,7 @@ package edacc.model;
 
 import java.sql.Date;
 
-public class Experiment extends BaseModel {
+public class Experiment extends BaseModel implements IntegerPKModel {
     private int id;
     private String description;
     private Date date;
