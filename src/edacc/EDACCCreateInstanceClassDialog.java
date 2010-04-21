@@ -192,7 +192,9 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelActionPerformed
-         this.dispose();
+        this.jTextArea1.setText("");
+        this.jTextFieldName.setText("");
+        this.dispose();
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
     private void jButtonCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCreateActionPerformed
@@ -219,6 +221,8 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
                         ret = InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), jTextArea1.getText(), true);
                      }else ret =  InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), jTextArea1.getText(), false);
                     tableModel.addClass(ret);
+                    this.jTextArea1.setText("");
+                    this.jTextFieldName.setText("");
                     this.dispose();
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(this,

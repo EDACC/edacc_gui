@@ -17,6 +17,8 @@ import edacc.model.InstanceClassDAO;
 import edacc.model.NoConnectionToDBException;
 import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -69,6 +71,11 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
         setMinimumSize(new java.awt.Dimension(385, 454));
         setName("Form"); // NOI18N
         setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         buttonGroupSourceOrUser.add(jRadioButtonSourceClass);
@@ -214,6 +221,23 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
         input = null;
         this.setVisible(false);
     }//GEN-LAST:event_jButtonCancelActionPerformed
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        try {
+            ((AddInstanceInstanceClassTabelModel)jTableSourceClass.getModel()).setClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllSourceClass()));
+            ((AddInstanceInstanceClassTabelModel)jTableUserClass.getModel()).setClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllUserClass()));
+         } catch (NoConnectionToDBException ex) {
+            JOptionPane.showMessageDialog(this.rootPane,
+                    ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+             JOptionPane.showMessageDialog(this.rootPane,
+                    "There is a Problem with the database: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_formWindowActivated
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroupSourceOrUser;

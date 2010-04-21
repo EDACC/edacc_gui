@@ -82,7 +82,7 @@ public class ExperimentController {
         Vector<InstanceClass> vic = new Vector<InstanceClass>();
         vic.addAll(InstanceClassDAO.getAll());
         instanceClasses = vic;
-        main.instanceClassModel.addClasses(instanceClasses);
+        main.instanceClassModel.setClasses(instanceClasses);
 
     }
 

@@ -51,4 +51,9 @@ public class AddInstanceInstanceClassTabelModel extends AbstractTableModel {
         this.classes.addAll(classes);
     }
 
+        public void setClasses(Vector<InstanceClass> classes){
+            this.classes = classes;
+        }
+
+
 }

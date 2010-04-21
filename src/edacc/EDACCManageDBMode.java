@@ -16,24 +16,14 @@ import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.MD5CheckFailedException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
-import edacc.model.ParameterDAO;
 import edacc.model.Solver;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.jdesktop.application.Action;
 
@@ -65,7 +55,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
         // initialize instance table
         instanceTableModel = new InstanceTableModel();
         tableInstances.setModel(instanceTableModel);
-        tableInstances.setDefaultRenderer(Object.class, new InstanceTableCellRenderer());
         sorter = new TableRowSorter<InstanceTableModel>(instanceTableModel);
 
         // initialize instance class table

@@ -27,17 +27,17 @@ public class InstanceTableCellRenderer extends DefaultTableCellRenderer {
          Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
          
          Instance instance = (Instance) ((InstanceTableModel)table.getModel()).getValueAt(row, 5);
-        try {
+       // try {
             if(isSelected)cell.setBackground(Color.blue);
-            else if (InstanceDAO.IsInAnyExperiment(instance.getId())) {
+            /*else if (InstanceDAO.IsInAnyExperiment(instance.getId())) {
                 cell.setBackground(Color.orange);
-            }
+            }*/
             else cell.setBackground(Color.white);
-        } catch (NoConnectionToDBException ex) {
+      /*  } catch (NoConnectionToDBException ex) {
             Logger.getLogger(InstanceTableCellRenderer.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(InstanceTableCellRenderer.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
          return cell;
 
     }

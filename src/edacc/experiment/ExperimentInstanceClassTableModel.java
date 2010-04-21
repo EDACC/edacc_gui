@@ -5,7 +5,6 @@
 
 package edacc.experiment;
 
-import edacc.experiment.InstanceTableModel;
 import edacc.manageDB.InstanceClassTableModel;
 import edacc.model.ExperimentHasInstance;
 import edacc.model.ExperimentHasInstanceDAO;
@@ -15,7 +14,6 @@ import edacc.model.InstanceDAO;
 import edacc.model.NoConnectionToDBException;
 import java.sql.SQLException;
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -99,6 +97,13 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel{
         this.classes.addAll(classes);
     }
 
+    public void setClasses (Vector <InstanceClass> classes){
+        for(int i = 0; i < classes.size(); i++){
+            this.classSelect.add(false);
+        }
+        this.classes = classes;
+    }
+    
     public void removeClass(int row){
         this.classes.remove(row);
         this.classSelect.remove(row);
@@ -109,6 +114,7 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel{
     }
 
 
+    @Override
      public void setValueAt(Object value, int row, int col) {
         if(col == 3){
             classSelect.set(row, (Boolean) value);

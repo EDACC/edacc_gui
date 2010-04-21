@@ -118,7 +118,7 @@ public class ManageDBInstances {
                 if(input.getName().equals("")){
                     Vector<Instance> instances;
  
-                        instances = buildInstancesAutogenerateClass(instanceFiles, ret);
+                     instances = buildInstancesAutogenerateClass(instanceFiles, ret);
 
                     main.instanceTableModel.addInstances(instances);
                     loadInstanceClasses();

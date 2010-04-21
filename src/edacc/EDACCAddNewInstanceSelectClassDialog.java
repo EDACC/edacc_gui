@@ -17,6 +17,8 @@ import edacc.model.InstanceClassDAO;
 import edacc.model.NoConnectionToDBException;
 import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -63,6 +65,11 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         setTitle(resourceMap.getString("AddNewInstanceSelectClass.title")); // NOI18N
         setMinimumSize(new java.awt.Dimension(400, 400));
         setName("AddNewInstanceSelectClass"); // NOI18N
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                formComponentShown(evt);
+            }
+        });
 
         jPanelButtons.setName("jPanelButtons"); // NOI18N
 
@@ -227,6 +234,22 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         input = null;
         this.setVisible(false);
     }//GEN-LAST:event_jButtonCancelActionPerformed
+
+    private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        try {
+            tableModel.setClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllSourceClass()));
+        } catch (NoConnectionToDBException ex) {
+            JOptionPane.showMessageDialog(this.rootPane,
+                    ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+             JOptionPane.showMessageDialog(this.rootPane,
+                    "There is a Problem with the database: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_formComponentShown
 
     public InstanceClass getInput(){
         return input;
