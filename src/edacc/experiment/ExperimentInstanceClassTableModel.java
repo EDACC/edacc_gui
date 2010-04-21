@@ -126,7 +126,7 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel{
                 Logger.getLogger(InstanceClassTableModel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        //fireTableCellUpdated(row, col);
+        fireTableCellUpdated(row, col);
 
     }
 
