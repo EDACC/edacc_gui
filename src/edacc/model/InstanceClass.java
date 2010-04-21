@@ -9,7 +9,7 @@ package edacc.model;
  *
  * @author dgall
  */
-public class InstanceClass extends BaseModel {
+public class InstanceClass extends BaseModel implements IntegerPKModel {
 
     private int instanceClassID;
     private String name;
@@ -22,6 +22,10 @@ public class InstanceClass extends BaseModel {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getId() {
+        return getInstanceClassID();
     }
 
     public int getInstanceClassID() {

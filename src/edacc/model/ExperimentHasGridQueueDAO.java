@@ -20,7 +20,6 @@ public class ExperimentHasGridQueueDAO {
     protected static final String table = "Experiment_has_gridQueue";
     protected static final String insertQuery = "INSERT INTO " + table + " (Experiment_idExperiment, gridQueue_idgridQueue) VALUES (?, ?)";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE Experiment_idExperiment=? AND gridQueue_idgridQueue=?";
-    private static final Hashtable<ExperimentHasGridQueue, ExperimentHasGridQueue> cache = new Hashtable<ExperimentHasGridQueue, ExperimentHasGridQueue>();
 
     /**
      * Factory method for building a ExperimentHasGridQueue object.
@@ -31,7 +30,6 @@ public class ExperimentHasGridQueueDAO {
     public static ExperimentHasGridQueue createExperimentHasGridQueue(Experiment e, GridQueue q) throws SQLException {
         ExperimentHasGridQueue eq = new ExperimentHasGridQueue(e.getId(), q.getId());
         save(eq);
-        cacheExperimentHasGridQueue(eq);
         return eq;
     }
 
@@ -45,33 +43,14 @@ public class ExperimentHasGridQueueDAO {
             st.setInt(1, q.getIdExperiment());
             st.setInt(2, q.getIdGridQueue());
             st.executeUpdate();
-            cache.remove(q);
         } else if (q.isNew()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             st.setInt(1, q.getIdExperiment());
             st.setInt(2, q.getIdGridQueue());
 
             st.executeUpdate();
-            q.setSaved();
-            cacheExperimentHasGridQueue(q);
         }
 
-    }
-
-    private static ExperimentHasGridQueue getCached(ExperimentHasGridQueue q) {
-        if (cache.containsKey(q)) {
-            return cache.get(q);
-        } else {
-            return null;
-        }
-    }
-
-    private static void cacheExperimentHasGridQueue(ExperimentHasGridQueue q) {
-        if (cache.containsKey(q)) {
-            return;
-        } else {
-            cache.put(q, q);
-        }
     }
 
     public static void removeExperimentHasGridQueue(ExperimentHasGridQueue q) throws SQLException {
@@ -87,14 +66,8 @@ public class ExperimentHasGridQueueDAO {
         while (rs.next()) {
             ExperimentHasGridQueue q = getExperimentHasGridQueueFromResultset(rs);
 
-            ExperimentHasGridQueue c = getCached(q);
-            if (c != null) {
-                res.add(c);
-            } else {
-                q.setSaved();
-                cacheExperimentHasGridQueue(q);
-                res.add(q);
-            }
+            q.setSaved();
+            res.add(q);
         }
         return res;
     }
@@ -107,14 +80,8 @@ public class ExperimentHasGridQueueDAO {
         if (rs.next()) {
             ExperimentHasGridQueue eq = getExperimentHasGridQueueFromResultset(rs);
 
-            ExperimentHasGridQueue c = getCached(eq);
-            if (c != null) {
-                return c;
-            } else {
-                q.setSaved();
-                cacheExperimentHasGridQueue(eq);
-                return eq;
-            }
+            q.setSaved();
+            return eq;
         }
         return null;
     }

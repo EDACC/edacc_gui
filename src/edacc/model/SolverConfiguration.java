@@ -1,6 +1,6 @@
 package edacc.model;
 
-public class SolverConfiguration extends BaseModel {
+public class SolverConfiguration extends BaseModel implements IntegerPKModel {
     private int solver_id;
     private int experiment_id;
     private int id;
