@@ -282,10 +282,6 @@ public class InstanceDAO {
      * @throws SQLException
      */
     public static LinkedList<Instance> getAllByInstanceClasses(Vector<InstanceClass> allChoosen) throws NoConnectionToDBException, SQLException {
-                                long zstVorher;
-            long zstNachher;
-
-            zstVorher = System.currentTimeMillis();
         if (!allChoosen.isEmpty()) {
             String query = "SELECT i.idInstance, i.maxClauseLength, i.md5, i.name, i.numAtoms, i.numClauses,"
                     + " i.ratio, i.instanceClass_idinstanceClass FROM " + table + " as i "
@@ -322,8 +318,6 @@ public class InstanceDAO {
                 }
             }
             rs.close();
-                        zstNachher = System.currentTimeMillis();
-            System.out.println("Zeit benötigt: " + ((zstNachher - zstVorher)) + " sec");
             return res;
         }
 
