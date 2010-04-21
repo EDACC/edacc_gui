@@ -156,7 +156,7 @@ public class InstanceDAO {
             i.setName(rs.getString("name"));
             i.setNumAtoms(rs.getInt("numAtoms"));
             i.setNumClauses(rs.getInt("numClauses"));
-            i.setRatio(rs.getInt("ratio"));
+            i.setRatio(rs.getFloat("ratio"));
             Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
             i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
@@ -190,7 +190,7 @@ public class InstanceDAO {
             i.setName(rs.getString("name"));
             i.setNumAtoms(rs.getInt("numAtoms"));
             i.setNumClauses(rs.getInt("numClauses"));
-            i.setRatio(rs.getInt("ratio"));
+            i.setRatio(rs.getFloat("ratio"));
             Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
             i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
@@ -222,7 +222,7 @@ public class InstanceDAO {
             i.setName(rs.getString("i.name"));
             i.setNumAtoms(rs.getInt("i.numAtoms"));
             i.setNumClauses(rs.getInt("i.numClauses"));
-            i.setRatio(rs.getInt("i.ratio"));
+            i.setRatio(rs.getFloat("i.ratio"));
             Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
             i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
@@ -282,9 +282,11 @@ public class InstanceDAO {
      * @throws SQLException
      */
     public static LinkedList<Instance> getAllByInstanceClasses(Vector<InstanceClass> allChoosen) throws NoConnectionToDBException, SQLException {
+                                long zstVorher;
+            long zstNachher;
 
+            zstVorher = System.currentTimeMillis();
         if (!allChoosen.isEmpty()) {
-
             String query = "SELECT i.idInstance, i.maxClauseLength, i.md5, i.name, i.numAtoms, i.numClauses,"
                     + " i.ratio, i.instanceClass_idinstanceClass FROM " + table + " as i "
                     + " LEFT JOIN Instances_has_instanceClass as ii ON i.idInstance = ii.Instances_idInstance "
@@ -297,6 +299,7 @@ public class InstanceDAO {
             Statement st = DatabaseConnector.getInstance().getConn().createStatement();
             ResultSet rs = st.executeQuery(query);
             LinkedList<Instance> res = new LinkedList<Instance>();
+
             while (rs.next()) {
                 Instance i = new Instance();
                 i.setId(rs.getInt("i.idInstance"));
@@ -305,7 +308,7 @@ public class InstanceDAO {
                 i.setName(rs.getString("i.name"));
                 i.setNumAtoms(rs.getInt("i.numAtoms"));
                 i.setNumClauses(rs.getInt("i.numClauses"));
-                i.setRatio(rs.getInt("i.ratio"));
+                i.setRatio(rs.getFloat("i.ratio"));
                 Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
                 i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
@@ -319,6 +322,8 @@ public class InstanceDAO {
                 }
             }
             rs.close();
+                        zstNachher = System.currentTimeMillis();
+            System.out.println("Zeit benötigt: " + ((zstNachher - zstVorher)) + " sec");
             return res;
         }
 
