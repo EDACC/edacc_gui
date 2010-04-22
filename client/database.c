@@ -123,7 +123,7 @@ status dbFetchExperimentData(experiment *e) {
     MYSQL_ROW row;
 
     if (mysql_library_init(0, NULL, NULL)) {
-        printf("could not initialize MySQL library\n");
+        logError("could not initialize MySQL library\n");
         return dbError;
     }
 
@@ -376,7 +376,7 @@ int dbFetchJob(job* j, status* s) {
 
     conn = mysql_init(NULL);
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
-        printf("could not establish mysql connection!\n");
+        logError("could not establish mysql connection!\n");
         *s = dbError;
         return 1;
     }
@@ -516,12 +516,12 @@ status dbUpdate(const job* j) {
 
     conn = mysql_init(NULL);
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
-        printf("could not establish mysql connection!\n");
+        logError("could not establish mysql connection!\n");
         return dbError;
     }
 
     if(mysql_query(conn, queryJob) != 0) {
-        printf("db update query error, message: %s\n", mysql_error(conn));
+        logError("db update query error, message: %s\n", mysql_error(conn));
         return dbError;
     }
 
@@ -591,19 +591,19 @@ status dbFetchInstance(const char* instanceName, instance* i) {
 
     conn = mysql_init(NULL);
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
-        printf("could not establish mysql connection!\n");
+        logError("could not establish mysql connection!\n");
         return dbError;
     }
 
 
     /* fetch job information */
     if(mysql_query(conn, queryInstance) != 0) {
-        printf("Query error. Message: %s\n", mysql_error(conn));
+        logError("Query error. Message: %s\n", mysql_error(conn));
         return dbError;
     }
 
     if((res = mysql_store_result(conn)) == NULL) { 
-        printf("NULL result.\n");
+        logError("NULL result.\n");
         return dbError;
     }
 
