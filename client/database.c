@@ -117,35 +117,6 @@
 "   WHERE name = '%s' "
 
 
-/* status dbFetchExperimentData_test(experiment *e) {
- *     MYSQL *conn;
- *     //MYSQL_RES *res;
- *     //MYSQL_ROW row;
- * 
- *     if (mysql_library_init(0, NULL, NULL)) {
- *         printf("could not initialize MySQL library\n");
- *         return dbError;
- *     }
- * 
- *     conn = mysql_init(NULL);
- * 
- *     printf("%s, %s, %s, %s\n", host, username, password, database);
- *     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
- *         printf("could not establish mysql connection!\n");
- *         return dbError;
- *     }
- *     printf("connected!\n");
- * 
- * 
- *     // closing the connection causes the client to stop without any message.
- *     mysql_close(conn);
- *     printf("disconnected!\n");
- *     mysql_library_end();
- *     return success;
- * }
- */
-
-
 status dbFetchExperimentData(experiment *e) {
     MYSQL *conn;
     MYSQL_RES *res;
@@ -161,9 +132,6 @@ status dbFetchExperimentData(experiment *e) {
     char *queryGridInfo = NULL;
     char *querySolver = NULL;
     char *queryInstance = NULL;
-
-    //int numRows;
-    //int lastId;
 
     int i;
     unsigned long *lengths = NULL;
@@ -397,7 +365,6 @@ int dbFetchJob(job* j, status* s) {
 
     char *params = NULL;
 
-    //int numRows;
     int lastId = 0;
 
     int i;
@@ -467,12 +434,9 @@ int dbFetchJob(job* j, status* s) {
 
         j->solverName = (char *)calloc(lengths[1]+1,sizeof(char));
         strncpy(j->solverName, row[1], lengths[1]);
-        //printf("row[1]: %s\n", row[1]);
-        //printf("j->solverName: %s\n", j->solverName);
 
         j->instanceName = (char *)calloc(lengths[2]+1,sizeof(char));
         strncpy(j->instanceName, row[2], lengths[2]);
-        //printf("length: %i\nrow[2]: %s\nj->instanceName: %s\n", lengths[2], row[2],j->instanceName);
        
         j->resultFileName = (char *)calloc(lengths[3]+1,sizeof(char));
         strncpy(j->resultFileName, row[3], lengths[3]);
@@ -496,7 +460,6 @@ int dbFetchJob(job* j, status* s) {
     params = (char *)calloc(256,sizeof(char));
 
     while((row = mysql_fetch_row(res)) != NULL) {
-        //printf("row[0]: %s, row[1]: %s, row[2]: %s, row[3]: %s\n", row[0], row[1], row[2], row[3]);
         if(strcmp(row[2],"")!=0) {
             params = strcat(params, row[1]);
             params = strcat(params, row[0]);
@@ -512,7 +475,6 @@ int dbFetchJob(job* j, status* s) {
     }
 
     strcpy(j->params, params);
-    //printf("j->params: %s\n", j->params);
 
     free(params);
     mysql_free_result(res);
@@ -538,21 +500,8 @@ void freeJob(job *j) {
 
 status dbUpdate(const job* j) {
     MYSQL *conn = NULL;
-    //MYSQL_RES *res;
-    //MYSQL_ROW row;
-
-    //char *updateJob;
     char *queryJob = NULL;
 
-
-/*     printf("this job resultfilename is: %s,", j->resultFileName);
- *     printf("this job status is: %i,", j->status);
- *     printf("this job seed is: %i,", j->seed);
- *     printf("this job time is: %f,", j->time);
- *     printf("this job statuc code is: %i,", j->statusCode);
- *     printf("this job result file is: %s,", j->resultFile);
- *     printf("this job id is: %i\n", j->id);
- */
 
     sprintfAlloc(&queryJob, UPDATE_JOB, 
             j->resultFileName, 
