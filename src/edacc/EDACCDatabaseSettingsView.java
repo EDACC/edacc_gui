@@ -53,6 +53,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         setIconImage(null);
         setMinimumSize(new java.awt.Dimension(350, 220));
         setName("Form"); // NOI18N
+        setResizable(false);
 
         btnConnect.setText(resourceMap.getString("btnConnect.text")); // NOI18N
         btnConnect.setName("btnConnect"); // NOI18N
