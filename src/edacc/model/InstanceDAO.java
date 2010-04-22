@@ -196,21 +196,22 @@ public class InstanceDAO {
         ResultSet rs = st.executeQuery();
         LinkedList<Instance> res = new LinkedList<Instance>();
         while (rs.next()) {
-            Instance i = new Instance();
-            i.setId(rs.getInt("i.idInstance"));
-            i.setMaxClauseLength(rs.getInt("i.maxClauseLength"));
-            i.setMd5(rs.getString("i.md5"));
-            i.setName(rs.getString("i.name"));
-            i.setNumAtoms(rs.getInt("i.numAtoms"));
-            i.setNumClauses(rs.getInt("i.numClauses"));
-            i.setRatio(rs.getFloat("i.ratio"));
-            Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
-            i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
-
-            Instance c = cache.getCached(i.getId());
+            Instance c = cache.getCached(rs.getInt("i.idInstance"));
             if (c != null) {
                 res.add(c);
-            } else {
+            }
+            else {
+                Instance i = new Instance();
+                i.setId(rs.getInt("i.idInstance"));
+                i.setMaxClauseLength(rs.getInt("i.maxClauseLength"));
+                i.setMd5(rs.getString("i.md5"));
+                i.setName(rs.getString("i.name"));
+                i.setNumAtoms(rs.getInt("i.numAtoms"));
+                i.setNumClauses(rs.getInt("i.numClauses"));
+                i.setRatio(rs.getFloat("i.ratio"));
+                Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
+                i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
+
                 i.setSaved();
                 cache.cache(i);
                 res.add(i);
