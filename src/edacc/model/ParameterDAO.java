@@ -26,20 +26,34 @@ public class ParameterDAO {
         if (!solver.isSaved())
             return; // TODO do something if solver isn't in db
         if (parameter.isSaved()) return;
-        final String insertQuery = "INSERT INTO Parameters (name, prefix, value, Parameters.order, Solver_idSolver) VALUES (?, ?, ?, ?, ?)";
-        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
-        ps.setString(1, parameter.getName());
-        ps.setString(2, parameter.getPrefix());
-        ps.setString(3, parameter.getValue());
-        ps.setInt(4, parameter.getOrder());
-        ps.setInt(5, solver.getId());
-        ps.executeUpdate();
+        if (parameter.isNew()) {
+            final String insertQuery = "INSERT INTO Parameters (name, prefix, value, Parameters.order, Solver_idSolver) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+            ps.setString(1, parameter.getName());
+            ps.setString(2, parameter.getPrefix());
+            ps.setString(3, parameter.getValue());
+            ps.setInt(4, parameter.getOrder());
+            ps.setInt(5, solver.getId());
+            ps.executeUpdate();
+            // set id
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next())
+                parameter.setId(rs.getInt(1));
+            parameter.setSaved();
+        }
+        else if (parameter.isModified()) {
+            final String updateQuery = "UPDATE Parameters SET name=?, prefix=?, value=?, Parameters.order=?, Solver_idSolver=? WHERE idParameter=?";
+            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
+            ps.setString(1, parameter.getName());
+            ps.setString(2, parameter.getPrefix());
+            ps.setString(3, parameter.getValue());
+            ps.setInt(4, parameter.getOrder());
+            ps.setInt(5, solver.getId());
+            ps.setInt(6, parameter.getId());
+            ps.executeUpdate();
+            parameter.setSaved();
+        }
 
-        // set id
-        ResultSet rs = ps.getGeneratedKeys();
-        if (rs.next())
-            parameter.setId(rs.getInt(1));
-        parameter.setSaved();
     }
 
     private static Parameter getParameterFromResultset(ResultSet rs) throws SQLException {

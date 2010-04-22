@@ -25,6 +25,9 @@ public class Parameter extends BaseModel {
 
     public void setName(String name) {
         this.name = name;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getOrder() {
@@ -33,6 +36,9 @@ public class Parameter extends BaseModel {
 
     public void setOrder(int order) {
         this.order = order;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public String getPrefix() {
@@ -41,6 +47,9 @@ public class Parameter extends BaseModel {
 
     public void setPrefix(String prefix) {
         this.prefix = prefix;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public String getValue() {
@@ -49,5 +58,8 @@ public class Parameter extends BaseModel {
 
     public void setValue(String value) {
         this.value = value;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 }
