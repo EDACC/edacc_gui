@@ -22,6 +22,9 @@ public class Solver extends BaseModel implements IntegerPKModel {
 
     public void setBinaryName(String binaryName) {
         this.binaryName = binaryName;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public String getDescription() {
@@ -30,6 +33,9 @@ public class Solver extends BaseModel implements IntegerPKModel {
 
     public void setDescription(String description) {
         this.description = description;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getId() {
@@ -46,6 +52,9 @@ public class Solver extends BaseModel implements IntegerPKModel {
 
     public void setMd5(String md5) {
         this.md5 = md5;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public String getName() {
@@ -62,6 +71,9 @@ public class Solver extends BaseModel implements IntegerPKModel {
 
     public void setBinaryFile(File binaryFile) {
         this.binaryFile = binaryFile;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     protected File getCodeFile() {
@@ -70,5 +82,8 @@ public class Solver extends BaseModel implements IntegerPKModel {
 
     public void setCodeFile(File codeFile) {
         this.codeFile = codeFile;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 }

@@ -22,6 +22,9 @@ public class InstanceClass extends BaseModel implements IntegerPKModel {
 
     public void setDescription(String description) {
         this.description = description;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getId() {
@@ -34,6 +37,9 @@ public class InstanceClass extends BaseModel implements IntegerPKModel {
 
     public void setInstanceClassID(int instanceClassID) {
         this.instanceClassID = instanceClassID;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public String getName() {
@@ -42,6 +48,9 @@ public class InstanceClass extends BaseModel implements IntegerPKModel {
 
     public void setName(String name) {
         this.name = name;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public boolean isSource() {
@@ -50,6 +59,9 @@ public class InstanceClass extends BaseModel implements IntegerPKModel {
 
     public void setSource(boolean source) {
         this.source = source;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     

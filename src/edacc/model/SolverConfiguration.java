@@ -12,6 +12,9 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
 
     public void setSeed_group(int seed_group) {
         this.seed_group = seed_group;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getExperiment_id() {
@@ -20,6 +23,9 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
 
     public void setExperiment_id(int experiment_id) {
         this.experiment_id = experiment_id;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getId() {
@@ -36,6 +42,9 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
 
     public void setSolver_id(int solver_id) {
         this.solver_id = solver_id;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
 }

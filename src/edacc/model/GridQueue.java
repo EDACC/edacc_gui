@@ -34,6 +34,9 @@ public class GridQueue extends BaseModel {
 
     public void setAvailNodes(int availNodes) {
         this.availNodes = availNodes;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public String getDescription() {
@@ -42,6 +45,9 @@ public class GridQueue extends BaseModel {
 
     public void setDescription(String description) {
         this.description = description;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     protected File getGenericPBSScript() {
@@ -50,6 +56,9 @@ public class GridQueue extends BaseModel {
 
     public void setGenericPBSScript(File genericPBSScript) {
         this.genericPBSScript = genericPBSScript;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getId() {
@@ -66,6 +75,9 @@ public class GridQueue extends BaseModel {
 
     public void setLocation(String location) {
         this.location = location;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getMaxJobsQueue() {
@@ -74,6 +86,9 @@ public class GridQueue extends BaseModel {
 
     public void setMaxJobsQueue(int maxJobsQueue) {
         this.maxJobsQueue = maxJobsQueue;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public String getName() {
@@ -82,6 +97,9 @@ public class GridQueue extends BaseModel {
 
     public void setName(String name) {
         this.name = name;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getNumCPUs() {
@@ -90,6 +108,9 @@ public class GridQueue extends BaseModel {
 
     public void setNumCPUs(int numCPUs) {
         this.numCPUs = numCPUs;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getNumNodes() {
@@ -98,6 +119,9 @@ public class GridQueue extends BaseModel {
 
     public void setNumNodes(int numNodes) {
         this.numNodes = numNodes;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getWalltime() {
@@ -106,5 +130,8 @@ public class GridQueue extends BaseModel {
 
     public void setWalltime(int walltime) {
         this.walltime = walltime;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 }

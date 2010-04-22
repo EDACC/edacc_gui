@@ -33,6 +33,8 @@ public class ExperimentResultDAO {
             st.setInt(8, r.getExperimentId());
             st.setInt(9, r.getInstanceId());
             st.addBatch();
+            r.setSaved(); // this should only be done if the batch save actually 
+                          // gets commited, right now this might not be the case if there's an DB exception
         }
         st.executeBatch();
         DatabaseConnector.getInstance().getConn().commit();
@@ -126,7 +128,9 @@ public class ExperimentResultDAO {
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
-            v.add(getExperimentResultFromResultSet(rs));
+            ExperimentResult er = getExperimentResultFromResultSet(rs);
+            v.add(er);
+            er.setSaved();
         }
         return v;
     }

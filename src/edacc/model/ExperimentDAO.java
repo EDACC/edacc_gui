@@ -70,10 +70,11 @@ public class ExperimentDAO {
      * @throws SQLException
      */
     public static void removeExperiment(Experiment experiment) throws SQLException {
-        cache.remove(experiment);
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
         st.setInt(1, experiment.getId());
         st.executeUpdate();
+        cache.remove(experiment);
+        experiment.setDeleted();
     }
 
     private static Experiment getExperimentFromResultset(ResultSet rs) throws SQLException {
