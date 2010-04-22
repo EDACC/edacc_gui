@@ -47,6 +47,7 @@ public class ExperimentHasInstanceDAO {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
             st.setInt(1, i.getId());
             st.executeUpdate();
+            st.close();
             cache.remove(i);
         } else if (i.isNew()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -57,6 +58,8 @@ public class ExperimentHasInstanceDAO {
             if (generatedKeys.next()) {
                 i.setId(generatedKeys.getInt(1));
             }
+            generatedKeys.close();
+            st.close();
             i.setSaved();
             cache.cache(i);
         }
@@ -85,6 +88,8 @@ public class ExperimentHasInstanceDAO {
                 res.add(i);
             }            
         }
+        rs.close();
+        st.close();
         return res;
     }
 }

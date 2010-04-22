@@ -47,6 +47,8 @@ public class InstanceDAO {
         i.setMaxClauseLength(maxClauseLength);
         i.setMd5(md5);
         i.setInstanceClass(instanceClass);
+        rs.close();
+        ps.close();
         return i;
     }
 
@@ -57,6 +59,7 @@ public class InstanceDAO {
             ps.executeUpdate();
             cache.remove(i);
             i.setDeleted();
+            ps.close();
         } else {
             throw new InstanceIsInExperimentException();
         }
@@ -117,7 +120,7 @@ public class InstanceDAO {
             }
             cache.cache(instance);
         }
-
+        ps.close();
         instance.setSaved();
     }
 
@@ -150,6 +153,7 @@ public class InstanceDAO {
             cache.cache(i);
             return i;
         }
+        rs.close();
         return null;
     }
 

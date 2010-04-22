@@ -44,6 +44,8 @@ public class InstanceClassDAO {
         i.setDescription(description);
         i.setSource(source);
         save(i);
+        rs.close();
+        ps.close();
         return i;
     }
 
@@ -60,6 +62,7 @@ public class InstanceClassDAO {
         ps.executeUpdate();
         cache.remove(i);
         i.setDeleted();
+        ps.close();
     }
 
     /**
@@ -98,10 +101,12 @@ public class InstanceClassDAO {
             if (rs.next()) {
                 instanceClass.setInstanceClassID(rs.getInt(1));
             }
+            rs.close();
         }
 
         instanceClass.setSaved();
         cache.cache(instanceClass);
+        ps.close();
     }
 
     /**
@@ -129,8 +134,12 @@ public class InstanceClassDAO {
 
             i.setSaved();
             cache.cache(i);
+            rs.close();
+            st.close();
             return i;
         }
+        rs.close();
+        st.close();
         return null;
     }
 

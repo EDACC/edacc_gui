@@ -43,12 +43,14 @@ public class ExperimentHasGridQueueDAO {
             st.setInt(1, q.getIdExperiment());
             st.setInt(2, q.getIdGridQueue());
             st.executeUpdate();
+            st.close();
         } else if (q.isNew()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             st.setInt(1, q.getIdExperiment());
             st.setInt(2, q.getIdGridQueue());
 
             st.executeUpdate();
+            st.close();
         }
 
     }
@@ -69,6 +71,8 @@ public class ExperimentHasGridQueueDAO {
             q.setSaved();
             res.add(q);
         }
+        rs.close();
+        st.close();
         return res;
     }
 
@@ -83,6 +87,8 @@ public class ExperimentHasGridQueueDAO {
             q.setSaved();
             return eq;
         }
+        rs.close();
+        st.close();
         return null;
     }
 }

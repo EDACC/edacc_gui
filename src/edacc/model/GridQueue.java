@@ -11,7 +11,7 @@ import java.io.File;
  *
  * @author dgall
  */
-public class GridQueue extends BaseModel {
+public class GridQueue extends BaseModel implements IntegerPKModel {
 
     private int id;
     private String name;

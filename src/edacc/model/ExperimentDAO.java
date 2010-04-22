@@ -63,6 +63,7 @@ public class ExperimentDAO {
             cache.cache(experiment);
         }
         experiment.setSaved();
+        st.close();
     }
     /**
      * removes an experiment from the database
@@ -73,6 +74,7 @@ public class ExperimentDAO {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
         st.setInt(1, experiment.getId());
         st.executeUpdate();
+        st.close();
         cache.remove(experiment);
         experiment.setDeleted();
     }
@@ -112,6 +114,8 @@ public class ExperimentDAO {
             cache.cache(i);
             return i;
         }
+        rs.close();
+        st.close();
         return null;
     }
 
@@ -138,6 +142,7 @@ public class ExperimentDAO {
             }
         }
         rs.close();
+        st.close();
         return res;
     }
 
@@ -163,6 +168,8 @@ public class ExperimentDAO {
             Solver s = SolverDAO.getById(id);
             solvers.add(s);
         }
+        rs.close();
+        ps.close();
         return solvers;
     }
 }

@@ -39,6 +39,7 @@ public class ExperimentResultDAO {
         st.executeBatch();
         DatabaseConnector.getInstance().getConn().commit();
         DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+        st.close();
     }
 
     private static ExperimentResult getExperimentResultFromResultSet(ResultSet rs) throws SQLException {
@@ -67,7 +68,9 @@ public class ExperimentResultDAO {
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         rs.next(); // there will always be a count
-        return rs.getInt("count");
+        int count = rs.getInt("count");
+        rs.close();
+        return count;
     }
 
 
@@ -89,7 +92,9 @@ public class ExperimentResultDAO {
         st.setInt(4, ExperimentId);
         ResultSet rs = st.executeQuery();
         rs.next();
-        return rs.getInt("count") > 0;
+        int count = rs.getInt("count");
+        rs.close();
+        return count > 0;
     }
 
     /**
@@ -110,7 +115,9 @@ public class ExperimentResultDAO {
         st.setInt(4, ExperimentId);
         ResultSet rs = st.executeQuery();
         rs.next();
-        return rs.getInt("seed");
+        int seed = rs.getInt("seed");
+        rs.close();
+        return seed;
     }
 
     /**
@@ -132,6 +139,8 @@ public class ExperimentResultDAO {
             v.add(er);
             er.setSaved();
         }
+        rs.close();
+        st.close();
         return v;
     }
 
