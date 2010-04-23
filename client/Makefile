@@ -10,6 +10,7 @@ clean:
 	rm -f log
 	rm -f sparrow
 	rm -f testinstance
+	rm -f *.cnf
 
 # Static build causes many problems. The most serious problem is, that the default glibc 
 # can only be dynamical linked, so mysql may won't work.

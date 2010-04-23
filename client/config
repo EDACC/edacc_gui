@@ -1,6 +1,6 @@
-host = localhost
-username = boris
-password = bobo
+host = 134.60.76.77
+username = edacc
+password = edaccteam
 database = EDACC
-experiment = 1
-gridqueue = 0
+experiment = 2
+gridqueue = 1
