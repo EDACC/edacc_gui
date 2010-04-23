@@ -18,7 +18,6 @@ import edacc.experiment.InstanceTableModel;
 import edacc.experiment.InstanceTableModelRowFilter;
 import edacc.experiment.SolverTableModel;
 import edacc.manageDB.ManageDBGridQueues;
-import edacc.model.AlreadyRunningTaskException;
 import edacc.model.GridQueue;
 import edacc.model.Solver;
 import edacc.model.Tasks;
@@ -794,20 +793,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                         "Loading an experiment will make you lose all unsaved changes of the current experiment. Continue loading the experiment?",
                         "Warning!",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-                    try {
-                        Integer i = (Integer) expTableModel.getValueAt(tableExperiments.getSelectedRow(), 5);
-                        expController.loadExperiment(i.intValue());
-                    } catch (SQLException ex) {
-                        createDatabaseErrorMessage(ex);
-                    }
+                    Integer i = (Integer) expTableModel.getValueAt(tableExperiments.getSelectedRow(), 5);
+                    // expController.loadExperiment(i.intValue());
+                    Tasks.startTask("loadExperiment", new Class[]{int.class, edacc.model.Tasks.class}, new Object[]{i.intValue(), null}, expController, this);
                 }
             } else {
-                try {
-                    Integer i = (Integer) expTableModel.getValueAt(tableExperiments.getSelectedRow(), 5);
-                    expController.loadExperiment(i.intValue());
-                } catch (SQLException ex) {
-                    createDatabaseErrorMessage(ex);
-                }
+                Integer i = (Integer) expTableModel.getValueAt(tableExperiments.getSelectedRow(), 5);
+                Tasks.startTask("loadExperiment", new Class[]{int.class, edacc.model.Tasks.class}, new Object[]{i.intValue(), null}, expController, this);
+                //     expController.loadExperiment(i.intValue());
             }
         }
     }
@@ -917,18 +910,17 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             boolean linkSeeds = chkLinkSeeds.isSelected();
             int maxSeed = Integer.parseInt(txtMaxSeeds.getText());
             //int added_experiments = expController.generateJobs(numRuns, timeout, generateSeeds, maxSeed, linkSeeds);
-            Tasks.startTask("generateJobs", new Class[]{int.class, int.class, boolean.class, int.class, boolean.class, edacc.model.Tasks.class}, new Object[]{numRuns, timeout, generateSeeds, maxSeed, linkSeeds, null}, expController, this, 0);
+            Tasks.startTask("generateJobs", new Class[]{int.class, int.class, boolean.class, int.class, boolean.class, edacc.model.Tasks.class}, new Object[]{numRuns, timeout, generateSeeds, maxSeed, linkSeeds, null}, expController, this);
             lblCurNumRuns.setText("currently: " + txtNumRuns.getText());
             lblCurTimeout.setText("currently: " + txtTimeout.getText());
 
             // TODO assignment of more than one queue/write extra method!
             // assign the default queue to this experiment
             GridQueue q = ManageDBGridQueues.getInstance().getDefaultQueue(); // TODO not very nice; will be changed
-            if (q == null)
+            if (q == null) {
                 throw new Exception("You have to specify the grid settings first!");
+            }
             expController.assignQueueToExperiment(q);
-        } catch (AlreadyRunningTaskException ex) {
-            javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage());
         } catch (NumberFormatException ex) {
             javax.swing.JOptionPane.showMessageDialog(null, "Expected integers for number of runs, timeout and max seed", "invalid data", javax.swing.JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
@@ -1019,30 +1011,20 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     private javax.swing.JTextField txtTimeout;
     // End of variables declaration//GEN-END:variables
 
-    public void onTaskSuccessful(int id, Object result) {
-        if (id == 0) {
+    public void onTaskSuccessful(String methodName, Object result) {
+        if ("generateJobs".equals(methodName)) {
             int added_experiments = (Integer) result;
             lblNumJobs.setText(String.valueOf(expController.getNumJobs()) + " jobs in the database");
             javax.swing.JOptionPane.showMessageDialog(null, "Added " + added_experiments + " new jobs", "Jobs added", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-            btnGenerateJobs.setEnabled(true);
-            manageExperimentPane.setEnabled(true);
         }
     }
 
-    public void onTaskStart(int id) {
-        if (id == 0) {
-            btnGenerateJobs.setEnabled(false);
-            manageExperimentPane.setEnabled(false);
-        }
+    public void onTaskStart(String methodName) {
     }
 
-    public void onTaskFailed(int id, Throwable e) {
-        if (id == 0) {
-            if (e instanceof SQLException) {
-                createDatabaseErrorMessage((SQLException) e);
-            }
-            btnGenerateJobs.setEnabled(true);
-            manageExperimentPane.setEnabled(true);
+    public void onTaskFailed(String methodName, Throwable e) {
+        if (e instanceof SQLException) {
+            createDatabaseErrorMessage((SQLException) e);
         }
     }
 }

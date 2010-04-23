@@ -91,17 +91,18 @@ public class ExperimentController {
      * @param id
      * @throws SQLException
      */
-    public void loadExperiment(int id) throws SQLException {
+    public void loadExperiment(int id, Tasks task) throws SQLException {
         if (activeExperiment != null) {
-            // TODO! messagedlg,..
             solverConfigPanel.removeAll();
         }
+        task.setStatus("Loading solvers..");
         activeExperiment = ExperimentDAO.getById(id);
         Vector<Solver> vs = new Vector<Solver>();
         vs.addAll(SolverDAO.getAll());
         solvers = vs;
         main.solTableModel.setSolvers(solvers);
-
+        task.setTaskProgress(.33f);
+        task.setStatus("Loading solver configurations..");
         Vector<SolverConfiguration> vss = SolverConfigurationDAO.getSolverConfigurationByExperimentId(id);
         main.solverConfigPanel.beginUpdate();
         for (int i = 0; i < vss.size(); i++) {
@@ -113,6 +114,8 @@ public class ExperimentController {
             }
         }
         main.solverConfigPanel.endUpdate();
+        task.setTaskProgress(.66f);
+        task.setStatus("Loading instances..");
         main.insTableModel.setExperimentHasInstances(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
 
         if (instances.size() > 0) {
@@ -282,7 +285,7 @@ public class ExperimentController {
             for (SolverConfiguration c : vsc) {
                 for (int run = 0; run < numRuns; ++run) {
                     task.setTaskProgress((float) done / (float) elements);
-                    task.setStatus("Adding Job " + done + " of " + elements);
+                    task.setStatus("Adding job " + done + " of " + elements);
 
                     // check if job already exists
                     if (ExperimentResultDAO.jobExists(run, c.getId(), i.getId(), activeExperiment.getId()) == false) {

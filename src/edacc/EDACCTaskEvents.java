@@ -1,26 +1,26 @@
 package edacc;
 
 /**
- * Implement this interface to use task events. Needed for Tasks.
+ * Implement this interface to use task events.
  * @author simon
  * @see edacc.model.Tasks
  */
 public interface EDACCTaskEvents {
     /**
      * Called if a task finished successfully.
-     * @param id The id of the task
+     * @param methodName the name of the method which finished successfully
      * @param result The result of the called method
      */
-    public void onTaskSuccessful(int id, Object result);
+    public void onTaskSuccessful(String methodName, Object result);
     /**
      * Called when a task has been started
-     * @param id The id of the task
+     * @param methodName the name of the method which started
      */
-    public void onTaskStart(int id);
+    public void onTaskStart(String methodName);
     /**
      * Called if a task failed.
-     * @param id The id of the task
+     * @param methodName the name of the method which failed
      * @param e The exception
      */
-    public void onTaskFailed(int id, Throwable e);
+    public void onTaskFailed(String methodName, Throwable e);
 }
