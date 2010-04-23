@@ -23,6 +23,7 @@ import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import edacc.manageDB.Util;
 
 /**
  * The application's main frame.
@@ -293,19 +294,26 @@ public class EDACCView extends FrameView implements Observer {
 
     @Action
     public void btnDisconnect() {
-        try {
-            DatabaseConnector.getInstance().disconnect();
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "An error occured while closing the database connection: \n" + ex.getMessage(), "Couldn't close database connection", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            noMode();
+        if (JOptionPane.showConfirmDialog(mode,
+                "Any unsaved changes will be lost, are you sure you want to continue?",
+                "Warning!",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+            
+            try {
+                DatabaseConnector.getInstance().disconnect();
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "An error occured while closing the database connection: \n" + ex.getMessage(), "Couldn't close database connection", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                Util.clearCaches();
+                noMode();
+            }
         }
     }
 
     @Action
     public void btnGenerateTables() {
         if (JOptionPane.showConfirmDialog(mode,
-                "This will destroy the EDACC tables of your DB an create new ones. Do you wish to continue?",
+                "This will destroy the EDACC tables of your DB and create new ones. Do you wish to continue?",
                 "Warning!",
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
             try {
@@ -359,14 +367,21 @@ public class EDACCView extends FrameView implements Observer {
 
     @Action
     public void manageExperimentMode() {
-        {
-        }
         if (!manageExperimentModeMenuItem.isSelected()) {
             noMode();
             return;
         }
         if (manageDBModeMenuItem.isSelected()) {
-            manageDBModeMenuItem.setSelected(false);
+            if (JOptionPane.showConfirmDialog(mode,
+                "Any unsaved changes will be lost, are you sure you want to switch to experiment mode?",
+                "Warning!",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+                manageDBModeMenuItem.setSelected(false);
+                Util.clearCaches();
+            }
+            else {
+                return;
+            }
         }
         try {
             experimentMode.initialize();

@@ -172,4 +172,8 @@ public class ExperimentDAO {
         ps.close();
         return solvers;
     }
+
+    public static void clearCache() {
+        cache.clear();
+    }
 }

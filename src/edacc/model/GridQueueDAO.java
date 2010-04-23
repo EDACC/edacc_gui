@@ -299,4 +299,8 @@ public class GridQueueDAO {
         rs.close();
         ps.close();
     }
+
+    public static void clearCache() {
+        cache.clear();
+    }
 }

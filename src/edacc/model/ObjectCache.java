@@ -55,4 +55,10 @@ public class ObjectCache<T extends IntegerPKModel> {
     protected Enumeration<T> elements() {
         return cache.elements();
     }
+
+    /** clears the cache
+     */
+    protected void clear() {
+        cache.clear();
+    }
 }

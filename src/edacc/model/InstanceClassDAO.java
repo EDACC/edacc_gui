@@ -256,4 +256,8 @@ public class InstanceClassDAO {
         rs.close();
         return res;
     }
+
+    public static void clearCache() {
+        cache.clear();
+    }
 }

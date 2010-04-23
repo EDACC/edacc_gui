@@ -86,4 +86,46 @@ public class Solver extends BaseModel implements IntegerPKModel {
             this.setModified();
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Solver other = (Solver) obj;
+        if (this.id != other.id) {
+            return false;
+        }
+        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
+            return false;
+        }
+        if ((this.binaryName == null) ? (other.binaryName != null) : !this.binaryName.equals(other.binaryName)) {
+            return false;
+        }
+        if (this.binaryFile != other.binaryFile && (this.binaryFile == null || !this.binaryFile.equals(other.binaryFile))) {
+            return false;
+        }
+        if ((this.description == null) ? (other.description != null) : !this.description.equals(other.description)) {
+            return false;
+        }
+        if ((this.md5 == null) ? (other.md5 != null) : !this.md5.equals(other.md5)) {
+            return false;
+        }
+        if (this.codeFile != other.codeFile && (this.codeFile == null || !this.codeFile.equals(other.codeFile))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 29 * hash + this.id;
+        return hash;
+    }
+
+
 }

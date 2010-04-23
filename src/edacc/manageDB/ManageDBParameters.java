@@ -34,6 +34,7 @@ public class ManageDBParameters {
      * @param solvers
      */
     public void loadParametersOfSolvers(Vector<Solver> solvers) throws SQLException {
+        parameterTableModel.clear();
         for (Solver s : solvers) {
             for (Parameter p : ParameterDAO.getParameterFromSolverId(s.getId())) {
                 parameterTableModel.addParameter(s, p);

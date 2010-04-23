@@ -147,4 +147,8 @@ public class ParameterTableModel extends AbstractTableModel{
     public void removeParametersOfSolver(Solver s) {
         parameters.remove(s);
     }
+
+    public void clear() {
+        parameters.clear();
+    }
 }

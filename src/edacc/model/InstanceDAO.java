@@ -347,4 +347,8 @@ public class InstanceDAO {
             in.close();
         }
     }
+
+    public static void clearCache() {
+        cache.clear();
+    }
 }

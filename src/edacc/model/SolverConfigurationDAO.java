@@ -107,4 +107,8 @@ public class SolverConfigurationDAO {
              save(e.nextElement());
          }
     }
+
+    public static void clearCache() {
+        cache.clear();
+    }
 }

@@ -314,4 +314,8 @@ public class SolverDAO {
         }
         rs.close();
     }
+
+    public static void clearCache() {
+        cache.clear();
+    }
 }
