@@ -157,6 +157,7 @@ public class EDACCView extends FrameView implements Observer {
         statusAnimationLabel = new javax.swing.JLabel();
         progressBar = new javax.swing.JProgressBar();
 
+        mainPanel.setMinimumSize(new java.awt.Dimension(800, 600));
         mainPanel.setName("mainPanel"); // NOI18N
 
         org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
@@ -167,7 +168,7 @@ public class EDACCView extends FrameView implements Observer {
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 630, Short.MAX_VALUE)
+            .add(0, 678, Short.MAX_VALUE)
         );
 
         menuBar.setAutoscrolls(true);
