@@ -143,6 +143,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         lblCurNumRuns = new javax.swing.JLabel();
         lblCurTimeout = new javax.swing.JLabel();
         btnGeneratePackage = new javax.swing.JButton();
+        txtMaxMem = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
         panelJobBrowser = new javax.swing.JPanel();
         jScrollPane6 = new javax.swing.JScrollPane();
         tableJobs = new javax.swing.JTable();
@@ -237,7 +239,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                             .addComponent(lblExperimentName))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlNewExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE)
                             .addComponent(lblExperimentDescription))))
                 .addContainerGap())
         );
@@ -584,6 +586,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             }
         });
 
+        txtMaxMem.setText(resourceMap.getString("txtMaxMem.text")); // NOI18N
+        txtMaxMem.setName("txtMaxMem"); // NOI18N
+
+        jLabel4.setText(resourceMap.getString("jLabel4.text")); // NOI18N
+        jLabel4.setName("jLabel4"); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -598,25 +606,28 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                                 .addComponent(jLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(txtMaxSeeds, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jLabel2))
-                                .addGap(4, 4, 4)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtNumRuns)
-                                    .addComponent(txtTimeout, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addComponent(chkGenerateSeeds, javax.swing.GroupLayout.Alignment.LEADING))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblCurTimeout)
-                            .addComponent(lblCurNumRuns)))
+                        .addGap(4, 4, 4))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(btnGeneratePackage, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnGenerateJobs, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(btnGenerateJobs, javax.swing.GroupLayout.Alignment.LEADING))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblNumJobs)))
+                        .addComponent(lblNumJobs))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel4))
+                        .addGap(4, 4, 4)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtNumRuns)
+                            .addComponent(txtTimeout, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                            .addComponent(txtMaxMem))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblCurTimeout)
+                            .addComponent(lblCurNumRuns))))
                 .addContainerGap(441, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -629,26 +640,29 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                     .addComponent(lblCurNumRuns))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(txtTimeout, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkGenerateSeeds)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkLinkSeeds)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(txtMaxSeeds, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnGenerateJobs)
-                            .addComponent(lblNumJobs, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel2)
+                        .addComponent(txtTimeout, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(lblCurTimeout))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtMaxMem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkGenerateSeeds)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkLinkSeeds)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txtMaxSeeds, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnGenerateJobs)
+                    .addComponent(lblNumJobs, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnGeneratePackage)
-                .addContainerGap(351, Short.MAX_VALUE))
+                .addContainerGap(320, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout panelExperimentParamsLayout = new javax.swing.GroupLayout(panelExperimentParams);
@@ -738,6 +752,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             if ("".equals(txtTimeout.getText())) {
                 txtTimeout.setText(String.valueOf(expController.getActiveExperiment().getTimeOut()));
             }
+            if ("".equals(txtMaxMem.getText())) {
+                txtMaxMem.setText(String.valueOf(expController.getActiveExperiment().getMemOut()));
+            }
+            if ("".equals(txtMaxSeeds.getText())) {
+                txtMaxSeeds.setText(String.valueOf(expController.getActiveExperiment().getMaxSeed()));
+            }
             chkGenerateSeeds.setSelected(expController.getActiveExperiment().isAutoGeneratedSeeds());
             lblNumJobs.setText(String.valueOf(expController.getNumJobs()) + " jobs in the database");
         } else if (manageExperimentPane.getSelectedIndex() == 4) {
@@ -770,6 +790,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         manageExperimentPane.setEnabledAt(2, true);
         manageExperimentPane.setEnabledAt(3, true);
         manageExperimentPane.setEnabledAt(4, true);
+        txtNumRuns.setText("");
+        txtMaxMem.setText("");
+        txtTimeout.setText("");
+        txtMaxSeeds.setText("");
     }
 
     /**
@@ -843,11 +867,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
     @Action
     public void btnSaveSolverConfigurations() {
-        try {
-            expController.saveSolverConfigurations();
-        } catch (SQLException e) {
-            createDatabaseErrorMessage(e);
-        }
+      //  try {
+       //     expController.saveSolverConfigurations();
+      //  } catch (SQLException e) {
+      //      createDatabaseErrorMessage(e);
+      //  }
+        Tasks.startTask("saveSolverConfigurations", new Class[] {Tasks.class}, new Object[] {null}, expController, this);
     }
 
     @Action
@@ -873,12 +898,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
     @Action
     public void btnSaveInstances() {
-        try {
-            expController.saveExperimentHasInstances();
-        } catch (SQLException ex) {
-            createDatabaseErrorMessage(ex);
-        }
-
+        //try {
+        //    expController.saveExperimentHasInstances();
+        //} catch (SQLException ex) {
+        //    createDatabaseErrorMessage(ex);
+        //}
+        Tasks.startTask("saveExperimentHasInstances", new Class[] {Tasks.class}, new Object[] {null}, expController, this);
     }
 
     @Action
@@ -907,11 +932,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         try {
             int numRuns = Integer.parseInt(txtNumRuns.getText());
             int timeout = Integer.parseInt(txtTimeout.getText());
+            int maxMem = Integer.parseInt(txtMaxMem.getText());
             boolean generateSeeds = chkGenerateSeeds.isSelected();
             boolean linkSeeds = chkLinkSeeds.isSelected();
             int maxSeed = Integer.parseInt(txtMaxSeeds.getText());
             //int added_experiments = expController.generateJobs(numRuns, timeout, generateSeeds, maxSeed, linkSeeds);
-            Tasks.startTask("generateJobs", new Class[]{int.class, int.class, boolean.class, int.class, boolean.class, edacc.model.Tasks.class}, new Object[]{numRuns, timeout, generateSeeds, maxSeed, linkSeeds, null}, expController, this);
+            Tasks.startTask("generateJobs", new Class[]{int.class, int.class, int.class, boolean.class, int.class, boolean.class, edacc.model.Tasks.class}, new Object[]{numRuns, timeout, maxMem, generateSeeds, maxSeed, linkSeeds, null}, expController, this);
             lblCurNumRuns.setText("currently: " + txtNumRuns.getText());
             lblCurTimeout.setText("currently: " + txtTimeout.getText());
 
@@ -975,6 +1001,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -1007,6 +1034,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     private javax.swing.JTable tableSolvers;
     private javax.swing.JTextArea txtExperimentDescription;
     private javax.swing.JTextField txtExperimentName;
+    private javax.swing.JTextField txtMaxMem;
     private javax.swing.JTextField txtMaxSeeds;
     private javax.swing.JTextField txtNumRuns;
     private javax.swing.JTextField txtTimeout;

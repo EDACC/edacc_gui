@@ -37,7 +37,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
             return;
         }
         task = new Tasks(org.jdesktop.application.Application.getInstance(EDACCApp.class), methodName, signature, parameters, target, view);
-        taskView = new EDACCTaskView(EDACCApp.getApplication().getMainFrame(), true);
+        taskView = new EDACCTaskView(EDACCApp.getApplication().getMainFrame(), true, (Tasks)task);
         taskView.setResizable(false);
         taskView.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         taskView.setTitle("Running..");
@@ -123,5 +123,9 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
     public void setStatus(String s) {
         this.setMessage(s);
         taskView.setMessage(s);
+    }
+
+    public static EDACCTaskView getTaskView() {
+        return taskView;
     }
 }

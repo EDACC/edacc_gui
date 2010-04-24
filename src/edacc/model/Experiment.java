@@ -8,6 +8,8 @@ public class Experiment extends BaseModel {
     private Date date;
     private int numRuns;
     private int timeOut;
+    private int memOut;
+    private int maxSeed;
     private String name;
 
     @Override
@@ -82,4 +84,19 @@ public class Experiment extends BaseModel {
         this.timeOut = timeOut;
     }
 
+    public int getMemOut() {
+        return memOut;
+    }
+
+    public void setMemOut(int memOut) {
+        this.memOut = memOut;
+    }
+
+    public int getMaxSeed() {
+        return maxSeed;
+    }
+
+    public void setMaxSeed(int maxSeed) {
+        this.maxSeed = maxSeed;
+    }
 }

@@ -6,16 +6,21 @@
 
 package edacc;
 
+import edacc.model.Tasks;
+import org.jdesktop.application.Action;
+
 /**
  *
  * @author simon
  */
 public class EDACCTaskView extends javax.swing.JDialog {
-
+    private Tasks task;
     /** Creates new form EDACCTaskView */
-    public EDACCTaskView(java.awt.Frame parent, boolean modal) {
+    public EDACCTaskView(java.awt.Frame parent, boolean modal, Tasks task) {
         super(parent, modal);
         initComponents();
+        this.task = task;
+        btnCancel.setVisible(false);
         progressBar.setMaximum(1000);
         progressBar.setIndeterminate(true);
     }
@@ -31,6 +36,7 @@ public class EDACCTaskView extends javax.swing.JDialog {
 
         progressBar = new javax.swing.JProgressBar();
         lblMessage = new javax.swing.JLabel();
+        btnCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -41,6 +47,11 @@ public class EDACCTaskView extends javax.swing.JDialog {
         lblMessage.setText(resourceMap.getString("lblMessage.text")); // NOI18N
         lblMessage.setName("lblMessage"); // NOI18N
 
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCTaskView.class, this);
+        btnCancel.setAction(actionMap.get("btnCancel")); // NOI18N
+        btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
+        btnCancel.setName("btnCancel"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -49,7 +60,10 @@ public class EDACCTaskView extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE)
-                    .addComponent(lblMessage))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblMessage)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 347, Short.MAX_VALUE)
+                        .addComponent(btnCancel)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -58,7 +72,9 @@ public class EDACCTaskView extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblMessage)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblMessage)
+                    .addComponent(btnCancel))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -67,6 +83,7 @@ public class EDACCTaskView extends javax.swing.JDialog {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancel;
     private javax.swing.JLabel lblMessage;
     private javax.swing.JProgressBar progressBar;
     // End of variables declaration//GEN-END:variables
@@ -85,5 +102,19 @@ public class EDACCTaskView extends javax.swing.JDialog {
             progressBar.setValue((int)(progress*10));
         }
         
+    }
+
+    public void setCancelable(boolean cancelable) {
+        if (cancelable) {
+            btnCancel.setVisible(true);
+        } else {
+            btnCancel.setVisible(false);
+        }
+    }
+
+    @Action
+    public void btnCancel() {
+        btnCancel.setEnabled(false);
+        task.cancel(false);
     }
 }
