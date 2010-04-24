@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableRowSorter;
 import org.jdesktop.application.Action;
 
@@ -867,12 +868,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
     @Action
     public void btnSaveSolverConfigurations() {
-      //  try {
-       //     expController.saveSolverConfigurations();
-      //  } catch (SQLException e) {
-      //      createDatabaseErrorMessage(e);
-      //  }
-        Tasks.startTask("saveSolverConfigurations", new Class[] {Tasks.class}, new Object[] {null}, expController, this);
+        //  try {
+        //     expController.saveSolverConfigurations();
+        //  } catch (SQLException e) {
+        //      createDatabaseErrorMessage(e);
+        //  }
+        Tasks.startTask("saveSolverConfigurations", new Class[]{Tasks.class}, new Object[]{null}, expController, this);
     }
 
     @Action
@@ -903,7 +904,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         //} catch (SQLException ex) {
         //    createDatabaseErrorMessage(ex);
         //}
-        Tasks.startTask("saveExperimentHasInstances", new Class[] {Tasks.class}, new Object[] {null}, expController, this);
+        Tasks.startTask("saveExperimentHasInstances", new Class[]{Tasks.class}, new Object[]{null}, expController, this);
     }
 
     @Action
@@ -949,11 +950,23 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             }
             expController.assignQueueToExperiment(q);
         } catch (NumberFormatException ex) {
-            javax.swing.JOptionPane.showMessageDialog(null, "Expected integers for number of runs, timeout and max seed", "invalid data", javax.swing.JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            javax.swing.JOptionPane.showMessageDialog(null, "An error occured while assigning a grid queue to the experiment: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-        } catch (Exception ex) {
-            javax.swing.JOptionPane.showMessageDialog(null, "An error occured while assigning a grid queue to the experiment: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    javax.swing.JOptionPane.showMessageDialog(null, "Expected integers for number of runs, timeout and max seed", "invalid data", javax.swing.JOptionPane.ERROR_MESSAGE);
+                }
+            });
+        } catch (final SQLException ex) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    javax.swing.JOptionPane.showMessageDialog(null, "An error occured while assigning a grid queue to the experiment: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                }
+            });
+        } catch (final Exception ex) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    javax.swing.JOptionPane.showMessageDialog(null, "An error occured while assigning a grid queue to the experiment: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                }
+            });
         }
     }
 
