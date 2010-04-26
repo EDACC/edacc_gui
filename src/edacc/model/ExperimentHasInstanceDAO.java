@@ -19,7 +19,7 @@ public class ExperimentHasInstanceDAO {
     protected static final String table = "Experiment_has_Instances";
     protected static final String insertQuery = "INSERT INTO " + table + " (Experiment_idExperiment, Instances_idInstance) VALUES (?, ?)";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idEI=?";
-    private static final Hashtable<ExperimentHasInstance, ExperimentHasInstance> cache = new Hashtable<ExperimentHasInstance, ExperimentHasInstance>();
+    private static final ObjectCache<ExperimentHasInstance> cache = new ObjectCache<ExperimentHasInstance>();
 
     /**
      * ExperimentHasInstance factory method, ensures that the created experiment is persisted and assigned an ID
@@ -47,6 +47,7 @@ public class ExperimentHasInstanceDAO {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
             st.setInt(1, i.getId());
             st.executeUpdate();
+            st.close();
             cache.remove(i);
         } else if (i.isNew()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -57,26 +58,12 @@ public class ExperimentHasInstanceDAO {
             if (generatedKeys.next()) {
                 i.setId(generatedKeys.getInt(1));
             }
+            generatedKeys.close();
+            st.close();
             i.setSaved();
-            cacheExperimentHasInstance(i);
+            cache.cache(i);
         }
         
-    }
-
-    private static ExperimentHasInstance getCached(ExperimentHasInstance i) {
-        if (cache.containsKey(i)) {
-            return cache.get(i);
-        } else {
-            return null;
-        }
-    }
-
-    private static void cacheExperimentHasInstance(ExperimentHasInstance i) {
-        if (cache.containsKey(i)) {
-            return;
-        } else {
-            cache.put(i, i);
-        }
     }
 
     public static void removeExperimentHasInstance(ExperimentHasInstance e) throws SQLException {
@@ -92,15 +79,17 @@ public class ExperimentHasInstanceDAO {
         while (rs.next()) {
             ExperimentHasInstance i = getExperimentHasInstanceFromResultset(rs);
 
-            ExperimentHasInstance c = getCached(i);
+            ExperimentHasInstance c = cache.getCached(i.getId());
             if (c != null) {
                 res.add(c);
             } else {
                 i.setSaved();
-                cacheExperimentHasInstance(i);
+                cache.cache(i);
                 res.add(i);
             }            
         }
+        rs.close();
+        st.close();
         return res;
     }
 }

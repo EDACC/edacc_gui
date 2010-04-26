@@ -18,7 +18,7 @@ import java.util.LinkedList;
 public class InstanceClassDAO {
 
     protected static final String table = "instanceClass";
-    private static final Hashtable<InstanceClass, InstanceClass> cache = new Hashtable<InstanceClass, InstanceClass>();
+    private static final ObjectCache<InstanceClass> cache = new ObjectCache<InstanceClass>();
 
     /**
      * InstanceClass factory method, ensures that the created instance class is persisted and assigned an ID
@@ -44,6 +44,8 @@ public class InstanceClassDAO {
         i.setDescription(description);
         i.setSource(source);
         save(i);
+        rs.close();
+        ps.close();
         return i;
     }
 
@@ -60,6 +62,7 @@ public class InstanceClassDAO {
         ps.executeUpdate();
         cache.remove(i);
         i.setDeleted();
+        ps.close();
     }
 
     /**
@@ -98,26 +101,12 @@ public class InstanceClassDAO {
             if (rs.next()) {
                 instanceClass.setInstanceClassID(rs.getInt(1));
             }
+            rs.close();
         }
 
         instanceClass.setSaved();
-        cacheInstanceClass(instanceClass);
-    }
-
-    private static InstanceClass getCached(InstanceClass i) {
-        if (cache.containsKey(i)) {
-            return cache.get(i);
-        } else {
-            return null;
-        }
-    }
-
-    private static void cacheInstanceClass(InstanceClass i) {
-        if (cache.containsKey(i)) {
-            return;
-        } else {
-            cache.put(i, i);
-        }
+        cache.cache(instanceClass);
+        ps.close();
     }
 
     /**
@@ -127,6 +116,12 @@ public class InstanceClassDAO {
      * @throws SQLException
      */
     public static InstanceClass getById(int id) throws SQLException {
+        InstanceClass c = cache.getCached(id);
+        if (c != null) {
+            return c;
+        }
+
+
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass, name, description, source FROM " + table + " WHERE idinstanceClass=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
@@ -137,15 +132,14 @@ public class InstanceClassDAO {
             i.setDescription(rs.getString("description"));
             i.setSource(rs.getBoolean("source"));
 
-            InstanceClass c = getCached(i);
-            if (c != null) {
-                return c;
-            } else {
-                i.setSaved();
-                cacheInstanceClass(i);
-                return i;
-            }
+            i.setSaved();
+            cache.cache(i);
+            rs.close();
+            st.close();
+            return i;
         }
+        rs.close();
+        st.close();
         return null;
     }
 
@@ -160,12 +154,12 @@ public class InstanceClassDAO {
             i.setDescription(rs.getString("description"));
             i.setSource(rs.getBoolean("source"));
 
-            InstanceClass c = getCached(i);
+            InstanceClass c = cache.getCached(i.getId());
             if (c != null) {
                 return c;
             } else {
                 i.setSaved();
-                cacheInstanceClass(i);
+                cache.cache(i);
                 return i;
             }
         }
@@ -192,13 +186,13 @@ public class InstanceClassDAO {
             i.setDescription(rs.getString("description"));
             i.setSource(rs.getBoolean("source"));
 
-            InstanceClass c = getCached(i);
+            InstanceClass c = cache.getCached(i.getId());
 
             if (c != null) {
                 res.add(c);
             } else {
                 i.setSaved();
-                cacheInstanceClass(i);
+                cache.cache(i);
                 res.add(i);
             }
         }
@@ -223,13 +217,13 @@ public class InstanceClassDAO {
             i.setDescription(rs.getString("description"));
             i.setSource(rs.getBoolean("source"));
 
-            InstanceClass c = getCached(i);
+            InstanceClass c = cache.getCached(i.getId());
 
             if (c != null) {
                 res.add(c);
             } else {
                 i.setSaved();
-                cacheInstanceClass(i);
+                cache.cache(i);
                 res.add(i);
             }
         }
@@ -249,17 +243,21 @@ public class InstanceClassDAO {
             i.setDescription(rs.getString("description"));
             i.setSource(rs.getBoolean("source"));
 
-            InstanceClass c = getCached(i);
+            InstanceClass c = cache.getCached(i.getId());
 
             if (c != null) {
                 res.add(c);
             } else {
                 i.setSaved();
-                cacheInstanceClass(i);
+                cache.cache(i);
                 res.add(i);
             }
         }
         rs.close();
         return res;
+    }
+
+    public static void clearCache() {
+        cache.clear();
     }
 }

@@ -80,6 +80,9 @@ public class ExperimentResult extends BaseModel{
 
     public void setExperimentId(int ExperimentId) {
         this.ExperimentId = ExperimentId;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getInstanceId() {
@@ -88,6 +91,9 @@ public class ExperimentResult extends BaseModel{
 
     public void setInstanceId(int InstanceId) {
         this.InstanceId = InstanceId;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getSolverConfigId() {
@@ -96,6 +102,9 @@ public class ExperimentResult extends BaseModel{
 
     public void setSolverConfigId(int SolverConfigId) {
         this.SolverConfigId = SolverConfigId;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getId() {
@@ -112,6 +121,9 @@ public class ExperimentResult extends BaseModel{
 
     public void setResultFileName(String resultFileName) {
         this.resultFileName = resultFileName;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getRun() {
@@ -120,6 +132,9 @@ public class ExperimentResult extends BaseModel{
 
     public void setRun(int run) {
         this.run = run;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getSeed() {
@@ -128,6 +143,9 @@ public class ExperimentResult extends BaseModel{
 
     public void setSeed(int seed) {
         this.seed = seed;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getStatus() {
@@ -136,6 +154,9 @@ public class ExperimentResult extends BaseModel{
 
     public void setStatus(int status) {
         this.status = status;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getStatusCode() {
@@ -144,6 +165,9 @@ public class ExperimentResult extends BaseModel{
 
     public void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public float getTime() {
@@ -152,6 +176,9 @@ public class ExperimentResult extends BaseModel{
 
     public void setTime(float time) {
         this.time = time;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
 

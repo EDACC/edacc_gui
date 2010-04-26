@@ -11,6 +11,9 @@ public class ParameterInstance extends BaseModel {
 
     public void setParameter_id(int parameter_id) {
         this.parameter_id = parameter_id;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public int getSolver_config_id() {
@@ -19,6 +22,9 @@ public class ParameterInstance extends BaseModel {
 
     public void setSolver_config_id(int solver_config_id) {
         this.solver_config_id = solver_config_id;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public String getValue() {
@@ -27,6 +33,9 @@ public class ParameterInstance extends BaseModel {
 
     public void setValue(String value) {
         this.value = value;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
 }

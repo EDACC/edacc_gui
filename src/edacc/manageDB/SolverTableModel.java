@@ -59,7 +59,7 @@ public class SolverTableModel extends AbstractTableModel {
     }
 
     public Vector<Solver> getSolvers() {
-        return (Vector<Solver>) solvers.clone();
+        return solvers;
     }
 
     public void clear() {

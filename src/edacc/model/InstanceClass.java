@@ -9,7 +9,7 @@ package edacc.model;
  *
  * @author dgall
  */
-public class InstanceClass extends BaseModel {
+public class InstanceClass extends BaseModel implements IntegerPKModel {
 
     private int instanceClassID;
     private String name;
@@ -22,6 +22,13 @@ public class InstanceClass extends BaseModel {
 
     public void setDescription(String description) {
         this.description = description;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public int getId() {
+        return getInstanceClassID();
     }
 
     public int getInstanceClassID() {
@@ -30,6 +37,9 @@ public class InstanceClass extends BaseModel {
 
     public void setInstanceClassID(int instanceClassID) {
         this.instanceClassID = instanceClassID;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public String getName() {
@@ -38,6 +48,9 @@ public class InstanceClass extends BaseModel {
 
     public void setName(String name) {
         this.name = name;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public boolean isSource() {
@@ -46,6 +59,9 @@ public class InstanceClass extends BaseModel {
 
     public void setSource(boolean source) {
         this.source = source;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     

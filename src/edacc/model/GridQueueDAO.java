@@ -25,7 +25,7 @@ import java.util.Vector;
 public class GridQueueDAO {
 
     protected static final String table = "gridQueue";
-    private static final Hashtable<GridQueue, GridQueue> cache = new Hashtable<GridQueue, GridQueue>();
+    private static final ObjectCache<GridQueue> cache = new ObjectCache<GridQueue>();
 
 //    /**
 //     * Grid Queue factory method, ensures that the created instance is persisted and assigned an ID
@@ -65,6 +65,7 @@ public class GridQueueDAO {
             ps.executeUpdate();
             cache.remove(q);
             q.setDeleted();
+            ps.close();
         } else {
             throw new InstanceIsInExperimentException();
         }
@@ -133,24 +134,10 @@ public class GridQueueDAO {
             }
         }
 
+        ps.close();
         q.setSaved();
     }
 
-    private static GridQueue getCached(GridQueue i) {
-        if (cache.containsKey(i)) {
-            return cache.get(i);
-        } else {
-            return null;
-        }
-    }
-
-    private static void cacheQueue(GridQueue i) {
-        if (cache.containsKey(i)) {
-            return;
-        } else {
-            cache.put(i, i);
-        }
-    }
 
     /**
      * retrieves a grid queue from the database
@@ -159,6 +146,11 @@ public class GridQueueDAO {
      * @throws SQLException
      */
     public static GridQueue getById(int id) throws SQLException {
+        GridQueue c = cache.getCached(id);
+        if (c != null) {
+            return c;
+        }
+
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idgridQueue=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
@@ -173,15 +165,16 @@ public class GridQueueDAO {
             q.setMaxJobsQueue(rs.getInt("maxJobsQueue"));
             q.setDescription(rs.getString("description"));
 
-            GridQueue c = getCached(q);
-            if (c != null) {
-                return c;
-            } else {
-                q.setSaved();
-                cacheQueue(q);
-                return q;
-            }
+
+            q.setSaved();
+            cache.cache(q);
+            rs.close();
+            st.close();
+            return q;
+
         }
+        rs.close();
+        st.close();
         return null;
     }
 
@@ -191,27 +184,27 @@ public class GridQueueDAO {
         ResultSet rs = st.executeQuery();
         Vector<GridQueue> res = new Vector<GridQueue>();
         while (rs.next()) {
-            GridQueue q = new GridQueue();
-            q.setId(rs.getInt("idgridQueue"));
-            q.setName(rs.getString("name"));
-            q.setLocation(rs.getString("location"));
-            q.setNumNodes(rs.getInt("numNodes"));
-            q.setNumCPUs(rs.getInt("numCPUs"));
-            q.setWalltime(rs.getInt("walltime"));
-            q.setAvailNodes(rs.getInt("availNodes"));
-            q.setMaxJobsQueue(rs.getInt("maxJobsQueue"));
-            q.setDescription(rs.getString("description"));
-
-            GridQueue c = getCached(q);
+            GridQueue c = cache.getCached(rs.getInt("idgridQueue"));
             if (c != null) {
                 res.add(c);
             } else {
+                GridQueue q = new GridQueue();
+                q.setId(rs.getInt("idgridQueue"));
+                q.setName(rs.getString("name"));
+                q.setLocation(rs.getString("location"));
+                q.setNumNodes(rs.getInt("numNodes"));
+                q.setNumCPUs(rs.getInt("numCPUs"));
+                q.setWalltime(rs.getInt("walltime"));
+                q.setAvailNodes(rs.getInt("availNodes"));
+                q.setMaxJobsQueue(rs.getInt("maxJobsQueue"));
+                q.setDescription(rs.getString("description"));
                 q.setSaved();
-                cacheQueue(q);
+                cache.cache(q);
                 res.add(q);
             }
         }
         rs.close();
+        st.close();
         return res;
     }
 
@@ -223,27 +216,28 @@ public class GridQueueDAO {
         ResultSet rs = st.executeQuery();
         Vector<GridQueue> res = new Vector<GridQueue>();
         while (rs.next()) {
-            GridQueue q = new GridQueue();
-            q.setId(rs.getInt("idgridQueue"));
-            q.setName(rs.getString("name"));
-            q.setLocation(rs.getString("location"));
-            q.setNumNodes(rs.getInt("numNodes"));
-            q.setNumCPUs(rs.getInt("numCPUs"));
-            q.setWalltime(rs.getInt("walltime"));
-            q.setAvailNodes(rs.getInt("availNodes"));
-            q.setMaxJobsQueue(rs.getInt("maxJobsQueue"));
-            q.setDescription(rs.getString("description"));
-
-            GridQueue c = getCached(q);
+            GridQueue c = cache.getCached(rs.getInt("idgridQueue"));
             if (c != null) {
                 res.add(c);
             } else {
+                GridQueue q = new GridQueue();
+                q.setId(rs.getInt("idgridQueue"));
+                q.setName(rs.getString("name"));
+                q.setLocation(rs.getString("location"));
+                q.setNumNodes(rs.getInt("numNodes"));
+                q.setNumCPUs(rs.getInt("numCPUs"));
+                q.setWalltime(rs.getInt("walltime"));
+                q.setAvailNodes(rs.getInt("availNodes"));
+                q.setMaxJobsQueue(rs.getInt("maxJobsQueue"));
+                q.setDescription(rs.getString("description"));
+
                 q.setSaved();
-                cacheQueue(q);
+                cache.cache(q);
                 res.add(q);
             }
         }
         rs.close();
+        st.close();
         return res;
     }
 
@@ -302,5 +296,11 @@ public class GridQueueDAO {
             out.close();
             in.close();
         }
+        rs.close();
+        ps.close();
+    }
+
+    public static void clearCache() {
+        cache.clear();
     }
 }

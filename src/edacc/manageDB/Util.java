@@ -4,6 +4,12 @@
  */
 package edacc.manageDB;
 
+import edacc.model.ExperimentDAO;
+import edacc.model.GridQueueDAO;
+import edacc.model.InstanceClassDAO;
+import edacc.model.InstanceDAO;
+import edacc.model.ParameterInstanceDAO;
+import edacc.model.SolverDAO;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -96,6 +102,15 @@ public class Util {
                 out.close();
             }
         }
+    }
+
+    public static void clearCaches() {
+        ExperimentDAO.clearCache();
+        GridQueueDAO.clearCache();
+        InstanceDAO.clearCache();
+        InstanceClassDAO.clearCache();
+        SolverDAO.clearCache();
+        ParameterInstanceDAO.clearCache();
     }
 }
 
