@@ -69,6 +69,7 @@ typedef struct {
     /* This is probably not needed anymore
     int idInstance; // the id of the used instance*/
     int statusCode; // solver return value, when the run is finished
+    char *startTime;
 } job;
 
 typedef struct {
