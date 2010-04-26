@@ -112,7 +112,11 @@ public class EDACCView extends FrameView implements Observer {
 
         mode = noMode;
         updateConnectionStateView();
-        btnConnectToDB();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                btnConnectToDB();
+            }
+        });
     }
 
     private void createDatabaseErrorMessage(SQLException e) {
