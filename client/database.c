@@ -98,7 +98,8 @@
 "       seed = %i, "            \
 "       time = %f, "            \
 "       statusCode = %i, "      \
-"       resultFile = '%s' "       \
+"       resultFile = '%s', "       \
+"       startTime = '%s' " \
 "   WHERE idJob = %i "
 
 
@@ -510,7 +511,8 @@ status dbUpdate(const job* j) {
             j->time, 
             j->statusCode, 
             j->resultFile,
-            j->id);
+            j->id, 
+            j->startTime);
 
     printf("queryJob: %s\n", queryJob);
 
