@@ -130,7 +130,10 @@ status init(int argc, char *argv[]) {
 		return s;
 	jobsLen=exp.numCPUs;
 	timeOut=exp.timeOut;
+    printf("experimet data fetched\n");
 
+
+    printf("going trough %i solvers\n", exp.numSolvers);
 	for(i=0; i<exp.numSolvers; ++i) {
 		//Prepend the solver name with pathname
 		fileName=prependBasename(exp.solverNames[i]);
@@ -165,6 +168,7 @@ status init(int argc, char *argv[]) {
 			return sysError;
 		}
 	}
+    printf("solvers created\n");
 
 	for(i=0; i<exp.numInstances; ++i) {
 		//Prepend the instance name with pathname
@@ -200,6 +204,7 @@ status init(int argc, char *argv[]) {
 			return sysError;
 		}
 	}
+    printf("instances created\n");
 
 	freeExperimentData(&exp);
 
@@ -528,6 +533,7 @@ int main(int argc, char *argv[]) {
         logError("Couldn't init successfully, for experiment %i.\n", experimentId);
 		exit(s);
 	}
+    printf("initialized\n");
 
 
 	setSignalHandler(signalHandler);

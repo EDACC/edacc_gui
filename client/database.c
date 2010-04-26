@@ -76,6 +76,7 @@
 "SELECT " \
 "       p.name, " \
 "       p.prefix, " \
+"       p.hasValue, " \
 "       p.value, " \
 "       scp.value " \
 "   FROM ExperimentResults AS er " \
@@ -466,10 +467,12 @@ int dbFetchJob(job* j, status* s) {
             params = strcat(params, row[0]);
             params = strcat(params, " ");
 
-            if(row[3] == NULL) {
-                params = strcat(params, row[2]);
-            } else {
-                params = strcat(params, row[3]);
+            if(row[2] != NULL) {
+                if(row[4] == NULL) {
+                    params = strcat(params, row[3]);
+                } else {
+                    params = strcat(params, row[4]);
+                }
             }
             params = strcat(params, " ");
         }
