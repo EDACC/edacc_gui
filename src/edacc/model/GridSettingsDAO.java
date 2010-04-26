@@ -11,18 +11,21 @@ public class GridSettingsDAO {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("UPDATE " + table + " SET numNodes=?");
         st.setInt(1, numNodes);
         st.executeUpdate();
+        st.close();
     }
 
     public static void saveMaxRuntime(int maxRuntime) throws SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("UPDATE " + table + " SET maxRuntime=?");
         st.setInt(1, maxRuntime);
         st.executeUpdate();
+        st.close();
     }
 
     public static void saveMaxJobsInQueue(int maxJobsInQueue) throws SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("UPDATE " + table + " SET maxJobsInQueue=?");
         st.setInt(1, maxJobsInQueue);
         st.executeUpdate();
+        st.close();
     }
 
     public static int getNumNodes() throws SQLException {

@@ -126,4 +126,8 @@ public class ParameterInstanceDAO {
         }
         return res;
     }
+
+    public static void clearCache() {
+        cache.clear();
+    }
 }

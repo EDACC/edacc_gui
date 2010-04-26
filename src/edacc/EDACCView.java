@@ -8,6 +8,8 @@ import edacc.model.NoConnectionToDBException;
 import java.awt.Component;
 import java.sql.SQLException;
 import java.util.Observable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
@@ -22,6 +24,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import edacc.manageDB.Util;
 
 /**
  * The application's main frame.
@@ -109,16 +112,11 @@ public class EDACCView extends FrameView implements Observer {
 
         mode = noMode;
         updateConnectionStateView();
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                btnConnectToDB();
-            }
-        });
+        btnConnectToDB();
     }
 
     private void createDatabaseErrorMessage(SQLException e) {
-        javax.swing.JOptionPane.showMessageDialog(null, "There was an error while communicating with the database: " + e, "Connection error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        javax.swing.JOptionPane.showMessageDialog(null, "There was an error while communicating with the database: " +e, "Connection error", javax.swing.JOptionPane.ERROR_MESSAGE);
     }
 
     @Action
@@ -172,7 +170,7 @@ public class EDACCView extends FrameView implements Observer {
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 678, Short.MAX_VALUE)
+            .add(0, 630, Short.MAX_VALUE)
         );
 
         menuBar.setAutoscrolls(true);
@@ -294,8 +292,7 @@ public class EDACCView extends FrameView implements Observer {
         }
 
         EDACCApp.getApplication().show(databaseSettings);
-        manageDBMode();
-
+       manageDBMode();
     }
 
     @Action
@@ -342,13 +339,13 @@ public class EDACCView extends FrameView implements Observer {
     @Action
     public void manageDBMode() {
         /**if (!manageDBModeMenuItem.isSelected()) {
-        noMode();
-        return;
+            noMode();
+            return;
         }*/
         if (manageExperimentModeMenuItem.isSelected()) {
             manageExperimentModeMenuItem.setSelected(false);
         }
-
+        
         try {
             manageDBMode.initialize();
             mainPanelLayout.replace(mode, manageDBMode);
@@ -357,7 +354,8 @@ public class EDACCView extends FrameView implements Observer {
         } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this.getComponent(), "You have to connect to the database before switching modes", "No database connection", JOptionPane.ERROR_MESSAGE);
             noMode();
-        } catch (SQLException ex) {
+        }
+        catch (SQLException ex) {
             createDatabaseErrorMessage(ex);
             noMode();
         }
@@ -365,14 +363,21 @@ public class EDACCView extends FrameView implements Observer {
 
     @Action
     public void manageExperimentMode() {
-        {
-        }
         if (!manageExperimentModeMenuItem.isSelected()) {
             noMode();
             return;
         }
         if (manageDBModeMenuItem.isSelected()) {
-            manageDBModeMenuItem.setSelected(false);
+            if (JOptionPane.showConfirmDialog(mode,
+                "Any unsaved changes will be lost, are you sure you want to switch to experiment mode?",
+                "Warning!",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+                manageDBModeMenuItem.setSelected(false);
+                Util.clearCaches();
+            }
+            else {
+                return;
+            }
         }
         try {
             experimentMode.initialize();

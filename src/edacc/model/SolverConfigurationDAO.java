@@ -21,7 +21,7 @@ public class SolverConfigurationDAO {
     private static final String deleteQuery = "DELETE FROM " + table + " WHERE idSolverConfig=?";
     private static final String insertQuery = "INSERT INTO " + table + " (Solver_IdSolver, Experiment_IdExperiment, seed_group) VALUES (?,?,?)";
     private static final String updateQuery = "UPDATE " + table + " SET seed_group=? WHERE idSolverConfig=?";
-    private static final Hashtable<SolverConfiguration, SolverConfiguration> cache = new Hashtable<SolverConfiguration, SolverConfiguration>();
+    private static final ObjectCache<SolverConfiguration> cache = new ObjectCache<SolverConfiguration>();
 
     private static SolverConfiguration getSolverConfigurationFromResultset(ResultSet rs) throws SQLException {
         SolverConfiguration i = new SolverConfiguration();
@@ -30,22 +30,6 @@ public class SolverConfigurationDAO {
         i.setId(rs.getInt("IdSolverConfig"));
         i.setSeed_group(rs.getInt("seed_group"));
         return i;
-    }
-
-    private static SolverConfiguration getCached(SolverConfiguration i) {
-        if (cache.containsKey(i)) {
-            return cache.get(i);
-        } else {
-            return null;
-        }
-    }
-
-    private static void cacheSolverConfiguration(SolverConfiguration i) {
-        if (cache.containsKey(i)) {
-            return;
-        } else {
-            cache.put(i, i);
-        }
     }
 
     private static void save(SolverConfiguration i) throws SQLException {
@@ -65,6 +49,7 @@ public class SolverConfigurationDAO {
                 i.setId(generatedKeys.getInt(1));
             }
             i.setSaved();
+            cache.cache(i);
         }
         else if (i.isModified()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
@@ -89,7 +74,7 @@ public class SolverConfigurationDAO {
         i.setExperiment_id(experimentId);
         i.setSeed_group(seed_group);
         save(i);
-        cacheSolverConfiguration(i);
+        cache.cache(i);
         return i;
     }
 
@@ -99,12 +84,11 @@ public class SolverConfigurationDAO {
         st.setInt(1, experimentId);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
-            SolverConfiguration i = getSolverConfigurationFromResultset(rs);
-            SolverConfiguration c = getCached(i);
-            if (c != null) {
-                res.add(c);
-            } else {
-                cacheSolverConfiguration(i);
+            SolverConfiguration c = cache.getCached(rs.getInt("IdSolverConfig"));
+            if (c != null) res.add(c);
+            else {
+                SolverConfiguration i = getSolverConfigurationFromResultset(rs);
+                cache.cache(i);
                 i.setSaved();
                 res.add(i);
             }
@@ -122,5 +106,9 @@ public class SolverConfigurationDAO {
          while (e.hasMoreElements()) {
              save(e.nextElement());
          }
+    }
+
+    public static void clearCache() {
+        cache.clear();
     }
 }

@@ -350,6 +350,7 @@ public class ExperimentController {
         try {
             main.jobsTableModel.jobs = ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId());
             main.jobsTableModel.fireTableDataChanged();
+            System.gc();
         } catch (Exception e) {
             // TODO: shouldn't happen but show message if it does
         }
