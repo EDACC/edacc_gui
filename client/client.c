@@ -138,18 +138,21 @@ status init(int argc, char *argv[]) {
 	for(i=0; i<exp.numSolvers; ++i) {
 		//Prepend the solver name with pathname
 		fileName=prependBasename(exp.solverNames[i]);
+        printf("test filename is NULL\n");
 		if(fileName==NULL) {
 			logError("Error: Out of memory\n");
 			freeExperimentData(&exp);
 			return sysError;
 		}
 		//Start a mutual execution lock between several application instances
+        printf("try lock mutex\n");
 		if(lockMutex()!=success) {
 			free(fileName);
 			freeExperimentData(&exp);
 			return sysError;
 		}
 		//Create the solver binary if it doesn't exist yet
+        printf("create solver binary\n");
 		if(fileExists(fileName)) {
 			free(fileName);
 			unlockMutex();

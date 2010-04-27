@@ -400,6 +400,7 @@ int dbFetchJob(job* j, status* s) {
 
     i = mysql_num_rows(res);
 
+    printf("num rows %i\n", i);
     if(i==0) {
         mysql_free_result(res);
         *s = success;
@@ -412,10 +413,12 @@ int dbFetchJob(job* j, status* s) {
         lastId = atoi(row[0]);
     }
 
+    printf("formatting queries\n");
     sprintfAlloc(&queryJob, QUERY_JOB, lastId);
     sprintfAlloc(&queryJobParams, QUERY_JOB_PARAMS, lastId);
 
     /* fetch job information */
+    printf("start query\n");
     if(mysql_query(conn, queryJob) != 0) {
         mysql_free_result(res);
         *s = dbError;
@@ -429,6 +432,7 @@ int dbFetchJob(job* j, status* s) {
     }
 
 
+    printf("fetching row\n");
     if((row = mysql_fetch_row(res)) != NULL) {
         lengths = mysql_fetch_lengths(res);
 
@@ -445,6 +449,7 @@ int dbFetchJob(job* j, status* s) {
     }
 
     /* fetch params information */
+    printf("fetch params information\n");
     if(mysql_query(conn, queryJobParams) != 0) {
         mysql_free_result(res);
         *s = dbError;
@@ -461,6 +466,7 @@ int dbFetchJob(job* j, status* s) {
     
     params = (char *)calloc(256,sizeof(char));
 
+    printf("start fill params\n");
     while((row = mysql_fetch_row(res)) != NULL) {
         if(strcmp(row[2],"")!=0) {
             params = strcat(params, row[1]);
