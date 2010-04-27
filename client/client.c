@@ -234,7 +234,9 @@ inline status update(const job* j) {
 	status retval;
 
 	deferSignals();
+    printf("db updating ...\n");
 	retval=dbUpdate(j);
+    printf("... db updated \n");
 	resetSignalHandler();
 
 	return retval;
@@ -546,11 +548,15 @@ void test_main() {
     j.id=1;
     if(fetchJob(&j, &s)!=0) {
         printf("unable to fetch job\n");
+    } else {
+        printf("JOB FETCHED\n");
     }
-    printf("JOB FETCHED\n");
 }
 
 int main(int argc, char *argv[]) {
+    //cleanMutex();
+    //return 0;
+
 	int numJobs;
 	status s;
 	job* j;
@@ -601,6 +607,7 @@ int main(int argc, char *argv[]) {
 				}
 				exitClient(s);
 			}
+            printf("fetchJob returned 0\n");
 
 			//Set j->startTime to the current local time
 			s=setStartTime(j);
@@ -608,14 +615,19 @@ int main(int argc, char *argv[]) {
 				unlockMutex();
 				exitClient(s);
 			}
+            printf("start time set\n");
 
 			//Set the job state to running in the database
 			j->status=0;
+            printf("updating ...\n");
 			s=update(j);
+            printf("... updated\n");
 			if(s!=success) {
+                printf("update not successfull\n");
 				unlockMutex();
 				exitClient(s);
 			}
+            printf("job state set to running\n");
 
 			//Create the solver binary if it doesn't exist yet
             //printf("creating solver binary %s ...\n", j->solverName);
@@ -627,6 +639,7 @@ int main(int argc, char *argv[]) {
 				s=update(j);
 				exitClient(sysError);
 			}
+            printf("file name is not NULL\n");
 			if(!fileExists(fileName)) {
                 //printf("file doesn't exist\n");
 				s=dbFetchSolver(j->solverName, &solv);
@@ -647,6 +660,7 @@ int main(int argc, char *argv[]) {
 				}
 				freeSolver(&solv);
 			}
+            printf("file exists\n");
 			free(fileName);
 
 			//Create the instance file if it doesn't exist yet
@@ -677,6 +691,7 @@ int main(int argc, char *argv[]) {
 				}
 				freeInstance(&inst);
 			}
+            printf("instance exists\n");
 			free(fileName);
 
 			//End the mutual execution lock
@@ -685,6 +700,7 @@ int main(int argc, char *argv[]) {
 				s=update(j);
 				exitClient(sysError);
 			}
+            printf("mutex unlocked\n");
 
 			//Create a process for processing the job
 			pid=fork();
@@ -723,6 +739,7 @@ int main(int argc, char *argv[]) {
 				//Now that was a shitty short life :-/
 				exit(sysError);
 			}
+            printf("pid forked\n");
 			j->pid=pid;
 		}
 

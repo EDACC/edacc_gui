@@ -518,6 +518,7 @@ status dbUpdate(const job* j) {
     char *queryJob = NULL;
 
 
+    printf("alloc query ...\n");
     sprintfAlloc(&queryJob, UPDATE_JOB, 
             j->resultFileName, 
             j->status, 
@@ -525,8 +526,8 @@ status dbUpdate(const job* j) {
             j->time, 
             j->statusCode, 
             j->resultFile,
-            j->id, 
-            j->startTime);
+            j->startTime,
+            j->id);
 
     printf("queryJob: %s\n", queryJob);
 
