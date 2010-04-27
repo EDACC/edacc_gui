@@ -17,6 +17,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <time.h>
 
 
 //This array stores the arguments for a solver run we execute via execve
@@ -512,6 +513,29 @@ void freeJobArgs() {
 	free(jobArgs[2]);
 }
 
+//Set the startTime field in j to the current local time
+status setStartTime(job *j) {
+	time_t t;
+	struct tm *tmp;
+
+	t=time(NULL);
+	if(t==((time_t) -1)) {
+		logError("Error in time(): %s\n", strerror(errno));
+		return sysError;
+	}
+	tmp=localtime(&t);
+	if(tmp==NULL) {
+		logError("Error in localtime(): %s\n", strerror(errno));
+		return sysError;
+	}
+	if (strftime(j->startTime, sizeof(j->startTime), "%H%M%S", tmp) != sizeof(j->startTime)-1) {
+		logError("Error in strftime()\n");
+		return sysError;
+	}
+
+	return success;
+}
+
 int main(int argc, char *argv[]) {
 	int numJobs;
 	status s;
@@ -520,7 +544,6 @@ int main(int argc, char *argv[]) {
 	solver solv;
 	instance inst;
 	char* fileName;
-
 
 	s=read_config();
 	if(s!=success) {
@@ -558,6 +581,13 @@ int main(int argc, char *argv[]) {
 					//Wait until all child processes have terminated.
 					s=handleChildren(numJobs);
 				}
+				exitClient(s);
+			}
+
+			//Set j->startTime to the current local time
+			s=setStartTime(j);
+			if(s!=success) {
+				unlockMutex();
 				exitClient(s);
 			}
 
