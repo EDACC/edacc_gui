@@ -378,6 +378,8 @@ int dbFetchJob(job* j, status* s) {
 
     conn = mysql_init(NULL);
     if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+        printf("host: %s, username: %s, password: %s, database: %s\n", host, username, password, database);
+        printf("%s\n", mysql_error(conn));
         logError("could not establish mysql connection!\n");
         *s = dbError;
         return 1;
@@ -485,10 +487,13 @@ int dbFetchJob(job* j, status* s) {
     }
 
     strcpy(j->params, params);
+    printf("%s\n", j->params);
 
+    printf("free memory and close mysql connection\n");
     free(params);
     mysql_free_result(res);
     mysql_close(conn);
+    printf("set s to success and return 0\n");
     *s = success;
     return 0;
 }
