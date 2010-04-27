@@ -142,7 +142,7 @@ public class InstanceParser
 					try {
 						nr=Integer.parseInt(token);
 					} catch(java.lang.NumberFormatException e) {
-						throw new InstanceException("Non-numeric token \""+token+"\" found in line "+lr.getLineNumber());
+						throw new InstanceException("Non-numeric token \""+token+"\" found in file: \""+filePath+"\" at line "+lr.getLineNumber());
 					}
 
 					if(nr.intValue()==0) {
