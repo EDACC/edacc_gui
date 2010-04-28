@@ -17,6 +17,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <time.h>
 
 
 //This array stores the arguments for a solver run we execute via execve
@@ -137,18 +138,21 @@ status init(int argc, char *argv[]) {
 	for(i=0; i<exp.numSolvers; ++i) {
 		//Prepend the solver name with pathname
 		fileName=prependBasename(exp.solverNames[i]);
+        printf("test filename is NULL\n");
 		if(fileName==NULL) {
 			logError("Error: Out of memory\n");
 			freeExperimentData(&exp);
 			return sysError;
 		}
 		//Start a mutual execution lock between several application instances
+        printf("try lock mutex\n");
 		if(lockMutex()!=success) {
 			free(fileName);
 			freeExperimentData(&exp);
 			return sysError;
 		}
 		//Create the solver binary if it doesn't exist yet
+        printf("create solver binary\n");
 		if(fileExists(fileName)) {
 			free(fileName);
 			unlockMutex();
@@ -230,7 +234,9 @@ inline status update(const job* j) {
 	status retval;
 
 	deferSignals();
+    printf("db updating ...\n");
 	retval=dbUpdate(j);
+    printf("... db updated \n");
 	resetSignalHandler();
 
 	return retval;
@@ -512,7 +518,45 @@ void freeJobArgs() {
 	free(jobArgs[2]);
 }
 
+//Set the startTime field in j to the current local time
+status setStartTime(job *j) {
+	time_t t;
+	struct tm *tmp;
+
+	t=time(NULL);
+	if(t==((time_t) -1)) {
+		logError("Error in time(): %s\n", strerror(errno));
+		return sysError;
+	}
+	tmp=localtime(&t);
+	if(tmp==NULL) {
+		logError("Error in localtime(): %s\n", strerror(errno));
+		return sysError;
+	}
+	if (strftime(j->startTime, sizeof(j->startTime), "%H%M%S", tmp) != sizeof(j->startTime)-1) {
+		logError("Error in strftime()\n");
+		return sysError;
+	}
+
+	return success;
+}
+
+void test_main() {
+    job j;
+    status s;
+
+    j.id=1;
+    if(fetchJob(&j, &s)!=0) {
+        printf("unable to fetch job\n");
+    } else {
+        printf("JOB FETCHED\n");
+    }
+}
+
 int main(int argc, char *argv[]) {
+    //cleanMutex();
+    //return 0;
+
 	int numJobs;
 	status s;
 	job* j;
@@ -521,12 +565,15 @@ int main(int argc, char *argv[]) {
 	instance inst;
 	char* fileName;
 
-
 	s=read_config();
 	if(s!=success) {
         logError("Couldn't read config successfully.");
 		exit(s);
 	}
+
+    //test_main();
+    //exit(0);
+
 
 	s=init(argc, argv);
 	if(s!=success) {
@@ -560,14 +607,27 @@ int main(int argc, char *argv[]) {
 				}
 				exitClient(s);
 			}
+            printf("fetchJob returned 0\n");
 
-			//Set the job state to running in the database
-			j->status=0;
-			s=update(j);
+			//Set j->startTime to the current local time
+			s=setStartTime(j);
 			if(s!=success) {
 				unlockMutex();
 				exitClient(s);
 			}
+            printf("start time set\n");
+
+			//Set the job state to running in the database
+			j->status=0;
+            printf("updating ...\n");
+			s=update(j);
+            printf("... updated\n");
+			if(s!=success) {
+                printf("update not successfull\n");
+				unlockMutex();
+				exitClient(s);
+			}
+            printf("job state set to running\n");
 
 			//Create the solver binary if it doesn't exist yet
             //printf("creating solver binary %s ...\n", j->solverName);
@@ -579,6 +639,7 @@ int main(int argc, char *argv[]) {
 				s=update(j);
 				exitClient(sysError);
 			}
+            printf("file name is not NULL\n");
 			if(!fileExists(fileName)) {
                 //printf("file doesn't exist\n");
 				s=dbFetchSolver(j->solverName, &solv);
@@ -599,6 +660,7 @@ int main(int argc, char *argv[]) {
 				}
 				freeSolver(&solv);
 			}
+            printf("file exists\n");
 			free(fileName);
 
 			//Create the instance file if it doesn't exist yet
@@ -629,6 +691,7 @@ int main(int argc, char *argv[]) {
 				}
 				freeInstance(&inst);
 			}
+            printf("instance exists\n");
 			free(fileName);
 
 			//End the mutual execution lock
@@ -637,6 +700,7 @@ int main(int argc, char *argv[]) {
 				s=update(j);
 				exitClient(sysError);
 			}
+            printf("mutex unlocked\n");
 
 			//Create a process for processing the job
 			pid=fork();
@@ -675,6 +739,7 @@ int main(int argc, char *argv[]) {
 				//Now that was a shitty short life :-/
 				exit(sysError);
 			}
+            printf("pid forked\n");
 			j->pid=pid;
 		}
 
@@ -688,35 +753,4 @@ int main(int argc, char *argv[]) {
 	//Avoid compiler warnings
 	return success;
 }
-
-/* int main_test(int argc, char *argv[]) {
- * 	int numJobs;
- * 	status s;
- * 	job* j;
- * 	pid_t pid;
- * 	solver solv;
- * 	instance inst;
- * 	char* fileName;
- *     experiment exp;
- * 
- * 	read_config();
- * 
- *     s=dbFetchExperimentData(&exp);
- * 	s=init(argc, argv);
- * 	if(s!=success) {
- * 		exit(s);
- * 	}
- * 
- * 	setSignalHandler(signalHandler);
- * 
- * 
- *     printf("id: %i, numcpus: %i, timeout: %i, numinstances: %i,"\
- *             "instancename 1: %s, numsolvers: %i, solvername 1: %s\n",
- *             exp.id, exp.numCPUs, exp.timeOut, exp.numInstances, 
- *             exp.instanceNames[0], exp.numSolvers, exp.solverNames[0]);
- * 
- * 
- *     return 1;
- * }
- */
 
