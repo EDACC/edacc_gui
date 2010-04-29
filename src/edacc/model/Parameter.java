@@ -8,6 +8,7 @@ public class Parameter extends BaseModel {
     private int order;
 
     public Parameter() {
+        super();
         name = prefix = value = "";
     }
 
