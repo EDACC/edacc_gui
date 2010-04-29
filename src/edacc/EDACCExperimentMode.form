@@ -24,7 +24,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageExperimentPane" pref="813" max="32767" attributes="0"/>
+              <Component id="manageExperimentPane" pref="954" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -73,7 +73,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnLoadExperiment" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="scrollPaneExperimentsTable" alignment="0" pref="784" max="32767" attributes="0"/>
+                          <Component id="scrollPaneExperimentsTable" alignment="0" pref="925" max="32767" attributes="0"/>
                           <Component id="pnlNewExperiment" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -124,6 +124,7 @@
                   <action class="edacc.EDACCExperimentMode" id="btnRemoveExperiment" methodName="btnRemoveExperiment"/>
                 </Property>
                 <Property name="text" type="java.lang.String" resourceKey="btnRemoveExperiment.text"/>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="btnRemoveExperiment.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="btnRemoveExperiment" noResource="true"/>
               </Properties>
             </Component>
@@ -133,7 +134,11 @@
                   <action class="edacc.EDACCExperimentMode" id="btnLoadExperiment" methodName="btnLoadExperiment"/>
                 </Property>
                 <Property name="text" type="java.lang.String" resourceKey="btnLoadExperiment.text"/>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="btnLoadExperiment.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="btnLoadExperiment" noResource="true"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[80, 25]"/>
+                </Property>
               </Properties>
             </Component>
             <Container class="javax.swing.JPanel" name="pnlNewExperiment">
@@ -228,6 +233,7 @@
                 </Container>
                 <Component class="javax.swing.JTextField" name="txtExperimentName">
                   <Properties>
+                    <Property name="toolTipText" type="java.lang.String" resourceKey="txtExperimentName.toolTipText"/>
                     <Property name="name" type="java.lang.String" value="txtExperimentName" noResource="true"/>
                   </Properties>
                 </Component>
@@ -237,7 +243,11 @@
                       <action class="edacc.EDACCExperimentMode" id="btnCreateExperiment" methodName="btnCreateExperiment"/>
                     </Property>
                     <Property name="text" type="java.lang.String" resourceKey="btnCreateExperiment.text"/>
+                    <Property name="toolTipText" type="java.lang.String" resourceKey="btnCreateExperiment.toolTipText"/>
                     <Property name="name" type="java.lang.String" value="btnCreateExperiment" noResource="true"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[80, 25]"/>
+                    </Property>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -262,16 +272,16 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="jSplitPane1" alignment="0" pref="784" max="32767" attributes="0"/>
+                          <Component id="jSplitPane1" alignment="0" pref="925" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="btnSelectAllSolvers" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnDeselectAllSolvers" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnReverseSolverSelection" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="149" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnChooseSolvers" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="151" max="32767" attributes="0"/>
+                              <EmptySpace pref="257" max="32767" attributes="0"/>
                               <Component id="btnSaveSolverConfigurations" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -289,8 +299,8 @@
                           <Component id="btnSelectAllSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnDeselectAllSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnReverseSolverSelection" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="btnChooseSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnSaveSolverConfigurations" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnChooseSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -380,7 +390,11 @@
                   <action class="edacc.EDACCExperimentMode" id="btnSaveSolverConfigurations" methodName="btnSaveSolverConfigurations"/>
                 </Property>
                 <Property name="text" type="java.lang.String" resourceKey="btnSaveSolverConfigurations.text"/>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="btnSaveSolverConfigurations.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="btnSaveSolverConfigurations" noResource="true"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[130, 25]"/>
+                </Property>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="btnSelectAllSolvers">
@@ -389,7 +403,11 @@
                   <action class="edacc.EDACCExperimentMode" id="btnSelectAllSolvers" methodName="btnSelectAllSolvers"/>
                 </Property>
                 <Property name="text" type="java.lang.String" resourceKey="btnSelectAllSolvers.text"/>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="btnSelectAllSolvers.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="btnSelectAllSolvers" noResource="true"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[130, 25]"/>
+                </Property>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="btnDeselectAllSolvers">
@@ -398,7 +416,11 @@
                   <action class="edacc.EDACCExperimentMode" id="btnDeselectAll" methodName="btnDeselectAll"/>
                 </Property>
                 <Property name="text" type="java.lang.String" resourceKey="btnDeselectAllSolvers.text"/>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="btnDeselectAllSolvers.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="btnDeselectAllSolvers" noResource="true"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[130, 25]"/>
+                </Property>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="btnReverseSolverSelection">
@@ -407,6 +429,7 @@
                   <action class="edacc.EDACCExperimentMode" id="btnReverseSolverSelection" methodName="btnReverseSolverSelection"/>
                 </Property>
                 <Property name="text" type="java.lang.String" resourceKey="btnReverseSolverSelection.text"/>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="btnReverseSolverSelection.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="btnReverseSolverSelection" noResource="true"/>
               </Properties>
             </Component>
@@ -416,7 +439,11 @@
                   <action class="edacc.EDACCExperimentMode" id="btnChooseSolvers" methodName="btnChooseSolvers"/>
                 </Property>
                 <Property name="text" type="java.lang.String" resourceKey="btnChooseSolvers.text"/>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="btnChooseSolvers.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="btnChooseSolvers" noResource="true"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[130, 25]"/>
+                </Property>
               </Properties>
             </Component>
           </SubComponents>
@@ -439,7 +466,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jSplitPane2" alignment="0" pref="808" max="32767" attributes="0"/>
+                  <Component id="jSplitPane2" alignment="0" pref="949" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -503,7 +530,11 @@
                     <Component class="javax.swing.JButton" name="btnSelectAllInstanceClasses">
                       <Properties>
                         <Property name="text" type="java.lang.String" resourceKey="btnSelectAllInstanceClasses.text"/>
+                        <Property name="toolTipText" type="java.lang.String" resourceKey="btnSelectAllInstanceClasses.toolTipText"/>
                         <Property name="name" type="java.lang.String" value="btnSelectAllInstanceClasses" noResource="true"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[130, 25]"/>
+                        </Property>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSelectAllInstanceClassesActionPerformed"/>
@@ -517,7 +548,11 @@
                     <Component class="javax.swing.JButton" name="btnDeselectAllInstnaceClasses">
                       <Properties>
                         <Property name="text" type="java.lang.String" resourceKey="btnDeselectAllInstnaceClasses.text"/>
+                        <Property name="toolTipText" type="java.lang.String" resourceKey="btnDeselectAllInstnaceClasses.toolTipText"/>
                         <Property name="name" type="java.lang.String" value="btnDeselectAllInstnaceClasses" noResource="true"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[130, 25]"/>
+                        </Property>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDeselectAllInstnaceClassesActionPerformed"/>
@@ -548,6 +583,7 @@
                           <action class="edacc.EDACCExperimentMode" id="btnInvertSelection" methodName="btnInvertSelection"/>
                         </Property>
                         <Property name="text" type="java.lang.String" resourceKey="btnInvertSelection.text"/>
+                        <Property name="toolTipText" type="java.lang.String" resourceKey="btnInvertSelection.toolTipText"/>
                         <Property name="name" type="java.lang.String" value="btnInvertSelection" noResource="true"/>
                       </Properties>
                       <Constraints>
@@ -562,7 +598,11 @@
                           <action class="edacc.EDACCExperimentMode" id="btnInstanceFilter" methodName="btnInstanceFilter"/>
                         </Property>
                         <Property name="text" type="java.lang.String" resourceKey="btnFilterInstances.text"/>
+                        <Property name="toolTipText" type="java.lang.String" resourceKey="btnFilterInstances.toolTipText"/>
                         <Property name="name" type="java.lang.String" value="btnFilterInstances" noResource="true"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[130, 25]"/>
+                        </Property>
                       </Properties>
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -576,7 +616,11 @@
                           <action class="edacc.EDACCExperimentMode" id="btnSelectAllInstances" methodName="btnSelectAllInstances"/>
                         </Property>
                         <Property name="text" type="java.lang.String" resourceKey="btnSelectAllInstances.text"/>
+                        <Property name="toolTipText" type="java.lang.String" resourceKey="btnSelectAllInstances.toolTipText"/>
                         <Property name="name" type="java.lang.String" value="btnSelectAllInstances" noResource="true"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[130, 25]"/>
+                        </Property>
                       </Properties>
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -590,7 +634,11 @@
                           <action class="edacc.EDACCExperimentMode" id="btnDeselectAllInstances" methodName="btnDeselectAllInstances"/>
                         </Property>
                         <Property name="text" type="java.lang.String" resourceKey="btnDeselectAllInstances.text"/>
+                        <Property name="toolTipText" type="java.lang.String" resourceKey="btnDeselectAllInstances.toolTipText"/>
                         <Property name="name" type="java.lang.String" value="btnDeselectAllInstances" noResource="true"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[130, 25]"/>
+                        </Property>
                       </Properties>
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -604,7 +652,14 @@
                           <action class="edacc.EDACCExperimentMode" id="btnSaveInstances" methodName="btnSaveInstances"/>
                         </Property>
                         <Property name="text" type="java.lang.String" resourceKey="btnSaveInstances.text"/>
+                        <Property name="toolTipText" type="java.lang.String" resourceKey="btnSaveInstances.toolTipText"/>
+                        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[130, 25]"/>
+                        </Property>
                         <Property name="name" type="java.lang.String" value="btnSaveInstances" noResource="true"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[130, 25]"/>
+                        </Property>
                       </Properties>
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -717,7 +772,7 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="489" max="32767" attributes="0"/>
+                          <EmptySpace pref="630" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -891,9 +946,9 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnRefreshJobs" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="715" max="32767" attributes="0"/>
+                      <EmptySpace pref="856" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="jScrollPane6" alignment="1" pref="808" max="32767" attributes="0"/>
+                  <Component id="jScrollPane6" alignment="1" pref="949" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
