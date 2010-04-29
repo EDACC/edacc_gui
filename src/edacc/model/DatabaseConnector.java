@@ -152,7 +152,7 @@ public class DatabaseConnector extends Observable {
         st.addBatch("DROP TABLE IF EXISTS `Instances` ;");
         st.addBatch("CREATE  TABLE IF NOT EXISTS `Instances` (  `idInstance` INT NOT NULL AUTO_INCREMENT ,"
                 + "  `name` VARCHAR(255) NOT NULL ,"
-                + "  `instance` MEDIUMBLOB NOT NULL COMMENT 'contains ' ,"
+                + "  `instance` LONGBLOB NOT NULL COMMENT 'contains ' ,"
                 + "  `md5` VARCHAR(60) NOT NULL ,"
                 + "  `numAtoms` INT NULL ,"
                 + "  `numClauses` INT NULL ,"
