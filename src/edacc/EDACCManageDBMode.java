@@ -958,6 +958,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private void solverChanged() {
         manageDBSolvers.applySolver(tfSolverName.getText(), taSolverDescription.getText());
         tableSolver.updateUI();
+        unsavedChanges = true;
     }
     private JFileChooser codeFileChooser;
     private void btnSolverAddCodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverAddCodeActionPerformed
