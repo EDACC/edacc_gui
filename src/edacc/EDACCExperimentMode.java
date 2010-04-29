@@ -35,7 +35,9 @@ import org.jdesktop.application.Action;
  * @author simon
  */
 public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTaskEvents {
-
+    private boolean unsavedSolverConfigChanges;
+    private boolean unsavedInstanceChanges;
+    
     public ExperimentController expController;
     public ExperimentTableModel expTableModel;
     public InstanceTableModel insTableModel;
@@ -75,9 +77,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         tableJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.setDefaultRenderer(Float.class, new EDACCExperimentModeJobsCellRenderer());
 
+        unsavedSolverConfigChanges = false;
+        unsavedInstanceChanges = false;
     }
 
     public void initialize() throws SQLException {
+        unsavedSolverConfigChanges = false;
+        unsavedInstanceChanges = false;
         expController.initialize();
     }
 
@@ -741,6 +747,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    public boolean hasUnsavedChanges() {
+        return unsavedSolverConfigChanges || unsavedInstanceChanges;
+    }
+
     private void manageExperimentPaneStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_manageExperimentPaneStateChanged
         if (manageExperimentPane.getSelectedIndex() == 3) {
             // generate jobs tab
@@ -800,6 +810,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
      * Method to be call after an experiment ist unloaded.
      */
     public void afterExperimentUnloaded() {
+        manageExperimentPane.setSelectedIndex(0);
         manageExperimentPane.setEnabledAt(1, false);
         manageExperimentPane.setEnabledAt(2, false);
         manageExperimentPane.setEnabledAt(3, false);
@@ -821,6 +832,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                     Integer i = (Integer) expTableModel.getValueAt(tableExperiments.getSelectedRow(), 5);
                     // expController.loadExperiment(i.intValue());
                     Tasks.startTask("loadExperiment", new Class[]{int.class, edacc.model.Tasks.class}, new Object[]{i.intValue(), null}, expController, this);
+                    unsavedSolverConfigChanges = false;
+                    unsavedInstanceChanges = false;
                 }
             } else {
                 Integer i = (Integer) expTableModel.getValueAt(tableExperiments.getSelectedRow(), 5);
@@ -858,6 +871,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
             if ((Boolean) solTableModel.getValueAt(i, 4) && !solverConfigPanel.solverExists(((Solver) solTableModel.getValueAt(i, 5)).getId())) {
                 solverConfigPanel.addSolver(solTableModel.getValueAt(i, 5));
+                unsavedSolverConfigChanges = true;
             } else if (!(Boolean) solTableModel.getValueAt(i, 4)) {
                 solverConfigPanel.removeSolver(solTableModel.getValueAt(i, 5));
             }
@@ -873,6 +887,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         //      createDatabaseErrorMessage(e);
         //  }
         Tasks.startTask("saveSolverConfigurations", new Class[]{Tasks.class}, new Object[]{null}, expController, this);
+        unsavedSolverConfigChanges = false;
     }
 
     @Action
@@ -904,6 +919,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         //    createDatabaseErrorMessage(ex);
         //}
         Tasks.startTask("saveExperimentHasInstances", new Class[]{Tasks.class}, new Object[]{null}, expController, this);
+        unsavedInstanceChanges = false;
     }
     
     @Action
@@ -915,6 +931,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                     (Float)insTableModel.getValueAt(i, 3),
                     (Integer)insTableModel.getValueAt(i, 4)))
                 insTableModel.setValueAt(true, i, 5);
+            unsavedInstanceChanges = true;
         }
     }
 
@@ -927,6 +944,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                     (Float)insTableModel.getValueAt(i, 3),
                     (Integer)insTableModel.getValueAt(i, 4)))
                 insTableModel.setValueAt(false, i, 5);
+            unsavedInstanceChanges = true;
         }
     }
 
@@ -938,7 +956,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                     (Integer)insTableModel.getValueAt(i, 2),
                     (Float)insTableModel.getValueAt(i, 3),
                     (Integer)insTableModel.getValueAt(i, 4)))
-            insTableModel.setValueAt(!((Boolean) insTableModel.getValueAt(i, 5)), i, 5);
+                insTableModel.setValueAt(!((Boolean) insTableModel.getValueAt(i, 5)), i, 5);
+            unsavedInstanceChanges = true;
         }
     }
 

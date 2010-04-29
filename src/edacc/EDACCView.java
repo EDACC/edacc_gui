@@ -342,11 +342,24 @@ public class EDACCView extends FrameView implements Observer {
 
     @Action
     public void manageDBMode() {
-        /**if (!manageDBModeMenuItem.isSelected()) {
+        /*if (manageDBModeMenuItem.isSelected()) {
             noMode();
             return;
         }*/
         if (manageExperimentModeMenuItem.isSelected()) {
+            if (experimentMode.hasUnsavedChanges()) {
+                if (JOptionPane.showConfirmDialog(mode,
+                    "Any unsaved changes will be lost, are you sure you want to switch to Manage DB mode?",
+                    "Warning!",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+
+                    Util.clearCaches();
+                }
+                else {
+                    return;
+                }
+            }
+            experimentMode.expController.unloadExperiment();
             manageExperimentModeMenuItem.setSelected(false);
         }
         
@@ -367,21 +380,24 @@ public class EDACCView extends FrameView implements Observer {
 
     @Action
     public void manageExperimentMode() {
-        if (!manageExperimentModeMenuItem.isSelected()) {
+        /*if (manageExperimentModeMenuItem.isSelected()) {
             noMode();
             return;
-        }
+        }*/
         if (manageDBModeMenuItem.isSelected()) {
-            if (JOptionPane.showConfirmDialog(mode,
-                "Any unsaved changes will be lost, are you sure you want to switch to experiment mode?",
-                "Warning!",
-                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-                manageDBModeMenuItem.setSelected(false);
-                Util.clearCaches();
+            if (manageDBMode.unsavedChanges) {
+                if (JOptionPane.showConfirmDialog(mode,
+                    "Any unsaved changes will be lost, are you sure you want to switch to experiment mode?",
+                    "Warning!",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+
+                    Util.clearCaches();
+                }
+                else {
+                    return;
+                }
             }
-            else {
-                return;
-            }
+            manageDBModeMenuItem.setSelected(false);
         }
         try {
             experimentMode.initialize();
