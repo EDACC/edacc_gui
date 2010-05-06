@@ -4,6 +4,7 @@
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="0"/>
     <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
+    <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -26,12 +27,10 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="progressBar" alignment="0" pref="464" max="32767" attributes="0"/>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="lblMessage" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="347" max="32767" attributes="0"/>
-                      <Component id="btnCancel" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="lblMessage" alignment="0" pref="414" max="32767" attributes="0"/>
+                  <Component id="progressBar" alignment="1" pref="414" max="32767" attributes="0"/>
+                  <Component id="lblOperationName" alignment="0" pref="414" max="32767" attributes="0"/>
+                  <Component id="btnCancel" alignment="1" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -41,13 +40,14 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
+              <Component id="lblOperationName" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="progressBar" min="-2" pref="31" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblMessage" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnCancel" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
+              <Component id="lblMessage" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
+              <Component id="btnCancel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -61,6 +61,9 @@
     <Component class="javax.swing.JLabel" name="lblMessage">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="lblMessage.text"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[32767, 14]"/>
+        </Property>
         <Property name="name" type="java.lang.String" value="lblMessage" noResource="true"/>
       </Properties>
     </Component>
@@ -70,7 +73,17 @@
           <action class="edacc.EDACCTaskView" id="btnCancel" methodName="btnCancel"/>
         </Property>
         <Property name="text" type="java.lang.String" resourceKey="btnCancel.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="btnCancel.toolTipText"/>
         <Property name="name" type="java.lang.String" value="btnCancel" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblOperationName">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lblOperationName.text"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[32767, 14]"/>
+        </Property>
+        <Property name="name" type="java.lang.String" value="lblOperationName" noResource="true"/>
       </Properties>
     </Component>
   </SubComponents>

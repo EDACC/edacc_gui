@@ -24,13 +24,12 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
 
     /**
      * Starts a new Task for a method specified in methodName and signature.
+     * If there is currently a task running this methode does nothing.
      * @param methodName The name of the method to start
      * @param signature The signature of this method as a array of Class
      * @param parameters The parameters which sould be passed to this method as a array of Object
      * @param target The target object in which this method is declared and set as public.
      * @param view The corresponding view which implements EDACCTaskEvents to have control over this task.
-     * @param id An id which is passed to the task events.
-     * @throws AlreadyRunningTaskException
      */
     public static void startTask(String methodName, Class[] signature, Object[] parameters, Object target, EDACCTaskEvents view) {
         if (task != null) {
@@ -41,14 +40,17 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
         taskView.setResizable(false);
         taskView.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         taskView.setTitle("Running..");
+        taskView.setOperationName("Running..");
         taskView.setMessage("");
         taskView.setProgress(0.);
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     taskView.setVisible(true);
                 } catch (Exception e) {
+                    // happens if the task view is already disposed, i.e. the task is finished.
                 }
             }
         });
@@ -58,12 +60,11 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
     }
 
     /**
-     * Start a task for a method without any parameters.
+     * Starts a task for a method without any parameters.
+     * If there is currently a task running this methode does nothing.
      * @param methodName
      * @param target
      * @param view
-     * @param id
-     * @throws AlreadyRunningTaskException
      */
     public static void startTask(String methodName, Object target, EDACCTaskEvents view) {
         startTask(methodName, new Class[]{}, new Object[]{}, target, view);
@@ -97,8 +98,6 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
             System.out.println("This should not happen. Called a method which should not be called. Be sure that your method is declared as public. Exception as follows: " + e);
         }
         task = null;
-
-        //taskView = null;
         return null;
     }
 
@@ -125,6 +124,18 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
         taskView.setMessage(s);
     }
 
+    /**
+     * Sets the operation name of the task.
+     * @param name the name of the operation
+     */
+    public void setOperationName(String name) {
+        taskView.setOperationName(name);
+    }
+
+    /**
+     * Returns the current task view.
+     * @return the task view
+     */
     public static EDACCTaskView getTaskView() {
         return taskView;
     }
