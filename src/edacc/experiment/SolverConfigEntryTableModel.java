@@ -83,7 +83,7 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int col) {
-        if (col == 4 || col == 2) {
+        if (col == 4 || (col == 2 && ((Parameter)getValueAt(row, 5)).getHasValue())) {
             return true;
         }
         return false;
@@ -106,7 +106,10 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
             case 1:
                 return parameters[rowIndex].getPrefix();
             case 2:
-                return values[rowIndex];
+                if (parameters[rowIndex].getHasValue()) 
+                    return values[rowIndex];
+                else
+                    return "togglable flag";
             case 3:
                 return parameters[rowIndex].getOrder();
             case 4:

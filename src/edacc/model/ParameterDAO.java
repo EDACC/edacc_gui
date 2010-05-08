@@ -27,13 +27,14 @@ public class ParameterDAO {
             return; // TODO do something if solver isn't in db
         if (parameter.isSaved()) return;
         if (parameter.isNew()) {
-            final String insertQuery = "INSERT INTO Parameters (name, prefix, value, Parameters.order, Solver_idSolver) VALUES (?, ?, ?, ?, ?)";
+            final String insertQuery = "INSERT INTO Parameters (name, prefix, value, hasValue, Parameters.order, Solver_idSolver) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setString(1, parameter.getName());
             ps.setString(2, parameter.getPrefix());
             ps.setString(3, parameter.getValue());
-            ps.setInt(4, parameter.getOrder());
-            ps.setInt(5, solver.getId());
+            ps.setBoolean(4, parameter.getHasValue());
+            ps.setInt(5, parameter.getOrder());
+            ps.setInt(6, solver.getId());
             ps.executeUpdate();
             // set id
             ResultSet rs = ps.getGeneratedKeys();
@@ -42,14 +43,15 @@ public class ParameterDAO {
             parameter.setSaved();
         }
         else if (parameter.isModified()) {
-            final String updateQuery = "UPDATE Parameters SET name=?, prefix=?, value=?, Parameters.order=?, Solver_idSolver=? WHERE idParameter=?";
+            final String updateQuery = "UPDATE Parameters SET name=?, prefix=?, value=?, hasValue=?, Parameters.order=?, Solver_idSolver=? WHERE idParameter=?";
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
             ps.setString(1, parameter.getName());
             ps.setString(2, parameter.getPrefix());
             ps.setString(3, parameter.getValue());
-            ps.setInt(4, parameter.getOrder());
-            ps.setInt(5, solver.getId());
-            ps.setInt(6, parameter.getId());
+            ps.setBoolean(4, parameter.getHasValue());
+            ps.setInt(5, parameter.getOrder());
+            ps.setInt(6, solver.getId());
+            ps.setInt(7, parameter.getId());
             ps.executeUpdate();
             parameter.setSaved();
         }
@@ -62,6 +64,7 @@ public class ParameterDAO {
         i.setOrder(rs.getInt("order"));
         i.setPrefix(rs.getString("prefix"));
         i.setValue(rs.getString("value"));
+        i.setHasValue(rs.getBoolean("hasValue"));
         return i;
     }
     

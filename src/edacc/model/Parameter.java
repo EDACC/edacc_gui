@@ -6,6 +6,7 @@ public class Parameter extends BaseModel {
     private String prefix;
     private String value;
     private int order;
+    private boolean hasValue;
 
     public Parameter() {
         super();
@@ -62,5 +63,13 @@ public class Parameter extends BaseModel {
         if (this.isSaved()) {
             this.setModified();
         }
+    }
+
+    public boolean getHasValue() {
+        return hasValue;
+    }
+
+    public void setHasValue(boolean hasValue) {
+        this.hasValue = hasValue;
     }
 }
