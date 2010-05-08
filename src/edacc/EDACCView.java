@@ -356,11 +356,11 @@ public class EDACCView extends FrameView implements Observer {
                     Util.clearCaches();
                 }
                 else {
+                    manageDBModeMenuItem.setSelected(false);
                     return;
                 }
             }
             experimentMode.expController.unloadExperiment();
-            manageExperimentModeMenuItem.setSelected(false);
         }
         
         try {
@@ -368,6 +368,7 @@ public class EDACCView extends FrameView implements Observer {
             mainPanelLayout.replace(mode, manageDBMode);
             mode = manageDBMode;
             manageDBModeMenuItem.setSelected(true);
+            manageExperimentModeMenuItem.setSelected(false);
         } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this.getComponent(), "You have to connect to the database before switching modes", "No database connection", JOptionPane.ERROR_MESSAGE);
             noMode();
@@ -394,16 +395,18 @@ public class EDACCView extends FrameView implements Observer {
                     Util.clearCaches();
                 }
                 else {
+                    manageExperimentModeMenuItem.setSelected(false);
                     return;
                 }
             }
-            manageDBModeMenuItem.setSelected(false);
+            
         }
         try {
             experimentMode.initialize();
             mainPanelLayout.replace(mode, experimentMode);
             mode = experimentMode;
             manageExperimentModeMenuItem.setSelected(true);
+            manageDBModeMenuItem.setSelected(false);
         } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this.getComponent(), "You have to connect to the database before switching modes", "No database connection", JOptionPane.ERROR_MESSAGE);
             noMode();
