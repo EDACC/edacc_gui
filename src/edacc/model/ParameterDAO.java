@@ -53,7 +53,6 @@ public class ParameterDAO {
             ps.executeUpdate();
             parameter.setSaved();
         }
-
     }
 
     private static Parameter getParameterFromResultset(ResultSet rs) throws SQLException {
@@ -95,6 +94,14 @@ public class ParameterDAO {
         final String query = "DELETE FROM Parameters WHERE Solver_idSolver=?";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.setInt(1, solver.getId());
+        ps.executeUpdate();
+    }
+
+    public static void delete(Parameter p) throws NoConnectionToDBException, SQLException {
+        if (p.isNew()) return;
+        final String query = "DELETE FROM Parameters WHERE idParameter=?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, p.getId());
         ps.executeUpdate();
     }
 }

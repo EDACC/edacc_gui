@@ -81,8 +81,9 @@ public class ManageDBParameters {
             currentParameter = null;
     }
 
-    public void removeParameter(Parameter param) {
+    public void removeParameter(Parameter param) throws SQLException {
         parameterTableModel.remove(param);
+        ParameterDAO.delete(param);
         currentParameter = null;
     }
 

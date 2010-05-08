@@ -1086,7 +1086,19 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             return;
         }
         Parameter p = parameterTableModel.getParameter(tableParameters.getSelectedRow());
-        manageDBParameters.removeParameter(p);
+        try {
+            manageDBParameters.removeParameter(p);
+        } catch (NoConnectionToDBException ex) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "No connection to database: " + ex.getMessage(),
+                        "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "SQL-Exception while deleting parameter: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
         tableParameters.clearSelection();
         showParameterDetails(
                 null);
