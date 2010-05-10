@@ -41,7 +41,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="876" max="32767" attributes="0"/>
+              <Component id="manageDBPane" pref="1266" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -85,7 +85,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane2" pref="847" max="32767" attributes="0"/>
+                      <Component id="jSplitPane2" pref="1237" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -141,7 +141,7 @@
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="jScrollPane1" alignment="0" pref="618" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane1" alignment="0" pref="483" max="32767" attributes="0"/>
                                   <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Group type="103" groupAlignment="1" max="-2" attributes="0">
@@ -284,7 +284,7 @@
                                   <Component id="btnParametersDelete" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                   <Component id="btnParametersRefresh" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="327" max="32767" attributes="0"/>
+                                  <EmptySpace pref="192" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -412,7 +412,7 @@
                                   <Component id="btnSolverRefresh" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="btnSolverExport" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
+                                  <EmptySpace pref="175" max="32767" attributes="0"/>
                                   <Component id="btnSolverSaveToDB" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
@@ -523,11 +523,11 @@
                                           <Group type="103" groupAlignment="0" attributes="0">
                                               <Component id="btnSolverAddBinary" alignment="0" min="-2" max="-2" attributes="0"/>
                                               <Component id="btnSolverAddCode" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              <Component id="jScrollPane3" alignment="0" pref="352" max="32767" attributes="2"/>
-                                              <Component id="tfSolverName" alignment="0" pref="352" max="32767" attributes="2"/>
+                                              <Component id="jScrollPane3" alignment="0" pref="521" max="32767" attributes="2"/>
+                                              <Component id="tfSolverName" alignment="0" pref="521" max="32767" attributes="2"/>
                                           </Group>
                                       </Group>
-                                      <Component id="jScrollPane2" alignment="1" pref="481" max="32767" attributes="2"/>
+                                      <Component id="jScrollPane2" alignment="1" pref="650" max="32767" attributes="2"/>
                                   </Group>
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
                               </Group>
@@ -684,7 +684,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane1" pref="1075" max="32767" attributes="0"/>
+                      <Component id="jSplitPane1" pref="1237" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -693,7 +693,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane1" max="32767" attributes="0"/>
+                      <Component id="jSplitPane1" pref="737" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -731,7 +731,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="panelInstanceClassTable" alignment="1" pref="275" max="32767" attributes="2"/>
+                                  <Component id="panelInstanceClassTable" alignment="1" pref="312" max="32767" attributes="2"/>
                                   <Component id="panelButtonsInstanceClass" alignment="1" max="32767" attributes="2"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
@@ -799,7 +799,7 @@
                                   <Component id="btnNewInstanceClass" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="btnRemoveInstanceClass" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
+                                  <EmptySpace pref="9" max="32767" attributes="0"/>
                                   <Component id="btnSelectAllInstanceClasses" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
@@ -824,6 +824,9 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" resourceKey="btnNewInstanceClass.text"/>
                             <Property name="name" type="java.lang.String" value="btnNewInstanceClass" noResource="true"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[89, 25]"/>
+                            </Property>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnNewInstanceClassActionPerformed"/>
@@ -833,6 +836,9 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" resourceKey="btnRemoveInstanceClass.text"/>
                             <Property name="name" type="java.lang.String" value="btnRemoveInstanceClass" noResource="true"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[89, 25]"/>
+                            </Property>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRemoveInstanceClassActionPerformed"/>
@@ -882,7 +888,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="panelButtonsInstances" alignment="0" max="32767" attributes="1"/>
-                                  <Component id="panelInstanceTable" alignment="0" pref="734" max="32767" attributes="2"/>
+                                  <Component id="panelInstanceTable" alignment="0" pref="849" max="32767" attributes="2"/>
                               </Group>
                           </Group>
                       </Group>
@@ -978,7 +984,7 @@
                                   <Component id="btnFilterInstances" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="btnExportInstances" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="16" max="32767" attributes="0"/>
+                                  <EmptySpace pref="79" max="32767" attributes="0"/>
                                   <Component id="btnAddToClass" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                   <Component id="btnRemoveFromClass" min="-2" max="-2" attributes="0"/>
@@ -1009,6 +1015,9 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" resourceKey="btnAddInstances.text"/>
                             <Property name="name" type="java.lang.String" value="btnAddInstances" noResource="true"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[83, 25]"/>
+                            </Property>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAddInstancesActionPerformed"/>
@@ -1027,6 +1036,9 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" resourceKey="btnRefreshTableInstances.text"/>
                             <Property name="name" type="java.lang.String" value="btnRefreshTableInstances" noResource="true"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[83, 25]"/>
+                            </Property>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRefreshTableInstancesActionPerformed"/>
@@ -1036,6 +1048,9 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" resourceKey="btnFilterInstances.text"/>
                             <Property name="name" type="java.lang.String" value="btnFilterInstances" noResource="true"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[83, 25]"/>
+                            </Property>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnFilterInstancesActionPerformed"/>
@@ -1045,6 +1060,9 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" resourceKey="btnExportInstances.text"/>
                             <Property name="name" type="java.lang.String" value="btnExportInstances" noResource="true"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[83, 25]"/>
+                            </Property>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnExportInstancesActionPerformed"/>
