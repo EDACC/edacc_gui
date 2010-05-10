@@ -272,21 +272,18 @@ public class ManageDBInstances {
     }
 
     /**
-     * Removes the selected instance classes.
-     * @param selectedRows The instance classes to remove.
+     * Removes the given instance classes.
+     * @param choosen The instance classes to remove.
      * @throws SQLException
      * @throws NoConnectionToDBException
      * @throws InstanceSourceClassHasInstance if one of the selected classes are a source class which has a refernce to an Instance.
      */
-    public void RemoveInstanceClass(int[] selectedRows) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance {
-        InstanceClass instanceClass;
+    public void RemoveInstanceClass(Vector<InstanceClass> choosen) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance {
         Boolean fail = false;
-        for(int i = 0; i < selectedRows.length; i++){
-           instanceClass = (InstanceClass) main.instanceClassTableModel.getValueAt(selectedRows[i], 4);
+        for(int i = 0; i < choosen.size(); i++){
             try {
-                InstanceClassDAO.delete(instanceClass);
-                main.instanceClassTableModel.classes.remove(instanceClass);
-                main.instanceClassTableModel.classSelect.remove(i);
+                InstanceClassDAO.delete(choosen.get(i));
+                main.instanceClassTableModel.removeClass(choosen.get(i));
             } catch (InstanceSourceClassHasInstance ex) {
                 fail = true;
             }
@@ -509,7 +506,7 @@ public class ManageDBInstances {
         Boolean isSource = false;
         try {
             for(int i = 0; i < selectedRowsInstance.length; i++){
-                Instance tempInstance = (Instance) main.instanceTableModel.getValueAt(i, 5);
+                Instance tempInstance = (Instance) main.instanceTableModel.getValueAt(selectedRowsInstance[i], 5);
                 for(int j = 0; j < instanceClass.size(); j++){
                     InstanceClass tempInstanceClass = instanceClass.get(j);
                     if(tempInstanceClass.isSource()){
