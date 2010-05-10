@@ -17,8 +17,6 @@ import edacc.model.InstanceClassDAO;
 import edacc.model.NoConnectionToDBException;
 import java.sql.SQLException;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -136,6 +134,11 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         });
         jTableInstanceClass.setName("jTableInstanceClass"); // NOI18N
         jTableInstanceClass.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jTableInstanceClass.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTableInstanceClassMouseClicked(evt);
+            }
+        });
         jScrollPaneInstanceTable.setViewportView(jTableInstanceClass);
         jTableInstanceClass.getColumnModel().getColumn(0).setHeaderValue(resourceMap.getString("jTableInstanceClass.columnModel.title0")); // NOI18N
         jTableInstanceClass.getColumnModel().getColumn(1).setHeaderValue(resourceMap.getString("jTableInstanceClass.columnModel.title1")); // NOI18N
@@ -147,6 +150,11 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         buttonGroupAutomaticOrManuel.add(jRadioButtonAutomatic);
         jRadioButtonAutomatic.setText(resourceMap.getString("jRadioButtonAutomatic.text")); // NOI18N
         jRadioButtonAutomatic.setName("jRadioButtonAutomatic"); // NOI18N
+        jRadioButtonAutomatic.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonAutomaticActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -250,6 +258,14 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
                     JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_formComponentShown
+
+    private void jTableInstanceClassMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableInstanceClassMouseClicked
+        this.jRadioButtonChoose.setSelected(true);
+    }//GEN-LAST:event_jTableInstanceClassMouseClicked
+
+    private void jRadioButtonAutomaticActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonAutomaticActionPerformed
+       this.jTableInstanceClass.removeRowSelectionInterval(0, this.jTableInstanceClass.getRowCount() - 1);
+    }//GEN-LAST:event_jRadioButtonAutomaticActionPerformed
 
     public InstanceClass getInput(){
         return input;
