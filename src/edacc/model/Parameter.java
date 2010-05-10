@@ -1,6 +1,6 @@
 package edacc.model;
 
-public class Parameter extends BaseModel {
+public class Parameter extends BaseModel implements IntegerPKModel {
     private int id;
     private String name;
     private String prefix;

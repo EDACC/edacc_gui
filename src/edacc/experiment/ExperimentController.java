@@ -351,7 +351,7 @@ public class ExperimentController {
 
     public void loadJobs() {
         try {
-            main.jobsTableModel.jobs = ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId());
+            main.jobsTableModel.setJobs(ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId()));
             main.jobsTableModel.fireTableDataChanged();
             System.gc();
         } catch (Exception e) {
