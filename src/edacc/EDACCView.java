@@ -302,11 +302,30 @@ public class EDACCView extends FrameView implements Observer {
     @Action
     public void btnDisconnect() {
         try {
-            DatabaseConnector.getInstance().disconnect();
+            if (experimentMode.hasUnsavedChanges() || manageDBMode.unsavedChanges) {
+                if (JOptionPane.showConfirmDialog(mode,
+                    "Any unsaved changes will be lost, are you sure you want to disconnect from the database?",
+                    "Warning!",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+
+                    Util.clearCaches();
+                    DatabaseConnector.getInstance().disconnect();
+                    experimentMode.expController.unloadExperiment();
+                    manageDBModeMenuItem.setSelected(false);
+                    manageExperimentModeMenuItem.setSelected(false);
+                    noMode();
+                }
+            }
+            else {
+                Util.clearCaches();
+                DatabaseConnector.getInstance().disconnect();
+                experimentMode.expController.unloadExperiment();
+                manageDBModeMenuItem.setSelected(false);
+                manageExperimentModeMenuItem.setSelected(false);
+                noMode();
+            }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "An error occured while closing the database connection: \n" + ex.getMessage(), "Couldn't close database connection", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            noMode();
         }
     }
 
