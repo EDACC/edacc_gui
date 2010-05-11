@@ -96,6 +96,11 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
             }
         ));
         jTableSourceClass.setName("jTableSourceClass"); // NOI18N
+        jTableSourceClass.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTableSourceClassMouseClicked(evt);
+            }
+        });
         jScrollPaneSourceClass.setViewportView(jTableSourceClass);
 
         buttonGroupSourceOrUser.add(jRadioButtonUserClass);
@@ -117,6 +122,11 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
             }
         ));
         jTableUserClass.setName("jTableUserClass"); // NOI18N
+        jTableUserClass.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTableUserClassMouseClicked(evt);
+            }
+        });
         jScrollPaneUserClass.setViewportView(jTableUserClass);
 
         jPanelButton.setName("jPanelButton"); // NOI18N
@@ -248,6 +258,16 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
                     JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_formWindowActivated
+
+    private void jTableSourceClassMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableSourceClassMouseClicked
+        this.jRadioButtonSourceClass.setSelected(true);
+        this.jTableUserClass.removeRowSelectionInterval(0, this.jTableUserClass.getRowCount() - 1);
+    }//GEN-LAST:event_jTableSourceClassMouseClicked
+
+    private void jTableUserClassMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableUserClassMouseClicked
+        this.jRadioButtonUserClass.setSelected(true);
+        this.jTableSourceClass.removeRowSelectionInterval(0, this.jTableSourceClass.getRowCount() - 1);
+    }//GEN-LAST:event_jTableUserClassMouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroupSourceOrUser;
