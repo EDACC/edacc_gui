@@ -39,7 +39,6 @@ public class ExperimentHasInstanceDAO {
         i.setId(rs.getInt(1));
         i.setExperiment_id(rs.getInt(2));
         i.setInstances_id(rs.getInt(3));
-        i.setNew();
         return i;
     }
 

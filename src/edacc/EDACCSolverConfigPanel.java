@@ -141,6 +141,24 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
             SolverConfigurationDAO.removeSolverConfiguration(entry.getSolverConfiguration());
         }
         this.remove(entry);
+
+        // if this was the last solver configuration for the corresponding solver
+        // we will deselect the solver in the solvers table
+        boolean lastSolver = true;
+        for (Component c : this.getComponents()) {
+            if (((EDACCSolverConfigEntry)c).getSolverId() == entry.getSolverId()) {
+                lastSolver = false;
+                break;
+            }
+        }
+        if (lastSolver) {
+            for (int i = 0; i < parent.solTableModel.getRowCount(); i++) {
+                if (((Solver)parent.solTableModel.getValueAt(i, 5)).getId() == entry.getSolverId()) {
+                    parent.solTableModel.setValueAt(false, i, 4);
+                    break;
+                }
+            }
+        }
         doRepaint();
         setTitles();
     }

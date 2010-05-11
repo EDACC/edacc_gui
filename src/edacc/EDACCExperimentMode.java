@@ -828,7 +828,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             lblNumJobs.setText(String.valueOf(expController.getNumJobs()) + " jobs in the database");
         } else if (manageExperimentPane.getSelectedIndex() == 4) {
             // job browser tab
-            Tasks.startTask("loadJobs", expController, this);
+
+            // first draw the results browser, then load the jobs (SwingUtilites)
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    Tasks.startTask("loadJobs", expController, EDACCExperimentMode.this);
+                }
+
+            });
         }
     }//GEN-LAST:event_manageExperimentPaneStateChanged
 
