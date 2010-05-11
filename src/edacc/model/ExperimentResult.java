@@ -19,12 +19,13 @@ public class ExperimentResult extends BaseModel{
         this.run = run;
         this.status = status;
         this.seed = seed;
-        this.resultFileName = resultFileName;
         this.time = time;
         this.statusCode = statusCode;
         this.SolverConfigId = SolverConfigId;
         this.ExperimentId = ExperimentId;
         this.InstanceId = InstanceId;
+        this.resultFileName = "results/"+this.ExperimentId+"_"+this.SolverConfigId+"_"+this.InstanceId+"_R"+this.run+".res";
+
     }
 
     @Override
