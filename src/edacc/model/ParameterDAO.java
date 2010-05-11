@@ -2,8 +2,6 @@ package edacc.model;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.Hashtable;
 import java.sql.ResultSet;
 import java.util.Vector;
 
@@ -13,7 +11,7 @@ import java.util.Vector;
  */
 public class ParameterDAO {
     private static final String table = "Parameters";
-
+    private static final ObjectCache<Parameter> cache = new ObjectCache<Parameter>();
 
     /**
      * TODO Add caching for parameters??
@@ -55,6 +53,7 @@ public class ParameterDAO {
             ps.executeUpdate();
             parameter.setSaved();
         }
+        cache.cache(parameter);
     }
 
     private static Parameter getParameterFromResultset(ResultSet rs) throws SQLException {
@@ -80,11 +79,31 @@ public class ParameterDAO {
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
-            Parameter i = getParameterFromResultset(rs);
+            Parameter i = cache.getCached(rs.getInt("idParameter"));
+            if (i == null) {
+                i = getParameterFromResultset(rs);
+                cache.cache(i);
+            }
             res.add(i);
             i.setSaved();
         }
         return res;
+    }
+
+    public static Parameter getById(int id) throws SQLException {
+        Parameter i = cache.getCached(id);
+        if (i != null) {
+            return i;
+        }
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idParameter=?");
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            i = getParameterFromResultset(rs);
+            cache.cache(i);
+            return i;
+        }
+        return null;
     }
 
     /**
@@ -94,17 +113,26 @@ public class ParameterDAO {
      * @throws SQLException
      */
     public static void removeParametersOfSolver(Solver solver) throws NoConnectionToDBException, SQLException {
-        final String query = "DELETE FROM Parameters WHERE Solver_idSolver=?";
-        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
-        ps.setInt(1, solver.getId());
-        ps.executeUpdate();
+       // final String query = "DELETE FROM Parameters WHERE Solver_idSolver=?";
+      //  PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+       // ps.setInt(1, solver.getId());
+      //  ps.executeUpdate();
+        Vector<Parameter> params = getParameterFromSolverId(solver.getId());
+        for (Parameter param: params) {
+            delete(param);
+        }
     }
 
     public static void delete(Parameter p) throws NoConnectionToDBException, SQLException {
+        cache.remove(p);
         if (p.isNew()) return;
         final String query = "DELETE FROM Parameters WHERE idParameter=?";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.setInt(1, p.getId());
         ps.executeUpdate();
+    }
+
+    public static void clearCache() {
+        cache.clear();
     }
 }

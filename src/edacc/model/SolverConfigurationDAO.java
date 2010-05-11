@@ -96,6 +96,27 @@ public class SolverConfigurationDAO {
         return res;
     }
 
+    public static SolverConfiguration getSolverConfigurationById(int id) throws SQLException {
+        SolverConfiguration sc = cache.getCached(id);
+        if (sc != null) return sc;
+
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idSolverConfig=?");
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        sc = new SolverConfiguration();
+        if (rs.next()) {
+            sc.setId(rs.getInt("idSolverConfig"));
+            sc.setSolver_id(rs.getInt("Solver_idSolver"));
+            sc.setExperiment_id(rs.getInt("Experiment_idExperiment"));
+            sc.setSeed_group(rs.getInt("seed_group"));
+            sc.setSaved();
+            cache.cache(sc);
+            return sc;
+        }
+        rs.close();
+        return null;
+    }
+
     /**
      * Equalises local data with database data so that the state of all
      * solver configurations is saved.

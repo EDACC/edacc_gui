@@ -8,6 +8,7 @@ import edacc.model.ExperimentDAO;
 import edacc.model.GridQueueDAO;
 import edacc.model.InstanceClassDAO;
 import edacc.model.InstanceDAO;
+import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstanceDAO;
 import edacc.model.SolverDAO;
 import java.io.BufferedOutputStream;
@@ -111,6 +112,7 @@ public class Util {
         InstanceClassDAO.clearCache();
         SolverDAO.clearCache();
         ParameterInstanceDAO.clearCache();
+        ParameterDAO.clearCache();
     }
 }
 

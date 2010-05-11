@@ -146,11 +146,6 @@ public class ManageDBInstances {
                     "A problem with the MD5-algorithm has occured: " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
-        } catch (InstanceException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
                     "Chosen file or directory not found: " + ex.getMessage(),
@@ -277,21 +272,18 @@ public class ManageDBInstances {
     }
 
     /**
-     * Removes the selected instance classes.
-     * @param selectedRows The instance classes to remove.
+     * Removes the given instance classes.
+     * @param choosen The instance classes to remove.
      * @throws SQLException
      * @throws NoConnectionToDBException
      * @throws InstanceSourceClassHasInstance if one of the selected classes are a source class which has a refernce to an Instance.
      */
-    public void RemoveInstanceClass(int[] selectedRows) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance {
-        InstanceClass instanceClass;
+    public void RemoveInstanceClass(Vector<InstanceClass> choosen) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance {
         Boolean fail = false;
-        for(int i = 0; i < selectedRows.length; i++){
-           instanceClass = (InstanceClass) main.instanceClassTableModel.getValueAt(selectedRows[i], 4);
+        for(int i = 0; i < choosen.size(); i++){
             try {
-                InstanceClassDAO.delete(instanceClass);
-                main.instanceClassTableModel.classes.remove(instanceClass);
-                main.instanceClassTableModel.classSelect.remove(i);
+                InstanceClassDAO.delete(choosen.get(i));
+                main.instanceClassTableModel.removeClass(choosen.get(i));
             } catch (InstanceSourceClassHasInstance ex) {
                 fail = true;
             }
@@ -327,25 +319,44 @@ public class ManageDBInstances {
      */
     private Vector<Instance> buildInstancesGivenClass(Vector<File> instanceFiles, InstanceClass instanceClass)
             throws FileNotFoundException, NullPointerException, NullPointerException, IOException,
-            InstanceException, NoSuchAlgorithmException, SQLException {
+            NoSuchAlgorithmException, SQLException {
 
         Vector<Instance> instances = new Vector<Instance>();
         String duplicatesDB = "";
-
+        StringBuilder instanceErrors = new StringBuilder("");
+        int errCount = 0;
+        
         for (int i = 0; i < instanceFiles.size(); i++) {
 
             try {
                 String md5 = calculateMD5(instanceFiles.get(i));
-                InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
-                Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, tempInstance.n,
-                        tempInstance.m, tempInstance.r, tempInstance.k, md5, instanceClass);{
-                instances.add(temp);
-                InstanceDAO.save(temp);
+                try {
+                    InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
+                    Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, tempInstance.n,
+                            tempInstance.m, tempInstance.r, tempInstance.k, md5, instanceClass);
+                    instances.add(temp);
+                    InstanceDAO.save(temp);
+                } catch (InstanceException e) {
+                    if (++errCount <= 20) { // show only first 20 errors
+                        instanceErrors.append(instanceFiles.get(i).getName() + ": " + e.getMessage() + '\n');
+                    }
                 }
             } catch (InstanceAlreadyInDBException ex) {
                 duplicatesDB += "\n " + instanceFiles.get(i).getAbsolutePath();
             }
 
+        }
+
+        String instanceErrs = instanceErrors.toString();
+        if (!"".equals(instanceErrs)) {
+            String err = "The following errors occured while adding the instances. Added only instances without errors:\n\n" + instanceErrs;
+            if (errCount > 20) {
+                err += "\n... and " + (errCount - 20) + " more errors";
+            }
+             JOptionPane.showMessageDialog(panelManageDBInstances,
+                    err,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
 
         if(!duplicatesDB.equals("")){
@@ -371,31 +382,52 @@ public class ManageDBInstances {
      * @throws InstanceException
      * @throws SQLException
      */
-    private Vector<Instance> buildInstancesAutogenerateClass(Vector<File> instanceFiles, File ret) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, InstanceException, SQLException {
+    private Vector<Instance> buildInstancesAutogenerateClass(Vector<File> instanceFiles, File ret) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException {
         
         Vector<Instance> instances = new Vector<Instance>();
         String duplicatesDB = "";
+        StringBuilder instanceErrors = new StringBuilder("");
         InstanceClass instanceClass;
+        int errCount = 0;
+
 
         for (int i = 0; i < instanceFiles.size(); i++) {
             try {
                 String name = autogenerateInstanceClassName(ret.getParent(), instanceFiles.get(i));
                 try {
-                    instanceClass = InstanceClassDAO.createInstanceClass(name, "Autogernerated instance source class", true);
+                    instanceClass = InstanceClassDAO.createInstanceClass(name, "Autogenerated instance source class", true);
                 } catch (InstanceClassAlreadyInDBException ex) {
                     instanceClass = InstanceClassDAO.getByName(name);
                 }
                 String md5 = calculateMD5(instanceFiles.get(i));
-                InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
-                Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, tempInstance.n, tempInstance.m, tempInstance.r, tempInstance.k, md5, instanceClass);
-                {
+                try {
+                    InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
+                    Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, tempInstance.n, tempInstance.m, tempInstance.r, tempInstance.k, md5, instanceClass);
                     instances.add(temp);
                     InstanceDAO.save(temp);
                 }
+                catch (InstanceException e) {
+                    if (++errCount <= 20) { // show only first 20 errors
+                        instanceErrors.append(instanceFiles.get(i).getName() + ": " + e.getMessage() + '\n');
+                    }
+                }
+
             } catch (InstanceAlreadyInDBException ex) {
                 duplicatesDB += "\n " + instanceFiles.get(i).getAbsolutePath();
             }
 
+        }
+
+        String instanceErrs = instanceErrors.toString();
+        if (!"".equals(instanceErrs)) {
+            String err = "The following errors occured while adding the instances. Added only instances without errors:\n\n" + instanceErrs;
+            if (errCount > 20) {
+                err += "\n... and " + (errCount - 20) + " more errors";
+            }
+             JOptionPane.showMessageDialog(panelManageDBInstances,
+                    err,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
 
         if(!duplicatesDB.equals("")){
@@ -474,7 +506,7 @@ public class ManageDBInstances {
         Boolean isSource = false;
         try {
             for(int i = 0; i < selectedRowsInstance.length; i++){
-                Instance tempInstance = (Instance) main.instanceTableModel.getValueAt(i, 5);
+                Instance tempInstance = (Instance) main.instanceTableModel.getValueAt(selectedRowsInstance[i], 5);
                 for(int j = 0; j < instanceClass.size(); j++){
                     InstanceClass tempInstanceClass = instanceClass.get(j);
                     if(tempInstanceClass.isSource()){

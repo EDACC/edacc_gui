@@ -94,6 +94,12 @@ public class InstanceClassTableModel extends AbstractTableModel{
         this.classSelect.remove(row);
     }
 
+       public void removeClass(InstanceClass instanceClass){
+        int index = this.classes.indexOf(instanceClass);
+        this.classSelect.remove(index);
+        this.classes.remove(index);
+    }
+
     public void setInstanceClassSelected(int row){
         if(!all){
             setValueAt(true, row, 3 );
