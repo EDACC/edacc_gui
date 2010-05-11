@@ -408,7 +408,7 @@ public class ExperimentController {
         addClient(zos);
 
         // add empty result library
-        entry = new ZipEntry("result" + fileSep + "~");
+        entry = new ZipEntry("results" + fileSep + "~");
         zos.putNextEntry(entry);
 
         zos.close();
