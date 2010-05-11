@@ -141,8 +141,6 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
             SolverConfigurationDAO.removeSolverConfiguration(entry.getSolverConfiguration());
         }
         this.remove(entry);
-        System.out.println("TRYING PROP CHANGE");
-        firePropertyChange("changed", 0, 0);
         doRepaint();
         setTitles();
     }

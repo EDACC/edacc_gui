@@ -43,7 +43,7 @@ public class ExperimentHasInstanceDAO {
         return i;
     }
 
-    public static void save(ExperimentHasInstance i) throws SQLException {
+    private static void save(ExperimentHasInstance i) throws SQLException {
         if (i.isDeleted()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
             st.setInt(1, i.getId());

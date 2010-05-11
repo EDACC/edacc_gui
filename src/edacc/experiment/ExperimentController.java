@@ -90,6 +90,7 @@ public class ExperimentController {
      */
     public void loadExperiment(int id, Tasks task) throws SQLException {
         solverConfigPanel.removeAll();
+        SolverConfigurationDAO.clearCache();
         task.setStatus("Loading solvers..");
         activeExperiment = ExperimentDAO.getById(id);
         Vector<Solver> vs = new Vector<Solver>();
