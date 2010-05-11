@@ -627,3 +627,91 @@ void freeInstance(instance *i) {
         free(i->instance);
     }
 }
+
+
+int check_params(job* j, int id) {
+    MYSQL *conn = NULL;
+    MYSQL_RES *res = NULL;
+    MYSQL_ROW row;
+
+    char *queryJobParams = NULL;
+
+    char *params = NULL;
+
+    conn = mysql_init(NULL);
+    if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+        printf("connect fail\n");
+        return 1;
+    }
+
+    sprintfAlloc(&queryJobParams, QUERY_JOB_PARAMS, id);
+
+    //printf("Query: %s\n", queryJobParams);
+
+    /* fetch params information */
+    if(mysql_query(conn, queryJobParams) != 0) {
+        mysql_free_result(res);
+        printf("query fail\n");
+        return 1;
+    }
+
+    mysql_free_result(res);
+    if((res = mysql_store_result(conn)) == NULL) {
+        printf("is null\n");
+        return 1;
+    }
+
+    
+    params = (char *)calloc(256,sizeof(char));
+
+    //printf("beginning while\n");
+    while((row = mysql_fetch_row(res)) != NULL) {
+        //printf("row fetched\n");
+      
+        // check whether this parameters uses a value
+        if(row[2]) {
+            // look whether there's a custom definied value
+            if(row[4] != NULL && strcmp(row[4],"")!=0) {
+                params = strcat(params, row[1]);
+                params = strcat(params, row[0]);
+                params = strcat(params, " ");
+                params = strcat(params, row[4]);
+                params = strcat(params, " ");
+            // look whether there's a default definied value
+            } else if(row[3] != NULL && strcmp(row[3],"")!=0) {
+                params = strcat(params, row[1]);
+                params = strcat(params, row[0]);
+                params = strcat(params, " ");
+                params = strcat(params, row[3]);
+                params = strcat(params, " ");
+            }
+
+        }
+        
+        /*
+        if(strcmp(row[2],"")!=0) {
+            params = strcat(params, row[1]);
+            params = strcat(params, row[0]);
+            params = strcat(params, " ");
+
+            if(row[2] != NULL) {
+                if(row[4] == NULL) {
+                    params = strcat(params, row[3]);
+                } else {
+                    params = strcat(params, row[4]);
+                }
+            }
+            params = strcat(params, " ");
+        }
+        */
+    }
+
+    strcpy(j->params, params);
+    printf("params value: %s\n", params);
+    printf("j->params value: %s\n", j->params);
+
+    free(params);
+    mysql_free_result(res);
+    mysql_close(conn);
+    return 0;
+}

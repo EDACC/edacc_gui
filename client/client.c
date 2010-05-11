@@ -534,13 +534,7 @@ status setStartTime(job *j) {
 
 void test_main() {
     job j;
-    status s;
-
-    j.id=1;
-    if(fetchJob(&j, &s)!=0) {
-        printf("unable to fetch job\n");
-    } else {
-    }
+    check_params(&j, 1);
 }
 
 int main(int argc, char *argv[]) {
@@ -561,8 +555,8 @@ int main(int argc, char *argv[]) {
 		exit(s);
 	}
 
-    //test_main();
-    //exit(0);
+    test_main();
+    exit(0);
 
 
 	s=init(argc, argv);
