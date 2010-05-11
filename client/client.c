@@ -29,6 +29,9 @@ static int jobsLen;
 
 //The path where we want to create solvers, instances and temporary files
 static char* basename="./";
+static char* solverDir = "./solvers/";
+static char* instancesDir = "./instances/";
+static char* resultsDir = "./results/";
 
 //The length of basename without the terminating '\0' character
 static int basenameLen;
@@ -77,11 +80,12 @@ status createFile(const char* fileName, const char* content, size_t contentLen, 
 	char md5String[33];
 	int i;
 	char* md5StringPtr;
+	int posDiff;
 
 	//Create the file
 	dst=fopen(fileName, "w+");
 	if(dst==NULL) {
-		logError("(1) Unable to open %s: %s\n", fileName, strerror(errno));
+		logError(" Unable to open %s: %s\n", fileName, strerror(errno));
 		return sysError;
 	}
 
@@ -99,8 +103,12 @@ status createFile(const char* fileName, const char* content, size_t contentLen, 
 	for(i=0, md5StringPtr=md5String; i<16; ++i, md5StringPtr+=2)
 		sprintf(md5StringPtr, "%02x", md5Buffer[i]);
 	md5String[32]='\0';
-	if(strcasecmp(md5String, md5sum)!=0) {
-		logError("The md5 sum of %s doesn't match\n", fileName);
+	posDiff=strcasecmp(md5String, md5sum);
+	if(posDiff!=0) {
+		logError("The md5 sum doesn't match for file: %s\n", fileName);
+		logError("%20s = %s\n","DB md5 sum",md5sum);
+		logError("%20s = %s\n","Computed md5 sum",md5sum);
+		logError("position where they start to differ = %d\n",posDiff);
 		fclose(dst);
 		return sysError;
 	}
@@ -122,20 +130,26 @@ status init(int argc, char *argv[]) {
 	status s;
 	int i;
 
-	if(argc>1)
-		basename=argv[1];
-	basenameLen=strlen(basename);
+	//printf("Got %d arguments and they are: %s", argc, argv);
 
+	if (argc>2)
+		basename=argv[2];
+	//TODO: Option parser
+	basenameLen=strlen(basename);
+	logComment(1,"base directory is: %s\n",basename);
 	s=dbFetchExperimentData(&exp);
 	if(s!=success)
 		return s;
 	jobsLen=exp.numCPUs;
+	logComment(2,"numCpus per Node = %d\n",jobsLen);
 	timeOut=exp.timeOut;
+	logComment(2,"timeOut for jobs = %d s\n",timeOut);
 
 
 	for(i=0; i<exp.numSolvers; ++i) {
 		//Prepend the solver name with pathname
 		fileName=prependBasename(exp.solverNames[i]);
+		//TODO: prependSolverDir(...); 3 defines definieren
 		if(fileName==NULL) {
 			logError("Error: Out of memory\n");
 			freeExperimentData(&exp);
@@ -154,7 +168,7 @@ status init(int argc, char *argv[]) {
 			continue;
 		}
 		if(createFile(fileName, exp.solvers[i], exp.lengthSolver[i],
-		   exp.md5Solvers[i], 0111)!=success                                  ) {
+				exp.md5Solvers[i], 0111)!=success                                  ) {
 			free(fileName);
 			unlockMutex();
 			freeExperimentData(&exp);
@@ -189,7 +203,7 @@ status init(int argc, char *argv[]) {
 			continue;
 		}
 		if(createFile(fileName, exp.instances[i], strlen(exp.instances[i]),
-		   exp.md5Instances[i], 0444)!=success                                         ) {
+				exp.md5Instances[i], 0444)!=success                                         ) {
 			free(fileName);
 			unlockMutex();
 			freeExperimentData(&exp);
@@ -297,6 +311,7 @@ status processResults(job* j) {
 	}
 
 	//Parse the temporary result file of j
+	logComment(4, "Trying to open for parsing results: %s\n", fileName);
 	filePtr=fopen(fileName, "r");
 	if(filePtr==NULL) {
 		logError("Unable to open %s: %s\n", fileName, strerror(errno));
@@ -486,16 +501,17 @@ status setJobArgs(const job* j) {
 		free(solverName);
 		return sysError;
 	}
+	//TODO: hier kann runsolver hinzugefuegt werden
 	if(sprintfAlloc(&command,
-	                "ulimit -S -t %d && /usr/bin/time -a -o %s -f \"|%%C|%%U|%%x\" %s %s %s >> %s",
-	                timeOut, fileName, solverName, j->params, instanceName, fileName          ) < 0) {
+			"ulimit -S -t %d && /usr/bin/time -a -o %s -f \"|%%C|%%U|%%x\" %s %s %s >> %s",
+			timeOut, fileName, solverName, j->params, instanceName, fileName          ) < 0) {
 		logError("Error in sprintfAlloc()\n");
 		free(fileName);
 		free(solverName);
 		free(instanceName);
 		return sysError;
 	}
-    //printf("command: %s\n", command);
+	//printf("command: %s\n", command);
 
 	jobArgs[0]="/bin/bash";
 	jobArgs[1]="-c";
@@ -533,13 +549,22 @@ status setStartTime(job *j) {
 }
 
 void test_main() {
-    job j;
-    check_params(&j, 1);
+	job j;
+	status s;
+
+	j.id=1;
+	if(fetchJob(&j, &s)!=0) {
+		printf("unable to fetch job\n");
+	} else {
+	}
 }
 
 int main(int argc, char *argv[]) {
-    //cleanMutex();
-    //return 0;
+	if(argc>1)
+		verbosity=atoi(argv[1]);
+	cleanMutex(); //TODO: sollte das immer ausgefuehrt werden!?
+
+	//return 0;
 
 	int numJobs;
 	status s;
@@ -549,25 +574,25 @@ int main(int argc, char *argv[]) {
 	instance inst;
 	char* fileName;
 
+	logComment(1,"reading from configuration file...\n");
 	s=read_config();
 	if(s!=success) {
-        logError("Couldn't read config successfully.");
+		logError("couldn't read config successfully.");
 		exit(s);
 	}
 
-    test_main();
-    exit(0);
+	//test_main();
+	//exit(0);
 
 
 	s=init(argc, argv);
 	if(s!=success) {
-        logError("Couldn't init successfully, for experiment %i.\n", experimentId);
+		logError("Couldn't init successfully, for experiment %i.\n", experimentId);
 		exit(s);
 	}
 
 
 	setSignalHandler(signalHandler);
-
 	for(numJobs=0; ;--numJobs) {
 		//Run jobsLen child processes, each of them processing one job
 		for(; numJobs<jobsLen; ++numJobs) {
@@ -600,6 +625,7 @@ int main(int argc, char *argv[]) {
 
 			//Set the job state to running in the database
 			j->status=0;
+			j->time=0;
 			s=update(j);
 			if(s!=success) {
 				unlockMutex();
@@ -607,7 +633,7 @@ int main(int argc, char *argv[]) {
 			}
 
 			//Create the solver binary if it doesn't exist yet
-            //printf("creating solver binary %s ...\n", j->solverName);
+			logComment(4,"checking for solver binary: %s ...\n", j->solverName);
 			fileName=prependBasename(j->solverName);
 			if(fileName==NULL) {
 				logError("Error: Out of memory\n");
@@ -617,7 +643,7 @@ int main(int argc, char *argv[]) {
 				exitClient(sysError);
 			}
 			if(!fileExists(fileName)) {
-                //printf("file doesn't exist\n");
+				//printf("file doesn't exist\n");
 				s=dbFetchSolver(j->solverName, &solv);
 				if(s!=success) {
 					unlockMutex();
@@ -639,6 +665,7 @@ int main(int argc, char *argv[]) {
 			free(fileName);
 
 			//Create the instance file if it doesn't exist yet
+			logComment(4,"checking for instance: %s ...\n", j->instanceName);
 			fileName=prependBasename(j->instanceName);
 			if(fileName==NULL) {
 				logError("Error: Out of memory\n");
@@ -680,17 +707,16 @@ int main(int argc, char *argv[]) {
 			if(pid==-1) {
 				logError("Error in fork(): %s\n", strerror(errno));
 				j->status=-2;
-				s=update(j);
 				exitClient(sysError);
 			} else if(pid==0) {
 				//This is the child process. Disable the inherited signal handler.
 				deferSignals();
 				//Set up jobArgs and run the command
 				if(s==success && (s=setJobArgs(j))==success) {
-/*                     for(t = jobArgs; t!=NULL; ++t) {
- *                         printf("jobArgs: %s\n", t);
- *                     }
- */
+					/*                     for(t = jobArgs; t!=NULL; ++t) {
+					 *                         printf("jobArgs: %s\n", t);
+					 *                     }
+					 */
 					if(execve("/bin/bash", jobArgs, NULL)==-1) {
 						logError("Error in execve(): %s\n", strerror(errno));
 						freeJobArgs();

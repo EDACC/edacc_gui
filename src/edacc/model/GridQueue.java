@@ -134,4 +134,9 @@ public class GridQueue extends BaseModel implements IntegerPKModel {
             this.setModified();
         }
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

@@ -1,6 +1,7 @@
 CC=gcc
-CFLAGS=-O2 -W -Wall -Wextra
-
+#CFLAGS=-O2 -W -Wall -Wextra
+#for debugging
+CFLAGS=-g3 -ggdb -W -Wall -Wextra
 all: client
 
 clean:

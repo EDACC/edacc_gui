@@ -71,7 +71,7 @@ void unrefMutex() {
 			//Something is seriously wrong. Try to destroy the semaphores.
 			sem_close(mutex);
 			sem_unlink(mutexName);
-			sem_close(refCnt); 
+			sem_close(refCnt);
 			sem_unlink(refCntName);
 		} else if(numRefs==1) {
 			//This is the last process having mutex opened. Destroy the semaphores.
@@ -88,9 +88,9 @@ void unrefMutex() {
 			if(sem_trywait(refCnt)==-1) {
 				logError("Error in sem_trywait() for semaphore named %s: %s\n", refCntName, strerror(errno));
 				//Something is seriously wrong. Try to destroy the semaphores.
-				sem_close(mutex); 
+				sem_close(mutex);
 				sem_unlink(mutexName);
-				sem_close(refCnt); 
+				sem_close(refCnt);
 				sem_unlink(refCntName);
 			} else {
 				//Close the semaphores, but don't destroy them.
@@ -102,15 +102,18 @@ void unrefMutex() {
 		}
 	} else if(mutex!=NULL) {
 		//mutex is opened but refCnt is not. Try to destroy mutex.
-		sem_close(mutex); 
+		sem_close(mutex);
 		sem_unlink(mutexName);
 	}
 }
 
 void cleanMutex() {
+	logComment(4,"Trying to close all mutex...");
 	sem_close(mutex);
 	sem_unlink(mutexName);
-	sem_close(refCnt); 
+	sem_close(refCnt);
 	sem_unlink(refCntName);
+	logComment(4," closed!\n");
+
 }
 

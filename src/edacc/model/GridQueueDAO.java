@@ -82,8 +82,6 @@ public class GridQueueDAO {
         PreparedStatement ps;
         if (q.isNew()) {
             // insert query, set ID!
-            // TODO insert instance blob
-            // insert instance into db
             final String insertQuery = "INSERT INTO " + table + " (name, location, numNodes, numCPUs, wallTime, availNodes, maxJobsQueue, description, genericPBSScript) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -136,6 +134,18 @@ public class GridQueueDAO {
 
         ps.close();
         q.setSaved();
+    }
+
+    public static void remove(GridQueue q) throws NoConnectionToDBException, SQLException {
+        if (q.isNew())
+            return;
+        final String deleteQuery = "DELETE FROM " + table
+                    + " WHERE idgridQueue=?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
+        ps.setInt(1, q.getId());
+        ps.executeUpdate();
+        cache.remove(q);
+        q.setDeleted();
     }
 
 
