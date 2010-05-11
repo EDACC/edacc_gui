@@ -37,7 +37,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 import javax.swing.JFileChooser;
 
@@ -52,7 +51,7 @@ public class ExperimentController {
     EDACCSolverConfigPanel solverConfigPanel;
     private Experiment activeExperiment;
     private Vector<Experiment> experiments;
-    private Vector<Instance> instances;
+   // private Vector<Instance> instances;
     private Vector<Solver> solvers;
     private Vector<InstanceClass> instanceClasses;
     private static RandomNumberGenerator rnd = new JavaRandom();
@@ -77,8 +76,6 @@ public class ExperimentController {
         experiments = v;
         main.expTableModel.setExperiments(experiments);
 
-        instances = new Vector<Instance>();
-
         Vector<InstanceClass> vic = new Vector<InstanceClass>();
         vic.addAll(InstanceClassDAO.getAll());
         instanceClasses = vic;
@@ -92,9 +89,8 @@ public class ExperimentController {
      * @throws SQLException
      */
     public void loadExperiment(int id, Tasks task) throws SQLException {
-        //if (activeExperiment != null) {
         solverConfigPanel.removeAll();
-        //}
+        SolverConfigurationDAO.clearCache();
         task.setStatus("Loading solvers..");
         activeExperiment = ExperimentDAO.getById(id);
         Vector<Solver> vs = new Vector<Solver>();
@@ -118,10 +114,9 @@ public class ExperimentController {
         task.setStatus("Loading instances..");
         main.insTableModel.setExperimentHasInstances(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
 
-        if (instances.size() > 0) {
+        if (main.insTableModel.getRowCount() > 0) {
             main.sorter.setRowFilter(main.rowFilter);
         }
-
         main.afterExperimentLoaded();
     }
 
@@ -205,19 +200,18 @@ public class ExperimentController {
      */
     public void saveExperimentHasInstances(Tasks task) throws SQLException {
         task.setStatus("Saving instances..");
-        for (int i = 0; i < main.insTableModel.getRowCount(); i++) {
-            if ((Boolean) main.insTableModel.getValueAt(i, 5)) {
-                if ((ExperimentHasInstance) main.insTableModel.getValueAt(i, 6) == null) {
-                    main.insTableModel.setExperimentHasInstance(ExperimentHasInstanceDAO.createExperimentHasInstance(activeExperiment.getId(), ((Instance) main.insTableModel.getValueAt(i, 7)).getId()), i);
-                }
-            } else {
-                ExperimentHasInstance ei = (ExperimentHasInstance) main.insTableModel.getValueAt(i, 6);
-                if (ei != null) {
-                    ExperimentHasInstanceDAO.removeExperimentHasInstance(ei);
-                    main.insTableModel.setExperimentHasInstance(null, i);
-                }
-            }
+
+        // First: add all new ExperimentHasInstance objects
+        for (Integer instanceId: main.insTableModel.getNewInstanceIds()) {
+            ExperimentHasInstanceDAO.createExperimentHasInstance(activeExperiment.getId(), instanceId);
         }
+
+        // Then: remove all removed ExperimentHasInstance objects
+        for (ExperimentHasInstance ehi: main.insTableModel.getDeletedExperimentHasInstances()) {
+            ExperimentHasInstanceDAO.removeExperimentHasInstance(ehi);
+        }
+
+        main.insTableModel.setExperimentHasInstances(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
     }
 
     /**
@@ -346,7 +340,7 @@ public class ExperimentController {
      * @return
      */
     public int getNumInstances() {
-        return instances.size();
+        return main.insTableModel.getRowCount();
     }
 
     public void loadJobs() {
@@ -471,24 +465,20 @@ public class ExperimentController {
         ExperimentHasGridQueue eq = ExperimentHasGridQueueDAO.createExperimentHasGridQueue(activeExperiment, q);
     }
 
-    void addInstancesToVector(Vector<Instance> instances) {
-        this.instances.addAll(instances);
-    }
-
-    void removeAllInstancesFromVector() {
-        this.instances.clear();
-    }
-
     public void selectAllInstanceClasses() {
+        main.instanceClassModel.beginUpdate();
         for (int i = 0; i < main.instanceClassModel.getRowCount(); i++) {
             main.instanceClassModel.setInstanceClassSelected(i);
         }
+        main.instanceClassModel.endUpdate();
     }
 
     public void deselectAllInstanceClasses() {
+        main.instanceClassModel.beginUpdate();
         for (int i = 0; i < main.instanceClassModel.getRowCount(); i++) {
             main.instanceClassModel.setInstanceClassDeselected(i);
         }
+        main.instanceClassModel.endUpdate();
     }
 
     private void addConfigurationFile(ZipOutputStream zos, Experiment activeExperiment, GridQueue activeQueue) throws IOException {

@@ -41,6 +41,26 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
         this.fireTableDataChanged();
     }
 
+    public boolean isModified() {
+        for (int i = 0; i < parameterInstances.length; i++) {
+            if (selected[i]) {
+                if (parameterInstances[i] == null) {
+                    return true;
+                }
+                if (parameters[i].getId() == parameterInstances[i].getParameter_id()) {
+                    if (parameters[i].getHasValue() && !values[i].equals(parameterInstances[i].getValue())) {
+                        return true;
+                    }
+                }
+            } else {
+                if (parameterInstances[i] != null) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public void setParameterInstances(Vector<ParameterInstance> params) {
         for (int i = 0; i < params.size(); i++) {
             for (int j = 0; j < parameters.length; j++) {
@@ -83,7 +103,7 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int col) {
-        if (col == 4 || (col == 2 && ((Parameter)getValueAt(row, 5)).getHasValue())) {
+        if (col == 4 || (col == 2 && ((Parameter) getValueAt(row, 5)).getHasValue())) {
             return true;
         }
         return false;
@@ -106,10 +126,11 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
             case 1:
                 return parameters[rowIndex].getPrefix();
             case 2:
-                if (parameters[rowIndex].getHasValue()) 
+                if (parameters[rowIndex].getHasValue()) {
                     return values[rowIndex];
-                else
+                } else {
                     return "togglable flag";
+                }
             case 3:
                 return parameters[rowIndex].getOrder();
             case 4:

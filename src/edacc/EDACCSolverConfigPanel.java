@@ -17,7 +17,10 @@ import edacc.model.SolverDAO;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.Vector;
 
 /**
  * A JPanel which serves as container for EDACCSolverConfigEntry objects.
@@ -28,14 +31,26 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
 
     private GridBagConstraints gridBagConstraints = new GridBagConstraints();
     private GridBagLayout layout;
+    private EDACCExperimentMode parent;
     private boolean update;
 
     /** Creates new form EDACCSolverConfigPanel */
     public EDACCSolverConfigPanel() {
         initComponents();
+        this.parent = null;
         layout = new GridBagLayout();
         this.setLayout(layout);
         this.update = false;
+    }
+
+    public void setParent(EDACCExperimentMode parent) {
+        this.parent = parent;
+    }
+
+    public void setTitles() {
+        if (parent != null) {
+            parent.setTitles();
+        }
     }
 
     private void doRepaint() {
@@ -94,7 +109,6 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
      */
     public void replicateEntry(EDACCSolverConfigEntry entry) throws SQLException {
         EDACCSolverConfigEntry repl = new EDACCSolverConfigEntry(SolverDAO.getById(entry.getSolverId()));
-        repl.getSeedGroup().setText(entry.getSeedGroup().getText());
         repl.setParent(this);
         repl.assign(entry);
         GridBagConstraints c = layout.getConstraints(entry);
@@ -114,6 +128,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
             layout.setConstraints(this.getComponent(i), gridBagConstraints);
         }
         doRepaint();
+        setTitles();
     }
 
     /**
@@ -127,6 +142,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
         }
         this.remove(entry);
         doRepaint();
+        setTitles();
     }
 
     /**
@@ -146,6 +162,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
             }
         }
         doRepaint();
+        setTitles();
     }
 
     /**
@@ -175,6 +192,28 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
     public void endUpdate() {
         this.update = false;
         doRepaint();
+    }
+
+    /**
+     * Checks for unsaved solver configurations
+     * @return true, if and only if there is a unsaved solver configuration, false otherwise
+     */
+    public boolean isModified() {
+        // checks for deleted entries
+        if (SolverConfigurationDAO.isModified()) {
+            return true;
+        }
+        // checks for changed entries
+        for (Component comp : this.getComponents()) {
+            if (comp instanceof EDACCSolverConfigEntry) {
+                EDACCSolverConfigEntry entry = (EDACCSolverConfigEntry) comp;
+                if (entry.isModified()) {
+                    return true;
+                }
+            }
+        }
+        // ... unchanged
+        return false;
     }
 
     /** This method is called from within the constructor to

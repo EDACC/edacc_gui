@@ -4,7 +4,7 @@
 
 void logError(const char* format, ...);
 
-void logComment(const char* format, ...);
+void logComment(int v_level, const char* format, ...);
 
 
 #endif

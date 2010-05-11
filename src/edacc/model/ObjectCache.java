@@ -1,5 +1,6 @@
 package edacc.model;
 
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -54,6 +55,10 @@ public class ObjectCache<T extends IntegerPKModel> {
      */
     protected Enumeration<T> elements() {
         return cache.elements();
+    }
+
+    protected Collection<T> values() {
+        return cache.values();
     }
 
     /** clears the cache

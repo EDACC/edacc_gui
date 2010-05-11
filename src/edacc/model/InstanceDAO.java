@@ -282,6 +282,12 @@ public class InstanceDAO {
             LinkedList<Instance> res = new LinkedList<Instance>();
 
             while (rs.next()) {
+
+                Instance c = cache.getCached(rs.getInt("i.idInstance"));
+                if (c != null) {
+                    res.add(c);
+                    continue;
+                }
                 Instance i = new Instance();
                 i.setId(rs.getInt("i.idInstance"));
                 i.setMaxClauseLength(rs.getInt("i.maxClauseLength"));
@@ -292,15 +298,9 @@ public class InstanceDAO {
                 i.setRatio(rs.getFloat("i.ratio"));
                 Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
                 i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
-
-                Instance c = cache.getCached(i.getId());
-                if (c != null) {
-                    res.add(c);
-                } else {
-                    i.setSaved();
-                    cache.cache(i);
-                    res.add(i);
-                }
+                i.setSaved();
+                cache.cache(i);
+                res.add(i);
             }
             rs.close();
             return res;

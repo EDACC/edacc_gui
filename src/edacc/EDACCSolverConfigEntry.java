@@ -22,6 +22,8 @@ import edacc.model.SolverDAO;
 import java.sql.SQLException;
 import java.util.Vector;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import org.jdesktop.application.Action;
 
 /**
@@ -66,6 +68,15 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         this.setBorder(border);
         solverConfigEntryTableModel.setParameters(ParameterDAO.getParameterFromSolverId(solver.getId()));
         this.solverConfiguration = null;
+        solverConfigEntryTableModel.addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                if (parent != null) {
+                    parent.setTitles();
+                }
+            }
+
+        });
     }
 
     /**
@@ -85,10 +96,12 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
      * @param entry
      */
     public void assign(EDACCSolverConfigEntry entry) {
+        txtSeedGroup.setText(entry.getSeedGroup().getText());
         for (int i = 0; i < entry.solverConfigEntryTableModel.getRowCount(); i++) {
             solverConfigEntryTableModel.setValueAt(entry.solverConfigEntryTableModel.getValueAt(i, 2), i, 2);
             solverConfigEntryTableModel.setValueAt(entry.solverConfigEntryTableModel.getValueAt(i, 4), i, 4);
         }
+
     }
 
     public int getSolverId() {
@@ -246,4 +259,15 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     private javax.swing.JTable parameterTable;
     private javax.swing.JTextField txtSeedGroup;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * Checks for unsaved data
+     * @return true, if and only if data is unsaved, false otherwise
+     */
+    public boolean isModified() {
+        if (solverConfiguration == null) {
+            return true;
+        }
+        return solverConfigEntryTableModel.isModified();
+    }
 }
