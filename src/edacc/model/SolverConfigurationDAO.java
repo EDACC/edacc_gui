@@ -64,6 +64,10 @@ public class SolverConfigurationDAO {
         return ParameterInstanceDAO.getBySolverConfigId(i.getId());
     }
 
+    /**
+     * Sets the solverConfig as deleted.
+     * @param solverConfig
+     */
     public static void removeSolverConfiguration(SolverConfiguration solverConfig) {
         solverConfig.setDeleted();
     }
@@ -111,6 +115,7 @@ public class SolverConfigurationDAO {
             sc.setSeed_group(rs.getInt("seed_group"));
             sc.setSaved();
             cache.cache(sc);
+            sc.setSaved();
             return sc;
         }
         rs.close();
@@ -131,5 +136,19 @@ public class SolverConfigurationDAO {
 
     public static void clearCache() {
         cache.clear();
+    }
+
+    /**
+     * Checks if there are unsaved solver configurations in the cache
+     * @return true, if and only if there are unsaved solver configurations
+     * in the cache, false otherwise
+     */
+    public static boolean isModified() {
+        for (SolverConfiguration sc : cache.values()) {
+            if (!sc.isSaved()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

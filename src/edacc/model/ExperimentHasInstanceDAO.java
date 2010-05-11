@@ -39,10 +39,11 @@ public class ExperimentHasInstanceDAO {
         i.setId(rs.getInt(1));
         i.setExperiment_id(rs.getInt(2));
         i.setInstances_id(rs.getInt(3));
+        i.setNew();
         return i;
     }
 
-    private static void save(ExperimentHasInstance i) throws SQLException {
+    public static void save(ExperimentHasInstance i) throws SQLException {
         if (i.isDeleted()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
             st.setInt(1, i.getId());

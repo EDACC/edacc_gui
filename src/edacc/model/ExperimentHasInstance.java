@@ -42,7 +42,5 @@ public class ExperimentHasInstance extends BaseModel implements IntegerPKModel {
         if (this.isSaved()) {
             this.setModified();
         }
-    }
-
-    
+    }    
 }

@@ -25,8 +25,9 @@ import java.sql.SQLException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.RowFilter.Entry;
 import javax.swing.SwingUtilities;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableRowSorter;
 import org.jdesktop.application.Action;
 
@@ -34,10 +35,7 @@ import org.jdesktop.application.Action;
  *
  * @author simon
  */
-public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTaskEvents {
-    private boolean unsavedSolverConfigChanges;
-    private boolean unsavedInstanceChanges;
-    
+public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTaskEvents {    
     public ExperimentController expController;
     public ExperimentTableModel expTableModel;
     public InstanceTableModel insTableModel;
@@ -77,13 +75,18 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         tableJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.setDefaultRenderer(Float.class, new EDACCExperimentModeJobsCellRenderer());
 
-        unsavedSolverConfigChanges = false;
-        unsavedInstanceChanges = false;
+        solverConfigPanel.setParent(this);
+        insTableModel.addTableModelListener(new TableModelListener() {
+
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                setTitles();
+            }
+
+        });
     }
 
     public void initialize() throws SQLException {
-        unsavedSolverConfigChanges = false;
-        unsavedInstanceChanges = false;
         expController.initialize();
     }
 
@@ -787,7 +790,21 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     }// </editor-fold>//GEN-END:initComponents
 
     public boolean hasUnsavedChanges() {
-        return unsavedSolverConfigChanges || unsavedInstanceChanges;
+        return solverConfigPanel.isModified() || insTableModel.isModified();
+    }
+
+    public void setTitles() {
+        if (solverConfigPanel.isModified()) {
+            manageExperimentPane.setTitleAt(1, "Solvers (modified)");
+        } else {
+            manageExperimentPane.setTitleAt(1, "Solvers");
+        }
+        if (insTableModel.isModified()) {
+            manageExperimentPane.setTitleAt(2, "Instances (modified)");
+        } else {
+            manageExperimentPane.setTitleAt(2, "Instances");
+        }
+        manageExperimentPane.invalidate();
     }
 
     private void manageExperimentPaneStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_manageExperimentPaneStateChanged
@@ -863,21 +880,17 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     @Action
     public void btnLoadExperiment() {
         if (tableExperiments.getSelectedRow() != -1) {
-            if (expController.getActiveExperiment() != null) {
+            if (expController.getActiveExperiment() != null && hasUnsavedChanges()) {
                 if (JOptionPane.showConfirmDialog(this,
                         "Loading an experiment will make you lose all unsaved changes of the current experiment. Continue loading the experiment?",
                         "Warning!",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                     Integer i = (Integer) expTableModel.getValueAt(tableExperiments.getSelectedRow(), 5);
-                    // expController.loadExperiment(i.intValue());
                     Tasks.startTask("loadExperiment", new Class[]{int.class, edacc.model.Tasks.class}, new Object[]{i.intValue(), null}, expController, this);
-                    unsavedSolverConfigChanges = false;
-                    unsavedInstanceChanges = false;
                 }
             } else {
                 Integer i = (Integer) expTableModel.getValueAt(tableExperiments.getSelectedRow(), 5);
                 Tasks.startTask("loadExperiment", new Class[]{int.class, edacc.model.Tasks.class}, new Object[]{i.intValue(), null}, expController, this);
-                //     expController.loadExperiment(i.intValue());
             }
         }
     }
@@ -885,7 +898,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     @Action
     public void btnCreateExperiment() {
         try {
-            long currentTime = System.currentTimeMillis();
             expController.createExperiment(txtExperimentName.getText(), txtExperimentDescription.getText());
         } catch (SQLException ex) {
             createDatabaseErrorMessage(ex);
@@ -910,23 +922,17 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
             if ((Boolean) solTableModel.getValueAt(i, 4) && !solverConfigPanel.solverExists(((Solver) solTableModel.getValueAt(i, 5)).getId())) {
                 solverConfigPanel.addSolver(solTableModel.getValueAt(i, 5));
-                unsavedSolverConfigChanges = true;
             } else if (!(Boolean) solTableModel.getValueAt(i, 4)) {
                 solverConfigPanel.removeSolver(solTableModel.getValueAt(i, 5));
             }
         }
         solverConfigPanel.endUpdate();
+        setTitles();
     }
 
     @Action
     public void btnSaveSolverConfigurations() {
-        //  try {
-        //     expController.saveSolverConfigurations();
-        //  } catch (SQLException e) {
-        //      createDatabaseErrorMessage(e);
-        //  }
         Tasks.startTask("saveSolverConfigurations", new Class[]{Tasks.class}, new Object[]{null}, expController, this);
-        unsavedSolverConfigChanges = false;
     }
 
     @Action
@@ -952,56 +958,54 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
     @Action
     public void btnSaveInstances() {
-        //try {
-        //    expController.saveExperimentHasInstances();
-        //} catch (SQLException ex) {
-        //    createDatabaseErrorMessage(ex);
-        //}
         Tasks.startTask("saveExperimentHasInstances", new Class[]{Tasks.class}, new Object[]{null}, expController, this);
-        unsavedInstanceChanges = false;
     }
-    
+
     @Action
     public void btnSelectAllInstances() {
         for (int i = 0; i < insTableModel.getRowCount(); i++) {
-            if (rowFilter.include((String)insTableModel.getValueAt(i, 0),
-                    (Integer)insTableModel.getValueAt(i, 1),
-                    (Integer)insTableModel.getValueAt(i, 2),
-                    (Float)insTableModel.getValueAt(i, 3),
-                    (Integer)insTableModel.getValueAt(i, 4)))
+            if (rowFilter.include((String) insTableModel.getValueAt(i, 0),
+                    (Integer) insTableModel.getValueAt(i, 1),
+                    (Integer) insTableModel.getValueAt(i, 2),
+                    (Float) insTableModel.getValueAt(i, 3),
+                    (Integer) insTableModel.getValueAt(i, 4))) {
                 insTableModel.setValueAt(true, i, 5);
-            unsavedInstanceChanges = true;
+            }
         }
     }
 
     @Action
     public void btnDeselectAllInstances() {
         for (int i = 0; i < insTableModel.getRowCount(); i++) {
-            if (rowFilter.include((String)insTableModel.getValueAt(i, 0),
-                    (Integer)insTableModel.getValueAt(i, 1),
-                    (Integer)insTableModel.getValueAt(i, 2),
-                    (Float)insTableModel.getValueAt(i, 3),
-                    (Integer)insTableModel.getValueAt(i, 4)))
+            if (rowFilter.include((String) insTableModel.getValueAt(i, 0),
+                    (Integer) insTableModel.getValueAt(i, 1),
+                    (Integer) insTableModel.getValueAt(i, 2),
+                    (Float) insTableModel.getValueAt(i, 3),
+                    (Integer) insTableModel.getValueAt(i, 4))) {
                 insTableModel.setValueAt(false, i, 5);
-            unsavedInstanceChanges = true;
+            }
         }
     }
 
     @Action
     public void btnInvertSelection() {
         for (int i = 0; i < insTableModel.getRowCount(); i++) {
-            if (rowFilter.include((String)insTableModel.getValueAt(i, 0),
-                    (Integer)insTableModel.getValueAt(i, 1),
-                    (Integer)insTableModel.getValueAt(i, 2),
-                    (Float)insTableModel.getValueAt(i, 3),
-                    (Integer)insTableModel.getValueAt(i, 4)))
+            if (rowFilter.include((String) insTableModel.getValueAt(i, 0),
+                    (Integer) insTableModel.getValueAt(i, 1),
+                    (Integer) insTableModel.getValueAt(i, 2),
+                    (Float) insTableModel.getValueAt(i, 3),
+                    (Integer) insTableModel.getValueAt(i, 4))) {
                 insTableModel.setValueAt(!((Boolean) insTableModel.getValueAt(i, 5)), i, 5);
-            unsavedInstanceChanges = true;
+            }
         }
     }
 
     @Action
     public void btnGenerateJobs() {
+        if (hasUnsavedChanges()) {
+            javax.swing.JOptionPane.showMessageDialog(null, "Please save all unsaved data first or reload the experiment before generating jobs.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         try {
             int numRuns = Integer.parseInt(txtNumRuns.getText());
             int timeout = Integer.parseInt(txtTimeout.getText());
@@ -1009,7 +1013,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             boolean generateSeeds = chkGenerateSeeds.isSelected();
             boolean linkSeeds = chkLinkSeeds.isSelected();
             int maxSeed = Integer.parseInt(txtMaxSeeds.getText());
-            //int added_experiments = expController.generateJobs(numRuns, timeout, generateSeeds, maxSeed, linkSeeds);
             Tasks.startTask("generateJobs", new Class[]{int.class, int.class, int.class, boolean.class, int.class, boolean.class, edacc.model.Tasks.class}, new Object[]{numRuns, timeout, maxMem, generateSeeds, maxSeed, linkSeeds, null}, expController, this);
             lblCurNumRuns.setText("currently: " + txtNumRuns.getText());
             lblCurTimeout.setText("currently: " + txtTimeout.getText());
@@ -1023,18 +1026,24 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             expController.assignQueueToExperiment(q);
         } catch (NumberFormatException ex) {
             SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
                 public void run() {
                     javax.swing.JOptionPane.showMessageDialog(null, "Expected integers for number of runs, timeout and max seed", "invalid data", javax.swing.JOptionPane.ERROR_MESSAGE);
                 }
             });
         } catch (final SQLException ex) {
             SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
                 public void run() {
                     javax.swing.JOptionPane.showMessageDialog(null, "An error occured while assigning a grid queue to the experiment: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
                 }
             });
         } catch (final Exception ex) {
             SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
                 public void run() {
                     javax.swing.JOptionPane.showMessageDialog(null, "An error occured while assigning a grid queue to the experiment: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
                 }
@@ -1132,6 +1141,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     private javax.swing.JTextField txtTimeout;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public void onTaskSuccessful(String methodName, Object result) {
         if ("generateJobs".equals(methodName)) {
             int added_experiments = (Integer) result;
@@ -1139,12 +1149,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             javax.swing.JOptionPane.showMessageDialog(null, "Added " + added_experiments + " new jobs", "Jobs added", javax.swing.JOptionPane.INFORMATION_MESSAGE);
         } else if ("loadJobs".equals(methodName)) {
             jobsTableModel.fireTableDataChanged();
+        } else if ("saveSolverConfigurations".equals(methodName) || "saveExperimentHasInstances".equals(methodName) || "loadExperiment".equals(methodName)) {
+            setTitles();
         }
     }
 
+    @Override
     public void onTaskStart(String methodName) {
     }
 
+    @Override
     public void onTaskFailed(String methodName, Throwable e) {
         if (e instanceof SQLException) {
             createDatabaseErrorMessage((SQLException) e);
