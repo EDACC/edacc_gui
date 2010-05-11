@@ -82,8 +82,6 @@ public class GridQueueDAO {
         PreparedStatement ps;
         if (q.isNew()) {
             // insert query, set ID!
-            // TODO insert instance blob
-            // insert instance into db
             final String insertQuery = "INSERT INTO " + table + " (name, location, numNodes, numCPUs, wallTime, availNodes, maxJobsQueue, description, genericPBSScript) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);

@@ -17,7 +17,7 @@ import edacc.experiment.ExperimentTableModel;
 import edacc.experiment.InstanceTableModel;
 import edacc.experiment.InstanceTableModelRowFilter;
 import edacc.experiment.SolverTableModel;
-import edacc.manageDB.ManageDBGridQueues;
+import edacc.gridqueues.GridQueuesController;
 import edacc.model.GridQueue;
 import edacc.model.Solver;
 import edacc.model.Tasks;
@@ -1016,7 +1016,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
             // TODO assignment of more than one queue/write extra method!
             // assign the default queue to this experiment
-            GridQueue q = ManageDBGridQueues.getInstance().getDefaultQueue(); // TODO not very nice; will be changed
+            GridQueue q = GridQueuesController.getInstance().getChosenQueue(); // TODO not very nice; will be changed
             if (q == null) {
                 throw new Exception("You have to specify the grid settings first!");
             }

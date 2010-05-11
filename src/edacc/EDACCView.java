@@ -113,6 +113,7 @@ public class EDACCView extends FrameView implements Observer {
         mode = noMode;
         updateConnectionStateView();
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 btnConnectToDB();
             }
@@ -120,7 +121,7 @@ public class EDACCView extends FrameView implements Observer {
     }
 
     private void createDatabaseErrorMessage(SQLException e) {
-        javax.swing.JOptionPane.showMessageDialog(null, "There was an error while communicating with the database: " +e, "Connection error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        javax.swing.JOptionPane.showMessageDialog(null, "There was an error while communicating with the database: " + e, "Connection error", javax.swing.JOptionPane.ERROR_MESSAGE);
     }
 
     @Action
@@ -174,7 +175,7 @@ public class EDACCView extends FrameView implements Observer {
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 630, Short.MAX_VALUE)
+            .add(0, 687, Short.MAX_VALUE)
         );
 
         menuBar.setAutoscrolls(true);
@@ -264,7 +265,7 @@ public class EDACCView extends FrameView implements Observer {
             .add(statusPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(statusMessageLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 836, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 822, Short.MAX_VALUE)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusAnimationLabel)
@@ -296,7 +297,7 @@ public class EDACCView extends FrameView implements Observer {
         }
 
         EDACCApp.getApplication().show(databaseSettings);
-       manageDBMode();
+        manageDBMode();
     }
 
     @Action
@@ -304,9 +305,9 @@ public class EDACCView extends FrameView implements Observer {
         try {
             if (experimentMode.hasUnsavedChanges() || manageDBMode.unsavedChanges) {
                 if (JOptionPane.showConfirmDialog(mode,
-                    "Any unsaved changes will be lost, are you sure you want to disconnect from the database?",
-                    "Warning!",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+                        "Any unsaved changes will be lost, are you sure you want to disconnect from the database?",
+                        "Warning!",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
                     Util.clearCaches();
                     DatabaseConnector.getInstance().disconnect();
@@ -315,8 +316,7 @@ public class EDACCView extends FrameView implements Observer {
                     manageExperimentModeMenuItem.setSelected(false);
                     noMode();
                 }
-            }
-            else {
+            } else {
                 Util.clearCaches();
                 DatabaseConnector.getInstance().disconnect();
                 experimentMode.expController.unloadExperiment();
@@ -362,26 +362,25 @@ public class EDACCView extends FrameView implements Observer {
     @Action
     public void manageDBMode() {
         /*if (manageDBModeMenuItem.isSelected()) {
-            noMode();
-            return;
+        noMode();
+        return;
         }*/
         if (manageExperimentModeMenuItem.isSelected()) {
             if (experimentMode.hasUnsavedChanges()) {
                 if (JOptionPane.showConfirmDialog(mode,
-                    "Any unsaved changes will be lost, are you sure you want to switch to Manage DB mode?",
-                    "Warning!",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+                        "Any unsaved changes will be lost, are you sure you want to switch to Manage DB mode?",
+                        "Warning!",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
                     Util.clearCaches();
-                }
-                else {
+                } else {
                     manageDBModeMenuItem.setSelected(false);
                     return;
                 }
             }
             experimentMode.expController.unloadExperiment();
         }
-        
+
         try {
             manageDBMode.initialize();
             mainPanelLayout.replace(mode, manageDBMode);
@@ -391,8 +390,7 @@ public class EDACCView extends FrameView implements Observer {
         } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this.getComponent(), "You have to connect to the database before switching modes", "No database connection", JOptionPane.ERROR_MESSAGE);
             noMode();
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             createDatabaseErrorMessage(ex);
             noMode();
         }
@@ -401,24 +399,23 @@ public class EDACCView extends FrameView implements Observer {
     @Action
     public void manageExperimentMode() {
         /*if (manageExperimentModeMenuItem.isSelected()) {
-            noMode();
-            return;
+        noMode();
+        return;
         }*/
         if (manageDBModeMenuItem.isSelected()) {
             if (manageDBMode.unsavedChanges) {
                 if (JOptionPane.showConfirmDialog(mode,
-                    "Any unsaved changes will be lost, are you sure you want to switch to experiment mode?",
-                    "Warning!",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+                        "Any unsaved changes will be lost, are you sure you want to switch to experiment mode?",
+                        "Warning!",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
                     Util.clearCaches();
-                }
-                else {
+                } else {
                     manageExperimentModeMenuItem.setSelected(false);
                     return;
                 }
             }
-            
+
         }
         try {
             experimentMode.initialize();
@@ -437,21 +434,14 @@ public class EDACCView extends FrameView implements Observer {
 
     @Action
     public void btnGridSettings() {
-        if (gridSettings == null) {
+        if (manageGridQueues == null) {
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            gridSettings = new EDACCGridSettingsView(mainFrame, true);
-            gridSettings.setLocationRelativeTo(mainFrame);
+            manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true);
+            manageGridQueues.setLocationRelativeTo(mainFrame);
         }
-        try {
-            gridSettings.loadSettings();
-            EDACCApp.getApplication().show(gridSettings);
-        } catch (NoConnectionToDBException e) {
-            JOptionPane.showMessageDialog(this.getComponent(), "Couldn't load settings. No connection to database", "No database connection", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this.getComponent(), "Error while loading settings: \n" + e.getMessage(), "Error loading settings", JOptionPane.ERROR_MESSAGE);
-        }
-
+        manageGridQueues.setVisible(true);
     }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem connectToDBMenuItem;
     private javax.swing.JMenuItem disconnectMenuItem;
@@ -476,7 +466,7 @@ public class EDACCView extends FrameView implements Observer {
     private int busyIconIndex = 0;
     private JDialog aboutBox;
     private JDialog databaseSettings;
-    private EDACCGridSettingsView gridSettings;
+    private EDACCManageGridQueuesDialog manageGridQueues;
 
     public void update(Observable o, Object arg) {
         // watch connection state

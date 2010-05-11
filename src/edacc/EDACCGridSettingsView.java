@@ -5,14 +5,11 @@
  */
 package edacc;
 
-import edacc.manageDB.ManageDBGridQueues;
+import edacc.gridqueues.GridQueuesController;
 import edacc.model.GridQueue;
-import edacc.model.GridSettingsDAO;
 import edacc.model.NoConnectionToDBException;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import org.jdesktop.application.Action;
@@ -23,10 +20,20 @@ import org.jdesktop.application.Action;
  */
 public class EDACCGridSettingsView extends javax.swing.JDialog {
 
+    private enum DialogMode {
+
+        Create, Edit
+    };
+    private DialogMode mode;
+    private EDACCManageGridQueuesDialog manageGridQueuesDialog;
+    private GridQueue currentQueue;
+
     /** Creates new form EDACCGridSettingsView */
-    public EDACCGridSettingsView(java.awt.Frame parent, boolean modal) {
+    public EDACCGridSettingsView(java.awt.Frame parent, boolean modal, EDACCManageGridQueuesDialog manageGridQueuesDialog) {
         super(parent, modal);
         initComponents();
+        this.manageGridQueuesDialog = manageGridQueuesDialog;
+        setLocationRelativeTo(manageGridQueuesDialog);
     }
 
     /** This method is called from within the constructor to
@@ -156,13 +163,10 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnCancel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 159, Short.MAX_VALUE)
-                .addComponent(btnOk, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 118, Short.MAX_VALUE)
+                .addComponent(btnOk)
                 .addContainerGap())
         );
-
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnCancel, btnOk});
-
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -258,27 +262,52 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
             pbsFileChooser.setMultiSelectionEnabled(false);
         }
         if (pbsFileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            try {
-                ManageDBGridQueues.getInstance().addPBSScript(pbsFileChooser.getSelectedFile());
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this, "Error while saving settings: \n" + ex.getMessage(), "Error saving settings", JOptionPane.ERROR_MESSAGE);
-
-            }
+            GridQueuesController.getInstance().addPBSScript(pbsFileChooser.getSelectedFile());
         }
     }//GEN-LAST:event_btnAdd
 
-    public void loadSettings() throws SQLException {
-        GridQueue q = ManageDBGridQueues.getInstance().getDefaultQueue();
+    /**
+     * Loads the given grid queue settings to the dialog's elements.
+     * If q is <code>null</code>, the dialog starts in creation mode and a new
+     * queue will be created. Otherwise the given queue will be updated.
+     * @param q
+     * @throws SQLException
+     */
+    public void loadSettings(GridQueue q) throws SQLException {
         if (q != null) {
-            txtName.setText(q.getName());
-            txtLocation.setText(q.getLocation());
-            txtNumNodes.setText(String.valueOf(q.getNumNodes()));
-            txtNumCPUs.setText(String.valueOf(q.getNumCPUs()));
-            txtWalltime.setText(String.valueOf(q.getWalltime()));
-            txtAvailNodes.setText(String.valueOf(q.getAvailNodes()));
-            txtMaxJobsInQueue.setText(String.valueOf(q.getMaxJobsQueue()));
-            taDescription.setText(q.getDescription());
+            currentQueue = q;
+            setDialogMode(DialogMode.Edit);
+        } else {
+            currentQueue = new GridQueue();
+            setDialogMode(DialogMode.Create);
         }
+        showQueue(currentQueue);
+    }
+
+    private void showQueue(GridQueue q) {
+        if (q == null) {
+            return;
+        }
+        // if (q != null) {
+        txtName.setText(q.getName());
+        txtLocation.setText(q.getLocation());
+        txtNumNodes.setText(String.valueOf(q.getNumNodes()));
+        txtNumCPUs.setText(String.valueOf(q.getNumCPUs()));
+        txtWalltime.setText(String.valueOf(q.getWalltime()));
+        txtAvailNodes.setText(String.valueOf(q.getAvailNodes()));
+        txtMaxJobsInQueue.setText(String.valueOf(q.getMaxJobsQueue()));
+        taDescription.setText(q.getDescription());
+        /*  } else {
+        txtName.setText("");
+        txtLocation.setText("");
+        txtNumNodes.setText("");
+        txtNumCPUs.setText("");
+        txtWalltime.setText("");
+        txtAvailNodes.setText("");
+        txtMaxJobsInQueue.setText("");
+        taDescription.setText("");
+        setDialogMode(DialogMode.Create);
+        }*/
     }
 
     @Action
@@ -292,8 +321,23 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
             int availNodes = Integer.parseInt(txtAvailNodes.getText());
             int maxJobsInQueue = Integer.parseInt(txtMaxJobsInQueue.getText());
             String description = taDescription.getText();
-            ManageDBGridQueues.getInstance().saveGridSettings(name, location, numNodes, numCPUs, walltime, availNodes, maxJobsInQueue, description);
+
+            currentQueue.setName(name);
+            currentQueue.setLocation(location);
+            currentQueue.setNumNodes(numNodes);
+            currentQueue.setNumCPUs(numCPUs);
+            currentQueue.setWalltime(walltime);
+            currentQueue.setAvailNodes(availNodes);
+            currentQueue.setMaxJobsQueue(maxJobsInQueue);
+            currentQueue.setDescription(description);
+            
+            if (mode == DialogMode.Create) {
+                GridQueuesController.getInstance().createNewGridQueue(currentQueue);
+            } else {
+                GridQueuesController.getInstance().saveEditedGridQueue(currentQueue);
+            }
             this.setVisible(false);
+            manageGridQueuesDialog.refreshView();
         } catch (NoConnectionToDBException e) {
             JOptionPane.showMessageDialog(this, "Couldn't save settings. No connection to database", "No database connection", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException e) {
@@ -302,11 +346,23 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, "Error saving settings, integers expected", "Integers expected", JOptionPane.ERROR_MESSAGE);
         } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(this, "Error saving settings: The specified PBS script couldn't be found!", "File not found", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error saving settings: " + e.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void setDialogMode(DialogMode mode) {
+        this.mode = mode;
+        if (mode == DialogMode.Create) {
+            btnOk.setText("Create Queue");
+        } else {
+            btnOk.setText("Save Queue");
         }
     }
 
     @Action
     public void btnCancel() {
+        GridQueuesController.getInstance().addPBSScript(null);
         this.setVisible(false);
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
