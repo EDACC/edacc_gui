@@ -27,7 +27,7 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane1" alignment="0" pref="438" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" alignment="0" pref="571" max="32767" attributes="0"/>
                   <Component id="lblQueues" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="lblChosenQueue" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
@@ -35,9 +35,11 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnEditQueue" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="btnChooseQueue" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnRemoveQueue" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="btnCancel" pref="75" max="32767" attributes="0"/>
+                      <Component id="btnChooseQueue" pref="125" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btnCancel" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -57,8 +59,9 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnCreateQueue" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnEditQueue" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnChooseQueue" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnCancel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnChooseQueue" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnRemoveQueue" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -133,6 +136,15 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCancel"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnRemoveQueue">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="btnRemoveQueue.text"/>
+        <Property name="name" type="java.lang.String" value="btnRemoveQueue" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRemoveQueue"/>
       </Events>
     </Component>
   </SubComponents>

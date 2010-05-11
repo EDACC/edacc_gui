@@ -7,6 +7,7 @@ package edacc.gridqueues;
 
 import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
+import edacc.model.NoConnectionToDBException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;

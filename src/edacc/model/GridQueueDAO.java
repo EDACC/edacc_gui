@@ -136,6 +136,18 @@ public class GridQueueDAO {
         q.setSaved();
     }
 
+    public static void remove(GridQueue q) throws NoConnectionToDBException, SQLException {
+        if (q.isNew())
+            return;
+        final String deleteQuery = "DELETE FROM " + table
+                    + " WHERE idgridQueue=?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
+        ps.setInt(1, q.getId());
+        ps.executeUpdate();
+        cache.remove(q);
+        q.setDeleted();
+    }
+
 
     /**
      * retrieves a grid queue from the database

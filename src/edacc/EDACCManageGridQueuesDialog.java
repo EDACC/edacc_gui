@@ -14,6 +14,7 @@ package edacc;
 import edacc.gridqueues.GridQueuesController;
 import edacc.gridqueues.QueueListModel;
 import edacc.model.GridQueue;
+import edacc.model.GridQueueDAO;
 import edacc.model.NoConnectionToDBException;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -36,9 +37,9 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
         try {
             listQueues.setModel(new QueueListModel());
         } catch (NoConnectionToDBException ex) {
-            JOptionPane.showInternalMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
-            JOptionPane.showInternalMessageDialog(this, "A database error occured while loading the dialog: " + ex.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "A database error occured while loading the dialog: " + ex.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -59,6 +60,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
         btnEditQueue = new javax.swing.JButton();
         btnChooseQueue = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
+        btnRemoveQueue = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCManageGridQueuesDialog.class);
@@ -109,6 +111,14 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
             }
         });
 
+        btnRemoveQueue.setText(resourceMap.getString("btnRemoveQueue.text")); // NOI18N
+        btnRemoveQueue.setName("btnRemoveQueue"); // NOI18N
+        btnRemoveQueue.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveQueue(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -116,7 +126,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
                     .addComponent(lblQueues)
                     .addComponent(lblChosenQueue)
                     .addGroup(layout.createSequentialGroup()
@@ -124,9 +134,11 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnEditQueue)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnChooseQueue)
+                        .addComponent(btnRemoveQueue)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnCancel, javax.swing.GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE)))
+                        .addComponent(btnChooseQueue, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnCancel)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -142,8 +154,9 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCreateQueue)
                     .addComponent(btnEditQueue)
+                    .addComponent(btnCancel)
                     .addComponent(btnChooseQueue)
-                    .addComponent(btnCancel))
+                    .addComponent(btnRemoveQueue))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -157,7 +170,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
             gridSettings.loadSettings(null);
             gridSettings.setVisible(true);
         } catch (SQLException ex) {
-            JOptionPane.showInternalMessageDialog(this, "Cannot show create dialog: " + ex.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Cannot show create dialog: " + ex.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnCreateQueue
 
@@ -169,7 +182,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
             gridSettings.loadSettings(selected);
             gridSettings.setVisible(true);
         } catch (SQLException ex) {
-            JOptionPane.showInternalMessageDialog(this, "Cannot show edit dialog: " + ex.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Cannot show edit dialog: " + ex.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnEditQueue
 
@@ -184,6 +197,20 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
     private void btnCancel(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancel
         this.setVisible(false);
     }//GEN-LAST:event_btnCancel
+
+    private void btnRemoveQueue(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveQueue
+        GridQueue selected = (GridQueue) listQueues.getSelectedValue();
+        if (selected == null)
+            return;
+        try {
+            GridQueueDAO.remove(selected);
+            refreshView();
+        } catch (NoConnectionToDBException ex) {
+            JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "An error occured while removing the queue from database: " + ex.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnRemoveQueue
 
     public void refreshView() throws NoConnectionToDBException, SQLException {
         // refresh list
@@ -201,6 +228,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnChooseQueue;
     private javax.swing.JButton btnCreateQueue;
     private javax.swing.JButton btnEditQueue;
+    private javax.swing.JButton btnRemoveQueue;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblChosenQueue;
     private javax.swing.JLabel lblQueues;
