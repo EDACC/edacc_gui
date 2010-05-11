@@ -77,6 +77,9 @@ public class InstanceTableModel extends AbstractTableModel {
      */
     public Vector<ExperimentHasInstance> getDeletedExperimentHasInstances() {
         Vector<ExperimentHasInstance> res = new Vector<ExperimentHasInstance>();
+        if (savedExperimentInstances == null) {
+            return res;
+        }
         for (ExperimentHasInstance ehi : savedExperimentInstances) {
             if (!selectedInstances.containsKey(ehi.getInstances_id())) {
                 res.add(ehi);
