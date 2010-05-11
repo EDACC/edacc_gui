@@ -18,10 +18,12 @@ public class ExperimentTableModel extends AbstractTableModel {
         this.fireTableDataChanged();
     }
 
+    @Override
     public int getRowCount() {
         return experiments.size();
     }
 
+    @Override
     public int getColumnCount() {
         return columns.length;
     }
@@ -36,6 +38,7 @@ public class ExperimentTableModel extends AbstractTableModel {
         return getValueAt(0, col).getClass();
     }
 
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
             case 0:

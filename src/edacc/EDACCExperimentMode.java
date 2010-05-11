@@ -13,6 +13,7 @@ package edacc;
 import edacc.experiment.ExperimentInstanceClassTableModel;
 import edacc.experiment.ExperimentController;
 import edacc.experiment.ExperimentResultsBrowserTableModel;
+import edacc.experiment.ExperimentResultsBrowserTableModelRowFilter;
 import edacc.experiment.ExperimentTableModel;
 import edacc.experiment.InstanceTableModel;
 import edacc.experiment.InstanceTableModelRowFilter;
@@ -44,7 +45,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     public ExperimentResultsBrowserTableModel jobsTableModel;
     public EDACCSolverConfigPanel solverConfigPanel;
     public TableRowSorter<InstanceTableModel> sorter;
+    public TableRowSorter<ExperimentResultsBrowserTableModel> resultsBrowserTableRowSorter;
     public InstanceTableModelRowFilter rowFilter;
+    public ExperimentResultsBrowserTableModelRowFilter resultBrowserRowFilter;
     private EDACCInstanceFilter dialogFilter;
 
     /** Creates new form EDACCExperimentMode */
@@ -63,6 +66,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         instanceClassModel = new ExperimentInstanceClassTableModel(tableInstances, expController);
 
         tableJobs.setModel(jobsTableModel);
+        resultsBrowserTableRowSorter = new TableRowSorter<ExperimentResultsBrowserTableModel>(jobsTableModel);
+        resultBrowserRowFilter = new ExperimentResultsBrowserTableModelRowFilter();
+        tableJobs.setRowSorter(resultsBrowserTableRowSorter);
         tableExperiments.setModel(expTableModel);
         tableInstances.setModel(insTableModel);
         tableSolvers.setModel(solTableModel);
@@ -161,6 +167,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         tableJobs = new javax.swing.JTable();
         btnRefreshJobs = new javax.swing.JButton();
         btnBrowserColumnSelection = new javax.swing.JButton();
+        btnFilterJobs = new javax.swing.JButton();
 
         setName("Form"); // NOI18N
         setPreferredSize(new java.awt.Dimension(500, 591));
@@ -745,6 +752,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         btnBrowserColumnSelection.setText(resourceMap.getString("btnBrowserColumnSelection.text")); // NOI18N
         btnBrowserColumnSelection.setName("btnBrowserColumnSelection"); // NOI18N
 
+        btnFilterJobs.setAction(actionMap.get("btnFilterJobs")); // NOI18N
+        btnFilterJobs.setText(resourceMap.getString("btnFilterJobs.text")); // NOI18N
+        btnFilterJobs.setName("btnFilterJobs"); // NOI18N
+        btnFilterJobs.setPreferredSize(new java.awt.Dimension(103, 23));
+
         javax.swing.GroupLayout panelJobBrowserLayout = new javax.swing.GroupLayout(panelJobBrowser);
         panelJobBrowser.setLayout(panelJobBrowserLayout);
         panelJobBrowserLayout.setHorizontalGroup(
@@ -754,7 +766,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 .addComponent(btnRefreshJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnBrowserColumnSelection)
-                .addContainerGap(472, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnFilterJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(363, Short.MAX_VALUE))
             .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 694, Short.MAX_VALUE)
         );
         panelJobBrowserLayout.setVerticalGroup(
@@ -765,7 +779,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelJobBrowserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRefreshJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnBrowserColumnSelection))
+                    .addComponent(btnBrowserColumnSelection)
+                    .addComponent(btnFilterJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -1094,6 +1109,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     private javax.swing.JButton btnDeselectAllInstnaceClasses;
     private javax.swing.JButton btnDeselectAllSolvers;
     private javax.swing.JButton btnFilterInstances;
+    private javax.swing.JButton btnFilterJobs;
     private javax.swing.JButton btnGenerateJobs;
     private javax.swing.JButton btnGeneratePackage;
     private javax.swing.JButton btnInvertSelection;
@@ -1172,5 +1188,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         if (e instanceof SQLException) {
             createDatabaseErrorMessage((SQLException) e);
         }
+    }
+
+    @Action
+    public void btnFilterJobs() {
+        EDACCJobsFilter jobsFilter = new EDACCJobsFilter(EDACCApp.getApplication().getMainFrame(),true,this);
+        jobsFilter.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+        jobsFilter.setVisible(true);
     }
 }

@@ -948,7 +948,9 @@
                       <Component id="btnRefreshJobs" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnBrowserColumnSelection" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="472" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btnFilterJobs" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="363" max="32767" attributes="0"/>
                   </Group>
                   <Component id="jScrollPane6" alignment="1" pref="694" max="32767" attributes="0"/>
               </Group>
@@ -962,6 +964,7 @@
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="btnRefreshJobs" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnBrowserColumnSelection" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnFilterJobs" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -1013,6 +1016,18 @@
                 </Property>
                 <Property name="text" type="java.lang.String" resourceKey="btnBrowserColumnSelection.text"/>
                 <Property name="name" type="java.lang.String" value="btnBrowserColumnSelection" noResource="true"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="btnFilterJobs">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                  <action class="edacc.EDACCExperimentMode" id="btnFilterJobs" methodName="btnFilterJobs"/>
+                </Property>
+                <Property name="text" type="java.lang.String" resourceKey="btnFilterJobs.text"/>
+                <Property name="name" type="java.lang.String" value="btnFilterJobs" noResource="true"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[103, 23]"/>
+                </Property>
               </Properties>
             </Component>
           </SubComponents>

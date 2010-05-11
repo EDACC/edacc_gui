@@ -27,6 +27,7 @@ public class InstanceTableModelRowFilter extends RowFilter<Object, Object> {
         filter_name = filter_numAtoms = filter_numClauses = filter_ratio = filter_maxClauseLength = false;
     }
 
+    @Override
     public boolean include(Entry entry) {
         if (entry == null) return false;
         return include((String)entry.getValue(0), (Integer)entry.getValue(1), (Integer)entry.getValue(2), (Float)entry.getValue(3), (Integer)entry.getValue(4));

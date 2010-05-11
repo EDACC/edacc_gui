@@ -83,10 +83,12 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
         }
     }
 
+    @Override
     public int getRowCount() {
         return parameters.length;
     }
 
+    @Override
     public int getColumnCount() {
         return columns.length;
     }
@@ -119,6 +121,7 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
         fireTableCellUpdated(row, col);
     }
 
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
             case 0:

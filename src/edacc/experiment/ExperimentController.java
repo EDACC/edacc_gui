@@ -51,9 +51,6 @@ public class ExperimentController {
     EDACCSolverConfigPanel solverConfigPanel;
     private Experiment activeExperiment;
     private Vector<Experiment> experiments;
-   // private Vector<Instance> instances;
-    private Vector<Solver> solvers;
-    private Vector<InstanceClass> instanceClasses;
     private static RandomNumberGenerator rnd = new JavaRandom();
 
     /**
@@ -78,8 +75,7 @@ public class ExperimentController {
 
         Vector<InstanceClass> vic = new Vector<InstanceClass>();
         vic.addAll(InstanceClassDAO.getAll());
-        instanceClasses = vic;
-        main.instanceClassModel.setClasses(instanceClasses);
+        main.instanceClassModel.setClasses(vic);
 
     }
 
@@ -95,8 +91,7 @@ public class ExperimentController {
         activeExperiment = ExperimentDAO.getById(id);
         Vector<Solver> vs = new Vector<Solver>();
         vs.addAll(SolverDAO.getAll());
-        solvers = vs;
-        main.solTableModel.setSolvers(solvers);
+        main.solTableModel.setSolvers(vs);
         task.setTaskProgress(.33f);
         task.setStatus("Loading solver configurations..");
         Vector<SolverConfiguration> vss = SolverConfigurationDAO.getSolverConfigurationByExperimentId(id);
@@ -346,6 +341,9 @@ public class ExperimentController {
     public void loadJobs() {
         try {
             main.jobsTableModel.setJobs(ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId()));
+            if (main.jobsTableModel.getRowCount()>0) {
+                main.resultsBrowserTableRowSorter.setRowFilter(main.resultBrowserRowFilter);
+            }
             main.jobsTableModel.fireTableDataChanged();
             System.gc();
         } catch (Exception e) {

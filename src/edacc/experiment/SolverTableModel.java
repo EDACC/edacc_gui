@@ -26,10 +26,12 @@ public class SolverTableModel extends AbstractTableModel {
         this.fireTableDataChanged();
     }
 
+    @Override
     public int getRowCount() {
         return solvers.size();
     }
 
+    @Override
     public int getColumnCount() {
         return columns.length;
     }
@@ -56,6 +58,7 @@ public class SolverTableModel extends AbstractTableModel {
         fireTableCellUpdated(row, col);
     }
 
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
             case 0:

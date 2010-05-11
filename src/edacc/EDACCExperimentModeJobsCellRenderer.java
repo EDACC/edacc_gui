@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package edacc;
 
+import edacc.experiment.ExperimentResultsBrowserTableModel;
 import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JComponent;
@@ -16,6 +16,7 @@ import javax.swing.table.DefaultTableCellRenderer;
  * @author daniel
  */
 public class EDACCExperimentModeJobsCellRenderer extends DefaultTableCellRenderer {
+
     public EDACCExperimentModeJobsCellRenderer() {
         super();
         this.setOpaque(true);
@@ -24,24 +25,27 @@ public class EDACCExperimentModeJobsCellRenderer extends DefaultTableCellRendere
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
         Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-        int status = ((Integer)table.getModel().getValueAt(row, -1)).intValue();
+        row = table.convertRowIndexToModel(row);
+        int status = ((ExperimentResultsBrowserTableModel) table.getModel()).getStatusCode(row);
         switch (status) {
             case -2: // error
-                comp.setBackground(Color.red); break;
+                comp.setBackground(Color.red);
+                break;
             case -1: // waiting
-                //comp.setBackground(Color.cyan);
-               // comp.setBackground(new Color(4*16+1,6*16+9,14*16+1));// Color.getColor("4169e1"));
-              //  comp.setBackground(new Color(10*16+13,13*16+8,14*16+6)); // add8e6 - light blue
-               // comp.setBackground(new Color(4*16+6,8*16+2,11*16+4)); // 4682B4 - steelblue
-                comp.setBackground(new Color(4*16+1,6*16+9,14*16+1)); // 4169E1 - royal blue
-              //  comp.setBackground(Color.blue);
+                // comp.setBackground(new Color(4*16+1,6*16+9,14*16+1));// Color.getColor("4169e1"));
+                //  comp.setBackground(new Color(10*16+13,13*16+8,14*16+6)); // add8e6 - light blue
+                // comp.setBackground(new Color(4*16+6,8*16+2,11*16+4)); // 4682B4 - steelblue
+                comp.setBackground(new Color(4 * 16 + 1, 6 * 16 + 9, 14 * 16 + 1)); // 4169E1 - royal blue
+                //  comp.setBackground(Color.blue);
                 break;
             case 0: // running
-                comp.setBackground(Color.orange); break;
+                comp.setBackground(Color.orange);
+                break;
             case 1: // finished
             case 2:
             case 3:
-                comp.setBackground(Color.green); break;
+                comp.setBackground(Color.green);
+                break;
             default:
                 comp.setBackground(null);
         }
