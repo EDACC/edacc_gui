@@ -1,4 +1,5 @@
 #include "log.h"
+#include "global.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -12,11 +13,24 @@ void logError(const char* format, ...) {
 	va_end(args);
 }
 
-void logComment(const char* format, ...) {
+void logComment(int v_level,const char* format, ...) {
 	va_list args;
-
+	if (v_level<=verbosity){
 	va_start(args, format);
 	vfprintf(stdout, format, args);
+	fflush(stdout);
 	va_end(args);
+	}
 }
+
+/*
+void logComment(const char* format, ...) {
+		va_list args;
+//		if (v_level>=verbosity){
+		va_start(args, format);
+		vfprintf(stdout, format, args);
+		va_end(args);
+	//	}
+*/
+
 

@@ -4,6 +4,7 @@
 #include <sys/types.h>
 
 #define VALUELENGTH 64
+int verbosity;
 
 /* experiment info */
 int numRuns;
@@ -32,9 +33,9 @@ typedef struct {
     int timeOut; // timeout for each solver run in seconds
     int numInstances; // number of used instances
     char **md5Instances; // md5 sums of instance files
-    // the instances, manually appended with 0x00, 
+    // the instances, manually appended with 0x00,
     // because column type in table is mediumblob
-    char **instances; 
+    char **instances;
     char **instanceNames; //the name of the instances
     /* This is probably not needed anymore
     int *idInstances; // the instances ids*/
@@ -42,7 +43,7 @@ typedef struct {
     int *lengthSolver; // length of each solver
     char **md5Solvers; // the md5 sums for each solver
     // the binary for each solver, NOT terminated by 0x00
-    char **solvers; 
+    char **solvers;
     char **solverNames; // the names for each solver
 } experiment;
 
@@ -52,9 +53,9 @@ typedef struct {
     // identifies the row in the result table
     int id;
     // temporary filename for the results of one SolverConfig.
-    // the file pattern is something like: 
+    // the file pattern is something like:
     // <solvername>_<instance>_<solverconfigid>.cnf
-    char *resultFileName; 
+    char *resultFileName;
     // the status of the run
     // -2: an error occured, -1: not started, 0: running, 1: finished normaly by solver,
     // 2: terminated by ulimit maxtime, 3: terminated by ulimit maxmem
@@ -62,7 +63,7 @@ typedef struct {
     // int idSolverConfig;  needed?
     int seed;  // saves what seed was used
     float time; // the runtime of the solver
-    char *solverName; // the used solver for this job. 
+    char *solverName; // the used solver for this job.
     char params[256]; // the full param string
     char *instanceName; //the name of the instance
     char *resultFile; // the output of the solver (stdout and stderr)
@@ -76,12 +77,12 @@ typedef struct {
     int length; // length of the solver
     char *md5; // the md5 sum of the solver
     // the binary of the solver, NOT terminated by 0x00
-    char *solver; 
+    char *solver;
 } solver;
 
 typedef struct {
     char *md5; // md5 sum of the instance file
-    // the instance, manually appended with 0x00, 
+    // the instance, manually appended with 0x00,
     // because column type in table is mediumblob
     char *instance;
 } instance;

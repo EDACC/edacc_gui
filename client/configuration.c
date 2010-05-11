@@ -57,7 +57,7 @@ status read_config() {
     int valueLen, keyLen;
 
     if((conf = fopen("./config", "r")) == NULL) {
-        logError("could not read config file\n");
+        logError("could not open configuration file!\n");
         return sysError;
     }
 
@@ -134,7 +134,11 @@ status read_config() {
         DONE:
         free(lineptr);
     }
-
+    logComment(1,"information from config-file:\nhost:  %s  \n",host);
+    logComment(1,"username: %s \n",username);
+    logComment(1,"password: **********\n");
+    logComment(1,"DB: %s\n",database);
+    logComment(1,"experiment: %d\n",experimentId);
     fclose(conf);
     return success;
 }
