@@ -25,12 +25,15 @@ import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import edacc.model.Tasks;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Hashtable;
@@ -522,5 +525,49 @@ public class ExperimentController {
         }
         zos.closeEntry();
         in.close();
+    }
+
+    /**
+     * Exports all jobs and all columns currently visible to a CSV file.
+     * @param file
+     * @throws IOException
+     */
+    public void exportCSV(File file, Tasks task) throws IOException {
+        Tasks.getTaskView().setCancelable(true);
+        task.setOperationName("Exporting jobs to CSV file");
+        
+        if (file.exists()) {
+            file.delete();
+        }
+
+        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+        for (int i = 0; i < main.jobsTableModel.getColumnCount(); i++) {
+            out.write("\"" + main.jobsTableModel.getColumnName(i) + "\"");
+            if (i < main.jobsTableModel.getColumnCount() - 1) out.write(",");
+        }
+        out.write('\n');
+
+        int total = main.getTableJobs().getRowCount();
+        int done = 0;
+        for (int i = 0; i < main.jobsTableModel.getJobs().size(); i++) {
+            int vis = main.getTableJobs().convertRowIndexToView(i);
+            if (vis != -1) {
+                done++;
+                task.setTaskProgress((float) done / (float) total);
+                if (task.isCancelled()) {
+                    task.setStatus("Cancelled");
+                    break;
+                }
+                task.setStatus("Exporting row " + done + " of " + total);
+                for (int col = 0; col < main.jobsTableModel.getColumnCount(); col++) {
+                    out.write("\"" + main.jobsTableModel.getValueAt(i, col).toString() + "\"");
+                    if (col < main.jobsTableModel.getColumnCount() - 1) out.write(",");
+                }
+                out.write('\n');
+            }
+        }
+
+        out.flush();
+        out.close();
     }
 }

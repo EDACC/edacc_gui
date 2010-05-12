@@ -325,4 +325,9 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         }
         return res;
     }
+    
+    public Vector<ExperimentResult> getJobs() {
+        return jobs;
+    }
+
 }

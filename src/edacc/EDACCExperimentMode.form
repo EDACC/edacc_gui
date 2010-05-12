@@ -24,7 +24,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageExperimentPane" pref="699" max="32767" attributes="0"/>
+              <Component id="manageExperimentPane" pref="952" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -33,7 +33,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageExperimentPane" pref="569" max="32767" attributes="0"/>
+              <Component id="manageExperimentPane" pref="567" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -73,7 +73,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnLoadExperiment" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="scrollPaneExperimentsTable" alignment="0" pref="674" max="32767" attributes="0"/>
+                          <Component id="scrollPaneExperimentsTable" alignment="0" pref="923" max="32767" attributes="0"/>
                           <Component id="pnlNewExperiment" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -189,7 +189,7 @@
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jScrollPane1" pref="221" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane1" pref="220" max="32767" attributes="0"/>
                                       <Component id="lblExperimentDescription" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
@@ -272,7 +272,7 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="jSplitPane1" alignment="0" pref="674" max="32767" attributes="0"/>
+                          <Component id="jSplitPane1" alignment="0" pref="923" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="btnSelectAllSolvers" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -281,7 +281,7 @@
                               <Component id="btnReverseSolverSelection" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnChooseSolvers" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="27" max="32767" attributes="0"/>
+                              <EmptySpace pref="255" max="32767" attributes="0"/>
                               <Component id="btnSaveSolverConfigurations" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -293,7 +293,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane1" pref="488" max="32767" attributes="0"/>
+                      <Component id="jSplitPane1" pref="485" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="btnSelectAllSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -330,14 +330,14 @@
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="jScrollPane3" pref="489" max="32767" attributes="0"/>
+                              <Component id="jScrollPane3" pref="487" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jScrollPane3" alignment="0" pref="486" max="32767" attributes="0"/>
+                          <Component id="jScrollPane3" alignment="0" pref="483" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -466,12 +466,12 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jSplitPane2" alignment="0" pref="694" max="32767" attributes="0"/>
+                  <Component id="jSplitPane2" alignment="0" pref="947" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jSplitPane2" alignment="0" pref="541" max="32767" attributes="0"/>
+                  <Component id="jSplitPane2" alignment="0" pref="540" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -772,7 +772,7 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="441" max="32767" attributes="0"/>
+                          <EmptySpace pref="628" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -814,7 +814,7 @@
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="btnGeneratePackage" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="320" max="32767" attributes="0"/>
+                          <EmptySpace pref="316" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -950,21 +950,24 @@
                       <Component id="btnBrowserColumnSelection" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnFilterJobs" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="363" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btnCSVExport" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="409" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="jScrollPane6" alignment="1" pref="694" max="32767" attributes="0"/>
+                  <Component id="jScrollPane6" alignment="1" pref="947" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane6" pref="485" max="32767" attributes="0"/>
+                      <Component id="jScrollPane6" pref="479" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="btnRefreshJobs" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnBrowserColumnSelection" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="btnFilterJobs" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnFilterJobs" alignment="3" min="-2" pref="24" max="-2" attributes="0"/>
+                          <Component id="btnCSVExport" alignment="3" min="-2" pref="25" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -1005,7 +1008,7 @@
                 <Property name="text" type="java.lang.String" resourceKey="btnRefreshJobs.text"/>
                 <Property name="name" type="java.lang.String" value="btnRefreshJobs" noResource="true"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[103, 23]"/>
+                  <Dimension value="[127, 25]"/>
                 </Property>
               </Properties>
             </Component>
@@ -1026,7 +1029,20 @@
                 <Property name="text" type="java.lang.String" resourceKey="btnFilterJobs.text"/>
                 <Property name="name" type="java.lang.String" value="btnFilterJobs" noResource="true"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[103, 23]"/>
+                  <Dimension value="[127, 25]"/>
+                </Property>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="btnCSVExport">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                  <action class="edacc.EDACCExperimentMode" id="btnCSVExport" methodName="btnCSVExport"/>
+                </Property>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="btnCSVExport.toolTipText"/>
+                <Property name="label" type="java.lang.String" resourceKey="btnCSVExport.label"/>
+                <Property name="name" type="java.lang.String" value="btnCSVExport" noResource="true"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[127, 25]"/>
                 </Property>
               </Properties>
             </Component>
