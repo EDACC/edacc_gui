@@ -879,12 +879,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     }//GEN-LAST:event_manageExperimentPaneStateChanged
 
     private void btnGeneratePackage(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGeneratePackage
-        try {
-            // Generate zip archive
-            expController.generatePackage();
-        } catch (Exception ex) {
-            javax.swing.JOptionPane.showMessageDialog(null, "There was an error while creating the package: " + ex, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        JFileChooser packageFileChooser = new JFileChooser();
+        packageFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        if (packageFileChooser.showDialog(this, "Select Package Location") != JFileChooser.APPROVE_OPTION) {
+            return;
         }
+
+        File zipFile = new File(packageFileChooser.getSelectedFile().getAbsolutePath() + System.getProperty("file.separator") + expController.getActiveExperiment().getDate().toString() + " - " + expController.getActiveExperiment().getName() + ".zip");
+        Tasks.startTask("generatePackage", new Class[]{File.class, edacc.model.Tasks.class}, new Object[]{zipFile, null}, expController, this);
     }//GEN-LAST:event_btnGeneratePackage
 
     private void btnSelectAllInstanceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstanceClassesActionPerformed
@@ -1216,6 +1218,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             if (e instanceof IOException) {
                 javax.swing.JOptionPane.showMessageDialog(null, "I/O Exception during CSV export:\n\n" + e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
+        } else if (methodName.equals("generatePackage")) {
+            javax.swing.JOptionPane.showMessageDialog(null, "Excpetion during package generation:\n\n" + e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }
 

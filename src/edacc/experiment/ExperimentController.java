@@ -436,42 +436,55 @@ public class ExperimentController {
         }
 
     }
-    private JFileChooser packageFileChooser;
 
     /**
      * Generates a ZIP archive with the necessary files for the grid.
      */
-    public void generatePackage() throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException {
-        final String fileSep = System.getProperty("file.separator");
-        if (packageFileChooser == null) {
-            packageFileChooser = new JFileChooser();
-            packageFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        }
-        if (packageFileChooser.showDialog(main, "Select Package Location") != JFileChooser.APPROVE_OPTION) {
-            return;
-        }
-        File zipFile = new File(packageFileChooser.getSelectedFile().getAbsolutePath() + fileSep + activeExperiment.getDate().toString() + " - " + activeExperiment.getName() + ".zip");
+    public void generatePackage(File zipFile, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException {
         if (zipFile.exists()) {
             zipFile.delete();
         }
         ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile));
         ZipEntry entry;
 
-        // add solvers to zip file
+        Tasks.getTaskView().setCancelable(true);
+        task.setOperationName("Generating Package");
+        
         Vector<Solver> solvers = ExperimentDAO.getSolversInExperiment(activeExperiment);
+        LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
+
+        int total = solvers.size() + instances.size();
+        int done = 0;
+        
+        // add solvers to zip file
         for (Solver s : solvers) {
+            done++;
+            task.setTaskProgress((float) done / (float) total);
+            if (task.isCancelled()) {
+                task.setStatus("Cancelled");
+                break;
+            }
+            task.setStatus("Writing solver " + done + " of " + solvers.size());
             File bin = SolverDAO.getBinaryFileOfSolver(s);
-            entry = new ZipEntry("solvers" + fileSep + s.getBinaryName());
+            entry = new ZipEntry("solvers" + System.getProperty("file.separator") + s.getBinaryName());
             addFileToZIP(bin, entry, zos);
         }
 
         // add instances to zip file
-        LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
         for (Instance i : instances) {
+            done++;
+            task.setTaskProgress((float) done / (float) total);
+            if (task.isCancelled()) {
+                task.setStatus("Cancelled");
+                break;
+            }
+            task.setStatus("Writing instance " + (done - solvers.size()) + " of " + instances.size());
             File f = InstanceDAO.getBinaryFileOfInstance(i);
-            entry = new ZipEntry("instances" + fileSep + i.getId() + "_" + i.getName());
+            entry = new ZipEntry("instances" + System.getProperty("file.separator") + i.getId() + "_" + i.getName());
             addFileToZIP(f, entry, zos);
         }
+
+        task.setStatus("Writing client");
 
         // add PBS script
         // TODO extend to multiple queue support
@@ -492,7 +505,7 @@ public class ExperimentController {
         addClient(zos);
 
         // add empty result library
-        entry = new ZipEntry("results" + fileSep + "~");
+        entry = new ZipEntry("results" + System.getProperty("file.separator") + "~");
         zos.putNextEntry(entry);
 
         zos.close();
