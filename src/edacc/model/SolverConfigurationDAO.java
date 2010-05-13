@@ -134,6 +134,22 @@ public class SolverConfigurationDAO {
          }
     }
 
+    /**
+     * Returns a vector of all solver configurations which are marked as deleted.
+     * @return a vector of solver configurations
+     */
+    public static Vector<SolverConfiguration> getAllDeleted() {
+        Vector<SolverConfiguration> res = new Vector<SolverConfiguration>();
+        Enumeration<SolverConfiguration> e = cache.elements();
+        while (e.hasMoreElements()) {
+            SolverConfiguration sc = e.nextElement();
+            if (sc.isDeleted()) {
+                res.add(sc);
+            }
+        }
+        return res;
+    }
+
     public static void clearCache() {
         cache.clear();
     }

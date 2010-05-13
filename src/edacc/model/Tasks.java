@@ -50,6 +50,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
                 try {
                     taskView.setVisible(true);
                 } catch (Exception e) {
+                    e.printStackTrace();
                     // happens if the task view is already disposed, i.e. the task is finished.
                 }
             }

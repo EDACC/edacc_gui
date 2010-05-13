@@ -5,6 +5,7 @@
 package edacc.experiment;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
 import javax.swing.table.AbstractTableModel;
 import java.util.Vector;
 import edacc.model.ExperimentResult;
@@ -19,6 +20,7 @@ import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * In this class rowIndexes are always the visible rowIndexes and columnIndexes
@@ -110,6 +112,9 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
      * @return
      */
     public Integer getStatusCode(int row) {
+        if (row < 0 || row >= getRowCount()) {
+            return null;
+        }
         return jobs.get(row).getStatus();
     }
 
@@ -140,6 +145,9 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public String getParameterString(int row) {
         try {
             Vector<ParameterInstance> params = getParameters(row);
+            if (params == null) {
+                return "";
+            }
             String paramString = "";
 
             for (ParameterInstance param : params) {
@@ -187,10 +195,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        if (jobs == null) {
-            return 0;
-        }
-        return jobs.size();
+        return jobs == null ? 0 : jobs.size();
     }
 
     @Override
@@ -211,7 +216,11 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int col) {
-        return getValueAt(0, getIndexForColumn(col)).getClass();
+        if (getRowCount() == 0) {
+            return String.class;
+        } else {
+            return getValueAt(0, getIndexForColumn(col)).getClass();
+        }
     }
 
     /**
@@ -236,6 +245,9 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+        if (rowIndex < 0 || rowIndex >= getRowCount()) {
+            return null;
+        }
         ExperimentResult j = jobs.get(rowIndex);
 
         if (columnIndex != -1) {
@@ -245,11 +257,13 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             case 0:
                 return j.getId();
             case 1:
-                return getSolver(rowIndex).getName();
+                Solver solver = getSolver(rowIndex);
+                return solver == null ? "" : solver.getName();
             case 2:
                 return getParameterString(rowIndex);
             case 3:
-                return getInstance(rowIndex).getName();
+                Instance instance = getInstance(rowIndex);
+                return instance == null ? "" : instance.getName();
             case 4:
                 return j.getRun();
             case 5:
@@ -266,66 +280,61 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     }
 
     /**
-     * Returns all disjunct instance names which are currently shown in the table.
+     * Returns all disjunct instance names which are currently in that model
      * @return
      */
     public Vector<String> getInstances() {
         Vector<String> res = new Vector<String>();
-        for (int i = 0; i < getRowCount(); i++) {
-            boolean found = false;
-            for (String instance : res) {
-                if (instance.equals(getInstance(i).getName())) {
-                    found = true;
-                    break;
+        if (getRowCount() == 0) {
+            return res;
+        }
+        int experimentId = jobs.get(0).getExperimentId();
+        try {
+            LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(experimentId);
+
+            HashSet<String> tmp = new HashSet<String>();
+            for (Instance i : instances) {
+                if (!tmp.contains(i.getName())) {
+                    tmp.add(i.getName());
                 }
             }
-            if (!found) {
-                res.add(getInstance(i).getName());
-            }
+            res.addAll(tmp);
+            return res;
+        } catch (Exception ex) {
+            return res;
         }
-        return res;
     }
 
     /**
-     * Returns all disjunct status codes which are currently shown in the table.
+     * Returns all disjunct status codes which are currently in that model
      */
     public Vector<Integer> getStatusCodes() {
         Vector<Integer> res = new Vector<Integer>();
+        HashSet<Integer> tmp = new HashSet<Integer>();
         for (int i = 0; i < getRowCount(); i++) {
-            boolean found = false;
-            for (Integer statusCode : res) {
-                if (statusCode.equals(getStatusCode(i))) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                res.add(getStatusCode(i));
+            if (!tmp.contains(getStatusCode(i))) {
+                tmp.add(getStatusCode(i));
             }
         }
+        res.addAll(tmp);
         return res;
     }
 
     /**
-     * Returns all disjunct solver names which are currently shown in the table.
+     * Returns all disjunct solver names which are currently in that model
      */
     public Vector<String> getSolvers() {
         Vector<String> res = new Vector<String>();
+        HashSet<String> tmp = new HashSet<String>();
         for (int i = 0; i < getRowCount(); i++) {
-            boolean found = false;
-            for (String solver : res) {
-                if (solver.equals(getSolver(i).getName())) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                res.add(getSolver(i).getName());
+            if (!tmp.contains(getSolver(i).getName())) {
+                tmp.add(getSolver(i).getName());
             }
         }
+        res.addAll(tmp);
         return res;
     }
-    
+
     public Vector<ExperimentResult> getJobs() {
         return jobs;
     }

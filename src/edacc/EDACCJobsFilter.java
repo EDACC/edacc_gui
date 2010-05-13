@@ -103,6 +103,7 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
         comboInstances.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         comboInstances.setName("comboInstances"); // NOI18N
 
+        jButton1.setAction(actionMap.get("btnCancel")); // NOI18N
         jButton1.setText(resourceMap.getString("jButton1.text")); // NOI18N
         jButton1.setName("jButton1"); // NOI18N
 
@@ -172,6 +173,11 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
         main.resultBrowserRowFilter.setSolverName(solver);
         main.resultBrowserRowFilter.setStatusCode(statusCode);
         main.jobsTableModel.fireTableDataChanged();
+        this.dispose();
+    }
+
+    @Action
+    public void btnCancel() {
         this.dispose();
     }
 

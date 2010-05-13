@@ -144,5 +144,53 @@ public class ExperimentResultDAO {
         return v;
     }
 
-    
+    public static Vector<ExperimentResult> getAllBySolverConfiguration(SolverConfiguration sc) throws SQLException {
+        Vector<ExperimentResult> res = new Vector<ExperimentResult>();
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT * FROM " + table + " " +
+                "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=?;"
+                );
+        st.setInt(1, sc.getExperiment_id());
+        st.setInt(2, sc.getId());
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            ExperimentResult er = getExperimentResultFromResultSet(rs);
+            res.add(er);
+            er.setSaved();
+        }
+        return res;
+    }
+
+    public static Vector<ExperimentResult> getAllByExperimentHasInstance(ExperimentHasInstance ehi) throws SQLException {
+         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT * FROM " + table + " " +
+                "WHERE Experiment_idExperiment=? AND Instances_idInstance=?;"
+                );
+        st.setInt(1, ehi.getExperiment_id());
+        st.setInt(2, ehi.getInstances_id());
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            ExperimentResult er = getExperimentResultFromResultSet(rs);
+            res.add(er);
+            er.setSaved();
+        }
+        return res;
+    }
+
+    public static void deleteExperimentResults(Vector<ExperimentResult> experimentResults) throws SQLException {
+        boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
+        DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
+        for (ExperimentResult r : experimentResults) {
+            st.setInt(1, r.getId());
+            st.addBatch();
+            r.setDeleted(); // this should only be done if the batch save actually
+                          // gets commited, right now this might not be the case if there's an DB exception
+        }
+        st.executeBatch();
+        DatabaseConnector.getInstance().getConn().commit();
+        DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+        st.close();
+    }
 }

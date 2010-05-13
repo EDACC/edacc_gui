@@ -34,6 +34,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Hashtable;
@@ -42,6 +43,7 @@ import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
 
 /**
  * Experiment design more controller class, handles requests by the GUI
@@ -169,8 +171,46 @@ public class ExperimentController {
      * config panel.
      * @throws SQLException
      */
-    public void saveSolverConfigurations(Tasks task) throws SQLException {
-        task.setStatus("Saving solvers..");
+    public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException {
+        
+        task.setStatus("Checking jobs..");
+        Vector<SolverConfiguration> deletedSolverConfigurations = SolverConfigurationDAO.getAllDeleted();
+        final Vector<ExperimentResult> deletedJobs = new Vector<ExperimentResult>();
+        for (SolverConfiguration sc : deletedSolverConfigurations) {
+            deletedJobs.addAll(ExperimentResultDAO.getAllBySolverConfiguration(sc));
+        }
+
+        if (deletedJobs.size() > 0) {
+            int notDeletableJobsCount = 0;
+            for (ExperimentResult job : deletedJobs) {
+                if (job.getStatus() != -1) {
+                    notDeletableJobsCount++;
+                }
+            }
+
+            if (notDeletableJobsCount > 0) {
+                final int _notDeletableJobsCount = notDeletableJobsCount;
+                SwingUtilities.invokeAndWait(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        javax.swing.JOptionPane.showMessageDialog(Tasks.getTaskView(), "There are " + _notDeletableJobsCount + " jobs in the database which would be deleted but the status code is not -1.", "Impossible", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    }
+
+                });
+                return ;
+            } else {
+                int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), "There are " + deletedJobs.size() + " jobs waiting in the database which would be deleted. Do you want to continue?", "Jobs would be deleted", javax.swing.JOptionPane.YES_NO_OPTION);
+                if (userInput == 1) {
+                    return ;
+                } else {
+                    task.setStatus("Deleting jobs..");
+                    ExperimentResultDAO.deleteExperimentResults(deletedJobs);
+                }
+            }
+        }
+        task.setStatus("Saving solver configurations..");
+        boolean invalidSeedGroup = false;
         for (int i = 0; i < solverConfigPanel.getComponentCount(); i++) {
             EDACCSolverConfigEntry entry = (EDACCSolverConfigEntry) solverConfigPanel.getComponent(i);
             int seed_group = 0;
@@ -179,7 +219,7 @@ public class ExperimentController {
             } catch (NumberFormatException e) {
                 seed_group = 0;
                 entry.getSeedGroup().setText("0");
-                javax.swing.JOptionPane.showMessageDialog(Tasks.getTaskView(), "Seed groups have to be integers, defaulted to 0", "Expected integer for seed groups", javax.swing.JOptionPane.ERROR_MESSAGE);
+                invalidSeedGroup = true;
             }
             if (entry.getSolverConfiguration() == null) {
                 entry.setSolverConfiguration(SolverConfigurationDAO.createSolverConfiguration(entry.getSolverId(), activeExperiment.getId(), seed_group));
@@ -190,22 +230,64 @@ public class ExperimentController {
             entry.saveParameterInstances();
         }
         SolverConfigurationDAO.saveAll();
+        if (invalidSeedGroup) {
+            SwingUtilities.invokeAndWait(new Runnable() {
+
+                @Override
+                public void run() {
+                    javax.swing.JOptionPane.showMessageDialog(Tasks.getTaskView(), "Seed groups have to be integers, defaulted to 0", "Expected integer for seed groups", javax.swing.JOptionPane.ERROR_MESSAGE);
+                }
+            });
+        }
     }
 
     /**
      * saves the instances selection of the currently loaded experiment
      * @throws SQLException
      */
-    public void saveExperimentHasInstances(Tasks task) throws SQLException {
-        task.setStatus("Saving instances..");
+    public void saveExperimentHasInstances(Tasks task) throws SQLException, InterruptedException, InvocationTargetException {
+        task.setStatus("Checking jobs..");
+        Vector<ExperimentHasInstance> deletedInstances = main.insTableModel.getDeletedExperimentHasInstances();
+        if (deletedInstances.size() > 0) {
+            Vector<ExperimentResult> deletedJobs = new Vector<ExperimentResult>();
+            for (ExperimentHasInstance ehi : deletedInstances) {
+                deletedJobs.addAll(ExperimentResultDAO.getAllByExperimentHasInstance(ehi));
+            }
+            int notDeletableJobsCount = 0;
+            for (ExperimentResult job: deletedJobs) {
+                if (job.getStatus() != -1) {
+                    notDeletableJobsCount++;
+                }
+            }
+            if (notDeletableJobsCount > 0) {
+                final int _notDeletableJobsCount = notDeletableJobsCount;
+                SwingUtilities.invokeAndWait(new Runnable() {
 
+                    @Override
+                    public void run() {
+                        javax.swing.JOptionPane.showMessageDialog(Tasks.getTaskView(), "There are " + _notDeletableJobsCount + " jobs in the database which would be deleted but the status code is not -1.", "Impossible", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    }
+
+                });
+                return ;
+            } else {
+                int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), "There are " + deletedJobs.size() + " jobs waiting in the database which would be deleted. Do you want to continue?", "Jobs would be deleted", javax.swing.JOptionPane.YES_NO_OPTION);
+                if (userInput == 1) {
+                    return ;
+                } else {
+                    task.setStatus("Deleting jobs..");
+                    ExperimentResultDAO.deleteExperimentResults(deletedJobs);
+                }
+            }
+        }
+        task.setStatus("Saving instances..");
         // First: add all new ExperimentHasInstance objects
-        for (Integer instanceId: main.insTableModel.getNewInstanceIds()) {
+        for (Integer instanceId : main.insTableModel.getNewInstanceIds()) {
             ExperimentHasInstanceDAO.createExperimentHasInstance(activeExperiment.getId(), instanceId);
         }
 
         // Then: remove all removed ExperimentHasInstance objects
-        for (ExperimentHasInstance ehi: main.insTableModel.getDeletedExperimentHasInstances()) {
+        for (ExperimentHasInstance ehi : main.insTableModel.getDeletedExperimentHasInstances()) {
             ExperimentHasInstanceDAO.removeExperimentHasInstance(ehi);
         }
 
@@ -344,7 +426,7 @@ public class ExperimentController {
     public void loadJobs() {
         try {
             main.jobsTableModel.setJobs(ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId()));
-            if (main.jobsTableModel.getRowCount()>0) {
+            if (main.jobsTableModel.getRowCount() > 0) {
                 main.resultsBrowserTableRowSorter.setRowFilter(main.resultBrowserRowFilter);
             }
             main.jobsTableModel.fireTableDataChanged();

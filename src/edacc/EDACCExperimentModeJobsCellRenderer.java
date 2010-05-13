@@ -26,7 +26,10 @@ public class EDACCExperimentModeJobsCellRenderer extends DefaultTableCellRendere
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
         Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
         row = table.convertRowIndexToModel(row);
-        int status = ((ExperimentResultsBrowserTableModel) table.getModel()).getStatusCode(row);
+        Integer status = ((ExperimentResultsBrowserTableModel) table.getModel()).getStatusCode(row);
+        if (status == null) {
+            return null;
+        }
         switch (status) {
             case -2: // error
                 comp.setBackground(Color.red);
