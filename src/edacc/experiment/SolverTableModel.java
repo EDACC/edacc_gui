@@ -77,4 +77,18 @@ public class SolverTableModel extends AbstractTableModel {
                 return "";
         }
     }
+
+    public void setSolverSelected(int solverId, boolean value) {
+        for (int i = 0; i < solvers.size(); i++) {
+            if (solvers.get(i).getId() == solverId) {
+                selected[i] = value;
+                this.fireTableCellUpdated(i, 4);
+                break;
+            }
+        }
+    }
+
+    public Solver getSolver(int row) {
+        return solvers.get(row);
+    }
 }

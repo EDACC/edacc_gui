@@ -37,6 +37,8 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Vector;
@@ -239,6 +241,26 @@ public class ExperimentController {
                 }
             });
         }
+    }
+
+    public void undoSolverConfigurations(Tasks task) throws SQLException {
+        main.solverConfigPanel.beginUpdate();
+        main.solverConfigPanel.removeAll();
+        Vector<SolverConfiguration> solverConfigurations = SolverConfigurationDAO.getAllCached();
+        Collections.sort(solverConfigurations, new Comparator<SolverConfiguration>() {
+
+            @Override
+            public int compare(SolverConfiguration o1, SolverConfiguration o2) {
+                return o1.getId() - o2.getId();
+            }
+
+        });
+        for (SolverConfiguration sc : solverConfigurations) {
+            main.solverConfigPanel.addSolverConfiguration(sc);
+            sc.setSaved();
+        }
+        main.solverConfigPanel.endUpdate();
+        main.setTitles();
     }
 
     /**

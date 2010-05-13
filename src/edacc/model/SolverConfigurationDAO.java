@@ -167,4 +167,12 @@ public class SolverConfigurationDAO {
         }
         return false;
     }
+
+    public static Vector<SolverConfiguration> getAllCached() {
+        Vector<SolverConfiguration> res = new Vector<SolverConfiguration>();
+        for (SolverConfiguration sc : cache.values()) {
+            res.add(sc);
+        }
+        return res;
+    }
 }

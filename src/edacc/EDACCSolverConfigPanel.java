@@ -17,10 +17,7 @@ import edacc.model.SolverDAO;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.Vector;
 
 /**
  * A JPanel which serves as container for EDACCSolverConfigEntry objects.
@@ -58,16 +55,43 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
             int oldId = -1;
             int count = 1;
             for (int i = 0; i < this.getComponentCount(); i++) {
-                EDACCSolverConfigEntry e = (EDACCSolverConfigEntry)this.getComponent(i);
+                EDACCSolverConfigEntry e = (EDACCSolverConfigEntry) this.getComponent(i);
                 if (e.getSolverId() != oldId) {
                     oldId = e.getSolverId();
                     count = 1;
-                } else { count++;}
+                } else {
+                    count++;
+                }
                 e.setTitleNumber(count);
             }
             this.repaint();
             this.revalidate();
         }
+    }
+
+    private int getIndex(int solverId) {
+        int solverIndex = 0;
+        int solverOrder[] = new int[parent.solTableModel.getRowCount()];
+        for (int i = 0; i < parent.solTableModel.getRowCount(); i++) {
+            solverOrder[i] = parent.solTableModel.getSolver(i).getId();
+            if (solverId == parent.solTableModel.getSolver(i).getId()) {
+                solverIndex = i;
+            }
+        }
+        int currentIndex = 0;
+        for (int i = 0; i < this.getComponents().length; i++) {
+            EDACCSolverConfigEntry entry = (EDACCSolverConfigEntry) this.getComponents()[i];
+            for (int j = currentIndex; j < solverOrder.length; j++) {
+                if (entry.getSolverId() == solverOrder[j]) {
+                    currentIndex = j;
+                    break;
+                }
+            }
+            if (currentIndex > solverIndex) {
+                return i;
+            }
+        }
+        return this.getComponentCount();
     }
 
     /**
@@ -81,7 +105,9 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
                 EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solver);
                 entry.setParent(this);
                 gridBagConstraints.gridy++;
-                this.add(entry, gridBagConstraints);
+                this.add(entry, getIndex(solver.getId()));
+                setGridBagConstraints();
+                parent.solTableModel.setSolverSelected(solver.getId(), true);
                 doRepaint();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -97,8 +123,9 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
     public void addSolverConfiguration(SolverConfiguration solverConfiguration) throws SQLException {
         EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solverConfiguration);
         entry.setParent(this);
-        gridBagConstraints.gridy++;
-        this.add(entry, gridBagConstraints);
+        this.add(entry, getIndex(solverConfiguration.getSolver_id()));
+        parent.solTableModel.setSolverSelected(solverConfiguration.getSolver_id(), true);
+        setGridBagConstraints();
         doRepaint();
     }
 
@@ -111,8 +138,6 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
         EDACCSolverConfigEntry repl = new EDACCSolverConfigEntry(SolverDAO.getById(entry.getSolverId()));
         repl.setParent(this);
         repl.assign(entry);
-        GridBagConstraints c = layout.getConstraints(entry);
-        c.gridy++;
         int pos = 0;
         for (int i = 0; i < this.getComponentCount(); i++) {
             if (this.getComponent(i) == entry) {
@@ -120,15 +145,18 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
                 break;
             }
         }
-        gridBagConstraints.gridy++;
-        this.add(repl, pos+1);
+        this.add(repl, pos + 1);
+        setGridBagConstraints();
+        doRepaint();
+        setTitles();
+    }
+
+    private void setGridBagConstraints() {
         gridBagConstraints.gridy = 0;
         for (int i = 0; i < this.getComponentCount(); i++) {
             gridBagConstraints.gridy++;
             layout.setConstraints(this.getComponent(i), gridBagConstraints);
         }
-        doRepaint();
-        setTitles();
     }
 
     /**
@@ -146,18 +174,13 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
         // we will deselect the solver in the solvers table
         boolean lastSolver = true;
         for (Component c : this.getComponents()) {
-            if (((EDACCSolverConfigEntry)c).getSolverId() == entry.getSolverId()) {
+            if (((EDACCSolverConfigEntry) c).getSolverId() == entry.getSolverId()) {
                 lastSolver = false;
                 break;
             }
         }
         if (lastSolver) {
-            for (int i = 0; i < parent.solTableModel.getRowCount(); i++) {
-                if (((Solver)parent.solTableModel.getValueAt(i, 5)).getId() == entry.getSolverId()) {
-                    parent.solTableModel.setValueAt(false, i, 4);
-                    break;
-                }
-            }
+            parent.solTableModel.setSolverSelected(entry.getSolverId(), false);
         }
         doRepaint();
         setTitles();
@@ -232,6 +255,13 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
         }
         // ... unchanged
         return false;
+    }
+
+    @Override
+    public void removeAll() {
+        while (this.getComponents().length > 0) {
+            removeEntry((EDACCSolverConfigEntry) this.getComponent(0));
+        }
     }
 
     /** This method is called from within the constructor to
