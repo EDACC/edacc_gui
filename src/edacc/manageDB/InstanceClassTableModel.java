@@ -147,7 +147,7 @@ public class InstanceClassTableModel extends AbstractTableModel{
             ((InstanceTableModel)instanceTable.getModel()).addInstances(new Vector<Instance>(test));
         }
         
-        instanceTable.updateUI();
+        ((InstanceTableModel)instanceTable.getModel()).fireTableDataChanged();
     }
 
 
