@@ -11,7 +11,6 @@ import edacc.EDACCCreateInstanceClassDialog;
 import edacc.EDACCManageDBInstanceFilter;
 import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
-import edacc.EDACCTaskEvents;
 import edacc.model.InstaceNotInDBException;
 import edacc.model.Instance;
 import edacc.model.InstanceAlreadyInDBException;
@@ -27,7 +26,6 @@ import edacc.model.InstanceIsInExperimentException;
 import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.MD5CheckFailedException;
 import edacc.model.NoConnectionToDBException;
-import edacc.model.Tasks;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -42,7 +40,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
-import javax.swing.RowFilter.ComparisonType;
 
 /**
  *

@@ -65,11 +65,11 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
+              <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jButtonOk" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="211" max="32767" attributes="0"/>
                   <Component id="jButtonCancel" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="211" max="32767" attributes="0"/>
+                  <Component id="jButtonOk" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>

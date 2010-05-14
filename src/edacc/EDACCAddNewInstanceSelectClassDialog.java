@@ -91,11 +91,11 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         jPanelButtons.setLayout(jPanelButtonsLayout);
         jPanelButtonsLayout.setHorizontalGroup(
             jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelButtonsLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelButtonsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButtonOk)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 211, Short.MAX_VALUE)
                 .addComponent(jButtonCancel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 211, Short.MAX_VALUE)
+                .addComponent(jButtonOk)
                 .addContainerGap())
         );
         jPanelButtonsLayout.setVerticalGroup(
