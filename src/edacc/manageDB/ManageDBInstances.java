@@ -40,13 +40,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
-import javax.swing.RowFilter.ComparisonType;
 
 /**
  *
  * @author rretz
  */
-public class ManageDBInstances {
+public class ManageDBInstances{
 
     EDACCManageDBMode main;
     JPanel panelManageDBInstances;
@@ -85,8 +84,10 @@ public class ManageDBInstances {
      * instance files into the "instance table" of the MangeDBMode.
      */
 
-    public void addInstances() {
+    public int addInstances() {
+
         try {
+            int count = 0;
             //Starts the dialog at which the user has to choose a instance source class or the autogeneration.
             if(main.addInstanceDialog == null){
                 JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
@@ -114,14 +115,13 @@ public class ManageDBInstances {
                             "Error",
                             JOptionPane.WARNING_MESSAGE);
                 }
-
                 if(input.getName().equals("")){
                     Vector<Instance> instances;
- 
-                     instances = buildInstancesAutogenerateClass(instanceFiles, ret);
+                    instances = buildInstancesAutogenerateClass(instanceFiles, ret);
 
                     main.instanceTableModel.addInstances(instances);
                     loadInstanceClasses();
+                    count = instances.size();
                 }else{
                     Vector<Instance> instances = buildInstancesGivenClass(instanceFiles, (InstanceClass)input);
                     main.instanceTableModel.addInstances(instances);
@@ -157,6 +157,7 @@ public class ManageDBInstances {
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
+        return 0;
 
     }
 
@@ -168,7 +169,7 @@ public class ManageDBInstances {
         Vector<Instance> rem = new Vector<Instance>();
         Vector<Instance> notRem = new Vector<Instance>();
         for (int i = 0; i < rows.length; i++) {
-            Instance ins = (Instance) main.instanceTableModel.getValueAt(rows[i], 5);
+            Instance ins = (Instance) main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(rows[i]), 5);
             try {
                 InstanceDAO.delete(ins);
                 rem.add(ins);
@@ -325,9 +326,9 @@ public class ManageDBInstances {
         String duplicatesDB = "";
         StringBuilder instanceErrors = new StringBuilder("");
         int errCount = 0;
+        int done = 0;
         
         for (int i = 0; i < instanceFiles.size(); i++) {
-
             try {
                 String md5 = calculateMD5(instanceFiles.get(i));
                 try {
@@ -343,8 +344,7 @@ public class ManageDBInstances {
                 }
             } catch (InstanceAlreadyInDBException ex) {
                 duplicatesDB += "\n " + instanceFiles.get(i).getAbsolutePath();
-            }
-
+            }    
         }
 
         String instanceErrs = instanceErrors.toString();
@@ -390,7 +390,6 @@ public class ManageDBInstances {
         InstanceClass instanceClass;
         int errCount = 0;
 
-
         for (int i = 0; i < instanceFiles.size(); i++) {
             try {
                 String name = autogenerateInstanceClassName(ret.getParent(), instanceFiles.get(i));
@@ -415,7 +414,6 @@ public class ManageDBInstances {
             } catch (InstanceAlreadyInDBException ex) {
                 duplicatesDB += "\n " + instanceFiles.get(i).getAbsolutePath();
             }
-
         }
 
         String instanceErrs = instanceErrors.toString();
@@ -506,7 +504,7 @@ public class ManageDBInstances {
         Boolean isSource = false;
         try {
             for(int i = 0; i < selectedRowsInstance.length; i++){
-                Instance tempInstance = (Instance) main.instanceTableModel.getValueAt(selectedRowsInstance[i], 5);
+                Instance tempInstance = (Instance) main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(selectedRowsInstance[i]), 5);
                 for(int j = 0; j < instanceClass.size(); j++){
                     InstanceClass tempInstanceClass = instanceClass.get(j);
                     if(tempInstanceClass.isSource()){

@@ -84,4 +84,8 @@ public class InstanceTableModel extends AbstractTableModel{
         }
     }
 
+    void addInstances() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
 }

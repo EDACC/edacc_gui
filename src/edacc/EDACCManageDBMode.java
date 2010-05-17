@@ -31,7 +31,7 @@ import org.jdesktop.application.Action;
  *
  * @author rretz
  */
-public class EDACCManageDBMode extends javax.swing.JPanel {
+public class EDACCManageDBMode extends javax.swing.JPanel{
 
     public boolean unsavedChanges;
 
@@ -921,7 +921,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
             manageDBInstances.removeInstances(tableInstances.getSelectedRows());
         } catch (Exception e) {
         }
-        tableInstances.updateUI();
+        this.instanceTableModel.fireTableDataChanged();
     }//GEN-LAST:event_btnRemoveInstancesActionPerformed
 
     private void btnRefreshTableInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshTableInstancesActionPerformed
@@ -1204,6 +1204,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     }//GEN-LAST:event_btnAddToClassActionPerformed
     private void btnRemoveFromClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveFromClassActionPerformed
         manageDBInstances.RemoveInstanceFromInstanceClass(tableInstances.getSelectedRows());
+        this.instanceTableModel.fireTableDataChanged();
     }//GEN-LAST:event_btnRemoveFromClassActionPerformed
     private JFileChooser exportFileChooser;
     private void btnExport(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExport
@@ -1394,4 +1395,5 @@ public class EDACCManageDBMode extends javax.swing.JPanel {
     private javax.swing.JTextField tfParametersPrefix;
     private javax.swing.JTextField tfSolverName;
     // End of variables declaration//GEN-END:variables
+
 }
