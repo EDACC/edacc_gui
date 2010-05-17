@@ -45,7 +45,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
     }
 
     public void setTitles() {
-        if (parent != null) {
+        if (!update && parent != null) {
             parent.setTitles();
         }
     }
@@ -66,6 +66,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
             }
             this.repaint();
             this.revalidate();
+            setTitles();
         }
     }
 
@@ -148,7 +149,6 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
         this.add(repl, pos + 1);
         setGridBagConstraints();
         doRepaint();
-        setTitles();
     }
 
     private void setGridBagConstraints() {
@@ -183,7 +183,6 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
             parent.solTableModel.setSolverSelected(entry.getSolverId(), false);
         }
         doRepaint();
-        setTitles();
     }
 
     /**
@@ -203,7 +202,6 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
             }
         }
         doRepaint();
-        setTitles();
     }
 
     /**

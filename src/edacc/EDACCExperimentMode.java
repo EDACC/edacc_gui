@@ -110,7 +110,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         manageExperimentPane = new javax.swing.JTabbedPane();
         panelManageExperiment = new javax.swing.JPanel();
@@ -142,16 +141,19 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         jPanel4 = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         tableInstanceClasses = new javax.swing.JTable();
-        btnSelectAllInstanceClasses = new javax.swing.JButton();
+        jPanel6 = new javax.swing.JPanel();
         btnDeselectAllInstnaceClasses = new javax.swing.JButton();
+        btnSelectAllInstanceClasses = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
-        btnInvertSelection = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tableInstances = new javax.swing.JTable();
+        jPanel5 = new javax.swing.JPanel();
+        btnSaveInstances = new javax.swing.JButton();
         btnFilterInstances = new javax.swing.JButton();
         btnSelectAllInstances = new javax.swing.JButton();
         btnDeselectAllInstances = new javax.swing.JButton();
-        btnSaveInstances = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tableInstances = new javax.swing.JTable();
+        btnInvertSelection = new javax.swing.JButton();
+        btnUndoInstances = new javax.swing.JButton();
         panelExperimentParams = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -288,7 +290,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                         .addComponent(btnRemoveExperiment)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnLoadExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 825, Short.MAX_VALUE)
+                    .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 789, Short.MAX_VALUE)
                     .addComponent(pnlNewExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
@@ -394,7 +396,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelChooseSolverLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelChooseSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 825, Short.MAX_VALUE)
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 789, Short.MAX_VALUE)
                     .addGroup(panelChooseSolverLayout.createSequentialGroup()
                         .addComponent(btnSelectAllSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -403,7 +405,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                         .addComponent(btnReverseSolverSelection)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnChooseSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnUndoSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSaveSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -435,7 +437,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         jSplitPane2.setName("jSplitPane2"); // NOI18N
 
         jPanel4.setName("jPanel4"); // NOI18N
-        jPanel4.setLayout(new java.awt.GridBagLayout());
 
         jScrollPane5.setName("jScrollPane5"); // NOI18N
 
@@ -450,110 +451,74 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tableInstanceClasses.setMinimumSize(new java.awt.Dimension(0, 0));
         tableInstanceClasses.setName("tableInstanceClasses"); // NOI18N
         jScrollPane5.setViewportView(tableInstanceClasses);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 5;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 12);
-        jPanel4.add(jScrollPane5, gridBagConstraints);
-
-        btnSelectAllInstanceClasses.setText(resourceMap.getString("btnSelectAllInstanceClasses.text")); // NOI18N
-        btnSelectAllInstanceClasses.setToolTipText(resourceMap.getString("btnSelectAllInstanceClasses.toolTipText")); // NOI18N
-        btnSelectAllInstanceClasses.setName("btnSelectAllInstanceClasses"); // NOI18N
-        btnSelectAllInstanceClasses.setPreferredSize(new java.awt.Dimension(130, 25));
-        btnSelectAllInstanceClasses.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSelectAllInstanceClassesActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
-        jPanel4.add(btnSelectAllInstanceClasses, gridBagConstraints);
+        jPanel6.setName("jPanel6"); // NOI18N
 
         btnDeselectAllInstnaceClasses.setText(resourceMap.getString("btnDeselectAllInstnaceClasses.text")); // NOI18N
         btnDeselectAllInstnaceClasses.setToolTipText(resourceMap.getString("btnDeselectAllInstnaceClasses.toolTipText")); // NOI18N
         btnDeselectAllInstnaceClasses.setName("btnDeselectAllInstnaceClasses"); // NOI18N
-        btnDeselectAllInstnaceClasses.setPreferredSize(new java.awt.Dimension(130, 25));
+        btnDeselectAllInstnaceClasses.setPreferredSize(new java.awt.Dimension(109, 25));
         btnDeselectAllInstnaceClasses.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDeselectAllInstnaceClassesActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
-        jPanel4.add(btnDeselectAllInstnaceClasses, gridBagConstraints);
+
+        btnSelectAllInstanceClasses.setText(resourceMap.getString("btnSelectAllInstanceClasses.text")); // NOI18N
+        btnSelectAllInstanceClasses.setToolTipText(resourceMap.getString("btnSelectAllInstanceClasses.toolTipText")); // NOI18N
+        btnSelectAllInstanceClasses.setName("btnSelectAllInstanceClasses"); // NOI18N
+        btnSelectAllInstanceClasses.setPreferredSize(new java.awt.Dimension(109, 25));
+        btnSelectAllInstanceClasses.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelectAllInstanceClassesActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnSelectAllInstanceClasses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnDeselectAllInstnaceClasses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSelectAllInstanceClasses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnDeselectAllInstnaceClasses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(14, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
 
         jSplitPane2.setLeftComponent(jPanel4);
 
         jPanel3.setName("jPanel3"); // NOI18N
-        jPanel3.setLayout(new java.awt.GridBagLayout());
-
-        btnInvertSelection.setAction(actionMap.get("btnInvertSelection")); // NOI18N
-        btnInvertSelection.setText(resourceMap.getString("btnInvertSelection.text")); // NOI18N
-        btnInvertSelection.setToolTipText(resourceMap.getString("btnInvertSelection.toolTipText")); // NOI18N
-        btnInvertSelection.setName("btnInvertSelection"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
-        jPanel3.add(btnInvertSelection, gridBagConstraints);
-
-        btnFilterInstances.setAction(actionMap.get("btnInstanceFilter")); // NOI18N
-        btnFilterInstances.setText(resourceMap.getString("btnFilterInstances.text")); // NOI18N
-        btnFilterInstances.setToolTipText(resourceMap.getString("btnFilterInstances.toolTipText")); // NOI18N
-        btnFilterInstances.setName("btnFilterInstances"); // NOI18N
-        btnFilterInstances.setPreferredSize(new java.awt.Dimension(130, 25));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
-        jPanel3.add(btnFilterInstances, gridBagConstraints);
-
-        btnSelectAllInstances.setAction(actionMap.get("btnSelectAllInstances")); // NOI18N
-        btnSelectAllInstances.setText(resourceMap.getString("btnSelectAllInstances.text")); // NOI18N
-        btnSelectAllInstances.setToolTipText(resourceMap.getString("btnSelectAllInstances.toolTipText")); // NOI18N
-        btnSelectAllInstances.setName("btnSelectAllInstances"); // NOI18N
-        btnSelectAllInstances.setPreferredSize(new java.awt.Dimension(130, 25));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
-        jPanel3.add(btnSelectAllInstances, gridBagConstraints);
-
-        btnDeselectAllInstances.setAction(actionMap.get("btnDeselectAllInstances")); // NOI18N
-        btnDeselectAllInstances.setText(resourceMap.getString("btnDeselectAllInstances.text")); // NOI18N
-        btnDeselectAllInstances.setToolTipText(resourceMap.getString("btnDeselectAllInstances.toolTipText")); // NOI18N
-        btnDeselectAllInstances.setName("btnDeselectAllInstances"); // NOI18N
-        btnDeselectAllInstances.setPreferredSize(new java.awt.Dimension(130, 25));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
-        jPanel3.add(btnDeselectAllInstances, gridBagConstraints);
-
-        btnSaveInstances.setAction(actionMap.get("btnSaveInstances")); // NOI18N
-        btnSaveInstances.setText(resourceMap.getString("btnSaveInstances.text")); // NOI18N
-        btnSaveInstances.setToolTipText(resourceMap.getString("btnSaveInstances.toolTipText")); // NOI18N
-        btnSaveInstances.setMaximumSize(new java.awt.Dimension(130, 25));
-        btnSaveInstances.setName("btnSaveInstances"); // NOI18N
-        btnSaveInstances.setPreferredSize(new java.awt.Dimension(130, 25));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.ipadx = 56;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
-        jPanel3.add(btnSaveInstances, gridBagConstraints);
 
         jScrollPane2.setName("jScrollPane2"); // NOI18N
 
@@ -568,18 +533,105 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tableInstances.setMinimumSize(new java.awt.Dimension(0, 0));
         tableInstances.setName("tableInstances"); // NOI18N
         jScrollPane2.setViewportView(tableInstances);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 5;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 12);
-        jPanel3.add(jScrollPane2, gridBagConstraints);
+        jPanel5.setName("jPanel5"); // NOI18N
+
+        btnSaveInstances.setAction(actionMap.get("btnSaveInstances")); // NOI18N
+        btnSaveInstances.setText(resourceMap.getString("btnSaveInstances.text")); // NOI18N
+        btnSaveInstances.setToolTipText(resourceMap.getString("btnSaveInstances.toolTipText")); // NOI18N
+        btnSaveInstances.setMaximumSize(new java.awt.Dimension(109, 23));
+        btnSaveInstances.setMinimumSize(new java.awt.Dimension(109, 23));
+        btnSaveInstances.setName("btnSaveInstances"); // NOI18N
+        btnSaveInstances.setPreferredSize(new java.awt.Dimension(109, 23));
+
+        btnFilterInstances.setAction(actionMap.get("btnInstanceFilter")); // NOI18N
+        btnFilterInstances.setText(resourceMap.getString("btnFilterInstances.text")); // NOI18N
+        btnFilterInstances.setToolTipText(resourceMap.getString("btnFilterInstances.toolTipText")); // NOI18N
+        btnFilterInstances.setMaximumSize(new java.awt.Dimension(109, 23));
+        btnFilterInstances.setMinimumSize(new java.awt.Dimension(109, 23));
+        btnFilterInstances.setName("btnFilterInstances"); // NOI18N
+        btnFilterInstances.setPreferredSize(new java.awt.Dimension(109, 25));
+
+        btnSelectAllInstances.setAction(actionMap.get("btnSelectAllInstances")); // NOI18N
+        btnSelectAllInstances.setText(resourceMap.getString("btnSelectAllInstances.text")); // NOI18N
+        btnSelectAllInstances.setToolTipText(resourceMap.getString("btnSelectAllInstances.toolTipText")); // NOI18N
+        btnSelectAllInstances.setMaximumSize(new java.awt.Dimension(109, 23));
+        btnSelectAllInstances.setMinimumSize(new java.awt.Dimension(109, 23));
+        btnSelectAllInstances.setName("btnSelectAllInstances"); // NOI18N
+        btnSelectAllInstances.setPreferredSize(new java.awt.Dimension(109, 25));
+
+        btnDeselectAllInstances.setAction(actionMap.get("btnDeselectAllInstances")); // NOI18N
+        btnDeselectAllInstances.setText(resourceMap.getString("btnDeselectAllInstances.text")); // NOI18N
+        btnDeselectAllInstances.setToolTipText(resourceMap.getString("btnDeselectAllInstances.toolTipText")); // NOI18N
+        btnDeselectAllInstances.setMaximumSize(new java.awt.Dimension(109, 23));
+        btnDeselectAllInstances.setMinimumSize(new java.awt.Dimension(109, 23));
+        btnDeselectAllInstances.setName("btnDeselectAllInstances"); // NOI18N
+        btnDeselectAllInstances.setPreferredSize(new java.awt.Dimension(109, 25));
+
+        btnInvertSelection.setAction(actionMap.get("btnInvertSelection")); // NOI18N
+        btnInvertSelection.setText(resourceMap.getString("btnInvertSelection.text")); // NOI18N
+        btnInvertSelection.setToolTipText(resourceMap.getString("btnInvertSelection.toolTipText")); // NOI18N
+        btnInvertSelection.setName("btnInvertSelection"); // NOI18N
+        btnInvertSelection.setPreferredSize(new java.awt.Dimension(109, 25));
+
+        btnUndoInstances.setAction(actionMap.get("btnUndoInstances")); // NOI18N
+        btnUndoInstances.setText(resourceMap.getString("btnUndoInstances.text")); // NOI18N
+        btnUndoInstances.setName("btnUndoInstances"); // NOI18N
+        btnUndoInstances.setPreferredSize(new java.awt.Dimension(109, 23));
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnFilterInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnSelectAllInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnDeselectAllInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnInvertSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnUndoInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnSaveInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSaveInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnFilterInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSelectAllInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnDeselectAllInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnInvertSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnUndoInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(14, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
+                .addGap(10, 10, 10))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
 
         jSplitPane2.setRightComponent(jPanel3);
 
@@ -587,11 +639,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         panelChooseInstances.setLayout(panelChooseInstancesLayout);
         panelChooseInstancesLayout.setHorizontalGroup(
             panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 845, Short.MAX_VALUE)
+            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 955, Short.MAX_VALUE)
         );
         panelChooseInstancesLayout.setVerticalGroup(
             panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)
+            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
         );
 
         manageExperimentPane.addTab("Instances", panelChooseInstances);
@@ -690,7 +742,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblCurTimeout)
                             .addComponent(lblCurNumRuns))))
-                .addContainerGap(592, Short.MAX_VALUE))
+                .addContainerGap(556, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -792,8 +844,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 .addComponent(btnFilterJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnCSVExport, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(333, Short.MAX_VALUE))
-            .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 845, Short.MAX_VALUE)
+                .addContainerGap(297, Short.MAX_VALUE))
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 809, Short.MAX_VALUE)
         );
         panelJobBrowserLayout.setVerticalGroup(
             panelJobBrowserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -817,7 +869,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 850, Short.MAX_VALUE)
+                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 814, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -886,12 +938,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     }//GEN-LAST:event_manageExperimentPaneStateChanged
 
     private void btnGeneratePackage(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGeneratePackage
-        try {
-            // Generate zip archive
-            expController.generatePackage();
-        } catch (Exception ex) {
-            javax.swing.JOptionPane.showMessageDialog(null, "There was an error while creating the package: " + ex, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        JFileChooser packageFileChooser = new JFileChooser();
+        packageFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        if (packageFileChooser.showDialog(this, "Select Package Location") != JFileChooser.APPROVE_OPTION) {
+            return;
         }
+
+        File zipFile = new File(packageFileChooser.getSelectedFile().getAbsolutePath() + System.getProperty("file.separator") + expController.getActiveExperiment().getDate().toString() + " - " + expController.getActiveExperiment().getName() + ".zip");
+        Tasks.startTask("generatePackage", new Class[]{File.class, edacc.model.Tasks.class}, new Object[]{zipFile, null}, expController, this);
     }//GEN-LAST:event_btnGeneratePackage
 
     private void btnSelectAllInstanceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstanceClassesActionPerformed
@@ -1157,6 +1211,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     private javax.swing.JButton btnSelectAllInstanceClasses;
     private javax.swing.JButton btnSelectAllInstances;
     private javax.swing.JButton btnSelectAllSolvers;
+    private javax.swing.JButton btnUndoInstances;
     private javax.swing.JButton btnUndoSolverConfigurations;
     private javax.swing.JCheckBox chkGenerateSeeds;
     private javax.swing.JCheckBox chkLinkSeeds;
@@ -1168,6 +1223,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -1227,9 +1284,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             if (e instanceof IOException) {
                 javax.swing.JOptionPane.showMessageDialog(null, "I/O Exception during CSV export:\n\n" + e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
-        } else {
-            e.printStackTrace();
-            javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        } else if (methodName.equals("generatePackage")) {
+            javax.swing.JOptionPane.showMessageDialog(null, "Excpetion during package generation:\n\n" + e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -1263,6 +1319,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
     public JTable getTableJobs() {
         return tableJobs;
+    }
+
+    @Action
+    public void btnUndoInstances() {
+        insTableModel.undo();
+        this.setTitles();
     }
     
 }

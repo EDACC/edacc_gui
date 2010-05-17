@@ -54,6 +54,11 @@ public class InstanceTableModel extends AbstractTableModel {
         }
     }
 
+    public void undo() {
+        setExperimentHasInstances(this.savedExperimentInstances);
+        this.fireTableDataChanged();
+    }
+
     /**
      * Returns a vector with all instance ids for which there is no
      * corresponding ExperimentHasInstance.
