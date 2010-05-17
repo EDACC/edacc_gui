@@ -107,27 +107,30 @@ public class ManageDBInstances{
 
                 int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
                 File ret = jFileChooserManageDBInstance.getSelectedFile();
-                RecursiveFileScanner InstanceScanner = new RecursiveFileScanner("cnf");
-                Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
-                if (instanceFiles.isEmpty()){
-                    JOptionPane.showMessageDialog(panelManageDBInstances,
-                            "No Instances have been found.",
-                            "Error",
-                            JOptionPane.WARNING_MESSAGE);
-                }
-                if(input.getName().equals("")){
-                    Vector<Instance> instances;
-                    instances = buildInstancesAutogenerateClass(instanceFiles, ret);
+                if(ret != null){
+                    RecursiveFileScanner InstanceScanner = new RecursiveFileScanner("cnf");
+                    Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
+                    if (instanceFiles.isEmpty()){
+                        JOptionPane.showMessageDialog(panelManageDBInstances,
+                                "No Instances have been found.",
+                                "Error",
+                                JOptionPane.WARNING_MESSAGE);
+                    }
+                    if(input.getName().equals("")){
+                        Vector<Instance> instances;
+                        instances = buildInstancesAutogenerateClass(instanceFiles, ret);
 
-                    main.instanceTableModel.addInstances(instances);
-                    loadInstanceClasses();
-                    count = instances.size();
-                }else{
-                    Vector<Instance> instances = buildInstancesGivenClass(instanceFiles, (InstanceClass)input);
-                    main.instanceTableModel.addInstances(instances);
-                    loadInstanceClasses();
+                        main.instanceTableModel.addInstances(instances);
+                        loadInstanceClasses();
+                        count = instances.size();
+                    }else{
+                        Vector<Instance> instances = buildInstancesGivenClass(instanceFiles, (InstanceClass)input);
+                        main.instanceTableModel.addInstances(instances);
+                        loadInstanceClasses();
+                    }
+                    main.instanceClassTableModel.changeInstanceTable();
                 }
-                main.instanceClassTableModel.changeInstanceTable();
+                
             }
         } catch (NullPointerException ex) {
                         Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
