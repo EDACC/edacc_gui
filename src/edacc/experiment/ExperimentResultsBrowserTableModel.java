@@ -30,7 +30,7 @@ import java.util.HashSet;
 public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
     private Vector<ExperimentResult> jobs;
-    private String[] columns = {"ID", "Solver", "Parameters", "Instance", "Run", "Result File", "Time", "Seed", "Status code"};
+    private String[] columns = {"ID", "Solver", "Parameters", "Instance", "Run", "Result File", "Time", "Seed", "Status"};
     private boolean[] visible = {true, true, true, true, true, true, true, true, true};
     private HashMap<Integer, Vector<ParameterInstance>> parameterInstances;
 
@@ -273,7 +273,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             case 7:
                 return j.getSeed();
             case 8:
-                return j.getStatus();
+                return j.getStatusText();
             default:
                 return "";
         }

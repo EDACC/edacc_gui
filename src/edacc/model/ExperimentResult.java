@@ -1,6 +1,7 @@
 package edacc.model;
 
-public class ExperimentResult extends BaseModel{
+public class ExperimentResult extends BaseModel {
+
     private int id;
     private int run;
     private int status;
@@ -24,7 +25,7 @@ public class ExperimentResult extends BaseModel{
         this.SolverConfigId = SolverConfigId;
         this.ExperimentId = ExperimentId;
         this.InstanceId = InstanceId;
-        this.resultFileName = "results/"+this.ExperimentId+"_"+this.SolverConfigId+"_"+this.InstanceId+"_R"+this.run+".res";
+        this.resultFileName = "results/" + this.ExperimentId + "_" + this.SolverConfigId + "_" + this.InstanceId + "_R" + this.run + ".res";
 
     }
 
@@ -182,7 +183,22 @@ public class ExperimentResult extends BaseModel{
         }
     }
 
-
-
-
+    public String getStatusText() {
+        switch (status) {
+            case -2:
+                return "error";
+            case -1:
+                return "not started";
+            case 0:
+                return "running";
+            case 1:
+                return "finished";
+            case 2:
+                return "terminated by ulimit";
+            case 3:
+                return "terminated by ulimit";
+            default:
+                return "unknown";
+        }
+    }
 }
