@@ -34,51 +34,50 @@ public class EDACCInstanceFilter extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        txtName = new javax.swing.JTextField();
-        chkMaxClauseLength = new javax.swing.JCheckBox();
+        btnApply = new javax.swing.JButton();
+        chkName = new javax.swing.JCheckBox();
+        txtAtomsLow = new javax.swing.JTextField();
         txtMaxClauseLengthLow = new javax.swing.JTextField();
         txtMaxClauseLengthHigh = new javax.swing.JTextField();
-        chkName = new javax.swing.JCheckBox();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        txtAtomsLow = new javax.swing.JTextField();
         txtAtomsHigh = new javax.swing.JTextField();
         chkAtoms = new javax.swing.JCheckBox();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        txtClausesLow = new javax.swing.JTextField();
-        jLabel11 = new javax.swing.JLabel();
         txtClausesHigh = new javax.swing.JTextField();
-        chkClauses = new javax.swing.JCheckBox();
-        jLabel12 = new javax.swing.JLabel();
-        txtRatioLow = new javax.swing.JTextField();
-        jLabel13 = new javax.swing.JLabel();
-        txtRatioHigh = new javax.swing.JTextField();
+        txtClausesLow = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
         chkRatio = new javax.swing.JCheckBox();
-        btnApply = new javax.swing.JButton();
+        txtRatioLow = new javax.swing.JTextField();
+        chkClauses = new javax.swing.JCheckBox();
+        txtRatioHigh = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        chkMaxClauseLength = new javax.swing.JCheckBox();
+        txtName = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCInstanceFilter.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
-        setMinimumSize(new java.awt.Dimension(300, 200));
+        setMinimumSize(new java.awt.Dimension(470, 240));
         setModal(true);
         setName("Form"); // NOI18N
 
-        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
-        jLabel1.setName("jLabel1"); // NOI18N
+        btnApply.setText(resourceMap.getString("btnApply.text")); // NOI18N
+        btnApply.setName("btnApply"); // NOI18N
+        btnApply.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnApplyActionPerformed(evt);
+            }
+        });
 
-        jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
-        jLabel3.setName("jLabel3"); // NOI18N
+        chkName.setName("chkName"); // NOI18N
 
-        txtName.setText(resourceMap.getString("txtName.text")); // NOI18N
-        txtName.setName("txtName"); // NOI18N
+        txtAtomsLow.setText(resourceMap.getString("txtAtomsLow.text")); // NOI18N
+        txtAtomsLow.setName("txtAtomsLow"); // NOI18N
+        txtAtomsLow.setPreferredSize(new java.awt.Dimension(80, 20));
 
-        chkMaxClauseLength.setText(resourceMap.getString("chkMaxClauseLength.text")); // NOI18N
-        chkMaxClauseLength.setName("chkMaxClauseLength"); // NOI18N
 
         txtMaxClauseLengthLow.setText(resourceMap.getString("txtMaxClauseLengthLow.text")); // NOI18N
         txtMaxClauseLengthLow.setName("txtMaxClauseLengthLow"); // NOI18N
@@ -86,119 +85,104 @@ public class EDACCInstanceFilter extends javax.swing.JDialog {
         txtMaxClauseLengthHigh.setText(resourceMap.getString("txtMaxClauseLengthHigh.text")); // NOI18N
         txtMaxClauseLengthHigh.setName("txtMaxClauseLengthHigh"); // NOI18N
 
-        chkName.setText(resourceMap.getString("chkName.text")); // NOI18N
-        chkName.setName("chkName"); // NOI18N
-
-        jLabel4.setText(resourceMap.getString("jLabel4.text")); // NOI18N
-        jLabel4.setName("jLabel4"); // NOI18N
-
-        jLabel5.setText(resourceMap.getString("jLabel5.text")); // NOI18N
-        jLabel5.setName("jLabel5"); // NOI18N
-
-        jLabel7.setText(resourceMap.getString("jLabel7.text")); // NOI18N
-        jLabel7.setName("jLabel7"); // NOI18N
-
-        txtAtomsLow.setText(resourceMap.getString("txtAtomsLow.text")); // NOI18N
-        txtAtomsLow.setName("txtAtomsLow"); // NOI18N
-        txtAtomsLow.setPreferredSize(new java.awt.Dimension(80, 20));
-
         txtAtomsHigh.setText(resourceMap.getString("txtAtomsHigh.text")); // NOI18N
         txtAtomsHigh.setName("txtAtomsHigh"); // NOI18N
         txtAtomsHigh.setPreferredSize(new java.awt.Dimension(80, 20));
 
         chkAtoms.setName("chkAtoms"); // NOI18N
 
-        jLabel8.setText(resourceMap.getString("jLabel8.text")); // NOI18N
-        jLabel8.setName("jLabel8"); // NOI18N
-
-        jLabel9.setText(resourceMap.getString("jLabel9.text")); // NOI18N
-        jLabel9.setName("jLabel9"); // NOI18N
-
-        jLabel10.setText(resourceMap.getString("jLabel10.text")); // NOI18N
-        jLabel10.setName("jLabel10"); // NOI18N
+        txtClausesHigh.setText(resourceMap.getString("txtClausesHigh.text")); // NOI18N
+        txtClausesHigh.setName("txtClausesHigh"); // NOI18N
 
         txtClausesLow.setText(resourceMap.getString("txtClausesLow.text")); // NOI18N
         txtClausesLow.setName("txtClausesLow"); // NOI18N
 
-        jLabel11.setText(resourceMap.getString("jLabel11.text")); // NOI18N
-        jLabel11.setName("jLabel11"); // NOI18N
+        jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
+        jLabel2.setName("jLabel2"); // NOI18N
 
-        txtClausesHigh.setText(resourceMap.getString("txtClausesHigh.text")); // NOI18N
-        txtClausesHigh.setName("txtClausesHigh"); // NOI18N
-
-        chkClauses.setName("chkClauses"); // NOI18N
-
-        jLabel12.setText(resourceMap.getString("jLabel12.text")); // NOI18N
-        jLabel12.setName("jLabel12"); // NOI18N
+        chkRatio.setName("chkRatio"); // NOI18N
 
         txtRatioLow.setText(resourceMap.getString("txtRatioLow.text")); // NOI18N
         txtRatioLow.setName("txtRatioLow"); // NOI18N
 
-        jLabel13.setText(resourceMap.getString("jLabel13.text")); // NOI18N
-        jLabel13.setName("jLabel13"); // NOI18N
+        chkClauses.setName("chkClauses"); // NOI18N
+
 
         txtRatioHigh.setText(resourceMap.getString("txtRatioHigh.text")); // NOI18N
         txtRatioHigh.setName("txtRatioHigh"); // NOI18N
 
-        chkRatio.setName("chkRatio"); // NOI18N
+        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
+        jLabel1.setName("jLabel1"); // NOI18N
 
-        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCInstanceFilter.class, this);
-        btnApply.setAction(actionMap.get("btnApply")); // NOI18N
-        btnApply.setText(resourceMap.getString("btnApply.text")); // NOI18N
-        btnApply.setName("btnApply"); // NOI18N
+        chkMaxClauseLength.setName("chkMaxClauseLength"); // NOI18N
+
+        txtName.setName("txtName"); // NOI18N
+
+        jLabel5.setText(resourceMap.getString("jLabel5.text")); // NOI18N
+        jLabel5.setName("jLabel5"); // NOI18N
+
+        jLabel6.setText(resourceMap.getString("jLabel6.text")); // NOI18N
+        jLabel6.setName("jLabel6"); // NOI18N
+
+        jLabel7.setText(resourceMap.getString("jLabel7.text")); // NOI18N
+        jLabel7.setName("jLabel7"); // NOI18N
+
+        jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
+        jLabel3.setName("jLabel3"); // NOI18N
+
+        jLabel4.setText(resourceMap.getString("jLabel4.text")); // NOI18N
+        jLabel4.setName("jLabel4"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(13, 13, 13)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3))
-                        .addGap(5, 5, 5)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtAtomsLow, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-                            .addComponent(txtClausesLow, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-                            .addComponent(txtRatioLow, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-                            .addComponent(txtMaxClauseLengthLow, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE))
-                        .addGap(2, 2, 2)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel9)
-                            .addComponent(jLabel11)
-                            .addComponent(jLabel13)
-                            .addComponent(jLabel8))
-                        .addGap(4, 4, 4)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtAtomsHigh, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-                            .addComponent(txtClausesHigh, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-                            .addComponent(txtRatioHigh, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-                            .addComponent(txtMaxClauseLengthHigh, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(213, 213, 213)
-                        .addComponent(txtName, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)))
-                .addGap(33, 33, 33)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkName, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(chkAtoms, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(chkClauses, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(chkRatio, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(chkMaxClauseLength, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 335, Short.MAX_VALUE)
-                .addComponent(jLabel4)
-                .addContainerGap(12, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(509, Short.MAX_VALUE)
-                .addComponent(btnApply)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtName, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtAtomsLow, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtAtomsHigh, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtClausesLow, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtClausesHigh, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtRatioLow, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtRatioHigh, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtMaxClauseLengthLow, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtMaxClauseLengthHigh, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE))
+                            .addComponent(jLabel4))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(jLabel2)
+                            .addComponent(chkName)
+                            .addComponent(chkAtoms)
+                            .addComponent(chkClauses)
+                            .addComponent(chkRatio)
+                            .addComponent(chkMaxClauseLength)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 341, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnApply)
+                        .addGap(9, 9, 9)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -206,48 +190,48 @@ public class EDACCInstanceFilter extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel4))
-                .addGap(32, 32, 32)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel2))
+                .addGap(11, 11, 11)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER, false)
                     .addComponent(jLabel1)
                     .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkName))
                 .addGap(6, 6, 6)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jLabel7)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER, false)
+                    .addComponent(jLabel5)
                     .addComponent(txtAtomsLow, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9)
                     .addComponent(txtAtomsHigh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkAtoms))
-                .addGap(6, 6, 6)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jLabel10)
+                .addGap(5, 5, 5)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER, false)
+                    .addComponent(jLabel6)
                     .addComponent(txtClausesLow, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel11)
                     .addComponent(txtClausesHigh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkClauses))
                 .addGap(5, 5, 5)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jLabel12)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER, false)
+                    .addComponent(jLabel7)
                     .addComponent(txtRatioLow, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel13)
                     .addComponent(txtRatioHigh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkRatio))
                 .addGap(5, 5, 5)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER, false)
                     .addComponent(jLabel3)
                     .addComponent(txtMaxClauseLengthLow, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel8)
                     .addComponent(txtMaxClauseLengthHigh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkMaxClauseLength))
-                .addGap(19, 19, 19)
+                .addGap(10, 10, 10)
                 .addComponent(btnApply)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyActionPerformed
+        btnApply();
+}//GEN-LAST:event_btnApplyActionPerformed
 
     public void loadValues() {
         if (main.rowFilter.name != null)
@@ -312,16 +296,12 @@ public class EDACCInstanceFilter extends javax.swing.JDialog {
     private javax.swing.JCheckBox chkName;
     private javax.swing.JCheckBox chkRatio;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JTextField txtAtomsHigh;
     private javax.swing.JTextField txtAtomsLow;
     private javax.swing.JTextField txtClausesHigh;

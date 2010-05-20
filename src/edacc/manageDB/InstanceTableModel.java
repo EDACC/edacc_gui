@@ -59,6 +59,14 @@ public class InstanceTableModel extends AbstractTableModel{
         return columns[col];
     }
 
+    @Override
+    public Class getColumnClass(int col) {
+        if (this.getRowCount() == 0)
+            return this.getClass();
+        else
+            return getValueAt(0, col).getClass();
+    }
+
     /**
      *
      * @param rowIndex

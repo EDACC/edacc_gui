@@ -24,7 +24,9 @@ public class SolverTableSelectionListener implements ListSelectionListener {
 
     public void valueChanged(ListSelectionEvent e) {
         if (e.getSource() == table.getSelectionModel() && table.getRowSelectionAllowed()) {
-            controller.showSolver(table.getSelectedRow());
+            if (table.getSelectedRow() != -1) {
+                controller.showSolver(table.convertRowIndexToModel(table.getSelectedRow()));
+            }
         }
     }
 }
