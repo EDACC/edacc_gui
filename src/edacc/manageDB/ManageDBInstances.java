@@ -26,6 +26,7 @@ import edacc.model.InstanceIsInExperimentException;
 import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.MD5CheckFailedException;
 import edacc.model.NoConnectionToDBException;
+import edacc.model.Tasks;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -84,91 +85,42 @@ public class ManageDBInstances{
      * instance files into the "instance table" of the MangeDBMode.
      */
 
-    public int addInstances() {
-
+    public void addInstances(InstanceClass input, File ret,  Tasks task){
         try {
-            int count = 0;
-            //Starts the dialog at which the user has to choose a instance source class or the autogeneration.
-            if(main.addInstanceDialog == null){
-                JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-                main.addInstanceDialog = new EDACCAddNewInstanceSelectClassDialog(mainFrame, true);
-                main.addInstanceDialog.setLocationRelativeTo(mainFrame);
+        
+            RecursiveFileScanner InstanceScanner = new RecursiveFileScanner("cnf");
+            Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
+            if (instanceFiles.isEmpty()) {
+                JOptionPane.showMessageDialog(panelManageDBInstances, "No Instances have been found.", "Error", JOptionPane.WARNING_MESSAGE);
             }
-            EDACCApp.getApplication().show(main.addInstanceDialog);
-
-            InstanceClass input = main.addInstanceDialog.getInput();
-            main.addInstanceDialog.dispose();
-            //if the user doesn't cancel the dialog above, the fileChooser is shown.
-            if(input != null){
-                
-                //When the user choos autogenerate only directorys can be choosen, else files and directorys.
-                if(input.getName().equals("")) jFileChooserManageDBInstance.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                else jFileChooserManageDBInstance.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-
-                int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
-                File ret = jFileChooserManageDBInstance.getSelectedFile();
-                if(ret != null){
-                    RecursiveFileScanner InstanceScanner = new RecursiveFileScanner("cnf");
-                    Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
-                    if (instanceFiles.isEmpty()){
-                        JOptionPane.showMessageDialog(panelManageDBInstances,
-                                "No Instances have been found.",
-                                "Error",
-                                JOptionPane.WARNING_MESSAGE);
-                    }
-                    if(input.getName().equals("")){
-                        Vector<Instance> instances;
-                        instances = buildInstancesAutogenerateClass(instanceFiles, ret);
-
-                        main.instanceTableModel.addInstances(instances);
-                        loadInstanceClasses();
-                        count = instances.size();
-                    }else{
-                        Vector<Instance> instances = buildInstancesGivenClass(instanceFiles, (InstanceClass)input);
-                        main.instanceTableModel.addInstances(instances);
-                        loadInstanceClasses();
-                    }
-                    main.instanceClassTableModel.changeInstanceTable();
-                }
-                
+            task.setOperationName("Adding Instances");
+            if (input.getName().equals("")) {
+                Vector<Instance> instances;
+                instances = buildInstancesAutogenerateClass(instanceFiles, ret, task);
+                main.instanceTableModel.addInstances(instances);
+                loadInstanceClasses();
+            } else {
+                Vector<Instance> instances = buildInstancesGivenClass(instanceFiles, (InstanceClass) input, task);
+                main.instanceTableModel.addInstances(instances);
+                loadInstanceClasses();
             }
-        } catch (NullPointerException ex) {
-                        Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoConnectionToDBException ex) {
-           JOptionPane.showMessageDialog(panelManageDBInstances,
-                    ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "There is a Problem with the database: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
         } catch (NoSuchAlgorithmException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "A problem with the MD5-algorithm has occured: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "Chosen file or directory not found: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NullPointerException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "Error reading chosen file or directory: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return 0;
-
     }
 
     /**
      * Remove the given rows from the instanceTableModel
      * @param rows the rows which have to be deleted
      */
-    public void removeInstances(int[] rows) throws NoConnectionToDBException, SQLException {
+    public void removeInstances(int[] rows, Tasks task) throws NoConnectionToDBException, SQLException {
+       task.setOperationName("Removing instances");
         Vector<Instance> rem = new Vector<Instance>();
         Vector<Instance> notRem = new Vector<Instance>();
         for (int i = 0; i < rows.length; i++) {
@@ -176,6 +128,8 @@ public class ManageDBInstances{
             try {
                 InstanceDAO.delete(ins);
                 rem.add(ins);
+                task.setStatus(i + " of " + rows.length + " instances removed");
+                task.setTaskProgress((float)i/(float) rows.length);
             } catch (InstanceIsInExperimentException ex) {
                 notRem.add(ins);
             }
@@ -249,18 +203,19 @@ public class ManageDBInstances{
      * @throws SQLException
      * @throws InstaceNotInDBException
      */
-    public void exportInstances(int[] rows) throws IOException, NoConnectionToDBException, SQLException, 
+    public void exportInstances(int[] rows, String path, Tasks task) throws IOException, NoConnectionToDBException, SQLException,
             InstaceNotInDBException, FileNotFoundException, MD5CheckFailedException,
             NoSuchAlgorithmException{
+        task.setOperationName("Exporting instances");
 
-        int returnVal = jFileChooserManageDBExportInstance.showOpenDialog(panelManageDBInstances);
-        String path = jFileChooserManageDBExportInstance.getSelectedFile().getAbsolutePath();
         Instance temp;
         for(int i = 0; i < rows.length; i++){
-           temp =    (Instance) main.instanceTableModel.getValueAt(rows[i], 5);
+           temp =    (Instance) main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(rows[i]), 5);
            File f = new File(path + System.getProperty("file.separator") + temp.getName());
            InstanceDAO.getBinaryFileOfInstance(temp, f);
            String md5File = Util.calculateMD5(f);
+           task.setStatus(i + " of " + rows.length + " instances are exported");
+           task.setTaskProgress((float)i/(float)rows.length);
            if (!md5File.equals(temp.getMd5()))
                 throw new MD5CheckFailedException("The exported solver binary of solver \"" + temp.getName() + "\" seems to be corrupt!");         
         }
@@ -321,7 +276,7 @@ public class ManageDBInstances{
      * @throws NoSuchAlgorithmException
      * @throws SQLException
      */
-    private Vector<Instance> buildInstancesGivenClass(Vector<File> instanceFiles, InstanceClass instanceClass)
+    public Vector<Instance> buildInstancesGivenClass(Vector<File> instanceFiles, InstanceClass instanceClass, Tasks task)
             throws FileNotFoundException, NullPointerException, NullPointerException, IOException,
             NoSuchAlgorithmException, SQLException {
 
@@ -330,7 +285,8 @@ public class ManageDBInstances{
         StringBuilder instanceErrors = new StringBuilder("");
         int errCount = 0;
         int done = 0;
-        
+
+         task.setTaskProgress((float)0 / (float)instanceFiles.size());
         for (int i = 0; i < instanceFiles.size(); i++) {
             try {
                 String md5 = calculateMD5(instanceFiles.get(i));
@@ -347,7 +303,9 @@ public class ManageDBInstances{
                 }
             } catch (InstanceAlreadyInDBException ex) {
                 duplicatesDB += "\n " + instanceFiles.get(i).getAbsolutePath();
-            }    
+            }
+             task.setTaskProgress((float)i / (float)instanceFiles.size());
+             task.setStatus("Added " + i +" instances of " + instanceFiles.size() );
         }
 
         String instanceErrs = instanceErrors.toString();
@@ -385,14 +343,14 @@ public class ManageDBInstances{
      * @throws InstanceException
      * @throws SQLException
      */
-    private Vector<Instance> buildInstancesAutogenerateClass(Vector<File> instanceFiles, File ret) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException {
+    public Vector<Instance> buildInstancesAutogenerateClass(Vector<File> instanceFiles, File ret, Tasks task) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException {
         
         Vector<Instance> instances = new Vector<Instance>();
         String duplicatesDB = "";
         StringBuilder instanceErrors = new StringBuilder("");
         InstanceClass instanceClass;
         int errCount = 0;
-
+        task.setTaskProgress((float)0 / (float)instanceFiles.size());
         for (int i = 0; i < instanceFiles.size(); i++) {
             try {
                 String name = autogenerateInstanceClassName(ret.getParent(), instanceFiles.get(i));
@@ -417,6 +375,8 @@ public class ManageDBInstances{
             } catch (InstanceAlreadyInDBException ex) {
                 duplicatesDB += "\n " + instanceFiles.get(i).getAbsolutePath();
             }
+            task.setTaskProgress((float)i / (float)instanceFiles.size());
+            task.setStatus("Added " + i +" instances of " + instanceFiles.size() );
         }
 
         String instanceErrs = instanceErrors.toString();
@@ -449,7 +409,7 @@ public class ManageDBInstances{
      * @param instanceFile
      * @return
      */
-    private String autogenerateInstanceClassName(String root, File instanceFile) {
+    public String autogenerateInstanceClassName(String root, File instanceFile) {
         return instanceFile.getAbsolutePath().substring(root.length()+1 , instanceFile.getParent().length());
     }
 
@@ -468,7 +428,7 @@ public class ManageDBInstances{
             if (input != null) {
                 if (input.isSource()) {
                     for (int i = 0; i < selectedRows.length; i++) {
-                        Instance temp = (Instance) main.instanceTableModel.getValueAt(selectedRows[i], 5);
+                        Instance temp = (Instance) main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(selectedRows[i]), 5);
                         temp.setInstanceClass(input);
                         temp.setModified();
                         InstanceDAO.save(temp);
