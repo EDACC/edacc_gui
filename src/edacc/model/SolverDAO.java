@@ -297,6 +297,7 @@ public class SolverDAO {
             if (in == null) return;
 
             // open temporary file to write the zip file to
+            new File("tmp").mkdir();
             File tmp = new File("tmp" + System.getProperty("file.separator") + s.getId() + ".zip.tmp");
             FileOutputStream out = new FileOutputStream(tmp);
             

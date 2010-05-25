@@ -72,6 +72,7 @@ public class ManageDBSolvers {
 
     public void newSolver() {
         solverTableModel.addSolver(new Solver());
+        solverTableModel.fireTableDataChanged();
     }
 
     public void showSolver(int index) {

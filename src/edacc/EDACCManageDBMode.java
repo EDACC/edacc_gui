@@ -66,6 +66,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         instanceTableModel = new InstanceTableModel();
         tableInstances.setModel(instanceTableModel);
         sorter = new TableRowSorter<InstanceTableModel>(instanceTableModel);
+        tableInstances.setRowSorter(sorter);
 
         // initialize instance class table
         instanceClassTableModel = new InstanceClassTableModel(tableInstances);
@@ -75,6 +76,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         solverTableModel = new SolverTableModel();
         manageDBSolvers = new ManageDBSolvers(this, solverTableModel);
         tableSolver.setModel(solverTableModel);
+        tableSolver.setRowSorter(new TableRowSorter<SolverTableModel>(solverTableModel));
 
         // initialize parameter table
         parameterTableModel = new ParameterTableModel();
@@ -329,6 +331,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelParametersLayout.createSequentialGroup()
                         .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jlParametersName, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+
                             .addComponent(jlParametersPrefix, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE)
                             .addComponent(jlParametersOrder, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE)
                             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE))
@@ -340,6 +343,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                             .addComponent(tfParametersPrefix, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
                             .addComponent(tfParametersName, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
                             .addComponent(tfParametersOrder, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE))))
+
                 .addGap(6, 6, 6))
         );
         panelParametersLayout.setVerticalGroup(
@@ -365,7 +369,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                     .addComponent(chkHasNoValue))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24))
+                .addGap(233, 233, 233))
         );
 
         jSplitPane2.setRightComponent(panelParameters);
@@ -543,6 +547,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSolverLayout.createSequentialGroup()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+
                 .addGap(18, 18, 18)
                 .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jlSolverName)
@@ -821,7 +826,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                 .addComponent(btnFilterInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnExportInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnAddToClass)
                 .addGap(18, 18, 18)
                 .addComponent(btnRemoveFromClass)
@@ -851,6 +856,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                 .addGroup(panelInstanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(panelButtonsInstances, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 731, Short.MAX_VALUE)))
+
         );
         panelInstanceLayout.setVerticalGroup(
             panelInstanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1073,7 +1079,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         int[] rows = tableSolver.getSelectedRows();
         LinkedList<Solver> selectedSolvers = new LinkedList<Solver>();
         for (int i : rows)
-            selectedSolvers.add(solverTableModel.getSolver(i));
+            selectedSolvers.add(solverTableModel.getSolver(tableSolver.convertRowIndexToModel(i)));
 
         while (!selectedSolvers.isEmpty()) { // are there remaining solvers to delete?
             try {
@@ -1087,6 +1093,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                         JOptionPane.ERROR_MESSAGE);
             } finally {
                 tableSolver.getSelectionModel().clearSelection();
+                solverTableModel.fireTableDataChanged();
                 tableSolver.updateUI();
                 tableParameters.updateUI();
             }
@@ -1215,11 +1222,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
             for (int i : rows) {
                 try {
-                    manageDBSolvers.exportSolver(solverTableModel.getSolver(i), exportFileChooser.getSelectedFile());
-                    manageDBSolvers.exportSolverCode(solverTableModel.getSolver(i), exportFileChooser.getSelectedFile());
+                    manageDBSolvers.exportSolver(solverTableModel.getSolver(tableSolver.convertRowIndexToModel(i)), exportFileChooser.getSelectedFile());
+                    manageDBSolvers.exportSolverCode(solverTableModel.getSolver(tableSolver.convertRowIndexToModel(i)), exportFileChooser.getSelectedFile());
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(this,
-                            "An error occured while exporting solver \"" + solverTableModel.getSolver(i).getName() + "\": " + ex.getMessage(),
+                            "An error occured while exporting solver \"" + solverTableModel.getSolver(tableSolver.convertRowIndexToModel(i)).getName() + "\": " + ex.getMessage(),
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }
