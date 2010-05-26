@@ -12,17 +12,24 @@ package edacc;
 
 import edacc.manageDB.*;
 import edacc.model.InstaceNotInDBException;
+import edacc.model.InstanceClass;
 import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.MD5CheckFailedException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
 import edacc.model.Solver;
+import edacc.model.Tasks;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.midi.SysexMessage;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableRowSorter;
 import org.jdesktop.application.Action;
@@ -31,7 +38,7 @@ import org.jdesktop.application.Action;
  *
  * @author rretz
  */
-public class EDACCManageDBMode extends javax.swing.JPanel{
+public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEvents{
 
     public boolean unsavedChanges;
 
@@ -319,22 +326,24 @@ public class EDACCManageDBMode extends javax.swing.JPanel{
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelParametersLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelParametersLayout.createSequentialGroup()
                         .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jlParametersName, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jlParametersPrefix, javax.swing.GroupLayout.DEFAULT_SIZE, 69, Short.MAX_VALUE)
-                            .addComponent(jlParametersOrder, javax.swing.GroupLayout.DEFAULT_SIZE, 69, Short.MAX_VALUE)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 69, Short.MAX_VALUE))
+
+                            .addComponent(jlParametersPrefix, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE)
+                            .addComponent(jlParametersOrder, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(panelParametersLayout.createSequentialGroup()
                                 .addComponent(chkHasNoValue, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 194, Short.MAX_VALUE))
-                            .addComponent(tfParametersPrefix, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
-                            .addComponent(tfParametersName, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
-                            .addComponent(tfParametersOrder, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE))))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 191, Short.MAX_VALUE))
+                            .addComponent(tfParametersPrefix, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+                            .addComponent(tfParametersName, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+                            .addComponent(tfParametersOrder, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE))))
+
                 .addGap(6, 6, 6))
         );
         panelParametersLayout.setVerticalGroup(
@@ -529,15 +538,16 @@ public class EDACCManageDBMode extends javax.swing.JPanel{
                         .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnSolverAddBinary)
                             .addComponent(btnSolverAddCode)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE)
-                            .addComponent(tfSolverName, javax.swing.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE)))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE))
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
+                            .addComponent(tfSolverName, javax.swing.GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelSolverLayout.setVerticalGroup(
             panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSolverLayout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+
                 .addGap(18, 18, 18)
                 .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jlSolverName)
@@ -588,14 +598,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel{
             panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelManageDBSolverLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
+                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)
                 .addContainerGap())
         );
         panelManageDBSolverLayout.setVerticalGroup(
             panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelManageDBSolverLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 725, Short.MAX_VALUE)
+                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -698,14 +708,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel{
             .addGroup(panelInstanceClassLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelInstanceClassLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelInstanceClassTable, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
+                    .addComponent(panelInstanceClassTable, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
                     .addComponent(panelButtonsInstanceClass, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelInstanceClassLayout.setVerticalGroup(
             panelInstanceClassLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelInstanceClassLayout.createSequentialGroup()
-                .addComponent(panelInstanceClassTable, javax.swing.GroupLayout.DEFAULT_SIZE, 643, Short.MAX_VALUE)
+                .addComponent(panelInstanceClassTable, javax.swing.GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(panelButtonsInstanceClass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -845,12 +855,13 @@ public class EDACCManageDBMode extends javax.swing.JPanel{
                 .addContainerGap()
                 .addGroup(panelInstanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(panelButtonsInstances, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 776, Short.MAX_VALUE)))
+                    .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 731, Short.MAX_VALUE)))
+
         );
         panelInstanceLayout.setVerticalGroup(
             panelInstanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelInstanceLayout.createSequentialGroup()
-                .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 647, Short.MAX_VALUE)
+                .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 437, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelButtonsInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -870,7 +881,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel{
             panelManageDBInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelManageDBInstancesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 737, Short.MAX_VALUE))
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE))
         );
 
         manageDBPane.addTab("Instances", panelManageDBInstances);
@@ -881,28 +892,64 @@ public class EDACCManageDBMode extends javax.swing.JPanel{
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manageDBPane, javax.swing.GroupLayout.DEFAULT_SIZE, 876, Short.MAX_VALUE)
+                .addComponent(manageDBPane, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manageDBPane, javax.swing.GroupLayout.DEFAULT_SIZE, 776, Short.MAX_VALUE)
+                .addComponent(manageDBPane, javax.swing.GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnAddInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddInstancesActionPerformed
-        manageDBInstances.addInstances();
-        unsavedChanges = true;
-        tableInstances.updateUI();
-        tableInstanceClass.updateUI();
+    public void test(Tasks task){
+        task.setStatus("lalalaaaaaa");
+        System.out.println("test");
+    }
+    public void btnAddInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddInstancesActionPerformed
+
+        //Starts the dialog at which the user has to choose a instance source class or the autogeneration.
+        
+          try {
+                if(addInstanceDialog == null){
+                    JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+                    this.addInstanceDialog = new EDACCAddNewInstanceSelectClassDialog(mainFrame, true);
+                    this.addInstanceDialog.setLocationRelativeTo(mainFrame);                                   
+                }
+                EDACCApp.getApplication().show(this.addInstanceDialog);
+                InstanceClass input = this.addInstanceDialog.getInput();
+
+                //if the user doesn't cancel the dialog above, the fileChooser is shown.
+                if(input != null){
+                    //When the user choos autogenerate only directorys can be choosen, else files and directorys.
+                    if(input.getName().equals("")) jFileChooserManageDBInstance.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                    else jFileChooserManageDBInstance.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+
+                    int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
+                    File ret = jFileChooserManageDBInstance.getSelectedFile();
+                    if(ret != null){
+                        Tasks.startTask("addInstances", new Class[]{edacc.model.InstanceClass.class, java.io.File.class, edacc.model.Tasks.class}, new Object[]{input, ret, null}, manageDBInstances, EDACCManageDBMode.this);
+                    }
+                }
+                input = null;
+                unsavedChanges = true;
+                tableInstances.updateUI();
+                tableInstanceClass.updateUI();
+           } catch (NoConnectionToDBException ex) {
+                Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        
+       
     }//GEN-LAST:event_btnAddInstancesActionPerformed
 
     private void btnRemoveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstancesActionPerformed
         try {
-            manageDBInstances.removeInstances(tableInstances.getSelectedRows());
+            Tasks.startTask("removeInstances", new Class[]{int[].class, edacc.model.Tasks.class}, new Object[]{tableInstances.getSelectedRows(), null}, manageDBInstances, EDACCManageDBMode.this);
         } catch (Exception e) {
         }
         this.instanceTableModel.fireTableDataChanged();
@@ -1053,46 +1100,18 @@ public class EDACCManageDBMode extends javax.swing.JPanel{
         }
     }//GEN-LAST:event_btnSolverDeleteActionPerformed
     private void btnExportInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportInstancesActionPerformed
-        try {
+
             if (tableInstances.getSelectedRowCount() == 0) {
                 JOptionPane.showMessageDialog(panelManageDBInstances,
                         "No instances are selected: ",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
             } else {
-                manageDBInstances.exportInstances(tableInstances.getSelectedRows());
+                int returnVal = jFileChooserManageDBExportInstance.showOpenDialog(panelManageDBInstances);
+               String path = jFileChooserManageDBExportInstance.getSelectedFile().getAbsolutePath();
+                Tasks.startTask("exportInstances", new Class[]{int[].class, String.class,edacc.model.Tasks.class}, new Object[]{tableInstances.getSelectedRows(), path, null}, manageDBInstances, EDACCManageDBMode.this);
             }
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "The instances couldn't be written: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (NoConnectionToDBException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "No connection to database: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "SQL-Exception: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (InstaceNotInDBException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "There is a problem with the data consistency ",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (MD5CheckFailedException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    ex,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (NoSuchAlgorithmException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "An error occured while exporting solver binary: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
+       
     }//GEN-LAST:event_btnExportInstancesActionPerformed
 
     private void btnSelectAllInstanceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstanceClassesActionPerformed
@@ -1380,5 +1399,65 @@ public class EDACCManageDBMode extends javax.swing.JPanel{
     private javax.swing.JTextField tfParametersPrefix;
     private javax.swing.JTextField tfSolverName;
     // End of variables declaration//GEN-END:variables
+
+
+
+    public void onTaskStart(String methodName) {
+       
+    }
+
+    public void onTaskFailed(String methodName, Throwable e) {
+
+        if(methodName.equals("exportInstances")){
+             if(e instanceof IOException) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "The instances couldn't be written: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            } else if(e instanceof NoConnectionToDBException) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "No connection to database: " + e.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }else if (e instanceof SQLException) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "SQL-Exception: " + e.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }else if (e instanceof InstaceNotInDBException) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "There is a problem with the data consistency ",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }else if( e instanceof MD5CheckFailedException) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                        e,
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } else if (e instanceof NoSuchAlgorithmException) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "An error occured while exporting solver binary: " + e.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+
+            
+        } else if(methodName.equals("addInstances")){
+                if(e instanceof NoConnectionToDBException) {
+                    JOptionPane.showMessageDialog(panelManageDBInstances,
+                            "No connection to database: " + e.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+              }else if (e instanceof SQLException) {
+                 JOptionPane.showMessageDialog(panelManageDBInstances,
+                            "SQL-Exception: " + e.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+            }
+        }      
+    }
+
+    public void onTaskSuccessful(String methodName, Object result) {
+    }
 
 }
