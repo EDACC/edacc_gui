@@ -77,6 +77,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         resultBrowserRowFilter = new ExperimentResultsBrowserTableModelRowFilter();
         tableJobs.setRowSorter(resultsBrowserTableRowSorter);
         tableExperiments.setModel(expTableModel);
+        tableExperiments.setRowSorter(new TableRowSorter<ExperimentTableModel>(expTableModel));
         tableInstances.setModel(insTableModel);
         tableSolvers.setModel(solTableModel);
         tableInstanceClasses.setModel(instanceClassModel);
@@ -1059,11 +1060,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                         "Loading an experiment will make you lose all unsaved changes of the current experiment. Continue loading the experiment?",
                         "Warning!",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-                    Integer i = (Integer) expTableModel.getValueAt(tableExperiments.getSelectedRow(), 5);
+                    Integer i = (Integer) expTableModel.getValueAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()), 5);
                     Tasks.startTask("loadExperiment", new Class[]{int.class, edacc.model.Tasks.class}, new Object[]{i.intValue(), null}, expController, this);
                 }
             } else {
-                Integer i = (Integer) expTableModel.getValueAt(tableExperiments.getSelectedRow(), 5);
+                Integer i = (Integer) expTableModel.getValueAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()), 5);
                 Tasks.startTask("loadExperiment", new Class[]{int.class, edacc.model.Tasks.class}, new Object[]{i.intValue(), null}, expController, this);
             }
         }
@@ -1082,7 +1083,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     public void btnRemoveExperiment() {
         if (tableExperiments.getSelectedRow() != -1) {
             try {
-                Integer i = (Integer) expTableModel.getValueAt(tableExperiments.getSelectedRow(), 5);
+                Integer i = (Integer) expTableModel.getValueAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()), 5);
                 expController.removeExperiment(i);
             } catch (SQLException ex) {
                 createDatabaseErrorMessage(ex);
