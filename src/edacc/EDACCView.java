@@ -70,7 +70,7 @@ public class EDACCView extends FrameView implements Observer {
         progressBar.setVisible(false);
 
         // connecting action tasks to status bar via TaskMonitor
-        TaskMonitor taskMonitor = new TaskMonitor(getApplication().getContext());
+      /*  TaskMonitor taskMonitor = new TaskMonitor(getApplication().getContext());
         taskMonitor.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
 
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
@@ -99,7 +99,7 @@ public class EDACCView extends FrameView implements Observer {
                     progressBar.setValue(value);
                 }
             }
-        });
+        });*/
         experimentMode = new EDACCExperimentMode();
         manageDBMode = new EDACCManageDBMode();
         noMode = new EDACCNoMode();

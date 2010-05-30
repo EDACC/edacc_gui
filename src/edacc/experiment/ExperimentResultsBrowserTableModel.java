@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import javax.swing.table.AbstractTableModel;
 import java.util.Vector;
 import edacc.model.ExperimentResult;
+import edacc.model.ExperimentResultStatus;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.Parameter;
@@ -116,6 +117,13 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             return null;
         }
         return jobs.get(row).getStatus();
+    }
+
+    public ExperimentResultStatus getExperimentResultStatus(int row) {
+        if (row < 0 || row >= getRowCount()) {
+            return null;
+        }
+        return jobs.get(row).getExperimentResultStatus();
     }
 
     /**
@@ -273,7 +281,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             case 7:
                 return j.getSeed();
             case 8:
-                return j.getStatusText();
+                return j.getExperimentResultStatus();
             default:
                 return "";
         }
@@ -308,12 +316,12 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     /**
      * Returns all disjunct status codes which are currently in that model
      */
-    public Vector<Integer> getStatusCodes() {
-        Vector<Integer> res = new Vector<Integer>();
-        HashSet<Integer> tmp = new HashSet<Integer>();
+    public Vector<ExperimentResultStatus> getStatusEnums() {
+        Vector<ExperimentResultStatus> res = new Vector<ExperimentResultStatus>();
+        HashSet<ExperimentResultStatus> tmp = new HashSet<ExperimentResultStatus>();
         for (int i = 0; i < getRowCount(); i++) {
-            if (!tmp.contains(getStatusCode(i))) {
-                tmp.add(getStatusCode(i));
+            if (!tmp.contains(getExperimentResultStatus(i))) {
+                tmp.add(getExperimentResultStatus(i));
             }
         }
         res.addAll(tmp);
