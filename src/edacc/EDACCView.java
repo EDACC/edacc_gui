@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.help.HelpSetException;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
@@ -25,6 +26,9 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import edacc.manageDB.Util;
+import java.net.URL;
+import javax.help.HelpSet;
+import javax.help.JHelp;
 
 /**
  * The application's main frame.
@@ -157,7 +161,7 @@ public class EDACCView extends FrameView implements Observer {
         manageExperimentModeMenuItem = new javax.swing.JRadioButtonMenuItem();
         javax.swing.JMenu helpMenu = new javax.swing.JMenu();
         javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        helpMenuItem = new javax.swing.JMenuItem();
         statusPanel = new javax.swing.JPanel();
         javax.swing.JSeparator statusPanelSeparator = new javax.swing.JSeparator();
         statusMessageLabel = new javax.swing.JLabel();
@@ -240,9 +244,14 @@ public class EDACCView extends FrameView implements Observer {
         aboutMenuItem.setName("aboutMenuItem"); // NOI18N
         helpMenu.add(aboutMenuItem);
 
-        jMenuItem1.setText(resourceMap.getString("jMenuItem1.text")); // NOI18N
-        jMenuItem1.setName("jMenuItem1"); // NOI18N
-        helpMenu.add(jMenuItem1);
+        helpMenuItem.setText(resourceMap.getString("helpMenuItem.text")); // NOI18N
+        helpMenuItem.setName("helpMenuItem"); // NOI18N
+        helpMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                helpMenuItemActionPerformed(evt);
+            }
+        });
+        helpMenu.add(helpMenuItem);
 
         menuBar.add(helpMenu);
 
@@ -265,7 +274,7 @@ public class EDACCView extends FrameView implements Observer {
             .add(statusPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(statusMessageLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 822, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 836, Short.MAX_VALUE)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusAnimationLabel)
@@ -287,6 +296,24 @@ public class EDACCView extends FrameView implements Observer {
         setMenuBar(menuBar);
         setStatusBar(statusPanel);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void helpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_helpMenuItemActionPerformed
+        JHelp helpViewer = null;
+        try {
+            // TODO add your handling code here:
+            ClassLoader cl = EDACCView.class.getClassLoader();
+            URL url = HelpSet.findHelpSet(cl, "jhelpset.hs");
+            helpViewer = new JHelp(new HelpSet(cl, url));
+        } catch (Exception ex) {
+            System.err.println("API HelpSet not found");
+        }
+        JFrame edacc = new JFrame();
+        edacc.setTitle("EDACC Help");
+        edacc.setSize(800, 600);
+        edacc.getContentPane().add(helpViewer);
+        edacc.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        edacc.setVisible(true);
+    }//GEN-LAST:event_helpMenuItemActionPerformed
 
     @Action
     public void btnConnectToDB() {
@@ -447,7 +474,7 @@ public class EDACCView extends FrameView implements Observer {
     private javax.swing.JMenuItem disconnectMenuItem;
     private javax.swing.JMenuItem generateDBMenuItem;
     private javax.swing.JMenu gridMenu;
-    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem helpMenuItem;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JRadioButtonMenuItem manageDBModeMenuItem;
     private javax.swing.JRadioButtonMenuItem manageExperimentModeMenuItem;
