@@ -183,22 +183,7 @@ public class ExperimentResult extends BaseModel {
         }
     }
 
-    public String getStatusText() {
-        switch (status) {
-            case -2:
-                return "error";
-            case -1:
-                return "not started";
-            case 0:
-                return "running";
-            case 1:
-                return "finished";
-            case 2:
-                return "terminated by ulimit";
-            case 3:
-                return "terminated by ulimit";
-            default:
-                return "unknown";
-        }
+    public ExperimentResultStatus getExperimentResultStatus() {
+        return ExperimentResultStatus.fromValue(status);
     }
 }

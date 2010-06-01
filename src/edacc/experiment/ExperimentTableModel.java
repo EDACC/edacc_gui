@@ -35,11 +35,17 @@ public class ExperimentTableModel extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int col) {
+        if (experiments.size() == 0) {
+            return String.class;
+        }
         return getValueAt(0, col).getClass();
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+        if (rowIndex > experiments.size()-1) {
+            return null;
+        }
         switch (columnIndex) {
             case 0:
                 return experiments.get(rowIndex).getName();

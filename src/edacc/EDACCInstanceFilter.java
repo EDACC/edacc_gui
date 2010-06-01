@@ -264,6 +264,15 @@ public class EDACCInstanceFilter extends javax.swing.JDialog {
             main.rowFilter.filter_ratio = this.chkRatio.isSelected();
             main.rowFilter.filter_maxClauseLength = this.chkMaxClauseLength.isSelected();
 
+            if (main.rowFilter.filter_name || main.rowFilter.filter_numAtoms ||
+                main.rowFilter.filter_numClauses || main.rowFilter.filter_ratio ||
+                main.rowFilter.filter_maxClauseLength) {
+                main.setFilterStatus("This list of instances has filters applied to it. Use the filter button below to modify.");
+            }
+            else {
+                main.setFilterStatus("");
+            }
+
             main.rowFilter.name = txtName.getText();
 
             main.rowFilter.numAtoms_low = Integer.valueOf(this.txtAtomsLow.getText());

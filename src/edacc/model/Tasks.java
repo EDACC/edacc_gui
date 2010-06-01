@@ -48,9 +48,9 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
             @Override
             public void run() {
                 try {
-                    taskView.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    if (taskView.isDisplayable())
+                        taskView.setVisible(true);
+                } catch (Exception _) {
                     // happens if the task view is already disposed, i.e. the task is finished.
                 }
             }

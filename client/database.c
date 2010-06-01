@@ -71,7 +71,7 @@
 	"       ON e.Instances_idInstance = i.idInstance " \
 	"   WHERE e.idJob = %i "
 
-
+/*
 #define QUERY_JOB_PARAMS "" \
 	"SELECT " \
 	"       p.name, " \
@@ -89,7 +89,21 @@
 	"   LEFT JOIN SolverConfig_has_Parameters AS scp " \
 	"       ON p.idParameter = scp.Parameters_idParameter " \
 	"   WHERE er.idJob = %i "
+*/
 
+#define QUERY_JOB_PARAMS "" \
+    "SELECT " \
+    "       p.name, " \
+    "       p.prefix, " \
+    "       p.hasValue, " \
+    "       p.value, " \
+    "       scp.value " \
+    "   FROM ExperimentResults AS er " \
+    "   LEFT JOIN SolverConfig_has_Parameters AS scp " \
+    "       ON er.SolverConfig_idSolverConfig = scp.SolverConfig_idSolverConfig " \
+    "   RIGHT JOIN Parameters AS p " \
+    "       ON scp.Parameters_idParameter = p.idParameter " \
+    "   WHERE er.idJob = %i "
 
 
 #define UPDATE_JOB ""           \
@@ -475,7 +489,34 @@ int dbFetchJob(job* j, status* s) {
 
 	params = (char *)calloc(256,sizeof(char));
 
+    // go through all set params for this experiment.
 	while((row = mysql_fetch_row(res)) != NULL) {
+        // every param starts with a prefix
+        params = strcat(params, row[1]);
+        params = strcat(params, row[0]);
+
+        // check if it's a param with value
+        if(row[2]) {
+            // delimiter between paramname and value
+            params = strcat(params, " ");
+
+            // check for value in solver_has_config, if not 
+            // present take the default from table parameters
+            if(row[4]!=NULL && (strcmp(row[4],"")!=0)) {
+                params = strcat(params, row[4]);
+            } else if(row[3]!=NULL && (strcmp(row[3],"")!=0)) {
+                params = strcat(params, row[3]);
+            } else {
+		        logError("No value present for param %s.\n", row[1]);
+		        return 1;
+            }
+        }
+
+        params = strcat(params, " ");
+
+	}
+
+        /*
 		if (row[2]==NULL){
 			//fprintf(stderr,"No parameteres");
 			fflush(stderr);;}
@@ -496,7 +537,7 @@ int dbFetchJob(job* j, status* s) {
 				params = strcat(params, " ");
 			}
 		}
-	}
+        */
 
 	strcpy(j->params, params);
 

@@ -1,19 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * EDACCJobsFilter.java
- *
- * Created on 11.05.2010, 20:57:16
- */
-
 package edacc;
 
-import java.awt.Dimension;
+import edacc.model.ExperimentResultStatus;
 import java.util.Vector;
-import javax.swing.SwingUtilities;
 import org.jdesktop.application.Action;
 
 /**
@@ -29,7 +17,7 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
         this.main = main;
         Vector<String> instances = main.jobsTableModel.getInstances();
         Vector<String> solvers = main.jobsTableModel.getSolvers();
-        Vector<Integer> statusCodes = main.jobsTableModel.getStatusCodes();
+        Vector<ExperimentResultStatus> statusCodes = main.jobsTableModel.getStatusEnums();
         comboSolvers.removeAllItems();
         comboInstances.removeAllItems();
         comboStatusCodes.removeAllItems();
@@ -42,17 +30,18 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
         for (String val : solvers) {
             comboSolvers.addItem(val);
         }
-        for (Integer val : statusCodes) {
+        for (ExperimentResultStatus val : statusCodes) {
             comboStatusCodes.addItem(val);
         }
         String selectedInstance = main.resultBrowserRowFilter.getInstanceName() == null ? "All" : main.resultBrowserRowFilter.getInstanceName();
         String selectedSolver = main.resultBrowserRowFilter.getSolverName() == null ? "All" : main.resultBrowserRowFilter.getSolverName();
+        ExperimentResultStatus selectedStatusCode = main.resultBrowserRowFilter.getStatusCode() == null ? null : ExperimentResultStatus.fromValue(main.resultBrowserRowFilter.getStatusCode());
         comboInstances.setSelectedItem(selectedInstance);
         comboSolvers.setSelectedItem(selectedSolver);
-        if (main.resultBrowserRowFilter.getStatusCode() == null) {
+        if (selectedStatusCode == null) {
             comboStatusCodes.setSelectedItem("All");
         } else {
-            comboStatusCodes.setSelectedItem(main.resultBrowserRowFilter.getStatusCode());
+            comboStatusCodes.setSelectedItem(selectedStatusCode);
         }
         pack();
     }
@@ -159,7 +148,7 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
     public void btnAccept() {
         String solver = null;
         String instance = null;
-        Integer statusCode = null;
+        ExperimentResultStatus statusCode = null;
         if (!"All".equals(comboSolvers.getSelectedItem())) {
             solver = (String) comboSolvers.getSelectedItem();
         }
@@ -167,12 +156,23 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
             instance = (String) comboInstances.getSelectedItem();
         }
         if (!"All".equals(comboStatusCodes.getSelectedItem())) {
-            statusCode = (Integer) comboStatusCodes.getSelectedItem();
+            statusCode = (ExperimentResultStatus) comboStatusCodes.getSelectedItem();
         }
         main.resultBrowserRowFilter.setInstanceName(instance);
         main.resultBrowserRowFilter.setSolverName(solver);
-        main.resultBrowserRowFilter.setStatusCode(statusCode);
+
+        if (statusCode == null)
+            main.resultBrowserRowFilter.setStatusCode(null);
+        else
+            main.resultBrowserRowFilter.setStatusCode(statusCode.getValue());
+
         main.jobsTableModel.fireTableDataChanged();
+        boolean filtersApplied = solver != null || instance != null || statusCode != null;
+        if (filtersApplied) {
+            main.setJobsFilterStatus("This list of jobs has filters applied to it. Use the filter button below to modify.");
+        } else {
+            main.setJobsFilterStatus("");
+        }
         this.dispose();
     }
 

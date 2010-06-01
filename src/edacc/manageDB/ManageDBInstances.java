@@ -514,11 +514,13 @@ public class ManageDBInstances{
         Vector<RowFilter<Object, Object>> filters  = main.instanceFilter.getFilter();
         if(filters.isEmpty()){
             removeFilter(tableInstances);
+            main.setFilterStatus("");
         }
         else{
             main.sorter.setRowFilter(RowFilter.andFilter(filters));
             tableInstances.setRowSorter(main.sorter);
             main.instanceTableModel.fireTableDataChanged();
+            main.setFilterStatus("This list of instances has filters applied to it. Use the filter button below to modify.");
         }
     }
 
