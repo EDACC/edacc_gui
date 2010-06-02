@@ -1055,10 +1055,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         try {
             if (codeFileChooser == null) {
                 codeFileChooser = new JFileChooser();
-                codeFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                codeFileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                codeFileChooser.setMultiSelectionEnabled(true);
             }
             if (codeFileChooser.showDialog(this, "Choose code directory") == JFileChooser.APPROVE_OPTION) {
-                manageDBSolvers.addSolverCode(codeFileChooser.getSelectedFile());
+                manageDBSolvers.addSolverCode(codeFileChooser.getSelectedFiles());
                 unsavedChanges = true;
             }
         } catch (FileNotFoundException ex) {

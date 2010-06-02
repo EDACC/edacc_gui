@@ -58,9 +58,9 @@ public class SolverDAO {
             ps.setBinaryStream(3, new FileInputStream(solver.getBinaryFile()));
             ps.setString(4, solver.getDescription());
             ps.setString(5, solver.getMd5());
-            if (solver.getCodeFile() != null && solver.getCodeFile().isDirectory()) { // only accept directories (enforced by UI)
+            if (solver.getCodeFile() != null && solver.getCodeFile().length > 0) {
                 // zip up directory
-                ByteArrayOutputStream zipped = Util.zipDirectoryToByteStream(solver.getCodeFile());
+                ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(solver.getCodeFile());
                 ps.setBinaryStream(6, new ByteArrayInputStream(zipped.toByteArray()));
             }
             else
@@ -88,7 +88,7 @@ public class SolverDAO {
             if (solver.getCodeFile() != null) { // if code is null, don't update the code (at the moment code can't be deleted)
                 ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQueryCode);
                 // zip up directory
-                ByteArrayOutputStream zipped = Util.zipDirectoryToByteStream(solver.getCodeFile());
+                ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(solver.getCodeFile());
                 ps.setBinaryStream(1, new ByteArrayInputStream(zipped.toByteArray()));
                 ps.setInt(2, solver.getId());
                 ps.executeUpdate();

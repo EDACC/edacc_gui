@@ -10,7 +10,7 @@ public class Solver extends BaseModel implements IntegerPKModel {
     private File binaryFile;
     private String description;
     private String md5;
-    private File codeFile;
+    private File[] codeFile;
     
     public Solver() {
         this.setNew();
@@ -76,11 +76,11 @@ public class Solver extends BaseModel implements IntegerPKModel {
         }
     }
 
-    protected File getCodeFile() {
+    protected File[] getCodeFile() {
         return codeFile;
     }
 
-    public void setCodeFile(File codeFile) {
+    public void setCodeFile(File[] codeFile) {
         this.codeFile = codeFile;
         if (this.isSaved()) {
             this.setModified();
