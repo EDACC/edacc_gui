@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+          "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"
+  [
+    <!ENTITY % global.entities SYSTEM "../../../system/custom-xsl/global-entities.xml">
+    %global.entities;
+
+    <!ENTITY % entities SYSTEM "../custom-cfg/local-entities.xml">
+    %entities;
+  ]
+>
+
+<ximy:includelist xmlns:ximy="http://www.agynamix.de/XincludeExtension">
+
+<chapter>
+  <title>An included Chapter</title>
+
+  <sect1>
+    <title>First Section</title>
+
+    <para>
+      This text comes from an xincluded document.
+    </para>
+
+  </sect1>
+
+</chapter>
+
+</ximy:includelist>

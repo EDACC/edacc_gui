@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This file is part of DobuDish                                           -->
+
+<!-- DobuDish is free software; you can redistribute it and/or modify        -->
+<!-- it under the terms of the GNU General Public License as published by    -->
+<!-- the Free Software Foundation; either version 2 of the License, or       -->
+<!-- (at your option) any later version.                                     -->
+
+<!-- DobuDish is distributed in the hope that it will be useful,             -->
+<!-- but WITHOUT ANY WARRANTY; without even the implied warranty of          -->
+<!-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           -->
+<!-- GNU General Public License for more details.                            -->
+
+<!-- You should have received a copy of the GNU General Public License       -->
+<!-- along with DobuDish; if not, write to the Free Software                 -->
+<!-- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA -->
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+          "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"
+  [
+    <!ENTITY % global.entities SYSTEM "../../../system/custom-xsl/global-entities.xml">
+    %global.entities;
+
+    <!ENTITY % entities SYSTEM "../custom-cfg/local-entities.xml">
+    %entities;
+  ]
+>
+
+<book lang="en">
+
+  <bookinfo>
+
+   <title>EDACC</title>
+    <pubdate>2010</pubdate>
+    <copyright>
+      <year>2010</year>
+      <holder>Das super EDACC-Team</holder>
+    </copyright>
+
+  </bookinfo>
+
+<chapter>
+  <title>Chapter</title>
+
+  <sect1>
+    <title>Section 1 </title>
+
+    <para>
+      We write the best help ever.
+    </para>
+
+  </sect1>
+
+</chapter>
+
+<!-- Via XInclude we can include document parts
+     You can use Xalan's xpointer features to select parts of your included document
+     or include all of it.
+-->
+<xi:include href="book-include.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+
+</book>
