@@ -51,7 +51,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCDatabaseSettingsView.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setIconImage(null);
-        setMinimumSize(new java.awt.Dimension(350, 220));
+        setMinimumSize(new java.awt.Dimension(400, 220));
         setName("Form"); // NOI18N
         setResizable(false);
 
@@ -62,12 +62,22 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
                 btnConnectActionPerformed(evt);
             }
         });
+        btnConnect.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                btnConnectKeyPressed(evt);
+            }
+        });
 
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelActionPerformed(evt);
+            }
+        });
+        btnCancel.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                btnCancelKeyPressed(evt);
             }
         });
 
@@ -150,33 +160,23 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblHostname, javax.swing.GroupLayout.PREFERRED_SIZE, 82, Short.MAX_VALUE)
+                    .addComponent(lblDatabase, 0, 0, Short.MAX_VALUE)
+                    .addComponent(lblUsername, 0, 0, Short.MAX_VALUE)
+                    .addComponent(lblPassword, 0, 0, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtUsername, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
+                    .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtHostname, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblPort, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
-                            .addComponent(txtUsername, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE)
-                            .addComponent(lblHostname, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtHostname, javax.swing.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(lblPort, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtPort, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(6, 6, 6))
-                            .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE))))
+                        .addComponent(txtPort, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE))
                 .addContainerGap())
         );
-
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {lblDatabase, lblHostname, lblPassword, lblUsername});
-
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -209,13 +209,13 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 147, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnConnect, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -234,6 +234,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         this.setVisible(false);
+        this.dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
@@ -249,34 +250,51 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
     }//GEN-LAST:event_btnConnectActionPerformed
 
     private void txtHostnameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtHostnameKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            txtHostname.select(0, 0);
-            txtPort.requestFocus();
-            txtPort.selectAll();
+//        if (evt.getKeyCode() == KeyEvent.VK_TAB) {
+//            txtHostname.select(0, 0);
+//            txtPort.requestFocus();
+//            txtPort.selectAll();
+//        }
+         if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
+        {
+            btnConnectActionPerformed(null);
         }
+
     }//GEN-LAST:event_txtHostnameKeyPressed
 
     private void txtPortKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPortKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            txtPort.select(0, 0);
-            txtDatabase.requestFocus();
-            txtDatabase.selectAll();
+//        if (evt.getKeyCode() == KeyEvent.VK_TAB) {
+//            txtPort.select(0, 0);
+//            txtDatabase.requestFocus();
+//            txtDatabase.selectAll();
+//        }
+         if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
+        {
+            btnConnectActionPerformed(null);
         }
     }//GEN-LAST:event_txtPortKeyPressed
 
     private void txtDatabaseKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDatabaseKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            txtDatabase.select(0, 0);
-            txtUsername.requestFocus();
-            txtUsername.selectAll();
+//        if (evt.getKeyCode() == KeyEvent.VK_TAB) {
+//            txtDatabase.select(0, 0);
+//            txtUsername.requestFocus();
+//            txtUsername.selectAll();
+//        }
+         if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
+        {
+            btnConnectActionPerformed(null);
         }
     }//GEN-LAST:event_txtDatabaseKeyPressed
 
     private void txtUsernameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUsernameKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            txtUsername.select(0, 0);
-            txtPassword.requestFocus();
-            txtPassword.selectAll();
+//        if (evt.getKeyCode() == KeyEvent.VK_TAB) {
+//            txtUsername.select(0, 0);
+//            txtPassword.requestFocus();
+//            txtPassword.selectAll();
+//        }
+         if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
+        {
+            btnConnectActionPerformed(null);
         }
     }//GEN-LAST:event_txtUsernameKeyPressed
 
@@ -286,6 +304,22 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
             btnConnectActionPerformed(null);
         }
     }//GEN-LAST:event_txtPasswordKeyPressed
+
+    private void btnConnectKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnConnectKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
+        {
+            btnConnectActionPerformed(null);
+        }
+    }//GEN-LAST:event_btnConnectKeyPressed
+
+    private void btnCancelKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnCancelKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
+        {
+        btnCancelActionPerformed(null);
+        }
+
+    }//GEN-LAST:event_btnCancelKeyPressed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnConnect;
