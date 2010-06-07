@@ -1,6 +1,7 @@
 package edacc.model;
 
 import edacc.manageDB.NoSolverBinarySpecifiedException;
+import edacc.manageDB.NoSolverNameSpecifiedException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,12 +38,14 @@ public class SolverDAO {
      * the solver is cached.
      * @param solver The Solver object to persist.
      */
-    public static void save(Solver solver) throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, IOException {
+    public static void save(Solver solver) throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, NoSolverNameSpecifiedException,  IOException {
         //if (solver.isSaved()) {
         //    return;
         //}
 
         // new solvers without binary aren't allowed
+        if (solver.isNew() && solver.getName().isEmpty())
+            throw new NoSolverNameSpecifiedException();
         if (solver.isNew() && solver.getBinaryFile() == null)
             throw new NoSolverBinarySpecifiedException();
 
