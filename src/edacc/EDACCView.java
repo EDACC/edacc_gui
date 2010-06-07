@@ -324,7 +324,9 @@ public class EDACCView extends FrameView implements Observer {
         }
 
         EDACCApp.getApplication().show(databaseSettings);
+        statusMessageLabel.setText("Connected to database: "+DatabaseConnector.getInstance().getDatabase()+ " on host: "+DatabaseConnector.getInstance().getHostname());
         manageDBMode();
+
     }
 
     @Action
@@ -384,6 +386,8 @@ public class EDACCView extends FrameView implements Observer {
         manageDBModeMenuItem.setSelected(false);
         mainPanelLayout.replace(mode, noMode);
         mode = noMode;
+        statusMessageLabel.setText("No database connection established!");
+        
     }
 
     @Action
@@ -421,6 +425,7 @@ public class EDACCView extends FrameView implements Observer {
             createDatabaseErrorMessage(ex);
             noMode();
         }
+        statusMessageLabel.setText("MANAGE DB MODE - Connected to database: "+DatabaseConnector.getInstance().getDatabase()+ " on host: "+DatabaseConnector.getInstance().getHostname());
     }
 
     @Action
@@ -457,6 +462,7 @@ public class EDACCView extends FrameView implements Observer {
             createDatabaseErrorMessage(ex);
             noMode();
         }
+        statusMessageLabel.setText("MANAGE EXPERIMENT MODE - Connected to database: "+DatabaseConnector.getInstance().getDatabase()+ " on host: "+DatabaseConnector.getInstance().getHostname());
     }
 
     @Action
