@@ -95,10 +95,10 @@ public class ManageDBSolvers {
         }
     }
 
-    public void addSolverCode(File code) throws FileNotFoundException {
-        if (!code.exists()) {
-            throw new FileNotFoundException("Couldn't find file \"" + code.getName() + "\".");
-        }
+    public void addSolverCode(File[] code) throws FileNotFoundException {
+        for (File c : code)
+            if (!c.exists())
+                throw new FileNotFoundException("Couldn't find file \"" + c.getName() + "\".");
         currentSolver.setCodeFile(code);
     }
 

@@ -54,6 +54,14 @@ public class Util {
         return bos;
     }
 
+    public static ByteArrayOutputStream zipFileArrayToByteStream(File[] dir) throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ZipOutputStream out = new ZipOutputStream(bos);
+        zip(dir, out);
+        out.close();
+        return bos;
+    }
+
     private static void zip(File dir, File base, ZipOutputStream out) throws IOException {
         File[] files = dir.listFiles();
         byte[] buffer = new byte[8192];
@@ -64,6 +72,26 @@ public class Util {
             } else {
                 FileInputStream fin = new FileInputStream(files[i]);
                 ZipEntry entry = new ZipEntry(files[i].getPath().substring(base.getPath().length() + 1));
+                out.putNextEntry(entry);
+
+                int bytes_read = 0;
+                while ((bytes_read = fin.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytes_read);
+                }
+                fin.close();
+            }
+        }
+    }
+
+    private static void zip(File[] files, ZipOutputStream out) throws IOException {
+        byte[] buffer = new byte[8192];
+
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isDirectory()) {
+                zip(files[i], files[i], out); // recursively zip sub-directories
+            } else {
+                FileInputStream fin = new FileInputStream(files[i]);
+                ZipEntry entry = new ZipEntry(files[i].getPath());
                 out.putNextEntry(entry);
 
                 int bytes_read = 0;
