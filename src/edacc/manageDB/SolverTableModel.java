@@ -15,11 +15,11 @@ import javax.swing.table.AbstractTableModel;
  */
 public class SolverTableModel extends AbstractTableModel {
     private final int NAME = 0;
-    private final int BINNAME = 1;
-    private final int MD5 = 2;
-    private final int DESCRIPTION = 3;
+    private final int BINNAME = 2;
+    private final int MD5 = 3;
+    private final int DESCRIPTION = 1;
 
-    private String[] columns = {"Name", "Binary Name", "MD5 hash", "Description" };
+    private String[] columns = {"Name", "Description", "Binary Name", "MD5 hash"};
     private Vector<Solver> solvers;
 
     public SolverTableModel() {

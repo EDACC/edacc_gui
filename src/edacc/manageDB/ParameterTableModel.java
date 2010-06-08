@@ -19,13 +19,15 @@ public class ParameterTableModel extends AbstractTableModel{
     private final int ORDER = 0;
     private final int NAME = 1;
     private final int PREFIX = 2;
+    private final int HASVALUE = 3;
     private Solver currentSolver;
 
-    private String[] colums = {"Order", "Name", "Prefix"};
+    private String[] colums = {"Order", "Name", "Prefix", "Boolean"};
     private HashMap<Solver, Vector<Parameter>> parameters;
 
     public ParameterTableModel(){
         parameters = new HashMap<Solver, Vector<Parameter>>();
+
     }
 
     /**
@@ -82,6 +84,8 @@ public class ParameterTableModel extends AbstractTableModel{
                 return p.getName();
             case PREFIX:
                 return p.getPrefix();
+            case HASVALUE:
+                return p.getHasValue()?"":"\u2713";//p.getHasValue();
         }
         return null;
     }
