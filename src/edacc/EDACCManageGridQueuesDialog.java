@@ -16,6 +16,7 @@ import edacc.gridqueues.QueueListModel;
 import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
 import edacc.model.NoConnectionToDBException;
+import java.awt.Color;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,6 +35,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
         super(parent, modal);
         gridSettings = new EDACCGridSettingsView(parent, true, this);
         initComponents();
+        lblSelected.setForeground(Color.red);
         try {
             listQueues.setModel(new QueueListModel());
         } catch (NoConnectionToDBException ex) {
@@ -52,23 +54,35 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lblQueues = new javax.swing.JLabel();
+        lblChosenQueue = new javax.swing.JLabel();
+        btnCancel = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         listQueues = new javax.swing.JList();
-        lblChosenQueue = new javax.swing.JLabel();
         btnCreateQueue = new javax.swing.JButton();
-        btnEditQueue = new javax.swing.JButton();
         btnChooseQueue = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
         btnRemoveQueue = new javax.swing.JButton();
+        btnEditQueue = new javax.swing.JButton();
+        lblSelected = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCManageGridQueuesDialog.class);
         setTitle(resourceMap.getString("dlgManageQueues.title")); // NOI18N
         setName("dlgManageQueues"); // NOI18N
 
-        lblQueues.setText(resourceMap.getString("lblQueues.text")); // NOI18N
-        lblQueues.setName("lblQueues"); // NOI18N
+        lblChosenQueue.setText(resourceMap.getString("lblChosenQueue.text")); // NOI18N
+        lblChosenQueue.setName("lblChosenQueue"); // NOI18N
+
+        btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
+        btnCancel.setName("btnCancel"); // NOI18N
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancel(evt);
+            }
+        });
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel1.border.title"))); // NOI18N
+        jPanel1.setName("jPanel1"); // NOI18N
 
         jScrollPane1.setName("jScrollPane1"); // NOI18N
 
@@ -76,10 +90,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
         listQueues.setName("listQueues"); // NOI18N
         jScrollPane1.setViewportView(listQueues);
 
-        lblChosenQueue.setText(resourceMap.getString("lblChosenQueue.text")); // NOI18N
-        lblChosenQueue.setName("lblChosenQueue"); // NOI18N
-
-        btnCreateQueue.setLabel(resourceMap.getString("btnCreateQueue.label")); // NOI18N
+        btnCreateQueue.setText(resourceMap.getString("btnCreateQueue.text")); // NOI18N
         btnCreateQueue.setName("btnCreateQueue"); // NOI18N
         btnCreateQueue.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -87,27 +98,11 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
             }
         });
 
-        btnEditQueue.setLabel(resourceMap.getString("btnEditQueue.label")); // NOI18N
-        btnEditQueue.setName("btnEditQueue"); // NOI18N
-        btnEditQueue.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditQueue(evt);
-            }
-        });
-
-        btnChooseQueue.setLabel(resourceMap.getString("btnChooseQueue.label")); // NOI18N
+        btnChooseQueue.setText(resourceMap.getString("btnChooseQueue.text")); // NOI18N
         btnChooseQueue.setName("btnChooseQueue"); // NOI18N
         btnChooseQueue.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnChooseQueue(evt);
-            }
-        });
-
-        btnCancel.setLabel(resourceMap.getString("btnCancel.label")); // NOI18N
-        btnCancel.setName("btnCancel"); // NOI18N
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancel(evt);
             }
         });
 
@@ -119,6 +114,54 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
             }
         });
 
+        btnEditQueue.setText(resourceMap.getString("btnEditQueue.text")); // NOI18N
+        btnEditQueue.setName("btnEditQueue"); // NOI18N
+        btnEditQueue.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditQueue(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnCreateQueue)
+                            .addComponent(btnEditQueue))
+                        .addComponent(btnRemoveQueue))
+                    .addComponent(btnChooseQueue))
+                .addContainerGap())
+        );
+
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnChooseQueue, btnCreateQueue, btnEditQueue, btnRemoveQueue});
+
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnCreateQueue)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnEditQueue)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnRemoveQueue)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                        .addComponent(btnChooseQueue))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        lblSelected.setText(resourceMap.getString("lblSelected.text")); // NOI18N
+        lblSelected.setName("lblSelected"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -126,18 +169,12 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
-                    .addComponent(lblQueues)
-                    .addComponent(lblChosenQueue)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnCreateQueue)
+                        .addComponent(lblChosenQueue)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnEditQueue)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnRemoveQueue)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnChooseQueue, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblSelected, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 102, Short.MAX_VALUE)
                         .addComponent(btnCancel)))
                 .addContainerGap())
         );
@@ -145,22 +182,16 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblQueues)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblChosenQueue)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnCreateQueue)
-                    .addComponent(btnEditQueue)
-                    .addComponent(btnCancel)
-                    .addComponent(btnChooseQueue)
-                    .addComponent(btnRemoveQueue))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(lblChosenQueue)
+                    .addComponent(lblSelected)
+                    .addComponent(btnCancel))
+                .addContainerGap())
         );
 
-        lblQueues.getAccessibleContext().setAccessibleName(resourceMap.getString("jLabel1.AccessibleContext.accessibleName")); // NOI18N
+        lblSelected.getAccessibleContext().setAccessibleName(resourceMap.getString("jLabel1.AccessibleContext.accessibleName")); // NOI18N
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -191,7 +222,8 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
         if (selected == null)
             return;
         GridQueuesController.getInstance().setChosenQueue(selected);
-        lblChosenQueue.setText("Chosen queue: " + selected.getName());
+        //lblChosenQueue.setText("Chosen queue: " + selected.getName());
+        this.lblSelected.setText(selected.getName());
     }//GEN-LAST:event_btnChooseQueue
 
     private void btnCancel(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancel
@@ -220,7 +252,8 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
         if (selected == null)
             lblChosenQueue.setText("Chosen queue: none");
         else
-            lblChosenQueue.setText("Chosen queue: " + selected.getName());
+        //    lblChosenQueue.setText("Chosen queue: " + selected.getName());
+        this.lblSelected.setText(selected.getName());
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -229,9 +262,10 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnCreateQueue;
     private javax.swing.JButton btnEditQueue;
     private javax.swing.JButton btnRemoveQueue;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblChosenQueue;
-    private javax.swing.JLabel lblQueues;
+    private javax.swing.JLabel lblSelected;
     private javax.swing.JList listQueues;
     // End of variables declaration//GEN-END:variables
 
