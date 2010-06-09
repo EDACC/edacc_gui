@@ -67,6 +67,8 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
         jButtonCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAddInstanceToInstanceClass.class);
+        setTitle(resourceMap.getString("Form.title")); // NOI18N
         setMinimumSize(new java.awt.Dimension(350, 500));
         setModal(true);
         setName("Form"); // NOI18N
@@ -77,7 +79,6 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
         });
 
         buttonGroupSourceOrUser.add(jRadioButtonSourceClass);
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAddInstanceToInstanceClass.class);
         jRadioButtonSourceClass.setText(resourceMap.getString("jRadioButtonSourceClass.text")); // NOI18N
         jRadioButtonSourceClass.setName("jRadioButtonSourceClass"); // NOI18N
 
@@ -178,10 +179,10 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPaneUserClass, javax.swing.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
+                    .addComponent(jScrollPaneUserClass, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
                     .addComponent(jRadioButtonSourceClass)
                     .addComponent(jRadioButtonUserClass)
-                    .addComponent(jScrollPaneSourceClass, javax.swing.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
+                    .addComponent(jScrollPaneSourceClass, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
                     .addComponent(jPanelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );

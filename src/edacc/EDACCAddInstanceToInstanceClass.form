@@ -7,6 +7,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
+    <Property name="title" type="java.lang.String" resourceKey="Form.title"/>
     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
       <Dimension value="[350, 500]"/>
     </Property>
@@ -37,10 +38,10 @@
           <Group type="102" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPaneUserClass" alignment="0" pref="395" max="32767" attributes="2"/>
+                  <Component id="jScrollPaneUserClass" alignment="0" pref="431" max="32767" attributes="2"/>
                   <Component id="jRadioButtonSourceClass" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jRadioButtonUserClass" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="jScrollPaneSourceClass" alignment="0" pref="395" max="32767" attributes="0"/>
+                  <Component id="jScrollPaneSourceClass" alignment="0" pref="431" max="32767" attributes="0"/>
                   <Component id="jPanelButton" alignment="0" max="32767" attributes="2"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>

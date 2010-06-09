@@ -6,7 +6,6 @@
     <Property name="title" type="java.lang.String" resourceKey="Form.title"/>
     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
       <Dimension value="[470, 240]"/>
-
     </Property>
     <Property name="modal" type="boolean" value="true"/>
     <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
@@ -29,7 +28,6 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -38,28 +36,28 @@
                           <Group type="102" alignment="0" attributes="1">
                               <Component id="jLabel1" min="-2" pref="130" max="-2" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="txtName" pref="216" max="32767" attributes="0"/>
+                              <Component id="txtName" pref="241" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel5" min="-2" pref="130" max="-2" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="txtAtomsLow" pref="99" max="32767" attributes="0"/>
+                              <Component id="txtAtomsLow" pref="111" max="32767" attributes="0"/>
                               <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
-                              <Component id="txtAtomsHigh" pref="99" max="32767" attributes="0"/>
+                              <Component id="txtAtomsHigh" pref="112" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel6" min="-2" pref="130" max="-2" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="txtClausesLow" pref="99" max="32767" attributes="0"/>
+                              <Component id="txtClausesLow" pref="111" max="32767" attributes="0"/>
                               <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
-                              <Component id="txtClausesHigh" pref="99" max="32767" attributes="0"/>
+                              <Component id="txtClausesHigh" pref="112" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel7" min="-2" pref="130" max="-2" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="txtRatioLow" pref="99" max="32767" attributes="0"/>
+                              <Component id="txtRatioLow" pref="111" max="32767" attributes="0"/>
                               <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtRatioHigh" pref="99" max="32767" attributes="0"/>
+                              <Component id="txtRatioHigh" pref="112" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
@@ -81,7 +79,7 @@
                       </Group>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace pref="341" max="-2" attributes="3"/>
+                      <EmptySpace pref="370" max="-2" attributes="3"/>
                       <Component id="btnApply" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
                   </Group>
@@ -100,7 +98,6 @@
               </Group>
               <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="2" max="-2" attributes="0">
-
                   <Component id="jLabel1" alignment="2" min="-2" max="-2" attributes="0"/>
                   <Component id="txtName" alignment="2" min="-2" max="-2" attributes="0"/>
                   <Component id="chkName" alignment="2" min="-2" max="-2" attributes="0"/>
@@ -116,7 +113,6 @@
               <Group type="103" groupAlignment="2" max="-2" attributes="0">
                   <Component id="jLabel6" alignment="2" min="-2" max="-2" attributes="0"/>
                   <Component id="txtClausesLow" alignment="2" min="-2" max="-2" attributes="0"/>
-
                   <Component id="txtClausesHigh" alignment="2" min="-2" max="-2" attributes="0"/>
                   <Component id="chkClauses" alignment="2" min="-2" max="-2" attributes="0"/>
               </Group>

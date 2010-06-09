@@ -94,7 +94,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelButtonsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButtonCancel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 211, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 196, Short.MAX_VALUE)
                 .addComponent(jButtonOk)
                 .addContainerGap())
         );
@@ -132,6 +132,8 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
                 return types [columnIndex];
             }
         });
+        jTableInstanceClass.setMaximumSize(new java.awt.Dimension(32760, 32760));
+        jTableInstanceClass.setMinimumSize(new java.awt.Dimension(0, 0));
         jTableInstanceClass.setName("jTableInstanceClass"); // NOI18N
         jTableInstanceClass.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jTableInstanceClass.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -163,9 +165,9 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jRadioButtonAutomatic, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
-                    .addComponent(jRadioButtonChoose, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
-                    .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE))
+                    .addComponent(jRadioButtonAutomatic, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
+                    .addComponent(jRadioButtonChoose, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
+                    .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -176,7 +178,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
                 .addGap(10, 10, 10)
                 .addComponent(jRadioButtonChoose)
                 .addGap(15, 15, 15)
-                .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
+                .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
