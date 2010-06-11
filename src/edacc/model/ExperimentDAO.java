@@ -21,7 +21,10 @@ public class ExperimentDAO {
      * so it can be referenced by related objects
      * @return new Experiment object
      */
-    public static Experiment createExperiment(String name, Date date, String description) throws SQLException {
+    public static Experiment createExperiment(String name, Date date, String description) throws SQLException, Exception {
+        if (getExperimentByName(name) != null) {
+            throw new Exception("There exists already an experiment with the same name.");
+        }
         Experiment i = new Experiment();
         i.setName(name);
         i.setDescription(description);
@@ -29,6 +32,21 @@ public class ExperimentDAO {
         save(i);
         cache.cache(i);
         return i;
+    }
+
+    public static Experiment getExperimentByName(String name) throws SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE name=?");
+        st.setString(1, name);
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            Experiment i = getExperimentFromResultset(rs);
+            i.setSaved();
+            cache.cache(i);
+            return i;
+        }
+        rs.close();
+        st.close();
+        return null;
     }
 
     /**

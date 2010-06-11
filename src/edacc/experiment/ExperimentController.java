@@ -161,8 +161,9 @@ public class ExperimentController {
      * @param date
      * @param description
      * @throws SQLException
+     * @throws Exception
      */
-    public void createExperiment(String name, String description) throws SQLException {
+    public void createExperiment(String name, String description) throws SQLException, Exception {
         java.util.Date d = new java.util.Date();
         ExperimentDAO.createExperiment(name, new Date(d.getTime()), description);
         initialize();
