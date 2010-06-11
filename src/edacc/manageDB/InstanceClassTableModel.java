@@ -22,7 +22,7 @@ import javax.swing.table.AbstractTableModel;
  * @author rretz
  */
 public class InstanceClassTableModel extends AbstractTableModel{
-     private String[] columns = {"Name", "Description", "Source", "Select"};
+     private String[] columns = {"Name", "Description", "Source", "Show"};
      protected Vector <InstanceClass> classes;
      protected Vector <Boolean> classSelect;
      protected JTable instanceTable;
