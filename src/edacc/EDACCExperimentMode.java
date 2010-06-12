@@ -14,6 +14,7 @@ import edacc.experiment.InstanceTableModel;
 import edacc.experiment.InstanceTableModelRowFilter;
 import edacc.experiment.SolverTableModel;
 import edacc.gridqueues.GridQueuesController;
+import edacc.model.DatabaseConnector;
 import edacc.model.GridQueue;
 import edacc.model.Solver;
 import edacc.model.Tasks;
@@ -62,10 +63,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     /** Creates new form EDACCExperimentMode */
     public EDACCExperimentMode() {
         initComponents();
-        manageExperimentPane.setEnabledAt(1, false);
-        manageExperimentPane.setEnabledAt(2, false);
-        manageExperimentPane.setEnabledAt(3, false);
-        manageExperimentPane.setEnabledAt(4, false);
 
         expController = new ExperimentController(this, solverConfigPanel);
         expTableModel = new ExperimentTableModel();
@@ -126,7 +123,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 btnLoadExperiment.setEnabled(mod);
             }
         });
+        manageExperimentPane.setEnabledAt(1, false);
+        manageExperimentPane.setEnabledAt(2, false);
+        manageExperimentPane.setEnabledAt(3, false);
+        manageExperimentPane.setEnabledAt(4, false);
         disableEditExperiment();
+        manageExperimentPane.setTitleAt(0, "Experiments");
+        btnDiscardExperiment.setEnabled(false);
     }
 
     public void initialize() throws SQLException {
@@ -197,6 +200,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         jLabel3 = new javax.swing.JLabel();
         txtMaxSeeds = new javax.swing.JTextField();
         btnEditExperimentSave = new javax.swing.JButton();
+        btnDiscardExperiment = new javax.swing.JButton();
         panelChooseSolver = new javax.swing.JPanel();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel2 = new javax.swing.JPanel();
@@ -360,9 +364,19 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
         txtTimeout.setText(resourceMap.getString("txtTimeout.text")); // NOI18N
         txtTimeout.setName("txtTimeout"); // NOI18N
+        txtTimeout.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtTimeoutKeyReleased(evt);
+            }
+        });
 
         txtMaxMem.setText(resourceMap.getString("txtMaxMem.text")); // NOI18N
         txtMaxMem.setName("txtMaxMem"); // NOI18N
+        txtMaxMem.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtMaxMemKeyReleased(evt);
+            }
+        });
 
         jLabel4.setText(resourceMap.getString("jLabel4.text")); // NOI18N
         jLabel4.setName("jLabel4"); // NOI18N
@@ -370,10 +384,20 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         chkGenerateSeeds.setToolTipText(resourceMap.getString("chkGenerateSeeds.toolTipText")); // NOI18N
         chkGenerateSeeds.setLabel(resourceMap.getString("chkGenerateSeeds.label")); // NOI18N
         chkGenerateSeeds.setName("chkGenerateSeeds"); // NOI18N
+        chkGenerateSeeds.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                chkGenerateSeedsMouseReleased(evt);
+            }
+        });
 
         chkLinkSeeds.setToolTipText(resourceMap.getString("chkLinkSeeds.toolTipText")); // NOI18N
         chkLinkSeeds.setLabel(resourceMap.getString("chkLinkSeeds.label")); // NOI18N
         chkLinkSeeds.setName("chkLinkSeeds"); // NOI18N
+        chkLinkSeeds.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                chkLinkSeedsMouseReleased(evt);
+            }
+        });
 
         jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
         jLabel3.setName("jLabel3"); // NOI18N
@@ -381,6 +405,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         txtMaxSeeds.setText(resourceMap.getString("txtMaxSeeds.text")); // NOI18N
         txtMaxSeeds.setToolTipText(resourceMap.getString("txtMaxSeeds.toolTipText")); // NOI18N
         txtMaxSeeds.setName("txtMaxSeeds"); // NOI18N
+        txtMaxSeeds.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtMaxSeedsKeyReleased(evt);
+            }
+        });
 
         btnEditExperimentSave.setAction(actionMap.get("btnEditExperimentSave")); // NOI18N
         btnEditExperimentSave.setText(resourceMap.getString("btnEditExperimentSave.text")); // NOI18N
@@ -394,10 +423,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         pnlEditExperimentLayout.setHorizontalGroup(
             pnlEditExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlEditExperimentLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlEditExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnEditExperimentSave, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(pnlEditExperimentLayout.createSequentialGroup()
+                .addGroup(pnlEditExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlEditExperimentLayout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(pnlEditExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pnlEditExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                 .addComponent(jLabel3)
@@ -409,7 +437,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                         .addGroup(pnlEditExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(txtMaxSeeds, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
                             .addComponent(txtMaxMem, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
-                            .addComponent(txtTimeout, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE))))
+                            .addComponent(txtTimeout, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)))
+                    .addComponent(btnEditExperimentSave, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         pnlEditExperimentLayout.setVerticalGroup(
@@ -434,6 +463,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 .addComponent(btnEditExperimentSave, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
+        btnDiscardExperiment.setAction(actionMap.get("btnDiscardExperiment")); // NOI18N
+        btnDiscardExperiment.setText(resourceMap.getString("btnDiscardExperiment.text")); // NOI18N
+        btnDiscardExperiment.setMaximumSize(new java.awt.Dimension(69, 23));
+        btnDiscardExperiment.setMinimumSize(new java.awt.Dimension(69, 23));
+        btnDiscardExperiment.setName("btnDiscardExperiment"); // NOI18N
+        btnDiscardExperiment.setPreferredSize(new java.awt.Dimension(69, 23));
+
         javax.swing.GroupLayout panelManageExperimentLayout = new javax.swing.GroupLayout(panelManageExperiment);
         panelManageExperiment.setLayout(panelManageExperimentLayout);
         panelManageExperimentLayout.setHorizontalGroup(
@@ -442,6 +478,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 .addContainerGap()
                 .addGroup(panelManageExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManageExperimentLayout.createSequentialGroup()
+                        .addComponent(btnDiscardExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnRemoveExperiment)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnLoadExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -460,7 +498,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelManageExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnLoadExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnRemoveExperiment))
+                    .addComponent(btnRemoveExperiment)
+                    .addComponent(btnDiscardExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(panelManageExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pnlEditExperiment, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
@@ -1012,7 +1051,29 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         } else {
             manageExperimentPane.setTitleAt(2, "Instances");
         }
+        if (expController.getActiveExperiment() == null) {
+            manageExperimentPane.setTitleAt(0, "Experiments");
+            ((EDACCView) EDACCApp.getApplication().getMainView()).setStatusText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+        } else if (experimentIsModified()) {
+            manageExperimentPane.setTitleAt(0, "Experiments (Active: " + expController.getActiveExperiment().getName() + ", modified)");
+            ((EDACCView) EDACCApp.getApplication().getMainView()).setStatusText("MANAGE EXPERIMENT MODE (Active: " + expController.getActiveExperiment().getName() + ", modified) - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+        } else {
+            manageExperimentPane.setTitleAt(0, "Experiments (Active: " + expController.getActiveExperiment().getName() + ")");
+            ((EDACCView) EDACCApp.getApplication().getMainView()).setStatusText("MANAGE EXPERIMENT MODE (Active: " + expController.getActiveExperiment().getName() + ") - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+        }
         manageExperimentPane.invalidate();
+    }
+
+    public boolean experimentIsModified() {
+        try {
+            return expController.getActiveExperiment().getTimeOut() != Integer.parseInt(txtTimeout.getText()) ||
+                    expController.getActiveExperiment().getMaxSeed() != Integer.parseInt(txtMaxSeeds.getText()) ||
+                    expController.getActiveExperiment().getMemOut() != Integer.parseInt(txtMaxMem.getText()) ||
+                    expController.getActiveExperiment().isAutoGeneratedSeeds() != chkGenerateSeeds.isSelected() ||
+                    expController.getActiveExperiment().isLinkSeeds() != chkLinkSeeds.isSelected();
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     private void manageExperimentPaneStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_manageExperimentPaneStateChanged
@@ -1078,6 +1139,40 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     private void btnDeselectAllInstnaceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeselectAllInstnaceClassesActionPerformed
         expController.deselectAllInstanceClasses();
     }//GEN-LAST:event_btnDeselectAllInstnaceClassesActionPerformed
+
+    private void txtTimeoutKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtTimeoutKeyReleased
+        txtTimeout.setText(getNumberText(txtTimeout.getText()));
+        setTitles();
+    }//GEN-LAST:event_txtTimeoutKeyReleased
+
+    private void txtMaxMemKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMaxMemKeyReleased
+        txtMaxMem.setText(getNumberText(txtMaxMem.getText()));
+        setTitles();
+    }//GEN-LAST:event_txtMaxMemKeyReleased
+
+    private void txtMaxSeedsKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMaxSeedsKeyReleased
+        txtMaxSeeds.setText(getNumberText(txtMaxSeeds.getText()));
+        setTitles();
+    }//GEN-LAST:event_txtMaxSeedsKeyReleased
+
+    private void chkGenerateSeedsMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chkGenerateSeedsMouseReleased
+        setTitles();
+    }//GEN-LAST:event_chkGenerateSeedsMouseReleased
+
+    private void chkLinkSeedsMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chkLinkSeedsMouseReleased
+        setTitles();
+    }//GEN-LAST:event_chkLinkSeedsMouseReleased
+
+    public String getNumberText(String text) {
+        String res = "";
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) >= '0' && text.charAt(i) <= '9') {
+                res += text.charAt(i);
+            }
+        }
+        return res;
+    }
+
     /**
      * Method to be called after an experiment is loaded.
      */
@@ -1087,6 +1182,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         manageExperimentPane.setEnabledAt(3, true);
         manageExperimentPane.setEnabledAt(4, true);
         enableEditExperiment(expController.getActiveExperiment().getMemOut(), expController.getActiveExperiment().getTimeOut(), expController.getActiveExperiment().getMaxSeed(), expController.getActiveExperiment().isAutoGeneratedSeeds(), expController.getActiveExperiment().isLinkSeeds());
+        setTitles();
+        btnDiscardExperiment.setEnabled(true);
     }
 
     /**
@@ -1099,6 +1196,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         manageExperimentPane.setEnabledAt(3, false);
         manageExperimentPane.setEnabledAt(4, false);
         disableEditExperiment();
+        setTitles();
+        btnDiscardExperiment.setEnabled(false);
     }
 
     private void createDatabaseErrorMessage(SQLException e) {
@@ -1149,7 +1248,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 return;
             } else {
                 try {
-                    
+
                     Integer i = (Integer) expTableModel.getValueAt(tableExperiments.convertRowIndexToModel(removedIndex), 5);
                     expController.removeExperiment(i);
                     if (removedIndex > 0) {
@@ -1335,6 +1434,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     private javax.swing.JButton btnDeselectAllInstances;
     private javax.swing.JButton btnDeselectAllInstnaceClasses;
     private javax.swing.JButton btnDeselectAllSolvers;
+    private javax.swing.JButton btnDiscardExperiment;
     private javax.swing.JButton btnEditExperimentSave;
     private javax.swing.JButton btnFilterInstances;
     private javax.swing.JButton btnFilterJobs;
@@ -1478,8 +1578,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             boolean generateSeeds = chkGenerateSeeds.isSelected();
             boolean linkSeeds = chkLinkSeeds.isSelected();
             int maxSeed = Integer.parseInt(txtMaxSeeds.getText());
+            int selectedExperiment = tableExperiments.getSelectedRow();
             expController.saveExperimentParameters(maxMem, timeout, maxSeed, generateSeeds, linkSeeds);
-
+            setTitles();
+            tableExperiments.getSelectionModel().setSelectionInterval(selectedExperiment, selectedExperiment);
         } catch (NumberFormatException ex) {
             javax.swing.JOptionPane.showMessageDialog(null, "Expected integers for number of runs, timeout and max seed", "invalid data", javax.swing.JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
@@ -1497,5 +1599,17 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         lblJobsFilterStatus.setIcon(new ImageIcon("warning-icon.png"));
         lblJobsFilterStatus.setForeground(Color.red);
         lblJobsFilterStatus.setText(status);
+    }
+
+    @Action
+    public void btnDiscardExperiment() {
+        boolean unload = !hasUnsavedChanges() || (JOptionPane.showConfirmDialog(this,
+                "Discarding an experiment will make you lose all unsaved changes of the current experiment. Continue discarding the experiment?",
+                "Warning!",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION);
+        if (unload) {
+            expController.unloadExperiment();
+            tableExperiments.requestFocusInWindow();
+        }
     }
 }

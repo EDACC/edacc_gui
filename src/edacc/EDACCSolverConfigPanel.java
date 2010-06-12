@@ -54,15 +54,23 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
         if (!update) {
             int oldId = -1;
             int count = 1;
+            EDACCSolverConfigEntry old = null;
             for (int i = 0; i < this.getComponentCount(); i++) {
                 EDACCSolverConfigEntry e = (EDACCSolverConfigEntry) this.getComponent(i);
                 if (e.getSolverId() != oldId) {
+                    if (old != null && count == 1) {
+                        old.setTitleNumber(0);
+                    }
                     oldId = e.getSolverId();
                     count = 1;
                 } else {
                     count++;
                 }
                 e.setTitleNumber(count);
+                old = e;
+            }
+            if (old != null && count == 1) {
+                old.setTitleNumber(0);
             }
             this.repaint();
             this.revalidate();

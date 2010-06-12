@@ -124,6 +124,10 @@ public class EDACCView extends FrameView implements Observer {
         });
     }
 
+    public void setStatusText(String text) {
+        statusMessageLabel.setText(text);
+    }
+
     private void createDatabaseErrorMessage(SQLException e) {
         javax.swing.JOptionPane.showMessageDialog(null, "There was an error while communicating with the database: " + e, "Connection error", javax.swing.JOptionPane.ERROR_MESSAGE);
     }

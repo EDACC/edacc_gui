@@ -84,7 +84,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
      * @param number
      */
     public void setTitleNumber(int number) {
-        if (number == 1) {
+        if (number == 0) {
             border.setTitle(title);
         } else {
             border.setTitle(title + " (" + number + ")");
