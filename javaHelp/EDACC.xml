@@ -41,24 +41,195 @@
   </bookinfo>
 
 <chapter>
-  <title>Chapter</title>
+  <title>Getting started</title>
 
-  <sect1>
-    <title>Section 1 </title>
+  <!-- First section for the systemrequriements -->
+  <section>
+    <title>Systemrequirements</title>
 
     <para>
-      We write the best help ever.
+		You need a connection to the internet, db, ...
     </para>
+	
+  </section>
+  
+  <!-- Second section -->
+  <section>
+    <title>How to start</title>
 
-  </sect1>
+    <para>
+		You have to start it...
+    </para>
+	
+  </section>
+  
+  <!-- another section -->
+  <section>
+    <title>Connect to the Database</title>
 
+    <para>
+		press the right buttons
+    </para>
+	
+  </section>
+  
+  <!-- another section -->
+  <section>
+    <title>Create the tables</title>
+
+    <para>
+		...
+    </para>
+	
+  </section>
+  
+</chapter>
+
+<chapter>
+	<title>Introduction</title>
+	
+	<!-- verschachtelte sections -->
+	<sect1>
+		<title>Was ist EDACC</title>
+		<para>
+			edacc is was tolles
+		</para>
+		<sect2>
+			<title>Manage Solver, instances and experiments</title>
+			<para>
+				und ne subsection auch
+			</para>
+		</sect2>
+		
+		<sect2>
+			<title>queuing-tool</title>
+			<para>
+				wie füllt man ne queu
+			</para>
+		</sect2>
+		
+		<sect2>
+			<title>workflow beispiel</title>
+			<para>
+				und wie läuft das ganze ab
+			</para>
+		</sect2>
+	</sect1>
+	
+	<sect1>
+		<title>Was für infos wird mit EDACC verwaltet</title>
+		<para>
+			here we will show the DB-modell
+		</para>
+		<sect2>
+			<title>Solver, Parameter</title>
+			<para>
+				was ist das?
+			</para>
+		</sect2>
+		
+		<sect2>
+			<title>Instanzklassen</title>
+			<para>
+				was ist das?
+			</para>
+		</sect2>
+		
+		<sect2>
+			<title>Instanzen</title>
+			<para>
+				was ist das?
+			</para>
+		</sect2>
+		
+		<sect2>
+			<title>Experiment</title>
+			<para>
+				was ist das?
+			</para>
+		</sect2>
+	</sect1>
+	
+</chapter>
+
+<chapter>
+	<title>Manage DB Modus</title>
+	
+	<section>
+		<title>Solver</title>
+		<para>
+		Here we will save the name, the binaray, ....
+		</para>
+	</section>
+	
+	<section>
+		<title>Paramter</title>
+		<para>
+		Every parameter have a solver, value, prefix,....
+		</para>
+	</section>
+	
+	<section>
+		<title>Instance classes</title>
+		<para>
+		some instances will be combined
+		</para>
+	</section>
+	
+	<section>
+		<title>Instance</title>
+		<para>
+		contains variables and klauses
+		</para>
+	</section>
+</chapter>
+
+<chapter>
+	<title>Experiment Mode</title>
+	
+	<section>
+		<title>Experiment Management</title>
+		<para>
+		create, change an experiment
+		</para>
+	</section>
+	
+	<section>
+		<title>...</title>
+		<para>
+		...
+		</para>
+	</section>
+</chapter>
+
+<chapter>
+	<title>GridQueues</title>
+	
+	<section>
+		<title>was es da halt so gibt</title>
+		<para>
+		und dann schön erklärt
+		</para>
+	</section>
+</chapter>
+
+<chapter>
+	<title>Client</title>
+	
+	<section>
+		<title>ne section</title>
+		<para>
+		und dann was die da macht
+		</para>
+	</section>
 </chapter>
 
 <!-- Via XInclude we can include document parts
      You can use Xalan's xpointer features to select parts of your included document
      or include all of it.
 -->
+<!--
 <xi:include href="book-include.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-
+-->
 
 </book>
