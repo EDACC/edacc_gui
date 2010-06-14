@@ -11,13 +11,14 @@ import edacc.model.NoConnectionToDBException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
+import java.util.Observable;
 
 /**
  * At the moment only support of one queue!
  * This class will change a lot when adding support of multiple queues!
  * @author dgall
  */
-public class GridQueuesController {
+public class GridQueuesController extends Observable {
 
     private static GridQueuesController instance;
 
@@ -69,6 +70,8 @@ public class GridQueuesController {
 
     public void setChosenQueue(GridQueue q) {
         this.chosenQueue = q;
+        setChanged();
+        notifyObservers();
     }
 
     public GridQueue getChosenQueue() {
