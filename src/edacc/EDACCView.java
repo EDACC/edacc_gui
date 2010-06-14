@@ -26,6 +26,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import edacc.manageDB.Util;
+import edacc.model.Tasks;
 import java.net.URL;
 import javax.help.HelpSet;
 import javax.help.JHelp;
@@ -74,10 +75,16 @@ public class EDACCView extends FrameView implements Observer {
         progressBar.setVisible(false);
 
         // connecting action tasks to status bar via TaskMonitor
-      /*  TaskMonitor taskMonitor = new TaskMonitor(getApplication().getContext());
+        TaskMonitor taskMonitor = new TaskMonitor(getApplication().getContext());
         taskMonitor.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
 
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                if (evt.getSource() instanceof Tasks) {
+                    Tasks task = (Tasks)evt.getSource();
+                    if (task.getTaskView() != null) {
+                        return ;
+                    }
+                }
                 String propertyName = evt.getPropertyName();
                 if ("started".equals(propertyName)) {
                     if (!busyIconTimer.isRunning()) {
@@ -103,7 +110,7 @@ public class EDACCView extends FrameView implements Observer {
                     progressBar.setValue(value);
                 }
             }
-        });*/
+        });
         experimentMode = new EDACCExperimentMode();
         manageDBMode = new EDACCManageDBMode();
         noMode = new EDACCNoMode();

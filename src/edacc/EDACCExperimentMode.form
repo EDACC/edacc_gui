@@ -24,7 +24,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageExperimentPane" pref="975" max="32767" attributes="0"/>
+              <Component id="manageExperimentPane" pref="960" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -84,11 +84,11 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnLoadExperiment" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="scrollPaneExperimentsTable" alignment="0" pref="950" max="32767" attributes="0"/>
+                          <Component id="scrollPaneExperimentsTable" alignment="0" pref="935" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="pnlNewExperiment" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="pnlEditExperiment" pref="461" max="32767" attributes="0"/>
+                              <Component id="pnlEditExperiment" pref="446" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -313,9 +313,9 @@
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="1" attributes="0">
-                                      <Component id="txtMaxSeeds" pref="324" max="32767" attributes="0"/>
-                                      <Component id="txtMaxMem" alignment="1" pref="324" max="32767" attributes="1"/>
-                                      <Component id="txtTimeout" alignment="1" pref="324" max="32767" attributes="1"/>
+                                      <Component id="txtMaxSeeds" pref="309" max="32767" attributes="0"/>
+                                      <Component id="txtMaxMem" alignment="1" pref="309" max="32767" attributes="1"/>
+                                      <Component id="txtTimeout" alignment="1" pref="309" max="32767" attributes="1"/>
                                   </Group>
                               </Group>
                               <Group type="102" alignment="1" attributes="0">
@@ -501,7 +501,7 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="jSplitPane1" alignment="0" pref="950" max="32767" attributes="0"/>
+                          <Component id="jSplitPane1" alignment="0" pref="935" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="btnSelectAllSolvers" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -510,7 +510,7 @@
                               <Component id="btnReverseSolverSelection" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnChooseSolvers" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="272" max="32767" attributes="0"/>
+                              <EmptySpace pref="257" max="32767" attributes="0"/>
                               <Component id="btnUndoSolverConfigurations" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnSaveSolverConfigurations" min="-2" max="-2" attributes="0"/>
@@ -565,7 +565,7 @@
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="jScrollPane3" pref="910" max="32767" attributes="0"/>
+                              <Component id="jScrollPane3" pref="895" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -716,7 +716,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jSplitPane2" alignment="0" pref="970" max="32767" attributes="0"/>
+                  <Component id="jSplitPane2" alignment="0" pref="955" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -753,7 +753,7 @@
                           <Component id="jPanel6" alignment="1" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="10" pref="10" max="10" attributes="0"/>
-                              <Component id="jScrollPane5" pref="229" max="32767" attributes="0"/>
+                              <Component id="jScrollPane5" pref="224" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -808,7 +808,7 @@
                                   <Component id="btnSelectAllInstanceClasses" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="btnDeselectAllInstnaceClasses" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="15" max="32767" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -871,12 +871,12 @@
                           <Component id="jPanel5" alignment="0" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-                              <Component id="jScrollPane2" pref="694" max="32767" attributes="0"/>
+                              <Component id="jScrollPane2" pref="684" max="32767" attributes="0"/>
                               <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="lblFilterStatus" pref="694" max="32767" attributes="0"/>
+                              <Component id="lblFilterStatus" pref="684" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -934,7 +934,7 @@
                                   <Component id="btnDeselectAllInstances" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="btnInvertSelection" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="16" max="32767" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
                                   <Component id="btnUndoInstances" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="btnSaveInstances" min="-2" max="-2" attributes="0"/>
@@ -1124,7 +1124,7 @@
                               <Component id="lblCurNumRuns" min="-2" max="-2" attributes="0"/>
                               <Component id="lblNumJobs" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="743" max="32767" attributes="0"/>
+                          <EmptySpace pref="728" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1245,14 +1245,20 @@
                       <Component id="btnFilterJobs" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnCSVExport" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="530" max="32767" attributes="0"/>
+                      <EmptySpace pref="343" max="32767" attributes="0"/>
+                      <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="txtJobsTimer" min="-2" pref="33" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkJobsTimer" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="lblJobsFilterStatus" pref="950" max="32767" attributes="0"/>
+                      <Component id="lblJobsFilterStatus" pref="935" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jScrollPane6" alignment="1" pref="970" max="32767" attributes="0"/>
+                  <Component id="jScrollPane6" alignment="1" pref="955" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -1268,6 +1274,9 @@
                           <Component id="btnBrowserColumnSelection" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnFilterJobs" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnCSVExport" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkJobsTimer" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtJobsTimer" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -1352,6 +1361,27 @@
             <Component class="javax.swing.JLabel" name="lblJobsFilterStatus">
               <Properties>
                 <Property name="name" type="java.lang.String" value="lblJobsFilterStatus" noResource="true"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="txtJobsTimer">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="txtJobsTimer.text"/>
+                <Property name="name" type="java.lang.String" value="txtJobsTimer" noResource="true"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="chkJobsTimer">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="chkJobsTimer.text"/>
+                <Property name="name" type="java.lang.String" value="chkJobsTimer" noResource="true"/>
+              </Properties>
+              <Events>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="chkJobsTimerMouseReleased"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel5">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="jLabel5.text"/>
+                <Property name="name" type="java.lang.String" value="jLabel5" noResource="true"/>
               </Properties>
             </Component>
           </SubComponents>

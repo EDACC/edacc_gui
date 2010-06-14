@@ -31,35 +31,43 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
      * @param target The target object in which this method is declared and set as public.
      * @param view The corresponding view which implements EDACCTaskEvents to have control over this task.
      */
-    public static void startTask(String methodName, Class[] signature, Object[] parameters, Object target, EDACCTaskEvents view) {
+    public static void startTask(String methodName, Class[] signature, Object[] parameters, Object target, EDACCTaskEvents view, boolean withTaskView) {
         if (task != null) {
             return;
         }
+        taskView = null;
         task = new Tasks(org.jdesktop.application.Application.getInstance(EDACCApp.class), methodName, signature, parameters, target, view);
-        taskView = new EDACCTaskView(EDACCApp.getApplication().getMainFrame(), true, (Tasks)task);
-        taskView.setResizable(false);
-        taskView.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
-        taskView.setTitle("Running..");
-        taskView.setOperationName("Running..");
-        taskView.setMessage("");
-        taskView.setProgress(0.);
-        SwingUtilities.invokeLater(new Runnable() {
+        if (withTaskView) {
+            taskView = new EDACCTaskView(EDACCApp.getApplication().getMainFrame(), true, (Tasks) task);
+            taskView.setResizable(false);
+            taskView.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+            taskView.setTitle("Running..");
+            taskView.setOperationName("Running..");
+            taskView.setMessage("");
+            taskView.setProgress(0.);
+            SwingUtilities.invokeLater(new Runnable() {
 
-            @Override
-            public void run() {
-                try {
-                    if (taskView.isDisplayable())
-                        taskView.setVisible(true);
-                } catch (Exception _) {
-                    // happens if the task view is already disposed, i.e. the task is finished.
+                @Override
+                public void run() {
+                    try {
+                        if (taskView.isDisplayable()) {
+                            taskView.setVisible(true);
+                        }
+                    } catch (Exception _) {
+                        // happens if the task view is already disposed, i.e. the task is finished.
+                    }
                 }
-            }
-        });
+            });
+        }
         ApplicationContext appC = Application.getInstance().getContext();
         appC.getTaskService().execute(task);
         appC.getTaskMonitor().setForegroundTask(task);
     }
 
+    public static void startTask(String methodName, Class[] signature, Object[] parameters, Object target, EDACCTaskEvents view) {
+        startTask(methodName, signature, parameters, target, view, true);
+    }
+    
     /**
      * Starts a task for a method without any parameters.
      * If there is currently a task running this methode does nothing.
@@ -68,7 +76,11 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
      * @param view
      */
     public static void startTask(String methodName, Object target, EDACCTaskEvents view) {
-        startTask(methodName, new Class[]{}, new Object[]{}, target, view);
+        startTask(methodName, target, view, true);
+    }
+
+    public static void startTask(String methodName, Object target, EDACCTaskEvents view, boolean withTaskView) {
+        startTask(methodName, new Class[]{}, new Object[]{}, target, view, withTaskView);
     }
 
     private Tasks(EDACCApp app, String methodName, Class[] signature, Object[] parameters, Object target, EDACCTaskEvents view) {
@@ -90,10 +102,12 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
             }
             view.onTaskStart(methodName);
             Object res = target.getClass().getDeclaredMethod(methodName, signature).invoke(target, parameters);
-            taskView.dispose();
+            if (taskView != null)
+              taskView.dispose();
             view.onTaskSuccessful(methodName, res);
         } catch (java.lang.reflect.InvocationTargetException e) {
-            taskView.dispose();
+            if (taskView != null)
+              taskView.dispose();
             view.onTaskFailed(methodName, e.getTargetException());
         } catch (Exception e) {
             System.out.println("This should not happen. Called a method which should not be called. Be sure that your method is declared as public. Exception as follows: " + e);
