@@ -1446,6 +1446,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         taSolverDescription.setEnabled(enabled);
         btnSolverAddBinary.setEnabled(enabled);
         btnSolverAddCode.setEnabled(enabled);
+        btnSolverExport.setEnabled(enabled);
 
 
         if (currentSolver != null) {

@@ -76,6 +76,13 @@ public class ManageDBSolvers {
         solverTableModel.fireTableDataChanged();
     }
 
+    /**
+     * Shows the sovler with the specified index, which means: All
+     * buttons for the solver are activated and its details are shown.
+     * If the index is invalid, no solver will be shown and the solver
+     * specific buttons are deactivated.
+     * @param index
+     */
     public void showSolver(int index) {
         currentSolver = solverTableModel.getSolver(index); // will be null if no solver selected!
         gui.showSolverDetails(currentSolver);
