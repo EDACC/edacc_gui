@@ -17,7 +17,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[900, 800]"/>
+      <Dimension value="[0, 0]"/>
     </Property>
     <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -40,9 +40,9 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="876" max="32767" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="manageDBPane" pref="1036" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -50,7 +50,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="776" max="32767" attributes="0"/>
+              <Component id="manageDBPane" pref="432" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -71,6 +71,9 @@
         <Container class="javax.swing.JPanel" name="panelManageDBSolver">
           <Properties>
             <Property name="name" type="java.lang.String" value="panelManageDBSolver" noResource="true"/>
+            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[0, 0]"/>
+            </Property>
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
@@ -85,7 +88,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane2" pref="847" max="32767" attributes="0"/>
+                      <Component id="jSplitPane2" pref="1007" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -94,7 +97,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane2" pref="726" max="32767" attributes="0"/>
+                      <Component id="jSplitPane2" pref="382" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -116,7 +119,7 @@
                   <Properties>
                     <Property name="name" type="java.lang.String" value="panelParametersOverall" noResource="true"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[1563, 740]"/>
+                      <Dimension value="[0, 0]"/>
                     </Property>
                   </Properties>
                   <AccessibilityProperties>
@@ -131,13 +134,18 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="1" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="panelParameters" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="panelParametersButons" alignment="0" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="panelParameters" pref="357" max="32767" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="panelParametersButons" max="32767" attributes="0"/>
+                                      <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
-                              <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -145,8 +153,8 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="panelParameters" max="32767" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="panelParameters" pref="301" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="panelParametersButons" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -167,7 +175,7 @@
                                   <Component id="btnParametersNew" linkSize="3" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                                   <Component id="btnParametersDelete" linkSize="3" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
+                                  <EmptySpace pref="56" max="32767" attributes="0"/>
                                   <Component id="btnParametersRefresh" linkSize="3" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
@@ -233,6 +241,9 @@
                           </Border>
                         </Property>
                         <Property name="name" type="java.lang.String" value="panelParameters" noResource="true"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[0, 0]"/>
+                        </Property>
                       </Properties>
 
                       <Layout>
@@ -241,23 +252,8 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" alignment="1" attributes="0">
-                                          <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
-                                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                              <Component id="jlParametersName" max="32767" attributes="1"/>
-                                              <Component id="jlParametersPrefix" alignment="0" max="32767" attributes="1"/>
-                                              <Component id="jlParametersOrder" alignment="0" max="32767" attributes="3"/>
-                                              <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="1"/>
-                                          </Group>
-                                          <EmptySpace min="-2" max="-2" attributes="0"/>
-                                          <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="tfParametersPrefix" alignment="0" pref="202" max="32767" attributes="2"/>
-                                              <Component id="tfParametersOrder" alignment="0" pref="202" max="32767" attributes="2"/>
-                                              <Component id="chkHasNoValue" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                                              <Component id="tfParametersName" alignment="1" pref="202" max="32767" attributes="2"/>
-                                          </Group>
-                                      </Group>
-                                      <Component id="jScrollPane1" alignment="0" pref="281" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane1" alignment="1" pref="323" max="32767" attributes="0"/>
+                                      <Component id="jPanel2" alignment="1" max="32767" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
@@ -265,29 +261,11 @@
                         </DimensionLayout>
                         <DimensionLayout dim="1">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
+                              <Group type="102" alignment="1" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="jScrollPane1" pref="482" max="32767" attributes="0"/>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="2" attributes="0">
-                                      <Component id="jlParametersName" alignment="2" min="-2" max="-2" attributes="0"/>
-                                      <Component id="tfParametersName" alignment="2" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="2" attributes="0">
-                                      <Component id="jlParametersPrefix" alignment="2" min="-2" pref="16" max="-2" attributes="0"/>
-                                      <Component id="tfParametersPrefix" alignment="2" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="2" attributes="0">
-                                      <Component id="jlParametersOrder" alignment="2" min="-2" max="-2" attributes="0"/>
-                                      <Component id="tfParametersOrder" alignment="2" min="-2" pref="19" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="chkHasNoValue" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
+                                  <Component id="jScrollPane1" pref="126" max="32767" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
                           </Group>
@@ -296,7 +274,13 @@
                       <SubComponents>
                         <Container class="javax.swing.JScrollPane" name="jScrollPane1">
                           <Properties>
+                            <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[0, 0]"/>
+                            </Property>
                             <Property name="name" type="java.lang.String" value="jScrollPane1" noResource="true"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[0, 0]"/>
+                            </Property>
                           </Properties>
                           <AuxValues>
                             <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
@@ -319,70 +303,127 @@
                             </Component>
                           </SubComponents>
                         </Container>
-                        <Component class="javax.swing.JLabel" name="jlParametersName">
+                        <Container class="javax.swing.JPanel" name="jPanel2">
                           <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="jlParametersName.text"/>
-                            <Property name="name" type="java.lang.String" value="jlParametersName" noResource="true"/>
+                            <Property name="name" type="java.lang.String" value="jPanel2" noResource="true"/>
                           </Properties>
-                        </Component>
-                        <Component class="javax.swing.JTextField" name="tfParametersName">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="tfParametersName.text"/>
-                            <Property name="name" type="java.lang.String" value="tfParametersName" noResource="true"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="parameterChangedOnFocusLost"/>
-                            <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="parameterChangedOnKeyReleased"/>
-                          </Events>
-                        </Component>
-                        <Component class="javax.swing.JLabel" name="jlParametersPrefix">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="jlParametersPrefix.text"/>
-                            <Property name="name" type="java.lang.String" value="jlParametersPrefix" noResource="true"/>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JTextField" name="tfParametersPrefix">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="tfParametersPrefix.text"/>
-                            <Property name="name" type="java.lang.String" value="tfParametersPrefix" noResource="true"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="parameterChangedOnFocusLost"/>
-                            <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="parameterChangedOnKeyReleased"/>
-                          </Events>
-                        </Component>
-                        <Component class="javax.swing.JLabel" name="jlParametersOrder">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="jlParametersOrder.text"/>
-                            <Property name="name" type="java.lang.String" value="jlParametersOrder" noResource="true"/>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JTextField" name="tfParametersOrder">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="tfParametersOrder.text"/>
-                            <Property name="name" type="java.lang.String" value="tfParametersOrder" noResource="true"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="parameterChangedOnFocusLost"/>
-                            <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="parameterChangedOnKeyReleased"/>
-                          </Events>
-                        </Component>
-                        <Component class="javax.swing.JLabel" name="jLabel1">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="jLabel1.text"/>
-                            <Property name="toolTipText" type="java.lang.String" resourceKey="jLabel1.toolTipText"/>
-                            <Property name="name" type="java.lang.String" value="jLabel1" noResource="true"/>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JCheckBox" name="chkHasNoValue">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="chkHasNoValue.text"/>
-                            <Property name="name" type="java.lang.String" value="chkHasNoValue" noResource="true"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="chkHasNoValueStateChanged"/>
-                          </Events>
-                        </Component>
+
+                          <Layout>
+                            <DimensionLayout dim="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="1" attributes="0">
+                                      <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                          <Component id="jlParametersName" max="32767" attributes="1"/>
+                                          <Component id="jlParametersPrefix" alignment="0" max="32767" attributes="1"/>
+                                          <Component id="jlParametersOrder" alignment="0" max="32767" attributes="3"/>
+                                          <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="1"/>
+                                      </Group>
+                                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="tfParametersPrefix" alignment="0" pref="236" max="32767" attributes="2"/>
+                                          <Component id="tfParametersOrder" alignment="0" pref="236" max="32767" attributes="2"/>
+                                          <Component id="chkHasNoValue" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                                          <Component id="tfParametersName" alignment="1" pref="236" max="32767" attributes="2"/>
+                                      </Group>
+                                  </Group>
+                              </Group>
+                            </DimensionLayout>
+                            <DimensionLayout dim="1">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="2" attributes="0">
+                                          <Component id="jlParametersName" alignment="2" min="-2" max="-2" attributes="0"/>
+                                          <Component id="tfParametersName" alignment="2" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="2" attributes="0">
+                                          <Component id="jlParametersPrefix" alignment="2" min="-2" pref="16" max="-2" attributes="0"/>
+                                          <Component id="tfParametersPrefix" alignment="2" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="2" attributes="0">
+                                          <Component id="jlParametersOrder" alignment="2" min="-2" max="-2" attributes="0"/>
+                                          <Component id="tfParametersOrder" alignment="2" min="-2" pref="19" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="chkHasNoValue" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="32767" attributes="0"/>
+                                  </Group>
+                              </Group>
+                            </DimensionLayout>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlParametersName">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="jlParametersName.text"/>
+                                <Property name="name" type="java.lang.String" value="jlParametersName" noResource="true"/>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JTextField" name="tfParametersName">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="tfParametersName.text"/>
+                                <Property name="name" type="java.lang.String" value="tfParametersName" noResource="true"/>
+                              </Properties>
+                              <Events>
+                                <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="parameterChangedOnFocusLost"/>
+                                <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="parameterChangedOnKeyReleased"/>
+                              </Events>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jlParametersPrefix">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="jlParametersPrefix.text"/>
+                                <Property name="name" type="java.lang.String" value="jlParametersPrefix" noResource="true"/>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JTextField" name="tfParametersPrefix">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="tfParametersPrefix.text"/>
+                                <Property name="name" type="java.lang.String" value="tfParametersPrefix" noResource="true"/>
+                              </Properties>
+                              <Events>
+                                <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="parameterChangedOnFocusLost"/>
+                                <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="parameterChangedOnKeyReleased"/>
+                              </Events>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jlParametersOrder">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="jlParametersOrder.text"/>
+                                <Property name="name" type="java.lang.String" value="jlParametersOrder" noResource="true"/>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JTextField" name="tfParametersOrder">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="tfParametersOrder.text"/>
+                                <Property name="name" type="java.lang.String" value="tfParametersOrder" noResource="true"/>
+                              </Properties>
+                              <Events>
+                                <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="parameterChangedOnFocusLost"/>
+                                <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="parameterChangedOnKeyReleased"/>
+                              </Events>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jLabel1">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="jLabel1.text"/>
+                                <Property name="toolTipText" type="java.lang.String" resourceKey="jLabel1.toolTipText"/>
+                                <Property name="name" type="java.lang.String" value="jLabel1" noResource="true"/>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JCheckBox" name="chkHasNoValue">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="chkHasNoValue.text"/>
+                                <Property name="name" type="java.lang.String" value="chkHasNoValue" noResource="true"/>
+                              </Properties>
+                              <Events>
+                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="chkHasNoValueStateChanged"/>
+                              </Events>
+                            </Component>
+                          </SubComponents>
+                        </Container>
                       </SubComponents>
                     </Container>
                   </SubComponents>
@@ -404,10 +445,10 @@
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <EmptySpace min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="panelSolverButtons" alignment="0" max="32767" attributes="2"/>
                                   <Component id="panelSolver" alignment="0" max="32767" attributes="2"/>
+                                  <Component id="panelSolverButtons" alignment="0" max="32767" attributes="2"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -416,9 +457,9 @@
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <EmptySpace min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="panelSolver" max="32767" attributes="2"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="panelSolverButtons" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -443,7 +484,7 @@
                                   <Component id="btnSolverRefresh" linkSize="1" min="-2" pref="89" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
                                   <Component id="btnSolverExport" linkSize="1" min="-2" pref="79" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
+                                  <EmptySpace pref="83" max="32767" attributes="0"/>
                                   <Component id="btnSolverSaveToDB" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
@@ -541,56 +582,22 @@
                       <Layout>
                         <DimensionLayout dim="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Group type="103" groupAlignment="0" attributes="0">
-                                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                                  <Component id="jlSolverName" linkSize="7" alignment="0" max="32767" attributes="1"/>
-                                                  <Component id="jlSolverBinary" linkSize="7" alignment="0" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="jlSolverCode" linkSize="7" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              </Group>
-                                              <Component id="jlSolverDescription" linkSize="7" min="-2" pref="91" max="-2" attributes="1"/>
-                                          </Group>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="btnSolverAddBinary" linkSize="2" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              <Component id="btnSolverAddCode" linkSize="2" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              <Component id="jScrollPane3" alignment="0" pref="377" max="32767" attributes="2"/>
-                                              <Component id="tfSolverName" alignment="0" pref="377" max="32767" attributes="2"/>
-                                          </Group>
-                                      </Group>
-                                      <Component id="jScrollPane2" alignment="1" pref="480" max="32767" attributes="2"/>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="1" attributes="0">
+                                      <Component id="jScrollPane2" alignment="0" pref="557" max="32767" attributes="2"/>
+                                      <Component id="jPanel1" alignment="0" pref="557" max="32767" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
                         <DimensionLayout dim="1">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="1" attributes="0">
-                                  <Component id="jScrollPane2" pref="415" max="32767" attributes="0"/>
-                                  <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jlSolverName" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="tfSolverName" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
+                                  <Component id="jScrollPane2" pref="65" max="32767" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jlSolverDescription" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                                      <Component id="jScrollPane3" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="2" attributes="0">
-                                      <Component id="jlSolverBinary" alignment="2" min="-2" max="-2" attributes="0"/>
-                                      <Component id="btnSolverAddBinary" alignment="2" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="2" attributes="0">
-                                      <Component id="jlSolverCode" alignment="2" min="-2" max="-2" attributes="0"/>
-                                      <Component id="btnSolverAddCode" alignment="2" min="-2" max="-2" attributes="0"/>
-                                  </Group>
+                                  <Component id="jPanel1" min="-2" pref="187" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
                           </Group>
@@ -602,9 +609,12 @@
                             <Property name="verticalScrollBarPolicy" type="int" value="22"/>
                             <Property name="autoscrolls" type="boolean" value="true"/>
                             <Property name="enabled" type="boolean" value="false"/>
+                            <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[0, 0]"/>
+                            </Property>
                             <Property name="name" type="java.lang.String" value="jScrollPane2" noResource="true"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[200, 100]"/>
+                              <Dimension value="[0, 0]"/>
                             </Property>
                           </Properties>
                           <AccessibilityProperties>
@@ -623,82 +633,143 @@
                             </Component>
                           </SubComponents>
                         </Container>
-                        <Component class="javax.swing.JLabel" name="jlSolverName">
+                        <Container class="javax.swing.JPanel" name="jPanel1">
                           <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="jlSolverName.text"/>
-                            <Property name="name" type="java.lang.String" value="jlSolverName" noResource="true"/>
+                            <Property name="name" type="java.lang.String" value="jPanel1" noResource="true"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[0, 0]"/>
+                            </Property>
                           </Properties>
-                        </Component>
-                        <Component class="javax.swing.JLabel" name="jlSolverDescription">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="jlSolverDescription.text"/>
-                            <Property name="name" type="java.lang.String" value="jlSolverDescription" noResource="true"/>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JTextField" name="tfSolverName">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="tfSolverName.text"/>
-                            <Property name="name" type="java.lang.String" value="tfSolverName" noResource="true"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="solverChangedOnFocusLost"/>
-                            <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="solverChangedOnKey"/>
-                          </Events>
-                        </Component>
-                        <Container class="javax.swing.JScrollPane" name="jScrollPane3">
-                          <Properties>
-                            <Property name="name" type="java.lang.String" value="jScrollPane3" noResource="true"/>
-                          </Properties>
-                          <AuxValues>
-                            <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
-                          </AuxValues>
 
-                          <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+                          <Layout>
+                            <DimensionLayout dim="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="1" attributes="0">
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="jlSolverBinary" linkSize="7" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="jlSolverCode" linkSize="7" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="jlSolverName" linkSize="7" alignment="0" pref="91" max="32767" attributes="1"/>
+                                          <Component id="jlSolverDescription" linkSize="7" alignment="0" min="-2" pref="91" max="-2" attributes="1"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="btnSolverAddBinary" linkSize="2" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="btnSolverAddCode" linkSize="2" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="jScrollPane3" alignment="0" pref="430" max="32767" attributes="2"/>
+                                          <Component id="tfSolverName" alignment="0" pref="430" max="32767" attributes="2"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                            </DimensionLayout>
+                            <DimensionLayout dim="1">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="3" attributes="0">
+                                          <Component id="tfSolverName" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="jlSolverName" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="jScrollPane3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="jlSolverDescription" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="2" attributes="0">
+                                          <Component id="jlSolverBinary" alignment="2" min="-2" max="-2" attributes="0"/>
+                                          <Component id="btnSolverAddBinary" alignment="2" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="2" attributes="0">
+                                          <Component id="jlSolverCode" alignment="2" min="-2" max="-2" attributes="0"/>
+                                          <Component id="btnSolverAddCode" alignment="2" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="32767" attributes="0"/>
+                                  </Group>
+                              </Group>
+                            </DimensionLayout>
+                          </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JTextArea" name="taSolverDescription">
+                            <Component class="javax.swing.JLabel" name="jlSolverName">
                               <Properties>
-                                <Property name="columns" type="int" value="20"/>
-                                <Property name="lineWrap" type="boolean" value="true"/>
-                                <Property name="rows" type="int" value="5"/>
-                                <Property name="name" type="java.lang.String" value="taSolverDescription" noResource="true"/>
+                                <Property name="text" type="java.lang.String" resourceKey="jlSolverName.text"/>
+                                <Property name="name" type="java.lang.String" value="jlSolverName" noResource="true"/>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JTextField" name="tfSolverName">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="tfSolverName.text"/>
+                                <Property name="name" type="java.lang.String" value="tfSolverName" noResource="true"/>
                               </Properties>
                               <Events>
                                 <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="solverChangedOnFocusLost"/>
                                 <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="solverChangedOnKey"/>
                               </Events>
                             </Component>
+                            <Component class="javax.swing.JLabel" name="jlSolverDescription">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="jlSolverDescription.text"/>
+                                <Property name="name" type="java.lang.String" value="jlSolverDescription" noResource="true"/>
+                              </Properties>
+                            </Component>
+                            <Container class="javax.swing.JScrollPane" name="jScrollPane3">
+                              <Properties>
+                                <Property name="name" type="java.lang.String" value="jScrollPane3" noResource="true"/>
+                              </Properties>
+                              <AuxValues>
+                                <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+                              </AuxValues>
+
+                              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+                              <SubComponents>
+                                <Component class="javax.swing.JTextArea" name="taSolverDescription">
+                                  <Properties>
+                                    <Property name="columns" type="int" value="20"/>
+                                    <Property name="lineWrap" type="boolean" value="true"/>
+                                    <Property name="rows" type="int" value="5"/>
+                                    <Property name="name" type="java.lang.String" value="taSolverDescription" noResource="true"/>
+                                  </Properties>
+                                  <Events>
+                                    <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="solverChangedOnFocusLost"/>
+                                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="solverChangedOnKey"/>
+                                  </Events>
+                                </Component>
+                              </SubComponents>
+                            </Container>
+                            <Component class="javax.swing.JLabel" name="jlSolverBinary">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="jlSolverBinary.text"/>
+                                <Property name="name" type="java.lang.String" value="jlSolverBinary" noResource="true"/>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="btnSolverAddBinary">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="btnSolverAddBinary.text"/>
+                                <Property name="name" type="java.lang.String" value="btnSolverAddBinary" noResource="true"/>
+                              </Properties>
+                              <Events>
+                                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverAddBinaryActionPerformed"/>
+                              </Events>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jlSolverCode">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="jlSolverCode.text"/>
+                                <Property name="name" type="java.lang.String" value="jlSolverCode" noResource="true"/>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="btnSolverAddCode">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="btnSolverAddCode.text"/>
+                                <Property name="name" type="java.lang.String" value="btnSolverAddCode" noResource="true"/>
+                              </Properties>
+                              <Events>
+                                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverAddCodeActionPerformed"/>
+                              </Events>
+                            </Component>
                           </SubComponents>
                         </Container>
-                        <Component class="javax.swing.JLabel" name="jlSolverBinary">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="jlSolverBinary.text"/>
-                            <Property name="name" type="java.lang.String" value="jlSolverBinary" noResource="true"/>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JButton" name="btnSolverAddBinary">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="btnSolverAddBinary.text"/>
-                            <Property name="name" type="java.lang.String" value="btnSolverAddBinary" noResource="true"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverAddBinaryActionPerformed"/>
-                          </Events>
-                        </Component>
-                        <Component class="javax.swing.JLabel" name="jlSolverCode">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="jlSolverCode.text"/>
-                            <Property name="name" type="java.lang.String" value="jlSolverCode" noResource="true"/>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JButton" name="btnSolverAddCode">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="btnSolverAddCode.text"/>
-                            <Property name="name" type="java.lang.String" value="btnSolverAddCode" noResource="true"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverAddCodeActionPerformed"/>
-                          </Events>
-                        </Component>
                       </SubComponents>
                     </Container>
                   </SubComponents>
@@ -711,7 +782,7 @@
           <Properties>
             <Property name="name" type="java.lang.String" value="panelManageDBInstances" noResource="true"/>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-              <Dimension value="[500, 471]"/>
+              <Dimension value="[0, 0]"/>
             </Property>
           </Properties>
           <Constraints>
@@ -727,7 +798,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane1" pref="926" max="32767" attributes="0"/>
+                      <Component id="jSplitPane1" pref="1007" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -736,7 +807,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane1" pref="738" max="32767" attributes="0"/>
+                      <Component id="jSplitPane1" pref="394" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -763,6 +834,9 @@
                       </Border>
                     </Property>
                     <Property name="name" type="java.lang.String" value="panelInstanceClass" noResource="true"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[0, 0]"/>
+                    </Property>
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
@@ -776,7 +850,7 @@
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="panelInstanceClassTable" alignment="0" pref="324" max="32767" attributes="2"/>
+                                  <Component id="panelInstanceClassTable" alignment="0" pref="360" max="32767" attributes="2"/>
                                   <Component id="panelButtonsInstanceClass" alignment="0" max="32767" attributes="2"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
@@ -786,7 +860,7 @@
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="panelInstanceClassTable" pref="638" max="32767" attributes="0"/>
+                              <Component id="panelInstanceClassTable" pref="294" max="32767" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="panelButtonsInstanceClass" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -808,7 +882,7 @@
                                   <Component id="btnNewInstanceClass" linkSize="11" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="btnRemoveInstanceClass" linkSize="11" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
+                                  <EmptySpace pref="42" max="32767" attributes="0"/>
                                   <Component id="btnSelectAllInstanceClasses" linkSize="11" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
@@ -923,7 +997,7 @@
                     </Property>
                     <Property name="name" type="java.lang.String" value="panelInstance" noResource="true"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[663, 596]"/>
+                      <Dimension value="[0, 0]"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -938,9 +1012,9 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="panelInstanceTable" alignment="0" pref="526" max="32767" attributes="2"/>
+                                  <Component id="panelInstanceTable" alignment="0" pref="571" max="32767" attributes="2"/>
                                   <Component id="panelButtonsInstances" alignment="1" max="32767" attributes="2"/>
-                                  <Component id="lblFilterStatus" alignment="0" pref="526" max="32767" attributes="0"/>
+                                  <Component id="lblFilterStatus" alignment="0" pref="571" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -950,7 +1024,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="lblFilterStatus" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="panelInstanceTable" pref="582" max="32767" attributes="0"/>
+                              <Component id="panelInstanceTable" pref="238" max="32767" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="panelButtonsInstances" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -1042,7 +1116,7 @@
                                           <Component id="btnRemoveInstances" linkSize="8" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                           <Component id="btnRefreshTableInstances" linkSize="8" min="-2" pref="98" max="-2" attributes="0"/>
-                                          <EmptySpace max="32767" attributes="0"/>
+                                          <EmptySpace pref="51" max="32767" attributes="0"/>
                                           <Component id="btnFilterInstances" linkSize="10" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                           <Component id="btnExportInstances" linkSize="10" min="-2" max="-2" attributes="0"/>
