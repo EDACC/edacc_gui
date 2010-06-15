@@ -64,10 +64,7 @@
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="jScrollPane1" pref="286" max="32767" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="jScrollPane1" alignment="0" pref="286" max="32767" attributes="0"/>
                   <Component id="lblExperimentDescription" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -92,6 +89,9 @@
         <Property name="toolTipText" type="java.lang.String" resourceKey="txtExperimentName.toolTipText"/>
         <Property name="name" type="java.lang.String" value="txtExperimentName" noResource="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtExperimentNameKeyPressed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lblExperimentDescription">
       <Properties>
@@ -115,6 +115,9 @@
             <Property name="rows" type="int" value="5"/>
             <Property name="name" type="java.lang.String" value="txtExperimentDescription" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtExperimentDescriptionKeyPressed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

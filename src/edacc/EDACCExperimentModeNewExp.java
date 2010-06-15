@@ -72,6 +72,11 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
 
         txtExperimentName.setToolTipText(resourceMap.getString("txtExperimentName.toolTipText")); // NOI18N
         txtExperimentName.setName("txtExperimentName"); // NOI18N
+        txtExperimentName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtExperimentNameKeyPressed(evt);
+            }
+        });
 
         lblExperimentDescription.setText(resourceMap.getString("lblExperimentDescription.text")); // NOI18N
         lblExperimentDescription.setName("lblExperimentDescription"); // NOI18N
@@ -81,6 +86,11 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         txtExperimentDescription.setColumns(20);
         txtExperimentDescription.setRows(5);
         txtExperimentDescription.setName("txtExperimentDescription"); // NOI18N
+        txtExperimentDescription.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtExperimentDescriptionKeyPressed(evt);
+            }
+        });
         jScrollPane1.setViewportView(txtExperimentDescription);
 
         btnCreateExperiment.setText(resourceMap.getString("btnCreateExperiment.text")); // NOI18N
@@ -142,9 +152,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                     .addComponent(txtExperimentName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
                     .addComponent(lblExperimentDescription))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -212,6 +220,27 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             this.btnCancelActionPerformed(null);
         }
     }//GEN-LAST:event_formKeyPressed
+
+    private void txtExperimentDescriptionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtExperimentDescriptionKeyPressed
+         if (evt.getKeyCode() == KeyEvent.VK_ENTER) //create Experiment
+        {
+            this.btnCreateExperimentActionPerformed(null);
+        }else  if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) //create Experiment
+        {
+            this.btnCancelActionPerformed(null);
+        }
+
+    }//GEN-LAST:event_txtExperimentDescriptionKeyPressed
+
+    private void txtExperimentNameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtExperimentNameKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) //create Experiment
+        {
+            this.btnCreateExperimentActionPerformed(null);
+        } else if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) //create Experiment
+        {
+            this.btnCancelActionPerformed(null);
+        }
+    }//GEN-LAST:event_txtExperimentNameKeyPressed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;

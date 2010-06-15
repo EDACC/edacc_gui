@@ -148,9 +148,9 @@
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
-                          <EmptySpace min="-2" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="103" alignment="0" groupAlignment="0" max="-2" attributes="0">
                                           <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -167,7 +167,11 @@
                                       <Component id="txtTimeout" alignment="1" pref="883" max="32767" attributes="2"/>
                                   </Group>
                               </Group>
-                              <Component id="btnEditExperimentSave" alignment="1" min="-2" pref="91" max="-2" attributes="0"/>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="btnEditExperimentUndo" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="btnEditExperimentSave" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -194,9 +198,11 @@
                               <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtMaxSeeds" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="64" max="32767" attributes="0"/>
-                          <Component id="btnEditExperimentSave" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="btnEditExperimentSave" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnEditExperimentUndo" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -281,6 +287,24 @@
                       <Dimension value="[57, 25]"/>
                     </Property>
                     <Property name="name" type="java.lang.String" value="btnEditExperimentSave" noResource="true"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[57, 25]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnEditExperimentUndo">
+                  <Properties>
+                    <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                      <action class="edacc.EDACCExperimentMode" id="btnEditExperimentUndo" methodName="btnEditExperimentUndo"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" resourceKey="btnEditExperimentUndo.text"/>
+                    <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[57, 25]"/>
+                    </Property>
+                    <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[57, 25]"/>
+                    </Property>
+                    <Property name="name" type="java.lang.String" value="btnEditExperimentUndo" noResource="true"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[57, 25]"/>
                     </Property>
@@ -1009,29 +1033,28 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
-                                  <Component id="btnGeneratePackage" alignment="0" max="32767" attributes="1"/>
-                                  <Component id="btnGenerateJobs" alignment="0" max="32767" attributes="1"/>
-                              </Group>
+                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                              <Component id="btnSelectQueue" alignment="0" max="32767" attributes="1"/>
+                              <Component id="btnGenerateJobs" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
+                              <Component id="btnGeneratePackage" alignment="0" max="32767" attributes="1"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtNumRuns" min="-2" pref="126" max="-2" attributes="1"/>
+                                  <Component id="txtNumRuns" min="-2" pref="84" max="-2" attributes="1"/>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="lblCurNumRuns" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="lblNumJobs" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblCurNumRuns" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblNumJobs" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="737" max="32767" attributes="0"/>
+                          <EmptySpace pref="728" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="1"/>
@@ -1039,13 +1062,15 @@
                               <Component id="lblCurNumRuns" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="btnGenerateJobs" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnSelectQueue" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnGeneratePackage" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="btnGeneratePackage" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnGenerateJobs" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="lblNumJobs" alignment="3" min="-2" pref="19" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="542" max="32767" attributes="0"/>
+                          <EmptySpace pref="328" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1063,6 +1088,9 @@
                     <Property name="toolTipText" type="java.lang.String" resourceKey="txtNumRuns.toolTipText"/>
                     <Property name="name" type="java.lang.String" value="txtNumRuns" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtNumRunsKeyReleased"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnGenerateJobs">
                   <Properties>
@@ -1101,6 +1129,15 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnGeneratePackage"/>
                   </Events>
                 </Component>
+                <Component class="javax.swing.JButton" name="btnSelectQueue">
+                  <Properties>
+                    <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                      <action class="edacc.EDACCExperimentMode" id="btnSelectQueue" methodName="btnSelectQueue"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" resourceKey="btnSelectQueue.text"/>
+                    <Property name="name" type="java.lang.String" value="btnSelectQueue" noResource="true"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
           </SubComponents>
@@ -1132,7 +1169,13 @@
                       <Component id="btnFilterJobs" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnCSVExport" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="641" max="32767" attributes="0"/>
+                      <EmptySpace pref="343" max="32767" attributes="0"/>
+                      <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="txtJobsTimer" min="-2" pref="33" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkJobsTimer" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
@@ -1155,6 +1198,9 @@
                           <Component id="btnBrowserColumnSelection" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnFilterJobs" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnCSVExport" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkJobsTimer" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtJobsTimer" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -1239,6 +1285,27 @@
             <Component class="javax.swing.JLabel" name="lblJobsFilterStatus">
               <Properties>
                 <Property name="name" type="java.lang.String" value="lblJobsFilterStatus" noResource="true"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="txtJobsTimer">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="txtJobsTimer.text"/>
+                <Property name="name" type="java.lang.String" value="txtJobsTimer" noResource="true"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="chkJobsTimer">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="chkJobsTimer.text"/>
+                <Property name="name" type="java.lang.String" value="chkJobsTimer" noResource="true"/>
+              </Properties>
+              <Events>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="chkJobsTimerMouseReleased"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel5">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="jLabel5.text"/>
+                <Property name="name" type="java.lang.String" value="jLabel5" noResource="true"/>
               </Properties>
             </Component>
           </SubComponents>

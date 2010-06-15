@@ -202,6 +202,11 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
 
         txtSeedGroup.setText(resourceMap.getString("txtSeedGroup.text")); // NOI18N
         txtSeedGroup.setName("txtSeedGroup"); // NOI18N
+        txtSeedGroup.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtSeedGroupKeyReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -216,7 +221,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                         .addComponent(lblSeedGroup)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtSeedGroup, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 198, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 220, Short.MAX_VALUE)
                         .addComponent(btnRemove))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
@@ -237,6 +242,18 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void txtSeedGroupKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSeedGroupKeyReleased
+        String res = "";
+        String tmp = txtSeedGroup.getText();
+        for (int i = 0; i < tmp.length(); i++) {
+            if (tmp.charAt(i) >= '0' && tmp.charAt(i) <= '9') {
+                res += tmp.charAt(i);
+            }
+        }
+        txtSeedGroup.setText(res);
+    
+    }//GEN-LAST:event_txtSeedGroupKeyReleased
 
     @Action
     public void btnReplicate() {

@@ -44,7 +44,6 @@ import java.util.LinkedList;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 
 /**
@@ -101,7 +100,7 @@ public class ExperimentController {
         vs.addAll(SolverDAO.getAll());
         main.solTableModel.setSolvers(vs);
         task.setTaskProgress(.33f);
-        
+
         task.setStatus("Loading solver configurations..");
         Vector<SolverConfiguration> vss = SolverConfigurationDAO.getSolverConfigurationByExperimentId(id);
         for (int i = 0; i < vss.size(); i++) {
@@ -175,7 +174,7 @@ public class ExperimentController {
      * @throws SQLException
      */
     public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException {
-        
+
         task.setStatus("Checking jobs..");
         Vector<SolverConfiguration> deletedSolverConfigurations = SolverConfigurationDAO.getAllDeleted();
         final Vector<ExperimentResult> deletedJobs = new Vector<ExperimentResult>();
@@ -190,26 +189,18 @@ public class ExperimentController {
                     notDeletableJobsCount++;
                 }
             }
-
+            String msg = "";
             if (notDeletableJobsCount > 0) {
-                final int _notDeletableJobsCount = notDeletableJobsCount;
-                SwingUtilities.invokeAndWait(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        javax.swing.JOptionPane.showMessageDialog(Tasks.getTaskView(), "There are " + _notDeletableJobsCount + " jobs in the database which would be deleted but the status code is not -1.", "Impossible", javax.swing.JOptionPane.ERROR_MESSAGE);
-                    }
-
-                });
-                return ;
+                msg = "There are " + notDeletableJobsCount + " started jobs and " + (deletedJobs.size() - notDeletableJobsCount) + " jobs waiting in the database which would be deleted. Do you want to continue?";
             } else {
-                int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), "There are " + deletedJobs.size() + " jobs waiting in the database which would be deleted. Do you want to continue?", "Jobs would be deleted", javax.swing.JOptionPane.YES_NO_OPTION);
-                if (userInput == 1) {
-                    return ;
-                } else {
-                    task.setStatus("Deleting jobs..");
-                    ExperimentResultDAO.deleteExperimentResults(deletedJobs);
-                }
+                msg = "There are " + deletedJobs.size() + " jobs waiting in the database which would be deleted. Do you want to continue?";
+            }
+            int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), msg, "Jobs would be deleted", javax.swing.JOptionPane.YES_NO_OPTION);
+            if (userInput == 1) {
+                return;
+            } else {
+                task.setStatus("Deleting jobs..");
+                ExperimentResultDAO.deleteExperimentResults(deletedJobs);
             }
         }
         task.setStatus("Saving solver configurations..");
@@ -254,7 +245,6 @@ public class ExperimentController {
             public int compare(SolverConfiguration o1, SolverConfiguration o2) {
                 return o1.getId() - o2.getId();
             }
-
         });
         for (SolverConfiguration sc : solverConfigurations) {
             main.solverConfigPanel.addSolverConfiguration(sc);
@@ -277,30 +267,23 @@ public class ExperimentController {
                 deletedJobs.addAll(ExperimentResultDAO.getAllByExperimentHasInstance(ehi));
             }
             int notDeletableJobsCount = 0;
-            for (ExperimentResult job: deletedJobs) {
+            for (ExperimentResult job : deletedJobs) {
                 if (job.getStatus() != -1) {
                     notDeletableJobsCount++;
                 }
             }
+            String msg = "";
             if (notDeletableJobsCount > 0) {
-                final int _notDeletableJobsCount = notDeletableJobsCount;
-                SwingUtilities.invokeAndWait(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        javax.swing.JOptionPane.showMessageDialog(Tasks.getTaskView(), "There are " + _notDeletableJobsCount + " jobs in the database which would be deleted but the status code is not -1.", "Impossible", javax.swing.JOptionPane.ERROR_MESSAGE);
-                    }
-
-                });
-                return ;
+                msg = "There are " + notDeletableJobsCount + " started jobs and " + (deletedJobs.size() - notDeletableJobsCount) + " jobs waiting in the database which would be deleted. Do you want to continue?";
             } else {
-                int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), "There are " + deletedJobs.size() + " jobs waiting in the database which would be deleted. Do you want to continue?", "Jobs would be deleted", javax.swing.JOptionPane.YES_NO_OPTION);
-                if (userInput == 1) {
-                    return ;
-                } else {
-                    task.setStatus("Deleting jobs..");
-                    ExperimentResultDAO.deleteExperimentResults(deletedJobs);
-                }
+                msg = "There are " + deletedJobs.size() + " jobs waiting in the database which would be deleted. Do you want to continue?";
+            }
+            int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), msg, "Jobs would be deleted", javax.swing.JOptionPane.YES_NO_OPTION);
+            if (userInput == 1) {
+                return;
+            } else {
+                task.setStatus("Deleting jobs..");
+                ExperimentResultDAO.deleteExperimentResults(deletedJobs);
             }
         }
         task.setStatus("Saving instances..");
@@ -477,13 +460,13 @@ public class ExperimentController {
 
         Tasks.getTaskView().setCancelable(true);
         task.setOperationName("Generating Package");
-        
+
         Vector<Solver> solvers = ExperimentDAO.getSolversInExperiment(activeExperiment);
         LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
 
         int total = solvers.size() + instances.size();
         int done = 0;
-        
+
         // add solvers to zip file
         for (Solver s : solvers) {
             done++;
@@ -658,7 +641,7 @@ public class ExperimentController {
     public void exportCSV(File file, Tasks task) throws IOException {
         Tasks.getTaskView().setCancelable(true);
         task.setOperationName("Exporting jobs to CSV file");
-        
+
         if (file.exists()) {
             file.delete();
         }
@@ -666,7 +649,9 @@ public class ExperimentController {
         PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
         for (int i = 0; i < main.jobsTableModel.getColumnCount(); i++) {
             out.write("\"" + main.jobsTableModel.getColumnName(i) + "\"");
-            if (i < main.jobsTableModel.getColumnCount() - 1) out.write(",");
+            if (i < main.jobsTableModel.getColumnCount() - 1) {
+                out.write(",");
+            }
         }
         out.write('\n');
 
@@ -684,7 +669,9 @@ public class ExperimentController {
                 task.setStatus("Exporting row " + done + " of " + total);
                 for (int col = 0; col < main.jobsTableModel.getColumnCount(); col++) {
                     out.write("\"" + main.jobsTableModel.getValueAt(i, col).toString() + "\"");
-                    if (col < main.jobsTableModel.getColumnCount() - 1) out.write(",");
+                    if (col < main.jobsTableModel.getColumnCount() - 1) {
+                        out.write(",");
+                    }
                 }
                 out.write('\n');
             }
