@@ -87,4 +87,19 @@ public class ManageDBParameters {
         currentParameter = null;
     }
 
+    /**
+     * Checks, if a parameter with the given name already exists for the
+     * current solver. Won't check the DB for performance reasons!
+     * @param name
+     * @return
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     */
+    public boolean parameterExists(String name) throws NoConnectionToDBException, SQLException {
+        Vector<String> parameterNames = new Vector<String>();
+        for (Parameter p : parameterTableModel.getParamtersOfCurrentSolver())
+            if (p != currentParameter)
+                parameterNames.add(p.getName());
+        return parameterNames.contains(name); //|| ParameterDAO.parameterExistsForSolver(name, parameterTableModel.getCurrentSolver());
+    }
 }

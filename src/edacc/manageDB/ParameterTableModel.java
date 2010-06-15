@@ -135,7 +135,7 @@ public class ParameterTableModel extends AbstractTableModel{
             return null;
         return getParamtersOfSolver(currentSolver);
     }
-
+    
     public Parameter getParameter(int rowIndex){
         if(rowIndex >= 0 && rowIndex < parameters.get(currentSolver).size()) {
             return parameters.get(currentSolver).get(rowIndex);
