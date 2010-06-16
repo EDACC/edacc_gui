@@ -135,4 +135,17 @@ public class ParameterDAO {
     public static void clearCache() {
         cache.clear();
     }
+
+    /**
+     * Returns if a parameter with the given name already exists.
+     * @param name
+     * @return
+     */
+    public static boolean parameterExistsForSolver(String name, Solver s) throws NoConnectionToDBException, SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE name=? AND Solver_idSolver=?");
+        st.setString(1, name);
+        st.setInt(2, s.getId());
+        ResultSet rs = st.executeQuery();
+        return rs.next();
+    }
 }
