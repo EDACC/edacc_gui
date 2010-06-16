@@ -1677,6 +1677,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             }
         }
 
+        @Override
         public boolean shouldYieldFocus(javax.swing.JComponent input) {
             boolean valid = verify(input);
             showInvalidParameterNameError(!valid);
@@ -1686,7 +1687,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
     private void showInvalidParameterNameError(boolean show) {
         if (show) {
-            tfParametersName.setBackground(Color.red);
+            // set the color of the TextField to a nice red
+            tfParametersName.setBackground(new Color(255, 102, 102));
         } else {
             tfParametersName.setBackground(Color.white);
         }
