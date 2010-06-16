@@ -49,7 +49,7 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int column) {
-        if (column == 2 || column == 3) {
+        if (column == 3) {
             return Boolean.class;
         }
         return String.class;
@@ -63,7 +63,7 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel {
             case 1:
                 return classes.get(rowIndex).getDescription();
             case 2:
-                return classes.get(rowIndex).isSource();
+                return classes.get(rowIndex).isSource()?"":"\u2713";
             case 3:
                 return classSelect.get(rowIndex);
             case 4:

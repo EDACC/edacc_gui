@@ -19,6 +19,7 @@ import edacc.model.GridQueue;
 import edacc.model.Solver;
 import edacc.model.Tasks;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -33,6 +34,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -44,6 +46,7 @@ import org.jdesktop.application.Action;
 import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  *
@@ -86,6 +89,18 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         tableInstances.setModel(insTableModel);
         tableSolvers.setModel(solTableModel);
         tableInstanceClasses.setModel(instanceClassModel);
+        // center third column
+        tableInstanceClasses.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                lbl.setHorizontalAlignment(JLabel.CENTER);
+                return lbl;
+            }
+        });
+        
         sorter = new TableRowSorter<InstanceTableModel>(insTableModel);
         rowFilter = new InstanceTableModelRowFilter();
         tableInstances.setRowSorter(sorter);
