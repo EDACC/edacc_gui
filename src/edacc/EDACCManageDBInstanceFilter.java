@@ -289,13 +289,13 @@ public class EDACCManageDBInstanceFilter extends javax.swing.JDialog {
             filters.add(RowFilter.numberFilter(ComparisonType.AFTER, Integer.parseInt(txtClausesLow.getText()), 2));
             filters.add(RowFilter.numberFilter(ComparisonType.BEFORE, Integer.parseInt(txtClausesHigh.getText()), 2));
         }
-        if(chkMaxClauseLength.isSelected()){
+        if(chkRatio.isSelected()){
             filters.add(RowFilter.numberFilter(ComparisonType.AFTER, Float.parseFloat(txtRatioLow.getText()), 3));
             filters.add(RowFilter.numberFilter(ComparisonType.BEFORE, Float.parseFloat(txtRatioHigh.getText()), 3));
         }
-        if(chkRatio.isSelected()){
-            filters.add(RowFilter.numberFilter(ComparisonType.AFTER, Integer.parseInt(txtMaxClauseLengthLow.getText()), 4));
-            filters.add(RowFilter.numberFilter(ComparisonType.BEFORE, Integer.parseInt(txtMaxClauseLengthHigh.getText()), 4));
+        if(chkMaxClauseLength.isSelected()){
+            filters.add(RowFilter.numberFilter(ComparisonType.AFTER, Float.parseFloat(txtMaxClauseLengthLow.getText()), 4));
+            filters.add(RowFilter.numberFilter(ComparisonType.BEFORE, Float.parseFloat(txtMaxClauseLengthHigh.getText()), 4));
         }
         this.setVisible(false);
     }//GEN-LAST:event_btnApplyActionPerformed

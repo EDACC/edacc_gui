@@ -503,25 +503,42 @@ public class ManageDBInstances{
        }
     }
 
+    /**
+     * Shows the dialog to configure a filter and add it to the instance table. If less than 2 instances are in the
+     * instance table, no filter can be added. Selects the first entry in the instance table after adding the filter.
+     */
     public void addFilter() {
-        if(main.instanceFilter == null){
-            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            main.instanceFilter = new EDACCManageDBInstanceFilter(mainFrame,true);
-            main.instanceFilter.setLocationRelativeTo(mainFrame);
-        }
-        EDACCApp.getApplication().show(main.instanceFilter);
 
-        Vector<RowFilter<Object, Object>> filters  = main.instanceFilter.getFilter();
-        if(filters.isEmpty()){
-            removeFilter(tableInstances);
-            main.setFilterStatus("");
+        if(tableInstances.getRowCount() <= 1){
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                "At least more than one instance is required in the instance table to add a filter.",
+                "Warning",
+                JOptionPane.WARNING_MESSAGE);
+        }else{
+            if(main.instanceFilter == null){
+                JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+                main.instanceFilter = new EDACCManageDBInstanceFilter(mainFrame,true);
+                main.instanceFilter.setLocationRelativeTo(mainFrame);
+            }
+            EDACCApp.getApplication().show(main.instanceFilter);
+
+            Vector<RowFilter<Object, Object>> filters  = main.instanceFilter.getFilter();
+            if(filters.isEmpty()){
+                removeFilter(tableInstances);
+                main.setFilterStatus("");
+                if(tableInstances.getRowCount() != 0)
+                    tableInstances.addRowSelectionInterval(0, 0);
+            }
+            else{
+                main.sorter.setRowFilter(RowFilter.andFilter(filters));
+                tableInstances.setRowSorter(main.sorter);
+                main.instanceTableModel.fireTableDataChanged();
+                if(tableInstances.getRowCount() != 0)
+                    tableInstances.addRowSelectionInterval(0, 0);
+                main.setFilterStatus("This list of instances has filters applied to it. Use the filter button below to modify.");
+            }
         }
-        else{
-            main.sorter.setRowFilter(RowFilter.andFilter(filters));
-            tableInstances.setRowSorter(main.sorter);
-            main.instanceTableModel.fireTableDataChanged();
-            main.setFilterStatus("This list of instances has filters applied to it. Use the filter button below to modify.");
-        }
+       
     }
 
 }
