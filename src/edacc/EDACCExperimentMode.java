@@ -1486,7 +1486,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         try {
             int numRuns = Integer.parseInt(txtNumRuns.getText());
             Tasks.startTask("generateJobs", new Class[]{int.class, edacc.model.Tasks.class}, new Object[]{numRuns, null}, expController, this);
-            lblCurNumRuns.setText("currently: " + txtNumRuns.getText());
 
             // TODO assignment of more than one queue/write extra method!
             // assign the default queue to this experiment
@@ -1627,6 +1626,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         if ("generateJobs".equals(methodName)) {
             int added_experiments = (Integer) result;
             lblNumJobs.setText(String.valueOf(expController.getNumJobs()) + " jobs in the database");
+            lblCurNumRuns.setText("currently: " + String.valueOf(expController.getActiveExperiment().getNumRuns()));
             javax.swing.JOptionPane.showMessageDialog(null, "Added " + added_experiments + " new jobs", "Jobs added", javax.swing.JOptionPane.INFORMATION_MESSAGE);
         } else if ("saveSolverConfigurations".equals(methodName) || "saveExperimentHasInstances".equals(methodName) || "loadExperiment".equals(methodName)) {
             setTitles();

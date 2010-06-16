@@ -324,8 +324,6 @@ public class ExperimentController {
     public int generateJobs(int numRuns, Tasks task) throws SQLException {
         Tasks.getTaskView().setCancelable(true);
         task.setOperationName("Generating jobs for experiment " + activeExperiment.getName());
-        activeExperiment.setNumRuns(numRuns);
-        ExperimentDAO.save(activeExperiment);
         // get instances of this experiment
         LinkedList<Instance> listInstances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
 
@@ -400,7 +398,7 @@ public class ExperimentController {
         task.setTaskProgress(0.f);
         task.setStatus("Saving changes to database..");
         ExperimentResultDAO.batchSave(experiment_results);
-
+        ExperimentDAO.updateNumRuns(activeExperiment);
         return experiments_added;
     }
 
@@ -436,11 +434,11 @@ public class ExperimentController {
 
     public void loadJobs() {
         try {
-            main.jobsTableModel.setJobs(ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId()));
+            Vector<ExperimentResult> jobs = ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId());
+            main.jobsTableModel.setJobs(jobs);
             if (main.jobsTableModel.getRowCount() > 0) {
                 main.resultsBrowserTableRowSorter.setRowFilter(main.resultBrowserRowFilter);
             }
-            main.jobsTableModel.fireTableDataChanged();
             System.gc();
         } catch (Exception e) {
             // TODO: shouldn't happen but show message if it does

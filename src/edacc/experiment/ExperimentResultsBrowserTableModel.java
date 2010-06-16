@@ -177,8 +177,17 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
      * @throws SQLException
      */
     public void setJobs(Vector<ExperimentResult> jobs) throws SQLException {
+        boolean fullUpdate = false;
+        if (this.jobs == null || jobs == null || this.jobs.size() != jobs.size()) {
+            fullUpdate = true;
+        }
         this.jobs = jobs;
         parameterInstances = new HashMap<Integer, Vector<ParameterInstance>>();
+        if (fullUpdate) {
+            fireTableDataChanged();
+        } else {
+            fireTableRowsUpdated(0, this.getRowCount() - 1);
+        }
     }
 
     private int getIndexForColumn(int col) {
@@ -346,5 +355,4 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public Vector<ExperimentResult> getJobs() {
         return jobs;
     }
-
 }
