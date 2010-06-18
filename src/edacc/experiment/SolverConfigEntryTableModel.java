@@ -15,7 +15,7 @@ import javax.swing.table.AbstractTableModel;
  */
 public class SolverConfigEntryTableModel extends AbstractTableModel {
 
-    private String[] columns = {"Parameter Name", "Prefix", "Value", "Order", "Selected"};
+    private String[] columns = {"Selected", "Parameter Name", "Prefix", "Value", "Order"};
     private Parameter[] parameters;
     private ParameterInstance[] parameterInstances;
     private String[] values;
@@ -105,39 +105,45 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int col) {
-        if (col == 4 || (col == 2 && ((Parameter) getValueAt(row, 5)).getHasValue())) {
+        if (col == 0) {
             return true;
+        }
+        if (col == 3 && ((Parameter) getValueAt(row, 5)).getHasValue()) {
+            return selected[row];
         }
         return false;
     }
 
     @Override
     public void setValueAt(Object value, int row, int col) {
-        if (col == 4) {
+        if (col == 0) {
             selected[row] = (Boolean) value;
-        } else if (col == 2) {
+            if (!selected[row]) {
+                values[row] = "";
+            }
+        } else if (col == 3) {
             values[row] = (String) value;
         }
-        fireTableCellUpdated(row, col);
+        this.fireTableRowsUpdated(row, row);
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
             case 0:
-                return parameters[rowIndex].getName();
+                return selected[rowIndex];
             case 1:
-                return parameters[rowIndex].getPrefix();
+                return parameters[rowIndex].getName();
             case 2:
+                return parameters[rowIndex].getPrefix();
+            case 3:
                 if (parameters[rowIndex].getHasValue()) {
                     return values[rowIndex];
                 } else {
                     return "togglable flag";
                 }
-            case 3:
-                return parameters[rowIndex].getOrder();
             case 4:
-                return selected[rowIndex];
+                return parameters[rowIndex].getOrder();
             case 5:
                 return parameters[rowIndex];
             case 6:

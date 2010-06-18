@@ -41,7 +41,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="904" max="32767" attributes="0"/>
+              <Component id="manageDBPane" pref="480" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -88,7 +88,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane2" pref="879" max="32767" attributes="0"/>
+                      <Component id="jSplitPane2" pref="455" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -138,7 +138,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="panelParameters" pref="297" max="32767" attributes="0"/>
+                                      <Component id="panelParameters" pref="281" max="32767" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                   </Group>
                                   <Group type="102" alignment="0" attributes="0">
@@ -175,7 +175,7 @@
                                   <Component id="btnParametersNew" linkSize="3" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                                   <Component id="btnParametersDelete" linkSize="3" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="22" max="32767" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
                                   <Component id="btnParametersRefresh" linkSize="3" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
@@ -252,7 +252,7 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jScrollPane1" alignment="1" pref="261" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane1" alignment="1" pref="245" max="32767" attributes="0"/>
                                       <Component id="jPanel2" alignment="1" max="32767" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -321,10 +321,10 @@
                                       </Group>
                                       <EmptySpace min="-2" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="tfParametersPrefix" alignment="0" pref="186" max="32767" attributes="2"/>
-                                          <Component id="tfParametersOrder" alignment="0" pref="186" max="32767" attributes="2"/>
+                                          <Component id="tfParametersPrefix" alignment="0" pref="170" max="32767" attributes="2"/>
+                                          <Component id="tfParametersOrder" alignment="0" pref="170" max="32767" attributes="2"/>
                                           <Component id="chkHasNoValue" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
-                                          <Component id="tfParametersName" alignment="1" pref="186" max="32767" attributes="2"/>
+                                          <Component id="tfParametersName" alignment="1" pref="170" max="32767" attributes="2"/>
                                       </Group>
                                   </Group>
                               </Group>
@@ -487,7 +487,7 @@
                                   <Component id="btnSolverRefresh" linkSize="1" min="-2" pref="89" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
                                   <Component id="btnSolverExport" linkSize="1" min="-2" pref="79" max="-2" attributes="0"/>
-                                  <EmptySpace pref="56" max="32767" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
                                   <Component id="btnSolverSaveToDB" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
@@ -588,8 +588,8 @@
                               <Group type="102" alignment="1" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="1" attributes="0">
-                                      <Component id="jScrollPane2" alignment="0" pref="499" max="32767" attributes="2"/>
-                                      <Component id="jPanel1" alignment="0" pref="499" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane2" alignment="0" pref="449" max="32767" attributes="2"/>
+                                      <Component id="jPanel1" alignment="0" pref="449" max="32767" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
@@ -659,8 +659,8 @@
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="btnSolverAddBinary" linkSize="2" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="btnSolverAddCode" linkSize="2" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="jScrollPane3" alignment="0" pref="384" max="32767" attributes="2"/>
-                                          <Component id="tfSolverName" alignment="0" pref="384" max="32767" attributes="2"/>
+                                          <Component id="jScrollPane3" alignment="0" pref="334" max="32767" attributes="2"/>
+                                          <Component id="tfSolverName" alignment="0" pref="334" max="32767" attributes="2"/>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
                                   </Group>

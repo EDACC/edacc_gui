@@ -17,6 +17,7 @@ import edacc.model.SolverDAO;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.sql.SQLException;
 
 /**
@@ -26,7 +27,7 @@ import java.sql.SQLException;
  */
 public class EDACCSolverConfigPanel extends javax.swing.JPanel {
 
-    private GridBagConstraints gridBagConstraints = new GridBagConstraints();
+    private GridBagConstraints gridBagConstraints;
     private GridBagLayout layout;
     private EDACCExperimentMode parent;
     private boolean update;
@@ -34,6 +35,13 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
     /** Creates new form EDACCSolverConfigPanel */
     public EDACCSolverConfigPanel() {
         initComponents();
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.weightx = 0.5;
+        //gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
+        //gridBagConstraints.weighty = 0.5;
+
         this.parent = null;
         layout = new GridBagLayout();
         this.setLayout(layout);

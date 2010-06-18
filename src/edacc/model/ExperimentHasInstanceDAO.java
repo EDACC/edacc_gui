@@ -92,4 +92,26 @@ public class ExperimentHasInstanceDAO {
         st.close();
         return res;
     }
+
+    /**
+     * Returns all instance ids associated with the experiment specified by id.
+     * @param id the experiment id
+     * @return vector of instance ids
+     * @throws SQLException
+     */
+    public static Vector<Integer> getAllInstanceIdsByExperimentId(int id) throws SQLException {
+        Vector<Integer> res = new Vector<Integer>();
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT Instances_idInstance " +
+                "FROM " + table + " " +
+                "WHERE Experiment_idExperiment=? GROUP BY Instances_idInstance ORDER BY Instances_idInstance;");
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            res.add(rs.getInt(1));
+        }
+
+        return res;
+    }
+
 }

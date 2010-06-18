@@ -27,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import edacc.manageDB.Util;
 import edacc.model.Tasks;
+import java.io.IOException;
 import java.net.URL;
 import javax.help.HelpSet;
 import javax.help.JHelp;
@@ -386,6 +387,10 @@ public class EDACCView extends FrameView implements Observer {
                 JOptionPane.showMessageDialog(mode,
                         "An error occured while trying to generate the EDACC tables: " + ex.getMessage(),
                         "Error!", JOptionPane.ERROR_MESSAGE);
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(mode,
+                        "An error occured while trying to generate the EDACC tables: " + ex.getMessage(),
+                        "Error!", JOptionPane.ERROR_MESSAGE);
             } finally {
                 noMode();
             }
@@ -429,6 +434,7 @@ public class EDACCView extends FrameView implements Observer {
             mode = manageDBMode;
             manageDBModeMenuItem.setSelected(true);
             manageExperimentModeMenuItem.setSelected(false);
+            statusMessageLabel.setText("MANAGE DB MODE - Connected to database: "+DatabaseConnector.getInstance().getDatabase()+ " on host: "+DatabaseConnector.getInstance().getHostname());
         } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this.getComponent(), "You have to connect to the database before switching modes", "No database connection", JOptionPane.ERROR_MESSAGE);
             noMode();
@@ -436,7 +442,6 @@ public class EDACCView extends FrameView implements Observer {
             createDatabaseErrorMessage(ex);
             noMode();
         }
-        statusMessageLabel.setText("MANAGE DB MODE - Connected to database: "+DatabaseConnector.getInstance().getDatabase()+ " on host: "+DatabaseConnector.getInstance().getHostname());
     }
 
     @Action

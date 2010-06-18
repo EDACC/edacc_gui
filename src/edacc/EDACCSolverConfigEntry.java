@@ -19,11 +19,15 @@ import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
+import java.awt.Component;
 import java.sql.SQLException;
 import java.util.Vector;
+import javax.swing.JLabel;
+import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import org.jdesktop.application.Action;
 
 /**
@@ -69,14 +73,28 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         solverConfigEntryTableModel.setParameters(ParameterDAO.getParameterFromSolverId(solver.getId()));
         this.solverConfiguration = null;
         solverConfigEntryTableModel.addTableModelListener(new TableModelListener() {
+
             @Override
             public void tableChanged(TableModelEvent e) {
                 if (parent != null) {
                     parent.setTitles();
                 }
             }
-
         });
+        parameterTable.setRowSelectionAllowed(false);
+        parameterTable.setCellSelectionEnabled(false);
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                JLabel lbl = (JLabel) comp;
+                lbl.setEnabled((Boolean) solverConfigEntryTableModel.getValueAt(row, 0));
+                return comp;
+            }
+        };
+        parameterTable.setDefaultRenderer(String.class, renderer);
+        parameterTable.setDefaultRenderer(Integer.class, renderer);
     }
 
     /**
@@ -90,7 +108,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             border.setTitle(title + " (" + number + ")");
         }
     }
-    
+
     /**
      * Assigns all parameter values/selections from entry.
      * @param entry
@@ -98,8 +116,8 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     public void assign(EDACCSolverConfigEntry entry) {
         txtSeedGroup.setText(entry.getSeedGroup().getText());
         for (int i = 0; i < entry.solverConfigEntryTableModel.getRowCount(); i++) {
-            solverConfigEntryTableModel.setValueAt(entry.solverConfigEntryTableModel.getValueAt(i, 2), i, 2);
-            solverConfigEntryTableModel.setValueAt(entry.solverConfigEntryTableModel.getValueAt(i, 4), i, 4);
+            solverConfigEntryTableModel.setValueAt(entry.solverConfigEntryTableModel.getValueAt(i, 3), i, 3);
+            solverConfigEntryTableModel.setValueAt(entry.solverConfigEntryTableModel.getValueAt(i, 0), i, 0);
         }
 
     }
@@ -137,15 +155,15 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     public void saveParameterInstances() throws SQLException {
         Vector<ParameterInstance> parameterVector = new Vector<ParameterInstance>();
         for (int i = 0; i < solverConfigEntryTableModel.getRowCount(); i++) {
-            if ((Boolean) solverConfigEntryTableModel.getValueAt(i, 4)) {
+            if ((Boolean) solverConfigEntryTableModel.getValueAt(i, 0)) {
                 Parameter p = (Parameter) solverConfigEntryTableModel.getValueAt(i, 5);
                 ParameterInstance pi = (ParameterInstance) solverConfigEntryTableModel.getValueAt(i, 6);
                 if (pi == null) {
                     pi = ParameterInstanceDAO.createParameterInstance(p.getId(), solverConfiguration.getId(), (String) solverConfigEntryTableModel.getValueAt(i, 2));
                     parameterVector.add(pi);
                 }
-                if (!pi.getValue().equals((String) solverConfigEntryTableModel.getValueAt(i, 2))) {
-                    pi.setValue((String) solverConfigEntryTableModel.getValueAt(i, 2));
+                if (!pi.getValue().equals((String) solverConfigEntryTableModel.getValueAt(i, 3))) {
+                    pi.setValue((String) solverConfigEntryTableModel.getValueAt(i, 3));
                     ParameterInstanceDAO.setModified(pi);
                     ParameterInstanceDAO.save(pi);
                 }
@@ -158,8 +176,9 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                 }
             }
         }
-        if (parameterVector.size() > 0)
+        if (parameterVector.size() > 0) {
             solverConfigEntryTableModel.setParameterInstances(parameterVector);
+        }
     }
 
     /** This method is called from within the constructor to
@@ -221,11 +240,11 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                         .addComponent(lblSeedGroup)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtSeedGroup, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 220, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnRemove))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 485, Short.MAX_VALUE)))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -252,7 +271,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             }
         }
         txtSeedGroup.setText(res);
-    
+        parent.setTitles();
     }//GEN-LAST:event_txtSeedGroupKeyReleased
 
     @Action
@@ -282,7 +301,13 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
      * @return true, if and only if data is unsaved, false otherwise
      */
     public boolean isModified() {
-        if (solverConfiguration == null) {
+        int seedGroup = -1;
+        try {
+            seedGroup = Integer.parseInt(txtSeedGroup.getText());
+        } catch (NumberFormatException _) {
+        }
+
+        if (solverConfiguration == null || solverConfiguration.getSeed_group() != seedGroup) {
             return true;
         }
         return solverConfigEntryTableModel.isModified();

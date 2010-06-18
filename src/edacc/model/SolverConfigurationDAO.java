@@ -50,8 +50,7 @@ public class SolverConfigurationDAO {
             }
             i.setSaved();
             cache.cache(i);
-        }
-        else if (i.isModified()) {
+        } else if (i.isModified()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
             st.setInt(1, i.getSeed_group());
             st.setInt(2, i.getId());
@@ -89,8 +88,9 @@ public class SolverConfigurationDAO {
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
             SolverConfiguration c = cache.getCached(rs.getInt("IdSolverConfig"));
-            if (c != null) res.add(c);
-            else {
+            if (c != null) {
+                res.add(c);
+            } else {
                 SolverConfiguration i = getSolverConfigurationFromResultset(rs);
                 cache.cache(i);
                 i.setSaved();
@@ -102,7 +102,9 @@ public class SolverConfigurationDAO {
 
     public static SolverConfiguration getSolverConfigurationById(int id) throws SQLException {
         SolverConfiguration sc = cache.getCached(id);
-        if (sc != null) return sc;
+        if (sc != null) {
+            return sc;
+        }
 
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idSolverConfig=?");
         st.setInt(1, id);
@@ -123,15 +125,36 @@ public class SolverConfigurationDAO {
     }
 
     /**
+     * Returns all solver config ids associated with the experiment specified by id.
+     * @param id the experiment id
+     * @return vector of solver config ids
+     * @throws SQLException
+     */
+    public static Vector<Integer> getAllSolverConfigIdsByExperimentId(int id) throws SQLException {
+        Vector<Integer> res = new Vector<Integer>();
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT idSolverConfig " +
+                "FROM " + table + " " +
+                "WHERE Experiment_idExperiment=? GROUP BY idSolverConfig ORDER BY idSolverConfig;");
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            res.add(rs.getInt(1));
+        }
+
+        return res;
+    }
+
+    /**
      * Equalises local data with database data so that the state of all
      * solver configurations is saved.
      * @throws SQLException
      */
     public static void saveAll() throws SQLException {
-         Enumeration<SolverConfiguration> e = cache.elements();
-         while (e.hasMoreElements()) {
-             save(e.nextElement());
-         }
+        Enumeration<SolverConfiguration> e = cache.elements();
+        while (e.hasMoreElements()) {
+            save(e.nextElement());
+        }
     }
 
     /**
