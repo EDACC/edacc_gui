@@ -36,6 +36,12 @@ public class ExperimentDAO {
         return i;
     }
 
+    /**
+     * Returns an experiment for the unique name.
+     * @param name the name of the experiment
+     * @return experiment named `name`
+     * @throws SQLException
+     */
     public static Experiment getExperimentByName(String name) throws SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE name=?");
         st.setString(1, name);
@@ -117,10 +123,6 @@ public class ExperimentDAO {
         return i;
     }
 
-    private static Vector<SolverConfiguration> getExperimentSolverConfiguration(Experiment i) throws SQLException {
-        return SolverConfigurationDAO.getSolverConfigurationByExperimentId(i.getId());
-    }
-
     /**
      * retrieves an experiment from the database
      * @param id the id of the experiment to be retrieved
@@ -199,20 +201,24 @@ public class ExperimentDAO {
         return solvers;
     }
 
+    /**
+     * Updates the numRuns property for an experiment.
+     * @param exp the experiment to be updated
+     */
     public static void updateNumRuns(Experiment exp) {
         try {
-            final String query = "SELECT MAX(run)+1 from ExperimentResults where Experiment_idExperiment=?";
+            //final String query = "SELECT MAX(run)+1 from ExperimentResults where Experiment_idExperiment=?";
+            final String query = "select rCount DIV (iCount*sCount) from (select count(*) AS sCount from (select idSolverConfig from SolverConfig WHERE Experiment_idExperiment=? GROUP BY idSolverConfig) AS solverConfigs) AS tblS JOIN (select count(*) AS rCount from ExperimentResults WHERE Experiment_idExperiment=?) AS tblR JOIN (select count(*) AS iCount from (select Instances_idInstance from ExperimentResults WHERE Experiment_idExperiment=? GROUP BY Instances_idInstance) AS instances) AS tblI";
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
             ps.setInt(1, exp.getId());
+            ps.setInt(2, exp.getId());
+            ps.setInt(3, exp.getId());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 exp.setNumRuns(rs.getInt(1));
             } else {
                 exp.setNumRuns(0);
             }
-
-
-            
         } catch (SQLException ex) {
             exp.setNumRuns(0);
         }

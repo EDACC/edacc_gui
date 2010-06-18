@@ -271,7 +271,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             }
         }
         txtSeedGroup.setText(res);
-
+        parent.setTitles();
     }//GEN-LAST:event_txtSeedGroupKeyReleased
 
     @Action
@@ -301,7 +301,13 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
      * @return true, if and only if data is unsaved, false otherwise
      */
     public boolean isModified() {
-        if (solverConfiguration == null) {
+        int seedGroup = -1;
+        try {
+            seedGroup = Integer.parseInt(txtSeedGroup.getText());
+        } catch (NumberFormatException _) {
+        }
+
+        if (solverConfiguration == null || solverConfiguration.getSeed_group() != seedGroup) {
             return true;
         }
         return solverConfigEntryTableModel.isModified();
