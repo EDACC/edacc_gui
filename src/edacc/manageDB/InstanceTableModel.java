@@ -31,7 +31,14 @@ public class InstanceTableModel extends AbstractTableModel{
     }
 
     public void addInstances(Vector<Instance> instances){
-        this.instances.addAll(instances);
+        for(int i = 0; i < instances.size(); i++){
+            addInstance(instances.get(i));
+        }
+    }
+
+    private void addInstance(Instance in){
+        if(!instances.contains(in))
+            instances.add(in);
     }
 
     public void clearTable(){

@@ -8,6 +8,7 @@ import edacc.EDACCAddInstanceToInstanceClass;
 import edacc.EDACCAddNewInstanceSelectClassDialog;
 import edacc.EDACCApp;
 import edacc.EDACCCreateInstanceClassDialog;
+import edacc.EDACCExtWarningErrorDialog;
 import edacc.EDACCManageDBInstanceFilter;
 import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
@@ -115,21 +116,42 @@ public class ManageDBInstances{
         }
     }
 
+    public void removeInstances(int[] rows) throws NoConnectionToDBException, SQLException {
+        Vector<Instance> toRemove = new Vector<Instance>();
+        
+        for (int i = 0; i < rows.length; i++) {
+            toRemove.add((Instance )main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(rows[i]), 5));
+        }
+        InstanceTableModel tableModel = new InstanceTableModel();
+        tableModel.addInstances(toRemove);
+        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+        EDACCExtWarningErrorDialog removeInstances = new EDACCExtWarningErrorDialog(mainFrame, true, true, tableModel,
+                "Do you really won't to remove the the listed instances?");
+        removeInstances.setLocationRelativeTo(mainFrame);
+        EDACCApp.getApplication().show(removeInstances);
+        if(removeInstances.isAccept()){
+            Tasks.startTask("TryToRemoveInstances", new Class[]{Vector.class, edacc.model.Tasks.class}, new Object[]{toRemove,  null}, this, this.main);
+        }
+
+
+        
+    }
+
     /**
      * Remove the given rows from the instanceTableModel
      * @param rows the rows which have to be deleted
      */
-    public void removeInstances(int[] rows, Tasks task) throws NoConnectionToDBException, SQLException {
+       public void TryToRemoveInstances(Vector<Instance> toRemove, Tasks task) throws NoConnectionToDBException, SQLException {
        task.setOperationName("Removing instances");
         Vector<Instance> rem = new Vector<Instance>();
         Vector<Instance> notRem = new Vector<Instance>();
-        for (int i = 0; i < rows.length; i++) {
-            Instance ins = (Instance) main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(rows[i]), 5);
+        for (int i = 0; i < toRemove.size(); i++) {
+            Instance ins = toRemove.get(i);
             try {
                 InstanceDAO.delete(ins);
                 rem.add(ins);
-                task.setStatus(i + " of " + rows.length + " instances removed");
-                task.setTaskProgress((float)i/(float) rows.length);
+                task.setStatus(i + " of " + toRemove.size() + " instances removed");
+                task.setTaskProgress((float)i/(float) toRemove.size());
             } catch (InstanceIsInExperimentException ex) {
                 notRem.add(ins);
             }
@@ -142,6 +164,7 @@ public class ManageDBInstances{
             JOptionPane.ERROR_MESSAGE);
         }
     }
+    
     /**
      * Removes all instances from the instancetable
      */
@@ -539,6 +562,18 @@ public class ManageDBInstances{
             }
         }
        
+    }
+
+    public void onTaskStart(String methodName) {
+    }
+
+    public void onTaskFailed(String methodName, Throwable e) {
+    }
+
+    public void onTaskSuccessful(String methodName, Object result) {
+        if(methodName.equals("TryToRemoveInstances")){
+            main.instanceTableModel.fireTableDataChanged();
+        }
     }
 
 }
