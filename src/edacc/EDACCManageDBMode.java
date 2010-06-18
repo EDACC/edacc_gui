@@ -93,19 +93,18 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         showSolverDetails(null);
         tableParameters.setDefaultRenderer(tableParameters.getColumnClass(2), new DefaultTableCellRenderer() {
 
+            @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                     boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (column % 3 == 0) {
-                    lbl.setHorizontalAlignment(JLabel.CENTER);
-                } else {
-                    lbl.setHorizontalAlignment(JLabel.LEFT);
-                }
+                lbl.setHorizontalAlignment(JLabel.CENTER);
                 return lbl;
             }
         });
         //TODO: FontMetrics verwenden!!!
-        tableParameters.getColumnModel().getColumn(0).setMaxWidth(50);
+        
+        //tableParameters.getColumnModel().getColumn(0).setMaxWidth(metric.stringWidth(tableParameters.getModel().getColumnName(0))+10);
+        //tableParameters.getColumnModel().getColumn(0).setMinWidth(metric.stringWidth(tableParameters.getModel().getColumnName(0))+5);
         tableParameters.getColumnModel().getColumn(3).setMaxWidth(50);
         tableInstanceClass.getColumnModel().getColumn(2).setMaxWidth(55);
         tableInstanceClass.getColumnModel().getColumn(3).setMaxWidth(55);

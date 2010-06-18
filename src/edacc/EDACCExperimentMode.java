@@ -573,7 +573,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 869, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 885, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -1197,16 +1197,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     }//GEN-LAST:event_btnGeneratePackage
 
     private void btnSelectAllInstanceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstanceClassesActionPerformed
-        if (this.btnSelectAllInstanceClasses.getText() == null ? "Select all" == null : this.btnSelectAllInstanceClasses.getText().equals("Select all")) {
             expController.selectAllInstanceClasses();
-            this.btnSelectAllInstanceClasses.setText("Deselect all");
-        } else {
-            expController.deselectAllInstanceClasses();
-            this.btnSelectAllInstanceClasses.setText("Select all");
-        }
-
-
-
     }//GEN-LAST:event_btnSelectAllInstanceClassesActionPerformed
 
     private void btnDeselectAllInstnaceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeselectAllInstnaceClassesActionPerformed
