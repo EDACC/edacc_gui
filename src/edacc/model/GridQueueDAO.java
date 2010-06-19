@@ -255,17 +255,15 @@ public class GridQueueDAO {
      * @author dgall
      * TODO implement
      * Checks if Queue is used in an experiment.
-     * @return Hashtable with all instances which belong to a experiment.
+     * @return if the Queue is used in an experiment
      * @throws NoConnectionToDBException if no connection to database exists.
      * @throws SQLException if an SQL error occurs while reading the instances from the database.
      */
     public static boolean isInAnyExperiment(GridQueue q) throws NoConnectionToDBException, SQLException {
-        /*Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-
-        ResultSet rs = st.executeQuery("SELECT i.idInstance FROM " + table + " AS i JOIN Experiment_has_Instances as ei ON " +
-        "i.idInstance = ei.Instances_idInstance WHERE idInstance = "+ id);
-        return rs.next();*/
-        throw new NotImplemented();
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT gridQueue_idgridQueue FROM Experiment_has_gridQueue WHERE gridQueue_idgridQueue=?");
+        st.setInt(1, q.getId());
+        ResultSet rs = st.executeQuery();
+        return rs.next();
     }
 
     /**

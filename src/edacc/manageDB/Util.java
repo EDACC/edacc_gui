@@ -54,10 +54,10 @@ public class Util {
         return bos;
     }
 
-    public static ByteArrayOutputStream zipFileArrayToByteStream(File[] dir) throws IOException {
+    public static ByteArrayOutputStream zipFileArrayToByteStream(File[] files) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ZipOutputStream out = new ZipOutputStream(bos);
-        zip(dir, out);
+        zip(files, out);
         out.close();
         return bos;
     }

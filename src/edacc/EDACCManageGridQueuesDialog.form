@@ -32,7 +32,7 @@
                       <Component id="lblChosenQueue" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="lblSelected" min="-2" pref="124" max="-2" attributes="0"/>
-                      <EmptySpace pref="136" max="32767" attributes="0"/>
+                      <EmptySpace pref="157" max="32767" attributes="0"/>
                       <Component id="btnCancel" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -119,7 +119,7 @@
                           <EmptySpace pref="72" max="32767" attributes="0"/>
                           <Component id="btnChooseQueue" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="jScrollPane1" alignment="0" pref="192" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" alignment="0" pref="196" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
@@ -139,7 +139,6 @@
           <SubComponents>
             <Component class="javax.swing.JList" name="listQueues">
               <Properties>
-                <Property name="selectionMode" type="int" value="0"/>
                 <Property name="name" type="java.lang.String" value="listQueues" noResource="true"/>
               </Properties>
             </Component>
