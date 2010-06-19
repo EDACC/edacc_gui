@@ -1098,6 +1098,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                 Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        this.tableInstances.requestFocus();
        
     }//GEN-LAST:event_btnRemoveInstancesActionPerformed
 
@@ -1387,7 +1388,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         parameterChanged();
     }//GEN-LAST:event_parameterChangedOnFocusLost
     private void btnAddToClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddToClassActionPerformed
-        manageDBInstances.addInstancesToClass(tableInstances.getSelectedRows());
+       int[] selectedRowsInstance = tableInstances.getSelectedRows();
+        for(int i = 0; i < selectedRowsInstance.length; i++){
+           selectedRowsInstance[i] = tableInstances.convertRowIndexToModel(selectedRowsInstance[i]);
+       }
+        manageDBInstances.addInstancesToClass(selectedRowsInstance);
         unsavedChanges = true;
     }//GEN-LAST:event_btnAddToClassActionPerformed
     private void btnRemoveFromClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveFromClassActionPerformed

@@ -442,42 +442,49 @@ public class ManageDBInstances{
      * @param selectedRows The rows of the selected instances
      */
     public void addInstancesToClass(int[] selectedRows){
-        try {
-            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            EDACCAddInstanceToInstanceClass addInstanceToClass = new EDACCAddInstanceToInstanceClass(mainFrame, true);
-            addInstanceToClass.setLocationRelativeTo(mainFrame);
-            EDACCApp.getApplication().show(addInstanceToClass);
-            InstanceClass input = addInstanceToClass.getInput();
-            if (input != null) {
-                if (input.isSource()) {
-                    for (int i = 0; i < selectedRows.length; i++) {
-                        Instance temp = (Instance) main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(selectedRows[i]), 5);
-                        temp.setInstanceClass(input);
-                        temp.setModified();
-                        InstanceDAO.save(temp);
-                    }
-                } else {
-                    for (int i = 0; i < selectedRows.length; i++) {
-                        Instance temp = (Instance) main.instanceTableModel.getValueAt(selectedRows[i], 5);
-                        InstanceHasInstanceClassDAO.createInstanceHasInstance(temp, input);
-                    }
-                }
-                main.instanceClassTableModel.changeInstanceTable();
-            }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoConnectionToDBException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "There is a Problem with the database: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
+         if(tableInstances.getSelectedRows().length == 0){
+             JOptionPane.showMessageDialog(panelManageDBInstances,
+                "No instances selected.",
+                "Warning",
+                JOptionPane.WARNING_MESSAGE);
+        } else {
 
+            try {
+                JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+                EDACCAddInstanceToInstanceClass addInstanceToClass = new EDACCAddInstanceToInstanceClass(mainFrame, true);
+                addInstanceToClass.setLocationRelativeTo(mainFrame);
+                EDACCApp.getApplication().show(addInstanceToClass);
+                InstanceClass input = addInstanceToClass.getInput();
+                if (input != null) {
+                    if (input.isSource()) {
+                        for (int i = 0; i < selectedRows.length; i++) {
+                            Instance temp = (Instance) main.instanceTableModel.getValueAt(selectedRows[i], 5);
+                            temp.setInstanceClass(input);
+                            temp.setModified();
+                            InstanceDAO.save(temp);
+                        }
+                    } else {
+                        for (int i = 0; i < selectedRows.length; i++) {
+                            Instance temp = (Instance) main.instanceTableModel.getValueAt(selectedRows[i], 5);
+                            InstanceHasInstanceClassDAO.createInstanceHasInstance(temp, input);
+                        }
+                    }
+                    main.instanceClassTableModel.changeInstanceTable();
+                }
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoConnectionToDBException ex) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                        ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "There is a Problem with the database: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     /**
