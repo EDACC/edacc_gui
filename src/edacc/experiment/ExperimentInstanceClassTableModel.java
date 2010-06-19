@@ -17,7 +17,7 @@ import javax.swing.table.AbstractTableModel;
  */
 public class ExperimentInstanceClassTableModel extends AbstractTableModel {
 
-    private String[] columns = {"Name", "Description", "Source", "Select"};
+    private String[] columns = {"Name", "Description", "Source", "Show"};
     protected Vector<InstanceClass> classes;
     protected Vector<Boolean> classSelect;
     protected JTable instanceTable;
@@ -63,7 +63,7 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel {
             case 1:
                 return classes.get(rowIndex).getDescription();
             case 2:
-                return classes.get(rowIndex).isSource()?"":"\u2713";
+                return classes.get(rowIndex).isSource()?"\u2713":"";
             case 3:
                 return classSelect.get(rowIndex);
             case 4:
