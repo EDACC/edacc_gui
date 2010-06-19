@@ -18,9 +18,11 @@ import edacc.model.GridQueueDAO;
 import edacc.model.NoConnectionToDBException;
 import java.awt.Color;
 import java.sql.SQLException;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.AbstractTableModel;
 
 /**
  *
@@ -86,7 +88,6 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
 
         jScrollPane1.setName("jScrollPane1"); // NOI18N
 
-        listQueues.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         listQueues.setName("listQueues"); // NOI18N
         jScrollPane1.setViewportView(listQueues);
 
@@ -155,7 +156,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
                         .addComponent(btnRemoveQueue)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
                         .addComponent(btnChooseQueue))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -174,7 +175,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
                         .addComponent(lblChosenQueue)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblSelected, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 136, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 157, Short.MAX_VALUE)
                         .addComponent(btnCancel)))
                 .addContainerGap())
         );
@@ -231,11 +232,22 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCancel
 
     private void btnRemoveQueue(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveQueue
-        GridQueue selected = (GridQueue) listQueues.getSelectedValue();
-        if (selected == null)
+        Object[] selected = listQueues.getSelectedValues();
+        if (selected.length <= 0)
             return;
         try {
-            GridQueueDAO.remove(selected);
+            Vector<GridQueue> queuesInExp = new Vector<GridQueue>();
+            for (Object s : selected) {
+                GridQueue q = (GridQueue) s;
+                if (GridQueueDAO.isInAnyExperiment(q))
+                    queuesInExp.add(q);
+                else
+                    GridQueueDAO.remove(q);
+            }
+            if (queuesInExp.size() > 0)
+                EDACCApp.getApplication().show(new EDACCExtWarningErrorDialog(this, true, false,
+                        new VectorTableModel(queuesInExp),
+                        "The following queues couldn't be removed, because they are used in an experiment:"));
             refreshView();
         } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
@@ -269,4 +281,39 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
     private javax.swing.JList listQueues;
     // End of variables declaration//GEN-END:variables
 
+
+    private class VectorTableModel extends AbstractTableModel {
+
+        private Vector<GridQueue> queues;
+
+        public VectorTableModel(Vector<GridQueue> queues) {
+            this.queues = queues;
+        }
+
+        public int getRowCount() {
+            return queues.size();
+        }
+
+        public int getColumnCount() {
+            return 2;
+        }
+
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            if (columnIndex == 0)
+                return queues.get(rowIndex).getName();
+            if (columnIndex == 1)
+                return queues.get(rowIndex).getDescription();
+            return null;
+        }
+
+        @Override
+        public String getColumnName(int col) {
+            if (col == 0)
+                return "Name";
+            if (col == 1)
+                return "Description";
+            return null;
+        }
+        
+    }
 }

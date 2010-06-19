@@ -338,9 +338,10 @@ public class InstanceDAO {
         if (rs.next()) {
             FileOutputStream out = new FileOutputStream(f);
             InputStream in = rs.getBinaryStream("instance");
-            int data;
-            while ((data = in.read()) > -1) {
-                out.write(data);
+            int len;
+            byte[] buf = new byte[256*1024];
+            while ((len = in.read(buf)) > -1) {
+                out.write(buf,0,len);
             }
             out.close();
             in.close();

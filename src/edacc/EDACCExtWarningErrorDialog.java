@@ -11,6 +11,7 @@
 
 package edacc;
 
+import javax.swing.JDialog;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -29,8 +30,8 @@ public class EDACCExtWarningErrorDialog extends javax.swing.JDialog {
      * @param warning
      * @param tableModel
      */
-    public EDACCExtWarningErrorDialog(java.awt.Frame parent, boolean modal, boolean warning, TableModel tableModel, String message) {
-        super(parent, modal);
+    public EDACCExtWarningErrorDialog(java.awt.Window parent, boolean modal, boolean warning, TableModel tableModel, String message) {
+        super(parent, modal ? JDialog.DEFAULT_MODALITY_TYPE : ModalityType.MODELESS);
         initComponents();
         if(!warning)
             jButtonCancel.setVisible(false);
