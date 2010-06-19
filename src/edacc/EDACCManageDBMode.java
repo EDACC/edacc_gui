@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.InputVerifier;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -76,6 +77,26 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         // initialize instance class table
         instanceClassTableModel = new InstanceClassTableModel(tableInstances);
         tableInstanceClass.setModel(instanceClassTableModel);
+        tableInstanceClass.setDefaultRenderer(tableInstanceClass.getColumnClass(2), new DefaultTableCellRenderer() {
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if(column == 3){
+                    JCheckBox check =  new JCheckBox();
+                    if(lbl.getText().equals("true"))
+                        check.setSelected(true);
+                    else check.setSelected(false);
+                    check.setHorizontalAlignment(JCheckBox.CENTER);
+                    check.setBackground(Color.white);
+                    return check;
+                }
+                lbl.setHorizontalAlignment(JLabel.CENTER);
+                return lbl; 
+ 
+            }
+        });
 
         // initialize solver table
         solverTableModel = new SolverTableModel();

@@ -61,9 +61,12 @@ public class InstanceClassTableModel extends AbstractTableModel{
             case 1:
                 return classes.get(rowIndex).getDescription();
             case 2:
-                return classes.get(rowIndex).isSource();
+                if(classes.get(rowIndex).isSource())
+                    return "\u2713";
+                else
+                    return "";
             case 3:
-                return classSelect.get(rowIndex);
+                return classSelect.get(rowIndex) ;
             case 4:
                 return classes.get(rowIndex);
             default:
@@ -115,6 +118,7 @@ public class InstanceClassTableModel extends AbstractTableModel{
         else all = true;
     }
     
+    @Override
      public void setValueAt(Object value, int row, int col) {
         if(col == 3){
             classSelect.set(row, (Boolean) value);

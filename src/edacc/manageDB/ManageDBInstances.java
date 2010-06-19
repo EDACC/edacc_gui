@@ -5,7 +5,6 @@
 package edacc.manageDB;
 
 import edacc.EDACCAddInstanceToInstanceClass;
-import edacc.EDACCAddNewInstanceSelectClassDialog;
 import edacc.EDACCApp;
 import edacc.EDACCCreateInstanceClassDialog;
 import edacc.EDACCExtWarningErrorDialog;
