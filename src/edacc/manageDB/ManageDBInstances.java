@@ -483,47 +483,72 @@ public class ManageDBInstances{
     /**
      * Removes the choosen instances from the selected instance classes in the instanceClasstable.
      * If one of the selected instance classes is a source class a error message will occur.
-     * @param selectedRowsInstance
+     * @param selectedRowsInstance the instances to remove
+     * @param selectedRowsInstanceClass rows of the InstanceClasses from which the selected instances have to be removed
      */
-    public void RemoveInstanceFromInstanceClass(int[] selectedRowsInstance){
-        Vector<InstanceClass> instanceClass = main.instanceClassTableModel.getAllChoosen();
-        Boolean isSource = false;
-        try {
-            for(int i = 0; i < selectedRowsInstance.length; i++){
-                Instance tempInstance = (Instance) main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(selectedRowsInstance[i]), 5);
-                for(int j = 0; j < instanceClass.size(); j++){
-                    InstanceClass tempInstanceClass = instanceClass.get(j);
-                    if(tempInstanceClass.isSource()){
-                       isSource = true;
-                    }else{
-                            InstanceHasInstanceClass rem = InstanceHasInstanceClassDAO.getInstanceHasInstanceClass(tempInstanceClass, tempInstance);
-                            if (rem != null) {
-                                InstanceHasInstanceClassDAO.removeInstanceHasInstanceClass(rem);
-                            }
-
-                    }
+    public void RemoveInstanceFromInstanceClass(int[] selectedRowsInstance, int[] selectedRowsInstanceClass){
+       // check if a instance is selected, if not notify the user
+        if(tableInstances.getSelectedRows().length == 0){
+             JOptionPane.showMessageDialog(panelManageDBInstances,
+                "No instances selected.",
+                "Warning",
+                JOptionPane.WARNING_MESSAGE);
+        }else{
+            Boolean isSource = false;
+         
+            try {
+                Vector<Instance> toRemove = new Vector<Instance>();
+                for(int i = 0; i < selectedRowsInstance.length; i++){
+                    toRemove.add((Instance) main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(selectedRowsInstance[i]), 5));
                 }
-            }
-            if(isSource){
+                // check if the user really want to remove the instances from the instace classes
+                InstanceTableModel tableModel = new InstanceTableModel();
+                tableModel.addInstances(toRemove);
+                JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+                EDACCExtWarningErrorDialog removeInstances = new EDACCExtWarningErrorDialog(mainFrame, true, true, tableModel,
+                    "Do you really won't to remove the the listed instances from the selected instance classes?");
+                removeInstances.setLocationRelativeTo(mainFrame);
+                EDACCApp.getApplication().show(removeInstances);
+
+                // remove the instances from the instace classes
+                if(removeInstances.isAccept()){
+                   for(int i = 0; i < toRemove.size(); i++){
+                       for(int j = 0; j < selectedRowsInstanceClass.length; j++){
+                            InstanceClass tempInstanceClass = (InstanceClass) main.instanceClassTableModel.getValueAt(selectedRowsInstanceClass[j], 4);
+                            if(tempInstanceClass.isSource()){
+                               isSource = true;
+                            }else{
+                                    InstanceHasInstanceClass rem = InstanceHasInstanceClassDAO.getInstanceHasInstanceClass(tempInstanceClass, toRemove.get(i));
+                                    if (rem != null) {
+                                        InstanceHasInstanceClassDAO.removeInstanceHasInstanceClass(rem);
+                                    }
+                            }
+                      }
+                   }
+                }
+
+                if(isSource){
+                    JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "Some of the choosen instance classes are source classes, " +
+                        "the selected instances couldn't removed from them.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+                main.instanceClassTableModel.changeInstanceTable();
+
+            } catch (NoConnectionToDBException ex) {
                 JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "Some of the choosen instance classes are source classes, " +
-                    "the selected instances couldn't removed from them.",
+                    ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
-            }
-            main.instanceClassTableModel.changeInstanceTable();
+           } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "There is a Problem with the database: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+           }
+        }
 
-        } catch (NoConnectionToDBException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                ex.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-       } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                "There is a Problem with the database: " + ex.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-       }
     }
 
     /**

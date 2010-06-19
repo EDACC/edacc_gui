@@ -1169,7 +1169,6 @@
                         <Component class="javax.swing.JButton" name="btnRemoveInstances">
                           <Properties>
                             <Property name="text" type="java.lang.String" resourceKey="btnRemoveInstances.text"/>
-                            <Property name="enabled" type="boolean" value="false"/>
                             <Property name="name" type="java.lang.String" value="btnRemoveInstances" noResource="true"/>
                           </Properties>
                           <Events>
