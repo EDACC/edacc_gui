@@ -57,7 +57,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
     private SolverTableModel solverTableModel;
     private ManageDBParameters manageDBParameters;
     private ParameterTableModel parameterTableModel;
-    public EDACCCreateInstanceClassDialog createInstanceClassDialog;
+    public EDACCCreateEditInstanceClassDialog createInstanceClassDialog;
     public EDACCAddNewInstanceSelectClassDialog addInstanceDialog;
     public EDACCManageDBInstanceFilter instanceFilter;
 
@@ -197,8 +197,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         panelInstanceClass = new javax.swing.JPanel();
         panelButtonsInstanceClass = new javax.swing.JPanel();
         btnNewInstanceClass = new javax.swing.JButton();
-        btnRemoveInstanceClass = new javax.swing.JButton();
+        btnEditInstanceClass = new javax.swing.JButton();
         btnSelectAllInstanceClasses = new javax.swing.JButton();
+        btnRemoveInstanceClass = new javax.swing.JButton();
         panelInstanceClassTable = new javax.swing.JScrollPane();
         tableInstanceClass = new javax.swing.JTable();
         panelInstance = new javax.swing.JPanel();
@@ -758,12 +759,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             }
         });
 
-        btnRemoveInstanceClass.setText(resourceMap.getString("btnRemoveInstanceClass.text")); // NOI18N
-        btnRemoveInstanceClass.setName("btnRemoveInstanceClass"); // NOI18N
-        btnRemoveInstanceClass.setPreferredSize(new java.awt.Dimension(89, 25));
-        btnRemoveInstanceClass.addActionListener(new java.awt.event.ActionListener() {
+        btnEditInstanceClass.setText(resourceMap.getString("btnEditInstanceClass.text")); // NOI18N
+        btnEditInstanceClass.setName("btnEditInstanceClass"); // NOI18N
+        btnEditInstanceClass.setPreferredSize(new java.awt.Dimension(89, 25));
+        btnEditInstanceClass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRemoveInstanceClassActionPerformed(evt);
+                btnEditInstanceClassActionPerformed(evt);
             }
         });
 
@@ -775,6 +776,15 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             }
         });
 
+        btnRemoveInstanceClass.setText(resourceMap.getString("btnRemoveInstanceClass.text")); // NOI18N
+        btnRemoveInstanceClass.setName("btnRemoveInstanceClass"); // NOI18N
+        btnRemoveInstanceClass.setPreferredSize(new java.awt.Dimension(89, 25));
+        btnRemoveInstanceClass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveInstanceClassActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelButtonsInstanceClassLayout = new javax.swing.GroupLayout(panelButtonsInstanceClass);
         panelButtonsInstanceClass.setLayout(panelButtonsInstanceClassLayout);
         panelButtonsInstanceClassLayout.setHorizontalGroup(
@@ -782,26 +792,26 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             .addGroup(panelButtonsInstanceClassLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnNewInstanceClass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnEditInstanceClass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRemoveInstanceClass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSelectAllInstanceClasses)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        panelButtonsInstanceClassLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnNewInstanceClass, btnRemoveInstanceClass, btnSelectAllInstanceClasses});
+        panelButtonsInstanceClassLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnEditInstanceClass, btnNewInstanceClass, btnSelectAllInstanceClasses});
 
         panelButtonsInstanceClassLayout.setVerticalGroup(
             panelButtonsInstanceClassLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelButtonsInstanceClassLayout.createSequentialGroup()
-                .addContainerGap(15, Short.MAX_VALUE)
-                .addComponent(btnSelectAllInstanceClasses)
-                .addContainerGap())
             .addGroup(panelButtonsInstanceClassLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelButtonsInstanceClassLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnNewInstanceClass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnRemoveInstanceClass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnEditInstanceClass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRemoveInstanceClass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSelectAllInstanceClasses))
                 .addContainerGap(13, Short.MAX_VALUE))
         );
 
@@ -828,6 +838,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         });
         tableInstanceClass.setFocusTraversalPolicyProvider(true);
         tableInstanceClass.setName("tableInstanceClass"); // NOI18N
+        tableInstanceClass.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         panelInstanceClassTable.setViewportView(tableInstanceClass);
         tableInstanceClass.getColumnModel().getColumn(0).setHeaderValue(resourceMap.getString("tableInstanceClass.columnModel.title0")); // NOI18N
         tableInstanceClass.getColumnModel().getColumn(1).setHeaderValue(resourceMap.getString("tableInstanceClass.columnModel.title1")); // NOI18N
@@ -839,7 +850,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelInstanceClassLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelInstanceClassLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(panelInstanceClassTable, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)
+                    .addComponent(panelInstanceClassTable, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE)
                     .addComponent(panelButtonsInstanceClass, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -1295,7 +1306,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
         if (tableInstances.getSelectedRowCount() == 0) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "No instances are selected: ",
+                    "No instances are selected. ",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         } else {
@@ -1316,28 +1327,18 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
     }//GEN-LAST:event_btnSelectAllInstanceClassesActionPerformed
 
-    private void btnRemoveInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstanceClassActionPerformed
-        try {
-            manageDBInstances.RemoveInstanceClass(((InstanceClassTableModel) tableInstanceClass.getModel()).getAllChoosen());
-            tableInstanceClass.updateUI();
-        } catch (NoConnectionToDBException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "No connection to database: " + ex.getMessage(),
+    private void btnEditInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditInstanceClassActionPerformed
+            if(tableInstanceClass.getSelectedRow() == -1){
+                    JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "No instances are selected. ",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "SQL-Exception: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (InstanceSourceClassHasInstance ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "Some of the selected classes couldn't be removed, because they are sourceclasses and"
-                    + "contain still any instances.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnRemoveInstanceClassActionPerformed
+            }else {
+                manageDBInstances.EditInstanceClass(instanceClassTableModel, tableInstanceClass.convertRowIndexToModel(tableInstanceClass.getSelectedRow()));
+                instanceClassTableModel.fireTableDataChanged();
+            }
+
+    }//GEN-LAST:event_btnEditInstanceClassActionPerformed
 
     private void btnParametersDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnParametersDeleteActionPerformed
         if (tableParameters.getSelectedRow() == -1) {
@@ -1467,6 +1468,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
     }//GEN-LAST:event_tableInstancesMouseClicked
 
+    private void btnRemoveInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstanceClassActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRemoveInstanceClassActionPerformed
+
     private void parameterChanged() {
         final int selectedRow = tableParameters.getSelectedRow();
 
@@ -1568,6 +1573,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddInstances;
     private javax.swing.JButton btnAddToClass;
+    private javax.swing.JButton btnEditInstanceClass;
     private javax.swing.JButton btnExportInstances;
     private javax.swing.JButton btnFilterInstances;
     private javax.swing.JButton btnNewInstanceClass;

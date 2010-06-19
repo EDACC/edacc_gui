@@ -6,7 +6,7 @@ package edacc.manageDB;
 
 import edacc.EDACCAddInstanceToInstanceClass;
 import edacc.EDACCApp;
-import edacc.EDACCCreateInstanceClassDialog;
+import edacc.EDACCCreateEditInstanceClassDialog;
 import edacc.EDACCExtWarningErrorDialog;
 import edacc.EDACCManageDBInstanceFilter;
 import edacc.manageDB.InstanceParser.*;
@@ -125,7 +125,7 @@ public class ManageDBInstances{
         tableModel.addInstances(toRemove);
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
         EDACCExtWarningErrorDialog removeInstances = new EDACCExtWarningErrorDialog(mainFrame, true, true, tableModel,
-                "Do you really won't to remove the the listed instances?");
+                "Do you really won't to remove the listed instances?");
         removeInstances.setLocationRelativeTo(mainFrame);
         EDACCApp.getApplication().show(removeInstances);
         if(removeInstances.isAccept()){
@@ -258,15 +258,13 @@ public class ManageDBInstances{
     }
 
     /**
-     * Opens a EDACCCreateInstanceClassDialog to create a new instance class.
+     * Opens a EDACCCreateEditInstanceClassDialog to create a new instance class.
      */
     public void addInstanceClasses() {
-        if(main.createInstanceClassDialog == null){
-            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            main.createInstanceClassDialog = new EDACCCreateInstanceClassDialog(mainFrame, true, main.instanceClassTableModel);
-            main.createInstanceClassDialog.setLocationRelativeTo(mainFrame);
-        }
-        EDACCApp.getApplication().show(main.createInstanceClassDialog);
+        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+        EDACCCreateEditInstanceClassDialog dialog = new EDACCCreateEditInstanceClassDialog(mainFrame, true, main.instanceClassTableModel, -1);
+        dialog.setLocationRelativeTo(mainFrame);
+        EDACCApp.getApplication().show(dialog);
     }
 
     /**
@@ -590,6 +588,13 @@ public class ManageDBInstances{
         if(methodName.equals("TryToRemoveInstances")){
             main.instanceTableModel.fireTableDataChanged();
         }
+    }
+
+    public void EditInstanceClass(InstanceClassTableModel instanceClassTableModel, int convertRowIndexToModel) {
+        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+        EDACCCreateEditInstanceClassDialog dialog = new EDACCCreateEditInstanceClassDialog(mainFrame, true, instanceClassTableModel, convertRowIndexToModel);
+        dialog.setLocationRelativeTo(mainFrame);
+        EDACCApp.getApplication().show(dialog);
     }
 
 }
