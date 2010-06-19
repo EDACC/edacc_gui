@@ -1394,6 +1394,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
        }
         manageDBInstances.addInstancesToClass(selectedRowsInstance);
         unsavedChanges = true;
+        tableInstances.requestFocus();
+        if(instanceTableModel.getRowCount() != 0)
+            tableInstances.addRowSelectionInterval(0, 0);
     }//GEN-LAST:event_btnAddToClassActionPerformed
     private void btnRemoveFromClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveFromClassActionPerformed
        int[] selectedRowsInstanceClass = tableInstanceClass.getSelectedRows();
@@ -1402,7 +1405,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
        }
         manageDBInstances.RemoveInstanceFromInstanceClass(tableInstances.getSelectedRows(), selectedRowsInstanceClass);
         this.instanceTableModel.fireTableDataChanged();
-        this.tableInstances.addRowSelectionInterval(0, 0);
+        if(instanceTableModel.getRowCount() != 0){
+           this.tableInstances.addRowSelectionInterval(0, 0);
+        }      
     }//GEN-LAST:event_btnRemoveFromClassActionPerformed
     private JFileChooser exportFileChooser;
     private void btnExport(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExport

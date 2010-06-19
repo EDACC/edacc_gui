@@ -203,11 +203,6 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
                     "Please enter a instace class name." ,
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
-       }else if(jTextArea1.getText().isEmpty()){
-        JOptionPane.showMessageDialog(this,
-                    "Please enter a description of the instance class",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
        }else if(SourceOrUserClass.getSelection() == null){
         JOptionPane.showMessageDialog(this,
                     "Please choos if the new instance class is a source class oder a user class." ,
@@ -217,9 +212,12 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
            
                 try {
                     InstanceClass ret;
+                    String description = "";
+                    if(!jTextArea1.getText().isEmpty())
+                        description = jTextArea1.getText();
                     if(jRadioButtonSourceClass.isSelected()){
-                        ret = InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), jTextArea1.getText(), true);
-                     }else ret =  InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), jTextArea1.getText(), false);
+                        ret = InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), description, true);
+                     }else ret =  InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), description, false);
                     tableModel.addClass(ret);
                     this.jTextArea1.setText("");
                     this.jTextFieldName.setText("");

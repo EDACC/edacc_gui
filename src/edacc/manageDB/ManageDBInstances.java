@@ -131,10 +131,7 @@ public class ManageDBInstances{
         EDACCApp.getApplication().show(removeInstances);
         if(removeInstances.isAccept()){
             Tasks.startTask("TryToRemoveInstances", new Class[]{Vector.class, edacc.model.Tasks.class}, new Object[]{toRemove,  null}, this, this.main);
-        }
-
-
-        
+        }       
     }
 
     /**
@@ -173,33 +170,6 @@ public class ManageDBInstances{
 
     }
 
-    /*private Vector<Instance> buildInstances(Vector<File> instanceFiles)
-            throws InstanceException, FileNotFoundException, NullPointerException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException {
-        Vector<Instance> instances = new Vector<Instance>();
-        String duplicatesDB = "";
-        for (int i = 0; i < instanceFiles.size(); i++) {
-            try {
-                String md5 = calculateMD5(instanceFiles.get(i));
-                InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
-                Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, tempInstance.n,
-                        tempInstance.m, tempInstance.r, tempInstance.k, md5);{
-                instances.add(temp);
-                InstanceDAO.save(temp);
-                }
-            } catch (InstanceAlreadyInDBException ex) {
-                duplicatesDB += "\n " + instanceFiles.get(i).getAbsolutePath();
-            }
-            
-        }
-        if(!duplicatesDB.equals("")){
-             JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "The following instances are already in the database: " + duplicatesDB,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-        return instances;
-    }*/
-
     /**
      * Removes the Filter of the given JTable
      */
@@ -232,17 +202,32 @@ public class ManageDBInstances{
         task.setOperationName("Exporting instances");
 
         Instance temp;
+        Vector<Instance> md5Error = new Vector<Instance>();
         for(int i = 0; i < rows.length; i++){
            temp =    (Instance) main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(rows[i]), 5);
+           
            File f = new File(path + System.getProperty("file.separator") + temp.getName());
-           InstanceDAO.getBinaryFileOfInstance(temp, f);
+           if(!f.exists())
+                 InstanceDAO.getBinaryFileOfInstance(temp, f);
            String md5File = Util.calculateMD5(f);
            task.setStatus(i + " of " + rows.length + " instances are exported");
            task.setTaskProgress((float)i/(float)rows.length);
            if (!md5File.equals(temp.getMd5()))
-                throw new MD5CheckFailedException("The exported solver binary of solver \"" + temp.getName() + "\" seems to be corrupt!");         
+                md5Error.add(temp);
+                f.delete();
+        }
+
+        if(!md5Error.isEmpty()){
+            InstanceTableModel tableModel = new InstanceTableModel();
+            tableModel.addInstances(md5Error);
+            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+            EDACCExtWarningErrorDialog removeInstances = new EDACCExtWarningErrorDialog(mainFrame, true, false, tableModel,
+                    "Following instances couldn't be written. Because the MD5checksum wasn't valid.");
+            removeInstances.setLocationRelativeTo(mainFrame);
+            EDACCApp.getApplication().show(removeInstances);
         }
     }
+    
     /**
      * Sets all checkboxes of the instanceclass table true.
      */
