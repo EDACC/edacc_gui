@@ -255,9 +255,10 @@ public class SolverDAO {
         if (rs.next()) {
             FileOutputStream out = new FileOutputStream(f);
             InputStream in = rs.getBinaryStream("binary");
-            int data;
-            while ((data = in.read()) > -1) {
-                out.write(data);
+            int len = 0;
+            byte[] buffer = new byte[256*1024];
+            while ((len = in.read(buffer)) > -1) {
+                out.write(buffer, 0, len);
             }
             out.close();
             in.close();

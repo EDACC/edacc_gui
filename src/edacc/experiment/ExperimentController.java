@@ -595,10 +595,10 @@ public class ExperimentController {
         FileInputStream in = new FileInputStream(f);
         zos.putNextEntry(entry);
 
-        int data;
-
-        while ((data = in.read()) > -1) {
-            zos.write(data);
+        byte[] buf = new byte[256*1024];
+        int len;
+        while ((len = in.read(buf)) > -1) {
+            zos.write(buf,0,len);
         }
         zos.closeEntry();
         in.close();
