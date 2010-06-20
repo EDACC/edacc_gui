@@ -17,6 +17,7 @@ import edacc.gridqueues.GridQueuesController;
 import edacc.model.DatabaseConnector;
 import edacc.model.GridQueue;
 import edacc.model.Solver;
+import edacc.model.TaskCancelledException;
 import edacc.model.Tasks;
 import java.awt.Color;
 import java.awt.Component;
@@ -1649,7 +1650,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
     @Override
     public void onTaskFailed(String methodName, Throwable e) {
-        if (e instanceof SQLException) {
+        if (e instanceof TaskCancelledException) {
+            javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        } else if (e instanceof SQLException) {
             createDatabaseErrorMessage((SQLException) e);
         } else if (methodName.equals("exportCSV")) {
             if (e instanceof IOException) {
