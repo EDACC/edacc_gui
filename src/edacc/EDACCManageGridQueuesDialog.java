@@ -8,7 +8,6 @@
  *
  * Created on 11.05.2010, 16:13:30
  */
-
 package edacc;
 
 import edacc.gridqueues.GridQueuesController;
@@ -21,7 +20,11 @@ import java.sql.SQLException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -40,6 +43,10 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
         lblSelected.setForeground(Color.red);
         try {
             listQueues.setModel(new QueueListModel());
+            listQueues.addListSelectionListener(new QueueListSelectionListener());
+            // deselect all queues and set the edit/del/choose-buttons disabled
+            listQueues.clearSelection();
+            setButtonStates(false);
         } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
@@ -208,8 +215,9 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
 
     private void btnEditQueue(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditQueue
         GridQueue selected = (GridQueue) listQueues.getSelectedValue();
-        if (selected == null)
+        if (selected == null) {
             return;
+        }
         try {
             gridSettings.loadSettings(selected);
             gridSettings.setVisible(true);
@@ -220,8 +228,9 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
 
     private void btnChooseQueue(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseQueue
         GridQueue selected = (GridQueue) listQueues.getSelectedValue();
-        if (selected == null)
+        if (selected == null) {
             return;
+        }
         GridQueuesController.getInstance().setChosenQueue(selected);
         //lblChosenQueue.setText("Chosen queue: " + selected.getName());
         this.lblSelected.setText(selected.getName());
@@ -233,22 +242,26 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
 
     private void btnRemoveQueue(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveQueue
         Object[] selected = listQueues.getSelectedValues();
-        if (selected.length <= 0)
+        if (selected.length <= 0) {
             return;
+        }
         try {
             Vector<GridQueue> queuesInExp = new Vector<GridQueue>();
             for (Object s : selected) {
                 GridQueue q = (GridQueue) s;
-                if (GridQueueDAO.isInAnyExperiment(q))
+                if (GridQueueDAO.isInAnyExperiment(q)) {
                     queuesInExp.add(q);
-                else
+                } else {
                     GridQueueDAO.remove(q);
+                }
             }
-            if (queuesInExp.size() > 0)
+            if (queuesInExp.size() > 0) {
                 EDACCApp.getApplication().show(new EDACCExtWarningErrorDialog(this, true, false,
                         new VectorTableModel(queuesInExp),
                         "The following queues couldn't be removed, because they are used in an experiment:"));
+            }
             refreshView();
+            listQueues.clearSelection();
         } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
@@ -261,13 +274,13 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
         ((QueueListModel) listQueues.getModel()).refreshQueues();
         // refresh "chosen queue" text
         GridQueue selected = GridQueuesController.getInstance().getChosenQueue();
-        if (selected == null)
+        if (selected == null) {
             lblChosenQueue.setText("Chosen queue: ");
-        else
-        //    lblChosenQueue.setText("Chosen queue: " + selected.getName());
-        this.lblSelected.setText(selected.getName());
+        } else //    lblChosenQueue.setText("Chosen queue: " + selected.getName());
+        {
+            this.lblSelected.setText(selected.getName());
+        }
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnChooseQueue;
@@ -280,7 +293,6 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
     private javax.swing.JLabel lblSelected;
     private javax.swing.JList listQueues;
     // End of variables declaration//GEN-END:variables
-
 
     private class VectorTableModel extends AbstractTableModel {
 
@@ -299,21 +311,42 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
-            if (columnIndex == 0)
+            if (columnIndex == 0) {
                 return queues.get(rowIndex).getName();
-            if (columnIndex == 1)
+            }
+            if (columnIndex == 1) {
                 return queues.get(rowIndex).getDescription();
+            }
             return null;
         }
 
         @Override
         public String getColumnName(int col) {
-            if (col == 0)
+            if (col == 0) {
                 return "Name";
-            if (col == 1)
+            }
+            if (col == 1) {
                 return "Description";
+            }
             return null;
         }
-        
+    }
+
+    private class QueueListSelectionListener implements ListSelectionListener {
+
+        public void valueChanged(ListSelectionEvent e) {
+            setButtonStates(((JList) e.getSource()).getSelectedValues().length > 0);
+        }
+    }
+
+    /**
+     * Sets the enable states of the buttons which need a selected queue.
+     * @param enabled
+     */
+    private void setButtonStates(boolean enabled) {
+        btnEditQueue.setEnabled(enabled);
+        btnRemoveQueue.setEnabled(enabled);
+        btnChooseQueue.setEnabled(enabled);
+
     }
 }
