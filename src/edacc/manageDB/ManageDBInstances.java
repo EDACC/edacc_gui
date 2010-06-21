@@ -8,6 +8,7 @@ import edacc.EDACCAddInstanceToInstanceClass;
 import edacc.EDACCApp;
 import edacc.EDACCCreateEditInstanceClassDialog;
 import edacc.EDACCExtWarningErrorDialog;
+import edacc.EDACCExtendedWarning;
 import edacc.EDACCManageDBInstanceFilter;
 import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
@@ -39,6 +40,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 
@@ -124,13 +126,34 @@ public class ManageDBInstances{
         InstanceTableModel tableModel = new InstanceTableModel();
         tableModel.addInstances(toRemove);
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+        EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,mainFrame, "Do you really won't to remove the listed instances?", new JTable(tableModel));
+        
+        //EDACCExtendedWarning.sho
+
+        //EDACCExtWarningErrorDialog removeInstances = new EDACCExtWarningErrorDialog(mainFrame, true, true, tableModel,
+        //        "Do you really won't to remove the listed instances?");
+        //removeInstances.setLocationRelativeTo(mainFrame);
+        //EDACCApp.getApplication().show(removeInstances);
+        //if(EDACCExtendedWarning.){
+//            Tasks.startTask("TryToRemoveInstances", new Class[]{Vector.class, edacc.model.Tasks.class}, new Object[]{toRemove,  null}, this, this.main);
+  //      }
+        /*
+         * Vector<Instance> toRemove = new Vector<Instance>();
+
+        for (int i = 0; i < rows.length; i++) {
+            toRemove.add((Instance )main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(rows[i]), 5));
+        }
+        InstanceTableModel tableModel = new InstanceTableModel();
+        tableModel.addInstances(toRemove);
+        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
         EDACCExtWarningErrorDialog removeInstances = new EDACCExtWarningErrorDialog(mainFrame, true, true, tableModel,
                 "Do you really won't to remove the listed instances?");
         removeInstances.setLocationRelativeTo(mainFrame);
         EDACCApp.getApplication().show(removeInstances);
         if(removeInstances.isAccept()){
             Tasks.startTask("TryToRemoveInstances", new Class[]{Vector.class, edacc.model.Tasks.class}, new Object[]{toRemove,  null}, this, this.main);
-        }       
+        }
+         */
     }
 
     /**
@@ -219,11 +242,13 @@ public class ManageDBInstances{
         if(!md5Error.isEmpty()){
             InstanceTableModel tableModel = new InstanceTableModel();
             tableModel.addInstances(md5Error);
-            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            EDACCExtWarningErrorDialog removeInstances = new EDACCExtWarningErrorDialog(mainFrame, true, false, tableModel,
-                    "Following instances couldn't be written. Because the MD5checksum wasn't valid.");
-            removeInstances.setLocationRelativeTo(mainFrame);
-            EDACCApp.getApplication().show(removeInstances);
+            EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(), "Following instances couldn't be written. Because the MD5checksum wasn't valid.", new JTable(tableModel));
+
+//            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+//            EDACCExtWarningErrorDialog removeInstances = new EDACCExtWarningErrorDialog(mainFrame, true, false, tableModel,
+//                    "Following instances couldn't be written. Because the MD5checksum wasn't valid.");
+//            removeInstances.setLocationRelativeTo(mainFrame);
+//            EDACCApp.getApplication().show(removeInstances);
         }
     }
     
@@ -493,14 +518,19 @@ public class ManageDBInstances{
                 // check if the user really want to remove the instances from the instace classes
                 InstanceTableModel tableModel = new InstanceTableModel();
                 tableModel.addInstances(toRemove);
-                JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-                EDACCExtWarningErrorDialog removeInstances = new EDACCExtWarningErrorDialog(mainFrame, true, true, tableModel,
-                    "Do you really won't to remove the the listed instances from the selected instance classes?");
-                removeInstances.setLocationRelativeTo(mainFrame);
-                EDACCApp.getApplication().show(removeInstances);
+
+//                JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+//                EDACCExtWarningErrorDialog removeInstances = new EDACCExtWarningErrorDialog(mainFrame, true, true, tableModel,
+//                    "Do you really won't to remove the the listed instances from the selected instance classes?");
+//                removeInstances.setLocationRelativeTo(mainFrame);
+//                EDACCApp.getApplication().show(removeInstances);
 
                 // remove the instances from the instace classes
-                if(removeInstances.isAccept()){
+                //if(removeInstances.isAccept()){
+                if(EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
+                        EDACCApp.getApplication().getMainFrame(),
+                        "Do you really won't to remove  the listed instances from the selected instance classes?",
+                        new JTable(tableModel))==EDACCExtendedWarning.RET_OK_OPTION){
                    for(int i = 0; i < toRemove.size(); i++){
                        for(int j = 0; j < selectedRowsInstanceClass.length; j++){
                             InstanceClass tempInstanceClass = (InstanceClass) main.instanceClassTableModel.getValueAt(selectedRowsInstanceClass[j], 4);

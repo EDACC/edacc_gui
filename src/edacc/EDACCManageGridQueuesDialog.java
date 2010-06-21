@@ -22,6 +22,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -245,9 +246,12 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
                     GridQueueDAO.remove(q);
             }
             if (queuesInExp.size() > 0)
-                EDACCApp.getApplication().show(new EDACCExtWarningErrorDialog(this, true, false,
-                        new VectorTableModel(queuesInExp),
-                        "The following queues couldn't be removed, because they are used in an experiment:"));
+                EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS,
+                        EDACCApp.getApplication().getMainFrame(),
+                        "The following queues couldn't be removed, because they are used in an experiment:",new JTable(new VectorTableModel(queuesInExp)) );
+//                EDACCApp.getApplication().show(new EDACCExtWarningErrorDialog(this, true, false,
+//                        new VectorTableModel(queuesInExp),
+//                        "The following queues couldn't be removed, because they are used in an experiment:"));
             refreshView();
         } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
