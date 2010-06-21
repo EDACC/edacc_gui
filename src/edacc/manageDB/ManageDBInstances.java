@@ -125,11 +125,6 @@ public class ManageDBInstances{
         }
         InstanceTableModel tableModel = new InstanceTableModel();
         tableModel.addInstances(toRemove);
-        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,mainFrame, "Do you really won't to remove the listed instances?", new JTable(tableModel));
-        
-        //EDACCExtendedWarning.sho
-
         //EDACCExtWarningErrorDialog removeInstances = new EDACCExtWarningErrorDialog(mainFrame, true, true, tableModel,
         //        "Do you really won't to remove the listed instances?");
         //removeInstances.setLocationRelativeTo(mainFrame);
@@ -149,11 +144,15 @@ public class ManageDBInstances{
         EDACCExtWarningErrorDialog removeInstances = new EDACCExtWarningErrorDialog(mainFrame, true, true, tableModel,
                 "Do you really won't to remove the listed instances?");
         removeInstances.setLocationRelativeTo(mainFrame);
-        EDACCApp.getApplication().show(removeInstances);
-        if(removeInstances.isAccept()){
+        EDACCApp.getApplication().show(removeInstances); */
+        if(EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
+                EDACCApp.getApplication().getMainFrame(),
+                "Do you really won't to remove the listed instances?",
+                new JTable(tableModel))==
+                EDACCExtendedWarning.RET_OK_OPTION){
             Tasks.startTask("TryToRemoveInstances", new Class[]{Vector.class, edacc.model.Tasks.class}, new Object[]{toRemove,  null}, this, this.main);
         }
-         */
+        
     }
 
     /**
