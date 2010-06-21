@@ -4,6 +4,7 @@ import edacc.EDACCApp;
 import edacc.EDACCExperimentMode;
 import edacc.EDACCSolverConfigEntry;
 import edacc.EDACCSolverConfigPanel;
+import edacc.gridqueues.GridQueuesController;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
@@ -24,7 +25,10 @@ import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
+import edacc.model.TaskCancelledException;
 import edacc.model.Tasks;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,12 +41,16 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.swing.SwingUtilities;
@@ -119,6 +127,10 @@ public class ExperimentController {
             main.sorter.setRowFilter(main.rowFilter);
         }
         main.solverConfigPanel.endUpdate();
+        Vector<GridQueue> queues = GridQueueDAO.getAllByExperiment(activeExperiment);
+        if (queues.size() > 0) {
+            GridQueuesController.getInstance().setChosenQueue(queues.get(0));
+        }
         main.afterExperimentLoaded();
     }
 
@@ -322,7 +334,18 @@ public class ExperimentController {
      * @return number of jobs added to the experiment results table
      * @throws SQLException
      */
-    public int generateJobs(int numRuns, Tasks task) throws SQLException {
+    public int generateJobs(int numRuns, final Tasks task) throws SQLException, TaskCancelledException {
+        PropertyChangeListener cancelExperimentResultDAOStatementListener = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("state".equals(evt.getPropertyName()) && task.isCancelled()) {
+                    try {
+                        ExperimentResultDAO.cancelStatement();
+                    } catch (SQLException ex) {
+                    }
+                }
+            }
+        };
         Tasks.getTaskView().setCancelable(true);
         task.setOperationName("Generating jobs for experiment " + activeExperiment.getName());
         // get instances of this experiment
@@ -339,7 +362,6 @@ public class ExperimentController {
         ExperimentDAO.updateNumRuns(activeExperiment);
         if (numRuns < activeExperiment.getNumRuns()) {
             // We have to delete jobs
-            Tasks.getTaskView().setCancelable(false);
             int runsToDelete = activeExperiment.getNumRuns() - numRuns;
             task.setStatus("Preparing..");
             Vector<Integer> runs = ExperimentResultDAO.getAllRunsByExperimentId(activeExperiment.getId());
@@ -356,7 +378,9 @@ public class ExperimentController {
             Vector<ExperimentResult> deletedJobs = new Vector<ExperimentResult>();
             for (int i = 0; i < deleteRuns.size(); i++) {
                 int run = deleteRuns.get(i);
-                // TODO status
+                if (task.isCancelled()) {
+                    throw new TaskCancelledException();
+                }
                 deletedJobs.addAll(ExperimentResultDAO.getAllByExperimentIdAndRun(activeExperiment.getId(), run));
                 task.setTaskProgress((float) (i + 1) / (deleteRuns.size()));
             }
@@ -367,30 +391,56 @@ public class ExperimentController {
                 return 0;
             } else {
                 task.setStatus("Deleting jobs..");
-                ExperimentResultDAO.deleteExperimentResults(deletedJobs);
-                task.setStatus("Updating existing jobs..");
-                Vector<ExperimentResult> updateJobs = new Vector<ExperimentResult>();
-                for (int i = 0; i < runs.size(); i++) {
-                    Vector<ExperimentResult> tmp = ExperimentResultDAO.getAllByExperimentIdAndRun(activeExperiment.getId(), runs.get(i));
-                    for (ExperimentResult er : tmp) {
-                        er.setRun(i);
+                task.addPropertyChangeListener(cancelExperimentResultDAOStatementListener);
+                try { 
+                    ExperimentResultDAO.setAutoCommit(false);
+                    ExperimentResultDAO.deleteExperimentResults(deletedJobs);
+                    task.setStatus("Updating existing jobs..");
+                    Vector<ExperimentResult> updateJobs = new Vector<ExperimentResult>();
+                    for (int i = 0; i < runs.size(); i++) {
+                        if (task.isCancelled()) {
+                            throw new TaskCancelledException();
+                        }
+                        Vector<ExperimentResult> tmp = ExperimentResultDAO.getAllByExperimentIdAndRun(activeExperiment.getId(), runs.get(i));
+                        for (ExperimentResult er : tmp) {
+                            er.setRun(i);
+                        }
+                        updateJobs.addAll(tmp);
+                        task.setTaskProgress((float) (i + 1) / (runs.size()));
                     }
-                    updateJobs.addAll(tmp);
-                    task.setTaskProgress((float) (i + 1) / (runs.size()));
+                    task.setTaskProgress(0.f);
+                    
+
+                    ExperimentResultDAO.batchUpdateRun(updateJobs);
+                } catch (SQLException ex) {
+                    if (ex.getMessage().contains("cancelled")) {
+                        throw new TaskCancelledException();
+                    }
+                    throw ex;
+                } finally {
+                    ExperimentResultDAO.setAutoCommit(true);
                 }
-                task.setTaskProgress(0.f);
-                ExperimentResultDAO.batchUpdateRun(updateJobs);
+                task.removePropertyChangeListener(cancelExperimentResultDAOStatementListener);
                 ExperimentDAO.updateNumRuns(activeExperiment);
             }
             Tasks.getTaskView().setCancelable(true);
         }
+        Vector<ExperimentResult> res = ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId());
+        HashMap<ExperimentResult, ExperimentResult> existingResults = new HashMap<ExperimentResult, ExperimentResult>();
+        for (ExperimentResult e : res) {
+            existingResults.put(e, e);
+        }
+        ExperimentResult er = ExperimentResultDAO.createExperimentResult(0, 0, 0, 0, 0, 0, activeExperiment.getId(), 0);
         if (activeExperiment.isAutoGeneratedSeeds() && activeExperiment.isLinkSeeds()) {
             // first pass over already existing jobs to accumulate existing linked seeds
             for (Instance i : listInstances) {
                 for (SolverConfiguration c : vsc) {
                     for (int run = 0; run < numRuns; ++run) {
                         task.setStatus("Preparing job generation");
-                        if (ExperimentResultDAO.jobExists(run, c.getId(), i.getId(), activeExperiment.getId())) {
+                        er.setRun(run);
+                        er.setInstanceId(i.getId());
+                        er.setSolverConfigId(c.getId());
+                        if (existingResults.containsKey(er)) {
                             // use the already existing jobs to populate the seed group hash table so jobs of newly added solver configs use
                             // the same seeds as already existing jobs
                             int seed = ExperimentResultDAO.getSeedValue(run, c.getId(), i.getId(), activeExperiment.getId());
@@ -404,8 +454,7 @@ public class ExperimentController {
             }
         }
         if (task.isCancelled()) {
-            task.setStatus("Cancelled");
-            return 0;
+            throw new TaskCancelledException();
         }
 
 
@@ -416,25 +465,27 @@ public class ExperimentController {
                 for (int run = 0; run < numRuns; ++run) {
                     task.setTaskProgress((float) done / (float) elements);
                     if (task.isCancelled()) {
-                        task.setStatus("Cancelled");
-                        return 0;
+                        throw new TaskCancelledException();
                     }
                     task.setStatus("Adding job " + done + " of " + elements);
                     // check if job already exists
-                    if (ExperimentResultDAO.jobExists(run, c.getId(), i.getId(), activeExperiment.getId()) == false) {
+                    er.setRun(run);
+                    er.setInstanceId(i.getId());
+                    er.setSolverConfigId(c.getId());
+                    if (!existingResults.containsKey(er)) {
                         if (activeExperiment.isAutoGeneratedSeeds() && activeExperiment.isLinkSeeds()) {
                             Integer seed = linked_seeds.get(new SeedGroup(c.getSeed_group(), i.getId(), run));
                             if (seed != null) {
-                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, seed.intValue(), "", 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
+                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, seed.intValue(), 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
                             } else {
                                 Integer new_seed = new Integer(generateSeed(activeExperiment.getMaxSeed()));
                                 linked_seeds.put(new SeedGroup(c.getSeed_group(), i.getId(), run), new_seed);
-                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, new_seed.intValue(), "", 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
+                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, new_seed.intValue(), 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
                             }
                         } else if (activeExperiment.isAutoGeneratedSeeds() && !activeExperiment.isLinkSeeds()) {
-                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, generateSeed(activeExperiment.getMaxSeed()), "", 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
+                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, generateSeed(activeExperiment.getMaxSeed()), 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
                         } else {
-                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, 0, "", 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
+                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, -1, 0, 0, -1, c.getId(), activeExperiment.getId(), i.getId()));
                         }
                         experiments_added++;
                     }
@@ -444,8 +495,17 @@ public class ExperimentController {
             }
         }
         task.setTaskProgress(0.f);
+        task.addPropertyChangeListener(cancelExperimentResultDAOStatementListener);
         task.setStatus("Saving changes to database..");
-        ExperimentResultDAO.batchSave(experiment_results);
+        try {
+            ExperimentResultDAO.batchSave(experiment_results);
+        } catch (SQLException ex) {
+            if (ex.getMessage().contains("cancelled")) {
+                throw new TaskCancelledException();
+            }
+            throw ex;
+        }
+        task.removePropertyChangeListener(cancelExperimentResultDAOStatementListener);
         ExperimentDAO.updateNumRuns(activeExperiment);
         return experiments_added;
     }
@@ -595,10 +655,10 @@ public class ExperimentController {
         FileInputStream in = new FileInputStream(f);
         zos.putNextEntry(entry);
 
-        byte[] buf = new byte[256*1024];
+        byte[] buf = new byte[256 * 1024];
         int len;
         while ((len = in.read(buf)) > -1) {
-            zos.write(buf,0,len);
+            zos.write(buf, 0, len);
         }
         zos.closeEntry();
         in.close();
@@ -732,10 +792,15 @@ public class ExperimentController {
             if (numRuns != activeExperiment.getNumRuns()) {
                 return true;
             }
-            if (!SolverConfigurationDAO.getAllSolverConfigIdsByExperimentId(activeExperiment.getId()).equals(ExperimentResultDAO.getAllSolverConfigIdsByExperimentId(activeExperiment.getId()))) {
+            Vector<Integer> solverConfigIds = ExperimentResultDAO.getAllSolverConfigIdsByExperimentId(activeExperiment.getId());
+            if (solverConfigIds.size() == 0) {
+                return false;
+            }
+            Vector<Integer> instanceIds = ExperimentResultDAO.getAllInstanceIdsByExperimentId(activeExperiment.getId());
+            if (!SolverConfigurationDAO.getAllSolverConfigIdsByExperimentId(activeExperiment.getId()).equals(solverConfigIds)) {
                 return true;
             }
-            if (!ExperimentHasInstanceDAO.getAllInstanceIdsByExperimentId(activeExperiment.getId()).equals(ExperimentResultDAO.getAllInstanceIdsByExperimentId(activeExperiment.getId()))) {
+            if (!ExperimentHasInstanceDAO.getAllInstanceIdsByExperimentId(activeExperiment.getId()).equals(instanceIds)) {
                 return true;
             }
         } catch (SQLException _) {

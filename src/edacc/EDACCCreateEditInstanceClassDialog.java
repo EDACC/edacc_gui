@@ -4,7 +4,7 @@
  */
 
 /*
- * EDACCCreateInstanceClassDialog.java
+ * EDACCCreateEditInstanceClassDialog.java
  *
  * Created on 19.03.2010, 14:55:29
  */
@@ -22,12 +22,43 @@ import javax.swing.JOptionPane;
  *
  * @author rretz
  */
-public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
+public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
      InstanceClassTableModel tableModel;
-    /** Creates new form EDACCCreateInstanceClassDialog */
-    public EDACCCreateInstanceClassDialog(java.awt.Frame parent, boolean modal, InstanceClassTableModel tableModel) {
+     InstanceClass instanceClass;
+
+     /**
+      * Creates new form EDACCCreateEditInstanceClassDialog
+      * @param parent
+      * @param modal
+      * @param tableModel
+      * @param rowOfInstanceClass if its -1 the dialog is used as a create dialog, else as a edit dialog
+      */
+    public EDACCCreateEditInstanceClassDialog(java.awt.Frame parent, boolean modal, InstanceClassTableModel tableModel,
+            int rowOfInstanceClass) {
         super(parent, modal);
         initComponents();
+        if(rowOfInstanceClass == -1){
+            this.jButtonEdit.setVisible(false);
+            this.jButtonCreate.setEnabled(true);
+        } else{
+            this.jButtonCreate.setVisible(false);
+            this.jButtonEdit.setEnabled(true);
+            this.jButtonEdit.setText("Edit");
+            this.jButtonEdit.setVisible(true);
+            
+            this.instanceClass = (InstanceClass)tableModel.getValueAt(rowOfInstanceClass, 4);
+            this.jTextFieldName.setText(instanceClass.getName());
+            this.jTextArea1.setText(instanceClass.getDescription());
+            if(instanceClass.isSource())
+                this.jRadioButtonSourceClass.setSelected(true);
+            else
+                this.jRadioButtonUserClass.setSelected(true);
+
+            this.jRadioButtonSourceClass.setEnabled(false);
+            this.jRadioButtonUserClass.setEnabled(false);
+        }
+            
+
         this.tableModel = tableModel;
     }
 
@@ -44,6 +75,7 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         jButtonCancel = new javax.swing.JButton();
         jButtonCreate = new javax.swing.JButton();
+        jButtonEdit = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabelName = new javax.swing.JLabel();
         jTextFieldName = new javax.swing.JTextField();
@@ -54,7 +86,7 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
         jRadioButtonUserClass = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCCreateInstanceClassDialog.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCCreateEditInstanceClassDialog.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setAlwaysOnTop(true);
         setMinimumSize(new java.awt.Dimension(350, 300));
@@ -71,10 +103,23 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
         });
 
         jButtonCreate.setText(resourceMap.getString("jButtonCreate.text")); // NOI18N
+        jButtonCreate.setEnabled(false);
         jButtonCreate.setName("jButtonCreate"); // NOI18N
         jButtonCreate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonCreateActionPerformed(evt);
+            }
+        });
+
+        jButtonEdit.setText(resourceMap.getString("jButtonEdit.text")); // NOI18N
+        jButtonEdit.setEnabled(false);
+        jButtonEdit.setMaximumSize(new java.awt.Dimension(65, 23));
+        jButtonEdit.setMinimumSize(new java.awt.Dimension(65, 23));
+        jButtonEdit.setName("jButtonEdit"); // NOI18N
+        jButtonEdit.setPreferredSize(new java.awt.Dimension(65, 23));
+        jButtonEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonEditActionPerformed(evt);
             }
         });
 
@@ -85,7 +130,9 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButtonCancel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 188, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 137, Short.MAX_VALUE)
+                .addComponent(jButtonEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonCreate)
                 .addContainerGap())
         );
@@ -95,10 +142,11 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(13, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonCancel)
                     .addComponent(jButtonCreate)
-                    .addComponent(jButtonCancel)))
+                    .addComponent(jButtonEdit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -203,11 +251,6 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
                     "Please enter a instace class name." ,
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
-       }else if(jTextArea1.getText().isEmpty()){
-        JOptionPane.showMessageDialog(this,
-                    "Please enter a description of the instance class",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
        }else if(SourceOrUserClass.getSelection() == null){
         JOptionPane.showMessageDialog(this,
                     "Please choos if the new instance class is a source class oder a user class." ,
@@ -217,9 +260,12 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
            
                 try {
                     InstanceClass ret;
+                    String description = "";
+                    if(!jTextArea1.getText().isEmpty())
+                        description = jTextArea1.getText();
                     if(jRadioButtonSourceClass.isSelected()){
-                        ret = InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), jTextArea1.getText(), true);
-                     }else ret =  InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), jTextArea1.getText(), false);
+                        ret = InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), description, true);
+                     }else ret =  InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), description, false);
                     tableModel.addClass(ret);
                     this.jTextArea1.setText("");
                     this.jTextFieldName.setText("");
@@ -239,11 +285,33 @@ public class EDACCCreateInstanceClassDialog extends javax.swing.JDialog {
        }
     }//GEN-LAST:event_jButtonCreateActionPerformed
 
+    private void jButtonEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEditActionPerformed
+          if(jTextFieldName.getText().isEmpty()){
+            JOptionPane.showMessageDialog(this,
+                        "Please enter a instace class name." ,
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+        }else {
+            try {
+                instanceClass.setName(jTextFieldName.getText());
+                instanceClass.setDescription(jTextArea1.getText());
+                InstanceClassDAO.save(instanceClass);
+                this.dispose();
+            } catch (SQLException ex) {
+                 JOptionPane.showMessageDialog(this,
+                    "There is a Problem with the database: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_jButtonEditActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup SourceOrUserClass;
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonCreate;
+    private javax.swing.JButton jButtonEdit;
     private javax.swing.JLabel jLabelDescription;
     private javax.swing.JLabel jLabelName;
     private javax.swing.JPanel jPanel1;

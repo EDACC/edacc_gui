@@ -3,43 +3,57 @@ package edacc.model;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
-import java.util.Hashtable;
 import java.util.Vector;
 
 public class ExperimentResultDAO {
+
+    protected static PreparedStatement curSt = null;
     protected static final String table = "ExperimentResults";
     protected static final String insertQuery = "INSERT INTO " + table + " (run, status, seed, resultFileName, time, statusCode, " +
-                                                "SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance) VALUES (?,?,?,?,?,?,?,?,?)";
+            "SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance) VALUES (?,?,?,?,?,?,?,?,?)";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idJob=?";
 
-    public static ExperimentResult createExperimentResult(int run, int status, int seed, String resultFileName, float time, int statusCode, int SolverConfigId, int ExperimentId, int InstanceId) throws SQLException {
-        ExperimentResult r = new ExperimentResult(run, status, seed, resultFileName, time, statusCode, SolverConfigId, ExperimentId, InstanceId);
+    public static ExperimentResult createExperimentResult(int run, int status, int seed, float time, int statusCode, int SolverConfigId, int ExperimentId, int InstanceId) throws SQLException {
+        ExperimentResult r = new ExperimentResult(run, status, seed, time, statusCode, SolverConfigId, ExperimentId, InstanceId);
         r.setNew();
         return r;
     }
 
     public static void batchSave(Vector<ExperimentResult> v) throws SQLException {
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
-        DatabaseConnector.getInstance().getConn().setAutoCommit(false);
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
-        for (ExperimentResult r : v) {
-            st.setInt(1, r.getRun());
-            st.setInt(2, r.getStatus());
-            st.setInt(3, r.getSeed());
-            st.setString(4, r.getResultFileName());
-            st.setFloat(5, r.getTime());
-            st.setInt(6, r.getStatusCode());
-            st.setInt(7, r.getSolverConfigId());
-            st.setInt(8, r.getExperimentId());
-            st.setInt(9, r.getInstanceId());
-            st.addBatch();
-            r.setSaved(); // this should only be done if the batch save actually 
-                          // gets commited, right now this might not be the case if there's an DB exception
+        try {
+            DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
+            curSt = st;
+            for (ExperimentResult r : v) {
+                st.setInt(1, r.getRun());
+                st.setInt(2, r.getStatus());
+                st.setInt(3, r.getSeed());
+                st.setString(4, r.getResultFileName());
+                st.setFloat(5, r.getTime());
+                st.setInt(6, r.getStatusCode());
+                st.setInt(7, r.getSolverConfigId());
+                st.setInt(8, r.getExperimentId());
+                st.setInt(9, r.getInstanceId());
+                st.addBatch();
+                r.setSaved();
+                /* this should only be done if the batch save actually
+                 * gets commited, right now this might not be the case
+                 * if there's an DB exception or the executeBatch() is
+                 * cancelled (see cancelStatement()).
+                 * Without caching this might not be a problem.
+                 */
+            }
+            st.executeBatch();
+            st.close();
+        } catch (SQLException e) {
+            DatabaseConnector.getInstance().getConn().rollback();
+            throw e;
+        } finally {
+            curSt = null;
+            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
         }
-        st.executeBatch();
-        DatabaseConnector.getInstance().getConn().commit();
-        DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
-        st.close();
+
     }
 
     /**
@@ -49,19 +63,65 @@ public class ExperimentResultDAO {
      */
     public static void batchUpdateRun(Vector<ExperimentResult> v) throws SQLException {
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
-        DatabaseConnector.getInstance().getConn().setAutoCommit(false);
-        final String query = "UPDATE " + table + " SET run=? WHERE idJob=?";
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
-        for (ExperimentResult r: v) {
-            st.setInt(1, r.getRun());
-            st.setInt(2, r.getId());
-            st.addBatch();
-            r.setSaved(); // same as above.
+        try {
+            DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+            final String query = "UPDATE " + table + " SET run=? WHERE idJob=?";
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+            curSt = st;
+            for (ExperimentResult r : v) {
+                st.setInt(1, r.getRun());
+                st.setInt(2, r.getId());
+                st.addBatch();
+                r.setSaved();
+                /* this should only be done if the batch update actually
+                 * gets commited, right now this might not be the case
+                 * if there's an DB exception or the executeBatch() is
+                 * cancelled (see cancelStatement()).
+                 * Without caching this might not be a problem.
+                 */
+            }
+            st.executeBatch();
+            st.close();
+        } catch (SQLException e) {
+            DatabaseConnector.getInstance().getConn().rollback();
+            throw e;
+        } finally {
+            curSt = null;
+            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
         }
-        st.executeBatch();
-        DatabaseConnector.getInstance().getConn().commit();
-        DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
-        st.close();
+    }
+
+    /**
+     * Deletes all experiment results at once (batch).
+     * @param experimentResults the experiment results to be deleted
+     * @throws SQLException
+     */
+    public static void deleteExperimentResults(Vector<ExperimentResult> experimentResults) throws SQLException {
+        boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
+        try {
+            DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
+            curSt = st;
+            for (ExperimentResult r : experimentResults) {
+                st.setInt(1, r.getId());
+                st.addBatch();
+                r.setDeleted();
+                /* this should only be done if the batch delete actually
+                 * gets commited, right now this might not be the case
+                 * if there's an DB exception or the executeBatch() is
+                 * cancelled (see cancelStatement()).
+                 * Without caching this might not be a problem.
+                 */
+            }
+            st.executeBatch();
+            st.close();
+        } catch (SQLException e) {
+            DatabaseConnector.getInstance().getConn().rollback();
+            throw e;
+        } finally {
+            curSt = null;
+            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+        }
     }
 
     private static ExperimentResult getExperimentResultFromResultSet(ResultSet rs) throws SQLException {
@@ -95,7 +155,6 @@ public class ExperimentResultDAO {
         return count;
     }
 
-
     /**
      * checks the database if a job with the given parameters already exists
      * @param run
@@ -106,7 +165,7 @@ public class ExperimentResultDAO {
      * @throws SQLException
      */
     public static boolean jobExists(int run, int solverConfigId, int InstanceId, int ExperimentId) throws SQLException {
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT COUNT(*) as count FROM " + table  + " " +
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT COUNT(*) as count FROM " + table + " " +
                 "WHERE run=? AND SolverConfig_idSolverConfig=? AND Instances_idInstance=? AND Experiment_idExperiment=? ;");
         st.setInt(1, run);
         st.setInt(2, solverConfigId);
@@ -129,7 +188,7 @@ public class ExperimentResultDAO {
      * @throws SQLException
      */
     public static int getSeedValue(int run, int solverConfigId, int InstanceId, int ExperimentId) throws SQLException {
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT seed FROM " + table  + " " +
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT seed FROM " + table + " " +
                 "WHERE run=? AND SolverConfig_idSolverConfig=? AND Instances_idInstance=? AND Experiment_idExperiment=? ;");
         st.setInt(1, run);
         st.setInt(2, solverConfigId);
@@ -231,13 +290,11 @@ public class ExperimentResultDAO {
         return res;
     }
 
-
     public static Vector<ExperimentResult> getAllByExperimentIdAndRun(int eid, int run) throws SQLException {
         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT * FROM " + table + " " +
-                "WHERE Experiment_idExperiment=? AND run=?;"
-                );
+                "WHERE Experiment_idExperiment=? AND run=?;");
         st.setInt(1, eid);
         st.setInt(2, run);
         ResultSet rs = st.executeQuery();
@@ -254,8 +311,7 @@ public class ExperimentResultDAO {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT COUNT(*) FROM " + table + " " +
                 "WHERE Experiment_idExperiment=? " +
-                "GROUP BY Instance_idInstance"
-                );
+                "GROUP BY Instance_idInstance");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
@@ -269,8 +325,7 @@ public class ExperimentResultDAO {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT COUNT(*) FROM " + table + " " +
                 "WHERE Experiment_idExperiment=? " +
-                "GROUP BY SolverConfig_idSolverConfig"
-                );
+                "GROUP BY SolverConfig_idSolverConfig");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
@@ -283,8 +338,7 @@ public class ExperimentResultDAO {
         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT * FROM " + table + " " +
-                "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=?;"
-                );
+                "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=?;");
         st.setInt(1, sc.getExperiment_id());
         st.setInt(2, sc.getId());
         ResultSet rs = st.executeQuery();
@@ -297,11 +351,10 @@ public class ExperimentResultDAO {
     }
 
     public static Vector<ExperimentResult> getAllByExperimentHasInstance(ExperimentHasInstance ehi) throws SQLException {
-         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
+        Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT * FROM " + table + " " +
-                "WHERE Experiment_idExperiment=? AND Instances_idInstance=?;"
-                );
+                "WHERE Experiment_idExperiment=? AND Instances_idInstance=?;");
         st.setInt(1, ehi.getExperiment_id());
         st.setInt(2, ehi.getInstances_id());
         ResultSet rs = st.executeQuery();
@@ -313,19 +366,16 @@ public class ExperimentResultDAO {
         return res;
     }
 
-    public static void deleteExperimentResults(Vector<ExperimentResult> experimentResults) throws SQLException {
-        boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
-        DatabaseConnector.getInstance().getConn().setAutoCommit(false);
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
-        for (ExperimentResult r : experimentResults) {
-            st.setInt(1, r.getId());
-            st.addBatch();
-            r.setDeleted(); // this should only be done if the batch save actually
-                          // gets commited, right now this might not be the case if there's an DB exception
+    public static void setAutoCommit(boolean commit) throws SQLException {
+        DatabaseConnector.getInstance().getConn().setAutoCommit(commit);
+    }
+
+    public static void cancelStatement() throws SQLException {
+        if (curSt != null) {
+            try {
+                curSt.cancel();
+            } catch (Exception _) {
+            }
         }
-        st.executeBatch();
-        DatabaseConnector.getInstance().getConn().commit();
-        DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
-        st.close();
     }
 }

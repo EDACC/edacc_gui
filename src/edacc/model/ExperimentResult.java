@@ -16,7 +16,7 @@ public class ExperimentResult extends BaseModel {
     protected ExperimentResult() {
     }
 
-    protected ExperimentResult(int run, int status, int seed, String resultFileName, float time, int statusCode, int SolverConfigId, int ExperimentId, int InstanceId) {
+    protected ExperimentResult(int run, int status, int seed, float time, int statusCode, int SolverConfigId, int ExperimentId, int InstanceId) {
         this.run = run;
         this.status = status;
         this.seed = seed;
@@ -31,8 +31,14 @@ public class ExperimentResult extends BaseModel {
 
     @Override
     public int hashCode() {
-        return 31 + 3 * id;
+        int hash = 5;
+        hash = 67 * hash + this.run;
+        hash = 67 * hash + this.SolverConfigId;
+        hash = 67 * hash + this.ExperimentId;
+        hash = 67 * hash + this.InstanceId;
+        return hash;
     }
+
 
     @Override
     public boolean equals(Object obj) {
@@ -43,25 +49,7 @@ public class ExperimentResult extends BaseModel {
             return false;
         }
         final ExperimentResult other = (ExperimentResult) obj;
-        if (this.id != other.id) {
-            return false;
-        }
         if (this.run != other.run) {
-            return false;
-        }
-        if (this.status != other.status) {
-            return false;
-        }
-        if (this.seed != other.seed) {
-            return false;
-        }
-        if ((this.resultFileName == null) ? (other.resultFileName != null) : !this.resultFileName.equals(other.resultFileName)) {
-            return false;
-        }
-        if (this.time != other.time) {
-            return false;
-        }
-        if (this.statusCode != other.statusCode) {
             return false;
         }
         if (this.SolverConfigId != other.SolverConfigId) {
