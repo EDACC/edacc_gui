@@ -41,7 +41,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.Savepoint;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -49,8 +48,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.swing.SwingUtilities;
@@ -713,7 +710,19 @@ public class ExperimentController {
     }
 
     private void addRunScript(ZipOutputStream zos, GridQueue q) throws IOException {
-        String sRun = "#!/bin/bash\n" + "for (( i = 1; i < " + q.getNumNodes() + "; i++ ))\n" + "do\n" + "    qsub start_client.pbs\n" + "done\n";
+        String sRun = "#!/bin/bash\n" + 
+                "chmod a-rwx client\n" +
+                "chmod u+x client\n" +
+                "chmod a-rwx config\n" +
+                "chmod u+r config\n" +
+                "chmod a-rwx solvers/*\n" +
+                "chmod u+x solvers/*\n" +
+                "chmod a-rwx instances/*\n" +
+                "chmod u+r instances/*\n" +
+                "for (( i = 0; i < " + q.getNumNodes() + "; i++ ))\n" +
+                "do\n" +
+                "    qsub start_client.pbs\n" +
+                "done\n";
 
         // write file into zip archive
         ZipEntry entry = new ZipEntry("run.sh");

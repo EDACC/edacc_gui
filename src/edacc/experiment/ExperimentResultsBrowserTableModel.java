@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edacc.experiment;
 
 import java.sql.SQLException;
@@ -181,12 +177,42 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         if (this.jobs == null || jobs == null || this.jobs.size() != jobs.size()) {
             fullUpdate = true;
         }
-        this.jobs = jobs;
-        parameterInstances = new HashMap<Integer, Vector<ParameterInstance>>();
+        LinkedList<Integer> changedRows = new LinkedList<Integer>();
+        if (!fullUpdate) {
+            // here: this.jobs.size() == jobs.size() => we only want to update the rows that have changed (GUI)
+            HashMap<ExperimentResult, ExperimentResult> jobMap = new HashMap<ExperimentResult, ExperimentResult>();
+            for (ExperimentResult job: jobs) {
+                jobMap.put(job, job);
+            }
+            for (ExperimentResult job: this.jobs) {
+                if (!jobMap.containsKey(job)) {
+                    // there is a job we don't have in our local table, so we replace
+                    // this.jobs with jobs => fullUpdate
+                    fullUpdate = true;
+                }
+            }
+            if (!fullUpdate) {
+                // update the changed jobs
+                for (int i = 0; i < this.jobs.size(); i++) {
+                    ExperimentResult j1 = this.jobs.get(i);
+                    ExperimentResult j2 = jobMap.get(j1);
+                    if (j1.getStatus() != j2.getStatus() || j1.getTime() != j2.getTime()) {
+                        j1.setStatus(j2.getStatus());
+                        j1.setTime(j2.getTime());
+                        changedRows.add(i);
+                    }
+                }
+            }
+        }
         if (fullUpdate) {
+            this.jobs = jobs;
+            parameterInstances = new HashMap<Integer, Vector<ParameterInstance>>();
             fireTableDataChanged();
         } else {
-            fireTableRowsUpdated(0, this.getRowCount() - 1);
+            // send the rows updated notification to the gui for the changed rows
+            for (int changedRow: changedRows) {
+                fireTableRowsUpdated(changedRow, changedRow);
+            }
         }
     }
 
