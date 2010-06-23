@@ -216,7 +216,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         }
     }
 
-    private int getIndexForColumn(int col) {
+    public int getIndexForColumn(int col) {
         for (int i = 0; i < visible.length; i++) {
             if (visible[i]) {
                 col--;

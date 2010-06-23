@@ -116,7 +116,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
                 @Override
                 public Object getValueAt(int row, int column) {
-                    if (column == 8) {
+                    // this is the status column
+                    if (((ExperimentResultsBrowserTableModel)this.getModel()).getIndexForColumn(column) == 8) {
                         return ""+(char)(((ExperimentResultsBrowserTableModel)this.getModel()).getStatusCode(row)+68);
                     }
                     return ((ExperimentResultsBrowserTableModel)this.getModel()).getValueAt(row, column);
