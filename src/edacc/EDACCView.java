@@ -197,22 +197,26 @@ public class EDACCView extends FrameView implements Observer {
         menuBar.setAutoscrolls(true);
         menuBar.setName("menuBar"); // NOI18N
 
+        fileMenu.setMnemonic('F');
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCView.class);
         fileMenu.setText(resourceMap.getString("fileMenu.text")); // NOI18N
         fileMenu.setName("fileMenu"); // NOI18N
 
         javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCView.class, this);
         connectToDBMenuItem.setAction(actionMap.get("btnConnectToDB")); // NOI18N
+        connectToDBMenuItem.setMnemonic('C');
         connectToDBMenuItem.setText(resourceMap.getString("connectToDBMenuItem.text")); // NOI18N
         connectToDBMenuItem.setName("connectToDBMenuItem"); // NOI18N
         fileMenu.add(connectToDBMenuItem);
 
         disconnectMenuItem.setAction(actionMap.get("btnDisconnect")); // NOI18N
+        disconnectMenuItem.setMnemonic('D');
         disconnectMenuItem.setText(resourceMap.getString("disconnectMenuItem.text")); // NOI18N
         disconnectMenuItem.setName("disconnectMenuItem"); // NOI18N
         fileMenu.add(disconnectMenuItem);
 
         generateDBMenuItem.setAction(actionMap.get("btnGenerateTables")); // NOI18N
+        generateDBMenuItem.setMnemonic('G');
         generateDBMenuItem.setText(resourceMap.getString("generateDBMenuItem.text")); // NOI18N
         generateDBMenuItem.setName("generateDBMenuItem"); // NOI18N
         fileMenu.add(generateDBMenuItem);
@@ -224,31 +228,37 @@ public class EDACCView extends FrameView implements Observer {
         menuBar.add(fileMenu);
 
         gridMenu.setAction(actionMap.get("btnGridSettings")); // NOI18N
+        gridMenu.setMnemonic('G');
         gridMenu.setText(resourceMap.getString("gridMenu.text")); // NOI18N
         gridMenu.setName("gridMenu"); // NOI18N
 
         settingsMenuItem.setAction(actionMap.get("btnGridSettings")); // NOI18N
+        settingsMenuItem.setMnemonic('S');
         settingsMenuItem.setText(resourceMap.getString("settingsMenuItem.text")); // NOI18N
         settingsMenuItem.setName("settingsMenuItem"); // NOI18N
         gridMenu.add(settingsMenuItem);
 
         menuBar.add(gridMenu);
 
+        modusMenu.setMnemonic('M');
         modusMenu.setText(resourceMap.getString("modusMenu.text")); // NOI18N
         modusMenu.setName("modusMenu"); // NOI18N
 
         manageDBModeMenuItem.setAction(actionMap.get("manageDBMode")); // NOI18N
+        manageDBModeMenuItem.setMnemonic('D');
         manageDBModeMenuItem.setText(resourceMap.getString("manageDBModeMenuItem.text")); // NOI18N
         manageDBModeMenuItem.setName("manageDBModeMenuItem"); // NOI18N
         modusMenu.add(manageDBModeMenuItem);
 
         manageExperimentModeMenuItem.setAction(actionMap.get("manageExperimentMode")); // NOI18N
+        manageExperimentModeMenuItem.setMnemonic('E');
         manageExperimentModeMenuItem.setText(resourceMap.getString("manageExperimentModeMenuItem.text")); // NOI18N
         manageExperimentModeMenuItem.setName("manageExperimentModeMenuItem"); // NOI18N
         modusMenu.add(manageExperimentModeMenuItem);
 
         menuBar.add(modusMenu);
 
+        helpMenu.setMnemonic('H');
         helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
         helpMenu.setName("helpMenu"); // NOI18N
 
@@ -256,6 +266,7 @@ public class EDACCView extends FrameView implements Observer {
         aboutMenuItem.setName("aboutMenuItem"); // NOI18N
         helpMenu.add(aboutMenuItem);
 
+        helpMenuItem.setMnemonic('H');
         helpMenuItem.setText(resourceMap.getString("helpMenuItem.text")); // NOI18N
         helpMenuItem.setName("helpMenuItem"); // NOI18N
         helpMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -286,7 +297,7 @@ public class EDACCView extends FrameView implements Observer {
             .add(statusPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(statusMessageLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 836, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 822, Short.MAX_VALUE)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusAnimationLabel)

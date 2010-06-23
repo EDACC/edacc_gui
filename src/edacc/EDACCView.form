@@ -35,6 +35,7 @@
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="fileMenu">
           <Properties>
+            <Property name="mnemonic" type="int" value="70"/>
             <Property name="text" type="java.lang.String" resourceKey="fileMenu.text"/>
             <Property name="name" type="java.lang.String" value="fileMenu" noResource="true"/>
           </Properties>
@@ -48,6 +49,7 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="btnConnectToDB" methodName="btnConnectToDB"/>
                 </Property>
+                <Property name="mnemonic" type="int" value="67"/>
                 <Property name="text" type="java.lang.String" resourceKey="connectToDBMenuItem.text"/>
                 <Property name="name" type="java.lang.String" value="connectToDBMenuItem" noResource="true"/>
               </Properties>
@@ -57,6 +59,7 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="btnDisconnect" methodName="btnDisconnect"/>
                 </Property>
+                <Property name="mnemonic" type="int" value="68"/>
                 <Property name="text" type="java.lang.String" resourceKey="disconnectMenuItem.text"/>
                 <Property name="name" type="java.lang.String" value="disconnectMenuItem" noResource="true"/>
               </Properties>
@@ -66,6 +69,7 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="btnGenerateTables" methodName="btnGenerateTables"/>
                 </Property>
+                <Property name="mnemonic" type="int" value="71"/>
                 <Property name="text" type="java.lang.String" resourceKey="generateDBMenuItem.text"/>
                 <Property name="name" type="java.lang.String" value="generateDBMenuItem" noResource="true"/>
               </Properties>
@@ -89,6 +93,7 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
               <action class="edacc.EDACCView" id="btnGridSettings" methodName="btnGridSettings"/>
             </Property>
+            <Property name="mnemonic" type="int" value="71"/>
             <Property name="text" type="java.lang.String" resourceKey="gridMenu.text"/>
             <Property name="name" type="java.lang.String" value="gridMenu" noResource="true"/>
           </Properties>
@@ -98,6 +103,7 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="btnGridSettings" methodName="btnGridSettings"/>
                 </Property>
+                <Property name="mnemonic" type="int" value="83"/>
                 <Property name="text" type="java.lang.String" resourceKey="settingsMenuItem.text"/>
                 <Property name="name" type="java.lang.String" value="settingsMenuItem" noResource="true"/>
               </Properties>
@@ -106,6 +112,7 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="modusMenu">
           <Properties>
+            <Property name="mnemonic" type="int" value="77"/>
             <Property name="text" type="java.lang.String" resourceKey="modusMenu.text"/>
             <Property name="name" type="java.lang.String" value="modusMenu" noResource="true"/>
           </Properties>
@@ -115,6 +122,7 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="manageDBMode" methodName="manageDBMode"/>
                 </Property>
+                <Property name="mnemonic" type="int" value="68"/>
                 <Property name="text" type="java.lang.String" resourceKey="manageDBModeMenuItem.text"/>
                 <Property name="name" type="java.lang.String" value="manageDBModeMenuItem" noResource="true"/>
               </Properties>
@@ -124,6 +132,7 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="manageExperimentMode" methodName="manageExperimentMode"/>
                 </Property>
+                <Property name="mnemonic" type="int" value="69"/>
                 <Property name="text" type="java.lang.String" resourceKey="manageExperimentModeMenuItem.text"/>
                 <Property name="name" type="java.lang.String" value="manageExperimentModeMenuItem" noResource="true"/>
               </Properties>
@@ -132,6 +141,7 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="helpMenu">
           <Properties>
+            <Property name="mnemonic" type="int" value="72"/>
             <Property name="text" type="java.lang.String" resourceKey="helpMenu.text"/>
             <Property name="name" type="java.lang.String" value="helpMenu" noResource="true"/>
           </Properties>
@@ -154,6 +164,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="helpMenuItem">
               <Properties>
+                <Property name="mnemonic" type="int" value="72"/>
                 <Property name="text" type="java.lang.String" resourceKey="helpMenuItem.text"/>
                 <Property name="name" type="java.lang.String" value="helpMenuItem" noResource="true"/>
               </Properties>
