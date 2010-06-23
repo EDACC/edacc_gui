@@ -12,6 +12,7 @@ public class ExperimentResult extends BaseModel {
     private int SolverConfigId;
     private int ExperimentId;
     private int InstanceId;
+    private int maxTimeLeft;
 
     protected ExperimentResult() {
     }
@@ -174,4 +175,14 @@ public class ExperimentResult extends BaseModel {
     public ExperimentResultStatus getExperimentResultStatus() {
         return ExperimentResultStatus.fromValue(status);
     }
+
+    public int getMaxTimeLeft() {
+        return maxTimeLeft;
+    }
+
+    public void setMaxTimeLeft(int maxTimeLeft) {
+        this.maxTimeLeft = maxTimeLeft;
+    }
+
+    
 }

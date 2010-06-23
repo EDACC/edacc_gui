@@ -541,9 +541,6 @@ public class ExperimentController {
         try {
             Vector<ExperimentResult> jobs = ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId());
             main.jobsTableModel.setJobs(jobs);
-            if (main.jobsTableModel.getRowCount() > 0) {
-                main.resultsBrowserTableRowSorter.setRowFilter(main.resultBrowserRowFilter);
-            }
             System.gc();
         } catch (Exception e) {
             // TODO: shouldn't happen but show message if it does

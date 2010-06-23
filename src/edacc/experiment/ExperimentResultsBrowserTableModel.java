@@ -196,11 +196,12 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 for (int i = 0; i < this.jobs.size(); i++) {
                     ExperimentResult j1 = this.jobs.get(i);
                     ExperimentResult j2 = jobMap.get(j1);
-                    if (j1.getStatus() != j2.getStatus() || j1.getTime() != j2.getTime()) {
+                    if (j1.getStatus() != j2.getStatus() || j1.getTime() != j2.getTime() || j1.getMaxTimeLeft() != j2.getMaxTimeLeft()) {
                         j1.setStatus(j2.getStatus());
                         j1.setTime(j2.getTime());
-                        changedRows.add(i);
+                        j1.setMaxTimeLeft(j2.getMaxTimeLeft());
                     }
+                    changedRows.add(i);
                 }
             }
         }
@@ -209,8 +210,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             parameterInstances = new HashMap<Integer, Vector<ParameterInstance>>();
             fireTableDataChanged();
         } else {
-            // send the rows updated notification to the gui for the changed rows
-            for (int changedRow: changedRows) {
+            for (Integer changedRow: changedRows) {
                 fireTableRowsUpdated(changedRow, changedRow);
             }
         }
@@ -316,7 +316,11 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             case 7:
                 return j.getSeed();
             case 8:
-                return j.getExperimentResultStatus();
+                String status = j.getExperimentResultStatus().toString();
+                if (j.getStatus() == 0) {
+                    status += " (" + j.getMaxTimeLeft() + " secs)";
+                }
+                return status;
             default:
                 return "";
         }
