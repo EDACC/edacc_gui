@@ -35,14 +35,14 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="jScrollPaneUserClass" alignment="0" pref="431" max="32767" attributes="2"/>
+                  <Component id="jPanelButton" alignment="0" max="32767" attributes="2"/>
                   <Component id="jRadioButtonSourceClass" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jRadioButtonUserClass" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jScrollPaneSourceClass" alignment="0" pref="431" max="32767" attributes="0"/>
-                  <Component id="jPanelButton" alignment="0" max="32767" attributes="2"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -54,14 +54,14 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jRadioButtonSourceClass" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-              <Component id="jScrollPaneSourceClass" pref="123" max="32767" attributes="0"/>
+              <Component id="jScrollPaneSourceClass" pref="144" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
               <Component id="jRadioButtonUserClass" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-              <Component id="jScrollPaneUserClass" pref="138" max="32767" attributes="0"/>
-              <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
+              <Component id="jScrollPaneUserClass" pref="144" max="32767" attributes="0"/>
+              <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
               <Component id="jPanelButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="1"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -73,6 +73,7 @@
           <ComponentRef name="buttonGroupSourceOrUser"/>
         </Property>
         <Property name="text" type="java.lang.String" resourceKey="jRadioButtonSourceClass.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="jRadioButtonSourceClass.toolTipText"/>
         <Property name="name" type="java.lang.String" value="jRadioButtonSourceClass" noResource="true"/>
       </Properties>
     </Component>
@@ -99,6 +100,7 @@
                 <Column editable="true" title="Title 4" type="java.lang.Object"/>
               </Table>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="jTableSourceClass.toolTipText"/>
             <Property name="name" type="java.lang.String" value="jTableSourceClass" noResource="true"/>
           </Properties>
           <Events>
@@ -113,6 +115,7 @@
           <ComponentRef name="buttonGroupSourceOrUser"/>
         </Property>
         <Property name="text" type="java.lang.String" resourceKey="jRadioButtonUserClass.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="jRadioButtonUserClass.toolTipText"/>
         <Property name="name" type="java.lang.String" value="jRadioButtonUserClass" noResource="true"/>
       </Properties>
     </Component>
@@ -139,6 +142,7 @@
                 <Column editable="true" title="Title 4" type="java.lang.Object"/>
               </Table>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="jTableUserClass.toolTipText"/>
             <Property name="name" type="java.lang.String" value="jTableUserClass" noResource="true"/>
           </Properties>
           <Events>
@@ -157,22 +161,18 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jButtonCancel" linkSize="1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="245" max="32767" attributes="0"/>
                   <Component id="jButtonOk" linkSize="1" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="245" max="32767" attributes="0"/>
+                  <Component id="jButtonCancel" linkSize="1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
-                  <EmptySpace min="5" pref="5" max="5" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jButtonOk" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jButtonCancel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jButtonCancel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jButtonOk" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -181,6 +181,7 @@
         <Component class="javax.swing.JButton" name="jButtonOk">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="jButtonOk.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="jButtonOk.toolTipText"/>
             <Property name="name" type="java.lang.String" value="jButtonOk" noResource="true"/>
           </Properties>
           <Events>
@@ -190,6 +191,7 @@
         <Component class="javax.swing.JButton" name="jButtonCancel">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="jButtonCancel.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="jButtonCancel.toolTipText"/>
             <Property name="name" type="java.lang.String" value="jButtonCancel" noResource="true"/>
           </Properties>
           <Events>

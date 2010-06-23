@@ -72,6 +72,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         jPanelButtons.setName("jPanelButtons"); // NOI18N
 
         jButtonOk.setText(resourceMap.getString("jButtonOk.text")); // NOI18N
+        jButtonOk.setToolTipText(resourceMap.getString("jButtonOk.toolTipText")); // NOI18N
         jButtonOk.setName("jButtonOk"); // NOI18N
         jButtonOk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -80,6 +81,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         });
 
         jButtonCancel.setText(resourceMap.getString("jButtonCancel.text")); // NOI18N
+        jButtonCancel.setToolTipText(resourceMap.getString("jButtonCancel.toolTipText")); // NOI18N
         jButtonCancel.setName("jButtonCancel"); // NOI18N
         jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -91,20 +93,21 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         jPanelButtons.setLayout(jPanelButtonsLayout);
         jPanelButtonsLayout.setHorizontalGroup(
             jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelButtonsLayout.createSequentialGroup()
+            .addGroup(jPanelButtonsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButtonCancel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 196, Short.MAX_VALUE)
                 .addComponent(jButtonOk)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 175, Short.MAX_VALUE)
+                .addComponent(jButtonCancel)
                 .addContainerGap())
         );
+
+        jPanelButtonsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButtonCancel, jButtonOk});
+
         jPanelButtonsLayout.setVerticalGroup(
             jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelButtonsLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonOk)
-                    .addComponent(jButtonCancel)))
+            .addGroup(jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jButtonOk)
+                .addComponent(jButtonCancel))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -132,8 +135,8 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
                 return types [columnIndex];
             }
         });
+        jTableInstanceClass.setToolTipText(resourceMap.getString("jTableInstanceClass.toolTipText")); // NOI18N
         jTableInstanceClass.setMaximumSize(new java.awt.Dimension(32760, 32760));
-        jTableInstanceClass.setMinimumSize(new java.awt.Dimension(0, 0));
         jTableInstanceClass.setName("jTableInstanceClass"); // NOI18N
         jTableInstanceClass.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jTableInstanceClass.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -147,10 +150,12 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
 
         buttonGroupAutomaticOrManuel.add(jRadioButtonChoose);
         jRadioButtonChoose.setText(resourceMap.getString("jRadioButtonChoose.text")); // NOI18N
+        jRadioButtonChoose.setToolTipText(resourceMap.getString("jRadioButtonChoose.toolTipText")); // NOI18N
         jRadioButtonChoose.setName("jRadioButtonChoose"); // NOI18N
 
         buttonGroupAutomaticOrManuel.add(jRadioButtonAutomatic);
         jRadioButtonAutomatic.setText(resourceMap.getString("jRadioButtonAutomatic.text")); // NOI18N
+        jRadioButtonAutomatic.setToolTipText(resourceMap.getString("jRadioButtonAutomatic.toolTipText")); // NOI18N
         jRadioButtonAutomatic.setName("jRadioButtonAutomatic"); // NOI18N
         jRadioButtonAutomatic.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -165,9 +170,9 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jRadioButtonAutomatic, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                    .addComponent(jRadioButtonChoose, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                    .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE))
+                    .addComponent(jRadioButtonAutomatic, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
+                    .addComponent(jRadioButtonChoose, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
+                    .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -178,7 +183,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
                 .addGap(10, 10, 10)
                 .addComponent(jRadioButtonChoose)
                 .addGap(15, 15, 15)
-                .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
+                .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -189,8 +194,8 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanelButtons, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanelButtons, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -198,7 +203,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanelButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );

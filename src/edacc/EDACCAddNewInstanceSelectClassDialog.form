@@ -35,12 +35,12 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="jPanelButtons" alignment="0" max="32767" attributes="2"/>
                   <Component id="jPanel1" alignment="0" max="32767" attributes="2"/>
+                  <Component id="jPanelButtons" alignment="0" max="32767" attributes="2"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -49,9 +49,9 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel1" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jPanelButtons" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -65,23 +65,20 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="1" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jButtonCancel" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="196" max="32767" attributes="0"/>
-                  <Component id="jButtonOk" min="-2" max="-2" attributes="0"/>
+                  <Component id="jButtonOk" linkSize="1" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="175" max="32767" attributes="0"/>
+                  <Component id="jButtonCancel" linkSize="1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
-                  <EmptySpace max="32767" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jButtonOk" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jButtonCancel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jButtonOk" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jButtonCancel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -90,6 +87,7 @@
         <Component class="javax.swing.JButton" name="jButtonOk">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="jButtonOk.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="jButtonOk.toolTipText"/>
             <Property name="name" type="java.lang.String" value="jButtonOk" noResource="true"/>
           </Properties>
           <Events>
@@ -99,6 +97,7 @@
         <Component class="javax.swing.JButton" name="jButtonCancel">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="jButtonCancel.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="jButtonCancel.toolTipText"/>
             <Property name="name" type="java.lang.String" value="jButtonCancel" noResource="true"/>
           </Properties>
           <Events>
@@ -123,9 +122,9 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jRadioButtonAutomatic" alignment="0" pref="326" max="32767" attributes="0"/>
-                      <Component id="jRadioButtonChoose" alignment="0" pref="326" max="32767" attributes="0"/>
-                      <Component id="jScrollPaneInstanceTable" alignment="0" pref="326" max="32767" attributes="0"/>
+                      <Component id="jRadioButtonAutomatic" alignment="0" pref="333" max="32767" attributes="0"/>
+                      <Component id="jRadioButtonChoose" alignment="0" pref="333" max="32767" attributes="0"/>
+                      <Component id="jScrollPaneInstanceTable" alignment="0" pref="333" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
@@ -139,7 +138,7 @@
                   <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                   <Component id="jRadioButtonChoose" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-                  <Component id="jScrollPaneInstanceTable" pref="60" max="32767" attributes="0"/>
+                  <Component id="jScrollPaneInstanceTable" pref="98" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -167,6 +166,7 @@
                     <Column editable="true" title="Description" type="java.lang.String"/>
                   </Table>
                 </Property>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="jTableInstanceClass.toolTipText"/>
                 <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
                   <TableColumnModel selectionModel="0">
                     <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
@@ -183,9 +183,6 @@
                 </Property>
                 <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[32760, 32760]"/>
-                </Property>
-                <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[0, 0]"/>
                 </Property>
                 <Property name="name" type="java.lang.String" value="jTableInstanceClass" noResource="true"/>
                 <Property name="selectionModel" type="javax.swing.ListSelectionModel" editor="org.netbeans.modules.form.editors2.JTableSelectionModelEditor">
@@ -207,6 +204,7 @@
               <ComponentRef name="buttonGroupAutomaticOrManuel"/>
             </Property>
             <Property name="text" type="java.lang.String" resourceKey="jRadioButtonChoose.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="jRadioButtonChoose.toolTipText"/>
             <Property name="name" type="java.lang.String" value="jRadioButtonChoose" noResource="true"/>
           </Properties>
         </Component>
@@ -216,6 +214,7 @@
               <ComponentRef name="buttonGroupAutomaticOrManuel"/>
             </Property>
             <Property name="text" type="java.lang.String" resourceKey="jRadioButtonAutomatic.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="jRadioButtonAutomatic.toolTipText"/>
             <Property name="name" type="java.lang.String" value="jRadioButtonAutomatic" noResource="true"/>
           </Properties>
           <Events>

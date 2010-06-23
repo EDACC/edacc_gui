@@ -20,7 +20,8 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
     public EDACCDatabaseSettingsView(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        btnConnect.requestFocus();
+        //btnConnect.requestFocus();
+        getRootPane().setDefaultButton(btnConnect);
 
     }
 
