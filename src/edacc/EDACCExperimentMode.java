@@ -33,6 +33,7 @@ import java.util.TimerTask;
 import javax.swing.JFileChooser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultRowSorter;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -48,6 +49,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableModel;
 
 /**
  *
@@ -81,10 +83,57 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         jobsTableModel = new ExperimentResultsBrowserTableModel();
         instanceClassModel = new ExperimentInstanceClassTableModel(tableInstances, expController);
 
+        /* -------------------------- SETUP JOBS TABLE -------------------------- */
         tableJobs.setModel(jobsTableModel);
-        resultsBrowserTableRowSorter = new TableRowSorter<ExperimentResultsBrowserTableModel>(jobsTableModel);
+        resultsBrowserTableRowSorter = new TableRowSorter<ExperimentResultsBrowserTableModel>(jobsTableModel) {
+
+            @Override
+            public void setModel(ExperimentResultsBrowserTableModel model) {
+                super.setModel(model);
+                setModelWrapper(new ExperimentResultsBrowserModelWrapper<ExperimentResultsBrowserTableModel>(getModelWrapper()));
+            }
+            class ExperimentResultsBrowserModelWrapper<M extends TableModel> extends DefaultRowSorter.ModelWrapper<M, Integer> {
+                private DefaultRowSorter.ModelWrapper<M, Integer> delegate;
+
+                public ExperimentResultsBrowserModelWrapper(DefaultRowSorter.ModelWrapper<M, Integer> delegate) {
+                    this.delegate = delegate;
+                }
+
+                @Override
+                public M getModel() {
+                    return delegate.getModel();
+                }
+
+                @Override
+                public int getColumnCount() {
+                    return delegate.getColumnCount();
+                }
+
+                @Override
+                public int getRowCount() {
+                    return delegate.getRowCount();
+                }
+
+                @Override
+                public Object getValueAt(int row, int column) {
+                    if (column == 8) {
+                        return ""+(char)(((ExperimentResultsBrowserTableModel)this.getModel()).getStatusCode(row)+68);
+                    }
+                    return ((ExperimentResultsBrowserTableModel)this.getModel()).getValueAt(row, column);
+                }
+
+                @Override
+                public Integer getIdentifier(int row) {
+                    return delegate.getIdentifier(row);
+                }
+            }
+        };
+        resultsBrowserTableRowSorter.setSortsOnUpdates(true);
         resultBrowserRowFilter = new ExperimentResultsBrowserTableModelRowFilter();
+        resultsBrowserTableRowSorter.setRowFilter(resultBrowserRowFilter);
         tableJobs.setRowSorter(resultsBrowserTableRowSorter);
+        /* ----------------------- END OF SETUP JOBS TABLE ----------------------- */
+
         tableExperiments.setModel(expTableModel);
         tableExperiments.setRowSorter(new TableRowSorter<ExperimentTableModel>(expTableModel));
         tableInstances.setModel(insTableModel);
