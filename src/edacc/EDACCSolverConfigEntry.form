@@ -33,7 +33,7 @@
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="10" pref="10" max="10" attributes="0"/>
-                      <Component id="jScrollPane2" pref="271" max="32767" attributes="0"/>
+                      <Component id="jScrollPane2" pref="359" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -64,6 +64,7 @@
           <action class="edacc.EDACCSolverConfigEntry" id="btnReplicate" methodName="btnReplicate"/>
         </Property>
         <Property name="text" type="java.lang.String" resourceKey="btnReplicate.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="btnReplicate.toolTipText"/>
         <Property name="actionCommand" type="java.lang.String" resourceKey="btnReplicate.actionCommand"/>
         <Property name="name" type="java.lang.String" value="btnReplicate" noResource="true"/>
       </Properties>
@@ -74,6 +75,7 @@
           <action class="edacc.EDACCSolverConfigEntry" id="btnRemove" methodName="btnRemove"/>
         </Property>
         <Property name="text" type="java.lang.String" resourceKey="btnRemove.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="btnRemove.toolTipText"/>
         <Property name="name" type="java.lang.String" value="btnRemove" noResource="true"/>
       </Properties>
     </Component>
@@ -103,6 +105,7 @@
     <Component class="javax.swing.JTextField" name="txtSeedGroup">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="txtSeedGroup.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="txtSeedGroup.toolTipText"/>
         <Property name="name" type="java.lang.String" value="txtSeedGroup" noResource="true"/>
       </Properties>
       <Events>
