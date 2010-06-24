@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.net.URL;
 import javax.help.HelpSet;
 import javax.help.JHelp;
+import javax.swing.UIManager;
 
 /**
  * The application's main frame.
@@ -47,7 +48,7 @@ public class EDACCView extends FrameView implements Observer {
         super(app);
 
         initComponents();
-
+        UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
         DatabaseConnector.getInstance().addObserver(this);
 
         // status bar initialization - message timeout, idle icon and busy animation, etc
@@ -232,6 +233,7 @@ public class EDACCView extends FrameView implements Observer {
         menuBar.add(fileMenu);
 
         gridMenu.setAction(actionMap.get("btnGridSettings")); // NOI18N
+        gridMenu.setMnemonic('G');
         gridMenu.setText(resourceMap.getString("gridMenu.text")); // NOI18N
         gridMenu.setName("gridMenu"); // NOI18N
 

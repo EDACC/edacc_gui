@@ -103,6 +103,7 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
               <action class="edacc.EDACCView" id="btnGridSettings" methodName="btnGridSettings"/>
             </Property>
+            <Property name="mnemonic" type="int" value="71"/>
             <Property name="text" type="java.lang.String" resourceKey="gridMenu.text"/>
             <Property name="name" type="java.lang.String" value="gridMenu" noResource="true"/>
           </Properties>
