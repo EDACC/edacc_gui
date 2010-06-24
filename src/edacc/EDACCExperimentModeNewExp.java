@@ -85,6 +85,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
 
         txtExperimentDescription.setColumns(20);
         txtExperimentDescription.setRows(5);
+        txtExperimentDescription.setToolTipText(resourceMap.getString("txtExperimentDescription.toolTipText")); // NOI18N
         txtExperimentDescription.setName("txtExperimentDescription"); // NOI18N
         txtExperimentDescription.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -109,6 +110,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         });
 
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
+        btnCancel.setToolTipText(resourceMap.getString("btnCancel.toolTipText")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
         btnCancel.setPreferredSize(new java.awt.Dimension(80, 25));
         btnCancel.addActionListener(new java.awt.event.ActionListener() {

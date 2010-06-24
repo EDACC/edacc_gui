@@ -66,6 +66,7 @@ public class EDACCInstanceFilter extends javax.swing.JDialog {
         setName("Form"); // NOI18N
 
         btnApply.setText(resourceMap.getString("btnApply.text")); // NOI18N
+        btnApply.setToolTipText(resourceMap.getString("btnApply.toolTipText")); // NOI18N
         btnApply.setName("btnApply"); // NOI18N
         btnApply.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -79,45 +80,59 @@ public class EDACCInstanceFilter extends javax.swing.JDialog {
         jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
         jLabel1.setName("jLabel1"); // NOI18N
 
+        txtName.setToolTipText(resourceMap.getString("txtName.toolTipText")); // NOI18N
         txtName.setName("txtName"); // NOI18N
 
         jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
         jLabel2.setName("jLabel2"); // NOI18N
 
+        chkName.setToolTipText(resourceMap.getString("chkName.toolTipText")); // NOI18N
         chkName.setName("chkName"); // NOI18N
 
+        chkAtoms.setToolTipText(resourceMap.getString("chkAtoms.toolTipText")); // NOI18N
         chkAtoms.setName("chkAtoms"); // NOI18N
 
+        chkClauses.setToolTipText(resourceMap.getString("chkClauses.toolTipText")); // NOI18N
         chkClauses.setName("chkClauses"); // NOI18N
 
+        chkRatio.setToolTipText(resourceMap.getString("chkRatio.toolTipText")); // NOI18N
         chkRatio.setName("chkRatio"); // NOI18N
 
+        chkMaxClauseLength.setToolTipText(resourceMap.getString("chkMaxClauseLength.toolTipText")); // NOI18N
         chkMaxClauseLength.setName("chkMaxClauseLength"); // NOI18N
 
         txtAtomsLow.setText(resourceMap.getString("txtAtomsLow.text")); // NOI18N
+        txtAtomsLow.setToolTipText(resourceMap.getString("txtAtomsLow.toolTipText")); // NOI18N
         txtAtomsLow.setName("txtAtomsLow"); // NOI18N
         txtAtomsLow.setPreferredSize(new java.awt.Dimension(80, 20));
 
         txtAtomsHigh.setText(resourceMap.getString("txtAtomsHigh.text")); // NOI18N
+        txtAtomsHigh.setToolTipText(resourceMap.getString("txtAtomsHigh.toolTipText")); // NOI18N
         txtAtomsHigh.setName("txtAtomsHigh"); // NOI18N
         txtAtomsHigh.setPreferredSize(new java.awt.Dimension(80, 20));
 
         txtClausesLow.setText(resourceMap.getString("txtClausesLow.text")); // NOI18N
+        txtClausesLow.setToolTipText(resourceMap.getString("txtClausesLow.toolTipText")); // NOI18N
         txtClausesLow.setName("txtClausesLow"); // NOI18N
 
         txtClausesHigh.setText(resourceMap.getString("txtClausesHigh.text")); // NOI18N
+        txtClausesHigh.setToolTipText(resourceMap.getString("txtClausesHigh.toolTipText")); // NOI18N
         txtClausesHigh.setName("txtClausesHigh"); // NOI18N
 
         txtRatioLow.setText(resourceMap.getString("txtRatioLow.text")); // NOI18N
+        txtRatioLow.setToolTipText(resourceMap.getString("txtRatioLow.toolTipText")); // NOI18N
         txtRatioLow.setName("txtRatioLow"); // NOI18N
 
         txtRatioHigh.setText(resourceMap.getString("txtRatioHigh.text")); // NOI18N
+        txtRatioHigh.setToolTipText(resourceMap.getString("txtRatioHigh.toolTipText")); // NOI18N
         txtRatioHigh.setName("txtRatioHigh"); // NOI18N
 
         txtMaxClauseLengthLow.setText(resourceMap.getString("txtMaxClauseLengthLow.text")); // NOI18N
+        txtMaxClauseLengthLow.setToolTipText(resourceMap.getString("txtMaxClauseLengthLow.toolTipText")); // NOI18N
         txtMaxClauseLengthLow.setName("txtMaxClauseLengthLow"); // NOI18N
 
         txtMaxClauseLengthHigh.setText(resourceMap.getString("txtMaxClauseLengthHigh.text")); // NOI18N
+        txtMaxClauseLengthHigh.setToolTipText(resourceMap.getString("txtMaxClauseLengthHigh.toolTipText")); // NOI18N
         txtMaxClauseLengthHigh.setName("txtMaxClauseLengthHigh"); // NOI18N
 
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
