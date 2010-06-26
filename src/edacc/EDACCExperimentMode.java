@@ -222,7 +222,39 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             btnGenerateJobs.setEnabled(true);
             btnGeneratePackage.setEnabled(true);
         }
+        DatabaseConnector.getInstance().addObserver(new Observer() {
 
+            public void update(Observable o, Object arg) {
+                if (DatabaseConnector.getInstance().isConnected()) {
+                    reinitializeGUI();
+                }
+            }
+
+        });
+    }
+
+    public void reinitializeGUI() {
+        expController.unloadExperiment();
+        /* instance tab */
+        btnDeselectAllInstnaceClassesActionPerformed(null);
+        rowFilter.filter_maxClauseLength = false;
+        rowFilter.filter_name = false;
+        rowFilter.filter_numAtoms = false;
+        rowFilter.filter_numClauses = false;
+        rowFilter.filter_ratio = false;
+        lblFilterStatus.setText("");
+        /* end of instance tab */
+        /* job browser tab */
+        resultBrowserRowFilter.setInstanceName(null);
+        resultBrowserRowFilter.setSolverName(null);
+        resultBrowserRowFilter.setStatusCode(null);
+        boolean[] columnVis = jobsTableModel.getColumnVisibility();
+        for (int i = 0; i < columnVis.length; i++) {
+            columnVis[i] = true;
+        }
+        jobsTableModel.setColumnVisibility(columnVis);
+        setJobsFilterStatus("");
+        /* end of job browser tab */
     }
 
     public void initialize() throws SQLException {
