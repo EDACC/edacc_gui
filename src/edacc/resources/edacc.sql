@@ -320,13 +320,13 @@ BEGIN
     SET time = time +24*60*60;
   END WHILE;
   RETURN time;
-END
-//
+END //
 delimiter ;
 
 -- -----------------------------------------------------
 -- EVENT `MONITOR_JOBS`
 -- -----------------------------------------------------
+
 DROP EVENT IF EXISTS MONITOR_JOBS;
 
 CREATE EVENT MONITOR_JOBS
