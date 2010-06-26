@@ -65,17 +65,20 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
         jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCJobsFilter.class);
+        setTitle(resourceMap.getString("Form.title")); // NOI18N
         setModal(true);
         setName("Form"); // NOI18N
         setResizable(false);
 
         comboSolvers.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboSolvers.setToolTipText(resourceMap.getString("comboSolvers.toolTipText")); // NOI18N
         comboSolvers.setName("comboSolvers"); // NOI18N
 
         javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCJobsFilter.class, this);
         btnAccept.setAction(actionMap.get("btnAccept")); // NOI18N
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCJobsFilter.class);
         btnAccept.setText(resourceMap.getString("btnAccept.text")); // NOI18N
+        btnAccept.setToolTipText(resourceMap.getString("btnAccept.toolTipText")); // NOI18N
         btnAccept.setName("btnAccept"); // NOI18N
 
         jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
@@ -85,16 +88,19 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
         jLabel2.setName("jLabel2"); // NOI18N
 
         comboStatusCodes.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboStatusCodes.setToolTipText(resourceMap.getString("comboStatusCodes.toolTipText")); // NOI18N
         comboStatusCodes.setName("comboStatusCodes"); // NOI18N
 
         jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
         jLabel3.setName("jLabel3"); // NOI18N
 
         comboInstances.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboInstances.setToolTipText(resourceMap.getString("comboInstances.toolTipText")); // NOI18N
         comboInstances.setName("comboInstances"); // NOI18N
 
         jButton1.setAction(actionMap.get("btnCancel")); // NOI18N
         jButton1.setText(resourceMap.getString("jButton1.text")); // NOI18N
+        jButton1.setToolTipText(resourceMap.getString("jButton1.toolTipText")); // NOI18N
         jButton1.setName("jButton1"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -107,14 +113,15 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
                     .addComponent(jLabel3)
                     .addComponent(jLabel2)
                     .addComponent(jLabel1)
-                    .addComponent(btnAccept))
+                    .addComponent(btnAccept, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(16, 16, 16)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(comboInstances, 0, 355, Short.MAX_VALUE)
-                            .addComponent(comboStatusCodes, 0, 355, Short.MAX_VALUE)
-                            .addComponent(comboSolvers, 0, 355, Short.MAX_VALUE)))
+                            .addComponent(comboInstances, 0, 313, Short.MAX_VALUE)
+                            .addComponent(comboStatusCodes, 0, 313, Short.MAX_VALUE)
+                            .addComponent(comboSolvers, 0, 313, Short.MAX_VALUE)))
                     .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );

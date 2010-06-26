@@ -54,6 +54,7 @@
     <Component class="javax.swing.JButton" name="btnApply">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="btnApply.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="btnApply.toolTipText"/>
         <Property name="name" type="java.lang.String" value="btnApply" noResource="true"/>
       </Properties>
       <Events>
@@ -171,6 +172,7 @@
         </Component>
         <Component class="javax.swing.JTextField" name="txtName">
           <Properties>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="txtName.toolTipText"/>
             <Property name="name" type="java.lang.String" value="txtName" noResource="true"/>
           </Properties>
         </Component>
@@ -182,32 +184,38 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="chkName">
           <Properties>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="chkName.toolTipText"/>
             <Property name="name" type="java.lang.String" value="chkName" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="chkAtoms">
           <Properties>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="chkAtoms.toolTipText"/>
             <Property name="name" type="java.lang.String" value="chkAtoms" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="chkClauses">
           <Properties>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="chkClauses.toolTipText"/>
             <Property name="name" type="java.lang.String" value="chkClauses" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="chkRatio">
           <Properties>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="chkRatio.toolTipText"/>
             <Property name="name" type="java.lang.String" value="chkRatio" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="chkMaxClauseLength">
           <Properties>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="chkMaxClauseLength.toolTipText"/>
             <Property name="name" type="java.lang.String" value="chkMaxClauseLength" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtAtomsLow">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="txtAtomsLow.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="txtAtomsLow.toolTipText"/>
             <Property name="name" type="java.lang.String" value="txtAtomsLow" noResource="true"/>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[80, 20]"/>
@@ -217,6 +225,7 @@
         <Component class="javax.swing.JTextField" name="txtAtomsHigh">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="txtAtomsHigh.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="txtAtomsHigh.toolTipText"/>
             <Property name="name" type="java.lang.String" value="txtAtomsHigh" noResource="true"/>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[80, 20]"/>
@@ -226,36 +235,42 @@
         <Component class="javax.swing.JTextField" name="txtClausesLow">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="txtClausesLow.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="txtClausesLow.toolTipText"/>
             <Property name="name" type="java.lang.String" value="txtClausesLow" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtClausesHigh">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="txtClausesHigh.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="txtClausesHigh.toolTipText"/>
             <Property name="name" type="java.lang.String" value="txtClausesHigh" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtRatioLow">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="txtRatioLow.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="txtRatioLow.toolTipText"/>
             <Property name="name" type="java.lang.String" value="txtRatioLow" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtRatioHigh">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="txtRatioHigh.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="txtRatioHigh.toolTipText"/>
             <Property name="name" type="java.lang.String" value="txtRatioHigh" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtMaxClauseLengthLow">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="txtMaxClauseLengthLow.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="txtMaxClauseLengthLow.toolTipText"/>
             <Property name="name" type="java.lang.String" value="txtMaxClauseLengthLow" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtMaxClauseLengthHigh">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="txtMaxClauseLengthHigh.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="txtMaxClauseLengthHigh.toolTipText"/>
             <Property name="name" type="java.lang.String" value="txtMaxClauseLengthHigh" noResource="true"/>
           </Properties>
         </Component>

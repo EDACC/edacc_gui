@@ -3,6 +3,7 @@
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
+    <Property name="title" type="java.lang.String" resourceKey="Form.title"/>
     <Property name="modal" type="boolean" value="true"/>
     <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
     <Property name="resizable" type="boolean" value="false"/>
@@ -31,15 +32,16 @@
                   <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnAccept" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnAccept" alignment="0" min="-2" pref="132" max="-2" attributes="0"/>
               </Group>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="comboInstances" alignment="0" pref="355" max="32767" attributes="0"/>
-                          <Component id="comboStatusCodes" alignment="0" pref="355" max="32767" attributes="0"/>
-                          <Component id="comboSolvers" alignment="0" pref="355" max="32767" attributes="0"/>
+                          <Component id="comboInstances" alignment="0" pref="313" max="32767" attributes="0"/>
+                          <Component id="comboStatusCodes" alignment="0" pref="313" max="32767" attributes="0"/>
+                          <Component id="comboSolvers" alignment="0" pref="313" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Component id="jButton1" alignment="1" min="-2" max="-2" attributes="0"/>
@@ -69,7 +71,7 @@
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jButton1" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnAccept" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnAccept" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -87,6 +89,7 @@
             <StringItem index="3" value="Item 4"/>
           </StringArray>
         </Property>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="comboSolvers.toolTipText"/>
         <Property name="name" type="java.lang.String" value="comboSolvers" noResource="true"/>
       </Properties>
     </Component>
@@ -96,6 +99,7 @@
           <action class="edacc.EDACCJobsFilter" id="btnAccept" methodName="btnAccept"/>
         </Property>
         <Property name="text" type="java.lang.String" resourceKey="btnAccept.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="btnAccept.toolTipText"/>
         <Property name="name" type="java.lang.String" value="btnAccept" noResource="true"/>
       </Properties>
     </Component>
@@ -121,6 +125,7 @@
             <StringItem index="3" value="Item 4"/>
           </StringArray>
         </Property>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="comboStatusCodes.toolTipText"/>
         <Property name="name" type="java.lang.String" value="comboStatusCodes" noResource="true"/>
       </Properties>
     </Component>
@@ -140,6 +145,7 @@
             <StringItem index="3" value="Item 4"/>
           </StringArray>
         </Property>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="comboInstances.toolTipText"/>
         <Property name="name" type="java.lang.String" value="comboInstances" noResource="true"/>
       </Properties>
     </Component>
@@ -149,6 +155,7 @@
           <action class="edacc.EDACCJobsFilter" id="btnCancel" methodName="btnCancel"/>
         </Property>
         <Property name="text" type="java.lang.String" resourceKey="jButton1.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="jButton1.toolTipText"/>
         <Property name="name" type="java.lang.String" value="jButton1" noResource="true"/>
       </Properties>
     </Component>

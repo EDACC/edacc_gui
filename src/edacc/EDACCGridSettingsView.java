@@ -84,9 +84,11 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         lblWallTime.setName("lblWallTime"); // NOI18N
 
         txtNumNodes.setText(resourceMap.getString("txtNumNodes.text")); // NOI18N
+        txtNumNodes.setToolTipText(resourceMap.getString("txtNumNodes.toolTipText")); // NOI18N
         txtNumNodes.setName("txtNumNodes"); // NOI18N
 
         txtWalltime.setText(resourceMap.getString("txtWalltime.text")); // NOI18N
+        txtWalltime.setToolTipText(resourceMap.getString("txtWalltime.toolTipText")); // NOI18N
         txtWalltime.setName("txtWalltime"); // NOI18N
 
         lblMaxJobsInQueue.setLabelFor(txtMaxJobsInQueue);
@@ -94,12 +96,14 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         lblMaxJobsInQueue.setName("lblMaxJobsInQueue"); // NOI18N
 
         txtMaxJobsInQueue.setText(resourceMap.getString("txtMaxJobsInQueue.text")); // NOI18N
+        txtMaxJobsInQueue.setToolTipText(resourceMap.getString("txtMaxJobsInQueue.toolTipText")); // NOI18N
         txtMaxJobsInQueue.setName("txtMaxJobsInQueue"); // NOI18N
 
         lblPBSScript.setText(resourceMap.getString("lblPBSScript.text")); // NOI18N
         lblPBSScript.setName("lblPBSScript"); // NOI18N
 
         btnAdd.setText(resourceMap.getString("btnPBSScript.text")); // NOI18N
+        btnAdd.setToolTipText(resourceMap.getString("btnPBSScript.toolTipText")); // NOI18N
         btnAdd.setName("btnPBSScript"); // NOI18N
         btnAdd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -116,15 +120,18 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         lblLocation.setName("lblLocation"); // NOI18N
 
         txtName.setText(resourceMap.getString("txtName.text")); // NOI18N
+        txtName.setToolTipText(resourceMap.getString("txtName.toolTipText")); // NOI18N
         txtName.setName("txtName"); // NOI18N
 
         txtLocation.setText(resourceMap.getString("txtLocation.text")); // NOI18N
+        txtLocation.setToolTipText(resourceMap.getString("txtLocation.toolTipText")); // NOI18N
         txtLocation.setName("txtLocation"); // NOI18N
 
         lblNumCPUs.setText(resourceMap.getString("lblNumCPUs.text")); // NOI18N
         lblNumCPUs.setName("lblNumCPUs"); // NOI18N
 
         txtNumCPUs.setText(resourceMap.getString("txtNumCPUs.text")); // NOI18N
+        txtNumCPUs.setToolTipText(resourceMap.getString("txtNumCPUs.toolTipText")); // NOI18N
         txtNumCPUs.setName("txtNumCPUs"); // NOI18N
 
         lblAvailNodes.setLabelFor(txtAvailNodes);
@@ -132,6 +139,7 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         lblAvailNodes.setName("lblAvailNodes"); // NOI18N
 
         txtAvailNodes.setText(resourceMap.getString("txtAvailNodes.text")); // NOI18N
+        txtAvailNodes.setToolTipText(resourceMap.getString("txtAvailNodes.toolTipText")); // NOI18N
         txtAvailNodes.setName("txtAvailNodes"); // NOI18N
 
         lblDescription.setLabelFor(taDescription);
@@ -142,6 +150,7 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
 
         taDescription.setColumns(20);
         taDescription.setRows(5);
+        taDescription.setToolTipText(resourceMap.getString("taDescription.toolTipText")); // NOI18N
         taDescription.setName("taDescription"); // NOI18N
         jScrollPane1.setViewportView(taDescription);
 
@@ -150,10 +159,12 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCGridSettingsView.class, this);
         btnOk.setAction(actionMap.get("btnOk")); // NOI18N
         btnOk.setText(resourceMap.getString("btnOk.text")); // NOI18N
+        btnOk.setToolTipText(resourceMap.getString("btnOk.toolTipText")); // NOI18N
         btnOk.setName("btnOk"); // NOI18N
 
         btnCancel.setAction(actionMap.get("btnCancel")); // NOI18N
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
+        btnCancel.setToolTipText(resourceMap.getString("btnCancel.toolTipText")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -195,15 +206,15 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
                             .addComponent(lblPBSScript, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtLocation, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
-                            .addComponent(txtNumNodes, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
-                            .addComponent(txtNumCPUs, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
-                            .addComponent(txtWalltime, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
-                            .addComponent(txtAvailNodes, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
-                            .addComponent(txtMaxJobsInQueue, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
+                            .addComponent(txtLocation, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
+                            .addComponent(txtNumNodes, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
+                            .addComponent(txtNumCPUs, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
+                            .addComponent(txtWalltime, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
+                            .addComponent(txtAvailNodes, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
+                            .addComponent(txtMaxJobsInQueue, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
                             .addComponent(btnAdd, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
-                            .addComponent(txtName, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE))))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
+                            .addComponent(txtName, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
