@@ -48,15 +48,15 @@
                       </Group>
                       <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="txtLocation" alignment="0" pref="192" max="32767" attributes="1"/>
-                          <Component id="txtNumNodes" alignment="0" pref="192" max="32767" attributes="1"/>
-                          <Component id="txtNumCPUs" alignment="0" pref="192" max="32767" attributes="1"/>
-                          <Component id="txtWalltime" alignment="0" pref="192" max="32767" attributes="1"/>
-                          <Component id="txtAvailNodes" alignment="0" pref="192" max="32767" attributes="1"/>
-                          <Component id="txtMaxJobsInQueue" alignment="0" pref="192" max="32767" attributes="1"/>
+                          <Component id="txtLocation" alignment="0" pref="194" max="32767" attributes="1"/>
+                          <Component id="txtNumNodes" alignment="0" pref="194" max="32767" attributes="1"/>
+                          <Component id="txtNumCPUs" alignment="0" pref="194" max="32767" attributes="1"/>
+                          <Component id="txtWalltime" alignment="0" pref="194" max="32767" attributes="1"/>
+                          <Component id="txtAvailNodes" alignment="0" pref="194" max="32767" attributes="1"/>
+                          <Component id="txtMaxJobsInQueue" alignment="0" pref="194" max="32767" attributes="1"/>
                           <Component id="btnAdd" alignment="1" min="-2" max="-2" attributes="1"/>
-                          <Component id="jScrollPane1" alignment="0" pref="192" max="32767" attributes="1"/>
-                          <Component id="txtName" alignment="0" pref="192" max="32767" attributes="1"/>
+                          <Component id="jScrollPane1" alignment="0" pref="194" max="32767" attributes="1"/>
+                          <Component id="txtName" alignment="0" pref="194" max="32767" attributes="1"/>
                       </Group>
                   </Group>
               </Group>
@@ -146,12 +146,14 @@
     <Component class="javax.swing.JTextField" name="txtNumNodes">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="txtNumNodes.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="txtNumNodes.toolTipText"/>
         <Property name="name" type="java.lang.String" value="txtNumNodes" noResource="true"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txtWalltime">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="txtWalltime.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="txtWalltime.toolTipText"/>
         <Property name="name" type="java.lang.String" value="txtWalltime" noResource="true"/>
       </Properties>
     </Component>
@@ -167,6 +169,7 @@
     <Component class="javax.swing.JTextField" name="txtMaxJobsInQueue">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="txtMaxJobsInQueue.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="txtMaxJobsInQueue.toolTipText"/>
         <Property name="name" type="java.lang.String" value="txtMaxJobsInQueue" noResource="true"/>
       </Properties>
     </Component>
@@ -179,6 +182,7 @@
     <Component class="javax.swing.JButton" name="btnAdd">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="btnPBSScript.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="btnPBSScript.toolTipText"/>
         <Property name="name" type="java.lang.String" value="btnPBSScript" noResource="true"/>
       </Properties>
       <Events>
@@ -206,12 +210,14 @@
     <Component class="javax.swing.JTextField" name="txtName">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="txtName.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="txtName.toolTipText"/>
         <Property name="name" type="java.lang.String" value="txtName" noResource="true"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txtLocation">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="txtLocation.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="txtLocation.toolTipText"/>
         <Property name="name" type="java.lang.String" value="txtLocation" noResource="true"/>
       </Properties>
     </Component>
@@ -224,6 +230,7 @@
     <Component class="javax.swing.JTextField" name="txtNumCPUs">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="txtNumCPUs.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="txtNumCPUs.toolTipText"/>
         <Property name="name" type="java.lang.String" value="txtNumCPUs" noResource="true"/>
       </Properties>
     </Component>
@@ -239,6 +246,7 @@
     <Component class="javax.swing.JTextField" name="txtAvailNodes">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="txtAvailNodes.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="txtAvailNodes.toolTipText"/>
         <Property name="name" type="java.lang.String" value="txtAvailNodes" noResource="true"/>
       </Properties>
     </Component>
@@ -265,6 +273,7 @@
           <Properties>
             <Property name="columns" type="int" value="20"/>
             <Property name="rows" type="int" value="5"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="taDescription.toolTipText"/>
             <Property name="name" type="java.lang.String" value="taDescription" noResource="true"/>
           </Properties>
         </Component>
@@ -303,6 +312,7 @@
               <action class="edacc.EDACCGridSettingsView" id="btnOk" methodName="btnOk"/>
             </Property>
             <Property name="text" type="java.lang.String" resourceKey="btnOk.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="btnOk.toolTipText"/>
             <Property name="name" type="java.lang.String" value="btnOk" noResource="true"/>
           </Properties>
         </Component>
@@ -312,6 +322,7 @@
               <action class="edacc.EDACCGridSettingsView" id="btnCancel" methodName="btnCancel"/>
             </Property>
             <Property name="text" type="java.lang.String" resourceKey="btnCancel.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="btnCancel.toolTipText"/>
             <Property name="name" type="java.lang.String" value="btnCancel" noResource="true"/>
           </Properties>
         </Component>

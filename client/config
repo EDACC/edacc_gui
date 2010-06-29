@@ -1,6 +1,0 @@
-host = 134.60.76.77
-username = edacc
-password = edaccteam
-database = EDACC2
-experiment = 9
-gridqueue = 2

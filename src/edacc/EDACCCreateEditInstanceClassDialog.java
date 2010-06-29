@@ -40,13 +40,14 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
         if(rowOfInstanceClass == -1){
             this.jButtonEdit.setVisible(false);
             this.jButtonCreate.setEnabled(true);
+            this.setTitle("Create a new instance class");
         } else{
             this.jButtonCreate.setVisible(false);
             this.jButtonEdit.setEnabled(true);
-            this.jButtonEdit.setText("Edit");
-            this.jButtonEdit.setVisible(true);
-            
+            this.jButtonEdit.setText("Save");
             this.instanceClass = (InstanceClass)tableModel.getValueAt(rowOfInstanceClass, 4);
+            this.setTitle("Edit instance class: "+this.instanceClass.getName());
+            this.jButtonEdit.setVisible(true);
             this.jTextFieldName.setText(instanceClass.getName());
             this.jTextArea1.setText(instanceClass.getDescription());
             if(instanceClass.isSource())

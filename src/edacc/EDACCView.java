@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.net.URL;
 import javax.help.HelpSet;
 import javax.help.JHelp;
+import javax.swing.UIManager;
 
 /**
  * The application's main frame.
@@ -47,7 +48,7 @@ public class EDACCView extends FrameView implements Observer {
         super(app);
 
         initComponents();
-
+        UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
         DatabaseConnector.getInstance().addObserver(this);
 
         // status bar initialization - message timeout, idle icon and busy animation, etc
@@ -204,20 +205,24 @@ public class EDACCView extends FrameView implements Observer {
 
         javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCView.class, this);
         connectToDBMenuItem.setAction(actionMap.get("btnConnectToDB")); // NOI18N
-        connectToDBMenuItem.setMnemonic('C');
+        connectToDBMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
+        connectToDBMenuItem.setMnemonic('N');
         connectToDBMenuItem.setText(resourceMap.getString("connectToDBMenuItem.text")); // NOI18N
         connectToDBMenuItem.setName("connectToDBMenuItem"); // NOI18N
         fileMenu.add(connectToDBMenuItem);
 
         disconnectMenuItem.setAction(actionMap.get("btnDisconnect")); // NOI18N
+        disconnectMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_MASK));
         disconnectMenuItem.setMnemonic('D');
         disconnectMenuItem.setText(resourceMap.getString("disconnectMenuItem.text")); // NOI18N
         disconnectMenuItem.setName("disconnectMenuItem"); // NOI18N
         fileMenu.add(disconnectMenuItem);
 
         generateDBMenuItem.setAction(actionMap.get("btnGenerateTables")); // NOI18N
+        generateDBMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_MASK));
         generateDBMenuItem.setMnemonic('G');
         generateDBMenuItem.setText(resourceMap.getString("generateDBMenuItem.text")); // NOI18N
+        generateDBMenuItem.setToolTipText(resourceMap.getString("generateDBMenuItem.toolTipText")); // NOI18N
         generateDBMenuItem.setName("generateDBMenuItem"); // NOI18N
         fileMenu.add(generateDBMenuItem);
 
@@ -233,8 +238,10 @@ public class EDACCView extends FrameView implements Observer {
         gridMenu.setName("gridMenu"); // NOI18N
 
         settingsMenuItem.setAction(actionMap.get("btnGridSettings")); // NOI18N
+        settingsMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
         settingsMenuItem.setMnemonic('S');
         settingsMenuItem.setText(resourceMap.getString("settingsMenuItem.text")); // NOI18N
+        settingsMenuItem.setToolTipText(resourceMap.getString("settingsMenuItem.toolTipText")); // NOI18N
         settingsMenuItem.setName("settingsMenuItem"); // NOI18N
         gridMenu.add(settingsMenuItem);
 
@@ -245,14 +252,18 @@ public class EDACCView extends FrameView implements Observer {
         modusMenu.setName("modusMenu"); // NOI18N
 
         manageDBModeMenuItem.setAction(actionMap.get("manageDBMode")); // NOI18N
-        manageDBModeMenuItem.setMnemonic('D');
+        manageDBModeMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.event.InputEvent.CTRL_MASK));
+        manageDBModeMenuItem.setMnemonic('M');
         manageDBModeMenuItem.setText(resourceMap.getString("manageDBModeMenuItem.text")); // NOI18N
+        manageDBModeMenuItem.setToolTipText(resourceMap.getString("manageDBModeMenuItem.toolTipText")); // NOI18N
         manageDBModeMenuItem.setName("manageDBModeMenuItem"); // NOI18N
         modusMenu.add(manageDBModeMenuItem);
 
         manageExperimentModeMenuItem.setAction(actionMap.get("manageExperimentMode")); // NOI18N
+        manageExperimentModeMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_MASK));
         manageExperimentModeMenuItem.setMnemonic('E');
         manageExperimentModeMenuItem.setText(resourceMap.getString("manageExperimentModeMenuItem.text")); // NOI18N
+        manageExperimentModeMenuItem.setToolTipText(resourceMap.getString("manageExperimentModeMenuItem.toolTipText")); // NOI18N
         manageExperimentModeMenuItem.setName("manageExperimentModeMenuItem"); // NOI18N
         modusMenu.add(manageExperimentModeMenuItem);
 
@@ -263,9 +274,11 @@ public class EDACCView extends FrameView implements Observer {
         helpMenu.setName("helpMenu"); // NOI18N
 
         aboutMenuItem.setAction(actionMap.get("showAboutBox")); // NOI18N
+        aboutMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
         aboutMenuItem.setName("aboutMenuItem"); // NOI18N
         helpMenu.add(aboutMenuItem);
 
+        helpMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK));
         helpMenuItem.setMnemonic('H');
         helpMenuItem.setText(resourceMap.getString("helpMenuItem.text")); // NOI18N
         helpMenuItem.setName("helpMenuItem"); // NOI18N

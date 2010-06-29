@@ -57,6 +57,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         setResizable(false);
 
         btnConnect.setText(resourceMap.getString("btnConnect.text")); // NOI18N
+        btnConnect.setToolTipText(resourceMap.getString("btnConnect.toolTipText")); // NOI18N
         btnConnect.setName("btnConnect"); // NOI18N
         btnConnect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -70,6 +71,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         });
 
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
+        btnCancel.setToolTipText(resourceMap.getString("btnCancel.toolTipText")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -86,6 +88,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         jPanel1.setName("jPanel1"); // NOI18N
 
         txtPassword.setText(resourceMap.getString("txtPassword.text")); // NOI18N
+        txtPassword.setToolTipText(resourceMap.getString("txtPassword.toolTipText")); // NOI18N
         txtPassword.setName("txtPassword"); // NOI18N
         txtPassword.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -108,6 +111,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         lblHostname.setPreferredSize(new java.awt.Dimension(100, 17));
 
         txtHostname.setText(resourceMap.getString("txtHostname.text")); // NOI18N
+        txtHostname.setToolTipText(resourceMap.getString("txtHostname.toolTipText")); // NOI18N
         txtHostname.setName("txtHostname"); // NOI18N
         txtHostname.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -121,7 +125,13 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         lblDatabase.setPreferredSize(new java.awt.Dimension(100, 17));
 
         txtDatabase.setText(resourceMap.getString("txtDatabase.text")); // NOI18N
+        txtDatabase.setToolTipText(resourceMap.getString("txtDatabase.toolTipText")); // NOI18N
         txtDatabase.setName("txtDatabase"); // NOI18N
+        txtDatabase.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDatabaseActionPerformed(evt);
+            }
+        });
         txtDatabase.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtDatabaseKeyPressed(evt);
@@ -134,6 +144,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         lblUsername.setPreferredSize(new java.awt.Dimension(100, 17));
 
         txtUsername.setText(resourceMap.getString("txtUsername.text")); // NOI18N
+        txtUsername.setToolTipText(resourceMap.getString("txtUsername.toolTipText")); // NOI18N
         txtUsername.setName("txtUsername"); // NOI18N
         txtUsername.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -142,6 +153,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         });
 
         txtPort.setText(resourceMap.getString("txtPort.text")); // NOI18N
+        txtPort.setToolTipText(resourceMap.getString("txtPort.toolTipText")); // NOI18N
         txtPort.setName("txtPort"); // NOI18N
         txtPort.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -320,6 +332,10 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         }
 
     }//GEN-LAST:event_btnCancelKeyPressed
+
+    private void txtDatabaseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDatabaseActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDatabaseActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;

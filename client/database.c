@@ -71,6 +71,7 @@
 	"       ON e.Instances_idInstance = i.idInstance " \
 	"   WHERE e.idJob = %i "
 
+
 /*
 #define QUERY_JOB_PARAMS "" \
 	"SELECT " \
@@ -89,21 +90,22 @@
 	"   LEFT JOIN SolverConfig_has_Parameters AS scp " \
 	"       ON p.idParameter = scp.Parameters_idParameter " \
 	"   WHERE er.idJob = %i "
-*/
+ */
 
 #define QUERY_JOB_PARAMS "" \
-    "SELECT " \
-    "       p.name, " \
-    "       p.prefix, " \
-    "       p.hasValue, " \
-    "       p.value, " \
-    "       scp.value " \
-    "   FROM ExperimentResults AS er " \
-    "   LEFT JOIN SolverConfig_has_Parameters AS scp " \
-    "       ON er.SolverConfig_idSolverConfig = scp.SolverConfig_idSolverConfig " \
-    "   RIGHT JOIN Parameters AS p " \
-    "       ON scp.Parameters_idParameter = p.idParameter " \
-    "   WHERE er.idJob = %i "
+	"SELECT " \
+	"       p.name, " \
+	"       p.prefix, " \
+	"       p.hasValue, " \
+	"       p.value, " \
+	"       scp.value " \
+	"   FROM ExperimentResults AS er " \
+	"   LEFT JOIN SolverConfig_has_Parameters AS scp " \
+	"       ON er.SolverConfig_idSolverConfig = scp.SolverConfig_idSolverConfig " \
+	"   RIGHT JOIN Parameters AS p " \
+	"       ON scp.Parameters_idParameter = p.idParameter " \
+	"   WHERE er.idJob = %i "
+
 
 
 #define UPDATE_JOB ""           \
@@ -169,12 +171,12 @@ status dbFetchExperimentData(experiment *e) {
 	sprintfAlloc(&queryInstance, QUERY_INSTANCES, experimentId);
 
 	conn = mysql_init(NULL);
-
+	logComment(1,"establishing a mysql-connection...");
 	if(mysql_real_connect(conn, host, username, password, database, 0, NULL, 0) == NULL) {
 		logError("could not establish a mysql connection!\n error message: %s",mysql_error(conn));
 		return dbError;
 	}
-	logComment(1,"mysql-connection established!\n");
+	logComment(1,"done\n");
 
 
 	/* fetch experiment information */
@@ -194,6 +196,7 @@ status dbFetchExperimentData(experiment *e) {
 		e->timeOut = atoi(row[0]);
 		//TODO:Error Meldung?
 	}
+	logComment(2,"timeOut for jobs = %d s\n",e->timeOut);
 
 
 	/* fetch grid information */
@@ -213,6 +216,7 @@ status dbFetchExperimentData(experiment *e) {
 		e->numCPUs = atoi(row[0]);
 	}
 
+	logComment(2,"numCpus per Node = %d\n",e->numCPUs);
 
 	/* fetch instances */
 	if(mysql_query(conn, queryInstance) != 0) {
@@ -229,6 +233,8 @@ status dbFetchExperimentData(experiment *e) {
 	}
 
 	e->numInstances = mysql_num_rows(res);
+
+	logComment(3,"num instances= %d\n",e->numInstances);
 
 	if((e->md5Instances = malloc(e->numInstances*sizeof(char *))) == NULL) {
 		mysql_free_result(res);
@@ -249,6 +255,7 @@ status dbFetchExperimentData(experiment *e) {
 	}
 
 	i=0;
+	logComment(4,"instances: \n");
 	while((row = mysql_fetch_row(res)) != NULL) {
 		lengths = mysql_fetch_lengths(res);
 		//TODO: Fehler wegen callocs
@@ -261,9 +268,11 @@ status dbFetchExperimentData(experiment *e) {
 
 		e->instanceNames[i] = calloc(lengths[1],sizeof(char*));
 		strncpy(e->instanceNames[i], row[1], lengths[1]);
+		logComment(4,"%s \n",e->instanceNames[i]);
 
 		i++;
 	}
+
 
 
 
@@ -281,6 +290,8 @@ status dbFetchExperimentData(experiment *e) {
 	}
 
 	e->numSolvers = mysql_num_rows(res);
+
+	logComment(3,"num solvers= %d \n",e->numSolvers);
 
 	if((e->lengthSolver = malloc(e->numSolvers*sizeof(char *))) == NULL) {
 		mysql_free_result(res);
@@ -303,9 +314,10 @@ status dbFetchExperimentData(experiment *e) {
 	}
 
 	i=0;
+	logComment(4,"solvers: \n");
 	while((row = mysql_fetch_row(res)) != NULL) {
 		lengths = mysql_fetch_lengths(res);
-//TODO: allocs fehler abfangen
+		//TODO: allocs fehler abfangen
 		e->lengthSolver[i] = lengths[3];
 
 		e->md5Solvers[i] = (char *)malloc(60*sizeof(char));
@@ -319,9 +331,11 @@ status dbFetchExperimentData(experiment *e) {
 			return sysError;
 		}
 		strncpy(e->solverNames[i], row[2], lengths[2]);
+		logComment(4,"%s \n",e->solverNames[i]);
 
 		i++;
 	}
+
 
 	mysql_free_result(res);
 	mysql_close(conn);
@@ -407,7 +421,7 @@ int dbFetchJob(job* j, status* s) {
 
 
 	conn = mysql_init(NULL);
-	if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+	if(!mysql_real_connect(conn, host, username, password, database, port, NULL, 0)) {
 		logError("could not establish mysql connection!\n");
 		*s = dbError;
 		return 1;
@@ -489,55 +503,54 @@ int dbFetchJob(job* j, status* s) {
 
 	params = (char *)calloc(256,sizeof(char));
 
-    // go through all set params for this experiment.
 	while((row = mysql_fetch_row(res)) != NULL) {
-        // every param starts with a prefix
-        params = strcat(params, row[1]);
-        params = strcat(params, row[0]);
+		// every param starts with a prefix
+		params = strcat(params, row[1]);
+		//params = strcat(params, row[0]);
 
-        // check if it's a param with value
-        if(row[2]) {
-            // delimiter between paramname and value
-            params = strcat(params, " ");
+		// check if it's a param with value
+		if(atoi(row[2])==1) {
+			// delimiter between paramname and value
+			params = strcat(params, " ");
 
-            // check for value in solver_has_config, if not 
-            // present take the default from table parameters
-            if(row[4]!=NULL && (strcmp(row[4],"")!=0)) {
-                params = strcat(params, row[4]);
-            } else if(row[3]!=NULL && (strcmp(row[3],"")!=0)) {
-                params = strcat(params, row[3]);
-            } else {
-		        logError("No value present for param %s.\n", row[1]);
-		        return 1;
-            }
-        }
+			// check for value in solver_has_config, if not
+			// present take the default from table parameters
+			if(row[4]!=NULL && (strcmp(row[4],"")!=0)) {
+				params = strcat(params, row[4]);
+			} else if(row[3]!=NULL && (strcmp(row[3],"")!=0)) {
+				params = strcat(params, row[3]);
+			} else {
+				logError("No value present for param %s.\n", row[1]);
+				return 1;
+			}
+		}
 
-        params = strcat(params, " ");
+		params = strcat(params, " ");
 
 	}
 
-        /*
-		if (row[2]==NULL){
-			//fprintf(stderr,"No parameteres");
-			fflush(stderr);;}
-		else{
-
-			if(strcmp(row[2],"")!=0) {
-				params = strcat(params, row[1]);
-				params = strcat(params, row[0]);
-				params = strcat(params, " ");
-
-				if(row[2] != NULL) {
-					if(row[4] == NULL) {
-						params = strcat(params, row[3]);
-					} else {
-						params = strcat(params, row[4]);
-					}
-				}
-				params = strcat(params, " ");
-			}
-		}
-        */
+	//	while((row = mysql_fetch_row(res)) != NULL) {
+	//		if (row[2]==NULL){
+	//			//fprintf(stderr,"No parameteres");
+	//			fflush(stderr);;}
+	//		else{
+	//
+	//			if(strcmp(row[2],"")!=0) {
+	//				params = strcat(params, row[1]);
+	//				params = strcat(params, row[0]);
+	//				params = strcat(params, " ");
+	//
+	//				if(row[2] != NULL) {
+	//					if(row[4] == NULL) {
+	//						params = strcat(params, row[3]);
+	//					} else {
+	//						params = strcat(params, row[4]);
+	//					}
+	//				}
+	//				params = strcat(params, " ");
+	//			}
+	//		}
+	//	}
 
 	strcpy(j->params, params);
 
@@ -580,7 +593,7 @@ status dbUpdate(const job* j) {
 
 
 	conn = mysql_init(NULL);
-	if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+	if(!mysql_real_connect(conn, host, username, password, database, port, NULL, 0)) {
 		logError("could not establish mysql connection!\n");
 		return dbError;
 	}
@@ -603,23 +616,26 @@ status dbFetchSolver(const char* solverName, solver* s) {
 	MYSQL_ROW row;
 
 	char *querySolver = NULL;
-	char *queryJob = NULL;
+	//char *queryJob = NULL;
 	unsigned long *lengths = NULL;
 
-	sprintfAlloc(&queryJob, QUERY_SOLVER, solverName);
+	sprintfAlloc(&querySolver, QUERY_SOLVER, solverName);
 
 	conn = mysql_init(NULL);
-	if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+	if(!mysql_real_connect(conn, host, username, password, database, port, NULL, 0)) {
+		logError("could not establish a mysql connection!\n error message: %s",mysql_error(conn));
 		return dbError;
 	}
 
 
 	/* fetch job information */
 	if(mysql_query(conn, querySolver) != 0) {
+		logError("DB error message: %s",mysql_error(conn));
 		return dbError;
 	}
 
 	if((res = mysql_store_result(conn)) == NULL) {
+		logError("DB error message: %s",mysql_error(conn));
 		return dbError;
 	}
 
@@ -655,7 +671,7 @@ status dbFetchInstance(const char* instanceName, instance* i) {
 	sprintfAlloc(&queryInstance, QUERY_INSTANCE, instanceName);
 
 	conn = mysql_init(NULL);
-	if(!mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)) {
+	if(!mysql_real_connect(conn, host, username, password, database, port, NULL, 0)) {
 		logError("could not establish mysql connection!\n");
 		return dbError;
 	}

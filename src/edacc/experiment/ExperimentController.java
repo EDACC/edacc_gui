@@ -44,6 +44,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Random;
@@ -567,6 +568,17 @@ public class ExperimentController {
         int total = solvers.size() + instances.size();
         int done = 0;
 
+        boolean foundSolverWithSameName = false;
+        HashSet<String> tmp = new HashSet<String>();
+        HashSet<String> solvernameMap = new HashSet<String>();
+        for (Solver s : solvers) {
+            if (tmp.contains(s.getBinaryName())) {
+                solvernameMap.add(s.getBinaryName());
+                foundSolverWithSameName = true;
+            } else {
+                tmp.add(s.getBinaryName());
+            }
+        }
         // add solvers to zip file
         for (Solver s : solvers) {
             done++;
@@ -577,7 +589,13 @@ public class ExperimentController {
             }
             task.setStatus("Writing solver " + done + " of " + solvers.size());
             File bin = SolverDAO.getBinaryFileOfSolver(s);
-            entry = new ZipEntry("solvers" + System.getProperty("file.separator") + s.getBinaryName());
+            String filename;
+            if (solvernameMap.contains(s.getBinaryName())) {
+                filename = s.getBinaryName() + "_" + s.getMd5().substring(0, 3);
+            } else {
+                filename = s.getBinaryName();
+            }
+            entry = new ZipEntry("solvers" + System.getProperty("file.separator") + filename);
             addFileToZIP(bin, entry, zos);
         }
 
@@ -623,6 +641,10 @@ public class ExperimentController {
 
         // delete tmp directory
         deleteDirectory(new File("tmp"));
+
+        if (foundSolverWithSameName) {
+            javax.swing.JOptionPane.showMessageDialog(null, "The resulting package file contains solvers with same names.", "Information", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     private boolean deleteDirectory(File dir) {
@@ -709,13 +731,13 @@ public class ExperimentController {
     private void addRunScript(ZipOutputStream zos, GridQueue q) throws IOException {
         String sRun = "#!/bin/bash\n" + 
                 "chmod a-rwx client\n" +
-                "chmod u+x client\n" +
+                "chmod u+rwx client\n" +
                 "chmod a-rwx config\n" +
-                "chmod u+r config\n" +
+                "chmod u+rw config\n" +
                 "chmod a-rwx solvers/*\n" +
-                "chmod u+x solvers/*\n" +
+                "chmod u+rwx solvers/*\n" +
                 "chmod a-rwx instances/*\n" +
-                "chmod u+r instances/*\n" +
+                "chmod u+wr instances/*\n" +
                 "for (( i = 0; i < " + q.getNumNodes() + "; i++ ))\n" +
                 "do\n" +
                 "    qsub start_client.pbs\n" +

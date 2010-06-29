@@ -308,7 +308,33 @@ CREATE  TABLE IF NOT EXISTS `Type` (
   PRIMARY KEY (`name`) )
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- FUNCTION `absTime`
+-- -----------------------------------------------------
+DROP FUNCTION IF EXISTS absTime;
 
+delimiter //
+CREATE FUNCTION absTime(time FLOAT) RETURNS INT
+BEGIN
+  WHILE time < 0 DO
+    SET time = time +24*60*60;
+  END WHILE;
+  RETURN time;
+END //
+delimiter ;
+
+-- -----------------------------------------------------
+-- EVENT `MONITOR_JOBS`
+-- -----------------------------------------------------
+
+DROP EVENT IF EXISTS MONITOR_JOBS;
+
+CREATE EVENT MONITOR_JOBS
+ON SCHEDULE EVERY '20' MINUTE
+DO
+UPDATE ExperimentResults SET status=-1 WHERE idJob IN (
+SELECT idJob FROM Experiment JOIN (SELECT * FROM ExperimentResults WHERE status=0) AS ERtmp on Experiment.idExperiment = Experiment_idExperiment WHERE absTime(curTime()-startTime)>timeOut*1.5
+);
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

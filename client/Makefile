@@ -1,7 +1,7 @@
 CC=gcc
 #CFLAGS=-O2 -W -Wall -Wextra
 #for debugging
-CFLAGS=-g3 -ggdb -W -Wall -Wextra
+CFLAGS= -g3 -ggdb -W -Wall -Wextra
 all: client
 
 clean:
@@ -16,8 +16,10 @@ clean:
 # Static build causes many problems. The most serious problem is, that the default glibc 
 # can only be dynamical linked, so mysql may won't work.
 client: client.o log.o signals.o safeio.o mutex.o database.o configuration.o dbmgr.o md5sum.o
-	$(CC) $(CFLAGS) *.o -o client -pthread `mysql_config --cflags` `mysql_config --libs`
-	#$(CC) $(CFLAGS) *.o -o client -static -pthread `mysql_config --cflags` `mysql_config --libs`
+	#$(CC) $(CFLAGS) *.o -o client -pthread `mysql_config --cflags` `mysql_config --libs`
+	$(CC) $(CFLAGS) *.o -o client -pthread -L ./lib -lmysqlclient -lz
+	#$(CC) $(CFLAGS) *.o -o client -pthread -L./lib -lmysqlclient -lz -lcrypt -lnsl -lm -L./lib -lssl -lcrypto
+
 
 client.o: client.c global.h log.h signals.h database.h configuration.h safeio.h mutex.h md5sum.h
 	$(CC) $(CFLAGS) -c $<

@@ -154,5 +154,11 @@ public class InstanceClassTableModel extends AbstractTableModel{
         ((InstanceTableModel)instanceTable.getModel()).fireTableDataChanged();
     }
 
+    void clearTable() {
+        this.classes.clear();
+        this.classSelect.clear();
+        this.fireTableDataChanged();
+    }
+
 
 }

@@ -116,7 +116,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
                 @Override
                 public Object getValueAt(int row, int column) {
-                    if (column == 8) {
+                    // this is the status column
+                    if (((ExperimentResultsBrowserTableModel)this.getModel()).getIndexForColumn(column) == 8) {
                         return ""+(char)(((ExperimentResultsBrowserTableModel)this.getModel()).getStatusCode(row)+68);
                     }
                     return ((ExperimentResultsBrowserTableModel)this.getModel()).getValueAt(row, column);
@@ -221,7 +222,39 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             btnGenerateJobs.setEnabled(true);
             btnGeneratePackage.setEnabled(true);
         }
+        DatabaseConnector.getInstance().addObserver(new Observer() {
 
+            public void update(Observable o, Object arg) {
+                if (DatabaseConnector.getInstance().isConnected()) {
+                    reinitializeGUI();
+                }
+            }
+
+        });
+    }
+
+    public void reinitializeGUI() {
+        expController.unloadExperiment();
+        /* instance tab */
+        btnDeselectAllInstnaceClassesActionPerformed(null);
+        rowFilter.filter_maxClauseLength = false;
+        rowFilter.filter_name = false;
+        rowFilter.filter_numAtoms = false;
+        rowFilter.filter_numClauses = false;
+        rowFilter.filter_ratio = false;
+        lblFilterStatus.setText("");
+        /* end of instance tab */
+        /* job browser tab */
+        resultBrowserRowFilter.setInstanceName(null);
+        resultBrowserRowFilter.setSolverName(null);
+        resultBrowserRowFilter.setStatusCode(null);
+        boolean[] columnVis = jobsTableModel.getColumnVisibility();
+        for (int i = 0; i < columnVis.length; i++) {
+            columnVis[i] = true;
+        }
+        jobsTableModel.setColumnVisibility(columnVis);
+        setJobsFilterStatus("");
+        /* end of job browser tab */
     }
 
     public void initialize() throws SQLException {
@@ -358,6 +391,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         panelManageExperiment.setName("panelManageExperiment"); // NOI18N
         panelManageExperiment.setPreferredSize(new java.awt.Dimension(0, 0));
 
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentMode.class);
+        scrollPaneExperimentsTable.setToolTipText(resourceMap.getString("scrollPaneExperimentsTable.toolTipText")); // NOI18N
         scrollPaneExperimentsTable.setName("scrollPaneExperimentsTable"); // NOI18N
         scrollPaneExperimentsTable.setNextFocusableComponent(btnLoadExperiment);
         scrollPaneExperimentsTable.setPreferredSize(new java.awt.Dimension(0, 0));
@@ -379,7 +414,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         });
         scrollPaneExperimentsTable.setViewportView(tableExperiments);
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentMode.class);
         pnlEditExperiment.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("pnlEditExperiment.border.title"))); // NOI18N
         pnlEditExperiment.setMinimumSize(new java.awt.Dimension(0, 0));
         pnlEditExperiment.setName("pnlEditExperiment"); // NOI18N
@@ -390,6 +424,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         jLabel2.setName("jLabel2"); // NOI18N
 
         txtTimeout.setText(resourceMap.getString("txtTimeout.text")); // NOI18N
+        txtTimeout.setToolTipText(resourceMap.getString("txtTimeout.toolTipText")); // NOI18N
         txtTimeout.setName("txtTimeout"); // NOI18N
         txtTimeout.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -397,7 +432,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             }
         });
 
+        txtMaxMem.setEditable(false);
         txtMaxMem.setText(resourceMap.getString("txtMaxMem.text")); // NOI18N
+        txtMaxMem.setToolTipText(resourceMap.getString("txtMaxMem.toolTipText")); // NOI18N
         txtMaxMem.setName("txtMaxMem"); // NOI18N
         txtMaxMem.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -443,6 +480,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCExperimentMode.class, this);
         btnEditExperimentSave.setAction(actionMap.get("btnEditExperimentSave")); // NOI18N
         btnEditExperimentSave.setText(resourceMap.getString("btnEditExperimentSave.text")); // NOI18N
+        btnEditExperimentSave.setToolTipText(resourceMap.getString("btnEditExperimentSave.toolTipText")); // NOI18N
         btnEditExperimentSave.setMaximumSize(new java.awt.Dimension(57, 25));
         btnEditExperimentSave.setMinimumSize(new java.awt.Dimension(57, 25));
         btnEditExperimentSave.setName("btnEditExperimentSave"); // NOI18N
@@ -450,6 +488,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
         btnEditExperimentUndo.setAction(actionMap.get("btnEditExperimentUndo")); // NOI18N
         btnEditExperimentUndo.setText(resourceMap.getString("btnEditExperimentUndo.text")); // NOI18N
+        btnEditExperimentUndo.setToolTipText(resourceMap.getString("btnEditExperimentUndo.toolTipText")); // NOI18N
         btnEditExperimentUndo.setMaximumSize(new java.awt.Dimension(57, 25));
         btnEditExperimentUndo.setMinimumSize(new java.awt.Dimension(57, 25));
         btnEditExperimentUndo.setName("btnEditExperimentUndo"); // NOI18N
@@ -460,24 +499,21 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         pnlEditExperimentLayout.setHorizontalGroup(
             pnlEditExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlEditExperimentLayout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(pnlEditExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlEditExperimentLayout.createSequentialGroup()
-                        .addContainerGap()
                         .addGroup(pnlEditExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlEditExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtMaxSeeds, javax.swing.GroupLayout.DEFAULT_SIZE, 757, Short.MAX_VALUE)
-                            .addComponent(txtTimeout, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 757, Short.MAX_VALUE)
-                            .addComponent(txtMaxMem, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 757, Short.MAX_VALUE)
-                            .addComponent(chkGenerateSeeds, javax.swing.GroupLayout.DEFAULT_SIZE, 757, Short.MAX_VALUE)))
+                            .addComponent(txtMaxSeeds, javax.swing.GroupLayout.DEFAULT_SIZE, 770, Short.MAX_VALUE)
+                            .addComponent(txtTimeout, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 770, Short.MAX_VALUE)
+                            .addComponent(txtMaxMem, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 770, Short.MAX_VALUE)
+                            .addComponent(chkGenerateSeeds, javax.swing.GroupLayout.DEFAULT_SIZE, 770, Short.MAX_VALUE)
+                            .addComponent(chkLinkSeeds, javax.swing.GroupLayout.DEFAULT_SIZE, 770, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlEditExperimentLayout.createSequentialGroup()
-                        .addGap(156, 156, 156)
-                        .addComponent(chkLinkSeeds, javax.swing.GroupLayout.DEFAULT_SIZE, 753, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlEditExperimentLayout.createSequentialGroup()
-                        .addContainerGap(709, Short.MAX_VALUE)
                         .addComponent(btnEditExperimentUndo, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(btnEditExperimentSave, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -504,11 +540,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 .addComponent(chkGenerateSeeds)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkLinkSeeds)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlEditExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnEditExperimentSave, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnEditExperimentUndo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(17, Short.MAX_VALUE))
+                    .addComponent(btnEditExperimentUndo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnEditExperimentSave, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel7.setName("jPanel7"); // NOI18N
@@ -516,6 +552,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
         btnDiscardExperiment.setAction(actionMap.get("btnDiscardExperiment")); // NOI18N
         btnDiscardExperiment.setText(resourceMap.getString("btnDiscardExperiment.text")); // NOI18N
+        btnDiscardExperiment.setToolTipText(resourceMap.getString("btnDiscardExperiment.toolTipText")); // NOI18N
         btnDiscardExperiment.setMaximumSize(new java.awt.Dimension(69, 23));
         btnDiscardExperiment.setMinimumSize(new java.awt.Dimension(69, 23));
         btnDiscardExperiment.setName("btnDiscardExperiment"); // NOI18N
@@ -543,7 +580,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                .addContainerGap(505, Short.MAX_VALUE)
+                .addContainerGap(518, Short.MAX_VALUE)
                 .addComponent(btnCreateExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnRemoveExperiment)
@@ -575,9 +612,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManageExperimentLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelManageExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(pnlEditExperiment, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 931, Short.MAX_VALUE)
-                    .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 931, Short.MAX_VALUE)
-                    .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 931, Short.MAX_VALUE))
+                    .addComponent(pnlEditExperiment, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 944, Short.MAX_VALUE)
+                    .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 944, Short.MAX_VALUE)
+                    .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 944, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelManageExperimentLayout.setVerticalGroup(
@@ -602,6 +639,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
         jPanel2.setName("jPanel2"); // NOI18N
 
+        jScrollPane3.setToolTipText(resourceMap.getString("jScrollPane3.toolTipText")); // NOI18N
         jScrollPane3.setName("jScrollPane3"); // NOI18N
 
         tableSolvers.setModel(new javax.swing.table.DefaultTableModel(
@@ -623,7 +661,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 885, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 898, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -633,6 +671,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
         jSplitPane1.setLeftComponent(jPanel2);
 
+        jScrollPane4.setToolTipText(resourceMap.getString("jScrollPane4.toolTipText")); // NOI18N
         jScrollPane4.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane4.setName("jScrollPane4"); // NOI18N
         solverConfigPanel = new EDACCSolverConfigPanel();
@@ -672,6 +711,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
         btnUndoSolverConfigurations.setAction(actionMap.get("btnUndoSolverConfigurations")); // NOI18N
         btnUndoSolverConfigurations.setText(resourceMap.getString("btnUndoSolverConfigurations.text")); // NOI18N
+        btnUndoSolverConfigurations.setToolTipText(resourceMap.getString("btnUndoSolverConfigurations.toolTipText")); // NOI18N
         btnUndoSolverConfigurations.setName("btnUndoSolverConfigurations"); // NOI18N
         btnUndoSolverConfigurations.setPreferredSize(new java.awt.Dimension(109, 25));
 
@@ -682,7 +722,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelChooseSolverLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelChooseSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 931, Short.MAX_VALUE)
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 944, Short.MAX_VALUE)
                     .addGroup(panelChooseSolverLayout.createSequentialGroup()
                         .addComponent(btnSelectAllSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -691,7 +731,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                         .addComponent(btnReverseSolverSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnChooseSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 253, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 266, Short.MAX_VALUE)
                         .addComponent(btnUndoSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSaveSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -737,6 +777,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tableInstanceClasses.setToolTipText(resourceMap.getString("tableInstanceClasses.toolTipText")); // NOI18N
         tableInstanceClasses.setName("tableInstanceClasses"); // NOI18N
         jScrollPane5.setViewportView(tableInstanceClasses);
 
@@ -805,6 +846,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
         jPanel3.setName("jPanel3"); // NOI18N
 
+        jScrollPane2.setToolTipText(resourceMap.getString("jScrollPane2.toolTipText")); // NOI18N
         jScrollPane2.setName("jScrollPane2"); // NOI18N
 
         tableInstances.setModel(new javax.swing.table.DefaultTableModel(
@@ -863,6 +905,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
         btnUndoInstances.setAction(actionMap.get("btnUndoInstances")); // NOI18N
         btnUndoInstances.setText(resourceMap.getString("btnUndoInstances.text")); // NOI18N
+        btnUndoInstances.setToolTipText(resourceMap.getString("btnUndoInstances.toolTipText")); // NOI18N
         btnUndoInstances.setName("btnUndoInstances"); // NOI18N
         btnUndoInstances.setPreferredSize(new java.awt.Dimension(109, 25));
 
@@ -932,7 +975,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         panelChooseInstances.setLayout(panelChooseInstancesLayout);
         panelChooseInstancesLayout.setHorizontalGroup(
             panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 955, Short.MAX_VALUE)
+            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 968, Short.MAX_VALUE)
         );
         panelChooseInstancesLayout.setVerticalGroup(
             panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -959,6 +1002,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
         btnGenerateJobs.setAction(actionMap.get("btnGenerateJobs")); // NOI18N
         btnGenerateJobs.setText(resourceMap.getString("btnGenerateJobs.text")); // NOI18N
+        btnGenerateJobs.setToolTipText(resourceMap.getString("btnGenerateJobs.toolTipText")); // NOI18N
         btnGenerateJobs.setName("btnGenerateJobs"); // NOI18N
         btnGenerateJobs.setPreferredSize(new java.awt.Dimension(197, 25));
 
@@ -966,9 +1010,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         lblNumJobs.setName("lblNumJobs"); // NOI18N
 
         lblCurNumRuns.setText(resourceMap.getString("lblCurNumRuns.text")); // NOI18N
+        lblCurNumRuns.setToolTipText(resourceMap.getString("lblCurNumRuns.toolTipText")); // NOI18N
         lblCurNumRuns.setName("lblCurNumRuns"); // NOI18N
 
         btnGeneratePackage.setText(resourceMap.getString("generatePackage.text")); // NOI18N
+        btnGeneratePackage.setToolTipText(resourceMap.getString("generatePackage.toolTipText")); // NOI18N
         btnGeneratePackage.setActionCommand(resourceMap.getString("generatePackage.actionCommand")); // NOI18N
         btnGeneratePackage.setName("generatePackage"); // NOI18N
         btnGeneratePackage.setPreferredSize(new java.awt.Dimension(155, 25));
@@ -980,6 +1026,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
         btnSelectQueue.setAction(actionMap.get("btnSelectQueue")); // NOI18N
         btnSelectQueue.setText(resourceMap.getString("btnSelectQueue.text")); // NOI18N
+        btnSelectQueue.setToolTipText(resourceMap.getString("btnSelectQueue.toolTipText")); // NOI18N
         btnSelectQueue.setName("btnSelectQueue"); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -1000,7 +1047,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblCurNumRuns)
                     .addComponent(lblNumJobs))
-                .addContainerGap(630, Short.MAX_VALUE))
+                .addContainerGap(643, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1050,21 +1097,25 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tableJobs.setToolTipText(resourceMap.getString("tableJobs.toolTipText")); // NOI18N
         tableJobs.setName("tableJobs"); // NOI18N
         jScrollPane6.setViewportView(tableJobs);
 
         btnRefreshJobs.setAction(actionMap.get("btnRefreshJobs")); // NOI18N
         btnRefreshJobs.setText(resourceMap.getString("btnRefreshJobs.text")); // NOI18N
+        btnRefreshJobs.setToolTipText(resourceMap.getString("btnRefreshJobs.toolTipText")); // NOI18N
         btnRefreshJobs.setName("btnRefreshJobs"); // NOI18N
         btnRefreshJobs.setPreferredSize(new java.awt.Dimension(103, 25));
 
         btnBrowserColumnSelection.setAction(actionMap.get("btnBrowserColumnSelection")); // NOI18N
         btnBrowserColumnSelection.setText(resourceMap.getString("btnBrowserColumnSelection.text")); // NOI18N
+        btnBrowserColumnSelection.setToolTipText(resourceMap.getString("btnBrowserColumnSelection.toolTipText")); // NOI18N
         btnBrowserColumnSelection.setName("btnBrowserColumnSelection"); // NOI18N
         btnBrowserColumnSelection.setPreferredSize(new java.awt.Dimension(103, 25));
 
         btnFilterJobs.setAction(actionMap.get("btnFilterJobs")); // NOI18N
         btnFilterJobs.setText(resourceMap.getString("btnFilterJobs.text")); // NOI18N
+        btnFilterJobs.setToolTipText(resourceMap.getString("btnFilterJobs.toolTipText")); // NOI18N
         btnFilterJobs.setName("btnFilterJobs"); // NOI18N
         btnFilterJobs.setPreferredSize(new java.awt.Dimension(103, 25));
 
@@ -1077,9 +1128,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         lblJobsFilterStatus.setName("lblJobsFilterStatus"); // NOI18N
 
         txtJobsTimer.setText(resourceMap.getString("txtJobsTimer.text")); // NOI18N
+        txtJobsTimer.setToolTipText(resourceMap.getString("txtJobsTimer.toolTipText")); // NOI18N
         txtJobsTimer.setName("txtJobsTimer"); // NOI18N
 
         chkJobsTimer.setText(resourceMap.getString("chkJobsTimer.text")); // NOI18N
+        chkJobsTimer.setToolTipText(resourceMap.getString("chkJobsTimer.toolTipText")); // NOI18N
         chkJobsTimer.setName("chkJobsTimer"); // NOI18N
         chkJobsTimer.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
@@ -1103,7 +1156,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 .addComponent(btnFilterJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnCSVExport, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 284, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 297, Short.MAX_VALUE)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtJobsTimer, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1112,9 +1165,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 .addContainerGap())
             .addGroup(panelJobBrowserLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblJobsFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 931, Short.MAX_VALUE)
+                .addComponent(lblJobsFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 944, Short.MAX_VALUE)
                 .addContainerGap())
-            .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 955, Short.MAX_VALUE)
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 968, Short.MAX_VALUE)
         );
         panelJobBrowserLayout.setVerticalGroup(
             panelJobBrowserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1143,7 +1196,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 960, Short.MAX_VALUE)
+                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 973, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(

@@ -49,7 +49,10 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="btnConnectToDB" methodName="btnConnectToDB"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="67"/>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+N"/>
+                </Property>
+                <Property name="mnemonic" type="int" value="78"/>
                 <Property name="text" type="java.lang.String" resourceKey="connectToDBMenuItem.text"/>
                 <Property name="name" type="java.lang.String" value="connectToDBMenuItem" noResource="true"/>
               </Properties>
@@ -58,6 +61,9 @@
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="btnDisconnect" methodName="btnDisconnect"/>
+                </Property>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+D"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="68"/>
                 <Property name="text" type="java.lang.String" resourceKey="disconnectMenuItem.text"/>
@@ -69,8 +75,12 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="btnGenerateTables" methodName="btnGenerateTables"/>
                 </Property>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+G"/>
+                </Property>
                 <Property name="mnemonic" type="int" value="71"/>
                 <Property name="text" type="java.lang.String" resourceKey="generateDBMenuItem.text"/>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="generateDBMenuItem.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="generateDBMenuItem" noResource="true"/>
               </Properties>
             </MenuItem>
@@ -103,8 +113,12 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="btnGridSettings" methodName="btnGridSettings"/>
                 </Property>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+S"/>
+                </Property>
                 <Property name="mnemonic" type="int" value="83"/>
                 <Property name="text" type="java.lang.String" resourceKey="settingsMenuItem.text"/>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="settingsMenuItem.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="settingsMenuItem" noResource="true"/>
               </Properties>
             </MenuItem>
@@ -122,8 +136,12 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="manageDBMode" methodName="manageDBMode"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="68"/>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+M"/>
+                </Property>
+                <Property name="mnemonic" type="int" value="77"/>
                 <Property name="text" type="java.lang.String" resourceKey="manageDBModeMenuItem.text"/>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="manageDBModeMenuItem.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="manageDBModeMenuItem" noResource="true"/>
               </Properties>
             </MenuItem>
@@ -132,8 +150,12 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="manageExperimentMode" methodName="manageExperimentMode"/>
                 </Property>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+E"/>
+                </Property>
                 <Property name="mnemonic" type="int" value="69"/>
                 <Property name="text" type="java.lang.String" resourceKey="manageExperimentModeMenuItem.text"/>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="manageExperimentModeMenuItem.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="manageExperimentModeMenuItem" noResource="true"/>
               </Properties>
             </MenuItem>
@@ -155,6 +177,9 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="showAboutBox" methodName="showAboutBox"/>
                 </Property>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+A"/>
+                </Property>
                 <Property name="name" type="java.lang.String" value="aboutMenuItem" noResource="true"/>
               </Properties>
               <AuxValues>
@@ -164,6 +189,9 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="helpMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+H"/>
+                </Property>
                 <Property name="mnemonic" type="int" value="72"/>
                 <Property name="text" type="java.lang.String" resourceKey="helpMenuItem.text"/>
                 <Property name="name" type="java.lang.String" value="helpMenuItem" noResource="true"/>

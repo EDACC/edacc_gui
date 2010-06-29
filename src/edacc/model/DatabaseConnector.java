@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.Observable;
+import java.util.Vector;
 
 /**
  * singleton class handling the database connection.
@@ -120,7 +121,28 @@ public class DatabaseConnector extends Observable {
             if (!(l = line.replaceAll("\\s", "")).isEmpty() && !l.startsWith("--"))
                 text += line + " ";
         in.close();
-        String[] queries = text.split(";");
+        Vector<String> queries = new Vector<String>();
+        String query = "";
+        String delimiter = ";";
+        int i = 0;
+        while (i < text.length()) {
+            if (text.startsWith(delimiter,i)) {
+                queries.add(query);
+                i += delimiter.length();
+                query = "";
+            } else if (text.startsWith("delimiter",i)) {
+                i += 10;
+                delimiter = text.substring(i, text.indexOf(' ', i));
+                i = text.indexOf(' ', i);
+            } else {
+                query += text.charAt(i);
+                i++;
+            }
+        }
+        if (!query.equals("")) {
+            queries.add(query);
+        }
+
         Statement st = getConn().createStatement();
         for (String q : queries)
             if (!q.replaceAll("\\s", "").isEmpty())
@@ -154,4 +176,5 @@ public class DatabaseConnector extends Observable {
     public String getUsername() {
         return username;
     }
+
 }

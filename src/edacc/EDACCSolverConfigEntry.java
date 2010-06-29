@@ -203,11 +203,13 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         btnReplicate.setAction(actionMap.get("btnReplicate")); // NOI18N
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCSolverConfigEntry.class);
         btnReplicate.setText(resourceMap.getString("btnReplicate.text")); // NOI18N
+        btnReplicate.setToolTipText(resourceMap.getString("btnReplicate.toolTipText")); // NOI18N
         btnReplicate.setActionCommand(resourceMap.getString("btnReplicate.actionCommand")); // NOI18N
         btnReplicate.setName("btnReplicate"); // NOI18N
 
         btnRemove.setAction(actionMap.get("btnRemove")); // NOI18N
         btnRemove.setText(resourceMap.getString("btnRemove.text")); // NOI18N
+        btnRemove.setToolTipText(resourceMap.getString("btnRemove.toolTipText")); // NOI18N
         btnRemove.setName("btnRemove"); // NOI18N
 
         jScrollPane2.setName("jScrollPane2"); // NOI18N
@@ -220,6 +222,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         lblSeedGroup.setName("lblSeedGroup"); // NOI18N
 
         txtSeedGroup.setText(resourceMap.getString("txtSeedGroup.text")); // NOI18N
+        txtSeedGroup.setToolTipText(resourceMap.getString("txtSeedGroup.toolTipText")); // NOI18N
         txtSeedGroup.setName("txtSeedGroup"); // NOI18N
         txtSeedGroup.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -244,7 +247,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                         .addComponent(btnRemove))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(

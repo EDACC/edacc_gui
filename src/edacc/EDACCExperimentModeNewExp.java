@@ -27,6 +27,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.txtExperimentName.requestFocus();
+        this.getRootPane().setDefaultButton(this.btnCreateExperiment);
     }
 
     /** This method is called from within the constructor to
@@ -61,22 +62,12 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                 formWindowActivated(evt);
             }
         });
-        addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                formKeyPressed(evt);
-            }
-        });
 
         lblExperimentName.setText(resourceMap.getString("lblExperimentName.text")); // NOI18N
         lblExperimentName.setName("lblExperimentName"); // NOI18N
 
         txtExperimentName.setToolTipText(resourceMap.getString("txtExperimentName.toolTipText")); // NOI18N
         txtExperimentName.setName("txtExperimentName"); // NOI18N
-        txtExperimentName.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtExperimentNameKeyPressed(evt);
-            }
-        });
 
         lblExperimentDescription.setText(resourceMap.getString("lblExperimentDescription.text")); // NOI18N
         lblExperimentDescription.setName("lblExperimentDescription"); // NOI18N
@@ -85,12 +76,8 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
 
         txtExperimentDescription.setColumns(20);
         txtExperimentDescription.setRows(5);
+        txtExperimentDescription.setToolTipText(resourceMap.getString("txtExperimentDescription.toolTipText")); // NOI18N
         txtExperimentDescription.setName("txtExperimentDescription"); // NOI18N
-        txtExperimentDescription.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtExperimentDescriptionKeyPressed(evt);
-            }
-        });
         jScrollPane1.setViewportView(txtExperimentDescription);
 
         btnCreateExperiment.setText(resourceMap.getString("btnCreateExperiment.text")); // NOI18N
@@ -109,6 +96,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         });
 
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
+        btnCancel.setToolTipText(resourceMap.getString("btnCancel.toolTipText")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
         btnCancel.setPreferredSize(new java.awt.Dimension(80, 25));
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
@@ -134,12 +122,12 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                             .addComponent(lblExperimentDescription, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lblExperimentName))
                         .addGap(12, 12, 12)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(txtExperimentName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                            .addComponent(txtExperimentName, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(btnCreateExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -152,13 +140,13 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                     .addComponent(txtExperimentName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
-                    .addComponent(lblExperimentDescription))
-                .addGap(18, 18, 18)
+                    .addComponent(lblExperimentDescription)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnCreateExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -175,6 +163,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             this.txtExperimentDescription.setText("");
             this.txtExperimentName.setText("");
             this.setVisible(false);
+            
         }
 
 
@@ -213,34 +202,6 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             this.btnCancelActionPerformed(null);
         }
     }//GEN-LAST:event_btnCancelKeyPressed
-
-    private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
-     if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) //create Experiment
-        {
-            this.btnCancelActionPerformed(null);
-        }
-    }//GEN-LAST:event_formKeyPressed
-
-    private void txtExperimentDescriptionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtExperimentDescriptionKeyPressed
-         if (evt.getKeyCode() == KeyEvent.VK_ENTER) //create Experiment
-        {
-            this.btnCreateExperimentActionPerformed(null);
-        }else  if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) //create Experiment
-        {
-            this.btnCancelActionPerformed(null);
-        }
-
-    }//GEN-LAST:event_txtExperimentDescriptionKeyPressed
-
-    private void txtExperimentNameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtExperimentNameKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) //create Experiment
-        {
-            this.btnCreateExperimentActionPerformed(null);
-        } else if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) //create Experiment
-        {
-            this.btnCancelActionPerformed(null);
-        }
-    }//GEN-LAST:event_txtExperimentNameKeyPressed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;

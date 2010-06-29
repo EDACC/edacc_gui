@@ -46,7 +46,9 @@ public class GridQueuesController extends Observable {
     public void createNewGridQueue(GridQueue q) throws SQLException, FileNotFoundException, Exception {
         if (tmpPBSScript == null)
             throw new Exception("You must specify a generic PBS script!");
+        else{
         q.setGenericPBSScript(tmpPBSScript);
+        }
         GridQueueDAO.save(q);
         tmpPBSScript = null;
     }
