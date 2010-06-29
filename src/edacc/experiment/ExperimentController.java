@@ -731,13 +731,13 @@ public class ExperimentController {
     private void addRunScript(ZipOutputStream zos, GridQueue q) throws IOException {
         String sRun = "#!/bin/bash\n" + 
                 "chmod a-rwx client\n" +
-                "chmod u+x client\n" +
+                "chmod u+rwx client\n" +
                 "chmod a-rwx config\n" +
-                "chmod u+r config\n" +
+                "chmod u+rw config\n" +
                 "chmod a-rwx solvers/*\n" +
-                "chmod u+x solvers/*\n" +
+                "chmod u+rwx solvers/*\n" +
                 "chmod a-rwx instances/*\n" +
-                "chmod u+r instances/*\n" +
+                "chmod u+wr instances/*\n" +
                 "for (( i = 0; i < " + q.getNumNodes() + "; i++ ))\n" +
                 "do\n" +
                 "    qsub start_client.pbs\n" +
