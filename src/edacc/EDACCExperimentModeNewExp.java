@@ -62,22 +62,12 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                 formWindowActivated(evt);
             }
         });
-        addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                formKeyPressed(evt);
-            }
-        });
 
         lblExperimentName.setText(resourceMap.getString("lblExperimentName.text")); // NOI18N
         lblExperimentName.setName("lblExperimentName"); // NOI18N
 
         txtExperimentName.setToolTipText(resourceMap.getString("txtExperimentName.toolTipText")); // NOI18N
         txtExperimentName.setName("txtExperimentName"); // NOI18N
-        txtExperimentName.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtExperimentNameKeyPressed(evt);
-            }
-        });
 
         lblExperimentDescription.setText(resourceMap.getString("lblExperimentDescription.text")); // NOI18N
         lblExperimentDescription.setName("lblExperimentDescription"); // NOI18N
@@ -88,11 +78,6 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         txtExperimentDescription.setRows(5);
         txtExperimentDescription.setToolTipText(resourceMap.getString("txtExperimentDescription.toolTipText")); // NOI18N
         txtExperimentDescription.setName("txtExperimentDescription"); // NOI18N
-        txtExperimentDescription.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtExperimentDescriptionKeyPressed(evt);
-            }
-        });
         jScrollPane1.setViewportView(txtExperimentDescription);
 
         btnCreateExperiment.setText(resourceMap.getString("btnCreateExperiment.text")); // NOI18N
@@ -217,34 +202,6 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             this.btnCancelActionPerformed(null);
         }
     }//GEN-LAST:event_btnCancelKeyPressed
-
-    private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
-     if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) //create Experiment
-        {
-            this.btnCancelActionPerformed(null);
-        }
-    }//GEN-LAST:event_formKeyPressed
-
-    private void txtExperimentDescriptionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtExperimentDescriptionKeyPressed
-         if (evt.getKeyCode() == KeyEvent.VK_ENTER) //create Experiment
-        {
-            this.btnCreateExperimentActionPerformed(null);
-        }else  if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) //create Experiment
-        {
-            this.btnCancelActionPerformed(null);
-        }
-
-    }//GEN-LAST:event_txtExperimentDescriptionKeyPressed
-
-    private void txtExperimentNameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtExperimentNameKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) //create Experiment
-        {
-            this.btnCreateExperimentActionPerformed(null);
-        } else if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) //create Experiment
-        {
-            this.btnCancelActionPerformed(null);
-        }
-    }//GEN-LAST:event_txtExperimentNameKeyPressed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
