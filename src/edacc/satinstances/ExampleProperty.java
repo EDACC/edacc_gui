@@ -23,7 +23,7 @@ public class ExampleProperty implements SATInstanceProperty {
 
     @Override
     public PropertyValueType<?> getPropertyValueType() {
-        return new IntegerPropertyValueType();
+        return PropertyValueTypeManager.getInstance().getPropertyValueTypeByName("Integer");
     }
 
   
