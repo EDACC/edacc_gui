@@ -5,6 +5,7 @@
 
 package edacc.satinstances;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Vector;
 
@@ -14,28 +15,24 @@ import java.util.Vector;
  * In this class, a clause is represented by a list of integers. Every integer i
  * in the list stands for a variable with the index i. A negative value of i
  * means that the variable i is negated in the clause.
- * For the indices i of the literals it is:
- * -getNumVariables() < i < getNumVariables()
- * and for the indices c of the clauses; 0 <= c < getNumClauses().
+ * The indices of the literals can be every int value except zero.
+ * For the indices c of the clauses; 0 <= c < getNumClauses().
  *
  * @author dgall
  */
 public class SATInstance {
 
     private Vector<Vector<Integer>> clauses;
-    private int numVariables;
+    private Vector<Integer> variables;
 
     /**
-     * Creates an empty SAT instance with a certain number of clauses
-     * and variables.
+     * Creates an empty SAT instance.
      * @param numClauses
      * @param numVariables
      */
     public SATInstance(int numClauses, int numVariables) {
         clauses = new Vector<Vector<Integer>>();
-        for (int i = 0; i < numClauses; i++)
-            clauses.add(new Vector<Integer>());
-        this.numVariables = numVariables;
+        variables = new Vector<Integer>();
     }
 
     /**
@@ -68,7 +65,7 @@ public class SATInstance {
      * @throws VariableDoesntExistException
      */
     public int getNumOccurenceOfLiteral(int literal) throws VariableDoesntExistException {
-        if (literal <= -getNumVariables() || literal >= getNumVariables())
+        if (literal < 0 ? variables.contains(-literal) : variables.contains(literal))
             throw new VariableDoesntExistException();
         int count = 0;
         for (int i = 0; i < clauses.size(); i++) {
@@ -114,7 +111,7 @@ public class SATInstance {
      * @return the number of variables in this SAT instance.
      */
     public int getNumVariables() {
-        return numVariables;
+        return variables.size();
     }
 
     /**
@@ -123,5 +120,56 @@ public class SATInstance {
      */
     public int getNumClauses() {
         return clauses.size();
+    }
+
+    /**
+     * Adds a new clause to the instance.
+     * @param clause the clause to be added.
+     * @return the index of the new clause.
+     */
+    public int addClause(Vector<Integer> clause) throws InvalidVariableException {
+        if (clause.contains(0))
+            throw new InvalidVariableException();
+        clauses.add(clause);
+        updateVariables();
+        return clauses.size() - 1;
+    }
+
+    /**
+     * Removes the clause with index index.
+     * @param index
+     * @return if the removal of the clause has been succesful.
+     */
+    public boolean removeClause(int index) {
+        try {
+            clauses.remove(index);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Sets the value of a clause.
+     * @param index
+     * @param clause
+     * @throws ClauseDoesntExistException if the index is < 0 or > numClauses()
+     */
+    public void setClause(int index, Vector<Integer> clause) throws ClauseDoesntExistException {
+        if (index < 0 || index >= clauses.size())
+            throw new ClauseDoesntExistException();
+        clauses.set(index, clause);
+    }
+
+    private void updateVariables() {
+        HashMap<Integer, Boolean> map = new HashMap<Integer, Boolean>();
+        for (Vector<Integer> clause : clauses)
+            for (int lit : clause) {
+                if (lit < 0)
+                    lit = -lit;
+                // mark variable as counted
+                map.put(lit, true);
+            }
+         variables = new Vector<Integer>(map.keySet());
     }
 }
