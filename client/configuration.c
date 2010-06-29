@@ -120,10 +120,14 @@ status read_config() {
                 return sysError;
             }
             strcpy(database, value);
+        } else if(strcmp(key, "port") == 0) {
+            port = atoi(value);
         } else if(strcmp(key, "experiment") == 0) {
             experimentId = atoi(value);
         } else if(strcmp(key, "gridqueue") == 0) {
             gridQueueId = atoi(value);
+        } else if(strcmp(key, "#") == 0) {
+            ;
         } else {
             printf("unknownn option %s\n", key);
             fclose(conf);

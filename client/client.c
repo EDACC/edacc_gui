@@ -29,9 +29,10 @@ static int jobsLen;
 
 //The path where we want to create solvers, instances and temporary files
 static char* basename="./";
-static char* solverDir = "./solvers/";
-static char* instancesDir = "./instances/";
-static char* resultsDir = "./results/";
+static char* solverPath = "solvers/";
+static char* instancePath = "instances/";
+static char* resultPath = "results/";
+static int  solverPathLen,instancePathLen,resultPathLen;
 
 //The length of basename without the terminating '\0' character
 static int basenameLen;
@@ -64,6 +65,50 @@ char* prependBasename(const char* fileName) {
 
 	return str;
 }
+
+char* prependSolverPath(const char* fileName) {
+	char* str;
+
+	int fileNameLen=strlen(fileName);
+
+	str=malloc(solverPathLen+fileNameLen+1);
+	if(str==NULL)
+		return NULL;
+	strcpy(str, solverPath);
+	strcpy(str+solverPathLen, fileName);
+	str[solverPathLen+fileNameLen]='\0';
+
+	return prependBasename(str);
+}
+
+char* prependInstancePath(const char* fileName) {
+	char* str;
+	int fileNameLen=strlen(fileName);
+
+	str=malloc(instancePathLen+fileNameLen+1);
+	if(str==NULL)
+		return NULL;
+	strcpy(str, instancePath);
+	strcpy(str+instancePathLen, fileName);
+	str[instancePathLen+fileNameLen]='\0';
+
+	return prependBasename(str);
+}
+
+char* prependResultPath(const char* fileName) {
+	char* str;
+	int fileNameLen=strlen(fileName);
+
+	str=malloc(resultPathLen+fileNameLen+1);
+	if(str==NULL)
+		return NULL;
+	strcpy(str,resultPath);
+	strcpy(str+resultPathLen, fileName);
+	str[resultPathLen+fileNameLen]='\0';
+
+	return prependBasename(str);
+}
+
 
 //Test if a file exists
 int fileExists(const char* fileName) {
@@ -136,22 +181,31 @@ status init(int argc, char *argv[]) {
 		basename=argv[2];
 	//TODO: Option parser
 	basenameLen=strlen(basename);
-	logComment(1,"base directory is: %s\n",basename);
+	solverPathLen=strlen(solverPath);
+	instancePathLen=strlen(instancePath);
+	resultPathLen=strlen(resultPath);
+	logComment(1,"base path is: %s\n",basename);
+	logComment(1,"solver path is: %s\n",solverPath);
+	logComment(1,"instance path is: %s\n",instancePath);
+	logComment(1,"result path is: %s\n",resultPath);
+
+	logComment(3,"starting to fetch experiment data (downloading if necessary):...\n");
 	s=dbFetchExperimentData(&exp);
 	if(s!=success)
 		return s;
+
 	jobsLen=exp.numCPUs;
-	logComment(2,"numCpus per Node = %d\n",jobsLen);
 	timeOut=exp.timeOut;
-	logComment(2,"timeOut for jobs = %d s\n",timeOut);
+
 
 
 	for(i=0; i<exp.numSolvers; ++i) {
 		//Prepend the solver name with pathname
-		fileName=prependBasename(exp.solverNames[i]);
+		fileName=prependSolverPath(exp.solverNames[i]);
+
 		//TODO: prependSolverDir(...); 3 defines definieren
 		if(fileName==NULL) {
-			logError("Error: Out of memory\n");
+			logError("Error: Out of memory! Could not allocate memory for solverFileName\n");
 			freeExperimentData(&exp);
 			return sysError;
 		}
@@ -162,8 +216,10 @@ status init(int argc, char *argv[]) {
 			return sysError;
 		}
 		//Create the solver binary if it doesn't exist yet
+		logComment(2,"checking for solver binary: %s ...",fileName);
 		if(fileExists(fileName)) {
 			free(fileName);
+			logComment(2,"present locally!\n");
 			unlockMutex();
 			continue;
 		}
@@ -175,6 +231,8 @@ status init(int argc, char *argv[]) {
 			return sysError;
 		}
 		free(fileName);
+		logComment(2,"%d Bytes downloaded!\n",exp.lengthSolver[i]);
+
 		//End the mutual execution lock
 		if(unlockMutex()!=success) {
 			freeExperimentData(&exp);
@@ -184,9 +242,9 @@ status init(int argc, char *argv[]) {
 
 	for(i=0; i<exp.numInstances; ++i) {
 		//Prepend the instance name with pathname
-		fileName=prependBasename(exp.instanceNames[i]);
+		fileName=prependInstancePath(exp.instanceNames[i]);
 		if(fileName==NULL) {
-			logError("Error: Out of memory\n");
+			logError("Error: Out of memory! Could not allocate memory for instancseFileName\n");
 			freeExperimentData(&exp);
 			return sysError;
 		}
@@ -197,8 +255,10 @@ status init(int argc, char *argv[]) {
 			return sysError;
 		}
 		//Create the instance file if it doesn't exist yet
+		logComment(2,"checking for instance: %s ...",fileName);
 		if(fileExists(fileName)) {
 			free(fileName);
+			logComment(2,"present locally!\n");
 			unlockMutex();
 			continue;
 		}
@@ -210,6 +270,7 @@ status init(int argc, char *argv[]) {
 			return sysError;
 		}
 		free(fileName);
+		logComment(2,"%d Bytes downloaded!\n",strlen(exp.instances[i]));
 		//End the mutual execution lock
 		if(unlockMutex()!=success) {
 			freeExperimentData(&exp);
@@ -263,7 +324,7 @@ void exitClient(status retval) {
 		if(jobs[i].pid!=0) {
 			jobs[i].status=-2;
 			update(&(jobs[i]));
-			fileName=prependBasename(pidToFileName(jobs[i].pid));
+			fileName=prependResultPath(pidToFileName(jobs[i].pid));
 			if(fileName!=NULL) {
 				remove(fileName);
 				free(fileName);
@@ -304,7 +365,7 @@ status processResults(job* j) {
 	//Set the status to -2 in case anything goes wrong in this function
 	j->status=-2;
 
-	fileName=prependBasename(pidToFileName(j->pid));
+	fileName=prependResultPath(pidToFileName(j->pid));
 	if(fileName==NULL) {
 		logError("Error: Out of memory\n");
 		return sysError;
@@ -329,12 +390,13 @@ status processResults(job* j) {
 		//Extract the solver output
 		do {
 			c=getc(filePtr);
+
 			if(c==EOF) {
 				logError("Error parsing %s: Unexpected format\n", fileName);
 				free(fileName);
 				return sysError;
 			}
-		} while(c!=(int)'|');
+		} while(c!=(int)'@');
 		outputLen=ftell(filePtr);
 		if(outputLen==-1) {
 			logError("Error in ftell(): %s\n", strerror(errno));
@@ -357,9 +419,9 @@ status processResults(job* j) {
 				return sysError;
 			}
 			*resultFilePtr=(char)c;
-		} while(c!=(int)'|');
+		} while(c!=(int)'@');
 		*resultFilePtr='\0';
-		//Skip the file content until the next '|' character
+		//Skip the file content until the next '§' character
 		do {
 			c=getc(filePtr);
 			if(c==EOF) {
@@ -367,9 +429,9 @@ status processResults(job* j) {
 				free(fileName);
 				return sysError;
 			}
-		} while(c!=(int)'|');
+		} while(c!=(int)'@');
 		//Extract the runtime and return value of the solver
-		if(fscanf(filePtr, "%f|%d", &(j->time), &(j->statusCode))!=2){
+		if(fscanf(filePtr, "%f@%d", &(j->time), &(j->statusCode))!=2){
 			logError("Error parsing %s: Unexpected format\n", fileName);
 			free(fileName);
 			return sysError;
@@ -425,7 +487,7 @@ status handleChildren(int cnt) {
 		//Point j to the entry in jobs corresponding to the terminated child process
 		for(j=jobs; j->pid!=pid; ++j);
 
-		if(WIFEXITED(retval) && (WEXITSTATUS(retval)==0)) {
+		if(1){//(WIFEXITED(retval) && (WEXITSTATUS(retval)==0)){
 			//The process terminated normally.
 			//Start a mutual execution lock between several application instances.
 			if(lockMutex()!=success) {
@@ -453,7 +515,7 @@ status handleChildren(int cnt) {
 			}
 		} else {
 			//The process terminated abnormally
-			fileName=prependBasename(pidToFileName(j->pid));
+			fileName=prependResultPath(pidToFileName(j->pid));
 			j->pid=0;
 			j->status=-2;
 			s=update(j);
@@ -483,18 +545,18 @@ status setJobArgs(const job* j) {
 	char* solverName;
 	char* instanceName;
 
-	fileName=prependBasename(pidToFileName(getpid()));
+	fileName=prependResultPath(pidToFileName(getpid()));
 	if(fileName==NULL) {
 		logError("Error: Out of memory\n");
 		return sysError;
 	}
-	solverName=prependBasename(j->solverName);
+	solverName=prependSolverPath(j->solverName);
 	if(solverName==NULL) {
 		logError("Error: Out of memory\n");
 		free(fileName);
 		return sysError;
 	}
-	instanceName=prependBasename(j->instanceName);
+	instanceName=prependInstancePath(j->instanceName);
 	if(instanceName==NULL) {
 		logError("Error: Out of memory\n");
 		free(fileName);
@@ -503,7 +565,7 @@ status setJobArgs(const job* j) {
 	}
 	//TODO: hier kann runsolver hinzugefuegt werden
 	if(sprintfAlloc(&command,
-			"ulimit -S -t %d && /usr/bin/time -a -o %s -f \"|%%C|%%U|%%x\" %s %s %s >> %s",
+			"ulimit -S -t %d && /usr/bin/time -a -o %s -f \"@%%C@%%U@%%x\" %s %s %s >> %s",
 			timeOut, fileName, solverName, j->params, instanceName, fileName          ) < 0) {
 		logError("Error in sprintfAlloc()\n");
 		free(fileName);
@@ -511,7 +573,7 @@ status setJobArgs(const job* j) {
 		free(instanceName);
 		return sysError;
 	}
-	//printf("command: %s\n", command);
+	logComment(1,"starting solver with command: %s\n", command);
 
 	jobArgs[0]="/bin/bash";
 	jobArgs[1]="-c";
@@ -584,12 +646,13 @@ int main(int argc, char *argv[]) {
 	//test_main();
 	//exit(0);
 
-
+	logComment(1,"starting the init-process (checking for solvers and instances)\n------------------------------\n");
 	s=init(argc, argv);
 	if(s!=success) {
-		logError("Couldn't init successfully, for experiment %i.\n", experimentId);
+		logError("couldn't init successfully, for experiment %i.\n", experimentId);
 		exit(s);
 	}
+	logComment(1,"init-process finished\n------------------------------\n");
 
 
 	setSignalHandler(signalHandler);
@@ -605,6 +668,7 @@ int main(int argc, char *argv[]) {
 			}
 
 			//Try to load a job from the database and write it to j
+			logComment(2,"loading job from DB...\n");
 			if(fetchJob(j, &s)!=0) {
 				//Unable to retrieve a job from the database
 				unlockMutex();
@@ -615,6 +679,9 @@ int main(int argc, char *argv[]) {
 				}
 				exitClient(s);
 			}
+			logComment(2,"job details: \n");
+			//TODO: job details ausgeben!
+
 
 			//Set j->startTime to the current local time
 			s=setStartTime(j);
@@ -632,9 +699,15 @@ int main(int argc, char *argv[]) {
 				exitClient(s);
 			}
 
-			//Create the solver binary if it doesn't exist yet
-			logComment(4,"checking for solver binary: %s ...\n", j->solverName);
-			fileName=prependBasename(j->solverName);
+			//Create the solver binary if it doesn't exist yet - this is the case if jobs where added afterwards
+			fileName=prependSolverPath(j->solverName);
+			//fileName=prependBasename(fileName);
+
+//			printf("%s",fileName);fflush(stdout);
+//			exit(0);
+
+
+			logComment(2,"checking for solver binary: %s ...",fileName);
 			if(fileName==NULL) {
 				logError("Error: Out of memory\n");
 				unlockMutex();
@@ -661,12 +734,17 @@ int main(int argc, char *argv[]) {
 					exitClient(sysError);
 				}
 				freeSolver(&solv);
+				logComment(2,"%d Bytes downloaded!\n",solv.length);
+			}
+			else{
+				logComment(2,"present locally!\n");
 			}
 			free(fileName);
 
 			//Create the instance file if it doesn't exist yet
-			logComment(4,"checking for instance: %s ...\n", j->instanceName);
-			fileName=prependBasename(j->instanceName);
+
+			fileName=prependInstancePath(j->instanceName);
+			logComment(2,"checking for instance: %s ...",fileName);
 			if(fileName==NULL) {
 				logError("Error: Out of memory\n");
 				unlockMutex();
@@ -692,6 +770,10 @@ int main(int argc, char *argv[]) {
 					exitClient(sysError);
 				}
 				freeInstance(&inst);
+				logComment(2,"%d Bytes downloaded!\n",strlen(inst.instance));
+			}
+			else{
+				logComment(2,"present locally!\n");
 			}
 			free(fileName);
 
@@ -703,7 +785,10 @@ int main(int argc, char *argv[]) {
 			}
 
 			//Create a process for processing the job
+
 			pid=fork();
+			if (pid!=0)
+				logComment(1,"starting job with pid=%d\n",pid);
 			if(pid==-1) {
 				logError("Error in fork(): %s\n", strerror(errno));
 				j->status=-2;
