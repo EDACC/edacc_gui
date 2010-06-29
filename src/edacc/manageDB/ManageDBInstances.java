@@ -7,11 +7,11 @@ package edacc.manageDB;
 import edacc.EDACCAddInstanceToInstanceClass;
 import edacc.EDACCApp;
 import edacc.EDACCCreateEditInstanceClassDialog;
-import edacc.EDACCExtWarningErrorDialog;
 import edacc.EDACCExtendedWarning;
 import edacc.EDACCManageDBInstanceFilter;
 import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
+import edacc.model.DatabaseConnector;
 import edacc.model.InstaceNotInDBException;
 import edacc.model.Instance;
 import edacc.model.InstanceAlreadyInDBException;
@@ -33,6 +33,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,7 +42,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 
@@ -48,7 +49,7 @@ import javax.swing.RowFilter;
  *
  * @author rretz
  */
-public class ManageDBInstances{
+public class ManageDBInstances implements Observer{
 
     EDACCManageDBMode main;
     JPanel panelManageDBInstances;
@@ -64,6 +65,7 @@ public class ManageDBInstances{
         this.jFileChooserManageDBInstance = jFileChooserManageDBInstance;
         this.jFileChooserManageDBExportInstance = jFileChooserManageDBExportInstance;
         this.tableInstances = tableInstances;
+        DatabaseConnector.getInstance().addObserver(this);
     }
     /**
      * Load all instances from the database into the instancetable
@@ -624,6 +626,11 @@ public class ManageDBInstances{
         EDACCCreateEditInstanceClassDialog dialog = new EDACCCreateEditInstanceClassDialog(mainFrame, true, instanceClassTableModel, convertRowIndexToModel);
         dialog.setLocationRelativeTo(mainFrame);
         EDACCApp.getApplication().show(dialog);
+    }
+
+    public void update(Observable o, Object arg) {
+        this.main.instanceTableModel.clearTable();
+        this.main.instanceClassTableModel.clearTable();
     }
 
 }
