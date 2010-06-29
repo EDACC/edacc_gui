@@ -27,6 +27,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.txtExperimentName.requestFocus();
+        this.getRootPane().setDefaultButton(this.btnCreateExperiment);
     }
 
     /** This method is called from within the constructor to
@@ -177,6 +178,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             this.txtExperimentDescription.setText("");
             this.txtExperimentName.setText("");
             this.setVisible(false);
+            
         }
 
 

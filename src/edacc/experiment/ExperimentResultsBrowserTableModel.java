@@ -156,9 +156,13 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
             for (ParameterInstance param : params) {
                 Parameter solverParameter = ParameterDAO.getById(param.getParameter_id());
-                paramString += solverParameter.getName() + " = " + param.getValue();
+                if (solverParameter.getHasValue())
+                    paramString += solverParameter.getPrefix() + " " + param.getValue();
+                else
+                    paramString += solverParameter.getPrefix()+ " ";
+
                 if (params.lastElement() != param) {
-                    paramString += ", ";
+                    paramString += " ";
                 }
             }
             return paramString;
