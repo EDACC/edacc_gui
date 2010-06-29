@@ -16,13 +16,15 @@ public interface SATInstanceProperty {
      *
      * @return the name of the property.
      */
-    String getName();
+    public String getName();
 
     /**
      *
      * @param f
      * @return the value of the property for a given instance.
      */
-    float computeProperty(SATInstance f);
+    public Object computeProperty(SATInstance f);
+
+    public PropertyValueType<?> getPropertyValueType();
 
 }
