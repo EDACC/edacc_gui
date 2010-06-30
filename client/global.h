@@ -22,6 +22,7 @@ char *host;
 char *username;
 char *password;
 char *database;
+unsigned int port;
 int experimentId;
 int gridQueueId;
 

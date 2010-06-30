@@ -13,7 +13,6 @@ package edacc;
 import edacc.manageDB.*;
 import edacc.model.InstaceNotInDBException;
 import edacc.model.InstanceClass;
-import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.MD5CheckFailedException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
@@ -35,10 +34,14 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.table.*;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableRowSorter;
 import org.jdesktop.application.Action;
 
@@ -77,7 +80,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         // initialize instance class table
         instanceClassTableModel = new InstanceClassTableModel(tableInstances);
         tableInstanceClass.setModel(instanceClassTableModel);
+             
         tableInstanceClass.setDefaultRenderer(tableInstanceClass.getColumnClass(2), new DefaultTableCellRenderer() {
+
 
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -1775,3 +1780,5 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         }
     }
 }
+
+

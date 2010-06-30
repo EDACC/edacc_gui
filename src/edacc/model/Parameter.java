@@ -11,6 +11,7 @@ public class Parameter extends BaseModel implements IntegerPKModel {
     public Parameter() {
         super();
         name = prefix = value = "";
+        hasValue=true;
     }
 
     public int getId() {

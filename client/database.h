@@ -2,7 +2,7 @@
 #define DATABASE_H
 
 #include <stdlib.h>
-#include <mysql/mysql.h>
+#include "mysql/mysql.h"
 #include "global.h"
 
 
