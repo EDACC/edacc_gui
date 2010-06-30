@@ -12,43 +12,6 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import org.rosuda.JRI.Rengine;
 
-class RunInstance {
-
-    public int run;
-    public int instanceId;
-
-    public RunInstance(int run, int instanceId) {
-        this.run = run;
-        this.instanceId = instanceId;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final RunInstance other = (RunInstance) obj;
-        if (this.run != other.run) {
-            return false;
-        }
-        if (this.instanceId != other.instanceId) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 23 * hash + this.run;
-        hash = 23 * hash + this.instanceId;
-        return hash;
-    }
-}
-
 /**
  *
  * @author simon
@@ -153,5 +116,41 @@ public class SolverComparison implements PlotInterface {
             combo1.addItem(solConfig);
             combo2.addItem(solConfig);
         }
+    }
+}
+
+class RunInstance {
+    public int run;
+    public int instanceId;
+
+    public RunInstance(int run, int instanceId) {
+        this.run = run;
+        this.instanceId = instanceId;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final RunInstance other = (RunInstance) obj;
+        if (this.run != other.run) {
+            return false;
+        }
+        if (this.instanceId != other.instanceId) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + this.run;
+        hash = 23 * hash + this.instanceId;
+        return hash;
     }
 }

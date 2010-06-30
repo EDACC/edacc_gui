@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * AnalyseBottomPanel.java
  *
  * Created on 29.06.2010, 11:52:39
@@ -15,6 +10,7 @@ import edacc.EDACCApp;
 import edacc.EDACCPlotView;
 import edacc.experiment.plots.DependencyException;
 import edacc.experiment.plots.PlotInterface;
+import java.awt.Dimension;
 import java.sql.SQLException;
 import javax.swing.JFrame;
 import org.jdesktop.application.Action;
@@ -78,10 +74,15 @@ public class AnalyseBottomPanel extends javax.swing.JPanel {
         try {
             analysePanel.updateDependencies();
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            EDACCPlotView test = new EDACCPlotView(mainFrame);
+            EDACCPlotView plotView = new EDACCPlotView(mainFrame);
+
+            plotView.setMaximumSize(new Dimension(65535, 65535));
+            plotView.setMinimumSize(new Dimension(0,0));
+                        plotView.setSize(new Dimension(640,480));
+            plotView.setPreferredSize(new Dimension(640,480));
             plot.plot(AnalyseController.getREngine());
-            test.setLocationRelativeTo(mainFrame);
-        EDACCApp.getApplication().show(test);
+            plotView.setLocationRelativeTo(mainFrame);
+            plotView.setVisible(true);
         } catch (DependencyException ex) {
             javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage(), "Invalid input", javax.swing.JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
