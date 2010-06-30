@@ -12,7 +12,6 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
 
 /**
  *
@@ -35,6 +34,8 @@ public class AnalysePanel extends javax.swing.JPanel {
         jLabel1.setText("Plot type:");
         comboType = new javax.swing.JComboBox();
         comboType.setModel(new javax.swing.DefaultComboBoxModel(new String[]{}));
+        comboType.addItem(new SolverComparison(expController));
+        comboType.addItem(new CactusPlot(expController));
         comboType.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -43,7 +44,6 @@ public class AnalysePanel extends javax.swing.JPanel {
                     try {
                         initializePlotType((PlotInterface) comboType.getSelectedItem());
                     } catch (SQLException _) {
-
                         //TODO: show error message
                         initialize();
                     }
@@ -51,18 +51,20 @@ public class AnalysePanel extends javax.swing.JPanel {
             }
         });
 
+
     }
 
     public void initialize() {
         this.removeAll();
-
-        comboType.removeAllItems();
         try {
-            comboType.addItem(new SolverComparison(expController));
-        } catch (SQLException ex) {
+                if (comboType.getSelectedItem() instanceof PlotInterface) {
+                    PlotInterface plot = (PlotInterface) comboType.getSelectedItem();
+                    plot.loadDefaultValues();
+                }
+        } catch (Exception ex) {
+            ex.printStackTrace();
             // TODO: ERROR MESSAGE!
         }
-
         setLayout(new java.awt.GridBagLayout());
 
         gridBagConstraints = new java.awt.GridBagConstraints();

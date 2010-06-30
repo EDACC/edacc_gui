@@ -12,14 +12,16 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import org.rosuda.JRI.Rengine;
 
+class RunInstance {
 
-class RunInstance{
     public int run;
     public int instanceId;
+
     public RunInstance(int run, int instanceId) {
         this.run = run;
         this.instanceId = instanceId;
     }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -45,8 +47,8 @@ class RunInstance{
         hash = 23 * hash + this.instanceId;
         return hash;
     }
-
 }
+
 /**
  *
  * @author simon
@@ -55,20 +57,20 @@ public class SolverComparison implements PlotInterface {
 
     private Dependency[] dependencies;
     private JComboBox combo1, combo2;
-    private JTextField txtMaxValue;
-    
-    public SolverComparison(ExperimentController expController) throws SQLException {
+    private JTextField txtMaxValue, txtRun;
+    private ExperimentController expController;
+
+    public SolverComparison(ExperimentController expController) {
+        this.expController = expController;
         combo1 = new JComboBox();
         combo2 = new JComboBox();
-        for (SolverConfiguration solConfig : ExperimentDAO.getSolverConfigurationsInExperiment(expController.getActiveExperiment())) {
-            combo1.addItem(solConfig);
-            combo2.addItem(solConfig);
-        }
-        txtMaxValue = new JTextField(""+expController.getActiveExperiment().getTimeOut());
+        txtMaxValue = new JTextField();
+        txtRun = new JTextField("0");
         dependencies = new Dependency[]{
                     new Dependency("First solver", combo1),
                     new Dependency("Second solver", combo2),
-                    new Dependency("Max x/y-value (sec)", txtMaxValue)
+                    new Dependency("Max x/y-value (sec)", txtMaxValue),
+                    new Dependency("Plot for run", txtRun)
                 };
 
     }
@@ -87,18 +89,27 @@ public class SolverComparison implements PlotInterface {
             throw new DependencyException("You have to select two solvers.");
         }
         double maxValue;
+        int run;
         try {
             maxValue = Double.parseDouble(txtMaxValue.getText());
         } catch (NumberFormatException ex) {
             throw new DependencyException("Expected double value for max value.");
         }
+        try {
+            run = Integer.parseInt(txtRun.getText());
+        } catch (NumberFormatException ex) {
+            throw new DependencyException("Expected integer value for run.");
+        }
+
         SolverConfiguration xSolverConfig = (SolverConfiguration) combo1.getSelectedItem();
         SolverConfiguration ySolverConfig = (SolverConfiguration) combo2.getSelectedItem();
         Vector<ExperimentResult> xResults = ExperimentResultDAO.getAllBySolverConfigurationAndStatus(xSolverConfig, 1);
         Vector<ExperimentResult> yResults = ExperimentResultDAO.getAllBySolverConfigurationAndStatus(ySolverConfig, 1);
         HashMap<RunInstance, ExperimentResult> hashMap = new HashMap<RunInstance, ExperimentResult>();
         for (ExperimentResult erx : xResults) {
+            if (erx.getRun() == run) {
                 hashMap.put(new RunInstance(erx.getRun(), erx.getInstanceId()), erx);
+            }
         }
         Vector<Float> xsVec = new Vector<Float>();
         Vector<Float> ysVec = new Vector<Float>();
@@ -122,7 +133,7 @@ public class SolverComparison implements PlotInterface {
         re.assign("ys", ys);
         re.assign("marValues", new double[]{3, 3, 10, 6});
         re.eval("par(mar=marValues)");
-        re.assign("maxValue", new double[] {0, maxValue});
+        re.assign("maxValue", new double[]{0, maxValue});
         re.eval("plot(maxValue, maxValue, type='l', col='black', lty=2, xlim=c(0," + maxValue + "), ylim=c(0," + maxValue + "), xaxs='i', yaxs='i',xaxt='n',yaxt='n', xlab='', ylab='')");
         re.eval("par(new=1)");
         re.eval("plot(xs, ys, type='p', col='red', las = 1, xlim=c(0," + maxValue + "), ylim=c(0," + maxValue + "), xaxs='i', yaxs='i',xlab='',ylab='',pch=3, tck=0.015, cex.axis=1.2, cex.main=1.5)");
@@ -131,5 +142,16 @@ public class SolverComparison implements PlotInterface {
         re.eval("mtext('" + ylabel + "', side=4, line=3, cex=1.2)");
         re.eval("mtext('" + xlabel + "', side=3, padj=0, line=3, cex=1.2)");
         re.eval("mtext('" + title + "', padj=-1.7, side=3, line=3, cex=1.7)");
+    }
+
+    public void loadDefaultValues() throws SQLException {
+        txtMaxValue.setText("" + expController.getActiveExperiment().getTimeOut());
+        txtRun.setText("0");
+        combo1.removeAllItems();
+        combo2.removeAllItems();
+        for (SolverConfiguration solConfig : ExperimentDAO.getSolverConfigurationsInExperiment(expController.getActiveExperiment())) {
+            combo1.addItem(solConfig);
+            combo2.addItem(solConfig);
+        }
     }
 }
