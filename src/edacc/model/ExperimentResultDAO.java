@@ -357,6 +357,24 @@ public class ExperimentResultDAO {
         return res;
     }
 
+    public static Vector<ExperimentResult> getAllBySolverConfigurationAndStatus(SolverConfiguration sc, int status) throws SQLException {
+        Vector<ExperimentResult> res = new Vector<ExperimentResult>();
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT idJob, run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
+                "Experiment_idExperiment, Instances_idInstance, curTime()-startTime AS maxTimeLeft FROM " + table + " " +
+                "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=? AND status=?;");
+        st.setInt(1, sc.getExperiment_id());
+        st.setInt(2, sc.getId());
+        st.setInt(3, status);
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            ExperimentResult er = getExperimentResultFromResultSet(rs);
+            res.add(er);
+            er.setSaved();
+        }
+        return res;
+    }
+
     public static Vector<ExperimentResult> getAllByExperimentHasInstance(ExperimentHasInstance ehi) throws SQLException {
         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
