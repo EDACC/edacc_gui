@@ -154,5 +154,6 @@ public class ParameterTableModel extends AbstractTableModel{
 
     public void clear() {
         parameters.clear();
+        fireTableDataChanged();
     }
 }

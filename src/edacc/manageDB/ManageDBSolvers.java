@@ -7,6 +7,7 @@ package edacc.manageDB;
 import edacc.model.MD5CheckFailedException;
 import edacc.model.SolverIsInExperimentException;
 import edacc.EDACCManageDBMode;
+import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Solver;
 import edacc.model.SolverDAO;
@@ -16,12 +17,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  *
  * @author dgall
  */
-public class ManageDBSolvers {
+public class ManageDBSolvers implements Observer {
 
     private EDACCManageDBMode gui;
     private SolverTableModel solverTableModel;
@@ -30,6 +33,7 @@ public class ManageDBSolvers {
     public ManageDBSolvers(EDACCManageDBMode gui, SolverTableModel solverTableModel) {
         this.gui = gui;
         this.solverTableModel = solverTableModel;
+        DatabaseConnector.getInstance().addObserver(this);
     }
 
     /**
@@ -164,5 +168,9 @@ public class ManageDBSolvers {
         }
         else return;
         SolverDAO.exportSolverCode(s, f);
+    }
+
+    public void update(Observable o, Object arg) {
+        solverTableModel.clear();
     }
 }

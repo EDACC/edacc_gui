@@ -6,18 +6,21 @@
 package edacc.manageDB;
 
 import edacc.EDACCManageDBMode;
+import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.Solver;
 import java.sql.SQLException;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Vector;
 
 /**
  *
  * @author gregor
  */
-public class ManageDBParameters {
+public class ManageDBParameters implements Observer {
 
     private EDACCManageDBMode gui;
     private ParameterTableModel parameterTableModel;
@@ -27,6 +30,7 @@ public class ManageDBParameters {
     public ManageDBParameters(EDACCManageDBMode gui, ParameterTableModel parameterTableModel){
         this.gui = gui;
         this.parameterTableModel = parameterTableModel;
+        DatabaseConnector.getInstance().addObserver(this);
     }
 
     /**
@@ -117,5 +121,9 @@ public class ManageDBParameters {
             if (p != currentParameter)
                 parameterPrefixes.add(p.getPrefix());
         return parameterPrefixes.contains(prefix); 
+    }
+
+    public void update(Observable o, Object arg) {
+        parameterTableModel.clear();
     }
 }
