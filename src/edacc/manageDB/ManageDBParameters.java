@@ -97,9 +97,25 @@ public class ManageDBParameters {
      */
     public boolean parameterExists(String name) throws NoConnectionToDBException, SQLException {
         Vector<String> parameterNames = new Vector<String>();
-        for (Parameter p : parameterTableModel.getParamtersOfCurrentSolver())
+        for (Parameter p : parameterTableModel.getParametersOfCurrentSolver())
             if (p != currentParameter)
                 parameterNames.add(p.getName());
         return parameterNames.contains(name); //|| ParameterDAO.parameterExistsForSolver(name, parameterTableModel.getCurrentSolver());
+    }
+
+    /**
+     * Checks, if a parameter with the given prefix already exists for the
+     * current solver. Won't check the DB for performance reasons!
+     * @param prefix
+     * @return
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     */
+    public boolean parameterPrefixExists(String prefix) throws NoConnectionToDBException, SQLException {
+        Vector<String> parameterPrefixes = new Vector<String>();
+        for (Parameter p : parameterTableModel.getParametersOfCurrentSolver())
+            if (p != currentParameter)
+                parameterPrefixes.add(p.getPrefix());
+        return parameterPrefixes.contains(prefix); 
     }
 }
