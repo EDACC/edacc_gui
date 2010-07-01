@@ -7,11 +7,14 @@ package edacc;
 
 import edacc.gridqueues.GridQueuesController;
 import edacc.model.GridQueue;
+import edacc.model.GridQueueDAO;
 import edacc.model.NoConnectionToDBException;
+import java.awt.Color;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import org.jdesktop.application.Action;
 
 /**
@@ -27,6 +30,8 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
     private DialogMode mode;
     private EDACCManageGridQueuesDialog manageGridQueuesDialog;
     private GridQueue currentQueue;
+    private final Color BAD = new Color(255, 102, 102);
+    private final Color GOOD = Color.white;
 
     /** Creates new form EDACCGridSettingsView */
     public EDACCGridSettingsView(java.awt.Frame parent, boolean modal, EDACCManageGridQueuesDialog manageGridQueuesDialog) {
@@ -67,6 +72,7 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         btnOk = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
+        pbsScriptMessage = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCGridSettingsView.class);
@@ -86,10 +92,20 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         txtNumNodes.setText(resourceMap.getString("txtNumNodes.text")); // NOI18N
         txtNumNodes.setToolTipText(resourceMap.getString("txtNumNodes.toolTipText")); // NOI18N
         txtNumNodes.setName("txtNumNodes"); // NOI18N
+        txtNumNodes.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                EDACCGridSettingsView.this.keyReleased(evt);
+            }
+        });
 
         txtWalltime.setText(resourceMap.getString("txtWalltime.text")); // NOI18N
         txtWalltime.setToolTipText(resourceMap.getString("txtWalltime.toolTipText")); // NOI18N
         txtWalltime.setName("txtWalltime"); // NOI18N
+        txtWalltime.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                EDACCGridSettingsView.this.keyReleased(evt);
+            }
+        });
 
         lblMaxJobsInQueue.setLabelFor(txtMaxJobsInQueue);
         lblMaxJobsInQueue.setText(resourceMap.getString("lblMaxJobsInQueue.text")); // NOI18N
@@ -98,6 +114,11 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         txtMaxJobsInQueue.setText(resourceMap.getString("txtMaxJobsInQueue.text")); // NOI18N
         txtMaxJobsInQueue.setToolTipText(resourceMap.getString("txtMaxJobsInQueue.toolTipText")); // NOI18N
         txtMaxJobsInQueue.setName("txtMaxJobsInQueue"); // NOI18N
+        txtMaxJobsInQueue.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                EDACCGridSettingsView.this.keyReleased(evt);
+            }
+        });
 
         lblPBSScript.setText(resourceMap.getString("lblPBSScript.text")); // NOI18N
         lblPBSScript.setName("lblPBSScript"); // NOI18N
@@ -122,6 +143,11 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         txtName.setText(resourceMap.getString("txtName.text")); // NOI18N
         txtName.setToolTipText(resourceMap.getString("txtName.toolTipText")); // NOI18N
         txtName.setName("txtName"); // NOI18N
+        txtName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                EDACCGridSettingsView.this.keyReleased(evt);
+            }
+        });
 
         txtLocation.setText(resourceMap.getString("txtLocation.text")); // NOI18N
         txtLocation.setToolTipText(resourceMap.getString("txtLocation.toolTipText")); // NOI18N
@@ -133,6 +159,11 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         txtNumCPUs.setText(resourceMap.getString("txtNumCPUs.text")); // NOI18N
         txtNumCPUs.setToolTipText(resourceMap.getString("txtNumCPUs.toolTipText")); // NOI18N
         txtNumCPUs.setName("txtNumCPUs"); // NOI18N
+        txtNumCPUs.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                EDACCGridSettingsView.this.keyReleased(evt);
+            }
+        });
 
         lblAvailNodes.setLabelFor(txtAvailNodes);
         lblAvailNodes.setText(resourceMap.getString("lblAvailNodes.text")); // NOI18N
@@ -141,6 +172,11 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         txtAvailNodes.setText(resourceMap.getString("txtAvailNodes.text")); // NOI18N
         txtAvailNodes.setToolTipText(resourceMap.getString("txtAvailNodes.toolTipText")); // NOI18N
         txtAvailNodes.setName("txtAvailNodes"); // NOI18N
+        txtAvailNodes.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                EDACCGridSettingsView.this.keyReleased(evt);
+            }
+        });
 
         lblDescription.setLabelFor(taDescription);
         lblDescription.setText(resourceMap.getString("lblDescription.text")); // NOI18N
@@ -167,22 +203,32 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         btnCancel.setToolTipText(resourceMap.getString("btnCancel.toolTipText")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
 
+        pbsScriptMessage.setForeground(resourceMap.getColor("pbsScriptMessage.foreground")); // NOI18N
+        pbsScriptMessage.setText(resourceMap.getString("pbsScriptMessage.text")); // NOI18N
+        pbsScriptMessage.setName("pbsScriptMessage"); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btnCancel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 118, Short.MAX_VALUE)
-                .addComponent(btnOk)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(btnCancel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 118, Short.MAX_VALUE)
+                        .addComponent(btnOk))
+                    .addComponent(pbsScriptMessage))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(btnCancel)
-                .addComponent(btnOk))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addComponent(pbsScriptMessage)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnCancel)
+                    .addComponent(btnOk)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -254,7 +300,7 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblDescription)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblPBSScript)
@@ -275,7 +321,12 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         if (pbsFileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             GridQueuesController.getInstance().addPBSScript(pbsFileChooser.getSelectedFile());
         }
+        checkInputs();
     }//GEN-LAST:event_btnAdd
+
+    private void keyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_keyReleased
+        checkInputs();
+    }//GEN-LAST:event_keyReleased
 
     /**
      * Loads the given grid queue settings to the dialog's elements.
@@ -285,6 +336,7 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
      * @throws SQLException
      */
     public void loadSettings(GridQueue q) throws SQLException {
+        GridQueuesController.getInstance().clearPBSScript();
         if (q != null) {
             currentQueue = q;
             setDialogMode(DialogMode.Edit);
@@ -319,6 +371,7 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         taDescription.setText("");
         setDialogMode(DialogMode.Create);
         }*/
+        checkInputs();
     }
 
     @Action
@@ -341,7 +394,7 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
             currentQueue.setAvailNodes(availNodes);
             currentQueue.setMaxJobsQueue(maxJobsInQueue);
             currentQueue.setDescription(description);
-            
+
             if (mode == DialogMode.Create) {
                 GridQueuesController.getInstance().createNewGridQueue(currentQueue);
             } else {
@@ -376,6 +429,62 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         GridQueuesController.getInstance().addPBSScript(null);
         this.setVisible(false);
     }
+
+    public void checkInputs() {
+        boolean error = false;
+        if (txtName.getText().equals("") || GridQueueDAO.queueExistsInCache(txtName.getText())) {
+            txtName.setBackground(BAD);
+            error = true;
+        } else {
+            txtName.setBackground(GOOD);
+        }
+
+        if (!checkIntegerTextField(txtAvailNodes)) {
+            error = true;
+        }
+        if (!checkIntegerTextField(txtMaxJobsInQueue)) {
+            error = true;
+        }
+        if (!checkIntegerTextField(txtNumCPUs)) {
+            error = true;
+        }
+        if (!checkIntegerTextField(txtNumNodes)) {
+            error = true;
+        }
+        if (!checkIntegerTextField(txtWalltime)) {
+            error = true;
+        }
+
+        // Show PBS script error message if no pbs script has been specified
+        boolean pbsError = mode == DialogMode.Create && !GridQueuesController.getInstance().hasTmpPBSScript();
+        pbsScriptMessage.setVisible(pbsError);
+
+        btnOk.setEnabled(!error && !pbsError);
+    }
+
+    /**
+     * Checks if a TextField expecting an int has a valid int in it and
+     * modifies the colors of the textfield (Color.BAD for invalid ints and
+     * Color.GOOD for valid ints).
+     * A string representation of an int is valid if it is != 0 and if it can
+     * be converted to a valid int.
+     * @param tf
+     * @return if the text of the TextField is a valid int.
+     */
+    private boolean checkIntegerTextField(JTextField tf) {
+        try {
+            if (Integer.parseInt(tf.getText()) == 0) {
+                tf.setBackground(BAD);
+                return false;
+            } else {
+                tf.setBackground(GOOD);
+                return true;
+            }
+        } catch (NumberFormatException e) {
+            tf.setBackground(BAD);
+            return false;
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnCancel;
@@ -391,6 +500,7 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
     private javax.swing.JLabel lblNumNodes;
     private javax.swing.JLabel lblPBSScript;
     private javax.swing.JLabel lblWallTime;
+    private javax.swing.JLabel pbsScriptMessage;
     private javax.swing.JTextArea taDescription;
     private javax.swing.JTextField txtAvailNodes;
     private javax.swing.JTextField txtLocation;
