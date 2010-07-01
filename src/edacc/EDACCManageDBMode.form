@@ -936,6 +936,7 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" resourceKey="btnEditInstanceClass.text"/>
                             <Property name="toolTipText" type="java.lang.String" resourceKey="btnEditInstanceClass.toolTipText"/>
+                            <Property name="enabled" type="boolean" value="false"/>
                             <Property name="name" type="java.lang.String" value="btnEditInstanceClass" noResource="true"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[89, 25]"/>
@@ -959,6 +960,7 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" resourceKey="btnRemoveInstanceClass.text"/>
                             <Property name="toolTipText" type="java.lang.String" resourceKey="btnRemoveInstanceClass.toolTipText"/>
+                            <Property name="enabled" type="boolean" value="false"/>
                             <Property name="name" type="java.lang.String" value="btnRemoveInstanceClass" noResource="true"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[89, 25]"/>
@@ -1204,6 +1206,7 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" resourceKey="btnRemoveInstances.text"/>
                             <Property name="toolTipText" type="java.lang.String" resourceKey="btnRemoveInstances.toolTipText"/>
+                            <Property name="enabled" type="boolean" value="false"/>
                             <Property name="name" type="java.lang.String" value="btnRemoveInstances" noResource="true"/>
                           </Properties>
                           <Events>
@@ -1227,6 +1230,7 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" resourceKey="btnFilterInstances.text"/>
                             <Property name="toolTipText" type="java.lang.String" resourceKey="btnFilterInstances.toolTipText"/>
+                            <Property name="enabled" type="boolean" value="false"/>
                             <Property name="name" type="java.lang.String" value="btnFilterInstances" noResource="true"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[83, 25]"/>
@@ -1240,6 +1244,7 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" resourceKey="btnExportInstances.text"/>
                             <Property name="toolTipText" type="java.lang.String" resourceKey="btnExportInstances.toolTipText"/>
+                            <Property name="enabled" type="boolean" value="false"/>
                             <Property name="name" type="java.lang.String" value="btnExportInstances" noResource="true"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[83, 25]"/>
@@ -1253,6 +1258,7 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" resourceKey="btnAddToClass.text"/>
                             <Property name="toolTipText" type="java.lang.String" resourceKey="btnAddToClass.toolTipText"/>
+                            <Property name="enabled" type="boolean" value="false"/>
                             <Property name="name" type="java.lang.String" value="btnAddToClass" noResource="true"/>
                           </Properties>
                           <Events>
@@ -1263,6 +1269,7 @@
                           <Properties>
                             <Property name="toolTipText" type="java.lang.String" resourceKey="btnRemoveFromClass.toolTipText"/>
                             <Property name="actionCommand" type="java.lang.String" resourceKey="btnRemoveFromClass.actionCommand"/>
+                            <Property name="enabled" type="boolean" value="false"/>
                             <Property name="label" type="java.lang.String" resourceKey="btnRemoveFromClass.label"/>
                             <Property name="name" type="java.lang.String" value="btnRemoveFromClass" noResource="true"/>
                           </Properties>

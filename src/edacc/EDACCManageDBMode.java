@@ -13,6 +13,7 @@ package edacc;
 import edacc.manageDB.*;
 import edacc.model.InstaceNotInDBException;
 import edacc.model.InstanceClass;
+import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.MD5CheckFailedException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
@@ -29,19 +30,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.InputVerifier;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.table.*;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableRowSorter;
 import org.jdesktop.application.Action;
 
@@ -76,30 +72,20 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         tableInstances.setModel(instanceTableModel);
         sorter = new TableRowSorter<InstanceTableModel>(instanceTableModel);
         tableInstances.setRowSorter(sorter);
+        tableInstances.getSelectionModel().addListSelectionListener(new InstanceTableSelectionListener(tableInstances, manageDBInstances));
 
         // initialize instance class table
         instanceClassTableModel = new InstanceClassTableModel(tableInstances);
         tableInstanceClass.setModel(instanceClassTableModel);
-             
-        tableInstanceClass.setDefaultRenderer(tableInstanceClass.getColumnClass(2), new DefaultTableCellRenderer() {
-
+        tableInstanceClass.getSelectionModel().addListSelectionListener(new InstanceClassTableSelectionListener(tableInstanceClass, manageDBInstances));        
+        tableInstanceClass.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
 
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                     boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if(column == 3){
-                    JCheckBox check =  new JCheckBox();
-                    if(lbl.getText().equals("true"))
-                        check.setSelected(true);
-                    else check.setSelected(false);
-                    check.setHorizontalAlignment(JCheckBox.CENTER);
-                    check.setBackground(Color.white);
-                    return check;
-                }
                 lbl.setHorizontalAlignment(JLabel.CENTER);
-                return lbl; 
- 
+                return lbl;
             }
         });
 
@@ -396,9 +382,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tfParametersName, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                    .addComponent(tfParametersPrefix, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                    .addComponent(tfParametersOrder, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+                    .addComponent(tfParametersName, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+                    .addComponent(tfParametersPrefix, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+                    .addComponent(tfParametersOrder, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
                     .addComponent(chkHasNoValue, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
@@ -434,14 +420,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                 .addContainerGap()
                 .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelParametersLayout.setVerticalGroup(
             panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelParametersLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -455,14 +441,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                 .addContainerGap()
                 .addGroup(panelParametersOverallLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(panelParametersButons, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelParameters, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE))
+                    .addComponent(panelParameters, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelParametersOverallLayout.setVerticalGroup(
             panelParametersOverallLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelParametersOverallLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelParameters, javax.swing.GroupLayout.DEFAULT_SIZE, 436, Short.MAX_VALUE)
+                .addComponent(panelParameters, javax.swing.GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelParametersButons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -538,7 +524,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                 .addComponent(btnSolverRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSolverExport, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnSolverSaveToDB)
                 .addContainerGap())
         );
@@ -656,8 +642,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnSolverAddBinary)
                     .addComponent(btnSolverAddCode)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
-                    .addComponent(tfSolverName, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
+                    .addComponent(tfSolverName, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -694,14 +680,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             .addGroup(panelSolverLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelSolverLayout.setVerticalGroup(
             panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSolverLayout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -738,14 +724,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelManageDBSolverLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 805, Short.MAX_VALUE)
+                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 720, Short.MAX_VALUE)
                 .addContainerGap())
         );
         panelManageDBSolverLayout.setVerticalGroup(
             panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelManageDBSolverLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE)
+                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -776,6 +762,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
         btnEditInstanceClass.setText(resourceMap.getString("btnEditInstanceClass.text")); // NOI18N
         btnEditInstanceClass.setToolTipText(resourceMap.getString("btnEditInstanceClass.toolTipText")); // NOI18N
+        btnEditInstanceClass.setEnabled(false);
         btnEditInstanceClass.setName("btnEditInstanceClass"); // NOI18N
         btnEditInstanceClass.setPreferredSize(new java.awt.Dimension(89, 25));
         btnEditInstanceClass.addActionListener(new java.awt.event.ActionListener() {
@@ -795,6 +782,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
         btnRemoveInstanceClass.setText(resourceMap.getString("btnRemoveInstanceClass.text")); // NOI18N
         btnRemoveInstanceClass.setToolTipText(resourceMap.getString("btnRemoveInstanceClass.toolTipText")); // NOI18N
+        btnRemoveInstanceClass.setEnabled(false);
         btnRemoveInstanceClass.setName("btnRemoveInstanceClass"); // NOI18N
         btnRemoveInstanceClass.setPreferredSize(new java.awt.Dimension(89, 25));
         btnRemoveInstanceClass.addActionListener(new java.awt.event.ActionListener() {
@@ -875,7 +863,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                 .addContainerGap()
                 .addGroup(panelInstanceClassLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(panelButtonsInstanceClass, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelInstanceClassTable, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE))
+                    .addComponent(panelInstanceClassTable, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelInstanceClassLayout.setVerticalGroup(
@@ -936,6 +924,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
         btnRemoveInstances.setText(resourceMap.getString("btnRemoveInstances.text")); // NOI18N
         btnRemoveInstances.setToolTipText(resourceMap.getString("btnRemoveInstances.toolTipText")); // NOI18N
+        btnRemoveInstances.setEnabled(false);
         btnRemoveInstances.setName("btnRemoveInstances"); // NOI18N
         btnRemoveInstances.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -955,6 +944,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
         btnFilterInstances.setText(resourceMap.getString("btnFilterInstances.text")); // NOI18N
         btnFilterInstances.setToolTipText(resourceMap.getString("btnFilterInstances.toolTipText")); // NOI18N
+        btnFilterInstances.setEnabled(false);
         btnFilterInstances.setName("btnFilterInstances"); // NOI18N
         btnFilterInstances.setPreferredSize(new java.awt.Dimension(83, 25));
         btnFilterInstances.addActionListener(new java.awt.event.ActionListener() {
@@ -965,6 +955,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
         btnExportInstances.setText(resourceMap.getString("btnExportInstances.text")); // NOI18N
         btnExportInstances.setToolTipText(resourceMap.getString("btnExportInstances.toolTipText")); // NOI18N
+        btnExportInstances.setEnabled(false);
         btnExportInstances.setName("btnExportInstances"); // NOI18N
         btnExportInstances.setPreferredSize(new java.awt.Dimension(83, 25));
         btnExportInstances.addActionListener(new java.awt.event.ActionListener() {
@@ -975,6 +966,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
         btnAddToClass.setText(resourceMap.getString("btnAddToClass.text")); // NOI18N
         btnAddToClass.setToolTipText(resourceMap.getString("btnAddToClass.toolTipText")); // NOI18N
+        btnAddToClass.setEnabled(false);
         btnAddToClass.setName("btnAddToClass"); // NOI18N
         btnAddToClass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -984,6 +976,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
         btnRemoveFromClass.setToolTipText(resourceMap.getString("btnRemoveFromClass.toolTipText")); // NOI18N
         btnRemoveFromClass.setActionCommand(resourceMap.getString("btnRemoveFromClass.actionCommand")); // NOI18N
+        btnRemoveFromClass.setEnabled(false);
         btnRemoveFromClass.setLabel(resourceMap.getString("btnRemoveFromClass.label")); // NOI18N
         btnRemoveFromClass.setName("btnRemoveFromClass"); // NOI18N
         btnRemoveFromClass.addActionListener(new java.awt.event.ActionListener() {
@@ -1049,16 +1042,16 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             .addGroup(panelInstanceLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelInstanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                    .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 516, Short.MAX_VALUE)
                     .addComponent(panelButtonsInstances, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)))
+                    .addComponent(lblFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 516, Short.MAX_VALUE)))
         );
         panelInstanceLayout.setVerticalGroup(
             panelInstanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelInstanceLayout.createSequentialGroup()
                 .addComponent(lblFilterStatus)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
+                .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(panelButtonsInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1072,14 +1065,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             panelManageDBInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManageDBInstancesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1017, Short.MAX_VALUE)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 977, Short.MAX_VALUE)
                 .addContainerGap())
         );
         panelManageDBInstancesLayout.setVerticalGroup(
             panelManageDBInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelManageDBInstancesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 529, Short.MAX_VALUE))
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE))
         );
 
         manageDBPane.addTab("Instances", panelManageDBInstances);
@@ -1090,14 +1083,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manageDBPane, javax.swing.GroupLayout.DEFAULT_SIZE, 834, Short.MAX_VALUE)
+                .addComponent(manageDBPane, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manageDBPane, javax.swing.GroupLayout.DEFAULT_SIZE, 567, Short.MAX_VALUE)
+                .addComponent(manageDBPane, javax.swing.GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -1350,7 +1343,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
     }//GEN-LAST:event_btnExportInstancesActionPerformed
 
     private void btnSelectAllInstanceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstanceClassesActionPerformed
-        manageDBInstances.SelectAllInstanceClass();
+        Tasks.startTask("SelectAllInstanceClass", new Class[]{edacc.model.Tasks.class}, new Object[]{null}, manageDBInstances, EDACCManageDBMode.this);
         if (btnSelectAllInstanceClasses.getText() == null ? "Show all" == null : btnSelectAllInstanceClasses.getText().equals("Show all")) {
             this.btnSelectAllInstanceClasses.setText("Show none");
         } else {
@@ -1497,7 +1490,25 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
     }//GEN-LAST:event_tableInstancesMouseClicked
 
     private void btnRemoveInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstanceClassActionPerformed
-        // TODO add your handling code here:
+          if(tableInstanceClass.getSelectedRows().length == 0){
+             JOptionPane.showMessageDialog(panelManageDBInstances,
+                "No instances selected.",
+                "Warning",
+                JOptionPane.WARNING_MESSAGE);
+          } else{
+                try {
+                    manageDBInstances.RemoveInstanceClass(tableInstanceClass.getSelectedRows());
+                    instanceClassTableModel.fireTableDataChanged();
+                } catch (SQLException ex){
+                    Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InstanceSourceClassHasInstance ex) {
+                     JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "The selected instance class cannot be removed. Because it is a source class with" +
+                        " related instances.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+          }
     }//GEN-LAST:event_btnRemoveInstanceClassActionPerformed
 
     private void tableInstanceClassMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableInstanceClassMouseClicked
@@ -1746,6 +1757,19 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         lblFilterStatus.setText(status);
         lblFilterStatus.setIcon(new ImageIcon("warning-icon.png"));
         lblFilterStatus.updateUI();
+    }
+
+    public void showInstanceClassButtons(boolean enable) {
+        btnEditInstanceClass.setEnabled(enable);
+        btnRemoveInstanceClass.setEnabled(enable);
+    }
+
+    public void showInstanceButtons(boolean enable) {
+        btnRemoveInstances.setEnabled(enable);
+        btnAddToClass.setEnabled(enable);
+        btnRemoveFromClass.setEnabled(enable);
+        btnExportInstances.setEnabled(enable);
+        btnFilterInstances.setEnabled(enable);
     }
 
     /**

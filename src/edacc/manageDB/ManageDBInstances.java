@@ -256,8 +256,12 @@ public class ManageDBInstances implements Observer{
     /**
      * Sets all checkboxes of the instanceclass table true.
      */
-    public void SelectAllInstanceClass() {
+    public void SelectAllInstanceClass(Tasks task) {
+        task.setOperationName("Showing all instances");
         for(int i = 0; i < main.instanceClassTableModel.getRowCount(); i++){
+           task.setStatus(i + " of " + main.instanceClassTableModel.getRowCount() + " instance classes are loaded");
+           task.setTaskProgress((float)i/(float)main.instanceClassTableModel.getRowCount());
+           main.instanceTableModel.fireTableDataChanged();
             main.instanceClassTableModel.setInstanceClassSelected(i);
         }
         main.instanceClassTableModel.setAll();
@@ -270,12 +274,13 @@ public class ManageDBInstances implements Observer{
      * @throws NoConnectionToDBException
      * @throws InstanceSourceClassHasInstance if one of the selected classes are a source class which has a refernce to an Instance.
      */
-    public void RemoveInstanceClass(Vector<InstanceClass> choosen) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance {
+    public void RemoveInstanceClass(int[] choosen) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance {
         Boolean fail = false;
-        for(int i = 0; i < choosen.size(); i++){
+        for(int i = 0; i < choosen.length; i++){
             try {
-                InstanceClassDAO.delete(choosen.get(i));
-                main.instanceClassTableModel.removeClass(choosen.get(i));
+                InstanceClass toRemove = (InstanceClass) main.instanceClassTableModel.getValueAt(choosen[i], 4);
+                InstanceClassDAO.delete(toRemove);
+                main.instanceClassTableModel.removeClass(toRemove);
             } catch (InstanceSourceClassHasInstance ex) {
                 fail = true;
             }
@@ -631,6 +636,14 @@ public class ManageDBInstances implements Observer{
     public void update(Observable o, Object arg) {
         this.main.instanceTableModel.clearTable();
         this.main.instanceClassTableModel.clearTable();
+    }
+
+    public void showInstanceClassButtons(boolean enable) {
+        main.showInstanceClassButtons(enable);
+    }
+
+    void showInstanceButtons(boolean enable) {
+        main.showInstanceButtons(enable);
     }
 
 }
