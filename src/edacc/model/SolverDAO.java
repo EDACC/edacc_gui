@@ -43,6 +43,9 @@ public class SolverDAO {
         //    return;
         //}
 
+        if (solver == null)
+            return;
+
         // new solvers without binary aren't allowed
         if (solver.isNew() && solver.getName().isEmpty())
             throw new NoSolverNameSpecifiedException();

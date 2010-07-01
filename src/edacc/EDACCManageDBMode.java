@@ -313,6 +313,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         ));
         tableParameters.setToolTipText(resourceMap.getString("tableParameters.toolTipText")); // NOI18N
         tableParameters.setName("tableParameters"); // NOI18N
+        tableParameters.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(tableParameters);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -573,6 +574,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
         tableSolver.setAutoCreateRowSorter(true);
         tableSolver.setName("tableSolver"); // NOI18N
+        tableSolver.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane2.setViewportView(tableSolver);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -1308,8 +1310,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
         int[] rows = tableSolver.getSelectedRows();
         LinkedList<Solver> selectedSolvers = new LinkedList<Solver>();
+        int lastSelectedIndex = -1;
         for (int i : rows) {
             selectedSolvers.add(solverTableModel.getSolver(tableSolver.convertRowIndexToModel(i)));
+            lastSelectedIndex = i;
         }
         if (selectedSolvers.isEmpty()) {
             JOptionPane.showMessageDialog(panelSolver, "No solver selected!", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -1326,6 +1330,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                             JOptionPane.ERROR_MESSAGE);
                 } finally {
                     tableSolver.getSelectionModel().clearSelection();
+                    if (lastSelectedIndex >= 0)
+                        tableSolver.getSelectionModel().setSelectionInterval(lastSelectedIndex, lastSelectedIndex);
                     solverTableModel.fireTableDataChanged();
                     tableSolver.updateUI();
                     tableParameters.updateUI();
