@@ -130,7 +130,7 @@ public class ParameterTableModel extends AbstractTableModel{
      * returns all parameters of the current solver.
      * @return
      */
-    public Vector<Parameter> getParamtersOfCurrentSolver(){
+    public Vector<Parameter> getParametersOfCurrentSolver(){
         if (currentSolver == null)
             return null;
         return getParamtersOfSolver(currentSolver);
@@ -154,5 +154,6 @@ public class ParameterTableModel extends AbstractTableModel{
 
     public void clear() {
         parameters.clear();
+        fireTableDataChanged();
     }
 }

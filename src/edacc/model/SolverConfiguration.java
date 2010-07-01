@@ -5,7 +5,6 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
     private int experiment_id;
     private int id;
     private int seed_group;
-
     public int getSeed_group() {
         return seed_group;
     }
@@ -46,5 +45,15 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
             this.setModified();
         }
     }
+
+    @Override
+    public String toString() {
+        try {
+            return SolverDAO.getById(solver_id).getName();
+        } catch (Exception e) {
+            return "Error.";
+        }
+    }
+
 
 }

@@ -201,6 +201,22 @@ public class ExperimentDAO {
         return solvers;
     }
 
+    public static Vector<SolverConfiguration> getSolverConfigurationsInExperiment(Experiment e) throws SQLException {
+        final String query = "SELECT DISTINCT idSolverConfig FROM SolverConfig WHERE Experiment_idExperiment=?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, e.getId());
+        ResultSet rs = ps.executeQuery();
+        Vector<SolverConfiguration> solverConfigs = new Vector<SolverConfiguration>();
+        while (rs.next()) {
+            int id = rs.getInt("idSolverConfig");
+            SolverConfiguration s = SolverConfigurationDAO.getSolverConfigurationById(id);
+            solverConfigs.add(s);
+        }
+        rs.close();
+        ps.close();
+        return solverConfigs;
+    }
+
     /**
      * Updates the numRuns property for an experiment.
      * @param exp the experiment to be updated

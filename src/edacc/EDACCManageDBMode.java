@@ -299,6 +299,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         ));
         tableParameters.setToolTipText(resourceMap.getString("tableParameters.toolTipText")); // NOI18N
         tableParameters.setName("tableParameters"); // NOI18N
+        tableParameters.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(tableParameters);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -327,6 +328,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
         tfParametersPrefix.setText(resourceMap.getString("tfParametersPrefix.text")); // NOI18N
         tfParametersPrefix.setToolTipText(resourceMap.getString("tfParametersPrefix.toolTipText")); // NOI18N
+        tfParametersPrefix.setInputVerifier(new ParameterPrefixVerifier());
         tfParametersPrefix.setName("tfParametersPrefix"); // NOI18N
         tfParametersPrefix.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
@@ -524,7 +526,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                 .addComponent(btnSolverRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSolverExport, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
                 .addComponent(btnSolverSaveToDB)
                 .addContainerGap())
         );
@@ -558,6 +560,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
         tableSolver.setAutoCreateRowSorter(true);
         tableSolver.setName("tableSolver"); // NOI18N
+        tableSolver.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane2.setViewportView(tableSolver);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -642,8 +645,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnSolverAddBinary)
                     .addComponent(btnSolverAddCode)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
-                    .addComponent(tfSolverName, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE)
+                    .addComponent(tfSolverName, javax.swing.GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -680,8 +683,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             .addGroup(panelSolverLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 546, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 546, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelSolverLayout.setVerticalGroup(
@@ -1002,7 +1005,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                         .addComponent(btnRemoveInstances)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnRefreshTableInstances, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
                         .addComponent(btnFilterInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnExportInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1042,9 +1045,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             .addGroup(panelInstanceLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelInstanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 516, Short.MAX_VALUE)
+                    .addComponent(panelInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 549, Short.MAX_VALUE)
                     .addComponent(panelButtonsInstances, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 516, Short.MAX_VALUE)))
+                    .addComponent(lblFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 549, Short.MAX_VALUE)))
         );
         panelInstanceLayout.setVerticalGroup(
             panelInstanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1083,7 +1086,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manageDBPane, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
+                .addComponent(manageDBPane, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -1300,8 +1303,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
 
         int[] rows = tableSolver.getSelectedRows();
         LinkedList<Solver> selectedSolvers = new LinkedList<Solver>();
+        int lastSelectedIndex = -1;
         for (int i : rows) {
             selectedSolvers.add(solverTableModel.getSolver(tableSolver.convertRowIndexToModel(i)));
+            lastSelectedIndex = i;
         }
         if (selectedSolvers.isEmpty()) {
             JOptionPane.showMessageDialog(panelSolver, "No solver selected!", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -1317,10 +1322,17 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
                 } finally {
+                   
                     tableSolver.getSelectionModel().clearSelection();
                     solverTableModel.fireTableDataChanged();
                     tableSolver.updateUI();
                     tableParameters.updateUI();
+
+                    // try to select the solver which stood one row over the last deleted solver
+                    if (lastSelectedIndex >= tableSolver.getRowCount())
+                        lastSelectedIndex = tableSolver.getRowCount() - 1;
+                    if (lastSelectedIndex >= 0)
+                        tableSolver.getSelectionModel().setSelectionInterval(lastSelectedIndex, lastSelectedIndex);
                 }
             }
         }
@@ -1373,7 +1385,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
-        Parameter p = parameterTableModel.getParameter(tableParameters.getSelectedRow());
+        int selectedIndex = tableParameters.getSelectedRow();
+        Parameter p = parameterTableModel.getParameter(tableParameters.convertRowIndexToModel(selectedIndex));
         try {
             manageDBParameters.removeParameter(p);
         } catch (NoConnectionToDBException ex) {
@@ -1387,9 +1400,18 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
+        // try select the parameter which stood on row over the deleted param
+        if (selectedIndex >= tableParameters.getRowCount())
+            selectedIndex--;
+        Parameter selected = null;
         tableParameters.clearSelection();
+        if (selectedIndex >= 0) {
+            selected = parameterTableModel.getParameter(tableParameters.convertRowIndexToModel(selectedIndex));
+            tableParameters.getSelectionModel().setSelectionInterval(selectedIndex, selectedIndex);
+        }
+        
         showParameterDetails(
-                null);
+                selected);
         tableParameters.updateUI();
     }//GEN-LAST:event_btnParametersDeleteActionPerformed
 
@@ -1544,6 +1566,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         unsavedChanges = true;
         // show error message if necessary
         tfParametersName.getInputVerifier().shouldYieldFocus(tfParametersName);
+        tfParametersPrefix.getInputVerifier().shouldYieldFocus(tfParametersPrefix);
 
     }
 
@@ -1594,13 +1617,16 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             tfParametersOrder.setText(Integer.toString(currentParameter.getOrder()));
             tfParametersPrefix.setText(currentParameter.getPrefix());
             chkHasNoValue.setSelected(!currentParameter.getHasValue());
+            tfParametersName.getInputVerifier().shouldYieldFocus(tfParametersName);
+            tfParametersPrefix.getInputVerifier().shouldYieldFocus(tfParametersPrefix);
         } else {
             tfParametersName.setText("");
             tfParametersOrder.setText("");
             tfParametersPrefix.setText("");
             chkHasNoValue.setSelected(false);
+            showInvalidParameterNameError(false);
+            showInvalidParameterNameError(false);
         }
-        showInvalidParameterNameError(enabled);
         tfParametersName.setEnabled(enabled);
         tfParametersPrefix.setEnabled(enabled);
         tfParametersOrder.setEnabled(enabled);
@@ -1801,6 +1827,38 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             tfParametersName.setBackground(new Color(255, 102, 102));
         } else {
             tfParametersName.setBackground(Color.white);
+        }
+    }
+
+    /**
+     * Verifies the input of the Parameter prefix TextField.
+     */
+    class ParameterPrefixVerifier extends InputVerifier {
+
+        @Override
+        public boolean verify(JComponent input) {
+            String text = ((JTextField) input).getText();
+            try {
+                return !text.equals("") && !manageDBParameters.parameterPrefixExists(text);
+            } catch (Exception ex) {
+                return false;
+            }
+        }
+
+        @Override
+        public boolean shouldYieldFocus(javax.swing.JComponent input) {
+            boolean valid = verify(input);
+            showInvalidParameterPrefixError(!valid);
+            return valid;
+        }
+    }
+
+    private void showInvalidParameterPrefixError(boolean show) {
+        if (show) {
+            // set the color of the TextField to a nice red
+            tfParametersPrefix.setBackground(new Color(255, 102, 102));
+        } else {
+            tfParametersPrefix.setBackground(Color.white);
         }
     }
 }
