@@ -1329,12 +1329,17 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
                 } finally {
+                   
                     tableSolver.getSelectionModel().clearSelection();
-                    if (lastSelectedIndex >= 0)
-                        tableSolver.getSelectionModel().setSelectionInterval(lastSelectedIndex, lastSelectedIndex);
                     solverTableModel.fireTableDataChanged();
                     tableSolver.updateUI();
                     tableParameters.updateUI();
+
+                    // try to select the solver which stood one row over the last deleted solver
+                    if (lastSelectedIndex >= tableSolver.getRowCount())
+                        lastSelectedIndex = tableSolver.getRowCount() - 1;
+                    if (lastSelectedIndex >= 0)
+                        tableSolver.getSelectionModel().setSelectionInterval(lastSelectedIndex, lastSelectedIndex);
                 }
             }
         }
@@ -1387,7 +1392,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
-        Parameter p = parameterTableModel.getParameter(tableParameters.getSelectedRow());
+        int selectedIndex = tableParameters.getSelectedRow();
+        Parameter p = parameterTableModel.getParameter(tableParameters.convertRowIndexToModel(selectedIndex));
         try {
             manageDBParameters.removeParameter(p);
         } catch (NoConnectionToDBException ex) {
@@ -1401,9 +1407,18 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
+        // try select the parameter which stood on row over the deleted param
+        if (selectedIndex >= tableParameters.getRowCount())
+            selectedIndex--;
+        Parameter selected = null;
         tableParameters.clearSelection();
+        if (selectedIndex >= 0) {
+            selected = parameterTableModel.getParameter(tableParameters.convertRowIndexToModel(selectedIndex));
+            tableParameters.getSelectionModel().setSelectionInterval(selectedIndex, selectedIndex);
+        }
+        
         showParameterDetails(
-                null);
+                selected);
         tableParameters.updateUI();
     }//GEN-LAST:event_btnParametersDeleteActionPerformed
 
