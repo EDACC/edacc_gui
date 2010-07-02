@@ -282,6 +282,17 @@ public class GridQueueDAO {
     }
 
     /**
+     * Checks if a queue with the given name exists in the cache (not the DB!)
+     * @param name
+     */
+    public static boolean queueExistsInCache(String name) {
+        for (GridQueue q : cache.values())
+            if (q.getName().equals(name))
+                return true;
+        return false;
+    }
+
+    /**
      * Copies the PBS Script of the specified queue to a specified place on the filesystem.
      * @param q
      * @param f

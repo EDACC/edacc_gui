@@ -2,12 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package edacc.gridqueues;
 
 import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
-import edacc.model.NoConnectionToDBException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
@@ -21,17 +19,16 @@ import java.util.Observable;
 public class GridQueuesController extends Observable {
 
     private static GridQueuesController instance;
-
     private File tmpPBSScript;
     private GridQueue chosenQueue;
 
     private GridQueuesController() {
-        
     }
 
     public static GridQueuesController getInstance() {
-        if (instance == null)
+        if (instance == null) {
             instance = new GridQueuesController();
+        }
         return instance;
     }
 
@@ -44,10 +41,10 @@ public class GridQueuesController extends Observable {
      * @throws Exception
      */
     public void createNewGridQueue(GridQueue q) throws SQLException, FileNotFoundException, Exception {
-        if (tmpPBSScript == null)
+        if (tmpPBSScript == null) {
             throw new Exception("You must specify a generic PBS script!");
-        else{
-        q.setGenericPBSScript(tmpPBSScript);
+        } else {
+            q.setGenericPBSScript(tmpPBSScript);
         }
         GridQueueDAO.save(q);
         tmpPBSScript = null;
@@ -65,9 +62,17 @@ public class GridQueuesController extends Observable {
         GridQueueDAO.save(q);
         tmpPBSScript = null;
     }
-    
+
     public void addPBSScript(File f) {
         tmpPBSScript = f;
+    }
+
+    public boolean hasTmpPBSScript() {
+        return tmpPBSScript != null;
+    }
+
+    public void clearPBSScript() {
+        tmpPBSScript = null;
     }
 
     public void setChosenQueue(GridQueue q) {

@@ -95,6 +95,11 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
 
         listQueues.setToolTipText(resourceMap.getString("listQueues.toolTipText")); // NOI18N
         listQueues.setName("listQueues"); // NOI18N
+        listQueues.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(listQueues);
 
         btnCreateQueue.setText(resourceMap.getString("btnCreateQueue.text")); // NOI18N
@@ -258,9 +263,10 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
                     GridQueueDAO.remove(q);
                 }
             }
-            EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS,
-                    EDACCApp.getApplication().getMainFrame(),
-                    "The following queues couldn't be removed, because they are used in an experiment:", new JTable(new VectorTableModel(queuesInExp)));
+            if (queuesInExp.size() > 0)
+                EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS,
+                        EDACCApp.getApplication().getMainFrame(),
+                        "The following queues couldn't be removed, because they are used in an experiment:", new JTable(new VectorTableModel(queuesInExp)));
 //                EDACCApp.getApplication().show(new EDACCExtWarningErrorDialog(this, true, false,
 //                        new VectorTableModel(queuesInExp),
 //                        "The following queues couldn't be removed, because they are used in an experiment:"));
@@ -272,6 +278,11 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, "An error occured while removing the queue from database: " + ex.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnRemoveQueue
+
+    private void tableClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableClicked
+        if (evt.getClickCount() == 2)
+            btnEditQueue.doClick();
+    }//GEN-LAST:event_tableClicked
 
     public void refreshView() throws NoConnectionToDBException, SQLException {
         // refresh list

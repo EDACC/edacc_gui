@@ -142,6 +142,9 @@
                 <Property name="toolTipText" type="java.lang.String" resourceKey="listQueues.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="listQueues" noResource="true"/>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tableClicked"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
