@@ -1519,8 +1519,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                 JOptionPane.WARNING_MESSAGE);
           } else{
                 try {
+                    int select = tableInstanceClass.getSelectedRows()[0] - 1;
                     manageDBInstances.RemoveInstanceClass(tableInstanceClass.getSelectedRows());
                     instanceClassTableModel.fireTableDataChanged();
+                    if(tableInstanceClass.getRowCount() != 0 && select >= 0){
+                        this.tableInstanceClass.addRowSelectionInterval(select, select);
+        }        
                 } catch (SQLException ex){
                     Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (InstanceSourceClassHasInstance ex) {
