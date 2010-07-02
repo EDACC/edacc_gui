@@ -150,6 +150,8 @@
         <Property name="name" type="java.lang.String" value="txtNumNodes" noResource="true"/>
       </Properties>
       <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
         <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="keyReleased"/>
       </Events>
     </Component>
@@ -160,6 +162,8 @@
         <Property name="name" type="java.lang.String" value="txtWalltime" noResource="true"/>
       </Properties>
       <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
         <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="keyReleased"/>
       </Events>
     </Component>
@@ -179,6 +183,8 @@
         <Property name="name" type="java.lang.String" value="txtMaxJobsInQueue" noResource="true"/>
       </Properties>
       <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
         <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="keyReleased"/>
       </Events>
     </Component>
@@ -223,6 +229,8 @@
         <Property name="name" type="java.lang.String" value="txtName" noResource="true"/>
       </Properties>
       <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
         <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="keyReleased"/>
       </Events>
     </Component>
@@ -232,6 +240,10 @@
         <Property name="toolTipText" type="java.lang.String" resourceKey="txtLocation.toolTipText"/>
         <Property name="name" type="java.lang.String" value="txtLocation" noResource="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lblNumCPUs">
       <Properties>
@@ -246,6 +258,8 @@
         <Property name="name" type="java.lang.String" value="txtNumCPUs" noResource="true"/>
       </Properties>
       <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
         <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="keyReleased"/>
       </Events>
     </Component>
@@ -265,6 +279,8 @@
         <Property name="name" type="java.lang.String" value="txtAvailNodes" noResource="true"/>
       </Properties>
       <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
         <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="keyReleased"/>
       </Events>
     </Component>
@@ -294,6 +310,10 @@
             <Property name="toolTipText" type="java.lang.String" resourceKey="taDescription.toolTipText"/>
             <Property name="name" type="java.lang.String" value="taDescription" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
