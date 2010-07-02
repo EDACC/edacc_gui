@@ -33,11 +33,12 @@
 
    <title>EDACC</title>
     <pubdate>2010</pubdate>
+<!--
     <copyright>
       <year>2010</year>
       <holder>Das super EDACC-Team</holder>
     </copyright>
-
+-->
   </bookinfo>
 
 <chapter>
@@ -48,7 +49,11 @@
     <title>Systemrequirements</title>
 
     <para>
-		You need a connection to the internet, db, ...
+		To start EDACC you need the JRE version 6. <!-- oder niedriger? oder hoeher? -->
+		Additional you need a connection to a SQL-database (DB), where you have read and write access. 
+		The DB should be reachable from the grid (computer) where the client will run.
+		
+		
     </para>
 	
   </section>
@@ -58,8 +63,12 @@
     <title>How to start</title>
 
     <para>
-		You have to start it...
+		When you have downloaded and unziped the zip-file,
+		you have to start it on a Unix like operating system by navigate with the comand line to the folder and type: java -jar "EDACC.jar".
     </para>
+	<para>
+		If you use Windows, you only have to execute the file EDACC.jar.
+	</para>
 	
   </section>
   
@@ -68,7 +77,10 @@
     <title>Connect to the Database</title>
 
     <para>
-		press the right buttons
+		When you have started EDACC correctly you will see now the "connect to DB"-dialog. 
+		Here you fill all fields with the correct data for your database.
+		At last you press the connect-button.
+		Without a connection to a database you can't do anything with EDACC.
     </para>
 	
   </section>
@@ -78,7 +90,9 @@
     <title>Create the tables</title>
 
     <para>
-		...
+		If there is a empty database (DB) without any tables, you can create them with this option.
+		First create a connection to your DB and make sure that you have required rights to create tables in the DB.
+		If this was successfull, now all tabels and relations are created which were needed.
     </para>
 	
   </section>
@@ -90,60 +104,80 @@
 	
 	<!-- verschachtelte sections -->
 	<sect1>
-		<title>Was ist EDACC</title>
+		<title>What is EDACC</title>
 		<para>
-			edacc is was tolles
+			EDACC (Experiment Design and Administration for Computer Clusters) is a tool to manage your solver with parameters, 
+			instances and experiments for SAT (Boolean satisfiability problem). 
 		</para>
-		<sect2>
-			<title>Manage Solver, instances and experiments</title>
-			<para>
-				und ne subsection auch
-			</para>
-		</sect2>
-		
-		<sect2>
-			<title>queuing-tool</title>
-			<para>
-				wie füllt man ne queu
-			</para>
-		</sect2>
-		
-		<sect2>
-			<title>workflow beispiel</title>
-			<para>
-				und wie läuft das ganze ab
-			</para>
-		</sect2>
+		<para>
+			EDACC is a queuing-tool for computer-cluster. It creats all files and skripts where have to exist. 
+		</para>
+			<sect2>
+				<title>Manage Solver, instances and experiments</title>
+				<para>
+					You can add all your solver's with every parameter to your database (DB). So you can 
+					manage and acess them from everywhere. 
+				</para>
+			</sect2>
+			
+			<sect2>
+				<title>queuing-tool</title>
+				<para>
+					If you want to solve a job on a grid (cluster-computer) you first have to add your job in the queuing-system.
+					This can be very complex, so you need all files on your cluster-device, a skript-file to start your jobs and somthing more.
+					EDACC will create all this things in a zip-file for	you.
+				</para>
+			</sect2>
+			
+			<sect2>
+				<title>Workflow example</title>
+				<para>
+					<itemizedlist>
+						<listitem><para>Load solver and parameter</para></listitem>
+						<listitem><para>Load instances</para></listitem>
+						<listitem><para>Create experiment</para></listitem>
+						<listitem><para>Select solver and set the parameter</para></listitem>
+						<listitem><para>Select Instaces</para></listitem>
+						<listitem><para>Set the number of runs</para></listitem>
+						<listitem><para>Create the jobs</para></listitem>
+						<listitem><para>Start the client on the grid</para></listitem>
+						<listitem><para>Export the results</para></listitem>
+					</itemizedlist>
+				</para>
+			</sect2>
 	</sect1>
 	
 	<sect1>
-		<title>Was für infos wird mit EDACC verwaltet</title>
+		<title>Which informations does EDACC manage</title>
 		<para>
-			here we will show the DB-modell
+			Here we will show the DB-modell and describe the components.
 		</para>
 		<sect2>
 			<title>Solver, Parameter</title>
 			<para>
-				was ist das?
+				A solver has a name, a description and parameters. All this things and additionaly the binary of the solver is saved in the DB. A solver is a algorithm to find a solution for a given formula (instance).
 			</para>
 		</sect2>
 		
 		<sect2>
-			<title>Instanzklassen</title>
+			<title>Instanceclasses</title>
 			<para>
-				was ist das?
+				The instanceclasses help you to manage your instances. Every instace has a sourceclass. 
+				The sourceclass is the class of the instances where you added from one folder where all instances have the same style (e.g. random 3-sat).
+				But you can also create userclasses. A userclass can contain variable instaces. 
 			</para>
 		</sect2>
 		
 		<sect2>
-			<title>Instanzen</title>
+			<title>Instances</title>
 			<para>
-				was ist das?
+				A instance is a formula for the SAT-problem. Every instance has a name, a number of klauses, a number of variables and belong to a sourceclass.
+				All this attributes plus the file from the instance were saved in the DB.
 			</para>
 		</sect2>
 		
 		<sect2>
-			<title>Experiment</title>
+			<title>Experiment (benchmark)</title>
 			<para>
 				was ist das?
 			</para>
