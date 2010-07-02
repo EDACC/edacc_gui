@@ -10,6 +10,7 @@
  */
 package edacc;
 
+import edacc.model.Experiment;
 import java.awt.event.KeyEvent;
 
 /**
@@ -22,12 +23,20 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     public String ExpDesc;
     public boolean canceled;
 
-    /** Creates new form EDACCExperimentModeNewSolver */
+    /** Creates new form EDACCExperimentModeNewExp */
     public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         this.txtExperimentName.requestFocus();
         this.getRootPane().setDefaultButton(this.btnCreateExperiment);
+    }
+
+
+    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, String expName, String expDescription) {
+        this(parent, modal);
+        txtExperimentName.setText(expName);
+        txtExperimentDescription.setText(expDescription);
+        btnCreateExperiment.setText("Save");
     }
 
     /** This method is called from within the constructor to
@@ -153,20 +162,10 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCreateExperimentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateExperimentActionPerformed
-        if (txtExperimentName.getText().equals("")) {
-            javax.swing.JOptionPane.showMessageDialog(null, "The experiment must have a name.", "Create experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
-            return;
-        } else {
-            this.ExpName = this.txtExperimentName.getText();
-            this.ExpDesc = this.txtExperimentDescription.getText();
-            this.canceled = false;
-            this.txtExperimentDescription.setText("");
-            this.txtExperimentName.setText("");
-            this.setVisible(false);
-            
-        }
-
-
+        this.ExpName = this.txtExperimentName.getText();
+        this.ExpDesc = this.txtExperimentDescription.getText();
+        this.canceled = false;
+        this.setVisible(false);
     }//GEN-LAST:event_btnCreateExperimentActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
@@ -177,32 +176,31 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
 }//GEN-LAST:event_btnCancelActionPerformed
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-        this.ExpName="";
-        this.ExpDesc="";
+        this.ExpName = "";
+        this.ExpDesc = "";
     }//GEN-LAST:event_formWindowActivated
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        this.canceled=true;        
+        this.canceled = true;
     }//GEN-LAST:event_formWindowClosed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        this.canceled=true;        
+        this.canceled = true;
     }//GEN-LAST:event_formWindowClosing
 
     private void btnCreateExperimentKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnCreateExperimentKeyPressed
-         if (evt.getKeyCode() == KeyEvent.VK_ENTER) //create Experiment
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) //create Experiment
         {
             this.btnCreateExperimentActionPerformed(null);
         }
     }//GEN-LAST:event_btnCreateExperimentKeyPressed
 
     private void btnCancelKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnCancelKeyPressed
-         if (evt.getKeyCode() == KeyEvent.VK_ENTER) //create Experiment
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) //create Experiment
         {
             this.btnCancelActionPerformed(null);
         }
     }//GEN-LAST:event_btnCancelKeyPressed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnCreateExperiment;

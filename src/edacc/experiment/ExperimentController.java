@@ -179,6 +179,10 @@ public class ExperimentController {
         initialize();
     }
 
+    public void saveExperiment(Experiment exp) throws SQLException {
+        ExperimentDAO.save(exp);
+    }
+
     /**
      * Saves all solver configurations with parameter instances in the solver
      * config panel.
@@ -813,6 +817,10 @@ public class ExperimentController {
 
         out.flush();
         out.close();
+    }
+
+    public Experiment getExperiment(String name) throws SQLException {
+        return ExperimentDAO.getExperimentByName(name);
     }
 
     public boolean experimentResultsIsModified(int numRuns) {

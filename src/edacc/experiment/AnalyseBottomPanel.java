@@ -78,8 +78,8 @@ public class AnalyseBottomPanel extends javax.swing.JPanel {
 
             plotView.setMaximumSize(new Dimension(65535, 65535));
             plotView.setMinimumSize(new Dimension(0,0));
-                        plotView.setSize(new Dimension(640,480));
-            plotView.setPreferredSize(new Dimension(640,480));
+                        plotView.setSize(new Dimension(580,640));
+            plotView.setPreferredSize(new Dimension(580,640));
             plot.plot(AnalyseController.getREngine());
             plotView.setLocationRelativeTo(mainFrame);
             plotView.setVisible(true);

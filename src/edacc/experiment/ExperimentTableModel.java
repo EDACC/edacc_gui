@@ -63,5 +63,8 @@ public class ExperimentTableModel extends AbstractTableModel {
                 return "";
         }
     }
-  
+
+    public Experiment getExperimentAt(int rowIndex) {
+        return experiments.get(rowIndex);
+    }
 }
