@@ -41,7 +41,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="480" max="32767" attributes="0"/>
+              <Component id="manageDBPane" pref="977" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -50,7 +50,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="569" max="32767" attributes="0"/>
+              <Component id="manageDBPane" pref="764" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -88,16 +88,21 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane2" pref="720" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jSplitPane2" alignment="1" pref="948" max="32767" attributes="0"/>
+                          <Component id="jPanel3" alignment="1" max="32767" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane2" pref="519" max="32767" attributes="0"/>
+                      <Component id="jSplitPane2" pref="668" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -138,7 +143,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="panelParametersButons" alignment="1" max="32767" attributes="0"/>
-                                  <Component id="panelParameters" alignment="1" pref="188" max="32767" attributes="0"/>
+                                  <Component id="panelParameters" alignment="1" pref="280" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -148,7 +153,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="panelParameters" pref="442" max="32767" attributes="0"/>
+                              <Component id="panelParameters" pref="587" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="panelParametersButons" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -168,7 +173,7 @@
                               <Group type="102" alignment="1" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="btnParametersNew" linkSize="3" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
+                                  <EmptySpace pref="94" max="32767" attributes="0"/>
                                   <Component id="btnParametersDelete" linkSize="3" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
@@ -238,7 +243,7 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="jPanel2" alignment="1" max="32767" attributes="0"/>
-                                      <Component id="jScrollPane1" alignment="1" pref="152" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane1" alignment="1" pref="246" max="32767" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
@@ -248,7 +253,7 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="1" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="jScrollPane1" pref="266" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane1" pref="416" max="32767" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -315,9 +320,9 @@
                                       </Group>
                                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="tfParametersName" alignment="0" pref="37" max="32767" attributes="2"/>
-                                          <Component id="tfParametersPrefix" alignment="0" pref="37" max="32767" attributes="2"/>
-                                          <Component id="tfParametersOrder" alignment="0" pref="37" max="32767" attributes="2"/>
+                                          <Component id="tfParametersName" alignment="0" pref="119" max="32767" attributes="2"/>
+                                          <Component id="tfParametersPrefix" alignment="0" pref="119" max="32767" attributes="2"/>
+                                          <Component id="tfParametersOrder" alignment="0" pref="119" max="32767" attributes="2"/>
                                           <Component id="chkHasNoValue" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
@@ -484,12 +489,8 @@
                                   <Component id="btnSolverNew" linkSize="1" min="-2" pref="81" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
                                   <Component id="btnSolverDelete" linkSize="1" min="-2" pref="81" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                                  <Component id="btnSolverRefresh" linkSize="1" min="-2" pref="89" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace pref="335" max="32767" attributes="0"/>
                                   <Component id="btnSolverExport" linkSize="1" min="-2" pref="79" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
-                                  <Component id="btnSolverSaveToDB" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
                           </Group>
@@ -501,9 +502,7 @@
                                   <Group type="103" groupAlignment="2" attributes="0">
                                       <Component id="btnSolverNew" alignment="2" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnSolverDelete" alignment="2" min="-2" max="-2" attributes="0"/>
-                                      <Component id="btnSolverRefresh" alignment="2" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnSolverExport" alignment="2" min="-2" max="-2" attributes="0"/>
-                                      <Component id="btnSolverSaveToDB" alignment="2" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="32767" attributes="0"/>
                               </Group>
@@ -511,16 +510,6 @@
                         </DimensionLayout>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JButton" name="btnSolverRefresh">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="btnSolverRefresh.text"/>
-                            <Property name="toolTipText" type="java.lang.String" resourceKey="btnSolverRefresh.toolTipText"/>
-                            <Property name="name" type="java.lang.String" value="btnSolverRefresh" noResource="true"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverRefreshActionPerformed"/>
-                          </Events>
-                        </Component>
                         <Component class="javax.swing.JButton" name="btnSolverDelete">
                           <Properties>
                             <Property name="text" type="java.lang.String" resourceKey="btnSolverDelete.text"/>
@@ -551,16 +540,6 @@
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverNewActionPerformed"/>
-                          </Events>
-                        </Component>
-                        <Component class="javax.swing.JButton" name="btnSolverSaveToDB">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="btnSolverSaveToDB.text"/>
-                            <Property name="toolTipText" type="java.lang.String" resourceKey="btnSolverSaveToDB.toolTipText"/>
-                            <Property name="name" type="java.lang.String" value="btnSolverSaveToDB" noResource="true"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverSaveToDBActionPerformed"/>
                           </Events>
                         </Component>
                         <Component class="javax.swing.JButton" name="btnSolverExport">
@@ -594,8 +573,8 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jScrollPane2" alignment="1" pref="449" max="32767" attributes="2"/>
-                                      <Component id="jPanel1" alignment="1" pref="449" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane2" alignment="1" pref="574" max="32767" attributes="2"/>
+                                      <Component id="jPanel1" alignment="1" pref="574" max="32767" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
@@ -604,7 +583,7 @@
                         <DimensionLayout dim="1">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="1" attributes="0">
-                                  <Component id="jScrollPane2" pref="199" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane2" pref="347" max="32767" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="jPanel1" min="-2" pref="191" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -674,8 +653,8 @@
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="btnSolverAddBinary" linkSize="2" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="btnSolverAddCode" linkSize="2" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="jScrollPane3" alignment="0" pref="330" max="32767" attributes="2"/>
-                                          <Component id="tfSolverName" alignment="0" pref="330" max="32767" attributes="2"/>
+                                          <Component id="jScrollPane3" alignment="0" pref="443" max="32767" attributes="2"/>
+                                          <Component id="tfSolverName" alignment="0" pref="443" max="32767" attributes="2"/>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
                                   </Group>
@@ -798,6 +777,60 @@
                 </Container>
               </SubComponents>
             </Container>
+            <Container class="javax.swing.JPanel" name="jPanel3">
+              <Properties>
+                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                  <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                    <TitledBorder/>
+                  </Border>
+                </Property>
+                <Property name="name" type="java.lang.String" value="jPanel3" noResource="true"/>
+              </Properties>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnSolverRefresh" linkSize="1" min="-2" pref="89" max="-2" attributes="0"/>
+                          <EmptySpace pref="715" max="32767" attributes="0"/>
+                          <Component id="btnSolverSaveToDB" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="btnSolverRefresh" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnSolverSaveToDB" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JButton" name="btnSolverSaveToDB">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnSolverSaveToDB.text"/>
+                    <Property name="toolTipText" type="java.lang.String" resourceKey="btnSolverSaveToDB.toolTipText"/>
+                    <Property name="name" type="java.lang.String" value="btnSolverSaveToDB" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverSaveToDBActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnSolverRefresh">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnSolverRefresh.text"/>
+                    <Property name="toolTipText" type="java.lang.String" resourceKey="btnSolverRefresh.toolTipText"/>
+                    <Property name="name" type="java.lang.String" value="btnSolverRefresh" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverRefreshActionPerformed"/>
+                  </Events>
+                </Component>
+              </SubComponents>
+            </Container>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JPanel" name="panelManageDBInstances">
@@ -820,7 +853,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane1" pref="977" max="32767" attributes="0"/>
+                      <Component id="jSplitPane1" pref="1017" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -829,7 +862,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane1" pref="530" max="32767" attributes="0"/>
+                      <Component id="jSplitPane1" pref="726" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -873,7 +906,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="1" attributes="0">
                                   <Component id="panelButtonsInstanceClass" alignment="0" max="32767" attributes="2"/>
-                                  <Component id="panelInstanceClassTable" alignment="0" pref="384" max="32767" attributes="2"/>
+                                  <Component id="panelInstanceClassTable" alignment="0" pref="415" max="32767" attributes="2"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -882,7 +915,7 @@
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="panelInstanceClassTable" pref="429" max="32767" attributes="0"/>
+                              <Component id="panelInstanceClassTable" pref="626" max="32767" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="panelButtonsInstanceClass" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -1058,9 +1091,9 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="panelInstanceTable" alignment="0" pref="516" max="32767" attributes="2"/>
+                                  <Component id="panelInstanceTable" alignment="0" pref="526" max="32767" attributes="2"/>
                                   <Component id="panelButtonsInstances" alignment="1" max="32767" attributes="2"/>
-                                  <Component id="lblFilterStatus" alignment="0" pref="516" max="32767" attributes="0"/>
+                                  <Component id="lblFilterStatus" alignment="0" pref="526" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -1070,7 +1103,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="lblFilterStatus" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="panelInstanceTable" pref="374" max="32767" attributes="0"/>
+                              <Component id="panelInstanceTable" pref="570" max="32767" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="panelButtonsInstances" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
