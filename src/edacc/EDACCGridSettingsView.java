@@ -518,7 +518,9 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
 
     public void checkInputs() {
         boolean error = false;
-        if (txtName.getText().equals("") || GridQueueDAO.queueExistsInCache(txtName.getText())) {
+        GridQueue queueWithSameName = GridQueueDAO.queueWithSameNameExistsInCache(txtName.getText());
+        
+        if (txtName.getText().equals("") || (queueWithSameName != null && queueWithSameName != currentQueue)) {
             txtName.setBackground(BAD);
             error = true;
         } else {
