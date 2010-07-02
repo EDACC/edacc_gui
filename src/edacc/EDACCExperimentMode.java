@@ -1495,7 +1495,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
                     Integer i = (Integer) expTableModel.getValueAt(tableExperiments.convertRowIndexToModel(removedIndex), 5);
                     expController.removeExperiment(i);
-                    if (removedIndex > 0) {
+                    if (removedIndex > this.tableExperiments.getRowCount()-1) {
                         removedIndex--;
                     }
                     if (tableExperiments.getRowCount() > 0) {
