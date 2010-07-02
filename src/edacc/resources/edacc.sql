@@ -337,6 +337,14 @@ COMMENT = 'Which instance belongs to which class.';
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `DBConfiguration` ;
 
+CREATE  TABLE IF NOT EXISTS `DBConfiguration` (
+  `id` INT NOT NULL ,
+  `competition` TINYINT(1) NOT NULL ,
+  `competitionPhase` INT NULL ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB
+COMMENT = 'Should only contain 1 row with id 0';
+
 -- -----------------------------------------------------
 -- FUNCTION `absTime`
 -- -----------------------------------------------------
