@@ -238,6 +238,7 @@ public class ManageDBInstances implements Observer{
            task.setTaskProgress((float)i/(float)rows.length);
            if (!md5File.equals(temp.getMd5()))
                 md5Error.add(temp);
+           System.out.println("md5 nicht OK!\n");
                 f.delete();
         }
 

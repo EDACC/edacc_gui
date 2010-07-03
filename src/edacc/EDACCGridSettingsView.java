@@ -10,11 +10,14 @@ import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
 import edacc.model.NoConnectionToDBException;
 import java.awt.Color;
+import java.awt.event.FocusEvent;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.text.JTextComponent;
 import org.jdesktop.application.Action;
 
 /**
@@ -92,6 +95,14 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         txtNumNodes.setText(resourceMap.getString("txtNumNodes.text")); // NOI18N
         txtNumNodes.setToolTipText(resourceMap.getString("txtNumNodes.toolTipText")); // NOI18N
         txtNumNodes.setName("txtNumNodes"); // NOI18N
+        txtNumNodes.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+        });
         txtNumNodes.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 EDACCGridSettingsView.this.keyReleased(evt);
@@ -101,6 +112,14 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         txtWalltime.setText(resourceMap.getString("txtWalltime.text")); // NOI18N
         txtWalltime.setToolTipText(resourceMap.getString("txtWalltime.toolTipText")); // NOI18N
         txtWalltime.setName("txtWalltime"); // NOI18N
+        txtWalltime.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+        });
         txtWalltime.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 EDACCGridSettingsView.this.keyReleased(evt);
@@ -114,6 +133,14 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         txtMaxJobsInQueue.setText(resourceMap.getString("txtMaxJobsInQueue.text")); // NOI18N
         txtMaxJobsInQueue.setToolTipText(resourceMap.getString("txtMaxJobsInQueue.toolTipText")); // NOI18N
         txtMaxJobsInQueue.setName("txtMaxJobsInQueue"); // NOI18N
+        txtMaxJobsInQueue.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+        });
         txtMaxJobsInQueue.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 EDACCGridSettingsView.this.keyReleased(evt);
@@ -143,6 +170,14 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         txtName.setText(resourceMap.getString("txtName.text")); // NOI18N
         txtName.setToolTipText(resourceMap.getString("txtName.toolTipText")); // NOI18N
         txtName.setName("txtName"); // NOI18N
+        txtName.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+        });
         txtName.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 EDACCGridSettingsView.this.keyReleased(evt);
@@ -152,6 +187,14 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         txtLocation.setText(resourceMap.getString("txtLocation.text")); // NOI18N
         txtLocation.setToolTipText(resourceMap.getString("txtLocation.toolTipText")); // NOI18N
         txtLocation.setName("txtLocation"); // NOI18N
+        txtLocation.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+        });
 
         lblNumCPUs.setText(resourceMap.getString("lblNumCPUs.text")); // NOI18N
         lblNumCPUs.setName("lblNumCPUs"); // NOI18N
@@ -159,6 +202,14 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         txtNumCPUs.setText(resourceMap.getString("txtNumCPUs.text")); // NOI18N
         txtNumCPUs.setToolTipText(resourceMap.getString("txtNumCPUs.toolTipText")); // NOI18N
         txtNumCPUs.setName("txtNumCPUs"); // NOI18N
+        txtNumCPUs.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+        });
         txtNumCPUs.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 EDACCGridSettingsView.this.keyReleased(evt);
@@ -172,6 +223,14 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         txtAvailNodes.setText(resourceMap.getString("txtAvailNodes.text")); // NOI18N
         txtAvailNodes.setToolTipText(resourceMap.getString("txtAvailNodes.toolTipText")); // NOI18N
         txtAvailNodes.setName("txtAvailNodes"); // NOI18N
+        txtAvailNodes.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+        });
         txtAvailNodes.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 EDACCGridSettingsView.this.keyReleased(evt);
@@ -188,6 +247,14 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         taDescription.setRows(5);
         taDescription.setToolTipText(resourceMap.getString("taDescription.toolTipText")); // NOI18N
         taDescription.setName("taDescription"); // NOI18N
+        taDescription.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                tcSelectOnFocus(evt);
+            }
+        });
         jScrollPane1.setViewportView(taDescription);
 
         jPanel1.setName("jPanel1"); // NOI18N
@@ -329,6 +396,24 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
     }//GEN-LAST:event_keyReleased
 
     /**
+     * Selects the complete text of the src-TextField/TextArea on the
+     * focusGained event respectively deselects the text on the focusLost event.
+     * Add this method to the focusGained and focusLost events of all textfields
+     * which should select all text on focusGained and deselect it on focusLost.
+     * The source of this event must be from the supertype JTextComponent!
+     * @param evt
+     */
+    private void tcSelectOnFocus(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tcSelectOnFocus
+        if (!(evt.getSource() instanceof JTextComponent))
+            return;
+        JTextComponent src = (JTextComponent) evt.getSource();
+        if (evt.getID() == FocusEvent.FOCUS_GAINED)
+            src.selectAll();
+        else if (evt.getID() == FocusEvent.FOCUS_LOST)
+            src.setSelectionEnd(0);
+    }//GEN-LAST:event_tcSelectOnFocus
+
+    /**
      * Loads the given grid queue settings to the dialog's elements.
      * If q is <code>null</code>, the dialog starts in creation mode and a new
      * queue will be created. Otherwise the given queue will be updated.
@@ -372,6 +457,7 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         setDialogMode(DialogMode.Create);
         }*/
         checkInputs();
+        txtName.requestFocus();
     }
 
     @Action
@@ -432,7 +518,9 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
 
     public void checkInputs() {
         boolean error = false;
-        if (txtName.getText().equals("") || GridQueueDAO.queueExistsInCache(txtName.getText())) {
+        GridQueue queueWithSameName = GridQueueDAO.queueWithSameNameExistsInCache(txtName.getText());
+        
+        if (txtName.getText().equals("") || (queueWithSameName != null && queueWithSameName != currentQueue)) {
             txtName.setBackground(BAD);
             error = true;
         } else {

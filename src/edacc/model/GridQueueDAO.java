@@ -282,14 +282,16 @@ public class GridQueueDAO {
     }
 
     /**
-     * Checks if a queue with the given name exists in the cache (not the DB!)
+     * Checks if another queue with the same name exists in the cache (not the DB!)
      * @param name
+     * @return the first found queue with the same name or @{code null} if no
+     * queue with the same name exists.
      */
-    public static boolean queueExistsInCache(String name) {
+    public static GridQueue queueWithSameNameExistsInCache(String name) {
         for (GridQueue q : cache.values())
             if (q.getName().equals(name))
-                return true;
-        return false;
+                return q;
+        return null;
     }
 
     /**
