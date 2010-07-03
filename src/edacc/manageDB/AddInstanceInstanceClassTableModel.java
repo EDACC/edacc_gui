@@ -13,11 +13,11 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author rretz
  */
-public class AddInstanceInstanceClassTabelModel extends AbstractTableModel {
+public class AddInstanceInstanceClassTableModel extends AbstractTableModel {
     private String[] columns = {"Name", "Description"};
     protected Vector <InstanceClass> classes;
 
-    public AddInstanceInstanceClassTabelModel(){
+    public AddInstanceInstanceClassTableModel(){
         this.classes = new Vector <InstanceClass>();
     }
 

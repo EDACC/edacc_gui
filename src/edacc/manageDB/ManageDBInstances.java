@@ -89,18 +89,19 @@ public class ManageDBInstances implements Observer{
      * instance files into the "instance table" of the MangeDBMode.
      */
 
-    public void addInstances(InstanceClass input, File ret,  Tasks task){
+    public void addInstances(InstanceClass input, File ret, Tasks task, int searchDepth){
         try {
         
             RecursiveFileScanner InstanceScanner = new RecursiveFileScanner("cnf");
             Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
             if (instanceFiles.isEmpty()) {
                 JOptionPane.showMessageDialog(panelManageDBInstances, "No Instances have been found.", "Error", JOptionPane.WARNING_MESSAGE);
+                return;
             }
             task.setOperationName("Adding Instances");
             if (input.getName().equals("")) {
                 Vector<Instance> instances;
-                instances = buildInstancesAutogenerateClass(instanceFiles, ret, task);
+                instances = buildInstancesAutogenerateClass(instanceFiles, ret, task, searchDepth);
                 main.instanceTableModel.addInstances(instances);
                 loadInstanceClasses();
             } else {
@@ -257,9 +258,8 @@ public class ManageDBInstances implements Observer{
      * Sets all checkboxes of the instanceclass table true.
      */
     public void SelectAllInstanceClass(Tasks task) {
-        task.setOperationName("Showing all instances");
         for(int i = 0; i < main.instanceClassTableModel.getRowCount(); i++){
-           task.setStatus(i + " of " + main.instanceClassTableModel.getRowCount() + " instance classes are loaded");
+           task.setStatus(i + " of " + main.instanceClassTableModel.getRowCount() + " instance classes are loaded/unloaded ");
            task.setTaskProgress((float)i/(float)main.instanceClassTableModel.getRowCount());
            main.instanceTableModel.fireTableDataChanged();
             main.instanceClassTableModel.setInstanceClassSelected(i);
@@ -280,7 +280,7 @@ public class ManageDBInstances implements Observer{
             toRemove.add((InstanceClass) main.instanceClassTableModel.getValueAt(choosen[i], 4));
         }
 
-        AddInstanceInstanceClassTabelModel tableModel = new AddInstanceInstanceClassTabelModel();
+        AddInstanceInstanceClassTableModel tableModel = new AddInstanceInstanceClassTableModel();
         tableModel.addClasses(new Vector<InstanceClass> (toRemove));
         if(EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
                 EDACCApp.getApplication().getMainFrame(),
@@ -298,7 +298,7 @@ public class ManageDBInstances implements Observer{
             }
 
             if(!errors.isEmpty()){
-                tableModel = new AddInstanceInstanceClassTabelModel();
+                tableModel = new AddInstanceInstanceClassTableModel();
                 tableModel.addClasses(errors);
                 EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS,
                     EDACCApp.getApplication().getMainFrame(),
@@ -339,6 +339,8 @@ public class ManageDBInstances implements Observer{
 
         Vector<Instance> instances = new Vector<Instance>();
         String duplicatesDB = "";
+        Vector<String> errorsDB = new Vector<String>();
+        Vector<String> errorsAdd = new Vector<String>();
         StringBuilder instanceErrors = new StringBuilder("");
         int errCount = 0;
         int done = 0;
@@ -354,34 +356,32 @@ public class ManageDBInstances implements Observer{
                     instances.add(temp);
                     InstanceDAO.save(temp);
                 } catch (InstanceException e) {
-                    if (++errCount <= 20) { // show only first 20 errors
-                        instanceErrors.append(instanceFiles.get(i).getName() + ": " + e.getMessage() + '\n');
-                    }
+                    errorsAdd.add(instanceFiles.get(i).getAbsolutePath());
                 }
             } catch (InstanceAlreadyInDBException ex) {
-                duplicatesDB += "\n " + instanceFiles.get(i).getAbsolutePath();
+                errorsDB.add(instanceFiles.get(i).getAbsolutePath());
             }
              task.setTaskProgress((float)i / (float)instanceFiles.size());
              task.setStatus("Added " + i +" instances of " + instanceFiles.size() );
         }
 
         String instanceErrs = instanceErrors.toString();
-        if (!"".equals(instanceErrs)) {
-            String err = "The following errors occured while adding the instances. Added only instances without errors:\n\n" + instanceErrs;
-            if (errCount > 20) {
-                err += "\n... and " + (errCount - 20) + " more errors";
-            }
-             JOptionPane.showMessageDialog(panelManageDBInstances,
-                    err,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+        if (!errorsAdd.isEmpty()) {
+            FileNameTableModel tmp = new FileNameTableModel();
+            tmp.setAll(errorsAdd);
+             EDACCExtendedWarning.showMessageDialog(
+                     EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
+                     "By adding the following instances an error occured.",
+                     new JTable(tmp));
         }
 
-        if(!duplicatesDB.equals("")){
-             JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "The following instances are already in the database: " + duplicatesDB,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+        if(!errorsDB.isEmpty()){
+             FileNameTableModel tmp = new FileNameTableModel();
+             tmp.setAll(errorsDB);
+             EDACCExtendedWarning.showMessageDialog(
+                     EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
+                     "The following instances are already in the database.",
+                     new JTable(tmp));
         }
         
         return instances;
@@ -400,17 +400,24 @@ public class ManageDBInstances implements Observer{
      * @throws InstanceException
      * @throws SQLException
      */
-    public Vector<Instance> buildInstancesAutogenerateClass(Vector<File> instanceFiles, File ret, Tasks task) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException {
+    public Vector<Instance> buildInstancesAutogenerateClass(Vector<File> instanceFiles, File ret, Tasks task, int searchDepth) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException {
         
         Vector<Instance> instances = new Vector<Instance>();
-        String duplicatesDB = "";
-        StringBuilder instanceErrors = new StringBuilder("");
+        Vector<String> errorsDB = new Vector<String>();
+        Vector<String> errorsAdd = new Vector<String>();
         InstanceClass instanceClass;
-        int errCount = 0;
         task.setTaskProgress((float)0 / (float)instanceFiles.size());
         for (int i = 0; i < instanceFiles.size(); i++) {
             try {
-                String name = autogenerateInstanceClassName(ret.getParent(), instanceFiles.get(i));
+                String name;
+                if(searchDepth == 0){
+                    name = autogenerateInstanceClassName(ret.getParent(), instanceFiles.get(i));
+                }
+                else{
+                    name = CutToSearchDepth(ret.getParent(), instanceFiles.get(i), searchDepth);
+                }
+                    
+                
                 try {
                     instanceClass = InstanceClassDAO.createInstanceClass(name, "Autogenerated instance source class", true);
                 } catch (InstanceClassAlreadyInDBException ex) {
@@ -424,37 +431,33 @@ public class ManageDBInstances implements Observer{
                     InstanceDAO.save(temp);
                 }
                 catch (InstanceException e) {
-                    if (++errCount <= 20) { // show only first 20 errors
-                        instanceErrors.append(instanceFiles.get(i).getName() + ": " + e.getMessage() + '\n');
-                    }
+                    errorsAdd.add(instanceFiles.get(i).getAbsolutePath());
                 }
 
             } catch (InstanceAlreadyInDBException ex) {
-                duplicatesDB += "\n " + instanceFiles.get(i).getAbsolutePath();
+                errorsDB.add(instanceFiles.get(i).getAbsolutePath());
             }
             task.setTaskProgress((float)i / (float)instanceFiles.size());
             task.setStatus("Added " + i +" instances of " + instanceFiles.size() );
         }
 
-        String instanceErrs = instanceErrors.toString();
-        if (!"".equals(instanceErrs)) {
-            String err = "The following errors occured while adding the instances. Added only instances without errors:\n\n" + instanceErrs;
-            if (errCount > 20) {
-                err += "\n... and " + (errCount - 20) + " more errors";
-            }
-             JOptionPane.showMessageDialog(panelManageDBInstances,
-                    err,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+        if (!errorsAdd.isEmpty()) {
+            FileNameTableModel tmp = new FileNameTableModel();
+            tmp.setAll(errorsAdd);
+             EDACCExtendedWarning.showMessageDialog(
+                     EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
+                     "By adding the following instances an error occured.",
+                     new JTable(tmp));
         }
 
-        if(!duplicatesDB.equals("")){
-             JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "The following instances are already in the database: " + duplicatesDB,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+        if(!errorsDB.isEmpty()){
+             FileNameTableModel tmp = new FileNameTableModel();
+             tmp.setAll(errorsDB);
+             EDACCExtendedWarning.showMessageDialog(
+                     EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
+                     "The following instances are already in the database.",
+                     new JTable(tmp)); 
         }
-
         return instances;
      
     }
@@ -489,18 +492,28 @@ public class ManageDBInstances implements Observer{
                 addInstanceToClass.setLocationRelativeTo(mainFrame);
                 EDACCApp.getApplication().show(addInstanceToClass);
                 InstanceClass input = addInstanceToClass.getInput();
+                Vector<Instance> toChange = new Vector<Instance>();
+                for(int i = 0; i < selectedRows.length; i++){
+                    toChange.add((Instance) main.instanceTableModel.getValueAt(selectedRows[i], 5));
+                }
                 if (input != null) {
                     if (input.isSource()) {
+                        InstanceTableModel tableModel = new InstanceTableModel();
+                        tableModel.addInstances(toChange);
+                        ;
+                        if(EDACCExtendedWarning.showMessageDialog(
+                            EDACCExtendedWarning.OK_CANCEL_OPTIONS, EDACCApp.getApplication().getMainFrame(),
+                            "The source class of the following instances will be changed to " + input.getName() + ".",
+                            new JTable(tableModel)) != EDACCExtendedWarning.RET_OK_OPTION)
+                                return;
                         for (int i = 0; i < selectedRows.length; i++) {
-                            Instance temp = (Instance) main.instanceTableModel.getValueAt(selectedRows[i], 5);
-                            temp.setInstanceClass(input);
-                            temp.setModified();
-                            InstanceDAO.save(temp);
+                            toChange.get(i).setInstanceClass(input);
+                            toChange.get(i).setModified();
+                            InstanceDAO.save(toChange.get(i));
                         }
                     } else {
-                        for (int i = 0; i < selectedRows.length; i++) {
-                            Instance temp = (Instance) main.instanceTableModel.getValueAt(selectedRows[i], 5);
-                            InstanceHasInstanceClassDAO.createInstanceHasInstance(temp, input);
+                        for (int i = 0; i < selectedRows.length; i++) {              
+                            InstanceHasInstanceClassDAO.createInstanceHasInstance( toChange.get(i), input);
                         }
                     }
                     main.instanceClassTableModel.changeInstanceTable();
@@ -603,12 +616,6 @@ public class ManageDBInstances implements Observer{
      */
     public void addFilter() {
 
-        if(tableInstances.getRowCount() <= 1){
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                "At least more than one instance is required in the instance table to add a filter.",
-                "Warning",
-                JOptionPane.WARNING_MESSAGE);
-        }else{
             if(main.instanceFilter == null){
                 JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
                 main.instanceFilter = new EDACCManageDBInstanceFilter(mainFrame,true);
@@ -631,7 +638,7 @@ public class ManageDBInstances implements Observer{
                     tableInstances.addRowSelectionInterval(0, 0);
                 main.setFilterStatus("This list of instances has filters applied to it. Use the filter button below to modify.");
             }
-        }
+        
        
     }
 
@@ -665,6 +672,27 @@ public class ManageDBInstances implements Observer{
 
     void showInstanceButtons(boolean enable) {
         main.showInstanceButtons(enable);
+    }
+
+    /**
+     *
+     * @param parent String which represents the path of root
+     * @param searchDepth int which represents the depth to which the root path has to be cut
+     * @return parent cut down to the given search depth.
+     */
+    private String CutToSearchDepth(String parent, File file, int searchDepth) {
+        String tmpString = file.getAbsolutePath().substring(parent.length()+1);
+        char[] tmp = tmpString.toCharArray();
+        int count = 0;
+        for(int i = 0; i < tmp.length; i++){
+            if(tmp[i] == System.getProperty("file.separator").toCharArray()[0]){
+                count++;
+                if(searchDepth == count){
+                    return tmpString.substring(0, i);
+                }
+            }
+        }
+        return tmpString;
     }
 
 }

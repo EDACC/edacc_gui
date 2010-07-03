@@ -11,7 +11,7 @@
 
 package edacc;
 
-import edacc.manageDB.AddInstanceInstanceClassTabelModel;
+import edacc.manageDB.AddInstanceInstanceClassTableModel;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassDAO;
 import edacc.model.NoConnectionToDBException;
@@ -25,14 +25,15 @@ import javax.swing.JOptionPane;
  */
 public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     InstanceClass input;
-    AddInstanceInstanceClassTabelModel tableModel;
+    AddInstanceInstanceClassTableModel tableModel;
+    private int searchDepth = 0;
 
     /** Creates new form EDACCAddNewInstanceSelectClassDialog */
     public EDACCAddNewInstanceSelectClassDialog(java.awt.Frame parent, boolean modal) throws NoConnectionToDBException, SQLException {
         super(parent, modal);
         initComponents();
         //Filling the table with all instance source class
-        tableModel = new AddInstanceInstanceClassTabelModel();
+        tableModel = new AddInstanceInstanceClassTableModel();
         tableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllSourceClass()));
         jTableInstanceClass.setModel(tableModel);
         
@@ -57,6 +58,8 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         jTableInstanceClass = new javax.swing.JTable();
         jRadioButtonChoose = new javax.swing.JRadioButton();
         jRadioButtonAutomatic = new javax.swing.JRadioButton();
+        jTextFieldSearchDepth = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAddNewInstanceSelectClassDialog.class);
@@ -96,7 +99,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
             .addGroup(jPanelButtonsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButtonOk)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 175, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 207, Short.MAX_VALUE)
                 .addComponent(jButtonCancel)
                 .addContainerGap())
         );
@@ -163,6 +166,18 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
             }
         });
 
+        jTextFieldSearchDepth.setText(resourceMap.getString("jTextFieldSearchDepth.text")); // NOI18N
+        jTextFieldSearchDepth.setName("jTextFieldSearchDepth"); // NOI18N
+        jTextFieldSearchDepth.setPreferredSize(new java.awt.Dimension(20, 20));
+        jTextFieldSearchDepth.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextFieldSearchDepthActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
+        jLabel1.setName("jLabel1"); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -170,7 +185,13 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jRadioButtonAutomatic, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jRadioButtonAutomatic, javax.swing.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel1)
+                        .addGap(12, 12, 12)
+                        .addComponent(jTextFieldSearchDepth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10))
                     .addComponent(jRadioButtonChoose, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
                     .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE))
                 .addContainerGap())
@@ -179,11 +200,14 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jRadioButtonAutomatic)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jRadioButtonAutomatic)
+                    .addComponent(jTextFieldSearchDepth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
                 .addGap(10, 10, 10)
                 .addComponent(jRadioButtonChoose)
                 .addGap(15, 15, 15)
-                .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)
+                .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -218,11 +242,19 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         this.input = new InstanceClass();
         if(buttonGroupAutomaticOrManuel.getSelection() == null){
             JOptionPane.showMessageDialog(this,
-                    "Please choose if the new instance class is a source class oder a user class." ,
+                    "Please choose if the new instance class is a source class or a user class." ,
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
        }else {
           if(jRadioButtonAutomatic.isSelected()){
+            if(!jTextFieldSearchDepth.getText().matches("\\d+")){
+                JOptionPane.showMessageDialog(this,
+                    "Please choose a depth search number >= 0." ,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            this.searchDepth = Integer.parseInt(this.jTextFieldSearchDepth.getText());
             this.input.setName("");
             this.setVisible(false);
           }else{
@@ -274,6 +306,10 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
        this.jTableInstanceClass.removeRowSelectionInterval(0, this.jTableInstanceClass.getRowCount() - 1);
     }//GEN-LAST:event_jRadioButtonAutomaticActionPerformed
 
+    private void jTextFieldSearchDepthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldSearchDepthActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextFieldSearchDepthActionPerformed
+
     public InstanceClass getInput(){
         return input;
     }
@@ -282,12 +318,18 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     private javax.swing.ButtonGroup buttonGroupAutomaticOrManuel;
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonOk;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanelButtons;
     private javax.swing.JRadioButton jRadioButtonAutomatic;
     private javax.swing.JRadioButton jRadioButtonChoose;
     private javax.swing.JScrollPane jScrollPaneInstanceTable;
     private javax.swing.JTable jTableInstanceClass;
+    private javax.swing.JTextField jTextFieldSearchDepth;
     // End of variables declaration//GEN-END:variables
+
+    int getSearchDepth() {
+        return searchDepth;
+    }
 
 }

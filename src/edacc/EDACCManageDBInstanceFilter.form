@@ -75,14 +75,15 @@
                       <Group type="102" alignment="0" attributes="1">
                           <Component id="jLabel1" min="-2" pref="130" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtName" pref="185" max="32767" attributes="0"/>
+                          <Component id="txtName" pref="162" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtRatioLow" alignment="2" pref="72" max="32767" attributes="0"/>
-                              <Component id="txtMaxClauseLengthLow" alignment="2" pref="72" max="32767" attributes="0"/>
-                              <Component id="txtClausesLow" alignment="0" pref="72" max="32767" attributes="2"/>
-                              <Component id="txtAtomsLow" alignment="0" pref="72" max="32767" attributes="2"/>
+                              <Component id="txtRatioLow" alignment="2" pref="88" max="32767" attributes="0"/>
+                              <Component id="txtMaxClauseLengthLow" alignment="2" pref="88" max="32767" attributes="0"/>
+                              <Component id="txtClausesLow" alignment="0" pref="88" max="32767" attributes="2"/>
+                              <Component id="txtAtomsLow" alignment="0" pref="88" max="32767" attributes="2"/>
                           </Group>
                           <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="2" attributes="0">
@@ -93,21 +94,21 @@
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtRatioHigh" alignment="0" pref="71" max="32767" attributes="0"/>
-                              <Component id="txtMaxClauseLengthHigh" alignment="0" pref="71" max="32767" attributes="0"/>
-                              <Component id="txtClausesHigh" alignment="0" pref="71" max="32767" attributes="2"/>
-                              <Component id="txtAtomsHigh" alignment="0" pref="71" max="32767" attributes="2"/>
+                              <Component id="txtRatioHigh" alignment="0" pref="87" max="32767" attributes="0"/>
+                              <Component id="txtMaxClauseLengthHigh" alignment="0" pref="87" max="32767" attributes="0"/>
+                              <Component id="txtClausesHigh" alignment="0" pref="87" max="32767" attributes="2"/>
+                              <Component id="txtAtomsHigh" alignment="0" pref="87" max="32767" attributes="2"/>
                           </Group>
                       </Group>
                   </Group>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="2" attributes="0">
-                      <Component id="chkName" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Component id="chkAtoms" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Component id="chkRatio" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Component id="chkMaxClauseLength" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="chkClauses" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel2" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkName" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkClauses" alignment="2" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
           </Group>
@@ -120,9 +121,9 @@
                   <Group type="103" groupAlignment="2" attributes="0">
                       <Component id="jLabel1" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Component id="txtName" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="chkClauses" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkName" alignment="2" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="2" attributes="0">
                       <Component id="txtAtomsLow" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel5" alignment="2" min="-2" max="-2" attributes="0"/>
@@ -134,7 +135,7 @@
                       <Component id="txtClausesLow" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel6" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Component id="txtClausesHigh" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="chkName" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkClauses" alignment="2" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="2" attributes="0">

@@ -11,7 +11,7 @@
 
 package edacc;
 
-import edacc.manageDB.AddInstanceInstanceClassTabelModel;
+import edacc.manageDB.AddInstanceInstanceClassTableModel;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassDAO;
 import edacc.model.NoConnectionToDBException;
@@ -32,12 +32,12 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         //Initiate the instance source class table
-        AddInstanceInstanceClassTabelModel sourceTableModel = new AddInstanceInstanceClassTabelModel();
+        AddInstanceInstanceClassTableModel sourceTableModel = new AddInstanceInstanceClassTableModel();
         jTableSourceClass.setModel(sourceTableModel);
         sourceTableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllSourceClass()));
 
         //Initiate the instance source class table
-        AddInstanceInstanceClassTabelModel userTableModel = new AddInstanceInstanceClassTabelModel();
+        AddInstanceInstanceClassTableModel userTableModel = new AddInstanceInstanceClassTableModel();
         jTableUserClass.setModel(userTableModel);
         userTableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllUserClass()));
     }
@@ -248,8 +248,8 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         try {
-            ((AddInstanceInstanceClassTabelModel)jTableSourceClass.getModel()).setClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllSourceClass()));
-            ((AddInstanceInstanceClassTabelModel)jTableUserClass.getModel()).setClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllUserClass()));
+            ((AddInstanceInstanceClassTableModel)jTableSourceClass.getModel()).setClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllSourceClass()));
+            ((AddInstanceInstanceClassTableModel)jTableUserClass.getModel()).setClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllUserClass()));
          } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this.rootPane,
                     ex.getMessage(),
