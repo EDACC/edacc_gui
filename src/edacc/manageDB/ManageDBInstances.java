@@ -275,17 +275,38 @@ public class ManageDBInstances implements Observer{
      * @throws InstanceSourceClassHasInstance if one of the selected classes are a source class which has a refernce to an Instance.
      */
     public void RemoveInstanceClass(int[] choosen) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance {
-        Boolean fail = false;
+        Vector<InstanceClass> toRemove = new Vector<InstanceClass>();
         for(int i = 0; i < choosen.length; i++){
-            try {
-                InstanceClass toRemove = (InstanceClass) main.instanceClassTableModel.getValueAt(choosen[i], 4);
-                InstanceClassDAO.delete(toRemove);
-                main.instanceClassTableModel.removeClass(toRemove);
-            } catch (InstanceSourceClassHasInstance ex) {
-                fail = true;
-            }
+            toRemove.add((InstanceClass) main.instanceClassTableModel.getValueAt(choosen[i], 4));
         }
-        if(fail) throw new InstanceSourceClassHasInstance();
+
+        AddInstanceInstanceClassTabelModel tableModel = new AddInstanceInstanceClassTabelModel();
+        tableModel.addClasses(new Vector<InstanceClass> (toRemove));
+        if(EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
+                EDACCApp.getApplication().getMainFrame(),
+                "Do you really won't to remove the listed instance classes?",
+                new JTable(tableModel))==
+                EDACCExtendedWarning.RET_OK_OPTION){
+            Vector<InstanceClass> errors = new Vector<InstanceClass>();
+            for(int i = 0; i < toRemove.size(); i++){
+                try {
+                    InstanceClassDAO.delete(toRemove.get(i));
+                    main.instanceClassTableModel.removeClass(toRemove.get(i));
+                } catch (InstanceSourceClassHasInstance ex) {
+                    errors.add(toRemove.get(i));
+                }
+            }
+
+            if(!errors.isEmpty()){
+                tableModel = new AddInstanceInstanceClassTabelModel();
+                tableModel.addClasses(errors);
+                EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS,
+                    EDACCApp.getApplication().getMainFrame(),
+                    "A Problem occured by removing the following instance classes.  \n " +
+                    "Check if all instances of the source classes are deleted or referenced to another class.",
+                    new JTable(tableModel));
+            }
+         }
     }
 
     /**
