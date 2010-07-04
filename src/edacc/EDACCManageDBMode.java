@@ -1371,12 +1371,16 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
     }//GEN-LAST:event_btnExportInstancesActionPerformed
 
     private void btnSelectAllInstanceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstanceClassesActionPerformed
-        Tasks.startTask("SelectAllInstanceClass", new Class[]{edacc.model.Tasks.class}, new Object[]{null}, manageDBInstances, EDACCManageDBMode.this);
+        
         if (btnSelectAllInstanceClasses.getText() == null ? "Show all" == null : btnSelectAllInstanceClasses.getText().equals("Show all")) {
+            Tasks.startTask("SelectAllInstanceClass", new Class[]{edacc.model.Tasks.class}, new Object[]{null}, manageDBInstances, EDACCManageDBMode.this);
             this.btnSelectAllInstanceClasses.setText("Show none");
         } else {
+            this.manageDBInstances.DeselectAllInstanceClass();
             this.btnSelectAllInstanceClasses.setText("Show all");
         }
+        instanceTableModel.fireTableDataChanged();
+        instanceClassTableModel.fireTableDataChanged();
 
     }//GEN-LAST:event_btnSelectAllInstanceClassesActionPerformed
 

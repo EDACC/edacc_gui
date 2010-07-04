@@ -104,19 +104,25 @@ public class InstanceClassTableModel extends AbstractTableModel{
     }
 
     public void setInstanceClassSelected(int row){
-        if(!all){
-            setValueAt(true, row, 3 );
+        if((Boolean)getValueAt(row, 3)){
+            setValueAt(false, row, 3 );
         }
         else {
-            setValueAt(false, row, 3);
+            setValueAt(true, row, 3);
         }
 
     }
 
-    public void setAll(){
+    public void DeselectAll(){
+        for(int i = 0; i < this.classSelect.size(); i++){
+                classSelect.setElementAt(false, i);
+        }
+    }
+
+   /* public void setAll(){
         if(all) all = false;
         else all = true;
-    }
+    }*/
     
     @Override
      public void setValueAt(Object value, int row, int col) {
@@ -158,6 +164,14 @@ public class InstanceClassTableModel extends AbstractTableModel{
         this.classes.clear();
         this.classSelect.clear();
         this.fireTableDataChanged();
+    }
+
+    /**
+     * Warning, this method doesn't change the instance table model like the setValueAt()
+     * @param row the row of the instance class to set to selected
+     */
+    void seSelected(int row) {
+        classSelect.setElementAt(true, row);
     }
 
 

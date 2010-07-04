@@ -260,12 +260,23 @@ public class ManageDBInstances implements Observer{
      */
     public void SelectAllInstanceClass(Tasks task) {
         for(int i = 0; i < main.instanceClassTableModel.getRowCount(); i++){
-           task.setStatus(i + " of " + main.instanceClassTableModel.getRowCount() + " instance classes are loaded/unloaded ");
+           task.setStatus(i + " of " + main.instanceClassTableModel.getRowCount() + " instance classes are loaded.");
            task.setTaskProgress((float)i/(float)main.instanceClassTableModel.getRowCount());
-           main.instanceTableModel.fireTableDataChanged();
-            main.instanceClassTableModel.setInstanceClassSelected(i);
+            main.instanceClassTableModel.seSelected(i);
         }
-        main.instanceClassTableModel.setAll();
+        try {
+            main.instanceClassTableModel.changeInstanceTable();
+        } catch (NoConnectionToDBException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void DeselectAllInstanceClass(){
+        main.instanceClassTableModel.DeselectAll();
+        main.instanceTableModel.clearTable();
+        main.instanceClassTableModel.fireTableDataChanged();
     }
 
     /**
