@@ -8,6 +8,7 @@ package edacc.model;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -180,5 +181,41 @@ public class InstanceHasInstanceClassDAO {
             return i;
         }
         return null;
+    }
+
+    /**
+     *
+     * @param instances 
+     * @return the intersection of all instanc classes of the given instances
+     */
+     public static Vector<InstanceClass> getIntersectionOfInstances(Vector<Instance> instances) throws NoConnectionToDBException, SQLException {
+
+        String querySource = "SELECT instanceClass_idinstanceClass, COUNT(instanceClass_idinstanceClass) " +
+                "FROM Instances WHERE idInstance = " + instances.firstElement().getId();
+        String queryUser =  "SELECT instanceClass_idinstanceClass, COUNT(instanceClass_idinstanceClass) " +
+                "FROM " + table + " WHERE Instances_idInstance = " + instances.firstElement().getId();
+        for(int i = 1; i < instances.size(); i++){
+            querySource += " OR idInstance = " + instances.get(i).getId();
+            queryUser += " OR Instances_idInstance = " + instances.get(i).getId();
+        }
+        querySource += " GROUP BY instanceClass_idinstanceClass";
+        queryUser += " GROUP BY instanceClass_idinstanceClass";
+
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+        ResultSet rsSource = st.executeQuery(querySource);
+        st = DatabaseConnector.getInstance().getConn().createStatement();
+        ResultSet rsUser = st.executeQuery(queryUser);
+
+        Vector<InstanceClass> instanceClasses = new Vector<InstanceClass>();
+        while(rsSource.next()){
+            if(rsSource.getInt("COUNT(instanceClass_idinstanceClass)") == instances.size())
+                instanceClasses.add(InstanceClassDAO.getById(rsSource.getInt("instanceClass_idinstanceClass")));
+        }
+
+        while(rsUser.next()){
+            if(rsUser.getInt("COUNT(instanceClass_idinstanceClass)") == instances.size())
+                instanceClasses.add(InstanceClassDAO.getById(rsUser.getInt("instanceClass_idinstanceClass")));
+        }
+        return instanceClasses;
     }
 }

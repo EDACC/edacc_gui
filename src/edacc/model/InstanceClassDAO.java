@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.Vector;
 
 /**
  *
@@ -260,4 +261,5 @@ public class InstanceClassDAO {
     public static void clearCache() {
         cache.clear();
     }
+
 }

@@ -236,10 +236,10 @@ public class ManageDBInstances implements Observer{
            String md5File = Util.calculateMD5(f);
            task.setStatus(i + " of " + rows.length + " instances are exported");
            task.setTaskProgress((float)i/(float)rows.length);
-           if (!md5File.equals(temp.getMd5()))
+           if (!md5File.equals(temp.getMd5())){
                 md5Error.add(temp);
-           System.out.println("md5 nicht OK!\n");
                 f.delete();
+           }
         }
 
         if(!md5Error.isEmpty()){
@@ -655,6 +655,11 @@ public class ManageDBInstances implements Observer{
         }
     }
 
+    /**
+     * Shows the dialog to edit an instance class of the selected instance class
+     * @param instanceClassTableModel Table model of the instance classes of the ManageDBMode
+     * @param convertRowIndexToModel the row of the selected instance class
+     */
     public void EditInstanceClass(InstanceClassTableModel instanceClassTableModel, int convertRowIndexToModel) {
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
         EDACCCreateEditInstanceClassDialog dialog = new EDACCCreateEditInstanceClassDialog(mainFrame, true, instanceClassTableModel, convertRowIndexToModel);
@@ -696,4 +701,28 @@ public class ManageDBInstances implements Observer{
         return tmpString;
     }
 
+    /**
+     *
+     * @param selectedRows
+     */
+    public void showInstanceInfoDialog(int[] selectedRows){
+        try {
+            // Get the intersection of the instance classes of the selected Instances
+            Vector<Instance> instances = new Vector<Instance>();
+            for (int i = 0; i < selectedRows.length; i++) {
+                instances.add((Instance) tableInstances.getModel().getValueAt(tableInstances.convertRowIndexToModel(selectedRows[i]), 5));
+            }
+            Vector<InstanceClass> instanceClasses = InstanceHasInstanceClassDAO.getIntersectionOfInstances(instances);
+            AddInstanceInstanceClassTableModel tableModel = new AddInstanceInstanceClassTableModel();
+            tableModel.addClasses(instanceClasses);
+            EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(), "The selected instances belong to the following common instance classes.", new JTable(tableModel));
+        
+        } catch (NoConnectionToDBException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }
+
+
