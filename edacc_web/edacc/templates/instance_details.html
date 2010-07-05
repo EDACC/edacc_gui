@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Instancedetails{% endblock %}
+{% block content %}
+<div class="navigation">
+    <a href="{{url_for('experiments_index', database=database)}}">Experiments</a>
+</div>
+<h2>Details of instance {{instance.name}}</h2>
+
+<table class="details">
+    <tr>
+        <td>Name:</td>
+        <td>{{instance.name}}</td>
+    </tr>
+    <tr>
+        <td>md5:</td>
+        <td>{{instance.md5}}</td>
+    </tr>
+</table>
+
+<a href="{{url_for('instance_download', database=database, instance_id=instance.idInstance)}}">Download</a> instance ({{blob_size|download_size}})
+
+<div>
+<pre>
+{{instance_text}}
+</pre>
+</div>
+{% endblock %}

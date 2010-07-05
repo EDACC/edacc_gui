@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    {% block head %}
+    <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+    <title>EDACC - {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/base.css" type="text/css" />
+    <script src="/static/js/jquery-1.4.2.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+            $(document).ready(function() {
+                $('#flash').delay(3000).fadeOut();
+            });
+        /* ]]> */
+    </script>
+    {% endblock %}
+</head>
+<body>
+    <div id="header">
+        <span id="title">EDACC Web Frontend</span>
+        <span id="subtitle">Experiment Design and Administration for Computer Clusters for SAT Solvers</span>
+        <span id="admin_login">
+            {% if session.logged_in %}Logged in as {{session.email}} to <a href="{{url_for('experiments_index', database=session.database)}}">{{session.db}}</a> (<a href="/">Change</a> | <a href="{{url_for('logout', database=session.database)}}">Logout</a>) | {% endif %}<a href="{{url_for('admin_login')}}">Admin</a> {% if session.admin %}(<a href="{{url_for('admin_logout')}}">Logout</a>){% endif %}</a><br/>
+        </span>
+    </div>
+    <div id="content">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div id="flash">
+            <img src="/static/img/info.png"/>
+            {% for message in messages %}
+              {{ message }}<br/>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

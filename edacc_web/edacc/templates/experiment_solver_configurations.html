@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Solver Configurations{% endblock %}
+{% block content %}
+    <div class="navigation">
+        <a href="{{url_for('experiments_index', database=database)}}">Experiments</a> :: 
+        <a href="{{url_for('experiment', database=database, experiment_id=experiment.idExperiment)}}">{{experiment.name}}</a> :: 
+        Solver Configurations
+    </div>
+    <h2>Solver configurations used in the experiment</h2>
+    <div>
+        A solver configuration consists of a solver and a set of parameters specified. If there is more than one configuration of a solver x,
+        they will be named x (1), x (2) etc.
+    </div>
+    {% if solver_configurations|length > 0 %}
+    <ul>
+        {% for solver_config in solver_configurations %}
+            <li>
+                <a href="{{url_for('solver_configuration_details', database=database, experiment_id=experiment.idExperiment, solver_configuration_id=solver_config.idSolverConfig)}}">
+                {{solver_config.get_name()}}
+                </a> ({{solver_config.parameter_instances|length}} parameter{{'s' if solver_config.parameter_instances|length != 1 else '' }} specified)
+            </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        No solvers configured in this experiment yet.
+    {% endif %}
+{% endblock %}
