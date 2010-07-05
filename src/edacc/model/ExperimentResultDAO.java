@@ -375,6 +375,23 @@ public class ExperimentResultDAO {
         return res;
     }
 
+
+    public static double getMaxCalculationTimeForSolverConfiguration(SolverConfiguration sc, int status, int run) throws SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT MAX(time) " +
+                "FROM " + table + " " +
+                "WHERE SolverConfig_idSolverConfig=? AND status=? AND run=?;");
+        st.setInt(1, sc.getId());
+        st.setInt(2, status);
+        st.setInt(3, run);
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            return rs.getDouble(1);
+        } else {
+            return 0.;
+        }
+    }
+
     public static Vector<ExperimentResult> getAllByExperimentHasInstance(ExperimentHasInstance ehi) throws SQLException {
         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(

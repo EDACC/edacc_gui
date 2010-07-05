@@ -4,11 +4,18 @@ import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
+import edacc.model.Instance;
+import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.JComboBox;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import org.rosuda.JRI.Rengine;
 
@@ -16,26 +23,39 @@ import org.rosuda.JRI.Rengine;
  *
  * @author simon
  */
-public class SolverComparison implements PlotInterface {
+public class SolverComparison extends Plot {
 
     private Dependency[] dependencies;
-    private JComboBox combo1, combo2;
-    private JTextField txtMaxValue, txtRun;
-    private ExperimentController expController;
-
+    private JComboBox combo1, combo2, comboRun;
+    private JTextField txtMaxValue;
+    private InstanceSelector instanceSelector;
     public SolverComparison(ExperimentController expController) {
-        this.expController = expController;
+        super(expController);
         combo1 = new JComboBox();
         combo2 = new JComboBox();
+        final ActionListener loadMaxValue = new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    loadMaxValue();
+                } catch (SQLException ex) {
+                    txtMaxValue.setText("0");
+                }
+            }
+        };
+        combo1.addActionListener(loadMaxValue);
+        combo2.addActionListener(loadMaxValue);
         txtMaxValue = new JTextField();
-        txtRun = new JTextField("0");
+        comboRun = new JComboBox();
+        comboRun.addActionListener(loadMaxValue);
+        instanceSelector = new InstanceSelector();
         dependencies = new Dependency[]{
                     new Dependency("First solver", combo1),
                     new Dependency("Second solver", combo2),
-                    new Dependency("Max x/y-value (sec)", txtMaxValue),
-                    new Dependency("Plot for run", txtRun)
+                    new Dependency("Instances", instanceSelector),
+                    new Dependency("Plot for run", comboRun),
+                    new Dependency("Max x/y-value (sec)", txtMaxValue)
                 };
-
     }
 
     public Dependency[] getDependencies() {
@@ -48,21 +68,27 @@ public class SolverComparison implements PlotInterface {
     }
 
     public void plot(final Rengine re) throws SQLException, DependencyException {
-        if (combo1.getSelectedItem() == null || combo2.getSelectedItem() == null) {
+        if (!(combo1.getSelectedItem() instanceof SolverConfiguration) || !(combo2.getSelectedItem() instanceof SolverConfiguration)) {
             throw new DependencyException("You have to select two solvers.");
         }
+        if (!(comboRun.getSelectedItem() instanceof Integer)) {
+            throw new DependencyException("You have to select a run.");
+        }
+        Vector<Instance> instances = instanceSelector.getSelectedInstances();
+        if (instances == null || instances.size() == 0) {
+            throw new DependencyException("You have to select instances in order to plot.");
+        }
+        HashSet<Integer> selectedInstanceIds = new HashSet<Integer>();
+        for (Instance i: instances) {
+            selectedInstanceIds.add(i.getId());
+        }
         double maxValue;
-        int run;
         try {
             maxValue = Double.parseDouble(txtMaxValue.getText());
         } catch (NumberFormatException ex) {
             throw new DependencyException("Expected double value for max value.");
         }
-        try {
-            run = Integer.parseInt(txtRun.getText());
-        } catch (NumberFormatException ex) {
-            throw new DependencyException("Expected integer value for run.");
-        }
+        int run = (Integer) comboRun.getSelectedItem();
 
         SolverConfiguration xSolverConfig = (SolverConfiguration) combo1.getSelectedItem();
         SolverConfiguration ySolverConfig = (SolverConfiguration) combo2.getSelectedItem();
@@ -70,7 +96,7 @@ public class SolverComparison implements PlotInterface {
         Vector<ExperimentResult> yResults = ExperimentResultDAO.getAllBySolverConfigurationAndStatus(ySolverConfig, 1);
         HashMap<RunInstance, ExperimentResult> hashMap = new HashMap<RunInstance, ExperimentResult>();
         for (ExperimentResult erx : xResults) {
-            if (erx.getRun() == run) {
+            if (erx.getRun() == run && selectedInstanceIds.contains(erx.getInstanceId())) {
                 hashMap.put(new RunInstance(erx.getRun(), erx.getInstanceId()), erx);
             }
         }
@@ -108,18 +134,45 @@ public class SolverComparison implements PlotInterface {
     }
 
     public void loadDefaultValues() throws SQLException {
-        txtMaxValue.setText("" + expController.getActiveExperiment().getTimeOut());
-        txtRun.setText("0");
+        loadMaxValue();
+        comboRun.removeAllItems();
         combo1.removeAllItems();
         combo2.removeAllItems();
         for (SolverConfiguration solConfig : ExperimentDAO.getSolverConfigurationsInExperiment(expController.getActiveExperiment())) {
             combo1.addItem(solConfig);
             combo2.addItem(solConfig);
         }
+        for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
+            comboRun.addItem(i);
+        }
+        Vector<Instance> instances = new Vector<Instance>();
+        instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
+        instanceSelector.setInstances(instances);
+        instanceSelector.btnSelectAll();
+    }
+
+    private void loadMaxValue() throws SQLException {
+        double maxValue;
+        if (!(combo1.getSelectedItem() instanceof SolverConfiguration) || !(combo2.getSelectedItem() instanceof SolverConfiguration) || !(comboRun.getSelectedItem() instanceof Integer)) {
+            maxValue = expController.getActiveExperiment().getTimeOut();
+        } else {
+            int run = (Integer) comboRun.getSelectedItem();
+            maxValue = expController.getMaxCalculationTimeForSolverConfiguration((SolverConfiguration) combo1.getSelectedItem(), 1, run);
+            double tmp = expController.getMaxCalculationTimeForSolverConfiguration((SolverConfiguration) combo2.getSelectedItem(), 1, run);
+            if (tmp > maxValue) {
+                maxValue = tmp;
+            }
+            maxValue *= 1.1;
+        }
+        if (maxValue == 0.) {
+            maxValue = expController.getActiveExperiment().getTimeOut();
+        }
+        txtMaxValue.setText("" + Math.round(maxValue));
     }
 }
 
 class RunInstance {
+
     public int run;
     public int instanceId;
 

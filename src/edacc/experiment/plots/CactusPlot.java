@@ -1,14 +1,18 @@
 package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
+import edacc.experiment.plots.InstanceSelector;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
+import edacc.model.Instance;
+import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Vector;
-import javax.swing.JTextField;
+import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
 
 class SolverInfos {
@@ -21,16 +25,19 @@ class SolverInfos {
  *
  * @author simon
  */
-public class CactusPlot implements PlotInterface {
+public class CactusPlot extends Plot {
     private static final String[] colors = {"red", "green", "blue", "darkgoldenrod1", "darkolivegreen", "darkorchid", "deeppink", "darkgreen", "blue4"};
-    private ExperimentController expController;
     private Dependency[] dependencies;
-    private JTextField txtRun;
+    private JComboBox comboRun;
+    private InstanceSelector instanceSelector;
+    
     public CactusPlot(ExperimentController expController) {
-        this.expController = expController;
-        txtRun = new JTextField();
+        super(expController);
+        comboRun = new JComboBox();
+        instanceSelector = new InstanceSelector();
         dependencies = new Dependency[] {
-            new Dependency("Plot for run", txtRun)
+            new Dependency("Instances", instanceSelector),
+            new Dependency("Plot for run", comboRun)
         };
     }
 
@@ -39,34 +46,48 @@ public class CactusPlot implements PlotInterface {
     }
 
     public void plot(Rengine engine) throws SQLException, DependencyException {
-        
-        int run;
-        try {
-            run = Integer.parseInt(txtRun.getText());
-        } catch (NumberFormatException ex) {
-            throw new DependencyException("Expected integer for run.");
+        if (!(comboRun.getSelectedItem() instanceof Integer)) {
+            throw new DependencyException("You have to select a run.");
         }
+        Vector<Instance> instances = instanceSelector.getSelectedInstances();
+        if (instances == null || instances.size() == 0) {
+            throw new DependencyException("You have to select instances in order to plot.");
+        }
+        HashSet<Integer> selectedInstanceIds = new HashSet<Integer>();
+        for (Instance i: instances) {
+            selectedInstanceIds.add(i.getId());
+        }
+        int run = (Integer) comboRun.getSelectedItem();
         Vector<SolverConfiguration> solverConfigs = SolverConfigurationDAO.getSolverConfigurationByExperimentId(expController.getActiveExperiment().getId());
         SolverInfos[] solver = new SolverInfos[solverConfigs.size()];
         double max_y = 0;
         for (int i = 0; i < solver.length; i++) {
             SolverConfiguration sc = solverConfigs.get(i);
             Vector<ExperimentResult> results = ExperimentResultDAO.getAllBySolverConfigurationAndRunAndStatusOrderByTime(sc, run, 1);
+            
+            for (int k = results.size()-1; k >= 0; k--) {
+                if (!selectedInstanceIds.contains(results.get(k).getInstanceId())) {
+                    results.remove(k);
+                }
+            }
+
             solver[i] = new SolverInfos();
             solver[i].name = SolverDAO.getById(sc.getSolver_id()).getName();
-            solver[i].xs = new int[results.size()];
-            solver[i].ys = new double[results.size()];
+            solver[i].xs = new int[results.size()+1];
+            solver[i].ys = new double[results.size()+1];
             
-            int k = 0;
+            int k = 1;
+            solver[i].xs[0] = 0;
+            solver[i].ys[0] = 0;
             for (ExperimentResult r : results) {
-                solver[i].xs[k] = k+1;
+                solver[i].xs[k] = k;
                 solver[i].ys[k] = r.getTime();
                 if (r.getTime() > max_y) max_y = r.getTime();
                 k++;
             }
         }
         max_y = max_y * 1.05;
-        int max_x = ExperimentResultDAO.getAllInstanceIdsByExperimentId(expController.getActiveExperiment().getId()).size()+10;
+        int max_x = (int)(selectedInstanceIds.size() * 1.1)+1;//(int) (ExperimentResultDAO.getAllInstanceIdsByExperimentId(expController.getActiveExperiment().getId()).size()*1.1);
         engine.eval("plot(c(), c(), type='p', col='red', las=1, xlim=c(0,"+max_x+"), ylim=c(0,"+max_y+"), xaxs='i', yaxs='i', xlab='', ylab='', cex.main=1.5)");
         engine.eval("par(new=1)");
         String[] used_colors = new String[solver.length];
@@ -111,8 +132,15 @@ public class CactusPlot implements PlotInterface {
         return "Number of instances solved within a given amount of time";
     }
 
-    public void loadDefaultValues() {
-        txtRun.setText("0");
+    public void loadDefaultValues() throws SQLException {
+        comboRun.removeAllItems();
+        for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
+            comboRun.addItem(i);
+        }
+        Vector<Instance> instances = new Vector<Instance>();
+        instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
+        instanceSelector.setInstances(instances);
+        instanceSelector.btnSelectAll();
     }
 
 

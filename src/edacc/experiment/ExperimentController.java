@@ -823,6 +823,10 @@ public class ExperimentController {
         return ExperimentDAO.getExperimentByName(name);
     }
 
+    public double getMaxCalculationTimeForSolverConfiguration(SolverConfiguration sc, int status, int run) throws SQLException {
+        return ExperimentResultDAO.getMaxCalculationTimeForSolverConfiguration(sc, status, run);
+    }
+
     public boolean experimentResultsIsModified(int numRuns) {
         try {
             if (numRuns != activeExperiment.getNumRuns()) {

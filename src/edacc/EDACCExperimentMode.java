@@ -159,6 +159,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         sorter = new TableRowSorter<InstanceTableModel>(insTableModel);
         rowFilter = new InstanceTableModelRowFilter();
         tableInstances.setRowSorter(sorter);
+        sorter.setRowFilter(rowFilter);
         tableJobs.setDefaultRenderer(Object.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.setDefaultRenderer(String.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeJobsCellRenderer());
@@ -1666,11 +1667,20 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     public void btnInstanceFilter() {
         if (dialogFilter == null) {
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            dialogFilter = new EDACCInstanceFilter(mainFrame, true, this);
+            dialogFilter = new EDACCInstanceFilter(mainFrame, true, this.rowFilter);
             dialogFilter.setLocationRelativeTo(mainFrame);
         }
         dialogFilter.loadValues();
         EDACCApp.getApplication().show(dialogFilter);
+        insTableModel.fireTableDataChanged();
+        if (rowFilter.filter_name || rowFilter.filter_numAtoms ||
+                rowFilter.filter_numClauses || rowFilter.filter_ratio ||
+                rowFilter.filter_maxClauseLength) {
+            setFilterStatus("This list of instances has filters applied to it. Use the filter button below to modify.");
+        } else {
+            setFilterStatus("");
+        }
+
     }
 
     @Action

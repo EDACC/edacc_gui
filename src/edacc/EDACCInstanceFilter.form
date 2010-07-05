@@ -86,10 +86,10 @@
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtMaxClauseLengthLow" pref="73" max="32767" attributes="2"/>
-                              <Component id="txtRatioLow" alignment="0" pref="73" max="32767" attributes="2"/>
-                              <Component id="txtClausesLow" alignment="0" pref="73" max="32767" attributes="2"/>
-                              <Component id="txtAtomsLow" alignment="0" pref="73" max="32767" attributes="2"/>
+                              <Component id="txtMaxClauseLengthLow" pref="77" max="32767" attributes="2"/>
+                              <Component id="txtRatioLow" alignment="0" pref="77" max="32767" attributes="2"/>
+                              <Component id="txtClausesLow" alignment="0" pref="77" max="32767" attributes="2"/>
+                              <Component id="txtAtomsLow" alignment="0" pref="77" max="32767" attributes="2"/>
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -100,10 +100,10 @@
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtMaxClauseLengthHigh" pref="72" max="32767" attributes="2"/>
-                              <Component id="txtRatioHigh" alignment="0" pref="72" max="32767" attributes="2"/>
-                              <Component id="txtClausesHigh" alignment="0" pref="72" max="32767" attributes="2"/>
-                              <Component id="txtAtomsHigh" alignment="0" pref="72" max="32767" attributes="2"/>
+                              <Component id="txtMaxClauseLengthHigh" pref="76" max="32767" attributes="2"/>
+                              <Component id="txtRatioHigh" alignment="0" pref="76" max="32767" attributes="2"/>
+                              <Component id="txtClausesHigh" alignment="0" pref="76" max="32767" attributes="2"/>
+                              <Component id="txtAtomsHigh" alignment="0" pref="76" max="32767" attributes="2"/>
                           </Group>
                       </Group>
                   </Group>

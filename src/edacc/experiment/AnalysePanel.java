@@ -18,13 +18,14 @@ import javax.swing.JLabel;
  * @author simon
  */
 public class AnalysePanel extends javax.swing.JPanel {
+    private static final Class[] plotClasses = new Class[] { SolverComparison.class, CactusPlot.class };
 
     public JComboBox comboType;
     private JLabel jLabel1;
     private java.awt.GridBagConstraints gridBagConstraints;
     private AnalyseBottomPanel bottom;
     private ExperimentController expController;
-
+    
     /** Creates new form AnalysePanel */
     public AnalysePanel(ExperimentController controller) {
         initComponents();
@@ -34,15 +35,17 @@ public class AnalysePanel extends javax.swing.JPanel {
         jLabel1.setText("Plot type:");
         comboType = new javax.swing.JComboBox();
         comboType.setModel(new javax.swing.DefaultComboBoxModel(new String[]{}));
+
         comboType.addItem(new SolverComparison(expController));
         comboType.addItem(new CactusPlot(expController));
+        
         comboType.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                if (comboType.getSelectedItem() instanceof PlotInterface) {
+                if (comboType.getSelectedItem() instanceof Plot) {
                     initialize();
                     try {
-                        initializePlotType((PlotInterface) comboType.getSelectedItem());
+                        initializePlotType((Plot) comboType.getSelectedItem());
                     } catch (SQLException _) {
                         //TODO: show error message
                         initialize();
@@ -57,8 +60,8 @@ public class AnalysePanel extends javax.swing.JPanel {
     public void initialize() {
         this.removeAll();
         try {
-                if (comboType.getSelectedItem() instanceof PlotInterface) {
-                    PlotInterface plot = (PlotInterface) comboType.getSelectedItem();
+                if (comboType.getSelectedItem() instanceof Plot) {
+                    Plot plot = (Plot) comboType.getSelectedItem();
                     plot.loadDefaultValues();
                 }
         } catch (Exception ex) {
@@ -86,7 +89,7 @@ public class AnalysePanel extends javax.swing.JPanel {
         add(jLabel1, gridBagConstraints);
     }
 
-    public void initializePlotType(PlotInterface plotType) throws SQLException {
+    public void initializePlotType(Plot plotType) throws SQLException {
         for (Dependency dependency : plotType.getDependencies()) {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy++;
@@ -108,16 +111,16 @@ public class AnalysePanel extends javax.swing.JPanel {
         add(bottom, gridBagConstraints);
     }
 
-    public PlotInterface getSelectedPlot() {
-        if (comboType.getSelectedItem() instanceof PlotInterface) {
-            return (PlotInterface) comboType.getSelectedItem();
+    public Plot getSelectedPlot() {
+        if (comboType.getSelectedItem() instanceof Plot) {
+            return (Plot) comboType.getSelectedItem();
         } else {
             return null;
         }
     }
 
     public void updateDependencies() {
-        PlotInterface plot = getSelectedPlot();
+        Plot plot = getSelectedPlot();
         if (plot != null) {
             for (Dependency dep : plot.getDependencies()) {
                 if (dep.getGuiObject() instanceof JComboBox) {

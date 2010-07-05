@@ -6,7 +6,7 @@
 
 package edacc;
 
-import java.awt.Dimension;
+import edacc.experiment.InstanceTableModelRowFilter;
 import javax.swing.JOptionPane;
 import org.jdesktop.application.Action;
 
@@ -17,13 +17,12 @@ import org.jdesktop.application.Action;
  * @author Daniel D.
  */
 public class EDACCInstanceFilter extends javax.swing.JDialog {
-    EDACCExperimentMode main;
-
+    InstanceTableModelRowFilter rowFilter;
     /** Creates new form EDACCGridSettingsView */
-    public EDACCInstanceFilter(java.awt.Frame parent, boolean modal, EDACCExperimentMode main) {
+    public EDACCInstanceFilter(java.awt.Frame parent, boolean modal, InstanceTableModelRowFilter rowFilter) {
         super(parent, modal);
         initComponents();
-        this.main = main;
+        this.rowFilter = rowFilter;
      }
 
     /** This method is called from within the constructor to
@@ -258,62 +257,50 @@ public class EDACCInstanceFilter extends javax.swing.JDialog {
 }//GEN-LAST:event_btnApplyActionPerformed
 
     public void loadValues() {
-        if (main.rowFilter.name != null)
-            this.txtName.setText(main.rowFilter.name);
-        this.chkName.setSelected(main.rowFilter.filter_name);
+        if (rowFilter.name != null)
+            this.txtName.setText(rowFilter.name);
+        this.chkName.setSelected(rowFilter.filter_name);
 
-        this.txtAtomsLow.setText(String.valueOf(main.rowFilter.numAtoms_low));
-        this.txtAtomsHigh.setText(String.valueOf(main.rowFilter.numAtoms_high));
-        this.chkAtoms.setSelected(main.rowFilter.filter_numAtoms);
+        this.txtAtomsLow.setText(String.valueOf(rowFilter.numAtoms_low));
+        this.txtAtomsHigh.setText(String.valueOf(rowFilter.numAtoms_high));
+        this.chkAtoms.setSelected(rowFilter.filter_numAtoms);
 
-        this.txtClausesLow.setText(String.valueOf(main.rowFilter.numClauses_low));
-        this.txtClausesHigh.setText(String.valueOf(main.rowFilter.numClauses_high));
-        this.chkClauses.setSelected(main.rowFilter.filter_numClauses);
+        this.txtClausesLow.setText(String.valueOf(rowFilter.numClauses_low));
+        this.txtClausesHigh.setText(String.valueOf(rowFilter.numClauses_high));
+        this.chkClauses.setSelected(rowFilter.filter_numClauses);
 
-        this.txtRatioLow.setText(String.valueOf(main.rowFilter.ratio_low));
-        this.txtRatioHigh.setText(String.valueOf(main.rowFilter.ratio_high));
-        this.chkRatio.setSelected(main.rowFilter.filter_ratio);
+        this.txtRatioLow.setText(String.valueOf(rowFilter.ratio_low));
+        this.txtRatioHigh.setText(String.valueOf(rowFilter.ratio_high));
+        this.chkRatio.setSelected(rowFilter.filter_ratio);
 
-        this.txtMaxClauseLengthLow.setText(String.valueOf(main.rowFilter.maxClauseLength_low));
-        this.txtMaxClauseLengthHigh.setText(String.valueOf(main.rowFilter.maxClauseLength_high));
-        this.chkMaxClauseLength.setSelected(main.rowFilter.filter_maxClauseLength);
+        this.txtMaxClauseLengthLow.setText(String.valueOf(rowFilter.maxClauseLength_low));
+        this.txtMaxClauseLengthHigh.setText(String.valueOf(rowFilter.maxClauseLength_high));
+        this.chkMaxClauseLength.setSelected(rowFilter.filter_maxClauseLength);
     }
 
     @Action
     public void btnApply() {
         try {
-            main.rowFilter.filter_name = this.chkName.isSelected();
-            main.rowFilter.filter_numAtoms = this.chkAtoms.isSelected();
-            main.rowFilter.filter_numClauses = this.chkClauses.isSelected();
-            main.rowFilter.filter_ratio = this.chkRatio.isSelected();
-            main.rowFilter.filter_maxClauseLength = this.chkMaxClauseLength.isSelected();
+            rowFilter.filter_name = this.chkName.isSelected();
+            rowFilter.filter_numAtoms = this.chkAtoms.isSelected();
+            rowFilter.filter_numClauses = this.chkClauses.isSelected();
+            rowFilter.filter_ratio = this.chkRatio.isSelected();
+            rowFilter.filter_maxClauseLength = this.chkMaxClauseLength.isSelected();
 
-            if (main.rowFilter.filter_name || main.rowFilter.filter_numAtoms ||
-                main.rowFilter.filter_numClauses || main.rowFilter.filter_ratio ||
-                main.rowFilter.filter_maxClauseLength) {
-                main.setFilterStatus("This list of instances has filters applied to it. Use the filter button below to modify.");
-            }
-            else {
-                main.setFilterStatus("");
-            }
+            rowFilter.name = txtName.getText();
 
-            main.rowFilter.name = txtName.getText();
+            rowFilter.numAtoms_low = Integer.valueOf(this.txtAtomsLow.getText());
+            rowFilter.numAtoms_high = Integer.valueOf(this.txtAtomsHigh.getText());
 
-            main.rowFilter.numAtoms_low = Integer.valueOf(this.txtAtomsLow.getText());
-            main.rowFilter.numAtoms_high = Integer.valueOf(this.txtAtomsHigh.getText());
-
-            main.rowFilter.numClauses_low = Integer.valueOf(this.txtClausesLow.getText());
-            main.rowFilter.numClauses_high = Integer.valueOf(this.txtClausesHigh.getText());
+            rowFilter.numClauses_low = Integer.valueOf(this.txtClausesLow.getText());
+            rowFilter.numClauses_high = Integer.valueOf(this.txtClausesHigh.getText());
             
-            main.rowFilter.ratio_low = Float.valueOf(this.txtRatioLow.getText());
-            main.rowFilter.ratio_high = Float.valueOf(this.txtRatioHigh.getText());
+            rowFilter.ratio_low = Float.valueOf(this.txtRatioLow.getText());
+            rowFilter.ratio_high = Float.valueOf(this.txtRatioHigh.getText());
             
-            main.rowFilter.maxClauseLength_low = Integer.valueOf(this.txtMaxClauseLengthLow.getText());
-            main.rowFilter.maxClauseLength_high = Integer.valueOf(this.txtMaxClauseLengthHigh.getText());
+            rowFilter.maxClauseLength_low = Integer.valueOf(this.txtMaxClauseLengthLow.getText());
+            rowFilter.maxClauseLength_high = Integer.valueOf(this.txtMaxClauseLengthHigh.getText());
 
-            if (main.expController.getNumInstances() > 0)
-                main.sorter.setRowFilter(main.rowFilter);
-            main.insTableModel.fireTableDataChanged();
             this.setVisible(false);
         }
         catch (NumberFormatException e) {

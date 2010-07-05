@@ -9,7 +9,7 @@ package edacc.experiment;
 import edacc.EDACCApp;
 import edacc.EDACCPlotView;
 import edacc.experiment.plots.DependencyException;
-import edacc.experiment.plots.PlotInterface;
+import edacc.experiment.plots.Plot;
 import java.awt.Dimension;
 import java.sql.SQLException;
 import javax.swing.JFrame;
@@ -66,7 +66,7 @@ public class AnalyseBottomPanel extends javax.swing.JPanel {
 
     @Action
     public void btnGeneratePlot() {
-        PlotInterface plot = analysePanel.getSelectedPlot();
+        Plot plot = analysePanel.getSelectedPlot();
         if (plot == null) {
             return;
         }

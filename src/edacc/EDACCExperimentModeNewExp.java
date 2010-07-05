@@ -37,6 +37,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         txtExperimentName.setText(expName);
         txtExperimentDescription.setText(expDescription);
         btnCreateExperiment.setText("Save");
+        this.setTitle("Edit experiment");
     }
 
     /** This method is called from within the constructor to

@@ -107,6 +107,16 @@ public class InstanceTableModel extends AbstractTableModel {
         selectedInstances = new HashMap<Integer, ExperimentHasInstance>();
     }
 
+    public Vector<Instance> getSelectedInstances() {
+        Vector<Instance> res = new Vector<Instance>();
+        for (Instance instance: instances) {
+            if (selectedInstances.containsKey(instance.getId())) {
+                res.add(instance);
+            }
+        }
+        return res;
+    }
+
     @Override
     public int getRowCount() {
         return instances.size();
