@@ -19,7 +19,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
@@ -47,21 +46,19 @@ public class InstanceSelector extends JPanel {
         sorter = new TableRowSorter<InstanceTableModel>(tableModel);
         table.setRowSorter(sorter);
         sorter.setRowFilter(rowFilter);
-        //table.setPreferredSize(new Dimension(200, 200));
-        // TODO: set column width
-      /*  TableColumnModel colmodel = table.getColumnModel();
-        colmodel.getColumn(0).setWidth(50);
-        colmodel.getColumn(1).setWidth(10);
-        colmodel.getColumn(2).setWidth(10);
-        colmodel.getColumn(3).setWidth(10);
-        colmodel.getColumn(4).setWidth(10);
-        colmodel.getColumn(5).setWidth(10);*/
+
+        TableColumnModel colModel = table.getColumnModel();
+        colModel.getColumn(0).setPreferredWidth(350);
+        colModel.getColumn(1).setPreferredWidth(15);
+        colModel.getColumn(2).setPreferredWidth(15);
+        colModel.getColumn(3).setPreferredWidth(15);
+        colModel.getColumn(4).setPreferredWidth(15);
+        colModel.getColumn(5).setPreferredWidth(15);
         scrollPane = new JScrollPane(table);
         lblFilter = new JLabel("");
         lblFilter.setForeground(Color.red);
-        scrollPane.setMinimumSize(new Dimension(0,150));
-        scrollPane.setPreferredSize(new Dimension(0, 150));
-        //scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollPane.setMinimumSize(new Dimension(0,250));
+        scrollPane.setPreferredSize(new Dimension(0, 250));
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(5, 5, 5, 5);
         c.gridx = 0;

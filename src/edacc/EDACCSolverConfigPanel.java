@@ -19,6 +19,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.sql.SQLException;
+import javax.swing.border.TitledBorder;
 
 /**
  * A JPanel which serves as container for EDACCSolverConfigEntry objects.
@@ -68,6 +69,9 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
                 if (e.getSolverId() != oldId) {
                     if (old != null && count == 1) {
                         old.setTitleNumber(0);
+                        if (old.getSolverConfiguration() != null) {
+                            old.getSolverConfiguration().setName(((TitledBorder) old.getBorder()).getTitle());
+                        }
                     }
                     oldId = e.getSolverId();
                     count = 1;
@@ -75,10 +79,16 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
                     count++;
                 }
                 e.setTitleNumber(count);
+                if (e.getSolverConfiguration() != null) {
+                    e.getSolverConfiguration().setName(((TitledBorder) e.getBorder()).getTitle());
+                }
                 old = e;
             }
             if (old != null && count == 1) {
                 old.setTitleNumber(0);
+                if (old.getSolverConfiguration() != null) {
+                    old.getSolverConfiguration().setName(((TitledBorder) old.getBorder()).getTitle());
+                }
             }
             this.repaint();
             this.revalidate();
