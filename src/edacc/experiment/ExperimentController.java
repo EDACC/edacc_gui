@@ -847,4 +847,11 @@ public class ExperimentController {
         }
         return false;
     }
+    public void checkForR() throws REngineInitializationException {
+        try {
+            System.loadLibrary("jri");
+        } catch (Throwable e) {
+            throw new REngineInitializationException(e.getMessage());
+        }
+    }
 }

@@ -30,12 +30,15 @@ public class CactusPlot extends Plot {
     private Dependency[] dependencies;
     private JComboBox comboRun;
     private InstanceSelector instanceSelector;
+    private SolverConfigurationSelector solverConfigurationSelector;
     
     public CactusPlot(ExperimentController expController) {
         super(expController);
         comboRun = new JComboBox();
         instanceSelector = new InstanceSelector();
+        solverConfigurationSelector = new SolverConfigurationSelector();
         dependencies = new Dependency[] {
+            new Dependency("Solvers", solverConfigurationSelector),
             new Dependency("Instances", instanceSelector),
             new Dependency("Plot for run", comboRun)
         };
@@ -53,12 +56,15 @@ public class CactusPlot extends Plot {
         if (instances == null || instances.size() == 0) {
             throw new DependencyException("You have to select instances in order to plot.");
         }
+        Vector<SolverConfiguration> solverConfigs = solverConfigurationSelector.getSelectedSolverConfigurations();
+        if (solverConfigs.size() == 0) {
+            throw new DependencyException("You have to select solvers in order to plot.");
+        }
         HashSet<Integer> selectedInstanceIds = new HashSet<Integer>();
         for (Instance i: instances) {
             selectedInstanceIds.add(i.getId());
         }
         int run = (Integer) comboRun.getSelectedItem();
-        Vector<SolverConfiguration> solverConfigs = SolverConfigurationDAO.getSolverConfigurationByExperimentId(expController.getActiveExperiment().getId());
         SolverInfos[] solver = new SolverInfos[solverConfigs.size()];
         double max_y = 0;
         for (int i = 0; i < solver.length; i++) {
@@ -141,6 +147,8 @@ public class CactusPlot extends Plot {
         instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
         instanceSelector.setInstances(instances);
         instanceSelector.btnSelectAll();
+        solverConfigurationSelector.setSolverConfigurations(SolverConfigurationDAO.getSolverConfigurationByExperimentId(expController.getActiveExperiment().getId()));
+        solverConfigurationSelector.btnSelectAll();
     }
 
 

@@ -70,113 +70,23 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     public ExperimentResultsBrowserTableModel jobsTableModel;
     public EDACCSolverConfigPanel solverConfigPanel;
     public TableRowSorter<InstanceTableModel> sorter;
-    public TableRowSorter<ExperimentResultsBrowserTableModel> resultsBrowserTableRowSorter;
     public InstanceTableModelRowFilter rowFilter;
     public ExperimentResultsBrowserTableModelRowFilter resultBrowserRowFilter;
+    private ResultsBrowserTableRowSorter resultsBrowserTableRowSorter;
     private EDACCInstanceFilter dialogFilter;
     private AnalysePanel analysePanel;
     private Timer jobsTimer = null;
+    private boolean jobsTimerWasActive = false;
 
     /** Creates new form EDACCExperimentMode */
     public EDACCExperimentMode() {
+        
         initComponents();
-
         expController = new ExperimentController(this, solverConfigPanel);
+        /* -------------------------------- experiment tab -------------------------------- */
         expTableModel = new ExperimentTableModel();
-        insTableModel = new InstanceTableModel();
-        solTableModel = new SolverTableModel();
-        jobsTableModel = new ExperimentResultsBrowserTableModel();
-        instanceClassModel = new ExperimentInstanceClassTableModel(tableInstances, expController);
-
-        /* -------------------------- SETUP JOBS TABLE -------------------------- */
-        tableJobs.setModel(jobsTableModel);
-        resultsBrowserTableRowSorter = new TableRowSorter<ExperimentResultsBrowserTableModel>(jobsTableModel) {
-
-            @Override
-            public void setModel(ExperimentResultsBrowserTableModel model) {
-                super.setModel(model);
-                setModelWrapper(new ExperimentResultsBrowserModelWrapper<ExperimentResultsBrowserTableModel>(getModelWrapper()));
-            }
-
-            class ExperimentResultsBrowserModelWrapper<M extends TableModel> extends DefaultRowSorter.ModelWrapper<M, Integer> {
-
-                private DefaultRowSorter.ModelWrapper<M, Integer> delegate;
-
-                public ExperimentResultsBrowserModelWrapper(DefaultRowSorter.ModelWrapper<M, Integer> delegate) {
-                    this.delegate = delegate;
-                }
-
-                @Override
-                public M getModel() {
-                    return delegate.getModel();
-                }
-
-                @Override
-                public int getColumnCount() {
-                    return delegate.getColumnCount();
-                }
-
-                @Override
-                public int getRowCount() {
-                    return delegate.getRowCount();
-                }
-
-                @Override
-                public Object getValueAt(int row, int column) {
-                    // this is the status column
-                    if (((ExperimentResultsBrowserTableModel) this.getModel()).getIndexForColumn(column) == 8) {
-                        return "" + (char) (((ExperimentResultsBrowserTableModel) this.getModel()).getStatusCode(row) + 68);
-                    }
-                    return ((ExperimentResultsBrowserTableModel) this.getModel()).getValueAt(row, column);
-                }
-
-                @Override
-                public Integer getIdentifier(int row) {
-                    return delegate.getIdentifier(row);
-                }
-            }
-        };
-        resultsBrowserTableRowSorter.setSortsOnUpdates(true);
-        resultBrowserRowFilter = new ExperimentResultsBrowserTableModelRowFilter();
-        resultsBrowserTableRowSorter.setRowFilter(resultBrowserRowFilter);
-        tableJobs.setRowSorter(resultsBrowserTableRowSorter);
-        /* ----------------------- END OF SETUP JOBS TABLE ----------------------- */
-
         tableExperiments.setModel(expTableModel);
         tableExperiments.setRowSorter(new TableRowSorter<ExperimentTableModel>(expTableModel));
-        tableInstances.setModel(insTableModel);
-        tableSolvers.setModel(solTableModel);
-        tableInstanceClasses.setModel(instanceClassModel);
-        // center third column
-        tableInstanceClasses.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
-
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-                JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                lbl.setHorizontalAlignment(JLabel.CENTER);
-                return lbl;
-            }
-        });
-
-        sorter = new TableRowSorter<InstanceTableModel>(insTableModel);
-        rowFilter = new InstanceTableModelRowFilter();
-        tableInstances.setRowSorter(sorter);
-        sorter.setRowFilter(rowFilter);
-        tableJobs.setDefaultRenderer(Object.class, new EDACCExperimentModeJobsCellRenderer());
-        tableJobs.setDefaultRenderer(String.class, new EDACCExperimentModeJobsCellRenderer());
-        tableJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeJobsCellRenderer());
-        tableJobs.setDefaultRenderer(Float.class, new EDACCExperimentModeJobsCellRenderer());
-
-        solverConfigPanel.setParent(this);
-        insTableModel.addTableModelListener(new TableModelListener() {
-
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                setTitles();
-            }
-        });
-
         tableExperiments.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "");
         tableExperiments.addKeyListener(new KeyListener() {
 
@@ -204,8 +114,61 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 btnLoadExperiment.setEnabled(mod);
             }
         });
+        /* -------------------------------- end of experiment tab -------------------------------- */
+        /* -------------------------------- solver tab -------------------------------- */
+        solTableModel = new SolverTableModel();
+        tableSolvers.setModel(solTableModel);
+        solverConfigPanel.setParent(this);
+        /* -------------------------------- end of solver tab -------------------------------- */
+        /* -------------------------------- instances tab -------------------------------- */
+        insTableModel = new InstanceTableModel();
+        insTableModel.addTableModelListener(new TableModelListener() {
+
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                setTitles();
+            }
+        });
+        tableInstances.setModel(insTableModel);
+        instanceClassModel = new ExperimentInstanceClassTableModel(tableInstances, expController);
+        tableInstanceClasses.setModel(instanceClassModel);
+        sorter = new TableRowSorter<InstanceTableModel>(insTableModel);
+        rowFilter = new InstanceTableModelRowFilter();
+        tableInstances.setRowSorter(sorter);
+        sorter.setRowFilter(rowFilter);
+        // center third column
+        tableInstanceClasses.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                lbl.setHorizontalAlignment(JLabel.CENTER);
+                return lbl;
+            }
+        });
+        /* -------------------------------- end of instances tab -------------------------------- */
+        /* -------------------------------- generate jobs tab -------------------------------- */
+
+        /* -------------------------------- end of generate jobs tab -------------------------------- */
+        /* -------------------------------- jobs browser tab -------------------------------- */
+        jobsTableModel = new ExperimentResultsBrowserTableModel();
+        tableJobs.setModel(jobsTableModel);
+        resultsBrowserTableRowSorter = new ResultsBrowserTableRowSorter(jobsTableModel);
+        resultsBrowserTableRowSorter.setSortsOnUpdates(true);
+        resultBrowserRowFilter = new ExperimentResultsBrowserTableModelRowFilter();
+        resultsBrowserTableRowSorter.setRowFilter(resultBrowserRowFilter);
+        tableJobs.setRowSorter(resultsBrowserTableRowSorter);
+                tableJobs.setDefaultRenderer(Object.class, new EDACCExperimentModeJobsCellRenderer());
+        tableJobs.setDefaultRenderer(String.class, new EDACCExperimentModeJobsCellRenderer());
+        tableJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeJobsCellRenderer());
+        tableJobs.setDefaultRenderer(Float.class, new EDACCExperimentModeJobsCellRenderer());
+        /* -------------------------------- end of jobs browser tab -------------------------------- */
+        /* -------------------------------- analyze tab -------------------------------- */
         analysePanel = new AnalysePanel(expController);
-        manageExperimentPane.add("Analyse", analysePanel);
+        panelAnalyse.setViewportView(analysePanel);
+        /* -------------------------------- end of analyze tab -------------------------------- */
+
 
         manageExperimentPane.setEnabledAt(1, false);
         manageExperimentPane.setEnabledAt(2, false);
@@ -266,6 +229,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         }
         jobsTableModel.setColumnVisibility(columnVis);
         setJobsFilterStatus("");
+        jobsTimerWasActive = false;
         /* end of job browser tab */
     }
 
@@ -390,6 +354,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         txtJobsTimer = new javax.swing.JTextField();
         chkJobsTimer = new javax.swing.JCheckBox();
         jLabel5 = new javax.swing.JLabel();
+        panelAnalyse = new javax.swing.JScrollPane();
 
         setName("Form"); // NOI18N
         setPreferredSize(new java.awt.Dimension(500, 500));
@@ -523,11 +488,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlEditExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtMaxSeeds, javax.swing.GroupLayout.DEFAULT_SIZE, 1001, Short.MAX_VALUE)
-                            .addComponent(txtTimeout, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1001, Short.MAX_VALUE)
-                            .addComponent(txtMaxMem, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1001, Short.MAX_VALUE)
-                            .addComponent(chkGenerateSeeds, javax.swing.GroupLayout.DEFAULT_SIZE, 1001, Short.MAX_VALUE)
-                            .addComponent(chkLinkSeeds, javax.swing.GroupLayout.DEFAULT_SIZE, 1001, Short.MAX_VALUE)))
+                            .addComponent(txtMaxSeeds, javax.swing.GroupLayout.DEFAULT_SIZE, 924, Short.MAX_VALUE)
+                            .addComponent(txtTimeout, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 924, Short.MAX_VALUE)
+                            .addComponent(txtMaxMem, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 924, Short.MAX_VALUE)
+                            .addComponent(chkGenerateSeeds, javax.swing.GroupLayout.DEFAULT_SIZE, 924, Short.MAX_VALUE)
+                            .addComponent(chkLinkSeeds, javax.swing.GroupLayout.DEFAULT_SIZE, 924, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlEditExperimentLayout.createSequentialGroup()
                         .addComponent(btnEditExperimentUndo, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
@@ -604,7 +569,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                .addContainerGap(617, Short.MAX_VALUE)
+                .addContainerGap(540, Short.MAX_VALUE)
                 .addComponent(btnCreateExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnRemoveExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -639,9 +604,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManageExperimentLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelManageExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(pnlEditExperiment, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 1127, Short.MAX_VALUE)
-                    .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 1127, Short.MAX_VALUE)
-                    .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 1127, Short.MAX_VALUE))
+                    .addComponent(pnlEditExperiment, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 1050, Short.MAX_VALUE)
+                    .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 1050, Short.MAX_VALUE)
+                    .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 1050, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelManageExperimentLayout.setVerticalGroup(
@@ -688,7 +653,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 1087, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 967, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -749,7 +714,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelChooseSolverLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelChooseSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 1127, Short.MAX_VALUE)
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 1050, Short.MAX_VALUE)
                     .addGroup(panelChooseSolverLayout.createSequentialGroup()
                         .addComponent(btnSelectAllSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -758,7 +723,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                         .addComponent(btnReverseSolverSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnChooseSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 449, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 372, Short.MAX_VALUE)
                         .addComponent(btnUndoSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSaveSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -839,7 +804,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 .addComponent(btnSelectAllInstanceClasses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDeselectAllInstnaceClasses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(78, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -857,7 +822,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
@@ -956,7 +921,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 .addComponent(btnInvertSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSelectedInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnUndoInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSaveInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -986,11 +951,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 808, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 799, Short.MAX_VALUE)
                 .addGap(10, 10, 10))
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 808, Short.MAX_VALUE)
+                .addComponent(lblFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 799, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -1010,7 +975,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         panelChooseInstances.setLayout(panelChooseInstancesLayout);
         panelChooseInstancesLayout.setHorizontalGroup(
             panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1147, Short.MAX_VALUE)
+            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1070, Short.MAX_VALUE)
         );
         panelChooseInstancesLayout.setVerticalGroup(
             panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1082,7 +1047,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblCurNumRuns)
                     .addComponent(lblNumJobs))
-                .addContainerGap(920, Short.MAX_VALUE))
+                .addContainerGap(843, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1191,7 +1156,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 .addComponent(btnFilterJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnCSVExport, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 535, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 458, Short.MAX_VALUE)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtJobsTimer, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1200,9 +1165,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 .addContainerGap())
             .addGroup(panelJobBrowserLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblJobsFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 1127, Short.MAX_VALUE)
+                .addComponent(lblJobsFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 1050, Short.MAX_VALUE)
                 .addContainerGap())
-            .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1147, Short.MAX_VALUE)
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1070, Short.MAX_VALUE)
         );
         panelJobBrowserLayout.setVerticalGroup(
             panelJobBrowserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1225,13 +1190,18 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
         manageExperimentPane.addTab(resourceMap.getString("panelJobBrowser.TabConstraints.tabTitle"), panelJobBrowser); // NOI18N
 
+        panelAnalyse.setName("panelAnalyse"); // NOI18N
+        panelAnalyse.setViewportView(analysePanel);
+        panelAnalyse.getVerticalScrollBar().setUnitIncrement(30);
+        manageExperimentPane.addTab(resourceMap.getString("panelAnalyse.TabConstraints.tabTitle"), panelAnalyse); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1152, Short.MAX_VALUE)
+                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1075, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -1318,6 +1288,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             });
         } else if (manageExperimentPane.getSelectedIndex() == 5) {
             // Analyse tab
+            try {
+            expController.checkForR();
+            } catch (Exception e) {
+                javax.swing.JOptionPane.showMessageDialog(null, "Error while initializing R: " + e.getMessage(), "Analyse", javax.swing.JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             analysePanel.initialize();
             if (analysePanel.comboType.getItemCount() > 0) {
                 analysePanel.comboType.setSelectedIndex(0);
@@ -1325,6 +1301,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         }
 
         if (manageExperimentPane.getSelectedIndex() != 4) {
+            jobsTimerWasActive = jobsTimer != null;
             stopJobsTimer();
         }
     }//GEN-LAST:event_manageExperimentPaneStateChanged
@@ -1763,6 +1740,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     private javax.swing.JLabel lblJobsFilterStatus;
     private javax.swing.JLabel lblNumJobs;
     private javax.swing.JTabbedPane manageExperimentPane;
+    private javax.swing.JScrollPane panelAnalyse;
     private javax.swing.JPanel panelChooseInstances;
     private javax.swing.JPanel panelChooseSolver;
     private javax.swing.JPanel panelExperimentParams;
@@ -1797,6 +1775,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         } else if ("saveSolverConfigurations".equals(methodName) || "saveExperimentHasInstances".equals(methodName)) {
             setTitles();
             setGenerateJobsTitle();
+        } else if ("loadJobs".equals(methodName)) {
+            if (jobsTimerWasActive) {
+                chkJobsTimer.setSelected(true);
+                chkJobsTimerMouseReleased(null);
+                jobsTimerWasActive = false;
+            }
         }
     }
 
@@ -1971,7 +1955,58 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     public void btnSelectedInstances() {
         btnSelectAllInstanceClassesActionPerformed(null);
         LinkedList<SortKey> sortKeys = new LinkedList<SortKey>();
-        sortKeys.add(new SortKey(5,SortOrder.DESCENDING));
+        sortKeys.add(new SortKey(5, SortOrder.DESCENDING));
         tableInstances.getRowSorter().setSortKeys(sortKeys);
+    }
+}
+
+class ResultsBrowserTableRowSorter extends TableRowSorter<ExperimentResultsBrowserTableModel> {
+
+    ResultsBrowserTableRowSorter(ExperimentResultsBrowserTableModel jobsTableModel) {
+        super(jobsTableModel);
+    }
+
+    @Override
+    public void setModel(ExperimentResultsBrowserTableModel model) {
+        super.setModel(model);
+        setModelWrapper(new ExperimentResultsBrowserModelWrapper<ExperimentResultsBrowserTableModel>(getModelWrapper()));
+    }
+
+    class ExperimentResultsBrowserModelWrapper<M extends TableModel> extends DefaultRowSorter.ModelWrapper<M, Integer> {
+
+        private DefaultRowSorter.ModelWrapper<M, Integer> delegate;
+
+        public ExperimentResultsBrowserModelWrapper(DefaultRowSorter.ModelWrapper<M, Integer> delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public M getModel() {
+            return delegate.getModel();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return delegate.getColumnCount();
+        }
+
+        @Override
+        public int getRowCount() {
+            return delegate.getRowCount();
+        }
+
+        @Override
+        public Object getValueAt(int row, int column) {
+            // this is the status column
+            if (((ExperimentResultsBrowserTableModel) this.getModel()).getIndexForColumn(column) == 8) {
+                return "" + (char) (((ExperimentResultsBrowserTableModel) this.getModel()).getStatusCode(row) + 68);
+            }
+            return ((ExperimentResultsBrowserTableModel) this.getModel()).getValueAt(row, column);
+        }
+
+        @Override
+        public Integer getIdentifier(int row) {
+            return delegate.getIdentifier(row);
+        }
     }
 }

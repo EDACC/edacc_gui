@@ -18,7 +18,6 @@ import javax.swing.JLabel;
  * @author simon
  */
 public class AnalysePanel extends javax.swing.JPanel {
-    private static final Class[] plotClasses = new Class[] { SolverComparison.class, CactusPlot.class };
 
     public JComboBox comboType;
     private JLabel jLabel1;
@@ -53,7 +52,6 @@ public class AnalysePanel extends javax.swing.JPanel {
                 }
             }
         });
-
 
     }
 

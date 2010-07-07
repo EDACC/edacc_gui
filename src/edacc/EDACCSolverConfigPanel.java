@@ -35,7 +35,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
 
     /** Creates new form EDACCSolverConfigPanel */
     public EDACCSolverConfigPanel() {
-        initComponents();
+      //  initComponents();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
