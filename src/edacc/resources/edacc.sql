@@ -135,6 +135,7 @@ CREATE  TABLE IF NOT EXISTS `Experiment` (
   `name` VARCHAR(255) NULL COMMENT 'Name of experiment.' ,
   `memOut` INT NULL COMMENT 'maximum amount of memeory a solver is allowed to use' ,
   `maxSeed` BIGINT NULL COMMENT 'Maximum number for the seed generating process. ' ,
+  `linkSeeds` TINYINT(1)  NULL ,
   PRIMARY KEY (`idExperiment`) )
 ENGINE = InnoDB
 COMMENT = 'Properties of an experiment.';

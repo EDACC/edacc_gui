@@ -332,4 +332,20 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         return searchDepth;
     }
 
+    public void refresh() {
+         try {
+            tableModel.setClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllSourceClass()));
+        } catch (NoConnectionToDBException ex) {
+            JOptionPane.showMessageDialog(this.rootPane,
+                    ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+             JOptionPane.showMessageDialog(this.rootPane,
+                    "There is a Problem with the database: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
 }
