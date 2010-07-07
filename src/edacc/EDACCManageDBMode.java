@@ -1133,7 +1133,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                 JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
                 this.addInstanceDialog = new EDACCAddNewInstanceSelectClassDialog(mainFrame, true);
                 this.addInstanceDialog.setLocationRelativeTo(mainFrame);
-            }
+            } else
+                addInstanceDialog.refresh();
             EDACCApp.getApplication().show(this.addInstanceDialog);
             InstanceClass input = this.addInstanceDialog.getInput();
             int searchDepth = this.addInstanceDialog.getSearchDepth();
@@ -1539,12 +1540,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                 JOptionPane.WARNING_MESSAGE);
           } else{
                 try {
+                    int tmp = tableInstanceClass.getRowCount();
                     int select = tableInstanceClass.getSelectedRows()[0] - 1;
                     manageDBInstances.RemoveInstanceClass(tableInstanceClass.getSelectedRows());
                     instanceClassTableModel.fireTableDataChanged();
-                    if(tableInstanceClass.getRowCount() != 0 && select >= 0){
+                    if(tableInstanceClass.getRowCount() != 0 && select >= 0 && tmp != tableInstanceClass.getRowCount()){
                         this.tableInstanceClass.addRowSelectionInterval(select, select);
-        }        
+                    }else
+                        this.tableInstanceClass.addRowSelectionInterval(select + 1, select + 1);
                 } catch (SQLException ex){
                     Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (InstanceSourceClassHasInstance ex) {

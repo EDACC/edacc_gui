@@ -695,7 +695,7 @@ public class ManageDBInstances implements Observer{
      *
      * @param parent String which represents the path of root
      * @param searchDepth int which represents the depth to which the root path has to be cut
-     * @return parent cut down to the given search depth.
+     * @return path cut down to the given search depth or the maximum search depth (depth of the layer of the instance file).
      */
     private String CutToSearchDepth(String parent, File file, int searchDepth) {
         String tmpString = file.getAbsolutePath().substring(parent.length()+1);
@@ -704,8 +704,9 @@ public class ManageDBInstances implements Observer{
         for(int i = 0; i < tmp.length; i++){
             if(tmp[i] == System.getProperty("file.separator").toCharArray()[0]){
                 count++;
-                if(searchDepth == count || !tmpString.substring(0, i).contains("" + System.getProperty("file.separator").toCharArray()[0])){
-                    return tmpString.substring(0, i);
+                String tmpS = tmpString.substring(0, i);
+                if(searchDepth == count || !tmpS.contains("" + System.getProperty("file.separator").toCharArray()[0])){
+                    return tmpS;
                 }
             }
         }
