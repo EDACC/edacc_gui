@@ -1,5 +1,7 @@
 package edacc.model;
 
+import java.sql.Time;
+
 public class ExperimentResult extends BaseModel {
 
     private int id;
@@ -12,7 +14,7 @@ public class ExperimentResult extends BaseModel {
     private int SolverConfigId;
     private int ExperimentId;
     private int InstanceId;
-    private int maxTimeLeft;
+    private Time maxTimeLeft;
 
     protected ExperimentResult() {
     }
@@ -176,11 +178,11 @@ public class ExperimentResult extends BaseModel {
         return ExperimentResultStatus.fromValue(status);
     }
 
-    public int getMaxTimeLeft() {
+    public Time getMaxTimeLeft() {
         return maxTimeLeft;
     }
 
-    public void setMaxTimeLeft(int maxTimeLeft) {
+    public void setMaxTimeLeft(Time maxTimeLeft) {
         this.maxTimeLeft = maxTimeLeft;
     }
 

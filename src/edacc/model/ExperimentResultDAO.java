@@ -137,9 +137,9 @@ public class ExperimentResultDAO {
         r.setInstanceId(rs.getInt("Instances_idInstance"));
         r.setExperimentId(rs.getInt("Experiment_idExperiment"));
         if (r.getStatus() == 0) {
-            r.setMaxTimeLeft(rs.getInt("maxTimeLeft"));
+            r.setMaxTimeLeft(rs.getTime("maxTimeLeft"));
         } else {
-            r.setMaxTimeLeft(0);
+            r.setMaxTimeLeft(null);
         }
         return r;
     }
@@ -216,7 +216,7 @@ public class ExperimentResultDAO {
         Vector<ExperimentResult> v = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idJob, run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
-                "Experiment_idExperiment, Instances_idInstance, curTime()-startTime AS maxTimeLeft FROM " + table + " " +
+                "Experiment_idExperiment, Instances_idInstance, TIMEDIFF(curTime(), startTime) AS maxTimeLeft FROM " + table + " " +
                 "WHERE Experiment_idExperiment=?;");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
@@ -299,7 +299,7 @@ public class ExperimentResultDAO {
         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idJob, run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
-                "Experiment_idExperiment, Instances_idInstance, curTime()-startTime AS maxTimeLeft FROM " + table + " " +
+                "Experiment_idExperiment, Instances_idInstance, TIMEDIFF(curTime(), startTime) AS maxTimeLeft FROM " + table + " " +
                 "WHERE Experiment_idExperiment=? AND run=?;");
         st.setInt(1, eid);
         st.setInt(2, run);
@@ -344,7 +344,7 @@ public class ExperimentResultDAO {
         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idJob, run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
-                "Experiment_idExperiment, Instances_idInstance, curTime()-startTime AS maxTimeLeft FROM " + table + " " +
+                "Experiment_idExperiment, Instances_idInstance, TIMEDIFF(curTime(), startTime) AS maxTimeLeft FROM " + table + " " +
                 "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=?;");
         st.setInt(1, sc.getExperiment_id());
         st.setInt(2, sc.getId());
@@ -361,7 +361,7 @@ public class ExperimentResultDAO {
         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idJob, run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
-                "Experiment_idExperiment, Instances_idInstance, curTime()-startTime AS maxTimeLeft FROM " + table + " " +
+                "Experiment_idExperiment, Instances_idInstance, TIMEDIFF(curTime(), startTime) AS maxTimeLeft FROM " + table + " " +
                 "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=? AND status=?;");
         st.setInt(1, sc.getExperiment_id());
         st.setInt(2, sc.getId());
@@ -396,7 +396,7 @@ public class ExperimentResultDAO {
         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idJob, run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
-                "Experiment_idExperiment, Instances_idInstance, curTime()-startTime AS maxTimeLeft FROM " + table + " " +
+                "Experiment_idExperiment, Instances_idInstance, TIMEDIFF(curTime(), startTime) AS maxTimeLeft FROM " + table + " " +
                 "WHERE Experiment_idExperiment=? AND Instances_idInstance=?;");
         st.setInt(1, ehi.getExperiment_id());
         st.setInt(2, ehi.getInstances_id());
@@ -413,7 +413,7 @@ public class ExperimentResultDAO {
         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idJob, run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
-                "Experiment_idExperiment, Instances_idInstance, curTime()-startTime AS maxTimeLeft FROM " + table + " " +
+                "Experiment_idExperiment, Instances_idInstance, TIMEDIFF(curTime(), startTime) AS maxTimeLeft FROM " + table + " " +
                 "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=? AND status=? AND run=? " +
                 "ORDER BY time");
         st.setInt(1, sc.getExperiment_id());
