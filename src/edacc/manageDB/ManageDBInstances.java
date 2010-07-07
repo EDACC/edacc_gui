@@ -392,7 +392,7 @@ public class ManageDBInstances implements Observer{
              tmp.setAll(errorsDB);
              EDACCExtendedWarning.showMessageDialog(
                      EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
-                     "The following instances are already in the database.",
+                     "The following instances are already in the database. (Equal name or md5 hash)",
                      new JTable(tmp));
         }
         
@@ -467,7 +467,7 @@ public class ManageDBInstances implements Observer{
              tmp.setAll(errorsDB);
              EDACCExtendedWarning.showMessageDialog(
                      EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
-                     "The following instances are already in the database.",
+                     "The following instances are already in the database. (Equal name or md5 hash)",
                      new JTable(tmp)); 
         }
         return instances;
@@ -704,7 +704,7 @@ public class ManageDBInstances implements Observer{
         for(int i = 0; i < tmp.length; i++){
             if(tmp[i] == System.getProperty("file.separator").toCharArray()[0]){
                 count++;
-                if(searchDepth == count){
+                if(searchDepth == count || !tmpString.substring(0, i).contains("" + System.getProperty("file.separator").toCharArray()[0])){
                     return tmpString.substring(0, i);
                 }
             }

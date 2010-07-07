@@ -30,9 +30,10 @@ public class InstanceDAO {
             float ratio, int maxClauseLength, String md5, InstanceClass instanceClass) throws SQLException, FileNotFoundException,
             InstanceAlreadyInDBException {
         PreparedStatement ps;
-        final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ?";
+        final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ? OR name = ?";
         ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
         ps.setString(1, md5);
+        ps.setString(2, name);
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
             throw new InstanceAlreadyInDBException();
