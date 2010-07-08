@@ -69,7 +69,6 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setModal(true);
         setName("Form"); // NOI18N
-        setResizable(false);
 
         comboSolvers.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         comboSolvers.setToolTipText(resourceMap.getString("comboSolvers.toolTipText")); // NOI18N
