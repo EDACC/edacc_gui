@@ -66,7 +66,6 @@ CREATE  TABLE IF NOT EXISTS `Parameters` (
   `Solver_idSolver` INT NOT NULL ,
   PRIMARY KEY (`idParameter`) ,
   INDEX `fk_Parameters_Solver` (`Solver_idSolver` ASC) ,
-  UNIQUE INDEX `uniqueprefix` (`Solver_idSolver` ASC, `prefix` ASC) ,
   UNIQUE INDEX `uniquename` (`name` ASC, `Solver_idSolver` ASC) ,
   CONSTRAINT `fk_Parameters_Solver`
     FOREIGN KEY (`Solver_idSolver` )
