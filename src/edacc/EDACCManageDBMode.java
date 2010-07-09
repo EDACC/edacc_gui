@@ -1607,8 +1607,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         unsavedChanges = true;
         // show error message if necessary
         tfParametersName.getInputVerifier().shouldYieldFocus(tfParametersName);
-        tfParametersPrefix.getInputVerifier().shouldYieldFocus(tfParametersPrefix);
-
     }
 
     public void showSolverDetails(Solver currentSolver) {
@@ -1659,7 +1657,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
             tfParametersPrefix.setText(currentParameter.getPrefix());
             chkHasNoValue.setSelected(!currentParameter.getHasValue());
             tfParametersName.getInputVerifier().shouldYieldFocus(tfParametersName);
-            tfParametersPrefix.getInputVerifier().shouldYieldFocus(tfParametersPrefix);
         } else {
             tfParametersName.setText("");
             tfParametersOrder.setText("");
