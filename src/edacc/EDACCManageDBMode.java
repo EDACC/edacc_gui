@@ -99,6 +99,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
         parameterTableModel = new ParameterTableModel();
         manageDBParameters = new ManageDBParameters(this, parameterTableModel);
         tableParameters.setModel(parameterTableModel);
+        tableParameters.setRowSorter(new TableRowSorter<ParameterTableModel>(parameterTableModel));
 
         tableSolver.getSelectionModel().addListSelectionListener(new SolverTableSelectionListener(tableSolver, manageDBSolvers));
         tableParameters.getSelectionModel().addListSelectionListener(new ParameterTableSelectionListener(tableParameters, manageDBParameters));
