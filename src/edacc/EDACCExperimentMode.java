@@ -1324,6 +1324,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         if (packageFileChooser.showDialog(this, "Select Package Location") != JFileChooser.APPROVE_OPTION) {
             return;
         }
+        File folder = new File(packageFileChooser.getSelectedFile().getAbsolutePath());
+        if (!folder.exists()) {
+            int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), "The directory " + folder.getAbsolutePath() + " doesn't exist. Should it be created?", "Generate cluster package", javax.swing.JOptionPane.YES_NO_OPTION);
+            if (userInput == 1) {
+                return;
+            } else {
+                folder.mkdirs();
+            }
+        }
 
         File zipFile = new File(packageFileChooser.getSelectedFile().getAbsolutePath() + System.getProperty("file.separator") + expController.getActiveExperiment().getDate().toString() + " - " + expController.getActiveExperiment().getName() + ".zip");
         Tasks.startTask("generatePackage", new Class[]{File.class, edacc.model.Tasks.class}, new Object[]{zipFile, null}, expController, this);
