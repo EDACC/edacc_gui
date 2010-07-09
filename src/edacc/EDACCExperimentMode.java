@@ -80,7 +80,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
     /** Creates new form EDACCExperimentMode */
     public EDACCExperimentMode() {
-        
+
         initComponents();
         expController = new ExperimentController(this, solverConfigPanel);
         /* -------------------------------- experiment tab -------------------------------- */
@@ -159,7 +159,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         resultBrowserRowFilter = new ExperimentResultsBrowserTableModelRowFilter();
         resultsBrowserTableRowSorter.setRowFilter(resultBrowserRowFilter);
         tableJobs.setRowSorter(resultsBrowserTableRowSorter);
-                tableJobs.setDefaultRenderer(Object.class, new EDACCExperimentModeJobsCellRenderer());
+        tableJobs.setDefaultRenderer(Object.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.setDefaultRenderer(String.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.setDefaultRenderer(Float.class, new EDACCExperimentModeJobsCellRenderer());
@@ -201,8 +201,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         DatabaseConnector.getInstance().addObserver(new Observer() {
 
             public void update(Observable o, Object arg) {
-                if (DatabaseConnector.getInstance().isConnected()) {
-                    reinitializeGUI();
+                if (!DatabaseConnector.getInstance().isConnected()) {
+                    if (((EDACCView) EDACCApp.getApplication().getMainView()).getMode() == EDACCExperimentMode.this) {
+                        reinitializeGUI();
+                        ((EDACCView) EDACCApp.getApplication().getMainView()).noMode();
+                        javax.swing.JOptionPane.showMessageDialog(null, "Database connection lost.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
         });
@@ -210,6 +214,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
     public void reinitializeGUI() {
         expController.unloadExperiment();
+        /* experiment tab */
+        expTableModel.setExperiments(null);
+        /* end of experiment tab */
         /* instance tab */
         btnDeselectAllInstnaceClassesActionPerformed(null);
         rowFilter.filter_maxClauseLength = false;
@@ -653,7 +660,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 967, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 996, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -1130,6 +1137,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         txtJobsTimer.setText(resourceMap.getString("txtJobsTimer.text")); // NOI18N
         txtJobsTimer.setToolTipText(resourceMap.getString("txtJobsTimer.toolTipText")); // NOI18N
         txtJobsTimer.setName("txtJobsTimer"); // NOI18N
+        txtJobsTimer.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtJobsTimerKeyReleased(evt);
+            }
+        });
 
         chkJobsTimer.setText(resourceMap.getString("chkJobsTimer.text")); // NOI18N
         chkJobsTimer.setToolTipText(resourceMap.getString("chkJobsTimer.toolTipText")); // NOI18N
@@ -1289,7 +1301,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         } else if (manageExperimentPane.getSelectedIndex() == 5) {
             // Analyse tab
             try {
-            expController.checkForR();
+                expController.checkForR();
             } catch (Exception e) {
                 javax.swing.JOptionPane.showMessageDialog(null, "Error while initializing R: " + e.getMessage(), "Analyse", javax.swing.JOptionPane.ERROR_MESSAGE);
                 return;
@@ -1385,6 +1397,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             this.btnLoadExperiment();
         }
     }//GEN-LAST:event_tableExperimentsMouseClicked
+
+    private void txtJobsTimerKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtJobsTimerKeyReleased
+        txtJobsTimer.setText(getNumberText(txtJobsTimer.getText()));
+        if (chkJobsTimer.isSelected()) {
+            chkJobsTimer.setSelected(false);
+            stopJobsTimer();
+        }
+    }//GEN-LAST:event_txtJobsTimerKeyReleased
 
     public void stopJobsTimer() {
         if (jobsTimer != null) {
@@ -1935,7 +1955,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                     exp.setDescription(oldDescr);
                     createDatabaseErrorMessage(ex);
                 }
-                // TODO: save exp!
                 for (int i = 0; i < expTableModel.getRowCount(); i++) {
                     if (expTableModel.getExperimentAt(i) == exp) {
                         expTableModel.fireTableRowsUpdated(i, i);

@@ -17,6 +17,8 @@ import edacc.model.GridQueueDAO;
 import edacc.model.NoConnectionToDBException;
 import java.awt.Color;
 import java.sql.SQLException;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Vector;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -49,6 +51,21 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "A database error occured while loading the dialog: " + ex.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
+        }
+        GridQueuesController.getInstance().addObserver(new Observer() {
+
+            public void update(Observable o, Object arg) {
+                if (GridQueuesController.getInstance().getChosenQueue() != null) {
+                    lblSelected.setText(GridQueuesController.getInstance().getChosenQueue().getName());
+                } else {
+                    lblSelected.setText("None");
+                }
+            }
+        });
+        if (GridQueuesController.getInstance().getChosenQueue() != null) {
+            lblSelected.setText(GridQueuesController.getInstance().getChosenQueue().getName());
+        } else {
+            lblSelected.setText("None");
         }
     }
 
@@ -236,12 +253,12 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
 
     private void btnChooseQueue(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseQueue
         GridQueue selected = (GridQueue) listQueues.getSelectedValue();
-        if (selected == null) {
-            return;
-        }
+       // if (selected == null) {
+       //     return;
+       // }
         GridQueuesController.getInstance().setChosenQueue(selected);
         //lblChosenQueue.setText("Chosen queue: " + selected.getName());
-        this.lblSelected.setText(selected.getName());
+       // this.lblSelected.setText(selected.getName());
     }//GEN-LAST:event_btnChooseQueue
 
     private void btnCancel(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancel
@@ -263,10 +280,11 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
                     GridQueueDAO.remove(q);
                 }
             }
-            if (queuesInExp.size() > 0)
+            if (queuesInExp.size() > 0) {
                 EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS,
                         EDACCApp.getApplication().getMainFrame(),
                         "The following queues couldn't be removed, because they are used in an experiment:", new JTable(new VectorTableModel(queuesInExp)));
+            }
 //                EDACCApp.getApplication().show(new EDACCExtWarningErrorDialog(this, true, false,
 //                        new VectorTableModel(queuesInExp),
 //                        "The following queues couldn't be removed, because they are used in an experiment:"));
@@ -280,8 +298,9 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnRemoveQueue
 
     private void tableClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableClicked
-        if (evt.getClickCount() == 2)
+        if (evt.getClickCount() == 2) {
             btnEditQueue.doClick();
+        }
     }//GEN-LAST:event_tableClicked
 
     public void refreshView() throws NoConnectionToDBException, SQLException {

@@ -367,11 +367,11 @@ delimiter ;
 
 DROP EVENT IF EXISTS MONITOR_JOBS;
 
-CREATE EVENT MONITOR_JOBS
+CREATE EVENT IF NOT EXISTS MONITOR_JOBS
 ON SCHEDULE EVERY '20' MINUTE
 DO
 UPDATE ExperimentResults SET status=-1 WHERE idJob IN (
-SELECT idJob FROM Experiment JOIN (SELECT * FROM ExperimentResults WHERE status=0) AS ERtmp on Experiment.idExperiment = Experiment_idExperiment WHERE absTime(curTime()-startTime)>timeOut*1.5
+select idJob FROM Experiment JOIN (SELECT * FROM ExperimentResults WHERE status=0) AS ERtmp on Experiment.idExperiment = Experiment_idExperiment WHERE absTime(TIME_TO_SEC(TIMEDIFF(curTime(), startTime)))>timeOut*1.5
 );
 
 SET SQL_MODE=@OLD_SQL_MODE;

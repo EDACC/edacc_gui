@@ -20,7 +20,7 @@ public class ExperimentTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return experiments.size();
+        return experiments==null?0:experiments.size();
     }
 
     @Override
@@ -35,7 +35,7 @@ public class ExperimentTableModel extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int col) {
-        if (experiments.size() == 0) {
+        if (experiments==null || experiments.size() == 0) {
             return String.class;
         }
         return getValueAt(0, col).getClass();
