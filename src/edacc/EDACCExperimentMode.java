@@ -204,8 +204,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                 if (!DatabaseConnector.getInstance().isConnected()) {
                     if (((EDACCView) EDACCApp.getApplication().getMainView()).getMode() == EDACCExperimentMode.this) {
                         reinitializeGUI();
-                        ((EDACCView) EDACCApp.getApplication().getMainView()).noMode();
-                        javax.swing.JOptionPane.showMessageDialog(null, "Database connection lost.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                        if (!"disconnect".equals(arg)) {
+                            ((EDACCView) EDACCApp.getApplication().getMainView()).noMode();
+                            javax.swing.JOptionPane.showMessageDialog(null, "Database connection lost.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 }
             }
@@ -213,6 +215,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
     }
 
     public void reinitializeGUI() {
+
         expController.unloadExperiment();
         /* experiment tab */
         expTableModel.setExperiments(null);
@@ -227,6 +230,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         lblFilterStatus.setText("");
         /* end of instance tab */
         /* job browser tab */
+        try {
+            jobsTableModel.setJobs(null);
+        } catch (SQLException ex) {
+        }
         resultBrowserRowFilter.setInstanceName(null);
         resultBrowserRowFilter.setSolverName(null);
         resultBrowserRowFilter.setStatusCode(null);

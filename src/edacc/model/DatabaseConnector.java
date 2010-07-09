@@ -75,7 +75,7 @@ public class DatabaseConnector extends Observable {
         if (conn != null) {
             conn.close();
             this.setChanged();
-            this.notifyObservers();
+            this.notifyObservers(new String("disconnect"));
         }
     }
 
