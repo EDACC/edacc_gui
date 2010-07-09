@@ -266,7 +266,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         if (getRowCount() == 0) {
             return String.class;
         } else {
-            return getValueAt(0, getIndexForColumn(col)).getClass();
+            return getValueAt(0, col).getClass();
         }
     }
 
