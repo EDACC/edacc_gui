@@ -3,6 +3,7 @@ package edacc.model;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.sql.Time;
 import java.util.Vector;
 
 public class ExperimentResultDAO {
@@ -137,7 +138,12 @@ public class ExperimentResultDAO {
         r.setInstanceId(rs.getInt("Instances_idInstance"));
         r.setExperimentId(rs.getInt("Experiment_idExperiment"));
         if (r.getStatus() == 0) {
-            r.setMaxTimeLeft(rs.getTime("maxTimeLeft"));
+            try {
+                r.setMaxTimeLeft(rs.getTime("maxTimeLeft"));
+            } catch (Exception e) {
+                // happens if the maxTimeLeft field is negative
+                r.setMaxTimeLeft(new Time(0));
+            }
         } else {
             r.setMaxTimeLeft(null);
         }
