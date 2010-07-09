@@ -394,7 +394,7 @@ public class ExperimentController {
             } else {
                 task.setStatus("Deleting jobs..");
                 task.addPropertyChangeListener(cancelExperimentResultDAOStatementListener);
-                try { 
+                try {
                     ExperimentResultDAO.setAutoCommit(false);
                     ExperimentResultDAO.deleteExperimentResults(deletedJobs);
                     task.setStatus("Updating existing jobs..");
@@ -411,7 +411,7 @@ public class ExperimentController {
                         task.setTaskProgress((float) (i + 1) / (runs.size()));
                     }
                     task.setTaskProgress(0.f);
-                    
+
 
                     ExperimentResultDAO.batchUpdateRun(updateJobs);
                 } catch (SQLException ex) {
@@ -544,8 +544,13 @@ public class ExperimentController {
 
     public void loadJobs() {
         try {
+
+
             Vector<ExperimentResult> jobs = ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId());
-            main.jobsTableModel.setJobs(jobs);
+            final ExperimentResultsBrowserTableModel sync = main.jobsTableModel;
+            synchronized (sync) {
+                main.jobsTableModel.setJobs(jobs);
+            }
             System.gc();
         } catch (Exception e) {
             // TODO: shouldn't happen but show message if it does
@@ -733,7 +738,7 @@ public class ExperimentController {
     }
 
     private void addRunScript(ZipOutputStream zos, GridQueue q) throws IOException {
-        String sRun = "#!/bin/bash\n" + 
+        String sRun = "#!/bin/bash\n" +
                 "chmod a-rwx client\n" +
                 "chmod u+rwx client\n" +
                 "chmod a-rwx config\n" +
@@ -847,6 +852,7 @@ public class ExperimentController {
         }
         return false;
     }
+
     public void checkForR() throws REngineInitializationException {
         try {
             System.loadLibrary("jri");

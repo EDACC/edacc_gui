@@ -1395,9 +1395,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
 
                         @Override
                         public void run() {
-                            synchronized (sync) {
-                                Tasks.startTask("loadJobs", expController, EDACCExperimentMode.this, false);
-                            }
+                            Tasks.startTask("loadJobs", expController, EDACCExperimentMode.this, false);
                         }
                     }, 0, period * 1000);
                 } catch (NumberFormatException e) {
