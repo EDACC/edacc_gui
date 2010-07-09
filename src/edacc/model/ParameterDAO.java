@@ -3,6 +3,7 @@ package edacc.model;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.util.Vector;
 
 /**
@@ -28,7 +29,10 @@ public class ParameterDAO {
             final String insertQuery = "INSERT INTO Parameters (name, prefix, value, hasValue, Parameters.order, Solver_idSolver) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setString(1, parameter.getName());
-            ps.setString(2, parameter.getPrefix());
+            if (parameter.getPrefix() == null || parameter.getPrefix().equals(""))
+                ps.setNull(2, Types.VARCHAR);
+            else
+                ps.setString(2, parameter.getPrefix());
             ps.setString(3, parameter.getValue());
             ps.setBoolean(4, parameter.getHasValue());
             ps.setInt(5, parameter.getOrder());
@@ -44,7 +48,10 @@ public class ParameterDAO {
             final String updateQuery = "UPDATE Parameters SET name=?, prefix=?, value=?, hasValue=?, Parameters.order=?, Solver_idSolver=? WHERE idParameter=?";
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
             ps.setString(1, parameter.getName());
-            ps.setString(2, parameter.getPrefix());
+            if (parameter.getPrefix() == null || parameter.getPrefix().equals(""))
+                ps.setNull(2, Types.VARCHAR);
+            else
+                ps.setString(2, parameter.getPrefix());
             ps.setString(3, parameter.getValue());
             ps.setBoolean(4, parameter.getHasValue());
             ps.setInt(5, parameter.getOrder());
