@@ -142,7 +142,7 @@ public class ExperimentResultDAO {
                 r.setMaxTimeLeft(rs.getTime("maxTimeLeft"));
             } catch (Exception e) {
                 // happens if the maxTimeLeft field is negative
-                r.setMaxTimeLeft(new Time(0));
+                r.setMaxTimeLeft(null);
             }
         } else {
             r.setMaxTimeLeft(null);

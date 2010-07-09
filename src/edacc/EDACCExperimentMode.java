@@ -1390,11 +1390,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                         throw new NumberFormatException();
                     }
                     jobsTimer = new Timer();
+                    final ExperimentResultsBrowserTableModel sync = jobsTableModel;
                     jobsTimer.scheduleAtFixedRate(new TimerTask() {
 
                         @Override
                         public void run() {
-                            Tasks.startTask("loadJobs", expController, EDACCExperimentMode.this, false);
+                            synchronized (sync) {
+                                Tasks.startTask("loadJobs", expController, EDACCExperimentMode.this, false);
+                            }
                         }
                     }, 0, period * 1000);
                 } catch (NumberFormatException e) {
@@ -2005,6 +2008,13 @@ class ResultsBrowserTableRowSorter extends TableRowSorter<ExperimentResultsBrows
     public void setModel(ExperimentResultsBrowserTableModel model) {
         super.setModel(model);
         setModelWrapper(new ExperimentResultsBrowserModelWrapper<ExperimentResultsBrowserTableModel>(getModelWrapper()));
+    }
+
+    @Override
+    public void toggleSortOrder(int column) {
+        synchronized (getModel()) {
+            super.toggleSortOrder(column);
+        }
     }
 
     class ExperimentResultsBrowserModelWrapper<M extends TableModel> extends DefaultRowSorter.ModelWrapper<M, Integer> {

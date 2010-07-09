@@ -321,7 +321,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 return j.getSeed();
             case 8:
                 String status = j.getExperimentResultStatus().toString();
-                if (j.getStatus() == 0) {
+                if (j.getStatus() == 0 && j.getMaxTimeLeft() != null) {
                     status += " (" + j.getMaxTimeLeft() + ")";
                 }
                 return status;
