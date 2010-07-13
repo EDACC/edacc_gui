@@ -23,7 +23,6 @@ public class DatabaseConnector extends Observable {
     private String database;
     private String username;
     private String password;
-
     private DatabaseConnector() {
     }
 
@@ -176,5 +175,4 @@ public class DatabaseConnector extends Observable {
     public String getUsername() {
         return username;
     }
-
 }

@@ -130,12 +130,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
             }
         });
         tableInstances.setModel(insTableModel);
-        instanceClassModel = new ExperimentInstanceClassTableModel(tableInstances, expController);
-        tableInstanceClasses.setModel(instanceClassModel);
         sorter = new TableRowSorter<InstanceTableModel>(insTableModel);
         rowFilter = new InstanceTableModelRowFilter();
         tableInstances.setRowSorter(sorter);
         sorter.setRowFilter(rowFilter);
+        instanceClassModel = new ExperimentInstanceClassTableModel(insTableModel, rowFilter, expController);
+        tableInstanceClasses.setModel(instanceClassModel);
         // center third column
         tableInstanceClasses.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
 
@@ -227,6 +227,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         rowFilter.filter_numAtoms = false;
         rowFilter.filter_numClauses = false;
         rowFilter.filter_ratio = false;
+        rowFilter.clearInstanceClassIds();
         lblFilterStatus.setText("");
         /* end of instance tab */
         /* job browser tab */

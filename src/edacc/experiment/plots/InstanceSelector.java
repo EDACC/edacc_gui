@@ -43,10 +43,10 @@ public class InstanceSelector extends JPanel {
         tableModel = new InstanceTableModel();
         table = new JTable(tableModel);
         rowFilter = new InstanceTableModelRowFilter();
+        rowFilter.setFilterInstanceClasses(false);
         sorter = new TableRowSorter<InstanceTableModel>(tableModel);
         table.setRowSorter(sorter);
         sorter.setRowFilter(rowFilter);
-
         TableColumnModel colModel = table.getColumnModel();
         colModel.getColumn(0).setPreferredWidth(350);
         colModel.getColumn(1).setPreferredWidth(15);

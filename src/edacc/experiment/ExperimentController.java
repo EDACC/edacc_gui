@@ -89,6 +89,9 @@ public class ExperimentController {
         Vector<InstanceClass> vic = new Vector<InstanceClass>();
         vic.addAll(InstanceClassDAO.getAll());
         main.instanceClassModel.setClasses(vic);
+        Vector<Instance> instances = new Vector<Instance>();
+        instances.addAll(InstanceDAO.getAll());
+        main.insTableModel.setInstances(instances);
 
     }
 
@@ -115,8 +118,6 @@ public class ExperimentController {
         }
         task.setTaskProgress(.66f);
         task.setStatus("Loading instances..");
-        // cache instances
-        InstanceDAO.getAllByExperimentId(id);
 
         // select instances for the experiment
         main.insTableModel.setExperimentHasInstances(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
@@ -302,6 +303,8 @@ public class ExperimentController {
             }
         }
         task.setStatus("Saving instances..");
+
+
         // First: add all new ExperimentHasInstance objects
         for (Integer instanceId : main.insTableModel.getNewInstanceIds()) {
             ExperimentHasInstanceDAO.createExperimentHasInstance(activeExperiment.getId(), instanceId);
@@ -311,7 +314,6 @@ public class ExperimentController {
         for (ExperimentHasInstance ehi : main.insTableModel.getDeletedExperimentHasInstances()) {
             ExperimentHasInstanceDAO.removeExperimentHasInstance(ehi);
         }
-
         main.insTableModel.setExperimentHasInstances(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
     }
 

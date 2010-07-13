@@ -1,7 +1,6 @@
 package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
-import edacc.experiment.plots.InstanceSelector;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.Instance;
@@ -150,6 +149,4 @@ public class CactusPlot extends Plot {
         solverConfigurationSelector.setSolverConfigurations(SolverConfigurationDAO.getSolverConfigurationByExperimentId(expController.getActiveExperiment().getId()));
         solverConfigurationSelector.btnSelectAll();
     }
-
-
 }

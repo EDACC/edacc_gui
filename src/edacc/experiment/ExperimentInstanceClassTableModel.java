@@ -10,6 +10,8 @@ import edacc.model.InstanceDAO;
 import java.util.Vector;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -20,21 +22,21 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel {
     private String[] columns = {"Name", "Description", "Source", "Show"};
     protected Vector<InstanceClass> classes;
     protected Vector<Boolean> classSelect;
-    protected JTable instanceTable;
+    protected InstanceTableModelRowFilter filter;
+    protected InstanceTableModel model;
     protected ExperimentController expController;
     private boolean update;
 
-    public ExperimentInstanceClassTableModel(JTable tableInstances, ExperimentController expController) {
-        this.classes = new Vector<InstanceClass>();
-        this.classSelect = new Vector<Boolean>();
-        this.instanceTable = tableInstances;
+    public ExperimentInstanceClassTableModel(InstanceTableModel model, InstanceTableModelRowFilter filter, ExperimentController expController) {
         this.expController = expController;
+        this.filter = filter;
+        this.model = model;
         this.update = false;
     }
 
     @Override
     public int getRowCount() {
-        return classes.size();
+        return classes==null?0:classes.size();
     }
 
     @Override
@@ -49,10 +51,11 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int column) {
-        if (column == 3) {
-            return Boolean.class;
+        if (getRowCount() == 0) {
+            return String.class;
+        } else {
+            return getValueAt(0, column).getClass();
         }
-        return String.class;
     }
 
     @Override
@@ -63,7 +66,7 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel {
             case 1:
                 return classes.get(rowIndex).getDescription();
             case 2:
-                return classes.get(rowIndex).isSource()?"\u2713":"";
+                return classes.get(rowIndex).isSource() ? "\u2713" : "";
             case 3:
                 return classSelect.get(rowIndex);
             case 4:
@@ -81,28 +84,15 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel {
         return false;
     }
 
-    public void addClass(InstanceClass instanceClass) {
-        this.classes.add(instanceClass);
-        this.classSelect.add(false);
-    }
-
-    public void addClasses(Vector<InstanceClass> classes) {
-        for (int i = 0; i < classes.size(); i++) {
-            this.classSelect.add(false);
-        }
-        this.classes.addAll(classes);
-    }
-
     public void setClasses(Vector<InstanceClass> classes) {
-        for (int i = 0; i < classes.size(); i++) {
-            this.classSelect.add(false);
+        if (classes != null) {
+            classSelect = new Vector<Boolean>();
+            for (int i = 0; i < classes.size(); i++) {
+                this.classSelect.add(false);
+            }
         }
         this.classes = classes;
-    }
-
-    public void removeClass(int row) {
-        this.classes.remove(row);
-        this.classSelect.remove(row);
+        filter.clearInstanceClassIds();
     }
 
     public void beginUpdate() {
@@ -111,42 +101,26 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel {
 
     public void endUpdate() {
         update = false;
-        try {
-            Vector<InstanceClass> selected = getAllChoosen();
-            if (!selected.isEmpty()) {
-                Vector<Instance> instances = new Vector<Instance>(InstanceDAO.getAllByInstanceClasses(selected));
-                ((InstanceTableModel) instanceTable.getModel()).setInstances(instances);
-            } else {
-                ((InstanceTableModel) instanceTable.getModel()).setInstances(new Vector<Instance>());
-            }
-
-        } catch (Exception ex) {
-        }
         this.fireTableDataChanged();
+        model.fireTableDataChanged();
     }
 
     @Override
     public void setValueAt(Object value, int row, int col) {
         if (col == 3) {
-            classSelect.set(row, (Boolean) value);
-            if (!update) {
-                try {
-                    Vector<InstanceClass> selected = getAllChoosen();
-                    if (!selected.isEmpty()) {
-                        Vector<Instance> instances = new Vector<Instance>(InstanceDAO.getAllByInstanceClasses(selected));
-                        ((InstanceTableModel) instanceTable.getModel()).setInstances(instances);
-                        this.fireTableDataChanged();
-                    } else {
-                        ((InstanceTableModel) instanceTable.getModel()).setInstances(new Vector<Instance>());
-                        this.fireTableDataChanged();
-                    }
+            boolean selected = (Boolean) value;
+            
+            classSelect.set(row, selected);
+            if (selected) {
 
-                } catch (Exception ex) {
-                }
+                filter.addInstanceClassId(classes.get(row).getId());
+            } else {
+                filter.removeInstanceClassId(classes.get(row).getId());
             }
         }
         if (!update) {
             fireTableCellUpdated(row, col);
+            model.fireTableDataChanged();
         }
 
     }

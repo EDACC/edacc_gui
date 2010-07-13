@@ -75,6 +75,10 @@ public class InstanceTableModel extends AbstractTableModel {
         return res;
     }
 
+    public Instance getInstanceAt(int rowIndex) {
+        return instances.get(rowIndex);
+    }
+
     /**
      * Returns a vector with all deselected ExperimentHasInstance objects which
      * were specified by setExperimentHasInstances()
