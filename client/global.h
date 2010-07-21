@@ -30,6 +30,7 @@ typedef enum {success=0, sysError, dbError} status;
 
 typedef struct {
     int id; //experiment id
+    char *name; //name of the experiment
     int numCPUs; // number of cpus
     int timeOut; // timeout for each solver run in seconds
     int numInstances; // number of used instances
@@ -71,8 +72,8 @@ typedef struct {
     /* This is probably not needed anymore
     int idInstance; // the id of the used instance*/
     int statusCode; // solver return value, when the run is finished
-    char startTime[7]; //The time the run started as a '\0' terminated string
-} job;
+    char *startTime; //The time the run started as a '\0' terminated string //startTime[7]
+    } job;
 
 typedef struct {
     int length; // length of the solver

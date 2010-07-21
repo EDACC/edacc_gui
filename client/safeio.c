@@ -34,7 +34,7 @@ int sprintfAlloc(char** str, const char* format, ...) {
 }
 
 int safeGetc(FILE *stream) {
-	int retval;
+/*	int retval;
 	struct timespec req;
 
 	req.tv_sec=0;
@@ -44,11 +44,12 @@ int safeGetc(FILE *stream) {
 	if(nanosleep(&req, NULL)!=0)
 		return EOF;
 
-	return retval;
+	return retval;*/
+	return getc(stream);
 }
 
 int safeFputc(int c, FILE *stream) {
-	int retval;
+/*	int retval;
 	struct timespec req;
 
 	req.tv_sec=0;
@@ -57,7 +58,8 @@ int safeFputc(int c, FILE *stream) {
 	retval=fputc(c, stream);
 	if(nanosleep(&req, NULL)!=0)
 		return EOF;
-	
-	return retval;
+
+	return retval;*/
+	return fputc(c, stream);
 }
 

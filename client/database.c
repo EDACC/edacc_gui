@@ -10,7 +10,8 @@
 
 #define QUERY_EXPERIMENT_INFO "" \
 	"SELECT " \
-	"       timeOut " \
+	"       timeOut, " \
+	"       name " \
 	"   FROM Experiment " \
 	"   WHERE idExperiment = %i "
 
@@ -125,7 +126,7 @@
 	"       binary, " \
 	"       md5 " \
 	"   FROM Solver " \
-	"   WHERE name = '%s' "
+	"   WHERE binaryName = '%s' "
 
 #define QUERY_INSTANCE "" \
 	"SELECT " \
@@ -133,6 +134,10 @@
 	"       md5 " \
 	"   FROM Instances " \
 	"   WHERE name = '%s' "
+
+#define QUERY_TIME "" \
+	"SELECT " \
+	"  CURTIME()"
 
 
 status dbFetchExperimentData(experiment *e) {
@@ -165,6 +170,8 @@ status dbFetchExperimentData(experiment *e) {
 
 	e->id=experimentId;
 
+	e->name=NULL;
+
 	sprintfAlloc(&queryExperimentInfo, QUERY_EXPERIMENT_INFO, experimentId);
 	sprintfAlloc(&queryGridInfo, QUERY_GRID_SETTINGS, gridQueueId);
 	sprintfAlloc(&querySolver, QUERY_SOLVERS, experimentId);
@@ -194,9 +201,13 @@ status dbFetchExperimentData(experiment *e) {
 
 	if((row = mysql_fetch_row(res)) != NULL) {
 		e->timeOut = atoi(row[0]);
+		e->name = malloc(256*sizeof(char));
+		strncpy(e->name, row[1], 256);
 		//TODO:Error Meldung?
 	}
-	logComment(2,"timeOut for jobs = %d s\n",e->timeOut);
+	logComment(2,"Experiment settings \n------------------------------\n");
+	logComment(2,"%20s : %s \n","name of experiment",e->name);
+	logComment(2,"%20s : %d s\n","timeOut for jobs",e->timeOut);
 
 
 	/* fetch grid information */
@@ -216,7 +227,8 @@ status dbFetchExperimentData(experiment *e) {
 		e->numCPUs = atoi(row[0]);
 	}
 
-	logComment(2,"numCpus per Node = %d\n",e->numCPUs);
+	logComment(2,"%20s : %d\n","numCpus per Node",e->numCPUs);
+	logComment(2,"------------------------------\n");
 
 	/* fetch instances */
 	if(mysql_query(conn, queryInstance) != 0) {
@@ -233,8 +245,8 @@ status dbFetchExperimentData(experiment *e) {
 	}
 
 	e->numInstances = mysql_num_rows(res);
-
-	logComment(3,"num instances= %d\n",e->numInstances);
+	logComment(2,"Instances:\n------------------------------\n");
+	logComment(3,"%20s : %d\n","number of instances",e->numInstances);
 
 	if((e->md5Instances = malloc(e->numInstances*sizeof(char *))) == NULL) {
 		mysql_free_result(res);
@@ -255,7 +267,7 @@ status dbFetchExperimentData(experiment *e) {
 	}
 
 	i=0;
-	logComment(4,"instances: \n");
+	logComment(4,"%20s : \n","instances");
 	while((row = mysql_fetch_row(res)) != NULL) {
 		lengths = mysql_fetch_lengths(res);
 		//TODO: Fehler wegen callocs
@@ -268,11 +280,11 @@ status dbFetchExperimentData(experiment *e) {
 
 		e->instanceNames[i] = calloc(lengths[1],sizeof(char*));
 		strncpy(e->instanceNames[i], row[1], lengths[1]);
-		logComment(4,"%s \n",e->instanceNames[i]);
+		logComment(4,"%d. %s \n",i+1,e->instanceNames[i]);
 
 		i++;
 	}
-
+	logComment(2,"------------------------------\n");
 
 
 
@@ -290,8 +302,8 @@ status dbFetchExperimentData(experiment *e) {
 	}
 
 	e->numSolvers = mysql_num_rows(res);
-
-	logComment(3,"num solvers= %d \n",e->numSolvers);
+	logComment(2,"Solvers:\n------------------------------\n");
+	logComment(3,"%20s : %d\n","number of solvers",e->numSolvers);
 
 	if((e->lengthSolver = malloc(e->numSolvers*sizeof(char *))) == NULL) {
 		mysql_free_result(res);
@@ -314,7 +326,7 @@ status dbFetchExperimentData(experiment *e) {
 	}
 
 	i=0;
-	logComment(4,"solvers: \n");
+	logComment(4,"%20s : \n","solvers");
 	while((row = mysql_fetch_row(res)) != NULL) {
 		lengths = mysql_fetch_lengths(res);
 		//TODO: allocs fehler abfangen
@@ -331,11 +343,10 @@ status dbFetchExperimentData(experiment *e) {
 			return sysError;
 		}
 		strncpy(e->solverNames[i], row[2], lengths[2]);
-		logComment(4,"%s \n",e->solverNames[i]);
+		logComment(4,"%d. %s \n",i+1,e->solverNames[i]);
 
 		i++;
 	}
-
 
 	mysql_free_result(res);
 	mysql_close(conn);
@@ -630,7 +641,8 @@ status dbFetchSolver(const char* solverName, solver* s) {
 
 	/* fetch job information */
 	if(mysql_query(conn, querySolver) != 0) {
-		logError("DB error message: %s",mysql_error(conn));
+		logError("DB error message: %s\n",mysql_error(conn));
+		logError("Query lunched: %s\n",querySolver);
 		return dbError;
 	}
 
@@ -705,4 +717,46 @@ void freeInstance(instance *i) {
 	if(i->instance != NULL) {
 		free(i->instance);
 	}
+}
+
+status setMySQLTime(job *j) {
+	MYSQL *conn = NULL;
+	MYSQL_RES *res;
+	MYSQL_ROW row;
+	char *queryTime = NULL;
+	unsigned long *lengths;
+
+
+	sprintfAlloc(&queryTime, QUERY_TIME);
+
+	conn = mysql_init(NULL);
+	if(!mysql_real_connect(conn, host, username, password, database, port, NULL, 0)) {
+		logError("could not establish mysql connection!\n");
+		return dbError;
+	}
+
+	if(mysql_query(conn, queryTime) != 0) {
+			logError("DB error message: %s\n",mysql_error(conn));
+			logError("Query lunched: %s\n",queryTime);
+			return dbError;
+		}
+
+		if((res = mysql_store_result(conn)) == NULL) {
+			logError("DB error message: %s",mysql_error(conn));
+			return dbError;
+		}
+
+		if((row = mysql_fetch_row(res)) != NULL) {
+			//j->startTime=row[0];
+
+			lengths = mysql_fetch_lengths(res);
+			j->startTime = (char *)calloc(lengths[0]+1,sizeof(char));
+			memcpy(j->startTime, row[0], lengths[0]);
+			//printf("StartTime from mysql server= %s", j->startTime);
+		}
+
+
+
+	mysql_close(conn);
+	return success;
 }

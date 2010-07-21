@@ -138,11 +138,11 @@ status read_config() {
         DONE:
         free(lineptr);
     }
-    logComment(1,"information from config-file:\nhost:  %s  \n",host);
-    logComment(1,"username: %s \n",username);
-    logComment(1,"password: **********\n");
-    logComment(1,"DB: %s\n",database);
-    logComment(1,"experiment: %d\n",experimentId);
+    logComment(1,"%20s  %s  \n","host:",host);
+    logComment(1,"%20s  %s  \n","username:",username);
+    logComment(1,"%20s  %s  \n","password:",password);
+    logComment(1,"%20s  %s  \n","database:",database);
+    logComment(1,"%20s  %d  \n","experiment:",experimentId);
     fclose(conf);
     return success;
 }

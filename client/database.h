@@ -33,5 +33,6 @@ status dbFetchInstance(const char* instanceName, instance* i);
 void freeSolver(solver *s);
 void freeInstance(instance *s);
 
+status setMySQLTime(job *j);
 #endif
 

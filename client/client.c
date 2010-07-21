@@ -44,8 +44,10 @@ int timeOut;
 //Returns a unique file name based on pid. The string is located in static memory
 //and must not be freed.
 char* pidToFileName(pid_t pid) {
-	static char fileName[20];
-	snprintf(fileName, 20, "%ld.tmp", (long)pid);
+	static char fileName[40];
+	char* host;
+	host = getenv("HOSTNAME");
+	snprintf(fileName, 40, "%s_%ld.tmp",host, (long)pid); //TODO: Sollte heissen Node.pid (pid ist nur fuer ein node eindeutig)
 	return fileName;
 }
 
@@ -137,9 +139,8 @@ status createFile(const char* fileName, const char* content, size_t contentLen, 
 	//Write the file content. There's no need to check for errors in fwrite here;
 	//if something goes wrong, we'll get an error in the md5 check anyway.
 	fwrite(content, sizeof(char), contentLen, dst);
-
 	//Verify the md5sum
-	rewind(dst);
+	//rewind(dst);
 	if(md5_stream(dst, &md5Buffer)!=0) {
 		logError("Error in md5_stream()\n");
 		fclose(dst);
@@ -150,11 +151,12 @@ status createFile(const char* fileName, const char* content, size_t contentLen, 
 	md5String[32]='\0';
 	posDiff=strcasecmp(md5String, md5sum);
 	if(posDiff!=0) {
-		logError("The md5 sum doesn't match for file: %s\n", fileName);
+		logError("\nThere might be a problem with the md5 sums for file: %s\n", fileName);
 		logError("%20s = %s\n","DB md5 sum",md5sum);
 		logError("%20s = %s\n","Computed md5 sum",md5sum);
 		logError("position where they start to differ = %d\n",posDiff);
 		fclose(dst);
+		remove(fileName);
 		return sysError;
 	}
 
@@ -184,13 +186,16 @@ status init(int argc, char *argv[]) {
 	solverPathLen=strlen(solverPath);
 	instancePathLen=strlen(instancePath);
 	resultPathLen=strlen(resultPath);
-	logComment(1,"base path is: %s\n",basename);
-	logComment(1,"solver path is: %s\n",solverPath);
-	logComment(1,"instance path is: %s\n",instancePath);
-	logComment(1,"result path is: %s\n",resultPath);
+	logComment(1,"%20s : \n","PATH variables");
+	logComment(1,"%20s : %s\n","base path", basename);
+	logComment(1,"%20s : %s\n","solver path",solverPath);
+	logComment(1,"%20s : %s\n","instance path",instancePath);
+	logComment(1,"%20s : %s\n","result path",resultPath);
+	logComment(1,"------------------------------\n");
+	logComment(2,"starting to fetch experiment data:\n------------------------------------------------------------\n");
 
-	logComment(3,"starting to fetch experiment data (downloading if necessary):...\n");
 	s=dbFetchExperimentData(&exp);
+	logComment(2,"------------------------------------------------------------\n");
 	if(s!=success)
 		return s;
 
@@ -357,6 +362,7 @@ void signalHandler(int signum) {
 status processResults(job* j) {
 	char* fileName;
 	char* resultFilePtr;
+	char* temp;
 	FILE* filePtr;
 	FILE* resultFile;
 	int signum, c;
@@ -371,8 +377,13 @@ status processResults(job* j) {
 		return sysError;
 	}
 
+	//time_t rawtime;
+	//time ( &rawtime );
+
+
 	//Parse the temporary result file of j
-	logComment(4, "Trying to open for parsing results: %s\n", fileName);
+
+	logComment(4, "Trying to open for parsing results: %s\n",fileName);
 	filePtr=fopen(fileName, "r");
 	if(filePtr==NULL) {
 		logError("Unable to open %s: %s\n", fileName, strerror(errno));
@@ -380,15 +391,28 @@ status processResults(job* j) {
 		return sysError;
 	}
 
-	if(fscanf(filePtr, "Command terminated by signal %d", &signum)==1) {
+/*	if(fscanf(filePtr, "Command terminated by signal %d", &signum)==1) {//TODO: das hier kann nicht stimmen
+		logComment(4,"Terminating solver due to signal %d\n",signum);
 		//The solver was terminated by signal signum
 		if(signum==SIGXCPU)
 			j->status=2;
 		else
 			j->status=3;
 	} else {
+
+
+		logComment(4,"No signal detected! Trying to parse run-time!\n");*/
+
 		//Extract the solver output
-		do {
+		{do {
+			if(fscanf(filePtr, "Command terminated by signal %d", &signum)==1){ //TODO: das hier kann nicht stimmen
+								logComment(4,"Terminating solver due to signal %d\n",signum);
+								if(signum==SIGXCPU)
+											j->status=2;
+										else
+											j->status=3;
+								continue;
+						}
 			c=getc(filePtr);
 
 			if(c==EOF) {
@@ -397,6 +421,8 @@ status processResults(job* j) {
 				return sysError;
 			}
 		} while(c!=(int)'@');
+
+
 		outputLen=ftell(filePtr);
 		if(outputLen==-1) {
 			logError("Error in ftell(): %s\n", strerror(errno));
@@ -437,6 +463,7 @@ status processResults(job* j) {
 			return sysError;
 		}
 		j->resultFile[outputLen-1]='\0';
+		if (j->status<1)
 		j->status=1;
 		//Append the content of fileName to j->resultFileName
 		rewind(filePtr);
@@ -458,6 +485,8 @@ status processResults(job* j) {
 			free(fileName);
 			return sysError;
 		}
+		//time ( &rawtime );
+		logComment(4, "parsing results from : %s  finished\n",fileName);
 		fclose(resultFile);
 	}
 
@@ -588,8 +617,9 @@ void freeJobArgs() {
 }
 
 //Set the startTime field in j to the current local time
+//TODO : Get db time and set starttime to DB-time
 status setStartTime(job *j) {
-	time_t t;
+/*	time_t t;
 	struct tm *tmp;
 
 	t=time(NULL);
@@ -606,8 +636,8 @@ status setStartTime(job *j) {
 		logError("Error in strftime()\n");
 		return sysError;
 	}
-
-	return success;
+return success;*/
+	return setMySQLTime(j);
 }
 
 void test_main() {
@@ -624,9 +654,9 @@ void test_main() {
 int main(int argc, char *argv[]) {
 	if(argc>1)
 		verbosity=atoi(argv[1]);
+	else
+		verbosity=2; //default value for verbosity
 	cleanMutex(); //TODO: sollte das immer ausgefuehrt werden!?
-
-	//return 0;
 
 	int numJobs;
 	status s;
@@ -636,18 +666,16 @@ int main(int argc, char *argv[]) {
 	instance inst;
 	char* fileName;
 
-	logComment(1,"reading from configuration file...\n");
+	logComment(1,"reading from configuration file...\n------------------------------\n");
 	s=read_config();
+	logComment(1,"------------------------------\n");
 	if(s!=success) {
 		logError("couldn't read config successfully.");
 		exit(s);
 	}
-
-	//test_main();
-	//exit(0);
-
-	logComment(1,"starting the init-process (checking for solvers and instances)\n------------------------------\n");
+	logComment(1,"starting the init-process \n------------------------------\n");
 	s=init(argc, argv);
+	logComment(1,"\n------------------------------\n");
 	if(s!=success) {
 		logError("couldn't init successfully, for experiment %i.\n", experimentId);
 		exit(s);
@@ -679,11 +707,18 @@ int main(int argc, char *argv[]) {
 				}
 				exitClient(s);
 			}
+			logComment(1,"\n------------------------------\n");
 			logComment(2,"job details: \n");
+			logComment(1,"%20s : %d\n","jobID", j->id);
+			logComment(1,"%20s : %s\n","solver", j->solverName);
+			logComment(1,"%20s : %s\n","parameters", j->params);
+			logComment(1,"%20s : %d\n","seed", j->seed);
+			logComment(1,"%20s : %s\n","instance", j->instanceName);
+			logComment(1,"%20s : %s\n","resultFile", j->resultFileName);
 			//TODO: job details ausgeben!
 
 
-			//Set j->startTime to the current local time
+			//Set j->startTime to the DB-time
 			s=setStartTime(j);
 			if(s!=success) {
 				unlockMutex();
@@ -789,6 +824,7 @@ int main(int argc, char *argv[]) {
 			pid=fork();
 			if (pid!=0)
 				logComment(1,"starting job with pid=%d\n",pid);
+
 			if(pid==-1) {
 				logError("Error in fork(): %s\n", strerror(errno));
 				j->status=-2;
@@ -802,6 +838,7 @@ int main(int argc, char *argv[]) {
 					 *                         printf("jobArgs: %s\n", t);
 					 *                     }
 					 */
+					logComment(1,"------------------------------\n");
 					if(execve("/bin/bash", jobArgs, NULL)==-1) {
 						logError("Error in execve(): %s\n", strerror(errno));
 						freeJobArgs();

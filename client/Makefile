@@ -16,8 +16,10 @@ clean:
 # Static build causes many problems. The most serious problem is, that the default glibc 
 # can only be dynamical linked, so mysql may won't work.
 client: client.o log.o signals.o safeio.o mutex.o database.o configuration.o dbmgr.o md5sum.o
-	#$(CC) $(CFLAGS) *.o -o client -pthread `mysql_config --cflags` `mysql_config --libs`
-	$(CC) $(CFLAGS) *.o -o client -pthread -L ./lib -lmysqlclient -lz
+#uncomment next line for use on regular linux machine	
+	$(CC) $(CFLAGS) *.o -o client -pthread `mysql_config --cflags` `mysql_config --libs`
+#uncomment next line to compile on the bwgrid
+	#$(CC) $(CFLAGS) *.o -o client -pthread -L ./lib -lmysqlclient -lz
 	#$(CC) $(CFLAGS) *.o -o client -pthread -L./lib -lmysqlclient -lz -lcrypt -lnsl -lm -L./lib -lssl -lcrypto
 
 
