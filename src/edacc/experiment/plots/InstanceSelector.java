@@ -147,7 +147,8 @@ public class InstanceSelector extends JPanel {
                     (Integer) tableModel.getValueAt(i, 1),
                     (Integer) tableModel.getValueAt(i, 2),
                     (Float) tableModel.getValueAt(i, 3),
-                    (Integer) tableModel.getValueAt(i, 4))) {
+                    (Integer) tableModel.getValueAt(i, 4),
+                    0)) {
                 tableModel.setValueAt(true, i, 5);
             }
         }
@@ -159,7 +160,8 @@ public class InstanceSelector extends JPanel {
                     (Integer) tableModel.getValueAt(i, 1),
                     (Integer) tableModel.getValueAt(i, 2),
                     (Float) tableModel.getValueAt(i, 3),
-                    (Integer) tableModel.getValueAt(i, 4))) {
+                    (Integer) tableModel.getValueAt(i, 4),
+                    0)) {
                 tableModel.setValueAt(false, i, 5);
             }
         }
@@ -171,7 +173,8 @@ public class InstanceSelector extends JPanel {
                     (Integer) tableModel.getValueAt(i, 1),
                     (Integer) tableModel.getValueAt(i, 2),
                     (Float) tableModel.getValueAt(i, 3),
-                    (Integer) tableModel.getValueAt(i, 4))) {
+                    (Integer) tableModel.getValueAt(i, 4),
+                    0)) {
                 tableModel.setValueAt(!((Boolean) tableModel.getValueAt(i, 5)), i, 5);
             }
         }
