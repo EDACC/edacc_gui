@@ -2,7 +2,6 @@ package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentResult;
-import edacc.model.ExperimentResultDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
@@ -25,6 +24,8 @@ class SolverInfos {
  * @author simon
  */
 public class CactusPlot extends Plot {
+    private static final int AVERAGE = -2;
+    private static final int MEDIAN = -1;
     private static final String[] colors = {"red", "green", "blue", "darkgoldenrod1", "darkolivegreen", "darkorchid", "deeppink", "darkgreen", "blue4"};
     private Dependency[] dependencies;
     private JComboBox comboRun;
@@ -47,8 +48,18 @@ public class CactusPlot extends Plot {
         return dependencies;
     }
 
+    @Override
     public void plot(Rengine engine) throws SQLException, DependencyException {
-        if (!(comboRun.getSelectedItem() instanceof Integer)) {
+        super.plot(engine);
+        int run = -3;
+        if ("average".equals(comboRun.getSelectedItem())) {
+            run = AVERAGE;
+        } else if ("median".equals(comboRun.getSelectedItem())) {
+            run = MEDIAN;
+        } else if (comboRun.getSelectedItem() instanceof Integer) {
+            run = (Integer) comboRun.getSelectedItem();
+        }
+        if (run == -3) {
             throw new DependencyException("You have to select a run.");
         }
         Vector<Instance> instances = instanceSelector.getSelectedInstances();
@@ -63,31 +74,49 @@ public class CactusPlot extends Plot {
         for (Instance i: instances) {
             selectedInstanceIds.add(i.getId());
         }
-        int run = (Integer) comboRun.getSelectedItem();
+        
         SolverInfos[] solver = new SolverInfos[solverConfigs.size()];
         double max_y = 0;
         for (int i = 0; i < solver.length; i++) {
             SolverConfiguration sc = solverConfigs.get(i);
-            Vector<ExperimentResult> results = ExperimentResultDAO.getAllBySolverConfigurationAndRunAndStatusOrderByTime(sc, run, 1);
-            
-            for (int k = results.size()-1; k >= 0; k--) {
-                if (!selectedInstanceIds.contains(results.get(k).getInstanceId())) {
-                    results.remove(k);
+
+            double[] resultTimes = new double[selectedInstanceIds.size()];
+            int k = 0;
+            for (Integer instanceId : selectedInstanceIds) {
+                if (run == AVERAGE) {
+                    Vector<ExperimentResult> results = getResults(sc.getId(), instanceId);
+                    for (int j = results.size()-1; j >= 0; j--) {
+                        if (results.get(j).getStatus() != 1) {
+                            results.remove(j);
+                        }
+                    }
+                    resultTimes[k++] = getAverageTime(results);
+                } else if (run == MEDIAN) {
+                    Vector<ExperimentResult> results = getResults(sc.getId(), instanceId);
+                    for (int j = results.size()-1; j >= 0; j--) {
+                        if (results.get(j).getStatus() != 1) {
+                            results.remove(j);
+                        }
+                    }
+                    resultTimes[k++] = getMedianTime(results);
+                } else {
+                    resultTimes[k++] = getResult(sc.getId(), instanceId, run).getTime();
                 }
             }
-
+            java.util.Arrays.sort(resultTimes);
+            
             solver[i] = new SolverInfos();
             solver[i].name = SolverDAO.getById(sc.getSolver_id()).getName();
-            solver[i].xs = new int[results.size()+1];
-            solver[i].ys = new double[results.size()+1];
+            solver[i].xs = new int[resultTimes.length+1];
+            solver[i].ys = new double[resultTimes.length+1];
             
-            int k = 1;
+            k = 1;
             solver[i].xs[0] = 0;
             solver[i].ys[0] = 0;
-            for (ExperimentResult r : results) {
+            for (double time : resultTimes) {
                 solver[i].xs[k] = k;
-                solver[i].ys[k] = r.getTime();
-                if (r.getTime() > max_y) max_y = r.getTime();
+                solver[i].ys[k] = time;
+                if (time > max_y) max_y = time;
                 k++;
             }
         }
@@ -139,6 +168,8 @@ public class CactusPlot extends Plot {
 
     public void loadDefaultValues() throws SQLException {
         comboRun.removeAllItems();
+        comboRun.addItem("average");
+        comboRun.addItem("median");
         for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
             comboRun.addItem(i);
         }

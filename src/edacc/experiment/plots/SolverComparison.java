@@ -3,14 +3,12 @@ package edacc.experiment.plots;
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentResult;
-import edacc.model.ExperimentResultDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.JComboBox;
@@ -23,10 +21,13 @@ import org.rosuda.JRI.Rengine;
  */
 public class SolverComparison extends Plot {
 
+    private static int AVERAGE = -2;
+    private static int MEDIAN = -1;
     private Dependency[] dependencies;
     private JComboBox combo1, combo2, comboRun;
     private JTextField txtMaxValue;
     private InstanceSelector instanceSelector;
+
     public SolverComparison(ExperimentController expController) {
         super(expController);
         combo1 = new JComboBox();
@@ -65,11 +66,21 @@ public class SolverComparison extends Plot {
         return "Comparison between two solvers";
     }
 
+    @Override
     public void plot(final Rengine re) throws SQLException, DependencyException {
+        super.plot(re);
         if (!(combo1.getSelectedItem() instanceof SolverConfiguration) || !(combo2.getSelectedItem() instanceof SolverConfiguration)) {
             throw new DependencyException("You have to select two solvers.");
         }
-        if (!(comboRun.getSelectedItem() instanceof Integer)) {
+        int run = -3;
+        if ("average".equals(comboRun.getSelectedItem())) {
+            run = AVERAGE;
+        } else if ("median".equals(comboRun.getSelectedItem())) {
+            run = MEDIAN;
+        } else if (comboRun.getSelectedItem() instanceof Integer) {
+            run = (Integer) comboRun.getSelectedItem();
+        }
+        if (run == -3) {
             throw new DependencyException("You have to select a run.");
         }
         Vector<Instance> instances = instanceSelector.getSelectedInstances();
@@ -77,7 +88,7 @@ public class SolverComparison extends Plot {
             throw new DependencyException("You have to select instances in order to plot.");
         }
         HashSet<Integer> selectedInstanceIds = new HashSet<Integer>();
-        for (Instance i: instances) {
+        for (Instance i : instances) {
             selectedInstanceIds.add(i.getId());
         }
         double maxValue;
@@ -86,27 +97,60 @@ public class SolverComparison extends Plot {
         } catch (NumberFormatException ex) {
             throw new DependencyException("Expected double value for max value.");
         }
-        int run = (Integer) comboRun.getSelectedItem();
 
         SolverConfiguration xSolverConfig = (SolverConfiguration) combo1.getSelectedItem();
         SolverConfiguration ySolverConfig = (SolverConfiguration) combo2.getSelectedItem();
-        Vector<ExperimentResult> xResults = ExperimentResultDAO.getAllBySolverConfigurationAndStatus(xSolverConfig, 1);
-        Vector<ExperimentResult> yResults = ExperimentResultDAO.getAllBySolverConfigurationAndStatus(ySolverConfig, 1);
-        HashMap<RunInstance, ExperimentResult> hashMap = new HashMap<RunInstance, ExperimentResult>();
-        for (ExperimentResult erx : xResults) {
-            if (erx.getRun() == run && selectedInstanceIds.contains(erx.getInstanceId())) {
-                hashMap.put(new RunInstance(erx.getRun(), erx.getInstanceId()), erx);
-            }
-        }
+
         Vector<Float> xsVec = new Vector<Float>();
         Vector<Float> ysVec = new Vector<Float>();
-        for (ExperimentResult ery : yResults) {
-            ExperimentResult erx = hashMap.get(new RunInstance(ery.getRun(), ery.getInstanceId()));
-            if (erx != null) {
-                xsVec.add(erx.getTime());
-                ysVec.add(ery.getTime());
+        for (Integer instanceId : selectedInstanceIds) {
+            if (run == AVERAGE) {
+                Vector<ExperimentResult> resultsX = getResults(xSolverConfig.getId(), instanceId);
+                Vector<ExperimentResult> resultsY = getResults(ySolverConfig.getId(), instanceId);
+                for (int j = resultsX.size() - 1; j >= 0; j--) {
+                    if (resultsX.get(j).getStatus() != 1) {
+                        resultsX.remove(j);
+                    }
+                }
+                for (int j = resultsY.size() - 1; j >= 0; j--) {
+                    if (resultsY.get(j).getStatus() != 1) {
+                        resultsY.remove(j);
+                    }
+                }
+                if (resultsX.size() == 0 || resultsY.size() == 0) {
+                    continue;
+                }
+                xsVec.add(new Float(super.getAverageTime(resultsX)));
+                ysVec.add(new Float(super.getAverageTime(resultsY)));
+            } else if (run == MEDIAN) {
+                Vector<ExperimentResult> resultsX = getResults(xSolverConfig.getId(), instanceId);
+                Vector<ExperimentResult> resultsY = getResults(ySolverConfig.getId(), instanceId);
+                for (int j = resultsX.size() - 1; j >= 0; j--) {
+                    if (resultsX.get(j).getStatus() != 1) {
+                        resultsX.remove(j);
+                    }
+                }
+                for (int j = resultsY.size() - 1; j >= 0; j--) {
+                    if (resultsY.get(j).getStatus() != 1) {
+                        resultsY.remove(j);
+                    }
+                }
+                if (resultsX.size() == 0 || resultsY.size() == 0) {
+                    continue;
+                }
+                xsVec.add(new Float(super.getMedianTime(resultsX)));
+                ysVec.add(new Float(super.getMedianTime(resultsY)));
+            } else {
+                ExperimentResult xRes = super.getResult(xSolverConfig.getId(), instanceId, run);
+                ExperimentResult yRes = super.getResult(xSolverConfig.getId(), instanceId, run);
+                if (xRes.getStatus() == yRes.getStatus() && xRes.getStatus() != 1) {
+                    continue;
+                }
+                xsVec.add(xRes.getTime());
+                ysVec.add(yRes.getTime());
             }
         }
+
         double[] xs = new double[xsVec.size()];
         double[] ys = new double[ysVec.size()];
         for (int i = 0; i < xsVec.size(); i++) {
@@ -140,6 +184,8 @@ public class SolverComparison extends Plot {
             combo1.addItem(solConfig);
             combo2.addItem(solConfig);
         }
+        comboRun.addItem("average");
+        comboRun.addItem("median");
         for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
             comboRun.addItem(i);
         }

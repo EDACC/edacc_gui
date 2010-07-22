@@ -3,10 +3,10 @@
  *
  * Created on 19.04.2010, 18:07:20
  */
-
 package edacc;
 
 import edacc.model.Tasks;
+import javax.swing.SwingUtilities;
 import org.jdesktop.application.Action;
 
 /**
@@ -14,7 +14,9 @@ import org.jdesktop.application.Action;
  * @author simon
  */
 public class EDACCTaskView extends javax.swing.JDialog {
+
     private Tasks task;
+
     /** Creates new form EDACCTaskView */
     public EDACCTaskView(java.awt.Frame parent, boolean modal, Tasks task) {
         super(parent, modal);
@@ -89,8 +91,6 @@ public class EDACCTaskView extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JLabel lblMessage;
@@ -106,16 +106,23 @@ public class EDACCTaskView extends javax.swing.JDialog {
         lblOperationName.setText(name);
     }
 
-    public void setProgress(double progress) {
-        if (progress == 0.) {
-            progressBar.setIndeterminate(true);
-        } else {
-            if (progressBar.isIndeterminate()) {
-                progressBar.setIndeterminate(false);
+    public void setProgress(final double progress) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                if (progress == 0.) {
+                    progressBar.setIndeterminate(true);
+                } else {
+                    if (progressBar.isIndeterminate()) {
+                        progressBar.setIndeterminate(false);
+                    }
+                    progressBar.setValue((int) (progress * 10));
+                }
+
             }
-            progressBar.setValue((int)(progress*10));
-        }
-        
+        });
+
+
     }
 
     public void setCancelable(boolean cancelable) {
