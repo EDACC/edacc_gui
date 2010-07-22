@@ -49,5 +49,4 @@ public class ExperimentResultsBrowserTableModelRowFilter extends RowFilter<Exper
                 && (solverName == null || solverName.equals(entry.getModel().getSolver(entry.getIdentifier()).getName()))
                 && (statusCode == null || statusCode.equals(entry.getModel().getStatusCode(entry.getIdentifier())));
     }
-
 }

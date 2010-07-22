@@ -159,6 +159,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
         resultBrowserRowFilter = new ExperimentResultsBrowserTableModelRowFilter();
         resultsBrowserTableRowSorter.setRowFilter(resultBrowserRowFilter);
         tableJobs.setRowSorter(resultsBrowserTableRowSorter);
+        resultsBrowserTableRowSorter.setSortsOnUpdates(true);
         tableJobs.setDefaultRenderer(Object.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.setDefaultRenderer(String.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeJobsCellRenderer());
@@ -1610,7 +1611,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                     (Integer) insTableModel.getValueAt(i, 1),
                     (Integer) insTableModel.getValueAt(i, 2),
                     (Float) insTableModel.getValueAt(i, 3),
-                    (Integer) insTableModel.getValueAt(i, 4))) {
+                    (Integer) insTableModel.getValueAt(i, 4),
+                    insTableModel.getInstanceAt(i).getInstanceClass().getId())) {
                 insTableModel.setValueAt(true, i, 5);
             }
         }
@@ -1623,7 +1625,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                     (Integer) insTableModel.getValueAt(i, 1),
                     (Integer) insTableModel.getValueAt(i, 2),
                     (Float) insTableModel.getValueAt(i, 3),
-                    (Integer) insTableModel.getValueAt(i, 4))) {
+                    (Integer) insTableModel.getValueAt(i, 4),
+                    insTableModel.getInstanceAt(i).getInstanceClass().getId())) {
                 insTableModel.setValueAt(false, i, 5);
             }
         }
@@ -1636,7 +1639,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTask
                     (Integer) insTableModel.getValueAt(i, 1),
                     (Integer) insTableModel.getValueAt(i, 2),
                     (Float) insTableModel.getValueAt(i, 3),
-                    (Integer) insTableModel.getValueAt(i, 4))) {
+                    (Integer) insTableModel.getValueAt(i, 4),
+                    insTableModel.getInstanceAt(i).getInstanceClass().getId())) {
                 insTableModel.setValueAt(!((Boolean) insTableModel.getValueAt(i, 5)), i, 5);
             }
         }

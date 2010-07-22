@@ -18,6 +18,7 @@ import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import java.util.HashMap;
 import java.util.HashSet;
+import javax.swing.SwingUtilities;
 
 /**
  * In this class rowIndexes are always the visible rowIndexes and columnIndexes
@@ -156,10 +157,11 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
             for (ParameterInstance param : params) {
                 Parameter solverParameter = ParameterDAO.getById(param.getParameter_id());
-                if (solverParameter.getHasValue())
+                if (solverParameter.getHasValue()) {
                     paramString += solverParameter.getPrefix() + " " + param.getValue();
-                else
-                    paramString += solverParameter.getPrefix()+ " ";
+                } else {
+                    paramString += solverParameter.getPrefix() + " ";
+                }
 
                 if (params.lastElement() != param) {
                     paramString += " ";
@@ -176,48 +178,76 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
      * @param jobs
      * @throws SQLException
      */
-    public void setJobs(Vector<ExperimentResult> jobs) throws SQLException {
-        boolean fullUpdate = false;
+    public void setJobs(final Vector<ExperimentResult> jobs) throws SQLException {
+
+        /*   boolean fullUpdate = false;
         if (this.jobs == null || jobs == null || this.jobs.size() != jobs.size()) {
-            fullUpdate = true;
+        fullUpdate = true;
         }
         LinkedList<Integer> changedRows = new LinkedList<Integer>();
         if (!fullUpdate) {
-            // here: this.jobs.size() == jobs.size() => we only want to update the rows that have changed (GUI)
-            HashMap<ExperimentResult, ExperimentResult> jobMap = new HashMap<ExperimentResult, ExperimentResult>();
-            for (ExperimentResult job: jobs) {
-                jobMap.put(job, job);
-            }
-            for (ExperimentResult job: this.jobs) {
-                if (!jobMap.containsKey(job)) {
-                    // there is a job we don't have in our local table, so we replace
-                    // this.jobs with jobs => fullUpdate
-                    fullUpdate = true;
-                }
-            }
-            if (!fullUpdate) {
-                // update the changed jobs
-                for (int i = 0; i < this.jobs.size(); i++) {
-                    ExperimentResult j1 = this.jobs.get(i);
-                    ExperimentResult j2 = jobMap.get(j1);
-                    if (j1.getStatus() != j2.getStatus() || j1.getTime() != j2.getTime() || j1.getMaxTimeLeft() != j2.getMaxTimeLeft()) {
-                        j1.setStatus(j2.getStatus());
-                        j1.setTime(j2.getTime());
-                        j1.setMaxTimeLeft(j2.getMaxTimeLeft());
-                    }
-                    changedRows.add(i);
-                }
-            }
+        // here: this.jobs.size() == jobs.size() => we only want to update the rows that have changed (GUI)
+        HashMap<ExperimentResult, ExperimentResult> jobMap = new HashMap<ExperimentResult, ExperimentResult>();
+        for (ExperimentResult job: jobs) {
+        jobMap.put(job, job);
         }
-        if (fullUpdate) {
-            this.jobs = jobs;
-            parameterInstances = new HashMap<Integer, Vector<ParameterInstance>>();
-            fireTableDataChanged();
+        for (ExperimentResult job: this.jobs) {
+        if (!jobMap.containsKey(job)) {
+        // there is a job we don't have in our local table, so we replace
+        // this.jobs with jobs => fullUpdate
+        fullUpdate = true;
+        }
+        }
+        if (!fullUpdate) {
+        // update the changed jobs
+        for (int i = 0; i < this.jobs.size(); i++) {
+        ExperimentResult j1 = this.jobs.get(i);
+        ExperimentResult j2 = jobMap.get(j1);
+        if (j1.getStatus() != j2.getStatus() || j1.getTime() != j2.getTime() || j1.getMaxTimeLeft() != j2.getMaxTimeLeft()) {
+        j1.setStatus(j2.getStatus());
+        j1.setTime(j2.getTime());
+        j1.setMaxTimeLeft(j2.getMaxTimeLeft());
+        changedRows.add(i);
+        }
+        }
+        }
+        }*/
+        //  if (fullUpdate) {
+
+        Runnable updateTable = new Runnable() {
+
+            public void run() {
+                ExperimentResultsBrowserTableModel.this.jobs = jobs;
+                parameterInstances = new HashMap<Integer, Vector<ParameterInstance>>();
+                ExperimentResultsBrowserTableModel.this.fireTableDataChanged();
+            }
+        };
+        if (SwingUtilities.isEventDispatchThread()) {
+            // already in EDT
+            updateTable.run();
         } else {
-            for (Integer changedRow: changedRows) {
-                fireTableRowsUpdated(changedRow, changedRow);
+            // we have to run this in the EDT, otherwise sync exceptions
+            try {
+                SwingUtilities.invokeAndWait(updateTable);
+            } catch (Exception _) {
             }
         }
+
+        //  } else {
+        //      fireTableDataChanged();
+        // for (Integer changedRow: changedRows) {
+        //     fireTableRowsUpdated(changedRow, changedRow);
+        // }
+        //  }
+
+
+        //  } else {
+        //      fireTableDataChanged();
+
+        // for (Integer changedRow: changedRows) {
+        //     fireTableRowsUpdated(changedRow, changedRow);
+        // }
+        //  }
     }
 
     public int getIndexForColumn(int col) {
