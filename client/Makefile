@@ -17,9 +17,9 @@ clean:
 # can only be dynamical linked, so mysql may won't work.
 client: client.o log.o signals.o safeio.o mutex.o database.o configuration.o dbmgr.o md5sum.o
 #uncomment next line for use on regular linux machine	
-	$(CC) $(CFLAGS) *.o -o client -pthread `mysql_config --cflags` `mysql_config --libs`
+	#$(CC) $(CFLAGS) *.o -o client -pthread `mysql_config --cflags` `mysql_config --libs`
 #uncomment next line to compile on the bwgrid
-	#$(CC) $(CFLAGS) *.o -o client -pthread -L ./lib -lmysqlclient -lz
+	$(CC) $(CFLAGS) *.o -o client -pthread -L ./mysql/lib -Xlinker -Bstatic -lmysqlclient -lm -lz -Xlinker -Bdynamic
 	#$(CC) $(CFLAGS) *.o -o client -pthread -L./lib -lmysqlclient -lz -lcrypt -lnsl -lm -L./lib -lssl -lcrypto
 
 
@@ -44,7 +44,7 @@ database.o: database.c database.h global.h log.h
 configuration.o: configuration.c configuration.h log.h safeio.h
 	$(CC) $(CFLAGS) -c $<
 
-dbmrg.o: dbmrg.c dbmrg.h
+dbmgr.o: dbmgr.c dbmgr.h
 	$(CC) $(CFLAGS) -c $<
 
 md5sum.o: md5sum.c md5sum.h
