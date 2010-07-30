@@ -10,7 +10,7 @@ package edacc.satinstances;
  * value.
  * @author dgall
  */
-public interface SATInstanceProperty {
+public interface Property {
 
     /**
      *
@@ -23,7 +23,7 @@ public interface SATInstanceProperty {
      * @param f
      * @return the value of the property for a given instance.
      */
-    public Object computeProperty(SATInstance f);
+    public Object computeProperty(PropertyInput f);
 
     public PropertyValueType<?> getPropertyValueType();
 

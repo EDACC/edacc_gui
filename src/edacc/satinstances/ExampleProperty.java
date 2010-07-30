@@ -9,7 +9,7 @@ package edacc.satinstances;
  *
  * @author dgall
  */
-public class ExampleProperty implements SATInstanceProperty {
+public class ExampleProperty implements Property {
 
     @Override
     public String getName() {
@@ -17,7 +17,7 @@ public class ExampleProperty implements SATInstanceProperty {
     }
 
     @Override
-    public Object computeProperty(SATInstance f) {
+    public Object computeProperty(PropertyInput f) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
