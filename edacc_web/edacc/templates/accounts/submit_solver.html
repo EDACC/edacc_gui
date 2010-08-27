@@ -1,0 +1,37 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block title %}Submit Solver{% endblock %}
+{% block content %}
+    <h2>Submit Solver</h2>
+    {% if id %}
+    <div>
+        <img alt="Info" title="Info" src="/static/img/info.png" />
+        You are about to submit a new version of a solver you previously submitted. The old version will be replaced by the new one.
+    </div>
+    {% endif %}
+    <form action="{{url_for('accounts.submit_solver', database=database, id=id)}}" method="post" enctype="multipart/form-data">
+        {{ form.csrf }}
+        <table width="800px">
+            {{ render_field(form.name, size=40, maxlength=255) }}
+            {{ render_field(form.version, size=40, maxlength=255) }}
+            {{ render_field(form.authors, size=40, maxlength=255) }}
+            {{ render_field(form.description, cols=30, rows=5) }}
+            {{ render_field(form.binary) }}
+            {{ render_field(form.code) }}
+            {{ render_field(form.competition_categories, explanation='Hold the Ctrl key to select multiple categories.') }}
+            {{ render_field(form.parameters, size=40) }}
+            <tr>
+                <td></td>
+                <td>Please provide the parameters your solver should use here.
+                    You have to use INSTANCE and SEED (case-sensitive) as variables in the parameter specification.
+                    The system will substitute the instance filename and RNG seed when your solver is run.
+                    <div>Example:<br/>
+                    <span class="command">"INSTANCE -s SEED -wp 0.05 -flag1"</span> will result in e.g. <span class="command">"./binaryName inst1.cnf -s 6441654 -wp 0.05 -flag1"</span>.
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <input type="submit" value="Submit" />
+    </form>
+    {% if error %}{{error}}{% endif %}
+{% endblock %}

@@ -41,8 +41,31 @@ a:hover {
     margin: 5px;
 }
 
+#navigation {
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ccc;
+}
+
+#navigation a {
+    margin-left: 5px;
+    margin-right: 5px;
+    font-weight: bold;
+    color: black;
+}
+
+#navigation a:hover {
+    text-decoration: underline;
+}
+
 #content {
     margin-left: 3px;
+    min-height: 500px;
+    clear: both;
+}
+
+#footer {
+    padding: 3px;
+    border-top: 1px solid #ccc;
 }
 
 #title {
@@ -65,6 +88,7 @@ a:hover {
 #flash {
     text-align: center;
     margin: auto;
+    margin-top: 3px;
     min-width: 25%;
     padding: 5px;
     border: 1px solid black;
@@ -99,6 +123,48 @@ ul {
 
 li {
     margin-top: 5px;
+}
+
+ul.errors {
+    margin: 0;
+    margin-left: 5px;
+    padding: 0;
+}
+
+ul.errors li {
+    list-style-type: none;
+    color: red;
+    margin: 0;
+    padding: 0;
+}
+
+form {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+form table {
+    border-collapse: collapse;
+    border-color: #ccc;
+}
+
+form td, th {
+    font-size: 12px;
+    line-height: 13px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+
+input, textarea, select {
+    margin: 3px;
+    margin-left: 5px;
+    vertical-align: middle;
+    font-family: "Lucida Grande", Verdana, Arial, sans-serif;
+    font-weight: normal;
+    font-size: 12px;
 }
 
 table.details {

@@ -18,10 +18,29 @@
 </head>
 <body>
     <div id="header">
-        <span id="title">EDACC Web Frontend</span>
-        <span id="subtitle">Experiment Design and Administration for Computer Clusters for SAT Solvers</span>
+        <span id="title">{{db}}</span>
+    </div>
+    <div id="navigation">
+        {% if db.is_competition() %}
+        <a href="{{url_for('frontend.competition_overview', database=database)}}">Overview</a>|
+        <a href="{{url_for('frontend.competition_schedule', database=database)}}">Schedule</a>|
+        <a href="{{url_for('frontend.competition_rules', database=database)}}">Rules</a>|
+        <a href="{{url_for('frontend.categories', database=database)}}">Categories</a>|
+        {% if db.is_competition() and not session.logged_in %}
+        {% if db.competition_phase() in (2,) %}
+        <a href="{{url_for('accounts.register', database=database)}}">Register</a>|
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        <a href="{{url_for('frontend.experiments_index', database=database)}}">Results</a>
+        {% if db.is_competition() and session.logged_in %}
+            |<a href="{{url_for('accounts.manage', database=database)}}">Manage</a>
+        {% endif %}
         <span id="admin_login">
-            {% if session.logged_in %}Logged in as {{session.email}} to <a href="{{url_for('frontend.experiments_index', database=session.database)}}">{{session.db}}</a> (<a href="/">Change</a> | <a href="{{url_for('accounts.logout', database=session.database)}}">Logout</a>) | {% endif %}<a href="{{url_for('admin.admin_login')}}">Admin</a> {% if session.admin %}(<a href="{{url_for('admin.admin_logout')}}">Logout</a>){% endif %}<br/>
+            {% if db.is_competition() and not session.logged_in %}
+            <a href="{{url_for('accounts.login', database=database)}}">Login</a>
+            {% endif %}
+            {% if session.logged_in %}Logged in as {{session.email}} (<a href="{{url_for('accounts.logout', database=session.database)}}">Logout</a>) {% endif %}
         </span>
     </div>
     <div id="content">
@@ -36,6 +55,10 @@
           {% endif %}
         {% endwith %}
         {% block content %}{% endblock %}
+    </div>
+    <div id="footer">
+        {% if db.is_competition() %}DEBUG: phase: {{ db.competition_phase()|competition_phase }} {% endif %}
+        <div style="float: right;">EDACC project on <a href="http://sourceforge.net/projects/edacc/">Sourceforge</a> — Code on <a href="http://github.com/ceari/edacc_web">Github</a></div>
     </div>
 </body>
 </html>

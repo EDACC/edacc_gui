@@ -1,0 +1,17 @@
+{% macro render_field(field, explanation=None) %}
+<tr>
+  <td style="vertical-align: middle;">{{ field.label }}</td>
+  <td>
+    {% if field.errors %}
+      <ul class="errors">
+        {% for error in field.errors %}<li>{{ error }}{% endfor %}
+      </ul>
+    {% endif %}
+    {{ field(**kwargs)|safe }}
+    {% if explanation %}
+    <br/>
+    {{ explanation }}
+    {% endif %}
+  </td>
+</tr>
+{% endmacro %}

@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+"""
+    edacc.utils
+    -----------
+
+    Utility functions, jinja2 filters, etc.
+
+    :copyright: (c) 2010 by Daniel Diepold.
+    :license: MIT, see LICENSE for details.
+"""
 
 import random
 from edacc.web import app
@@ -10,21 +19,21 @@ def download_size(value):
     elif value < 1024: return str(value) + " Bytes"
     elif value < 1024*1024: return "%.1f kB" % (value / 1024.0)
     else: return "%.1f MB" % (value / 1024.0 / 1024.0)
-    
+
 def job_status(value):
     """ Translates an integer job status to its string representation """
     if value not in JOB_STATUS:
         return "unknown status"
     else:
         return JOB_STATUS[value]
-    
+
 def job_status_color(value):
     """ Returns an HTML conform color string for the job status """
     if value not in JOB_STATUS:
         return ''
     else:
         return JOB_STATUS_COLOR[value]
-        
+
 def parameter_string(solver_config):
     """ Returns a string of the solver configuration parameters """
     parameters = solver_config.parameter_instances
@@ -37,22 +46,25 @@ def parameter_string(solver_config):
             else:
                 args.append(p.value)
     return " ".join(args)
-        
+
 def launch_command(solver_config):
     """ Returns a string of what the solver launch command looks like given the solver configuration """
     return "./" + solver_config.solver.binaryName + " " + parameter_string(solver_config)
 
 def datetimeformat(value, format='%H:%M / %d-%m-%Y'):
     return value.strftime(format)
-    
+
 def competition_phase(value):
     """ returns a textual label of a competiton phase given by an integer value """
-    if value == 1: return "Submission phase"
-    elif value == 2: return "Experiment creation phase"
-    elif value == 3: return "Competition/Tests running"
-    elif value == 4: return "Competition finished"
+    if value == 1: return "Category Definition Phase"
+    elif value == 2: return "Registration and Submission Phase"
+    elif value == 3: return "Solver Testing Phase"
+    elif value == 4: return "Solver Resubmission Phase"
+    elif value == 5: return "Competition Phase"
+    elif value == 6: return "Release Phase"
+    elif value == 7: return "Post-Release Phase"
     else: return "unknown phase"
-    
+
 
 app.jinja_env.filters['download_size'] = download_size
 app.jinja_env.filters['job_status'] = job_status
@@ -110,7 +122,7 @@ def parse_parameters(parameters):
 random.seed()
 def random_clause(l):
     return [random.randint(0, 1) for _ in xrange(l)]
-    
+
 def random_formula(clauses, clauseLength):
     return [random_clause(clauseLength) for _ in xrange(clauses)]
 
@@ -122,7 +134,7 @@ def assignment(n):
         for a in assignment(n - 1):
             yield a + [0]
             yield a + [1]
-            
+
 def satisfies(a, f):
     sat_clauses = 0
     for clause in f:
@@ -131,7 +143,7 @@ def satisfies(a, f):
     if sat_clauses == len(f):
         return True
     return False
-        
+
 def SAT(f):
     for a in assignment(len(f[0])):
         if satisfies(a, f): return a
