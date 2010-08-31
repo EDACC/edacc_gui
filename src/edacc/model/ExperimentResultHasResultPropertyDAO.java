@@ -21,7 +21,7 @@ public class ExperimentResultHasResultPropertyDAO {
     private static final ObjectCache<ExperimentResultHasResultProperty> cache = new ObjectCache<ExperimentResultHasResultProperty>();
     private static final String deleteQuery = "DELETE FROM " + table + " WHERE idER_h_RP=?";
     private static String updateQuery = "UPDATE " + table + " SET ExperimentResults_idJob=?, ResultProperty_idResultProperty=?, value=? WHERE idER_h_RP=?";
-    private static String insertQuery = "INSERT INTO " + table + " (ExperimentResults_idJob, ResultProperty_idResultProperty, value) VALUES (?, ?, ?)";;
+    private static String insertQuery = "INSERT INTO " + table + " (ExperimentResults_idJob, ResultProperty_idResultProperty, value) VALUES (?, ?, ?)";
 
     /**
      * Creates a new  ExperimentResultHasResultProperty object, saves it into the database and cache, and returns it.
@@ -67,10 +67,9 @@ public class ExperimentResultHasResultPropertyDAO {
             e.setSaved();
         }else if(e.isNew()){
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
-            ps.setInt(1, e.getId());
-            ps.setInt(2, e.getExpResult().getId());
-            ps.setInt(3, e.getResProperty().getId());
-            ps.setString(4, e.getValue());
+            ps.setInt(1, e.getExpResult().getId());
+            ps.setInt(2, e.getResProperty().getId());
+            ps.setString(3, e.getValue());
             ps.executeUpdate();
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
