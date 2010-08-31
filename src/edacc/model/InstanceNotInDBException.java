@@ -9,9 +9,9 @@ package edacc.model;
  *
  * @author rretz
  */
-public class InstaceNotInDBException extends Exception{
+public class InstanceNotInDBException extends Exception{
 
-    public InstaceNotInDBException() {
+    public InstanceNotInDBException() {
     }
 
 }

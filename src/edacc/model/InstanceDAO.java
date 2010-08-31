@@ -246,16 +246,16 @@ public class InstanceDAO {
      * @return Blob of the instance binary.
      * @throws NoConnectionToDBException
      * @throws SQLException
-     * @throws InstaceNotInDBException
+     * @throws InstanceNotInDBException
      */
-    public static Blob getBinary(int id) throws NoConnectionToDBException, SQLException, InstaceNotInDBException {
+    public static Blob getBinary(int id) throws NoConnectionToDBException, SQLException, InstanceNotInDBException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
 
         ResultSet rs = st.executeQuery("SELECT i.instance FROM instances AS i WHERE i.idInstance = " + id);
         if (rs.next()) {
             return rs.getBlob("instance");
         } else {
-            throw new InstaceNotInDBException();
+            throw new InstanceNotInDBException();
         }
     }
 

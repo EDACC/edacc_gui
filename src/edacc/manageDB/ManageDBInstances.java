@@ -12,7 +12,7 @@ import edacc.EDACCManageDBInstanceFilter;
 import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
 import edacc.model.DatabaseConnector;
-import edacc.model.InstaceNotInDBException;
+import edacc.model.InstanceNotInDBException;
 import edacc.model.Instance;
 import edacc.model.InstanceAlreadyInDBException;
 import edacc.model.InstanceClass;
@@ -218,10 +218,10 @@ public class ManageDBInstances implements Observer{
      * @throws IOException
      * @throws NoConnectionToDBException
      * @throws SQLException
-     * @throws InstaceNotInDBException
+     * @throws InstanceNotInDBException
      */
     public void exportInstances(int[] rows, String path, Tasks task) throws IOException, NoConnectionToDBException, SQLException,
-            InstaceNotInDBException, FileNotFoundException, MD5CheckFailedException,
+            InstanceNotInDBException, FileNotFoundException, MD5CheckFailedException,
             NoSuchAlgorithmException{
         task.setOperationName("Exporting instances");
 

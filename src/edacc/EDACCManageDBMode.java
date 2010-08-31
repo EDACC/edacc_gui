@@ -11,7 +11,7 @@
 package edacc;
 
 import edacc.manageDB.*;
-import edacc.model.InstaceNotInDBException;
+import edacc.model.InstanceNotInDBException;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.MD5CheckFailedException;
@@ -1771,7 +1771,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEv
                         "SQL-Exception: " + e.getMessage(),
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
-            } else if (e instanceof InstaceNotInDBException) {
+            } else if (e instanceof InstanceNotInDBException) {
                 JOptionPane.showMessageDialog(panelManageDBInstances,
                         "There is a problem with the data consistency ",
                         "Error",

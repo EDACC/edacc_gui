@@ -446,4 +446,25 @@ public class ExperimentResultDAO {
             }
         }
     }
+
+    /**
+     *
+     * @param id of the requested ExperimentResult
+     * @return the ExperimentResult object with the given id
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws ExperimentResultNotInDBException
+     * @author rretz
+     */
+    public static ExperimentResult getById(int id) throws NoConnectionToDBException, SQLException, ExperimentResultNotInDBException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT idJob run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
+                "Experiment_idExperiment, Instances_idInstance, TIMEDIFF(curTime(), startTime) AS maxTimeLeft FROM " + table + " " +
+                "WHERE idJob=?;");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        if(!rs.next())
+            throw new ExperimentResultNotInDBException();
+        return getExperimentResultFromResultSet(rs);
+    }
 }

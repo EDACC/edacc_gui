@@ -13,15 +13,24 @@ import edacc.satinstances.PropertyValueType;
  *
  * @author rretz
  */
-public class ResultProperty implements Property{
+public class ResultProperty extends BaseModel implements IntegerPKModel, Property{
 
+   private int id;
    private String name;
    private String prefix;
    private String description;
+   private PropertyValueType valueType;
+
+    public void setValueType(PropertyValueType valueType) {
+        this.valueType = valueType;
+        if (this.isSaved())
+            this.setModified();
+    }
 
 
     public void setName(String name){
-        this.name = name;
+        if (this.isSaved())
+            this.setModified();
     }
     
     @Override
@@ -49,6 +58,8 @@ public class ResultProperty implements Property{
 
     public void setPrefix(String prefix) {
         this.prefix = prefix;
+        if (this.isSaved())
+            this.setModified();
     }
 
     public String getDescription() {
@@ -57,6 +68,20 @@ public class ResultProperty implements Property{
 
     public void setDescription(String description) {
         this.description = description;
+        if (this.isSaved())
+            this.setModified();
+    }
+
+    @Override
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id){
+        this.id = id;
+        if (this.isSaved())
+            this.setModified();
+
     }
 
 }
