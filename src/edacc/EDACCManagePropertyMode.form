@@ -114,7 +114,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="panelManageResultPropertyTable" pref="209" max="32767" attributes="0"/>
+                              <Component id="panelManageResultPropertyTable" pref="276" max="32767" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Component id="panelManageResultPropertyShowButtons" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>

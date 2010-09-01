@@ -13,7 +13,7 @@ package edacc;
 
 /**
  *
- * @author Robert
+ * @author rretz
  */
 public class EDACCManagePropertyMode extends javax.swing.JPanel {
 
