@@ -5,7 +5,6 @@
 
 package edacc.model;
 
-import edacc.satinstances.Property;
 import edacc.satinstances.PropertyInput;
 import edacc.satinstances.PropertyValueType;
 
@@ -13,7 +12,7 @@ import edacc.satinstances.PropertyValueType;
  *
  * @author rretz
  */
-public class ResultProperty extends BaseModel implements IntegerPKModel, Property{
+public class ResultProperty extends BaseModel implements IntegerPKModel{
 
    private int id;
    private String name;
@@ -33,17 +32,10 @@ public class ResultProperty extends BaseModel implements IntegerPKModel, Propert
             this.setModified();
     }
     
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
-    public Object computeProperty(PropertyInput f) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public PropertyValueType<?> getPropertyValueType() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
