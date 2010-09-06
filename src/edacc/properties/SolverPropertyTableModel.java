@@ -14,7 +14,7 @@ import javax.swing.table.AbstractTableModel;
  * @author rretz
  */
 public class SolverPropertyTableModel extends AbstractTableModel {
-    private String[] columns = {"Name", "Prefix", "Valuetype"};
+    private String[] columns = {"Name", "Prefix", "Value type", "Property type"};
     private Vector<SolverProperty> rows;
 
     /**
@@ -38,7 +38,7 @@ public class SolverPropertyTableModel extends AbstractTableModel {
     /**
      * Returns the value of the requested cell. ColumnIndex of 0 returns a String representing the name of the SolverProperty.
      * ColumnIndex of 1 returns a String representing the prefix of the SolverProperty. ColumnIndex 2 returns
-     * the PropertyValueType object of the SolverProperty and a ColumnIndex of 3 returns the SolverProperty object.
+     * the PropertyValueType object of the SolverProperty. ColumnIndex of 3 returns the SolverPropertyType and a ColumnIndex of 4 returns the SolverProperty object.
      *
      * @param rowIndex
      * @param columnIndex
@@ -54,6 +54,8 @@ public class SolverPropertyTableModel extends AbstractTableModel {
             case 2:
                 return rows.get(rowIndex).getPropertyValueType();
             case 3:
+                return rows.get(rowIndex).getSolverPropertyType();
+            case 4:
                 return rows.get(rowIndex);
             default:
                 return "";

@@ -5,6 +5,8 @@
 
 package edacc.satinstances;
 
+import java.util.Vector;
+
 /**
  *
  * @author dgall
@@ -25,4 +27,7 @@ public class PropertyValueTypeManager {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
+    public Vector<PropertyValueType> getAll(){
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
 }

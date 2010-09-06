@@ -44,14 +44,14 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
-        <Container class="javax.swing.JPanel" name="panelManageResultProperty">
+        <Container class="javax.swing.JPanel" name="panelManageSolverProperty">
           <Properties>
-            <Property name="name" type="java.lang.String" value="panelManageResultProperty" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="panelManageSolverProperty" noResource="true"/>
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Result properties">
-                <Property name="tabTitle" type="java.lang.String" resourceKey="panelManageResultProperty.TabConstraints.tabTitle"/>
+                <Property name="tabTitle" type="java.lang.String" resourceKey="panelManageSolverProperty.TabConstraints.tabTitle"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
@@ -87,9 +87,9 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout"/>
               <SubComponents>
-                <Container class="javax.swing.JPanel" name="panelMangeResultPropertyShow">
+                <Container class="javax.swing.JPanel" name="panelMangeSolverPropertyShow">
                   <Properties>
-                    <Property name="name" type="java.lang.String" value="panelMangeResultPropertyShow" noResource="true"/>
+                    <Property name="name" type="java.lang.String" value="panelMangeSolverPropertyShow" noResource="true"/>
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
@@ -103,8 +103,8 @@
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="panelManageResultPropertyTable" alignment="0" pref="586" max="32767" attributes="0"/>
-                                  <Component id="panelManageResultPropertyShowButtons" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="panelManageSolverPropertyTable" alignment="0" pref="586" max="32767" attributes="0"/>
+                                  <Component id="panelManageSolverPropertyShowButtons" alignment="0" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -114,18 +114,18 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="panelManageResultPropertyTable" pref="276" max="32767" attributes="0"/>
+                              <Component id="panelManageSolverPropertyTable" pref="276" max="32767" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="panelManageResultPropertyShowButtons" min="-2" max="-2" attributes="0"/>
+                              <Component id="panelManageSolverPropertyShowButtons" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
                   </Layout>
                   <SubComponents>
-                    <Container class="javax.swing.JPanel" name="panelManageResultPropertyShowButtons">
+                    <Container class="javax.swing.JPanel" name="panelManageSolverPropertyShowButtons">
                       <Properties>
-                        <Property name="name" type="java.lang.String" value="panelManageResultPropertyShowButtons" noResource="true"/>
+                        <Property name="name" type="java.lang.String" value="panelManageSolverPropertyShowButtons" noResource="true"/>
                       </Properties>
 
                       <Layout>
@@ -133,9 +133,9 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="buttonNewResultProperty" linkSize="1" min="-2" pref="57" max="-2" attributes="0"/>
+                                  <Component id="buttonNewSolverProperty" linkSize="1" min="-2" pref="57" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="buttonRemoveResultProperty" linkSize="1" min="-2" max="-2" attributes="0"/>
+                                  <Component id="buttonRemoveSolverProperty" linkSize="1" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace pref="428" max="32767" attributes="0"/>
                               </Group>
                           </Group>
@@ -145,8 +145,8 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="buttonNewResultProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="buttonRemoveResultProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="buttonNewSolverProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="buttonRemoveSolverProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="32767" attributes="0"/>
                               </Group>
@@ -154,23 +154,26 @@
                         </DimensionLayout>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JButton" name="buttonNewResultProperty">
+                        <Component class="javax.swing.JButton" name="buttonNewSolverProperty">
                           <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="buttonNewResultProperty.text"/>
-                            <Property name="name" type="java.lang.String" value="buttonNewResultProperty" noResource="true"/>
+                            <Property name="text" type="java.lang.String" resourceKey="buttonNewSolverProperty.text"/>
+                            <Property name="name" type="java.lang.String" value="buttonNewSolverProperty" noResource="true"/>
                           </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonNewSolverPropertyActionPerformed"/>
+                          </Events>
                         </Component>
-                        <Component class="javax.swing.JButton" name="buttonRemoveResultProperty">
+                        <Component class="javax.swing.JButton" name="buttonRemoveSolverProperty">
                           <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="buttonRemoveResultProperty.text"/>
-                            <Property name="name" type="java.lang.String" value="buttonRemoveResultProperty" noResource="true"/>
+                            <Property name="text" type="java.lang.String" resourceKey="buttonRemoveSolverProperty.text"/>
+                            <Property name="name" type="java.lang.String" value="buttonRemoveSolverProperty" noResource="true"/>
                           </Properties>
                         </Component>
                       </SubComponents>
                     </Container>
-                    <Container class="javax.swing.JScrollPane" name="panelManageResultPropertyTable">
+                    <Container class="javax.swing.JScrollPane" name="panelManageSolverPropertyTable">
                       <Properties>
-                        <Property name="name" type="java.lang.String" value="panelManageResultPropertyTable" noResource="true"/>
+                        <Property name="name" type="java.lang.String" value="panelManageSolverPropertyTable" noResource="true"/>
                       </Properties>
                       <AuxValues>
                         <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
@@ -178,7 +181,7 @@
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
                       <SubComponents>
-                        <Component class="javax.swing.JTable" name="tableResultProperty">
+                        <Component class="javax.swing.JTable" name="tableSovlerProperty">
                           <Properties>
                             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                               <Table columnCount="4" rowCount="4">
@@ -188,16 +191,16 @@
                                 <Column editable="true" title="Title 4" type="java.lang.Object"/>
                               </Table>
                             </Property>
-                            <Property name="name" type="java.lang.String" value="tableResultProperty" noResource="true"/>
+                            <Property name="name" type="java.lang.String" value="tableSovlerProperty" noResource="true"/>
                           </Properties>
                         </Component>
                       </SubComponents>
                     </Container>
                   </SubComponents>
                 </Container>
-                <Container class="javax.swing.JPanel" name="panelManageResultPropertyEdit">
+                <Container class="javax.swing.JPanel" name="panelManageSolverPropertyEdit">
                   <Properties>
-                    <Property name="name" type="java.lang.String" value="panelManageResultPropertyEdit" noResource="true"/>
+                    <Property name="name" type="java.lang.String" value="panelManageSolverPropertyEdit" noResource="true"/>
                   </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
@@ -208,15 +211,11 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
+                          <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="panelManageResultPropertyEditInput" alignment="1" max="32767" attributes="0"/>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="buttonSaveResultProperty" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="panelManageResultPropertyEditButtons" max="32767" attributes="0"/>
-                                  </Group>
+                                  <Component id="panelManageSolverPropertyEditInput" max="32767" attributes="0"/>
+                                  <Component id="panelManageSolverPropertyEditButtons" alignment="1" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -225,45 +224,55 @@
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="panelManageResultPropertyEditInput" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="panelManageResultPropertyEditButtons" min="-2" max="-2" attributes="0"/>
-                                  <Component id="buttonSaveResultProperty" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <EmptySpace min="-2" max="-2" attributes="0"/>
+                              <Component id="panelManageSolverPropertyEditInput" max="32767" attributes="0"/>
+                              <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+                              <Component id="panelManageSolverPropertyEditButtons" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
                   </Layout>
                   <SubComponents>
-                    <Container class="javax.swing.JPanel" name="panelManageResultPropertyEditButtons">
+                    <Container class="javax.swing.JPanel" name="panelManageSolverPropertyEditButtons">
                       <Properties>
-                        <Property name="name" type="java.lang.String" value="panelManageResultPropertyEditButtons" noResource="true"/>
+                        <Property name="name" type="java.lang.String" value="panelManageSolverPropertyEditButtons" noResource="true"/>
                       </Properties>
 
                       <Layout>
                         <DimensionLayout dim="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <EmptySpace min="0" pref="523" max="32767" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="buttonSaveSolverProperty" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace pref="519" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
                         </DimensionLayout>
                         <DimensionLayout dim="1">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <EmptySpace min="0" pref="23" max="32767" attributes="0"/>
+                              <Component id="buttonSaveSolverProperty" min="-2" max="-2" attributes="0"/>
                           </Group>
                         </DimensionLayout>
                       </Layout>
+                      <SubComponents>
+                        <Component class="javax.swing.JButton" name="buttonSaveSolverProperty">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" resourceKey="buttonSaveSolverProperty.text"/>
+                            <Property name="enabled" type="boolean" value="false"/>
+                            <Property name="name" type="java.lang.String" value="buttonSaveSolverProperty" noResource="true"/>
+                          </Properties>
+                        </Component>
+                      </SubComponents>
                     </Container>
-                    <Container class="javax.swing.JPanel" name="panelManageResultPropertyEditInput">
+                    <Container class="javax.swing.JPanel" name="panelManageSolverPropertyEditInput">
                       <Properties>
                         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                           <Border info="org.netbeans.modules.form.compat2.border.BevelBorderInfo">
                             <BevelBorder/>
                           </Border>
                         </Property>
-                        <Property name="name" type="java.lang.String" value="panelManageResultPropertyEditInput" noResource="true"/>
+                        <Property name="name" type="java.lang.String" value="panelManageSolverPropertyEditInput" noResource="true"/>
                       </Properties>
 
                       <Layout>
@@ -274,23 +283,32 @@
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
                                           <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="labelResultPropertyPrefix" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              <Component id="labelResultPropertyname" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              <Component id="labelResultPropertyDescription" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              <Component id="labelSolverPropertyPrefix" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              <Component id="labelSolverPropertyname" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              <Component id="labelSolverPropertyDescription" alignment="0" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                           <EmptySpace min="-2" pref="71" max="-2" attributes="0"/>
                                           <Group type="103" groupAlignment="1" attributes="0">
                                               <Component id="jScrollPane1" pref="434" max="32767" attributes="1"/>
-                                              <Component id="textResultPropertyFieldPrefix" pref="434" max="32767" attributes="1"/>
-                                              <Component id="textResultPropertyFieldName" alignment="1" pref="434" max="32767" attributes="1"/>
+                                              <Component id="textSolvertPropertyFieldPrefix" pref="434" max="32767" attributes="1"/>
+                                              <Component id="textSolverPropertyFieldName" alignment="1" pref="434" max="32767" attributes="1"/>
                                           </Group>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
-                                          <Component id="labelResultPropertyValuetype" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" pref="71" max="-2" attributes="0"/>
-                                          <Component id="comboBoxResultPropertyValuetype" min="-2" max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                              <Group type="102" alignment="0" attributes="1">
+                                                  <Component id="labeSolverPropertyType" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace max="32767" attributes="0"/>
+                                                  <Component id="comboBoxSolverPropertyType" min="-2" max="-2" attributes="0"/>
+                                              </Group>
+                                              <Group type="102" alignment="0" attributes="0">
+                                                  <Component id="labelSolverPropertyValuetype" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace min="-2" pref="71" max="-2" attributes="0"/>
+                                                  <Component id="comboBoxSolverPropertyValuetype" min="-2" max="-2" attributes="0"/>
+                                              </Group>
+                                          </Group>
                                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                                          <Component id="buttonResultPropertyAddValueType" min="-2" max="-2" attributes="0"/>
+                                          <Component id="buttonSolverPropertyAddValueType" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -304,27 +322,32 @@
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
                                           <Group type="103" groupAlignment="3" attributes="0">
-                                              <Component id="labelResultPropertyname" alignment="3" min="-2" max="-2" attributes="0"/>
-                                              <Component id="textResultPropertyFieldName" alignment="3" min="-2" max="-2" attributes="0"/>
+                                              <Component id="labelSolverPropertyname" alignment="3" min="-2" max="-2" attributes="0"/>
+                                              <Component id="textSolverPropertyFieldName" alignment="3" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="textResultPropertyFieldPrefix" min="-2" max="-2" attributes="0"/>
+                                          <Component id="textSolvertPropertyFieldPrefix" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
                                           <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
-                                          <Component id="labelResultPropertyPrefix" min="-2" max="-2" attributes="0"/>
+                                          <Component id="labelSolverPropertyPrefix" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="labelResultPropertyDescription" min="-2" max="-2" attributes="0"/>
+                                      <Component id="labelSolverPropertyDescription" min="-2" max="-2" attributes="0"/>
                                       <Component id="jScrollPane1" min="-2" pref="61" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="comboBoxResultPropertyValuetype" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="labelResultPropertyValuetype" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="buttonResultPropertyAddValueType" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="comboBoxSolverPropertyValuetype" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="labelSolverPropertyValuetype" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="buttonSolverPropertyAddValueType" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="labeSolverPropertyType" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="comboBoxSolverPropertyType" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="32767" attributes="0"/>
                               </Group>
@@ -332,32 +355,35 @@
                         </DimensionLayout>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JTextField" name="textResultPropertyFieldName">
+                        <Component class="javax.swing.JTextField" name="textSolverPropertyFieldName">
                           <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="textResultPropertyFieldName.text"/>
-                            <Property name="name" type="java.lang.String" value="textResultPropertyFieldName" noResource="true"/>
+                            <Property name="text" type="java.lang.String" resourceKey="textSolverPropertyFieldName.text"/>
+                            <Property name="enabled" type="boolean" value="false"/>
+                            <Property name="name" type="java.lang.String" value="textSolverPropertyFieldName" noResource="true"/>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JLabel" name="labelResultPropertyname">
+                        <Component class="javax.swing.JLabel" name="labelSolverPropertyname">
                           <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="labelResultPropertyname.text"/>
-                            <Property name="name" type="java.lang.String" value="labelResultPropertyname" noResource="true"/>
+                            <Property name="text" type="java.lang.String" resourceKey="labelSolverPropertyname.text"/>
+                            <Property name="name" type="java.lang.String" value="labelSolverPropertyname" noResource="true"/>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JTextField" name="textResultPropertyFieldPrefix">
+                        <Component class="javax.swing.JTextField" name="textSolvertPropertyFieldPrefix">
                           <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="textResultPropertyFieldPrefix.text"/>
-                            <Property name="name" type="java.lang.String" value="textResultPropertyFieldPrefix" noResource="true"/>
+                            <Property name="text" type="java.lang.String" resourceKey="textSolvertPropertyFieldPrefix.text"/>
+                            <Property name="enabled" type="boolean" value="false"/>
+                            <Property name="name" type="java.lang.String" value="textSolvertPropertyFieldPrefix" noResource="true"/>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JLabel" name="labelResultPropertyPrefix">
+                        <Component class="javax.swing.JLabel" name="labelSolverPropertyPrefix">
                           <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="labelResultPropertyPrefix.text"/>
-                            <Property name="name" type="java.lang.String" value="labelResultPropertyPrefix" noResource="true"/>
+                            <Property name="text" type="java.lang.String" resourceKey="labelSolverPropertyPrefix.text"/>
+                            <Property name="name" type="java.lang.String" value="labelSolverPropertyPrefix" noResource="true"/>
                           </Properties>
                         </Component>
                         <Container class="javax.swing.JScrollPane" name="jScrollPane1">
                           <Properties>
+                            <Property name="enabled" type="boolean" value="false"/>
                             <Property name="name" type="java.lang.String" value="jScrollPane1" noResource="true"/>
                           </Properties>
                           <AuxValues>
@@ -371,50 +397,57 @@
                                 <Property name="columns" type="int" value="20"/>
                                 <Property name="rows" type="int" value="4"/>
                                 <Property name="wrapStyleWord" type="boolean" value="true"/>
+                                <Property name="enabled" type="boolean" value="false"/>
                                 <Property name="name" type="java.lang.String" value="textAreaResultPropertyDescription" noResource="true"/>
                               </Properties>
                             </Component>
                           </SubComponents>
                         </Container>
-                        <Component class="javax.swing.JLabel" name="labelResultPropertyDescription">
+                        <Component class="javax.swing.JLabel" name="labelSolverPropertyDescription">
                           <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="labelResultPropertyDescription.text"/>
-                            <Property name="name" type="java.lang.String" value="labelResultPropertyDescription" noResource="true"/>
+                            <Property name="text" type="java.lang.String" resourceKey="labelSolverPropertyDescription.text"/>
+                            <Property name="name" type="java.lang.String" value="labelSolverPropertyDescription" noResource="true"/>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JComboBox" name="comboBoxResultPropertyValuetype">
+                        <Component class="javax.swing.JComboBox" name="comboBoxSolverPropertyValuetype">
                           <Properties>
                             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                              <StringArray count="4">
-                                <StringItem index="0" value="Item 1"/>
-                                <StringItem index="1" value="Item 2"/>
-                                <StringItem index="2" value="Item 3"/>
-                                <StringItem index="3" value="Item 4"/>
-                              </StringArray>
+                              <StringArray count="0"/>
                             </Property>
-                            <Property name="name" type="java.lang.String" value="comboBoxResultPropertyValuetype" noResource="true"/>
+                            <Property name="enabled" type="boolean" value="false"/>
+                            <Property name="name" type="java.lang.String" value="comboBoxSolverPropertyValuetype" noResource="true"/>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JLabel" name="labelResultPropertyValuetype">
+                        <Component class="javax.swing.JLabel" name="labelSolverPropertyValuetype">
                           <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="labelResultPropertyValuetype.text"/>
-                            <Property name="name" type="java.lang.String" value="labelResultPropertyValuetype" noResource="true"/>
+                            <Property name="text" type="java.lang.String" resourceKey="labelSolverPropertyValuetype.text"/>
+                            <Property name="name" type="java.lang.String" value="labelSolverPropertyValuetype" noResource="true"/>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JButton" name="buttonResultPropertyAddValueType">
+                        <Component class="javax.swing.JButton" name="buttonSolverPropertyAddValueType">
                           <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="buttonResultPropertyAddValueType.text"/>
-                            <Property name="name" type="java.lang.String" value="buttonResultPropertyAddValueType" noResource="true"/>
+                            <Property name="text" type="java.lang.String" resourceKey="buttonSolverPropertyAddValueType.text"/>
+                            <Property name="enabled" type="boolean" value="false"/>
+                            <Property name="name" type="java.lang.String" value="buttonSolverPropertyAddValueType" noResource="true"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JLabel" name="labeSolverPropertyType">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" resourceKey="labeSolverPropertyType.text"/>
+                            <Property name="name" type="java.lang.String" value="labeSolverPropertyType" noResource="true"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JComboBox" name="comboBoxSolverPropertyType">
+                          <Properties>
+                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                              <StringArray count="0"/>
+                            </Property>
+                            <Property name="enabled" type="boolean" value="false"/>
+                            <Property name="name" type="java.lang.String" value="comboBoxSolverPropertyType" noResource="true"/>
                           </Properties>
                         </Component>
                       </SubComponents>
                     </Container>
-                    <Component class="javax.swing.JButton" name="buttonSaveResultProperty">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="buttonSaveResultProperty.text"/>
-                        <Property name="name" type="java.lang.String" value="buttonSaveResultProperty" noResource="true"/>
-                      </Properties>
-                    </Component>
                   </SubComponents>
                 </Container>
               </SubComponents>
