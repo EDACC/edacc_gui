@@ -5,7 +5,7 @@
 
 package edacc.properties;
 
-import edacc.model.ResultProperty;
+import edacc.model.SolverProperty;
 import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 
@@ -13,9 +13,9 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author rretz
  */
-public class ResultPropertyTableModel extends AbstractTableModel {
+public class SolverPropertyTableModel extends AbstractTableModel {
     private String[] columns = {"Name", "Prefix", "Valuetype"};
-    private Vector<ResultProperty> rows;
+    private Vector<SolverProperty> rows;
 
     /**
      *
@@ -36,9 +36,9 @@ public class ResultPropertyTableModel extends AbstractTableModel {
     }
 
     /**
-     * Returns the value of the requested cell. ColumnIndex of 0 returns a String representing the name of the ResultProperty.
-     * ColumnIndex of 1 returns a String representing the prefix of the ResultProperty. ColumnIndex 2 returns
-     * the PropertyValueType object of the ResultProperty and a ColumnIndex of 3 returns the ResultProperty object.
+     * Returns the value of the requested cell. ColumnIndex of 0 returns a String representing the name of the SolverProperty.
+     * ColumnIndex of 1 returns a String representing the prefix of the SolverProperty. ColumnIndex 2 returns
+     * the PropertyValueType object of the SolverProperty and a ColumnIndex of 3 returns the SolverProperty object.
      *
      * @param rowIndex
      * @param columnIndex
@@ -61,19 +61,19 @@ public class ResultPropertyTableModel extends AbstractTableModel {
     }
 
     /**
-     * Adds the given ResultProperty object.
-     * @param resProperty ResultProperty object to add
+     * Adds the given SolverProperty object.
+     * @param resProperty SolverProperty object to add
      */
-    private void addResultProperty(ResultProperty resProperty){
+    private void addResultProperty(SolverProperty resProperty){
         rows.add(resProperty);
 
     }
 
     /**
-     * Adds all given ResultProperty objects.
-     * @param resProperties the ResultProperty objects to add
+     * Adds all given SolverProperty objects.
+     * @param resProperties the SolverProperty objects to add
      */
-    public void addResultProperties(Vector<ResultProperty> resProperties){
+    public void addResultProperties(Vector<SolverProperty> resProperties){
         for(int i = 0; i <= resProperties.size(); i++){
             addResultProperty(resProperties.get(i));
         }
@@ -81,16 +81,16 @@ public class ResultPropertyTableModel extends AbstractTableModel {
     }
 
     /**
-     * Removes the ResultProperty at the given position of the table.
-     * @param rowIndex of the ResultProperty to remove
+     * Removes the SolverProperty at the given position of the table.
+     * @param rowIndex of the SolverProperty to remove
      */
     private void removeResultProperty(int rowIndex){
         rows.remove(rowIndex);
     }
 
     /**
-     * Removes all the ResultProperty objects at the given position of the table.
-     * @param rowIndexes of all ResultProperty objects to remove
+     * Removes all the SolverProperty objects at the given position of the table.
+     * @param rowIndexes of all SolverProperty objects to remove
      */
     public void removeResultProperties(Vector<Integer> rowIndexes){
         for(int i = 0; i <= rowIndexes.size(); i++){

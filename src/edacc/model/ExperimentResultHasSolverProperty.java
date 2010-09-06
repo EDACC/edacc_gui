@@ -9,11 +9,11 @@ package edacc.model;
  *
  * @author rretz
  */
-public class ExperimentResultHasResultProperty extends BaseModel implements IntegerPKModel {
+public class ExperimentResultHasSolverProperty extends BaseModel implements IntegerPKModel {
 
     private int id;
     private ExperimentResult expResult;
-    private ResultProperty resProperty;
+    private SolverProperty solvProperty;
     private String value;
 
     public ExperimentResult getExpResult() {
@@ -26,12 +26,12 @@ public class ExperimentResultHasResultProperty extends BaseModel implements Inte
             this.setModified();
     }
 
-    public ResultProperty getResProperty() {
-        return resProperty;
+    public SolverProperty getSolvProperty() {
+        return solvProperty;
     }
 
-    public void setResProperty(ResultProperty resProperty) {
-        this.resProperty = resProperty;
+    public void setSolvProperty(SolverProperty solvProperty) {
+        this.solvProperty = solvProperty;
         if (this.isSaved())
             this.setModified();
     }

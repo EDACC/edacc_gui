@@ -9,9 +9,9 @@ package edacc.model;
  * This exception is thrown if the requested ExperimentResultHasResultProperty object does not exist in the database.
  * @author Robert
  */
-class ExpResultHasResPropertyNotInDBException extends Exception{
+class ExpResultHasSolvPropertyNotInDBException extends Exception{
 
-    public ExpResultHasResPropertyNotInDBException() {
+    public ExpResultHasSolvPropertyNotInDBException() {
         super("Requested ExperimentResultHasResultProperty object does not exist in the database!");
     }
 
