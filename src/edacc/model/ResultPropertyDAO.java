@@ -5,6 +5,7 @@
 
 package edacc.model;
 
+import edacc.satinstances.PropertyValueType;
 import edacc.satinstances.PropertyValueTypeManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

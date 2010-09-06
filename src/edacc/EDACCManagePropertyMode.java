@@ -11,7 +11,7 @@
 
 package edacc;
 
-import edacc.properties.ManageResultProperties;
+import edacc.properties.ManageSolverProperties;
 import edacc.properties.ResultPropertyTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -20,7 +20,7 @@ import javax.swing.table.TableRowSorter;
  * @author rretz
  */
 public class EDACCManagePropertyMode extends javax.swing.JPanel {
-    private ManageResultProperties manageResultProperties;
+    private ManageSolverProperties manageResultProperties;
     private ResultPropertyTableModel resPropertyTableModel;
 
     /** Creates new form EDACCManagePropertyMode */
@@ -31,7 +31,7 @@ public class EDACCManagePropertyMode extends javax.swing.JPanel {
         resPropertyTableModel = new ResultPropertyTableModel();
         tableResultProperty.setRowSorter(new TableRowSorter<ResultPropertyTableModel>(resPropertyTableModel));
 
-        manageResultProperties = new ManageResultProperties(this, panelManageResultProperty, tableResultProperty);
+        manageResultProperties = new ManageSolverProperties(this, panelManageResultProperty, tableResultProperty);
 
 
 
