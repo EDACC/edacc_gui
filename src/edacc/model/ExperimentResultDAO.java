@@ -1,5 +1,6 @@
 package edacc.model;
 
+import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
@@ -466,5 +467,13 @@ public class ExperimentResultDAO {
         if(!rs.next())
             throw new ExperimentResultNotInDBException();
         return getExperimentResultFromResultSet(rs);
+    }
+
+    public static File getResultFile(int id) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public static File getClientOutput(int id) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

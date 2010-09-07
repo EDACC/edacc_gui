@@ -5,6 +5,9 @@
 
 package edacc.properties;
 
+import edacc.model.ExperimentResult;
+import edacc.model.ExperimentResultDAO;
+import edacc.model.SolverProperty;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,45 +27,62 @@ public class FilePropertyParser {
     }
 
     /**
-     * Parses the properties of the given prefixes from the file given by the filePath.
-     * Only the first appearance of each prefix is used, any other will be ignored.
-     * @param prefix Vector of perfixes to parse for.
-     * @param filePath the path of the file on which the parser shall work.
-     * @return Array with the results of all prefixs used at the given file in ordner of the given prefix Vector
+     * 
+     * @param solvProp
+     * @param expResult
+     * @return
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws NoAllowedSolverPropertyTypeException
      */
-    public String[] parse(Vector<String> prefix, String filePath) throws FileNotFoundException, IOException{
-        File file = new File(filePath);
-        String[] result = new String[prefix.size()];
-        BufferedReader br = new BufferedReader(new FileReader(file));
+    public Vector<String> parse(SolverProperty solvProp, ExperimentResult expResult) throws FileNotFoundException, IOException, NoAllowedSolverPropertyTypeException{
+        File file;
+        if(solvProp.getSolverPropertyType() == SolverPropertyType.ResultFile)
+            file = ExperimentResultDAO.getResultFile(expResult.getId());
+        else if(solvProp.getSolverPropertyType() == SolverPropertyType.ClientOutput)
+            file = ExperimentResultDAO.getClientOutput(expResult.getId());
+        else
+            throw new NoAllowedSolverPropertyTypeException();
         
-        // iterate over all lines of the given file and parse for the given prefix
-        String line;
-        int found = -1;
-        while((line = br.readLine()) != null){
-            StringTokenizer t = new StringTokenizer(line);
-            while(t.hasMoreTokens()){
-                String token = t.nextToken();
-                
-                // add the current token to the result array when the previous token was one of the prefixes
-                if(found != -1){
-                    result[found] = token;
-                    found = -1;
-                } else{
-                   for(int i = 0; i < prefix.size(); i++){
-                        if(result[i] == null){
-                            if(token.equals(prefix.get(i))){
-                               found = i;
-                               break;
-                            }
-                        }
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        Vector<String> res = new Vector<String>();
+        boolean found = false;
+        String buffer;
+        // Parse the complete file, because the Property can have multiple occurences in the file
+        if(solvProp.isMultiple()){
+            StringTokenizer t;
+            while((buffer = br.readLine()) != null){
+                t = new StringTokenizer(buffer);
+                while(t.hasMoreTokens()){
+                    String token = t.nextToken();
+                    if(found){
+                        res.add(token);
+                        found = false;
                     }
+                    else if(token.equals(solvProp.getPrefix()))
+                        found = true;
 
                 }
-                
             }
-
+        // Only parse to the first occurnce of the prefix, because the Property only have one occurence per file
+        }else {
+            StringTokenizer t;
+            while((buffer = br.readLine()) != null){
+                t = new StringTokenizer(buffer);
+                while(t.hasMoreTokens()){
+                    String token = t.nextToken();
+                    if(found){
+                        res.add(token);
+                        break;
+                    }
+                    else if(token.equals(solvProp.getPrefix()))
+                        found = true;
+                    
+                }
+            } 
         }
-        return result;
+
+        return res;
     }
 
 }
