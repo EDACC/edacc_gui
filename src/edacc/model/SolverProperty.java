@@ -7,7 +7,6 @@ package edacc.model;
 
 import edacc.properties.SolverPropertyTypeNotExistException;
 import edacc.properties.SolverPropertyType;
-import edacc.satinstances.PropertyInput;
 import edacc.satinstances.PropertyValueType;
 
 /**
@@ -22,6 +21,22 @@ public class SolverProperty extends BaseModel implements IntegerPKModel{
    private String description;
    private PropertyValueType valueType;
    private SolverPropertyType solvPropertyType;
+   private boolean multiple;
+
+   /**
+    *
+    * @return true if the SolverProperty can have more than one sources in the the file to parse (ResultFile or ClientOutput).
+    */
+    public boolean isMultiple() {
+        return multiple;
+
+    }
+
+    public void setMultiple(boolean multiple) {
+        this.multiple = multiple;
+        if (this.isSaved())
+            this.setModified();
+    }
 
     public void setValueType(PropertyValueType valueType) {
         this.valueType = valueType;

@@ -14,8 +14,8 @@ import javax.swing.table.AbstractTableModel;
  * @author rretz
  */
 public class SolverPropertyTableModel extends AbstractTableModel {
-    private String[] columns = {"Name", "Prefix", "Value type", "Property type"};
-    private Vector<SolverProperty> rows;
+    private String[] columns = {"Name", "Prefix", "Value type", "Property type", "Multiple"};
+    private Vector<SolverProperty> rows = new Vector<SolverProperty>();
 
     /**
      *
@@ -35,10 +35,24 @@ public class SolverPropertyTableModel extends AbstractTableModel {
         return columns.length;
     }
 
+    @Override
+    public String getColumnName(int col) {
+        return columns[col];
+    }
+
+    @Override
+    public Class getColumnClass(int col) {
+        if (this.getRowCount() == 0)
+            return this.getClass();
+        else
+            return getValueAt(0, col).getClass();
+    }
+
     /**
      * Returns the value of the requested cell. ColumnIndex of 0 returns a String representing the name of the SolverProperty.
      * ColumnIndex of 1 returns a String representing the prefix of the SolverProperty. ColumnIndex 2 returns
-     * the PropertyValueType object of the SolverProperty. ColumnIndex of 3 returns the SolverPropertyType and a ColumnIndex of 4 returns the SolverProperty object.
+     * the PropertyValueType object of the SolverProperty. ColumnIndex of 3 returns the SolverPropertyType.
+     * ColumnIndex of 4 returns the multiple status and a ColumnIndex of 5 returns the SolverProperty object.
      *
      * @param rowIndex
      * @param columnIndex
@@ -56,6 +70,8 @@ public class SolverPropertyTableModel extends AbstractTableModel {
             case 3:
                 return rows.get(rowIndex).getSolverPropertyType();
             case 4:
+                return rows.get(rowIndex).isMultiple();
+            case 5:
                 return rows.get(rowIndex);
             default:
                 return "";

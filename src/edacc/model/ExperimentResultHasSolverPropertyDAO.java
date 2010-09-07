@@ -19,10 +19,13 @@ import java.util.Vector;
 public class ExperimentResultHasSolverPropertyDAO {
 
     protected static final String table = "ExperimentResult_has_SolverProperty";
+    protected static final String valueTable = "SolverPropertyValue";
     private static final ObjectCache<ExperimentResultHasSolverProperty> cache = new ObjectCache<ExperimentResultHasSolverProperty>();
     private static final String deleteQuery = "DELETE FROM " + table + " WHERE idER_h_SP=?";
-    private static String updateQuery = "UPDATE " + table + " SET ExperimentResults_idJob=?, SolverProperty_idSolverProperty=?, value=? WHERE idER_h_SP=?";
-    private static String insertQuery = "INSERT INTO " + table + " (ExperimentResults_idJob, SolverProperty_idSolverProperty, value) VALUES (?, ?, ?)";
+    private static String updateQuery = "UPDATE " + table + " SET ExperimentResults_idJob=?, SolverProperty_idSolverProperty=? WHERE idER_h_SP=?";
+    private static String insertQuery = "INSERT INTO " + table + " (ExperimentResults_idJob, SolverProperty_idSolverProperty) VALUES (?, ?)";
+    private static final String deleteValueQuery = "DELETE FROM " + valueTable + " WHERE ExperimentResult_has_SolverProperty_idER_h_SP=?";
+    private static String insertValueQuery = "INSERT INTO " + valueTable + " (ExperimentResult_has_SolverProperty_idER_h_SP, value, order) VALUES (?, ?, ?)";
 
     /**
      * Creates a new  ExperimentResultHasSolverProperty object, saves it into the database and cache, and returns it.
@@ -52,7 +55,10 @@ public class ExperimentResultHasSolverPropertyDAO {
      */
     private static void save(ExperimentResultHasSolverProperty e) throws NoConnectionToDBException, SQLException {
         if(e.isDeleted()){
-            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
+            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteValueQuery);
+            ps.setInt(1, e.getId());
+            ps.executeUpdate();
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
             ps.setInt(1, e.getId());
             ps.executeUpdate();
             ps.close();
@@ -61,22 +67,33 @@ public class ExperimentResultHasSolverPropertyDAO {
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
             ps.setInt(1, e.getExpResult().getId());
             ps.setInt(2, e.getSolvProperty().getId());
-            ps.setString(3, e.getValue());
-            ps.setInt(4, e.getId());
+            ps.setInt(3, e.getId());
             ps.executeUpdate();
+            
+            // Replace the value Vector in the SolverPropertyValue table of the database with the modified one
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteValueQuery);
+            ps.setInt(1, e.getId());
+            ps.executeUpdate();
+            for(int i = 0; i < e.getValue().size(); i++){
+                ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertValueQuery);
+                ps.setInt(1, e.getId());
+                ps.setString(2, e.getValue().get(i));
+                ps.setInt(3, i);
+                ps.execute();
+            }
+
             ps.close();
             e.setSaved();
         }else if(e.isNew()){
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
             ps.setInt(1, e.getExpResult().getId());
             ps.setInt(2, e.getSolvProperty().getId());
-            ps.setString(3, e.getValue());
             ps.executeUpdate();
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
                 e.setId(generatedKeys.getInt(1));
             }
-            generatedKeys.close();           
+            generatedKeys.close();            
             ps.close();
             e.setSaved();
             cache.cache(e);
@@ -151,7 +168,7 @@ public class ExperimentResultHasSolverPropertyDAO {
     }
 
     /**
-     * Returns and caches (if necessary) the ExperimentResultHasSolverProperty object with the given id.
+     * Returns and caches (if necessary) the ExperimentResultHasSolverProperty object with the given id. The  values are kept in their order.
      * @param id <Integer> of the requested ExperimentResultHasSolverProperty
      * @return the ExperimentResultHasSolverProperty object with the given id
      * @throws NoConnectionToDBException
@@ -167,7 +184,7 @@ public class ExperimentResultHasSolverPropertyDAO {
             return res;
         }else{
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                    "SELECT ExperimentResults_idJob, SolverProperty_idSolverProperty, value "
+                    "SELECT ExperimentResults_idJob, SolverProperty_idSolverProperty "
                     + "FROM " + table + " WHERE idER_h_SP=?");
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -176,7 +193,20 @@ public class ExperimentResultHasSolverPropertyDAO {
             res.setId(id);
             res.setExpResult(ExperimentResultDAO.getById(rs.getInt(1)));
             res.setSolvProperty(SolverPropertyDAO.getById(rs.getInt(2)));
-            res.setValue(rs.getString(3));
+
+            // Get the values for the value Vector of the ExperimentResultHasSolverProperty object from the SolverPropertyValue table from the database
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                    "SELECT value "
+                    + "FROM " + valueTable + " WHERE ExperimentResult_has_SolverProperty_idER_h_SP=? "
+                    + "ORDER BY order");
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+            Vector<String> value = new Vector<String>();
+            while(rs.next()){
+                value.add(rs.getString(1));
+            }
+            res.setValue(value);
+
             res.setSaved();
             cache.cache(res);
             return res;

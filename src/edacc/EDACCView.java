@@ -175,6 +175,8 @@ public class EDACCView extends FrameView implements Observer {
         javax.swing.JMenu helpMenu = new javax.swing.JMenu();
         javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
         helpMenuItem = new javax.swing.JMenuItem();
+        propertyMenu = new javax.swing.JMenu();
+        solverPropertyMenuItem = new javax.swing.JMenuItem();
         statusPanel = new javax.swing.JPanel();
         javax.swing.JSeparator statusPanelSeparator = new javax.swing.JSeparator();
         statusMessageLabel = new javax.swing.JLabel();
@@ -192,7 +194,7 @@ public class EDACCView extends FrameView implements Observer {
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 687, Short.MAX_VALUE)
+            .add(0, 682, Short.MAX_VALUE)
         );
 
         menuBar.setAutoscrolls(true);
@@ -205,22 +207,16 @@ public class EDACCView extends FrameView implements Observer {
 
         javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCView.class, this);
         connectToDBMenuItem.setAction(actionMap.get("btnConnectToDB")); // NOI18N
-        connectToDBMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
-        connectToDBMenuItem.setMnemonic('N');
         connectToDBMenuItem.setText(resourceMap.getString("connectToDBMenuItem.text")); // NOI18N
         connectToDBMenuItem.setName("connectToDBMenuItem"); // NOI18N
         fileMenu.add(connectToDBMenuItem);
 
         disconnectMenuItem.setAction(actionMap.get("btnDisconnect")); // NOI18N
-        disconnectMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_MASK));
-        disconnectMenuItem.setMnemonic('D');
         disconnectMenuItem.setText(resourceMap.getString("disconnectMenuItem.text")); // NOI18N
         disconnectMenuItem.setName("disconnectMenuItem"); // NOI18N
         fileMenu.add(disconnectMenuItem);
 
         generateDBMenuItem.setAction(actionMap.get("btnGenerateTables")); // NOI18N
-        generateDBMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_MASK));
-        generateDBMenuItem.setMnemonic('G');
         generateDBMenuItem.setText(resourceMap.getString("generateDBMenuItem.text")); // NOI18N
         generateDBMenuItem.setToolTipText(resourceMap.getString("generateDBMenuItem.toolTipText")); // NOI18N
         generateDBMenuItem.setName("generateDBMenuItem"); // NOI18N
@@ -233,13 +229,10 @@ public class EDACCView extends FrameView implements Observer {
         menuBar.add(fileMenu);
 
         gridMenu.setAction(actionMap.get("btnGridSettings")); // NOI18N
-        gridMenu.setMnemonic('G');
         gridMenu.setText(resourceMap.getString("gridMenu.text")); // NOI18N
         gridMenu.setName("gridMenu"); // NOI18N
 
         settingsMenuItem.setAction(actionMap.get("btnGridSettings")); // NOI18N
-        settingsMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
-        settingsMenuItem.setMnemonic('S');
         settingsMenuItem.setText(resourceMap.getString("settingsMenuItem.text")); // NOI18N
         settingsMenuItem.setToolTipText(resourceMap.getString("settingsMenuItem.toolTipText")); // NOI18N
         settingsMenuItem.setName("settingsMenuItem"); // NOI18N
@@ -252,16 +245,12 @@ public class EDACCView extends FrameView implements Observer {
         modusMenu.setName("modusMenu"); // NOI18N
 
         manageDBModeMenuItem.setAction(actionMap.get("manageDBMode")); // NOI18N
-        manageDBModeMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.event.InputEvent.CTRL_MASK));
-        manageDBModeMenuItem.setMnemonic('M');
         manageDBModeMenuItem.setText(resourceMap.getString("manageDBModeMenuItem.text")); // NOI18N
         manageDBModeMenuItem.setToolTipText(resourceMap.getString("manageDBModeMenuItem.toolTipText")); // NOI18N
         manageDBModeMenuItem.setName("manageDBModeMenuItem"); // NOI18N
         modusMenu.add(manageDBModeMenuItem);
 
         manageExperimentModeMenuItem.setAction(actionMap.get("manageExperimentMode")); // NOI18N
-        manageExperimentModeMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_MASK));
-        manageExperimentModeMenuItem.setMnemonic('E');
         manageExperimentModeMenuItem.setText(resourceMap.getString("manageExperimentModeMenuItem.text")); // NOI18N
         manageExperimentModeMenuItem.setToolTipText(resourceMap.getString("manageExperimentModeMenuItem.toolTipText")); // NOI18N
         manageExperimentModeMenuItem.setName("manageExperimentModeMenuItem"); // NOI18N
@@ -274,7 +263,6 @@ public class EDACCView extends FrameView implements Observer {
         helpMenu.setName("helpMenu"); // NOI18N
 
         aboutMenuItem.setAction(actionMap.get("showAboutBox")); // NOI18N
-        aboutMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
         aboutMenuItem.setName("aboutMenuItem"); // NOI18N
         helpMenu.add(aboutMenuItem);
 
@@ -290,6 +278,21 @@ public class EDACCView extends FrameView implements Observer {
         helpMenu.add(helpMenuItem);
 
         menuBar.add(helpMenu);
+
+        propertyMenu.setText(resourceMap.getString("propertyMenu.text")); // NOI18N
+        propertyMenu.setName("propertyMenu"); // NOI18N
+
+        solverPropertyMenuItem.setAction(actionMap.get("btnSolverProperties")); // NOI18N
+        solverPropertyMenuItem.setText(resourceMap.getString("solverPropertyMenuItem.text")); // NOI18N
+        solverPropertyMenuItem.setName("solverPropertyMenuItem"); // NOI18N
+        solverPropertyMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                solverPropertyMenuItemActionPerformed(evt);
+            }
+        });
+        propertyMenu.add(solverPropertyMenuItem);
+
+        menuBar.add(propertyMenu);
 
         statusPanel.setName("statusPanel"); // NOI18N
 
@@ -310,7 +313,7 @@ public class EDACCView extends FrameView implements Observer {
             .add(statusPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(statusMessageLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 822, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 836, Short.MAX_VALUE)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusAnimationLabel)
@@ -350,6 +353,10 @@ public class EDACCView extends FrameView implements Observer {
         edacc.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         edacc.setVisible(true);
     }//GEN-LAST:event_helpMenuItemActionPerformed
+
+    private void solverPropertyMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_solverPropertyMenuItemActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_solverPropertyMenuItemActionPerformed
 
     @Action
     public void btnConnectToDB() {
@@ -514,6 +521,15 @@ public class EDACCView extends FrameView implements Observer {
         }
         manageGridQueues.setVisible(true);
     }
+    @Action
+    public void btnSolverProperties() {
+      if(manageSolverProperties == null){
+            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+            manageSolverProperties = new EDACCManageSolverPropertyDialog(mainFrame, true);
+            manageSolverProperties.setLocationRelativeTo(mainFrame);
+      }
+      manageSolverProperties.setVisible(true);
+    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem connectToDBMenuItem;
@@ -527,7 +543,9 @@ public class EDACCView extends FrameView implements Observer {
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu modusMenu;
     private javax.swing.JProgressBar progressBar;
+    private javax.swing.JMenu propertyMenu;
     private javax.swing.JMenuItem settingsMenuItem;
+    private javax.swing.JMenuItem solverPropertyMenuItem;
     private javax.swing.JLabel statusAnimationLabel;
     private javax.swing.JLabel statusMessageLabel;
     private javax.swing.JPanel statusPanel;
@@ -540,6 +558,7 @@ public class EDACCView extends FrameView implements Observer {
     private JDialog aboutBox;
     private JDialog databaseSettings;
     private EDACCManageGridQueuesDialog manageGridQueues;
+    private EDACCManageSolverPropertyDialog manageSolverProperties;
 
     public void update(Observable o, Object arg) {
         // watch connection state

@@ -18,7 +18,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="687" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="682" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -49,10 +49,6 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="btnConnectToDB" methodName="btnConnectToDB"/>
                 </Property>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+N"/>
-                </Property>
-                <Property name="mnemonic" type="int" value="78"/>
                 <Property name="text" type="java.lang.String" resourceKey="connectToDBMenuItem.text"/>
                 <Property name="name" type="java.lang.String" value="connectToDBMenuItem" noResource="true"/>
               </Properties>
@@ -62,10 +58,6 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="btnDisconnect" methodName="btnDisconnect"/>
                 </Property>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+D"/>
-                </Property>
-                <Property name="mnemonic" type="int" value="68"/>
                 <Property name="text" type="java.lang.String" resourceKey="disconnectMenuItem.text"/>
                 <Property name="name" type="java.lang.String" value="disconnectMenuItem" noResource="true"/>
               </Properties>
@@ -75,10 +67,6 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="btnGenerateTables" methodName="btnGenerateTables"/>
                 </Property>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+G"/>
-                </Property>
-                <Property name="mnemonic" type="int" value="71"/>
                 <Property name="text" type="java.lang.String" resourceKey="generateDBMenuItem.text"/>
                 <Property name="toolTipText" type="java.lang.String" resourceKey="generateDBMenuItem.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="generateDBMenuItem" noResource="true"/>
@@ -103,7 +91,6 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
               <action class="edacc.EDACCView" id="btnGridSettings" methodName="btnGridSettings"/>
             </Property>
-            <Property name="mnemonic" type="int" value="71"/>
             <Property name="text" type="java.lang.String" resourceKey="gridMenu.text"/>
             <Property name="name" type="java.lang.String" value="gridMenu" noResource="true"/>
           </Properties>
@@ -113,10 +100,6 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="btnGridSettings" methodName="btnGridSettings"/>
                 </Property>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+S"/>
-                </Property>
-                <Property name="mnemonic" type="int" value="83"/>
                 <Property name="text" type="java.lang.String" resourceKey="settingsMenuItem.text"/>
                 <Property name="toolTipText" type="java.lang.String" resourceKey="settingsMenuItem.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="settingsMenuItem" noResource="true"/>
@@ -136,10 +119,6 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="manageDBMode" methodName="manageDBMode"/>
                 </Property>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+M"/>
-                </Property>
-                <Property name="mnemonic" type="int" value="77"/>
                 <Property name="text" type="java.lang.String" resourceKey="manageDBModeMenuItem.text"/>
                 <Property name="toolTipText" type="java.lang.String" resourceKey="manageDBModeMenuItem.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="manageDBModeMenuItem" noResource="true"/>
@@ -150,10 +129,6 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="manageExperimentMode" methodName="manageExperimentMode"/>
                 </Property>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+E"/>
-                </Property>
-                <Property name="mnemonic" type="int" value="69"/>
                 <Property name="text" type="java.lang.String" resourceKey="manageExperimentModeMenuItem.text"/>
                 <Property name="toolTipText" type="java.lang.String" resourceKey="manageExperimentModeMenuItem.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="manageExperimentModeMenuItem" noResource="true"/>
@@ -177,9 +152,6 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCView" id="showAboutBox" methodName="showAboutBox"/>
                 </Property>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+A"/>
-                </Property>
                 <Property name="name" type="java.lang.String" value="aboutMenuItem" noResource="true"/>
               </Properties>
               <AuxValues>
@@ -202,6 +174,26 @@
             </MenuItem>
           </SubComponents>
         </Menu>
+        <Menu class="javax.swing.JMenu" name="propertyMenu">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="propertyMenu.text"/>
+            <Property name="name" type="java.lang.String" value="propertyMenu" noResource="true"/>
+          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="solverPropertyMenuItem">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                  <action class="edacc.EDACCView" id="btnSolverProperties" methodName="btnSolverProperties"/>
+                </Property>
+                <Property name="text" type="java.lang.String" resourceKey="solverPropertyMenuItem.text"/>
+                <Property name="name" type="java.lang.String" value="solverPropertyMenuItem" noResource="true"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="solverPropertyMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+          </SubComponents>
+        </Menu>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="statusPanel">
@@ -216,7 +208,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="statusMessageLabel" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="822" max="32767" attributes="0"/>
+                  <EmptySpace pref="836" max="32767" attributes="0"/>
                   <Component id="progressBar" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="statusAnimationLabel" min="-2" max="-2" attributes="0"/>

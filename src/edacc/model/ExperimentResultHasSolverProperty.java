@@ -5,6 +5,8 @@
 
 package edacc.model;
 
+import java.util.Vector;
+
 /**
  *
  * @author rretz
@@ -14,7 +16,7 @@ public class ExperimentResultHasSolverProperty extends BaseModel implements Inte
     private int id;
     private ExperimentResult expResult;
     private SolverProperty solvProperty;
-    private String value;
+    private Vector<String> value;
 
     public ExperimentResult getExpResult() {
         return expResult;
@@ -36,11 +38,11 @@ public class ExperimentResultHasSolverProperty extends BaseModel implements Inte
             this.setModified();
     }
 
-    public String getValue() {
+    public Vector<String> getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Vector<String> value) {
         this.value = value;
                 if (this.isSaved())
             this.setModified();

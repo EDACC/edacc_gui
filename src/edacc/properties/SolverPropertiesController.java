@@ -5,7 +5,7 @@
 
 package edacc.properties;
 
-import edacc.EDACCManagePropertyMode;
+import edacc.EDACCManageSolverPropertyDialog;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 
@@ -13,16 +13,17 @@ import javax.swing.JTable;
  *
  * @author rretz
  */
-public class ManageSolverProperties {
-    private EDACCManagePropertyMode main;
+public class SolverPropertiesController {
+    private EDACCManageSolverPropertyDialog main;
     private JPanel panel;
     private JTable tableSolverProperty;
 
-    public ManageSolverProperties(EDACCManagePropertyMode manage, JPanel panelManageResultProperty, JTable tableResultProperty) {
+    public SolverPropertiesController(EDACCManageSolverPropertyDialog manage, JPanel panelManageResultProperty, JTable tableResultProperty) {
         this.main = manage;
         this.panel = panelManageResultProperty;
         this.tableSolverProperty = tableResultProperty;
     }
+
 
     public void showSolverPropertyEditField(boolean enable) {
         main.enableSolverPropertyEditField(enable);
