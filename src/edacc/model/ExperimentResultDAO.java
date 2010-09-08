@@ -1,6 +1,10 @@
 package edacc.model;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
@@ -469,11 +473,99 @@ public class ExperimentResultDAO {
         return getExperimentResultFromResultSet(rs);
     }
 
-    public static File getResultFile(int id) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    /**
+     * Copies the binary file of the result file of a ExperimentResult to a temporary location on the file system and retuns a File
+     * reference on it.
+     * @param expRes expRes ExperimentResult from which the binary file is copied
+     * @return reference of the binary file of the result file of the given ExperimentResult
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static File getClientOutput(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+         File f = new File("tmp" + System.getProperty("file.separator") + expRes.getId() + "_" + expRes.getResultFileName());
+        // create missing directories
+        f.getParentFile().mkdirs();
+        getClientOutput(expRes.getId(), f);
+        return f;
     }
 
-    public static File getClientOutput(int id) {
-        throw new UnsupportedOperationException("Not yet implemented");
+
+    /**
+     * Copies the binary file of the client output of a ExperimentResult to a temporary location on the file system and retuns a File
+     * reference on it.
+     * @param expRes ExperimentResult from which the binary file is copied
+     * @return reference of the binary file of the clinet output of the given ExperimentResult
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static File getResultFile(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        File f = new File("tmp" + System.getProperty("file.separator") + expRes.getId() + "_" + expRes.getResultFileName());
+        // create missing directories
+        f.getParentFile().mkdirs();
+        getResultFile(expRes.getId(), f);
+        return f;
+    }
+
+
+    /**
+     * Copies the binary file of a result file of an ExperimentResult to a specified location on the filesystem.
+     * @param id the id of the ExperimentResult
+     * @param f the file in which the binary file is copied
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static void getResultFile(int id, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT resultFile " +
+                "FROM " + table + " " +
+                "WHERE idJob=?;");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            FileOutputStream out = new FileOutputStream(f);
+            InputStream in = rs.getBinaryStream("resultFile");
+            int len;
+            byte[] buf = new byte[256*1024];
+            while ((len = in.read(buf)) > -1) {
+                out.write(buf,0,len);
+            }
+            out.close();
+            in.close();
+        }
+    }
+
+    /**
+     * Copies the binary file of a client output of an ExperimentResult to a specified location on the filesystem.
+     * @param id th id of the ExperimentResult
+     * @param f the file in which the binary file is copied
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    private static void getClientOutput(int id, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT clientOutput " +
+                "FROM " + table + " " +
+                "WHERE idJob=?;");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            FileOutputStream out = new FileOutputStream(f);
+            InputStream in = rs.getBinaryStream("resultFile");
+            int len;
+            byte[] buf = new byte[256*1024];
+            while ((len = in.read(buf)) > -1) {
+                out.write(buf,0,len);
+            }
+            out.close();
+            in.close();
+        }
     }
 }

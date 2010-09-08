@@ -28,9 +28,10 @@ public class FilePropertyParser {
 
     /**
      * 
-     * @param solvProp
-     * @param expResult
-     * @return
+     *
+     * @param solvProp to parse for
+     * @param expResult on which the parser works (result file oder client output file)
+     * @return values of all occurences of given SolverProperty in the given ExperimentResult.
      * @throws FileNotFoundException
      * @throws IOException
      * @throws NoAllowedSolverPropertyTypeException
