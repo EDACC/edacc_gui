@@ -7,12 +7,14 @@ package edacc.properties;
 
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
+import edacc.model.NoConnectionToDBException;
 import edacc.model.SolverProperty;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -36,12 +38,12 @@ public class FilePropertyParser {
      * @throws IOException
      * @throws NoAllowedSolverPropertyTypeException
      */
-    public Vector<String> parse(SolverProperty solvProp, ExperimentResult expResult) throws FileNotFoundException, IOException, NoAllowedSolverPropertyTypeException{
+    public Vector<String> parse(SolverProperty solvProp, ExperimentResult expResult) throws FileNotFoundException, IOException, NoAllowedSolverPropertyTypeException, NoConnectionToDBException, SQLException{
         File file;
         if(solvProp.getSolverPropertyType() == SolverPropertyType.ResultFile)
-            file = ExperimentResultDAO.getResultFile(expResult.getId());
+            file = ExperimentResultDAO.getResultFile(expResult);
         else if(solvProp.getSolverPropertyType() == SolverPropertyType.ClientOutput)
-            file = ExperimentResultDAO.getClientOutput(expResult.getId());
+            file = ExperimentResultDAO.getClientOutput(expResult);
         else
             throw new NoAllowedSolverPropertyTypeException();
         
