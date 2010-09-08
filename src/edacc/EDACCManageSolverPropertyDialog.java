@@ -13,8 +13,11 @@ package edacc;
 
 import edacc.properties.SolverPropertiesController;
 import edacc.properties.SolverPropertyTableModel;
+import edacc.properties.SolverPropertyType;
 import edacc.properties.SolverPropertyValueComboBoxModel;
 import java.awt.Component;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -28,6 +31,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
     private SolverPropertiesController controller;
     private SolverPropertyTableModel solPropertyTableModel;
     private SolverPropertyValueComboBoxModel solPropTypeValueComModel;
+    private SolverPropertyType[] comboBoxSolPropType = {SolverPropertyType.ClientOutput, SolverPropertyType.ResultFile, SolverPropertyType.Parameter};
 
     /** Creates new form EDACCManageSolverPropertyDialog */
     public EDACCManageSolverPropertyDialog(java.awt.Frame parent, boolean modal) {
@@ -58,8 +62,9 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         comboBoxSolverPropertyValuetype.setModel(solPropTypeValueComModel);
 */
         // initialize comboBoxSolverPropertyType
-        String[] solPropTypes = {"ResultFile", "ClientOutput", "Parameter"};
-
+        for(int i = 0; i < comboBoxSolPropType.length; i++){
+            comboBoxSolverPropertyType.addItem(comboBoxSolPropType[i]);
+        }
     }
 
     /** This method is called from within the constructor to
@@ -95,6 +100,9 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         buttonSolverPropertyAddValueType = new javax.swing.JButton();
         labeSolverPropertyType = new javax.swing.JLabel();
         comboBoxSolverPropertyType = new javax.swing.JComboBox();
+        labeMultipleOccurrences = new javax.swing.JLabel();
+        checkBoxMultipleOccurrences = new javax.swing.JCheckBox();
+        buttonDone = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -132,7 +140,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
                 .addComponent(buttonNewSolverProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonRemoveSolverProperty)
-                .addContainerGap(406, Short.MAX_VALUE))
+                .addContainerGap(641, Short.MAX_VALUE))
         );
         panelManageSolverPropertyShowButtonsLayout.setVerticalGroup(
             panelManageSolverPropertyShowButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -167,7 +175,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelMangeSolverPropertyShowLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelMangeSolverPropertyShowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
+                    .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 785, Short.MAX_VALUE)
                     .addComponent(panelManageSolverPropertyShowButtons, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -175,7 +183,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             panelMangeSolverPropertyShowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelMangeSolverPropertyShowLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
+                .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelManageSolverPropertyShowButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -187,23 +195,20 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
 
         panelManageSolverPropertyEditButtons.setName("panelManageSolverPropertyEditButtons"); // NOI18N
 
-        buttonSaveSolverProperty.setText(resourceMap.getString("buttonSaveSolverProperty.text")); // NOI18N
-        buttonSaveSolverProperty.setEnabled(false);
-        buttonSaveSolverProperty.setName("buttonSaveSolverProperty"); // NOI18N
-
         javax.swing.GroupLayout panelManageSolverPropertyEditButtonsLayout = new javax.swing.GroupLayout(panelManageSolverPropertyEditButtons);
         panelManageSolverPropertyEditButtons.setLayout(panelManageSolverPropertyEditButtonsLayout);
         panelManageSolverPropertyEditButtonsLayout.setHorizontalGroup(
             panelManageSolverPropertyEditButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelManageSolverPropertyEditButtonsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(buttonSaveSolverProperty)
-                .addContainerGap(483, Short.MAX_VALUE))
+            .addGap(0, 0, Short.MAX_VALUE)
         );
         panelManageSolverPropertyEditButtonsLayout.setVerticalGroup(
             panelManageSolverPropertyEditButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(buttonSaveSolverProperty)
+            .addGap(0, 243, Short.MAX_VALUE)
         );
+
+        buttonSaveSolverProperty.setText(resourceMap.getString("buttonSaveSolverProperty.text")); // NOI18N
+        buttonSaveSolverProperty.setEnabled(false);
+        buttonSaveSolverProperty.setName("buttonSaveSolverProperty"); // NOI18N
 
         panelManageSolverPropertyEditInput.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         panelManageSolverPropertyEditInput.setName("panelManageSolverPropertyEditInput"); // NOI18N
@@ -248,6 +253,18 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
 
         comboBoxSolverPropertyType.setEnabled(false);
         comboBoxSolverPropertyType.setName("comboBoxSolverPropertyType"); // NOI18N
+        comboBoxSolverPropertyType.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboBoxSolverPropertyTypeActionPerformed(evt);
+            }
+        });
+
+        labeMultipleOccurrences.setText(resourceMap.getString("labeMultipleOccurrences.text")); // NOI18N
+        labeMultipleOccurrences.setName("labeMultipleOccurrences"); // NOI18N
+
+        checkBoxMultipleOccurrences.setText(resourceMap.getString("checkBoxMultipleOccurrences.text")); // NOI18N
+        checkBoxMultipleOccurrences.setEnabled(false);
+        checkBoxMultipleOccurrences.setName("checkBoxMultipleOccurrences"); // NOI18N
 
         javax.swing.GroupLayout panelManageSolverPropertyEditInputLayout = new javax.swing.GroupLayout(panelManageSolverPropertyEditInput);
         panelManageSolverPropertyEditInput.setLayout(panelManageSolverPropertyEditInputLayout);
@@ -263,9 +280,13 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
                             .addComponent(labelSolverPropertyDescription))
                         .addGap(71, 71, 71)
                         .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
-                            .addComponent(textSolvertPropertyFieldPrefix, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
-                            .addComponent(textSolverPropertyFieldName, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)
+                            .addComponent(textSolvertPropertyFieldPrefix, javax.swing.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)
+                            .addComponent(textSolverPropertyFieldName, javax.swing.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE))
+                        .addContainerGap())
+                    .addGroup(panelManageSolverPropertyEditInputLayout.createSequentialGroup()
+                        .addComponent(labeMultipleOccurrences)
+                        .addContainerGap(666, Short.MAX_VALUE))
                     .addGroup(panelManageSolverPropertyEditInputLayout.createSequentialGroup()
                         .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelManageSolverPropertyEditInputLayout.createSequentialGroup()
@@ -275,10 +296,12 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelManageSolverPropertyEditInputLayout.createSequentialGroup()
                                 .addComponent(labelSolverPropertyValuetype)
                                 .addGap(71, 71, 71)
-                                .addComponent(comboBoxSolverPropertyValuetype, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(checkBoxMultipleOccurrences)
+                                    .addComponent(comboBoxSolverPropertyValuetype, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addGap(18, 18, 18)
-                        .addComponent(buttonSolverPropertyAddValueType)))
-                .addContainerGap())
+                        .addComponent(buttonSolverPropertyAddValueType)
+                        .addContainerGap(540, Short.MAX_VALUE))))
         );
         panelManageSolverPropertyEditInputLayout.setVerticalGroup(
             panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -300,14 +323,18 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labeSolverPropertyType)
+                    .addComponent(comboBoxSolverPropertyType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(comboBoxSolverPropertyValuetype, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(labelSolverPropertyValuetype)
                     .addComponent(buttonSolverPropertyAddValueType))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labeSolverPropertyType)
-                    .addComponent(comboBoxSolverPropertyType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(labeMultipleOccurrences)
+                    .addComponent(checkBoxMultipleOccurrences))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout panelManageSolverPropertyEditLayout = new javax.swing.GroupLayout(panelManageSolverPropertyEdit);
@@ -317,18 +344,26 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             .addGroup(panelManageSolverPropertyEditLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelManageSolverPropertyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelManageSolverPropertyEditInput, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelManageSolverPropertyEditButtons, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManageSolverPropertyEditLayout.createSequentialGroup()
+                        .addComponent(panelManageSolverPropertyEditInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(panelManageSolverPropertyEditButtons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(buttonSaveSolverProperty))
                 .addContainerGap())
         );
         panelManageSolverPropertyEditLayout.setVerticalGroup(
             panelManageSolverPropertyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelManageSolverPropertyEditLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManageSolverPropertyEditLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelManageSolverPropertyEditInput, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(panelManageSolverPropertyEditButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(22, 22, 22))
+                .addGroup(panelManageSolverPropertyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelManageSolverPropertyEditLayout.createSequentialGroup()
+                        .addComponent(panelManageSolverPropertyEditButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(3, 3, 3))
+                    .addGroup(panelManageSolverPropertyEditLayout.createSequentialGroup()
+                        .addComponent(panelManageSolverPropertyEditInput, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                .addComponent(buttonSaveSolverProperty)
+                .addContainerGap())
         );
 
         jSplitPane1.setRightComponent(panelManageSolverPropertyEdit);
@@ -339,44 +374,60 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             panelManageSolverPropertyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelManageSolverPropertyLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 572, Short.MAX_VALUE)
+                .addComponent(jSplitPane1)
                 .addContainerGap())
         );
         panelManageSolverPropertyLayout.setVerticalGroup(
             panelManageSolverPropertyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManageSolverPropertyLayout.createSequentialGroup()
+            .addGroup(panelManageSolverPropertyLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 528, Short.MAX_VALUE)
                 .addContainerGap())
         );
+
+        buttonDone.setText(resourceMap.getString("buttonDone.text")); // NOI18N
+        buttonDone.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        buttonDone.setName("buttonDone"); // NOI18N
+        buttonDone.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonDoneActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 628, Short.MAX_VALUE)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(panelManageSolverProperty, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap()))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(buttonDone)
+                    .addComponent(panelManageSolverProperty, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 458, Short.MAX_VALUE)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(panelManageSolverProperty, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap()))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(panelManageSolverProperty, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(buttonDone, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonNewSolverPropertyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonNewSolverPropertyActionPerformed
-
+        controller.NewSolverProperty();
 }//GEN-LAST:event_buttonNewSolverPropertyActionPerformed
+
+    private void buttonDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDoneActionPerformed
+       this.setVisible(false);
+    }//GEN-LAST:event_buttonDoneActionPerformed
+
+    private void comboBoxSolverPropertyTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxSolverPropertyTypeActionPerformed
+
+    }//GEN-LAST:event_comboBoxSolverPropertyTypeActionPerformed
 
     /**
     * @param args the command line arguments
@@ -396,14 +447,17 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonDone;
     private javax.swing.JButton buttonNewSolverProperty;
     private javax.swing.JButton buttonRemoveSolverProperty;
     private javax.swing.JButton buttonSaveSolverProperty;
     private javax.swing.JButton buttonSolverPropertyAddValueType;
+    private javax.swing.JCheckBox checkBoxMultipleOccurrences;
     private javax.swing.JComboBox comboBoxSolverPropertyType;
     private javax.swing.JComboBox comboBoxSolverPropertyValuetype;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JLabel labeMultipleOccurrences;
     private javax.swing.JLabel labeSolverPropertyType;
     private javax.swing.JLabel labelSolverPropertyDescription;
     private javax.swing.JLabel labelSolverPropertyPrefix;
@@ -423,21 +477,37 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
 
     public void enableSolverPropertyEditField(boolean enable) {
-        this.comboBoxSolverPropertyType.setEnabled(enable);
-        this.comboBoxSolverPropertyValuetype.setEnabled(enable);
-        this.buttonSolverPropertyAddValueType.setEnabled(enable);
+        this.comboBoxSolverPropertyType.setEnabled(enable);       
         this.buttonSaveSolverProperty.setEnabled(enable);
         this.textSolvertPropertyFieldPrefix.setEnabled(enable);
         this.textSolverPropertyFieldName.setEnabled(enable);
         this.textAreaResultPropertyDescription.setEnabled(enable);
-
+        this.textSolverPropertyFieldName.requestFocus();
+        if(!enable){
+           this.comboBoxSolverPropertyValuetype.setEnabled(false);
+           this.buttonSolverPropertyAddValueType.setEnabled(false);
+           this.checkBoxMultipleOccurrences.setEnabled(false);
+        }
     }
 
     public void clearSolverPropertyEditField() {
         this.comboBoxSolverPropertyType.setSelectedIndex(0);
         this.comboBoxSolverPropertyValuetype.setSelectedIndex(0);
+        this.checkBoxMultipleOccurrences.setSelected(false);
         this.textSolverPropertyFieldName.setText("");
         this.textSolvertPropertyFieldPrefix.setText("");
         this.textAreaResultPropertyDescription.setText("");
+    }
+
+    public void SolverPropertyTypeChanged() {
+        if(this.comboBoxSolverPropertyType.getSelectedItem() != SolverPropertyType.Parameter){
+            this.comboBoxSolverPropertyValuetype.setEnabled(true);
+            this.buttonSolverPropertyAddValueType.setEnabled(true);
+            this.checkBoxMultipleOccurrences.setEnabled(true);
+        }else {
+           this.comboBoxSolverPropertyValuetype.setEnabled(false);
+           this.buttonSolverPropertyAddValueType.setEnabled(false);
+           this.checkBoxMultipleOccurrences.setEnabled(false);
+        }
     }
 }

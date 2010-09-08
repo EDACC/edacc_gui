@@ -23,25 +23,23 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <EmptySpace min="0" pref="628" max="32767" attributes="0"/>
-          <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="panelManageSolverProperty" max="32767" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="buttonDone" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Component id="panelManageSolverProperty" alignment="1" max="32767" attributes="0"/>
               </Group>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <EmptySpace min="0" pref="458" max="32767" attributes="0"/>
-          <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="panelManageSolverProperty" max="32767" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-              </Group>
+          <Group type="102" alignment="1" attributes="0">
+              <Component id="panelManageSolverProperty" max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="buttonDone" min="-2" pref="23" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -64,16 +62,16 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jSplitPane1" pref="572" max="32767" attributes="0"/>
+                  <Component id="jSplitPane1" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="1" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jSplitPane1" pref="384" max="32767" attributes="0"/>
+                  <Component id="jSplitPane1" pref="528" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -106,7 +104,7 @@
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="1" attributes="0">
-                              <Component id="panelManageSolverPropertyTable" alignment="0" pref="550" max="32767" attributes="0"/>
+                              <Component id="panelManageSolverPropertyTable" alignment="0" pref="785" max="32767" attributes="0"/>
                               <Component id="panelManageSolverPropertyShowButtons" alignment="0" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -117,7 +115,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace min="-2" max="-2" attributes="0"/>
-                          <Component id="panelManageSolverPropertyTable" pref="28" max="32767" attributes="0"/>
+                          <Component id="panelManageSolverPropertyTable" pref="145" max="32767" attributes="0"/>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Component id="panelManageSolverPropertyShowButtons" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -139,7 +137,7 @@
                               <Component id="buttonNewSolverProperty" min="-2" pref="57" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="buttonRemoveSolverProperty" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="406" max="32767" attributes="0"/>
+                              <EmptySpace pref="641" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -214,11 +212,15 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="panelManageSolverPropertyEditInput" alignment="0" max="32767" attributes="0"/>
-                              <Component id="panelManageSolverPropertyEditButtons" alignment="1" max="32767" attributes="0"/>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="panelManageSolverPropertyEditInput" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="panelManageSolverPropertyEditButtons" max="32767" attributes="0"/>
+                              </Group>
+                              <Component id="buttonSaveSolverProperty" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -226,12 +228,20 @@
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" max="-2" attributes="0"/>
-                          <Component id="panelManageSolverPropertyEditInput" max="32767" attributes="0"/>
-                          <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
-                          <Component id="panelManageSolverPropertyEditButtons" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
+                      <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Component id="panelManageSolverPropertyEditButtons" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" attributes="0">
+                                  <Component id="panelManageSolverPropertyEditInput" max="32767" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Component id="buttonSaveSolverProperty" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -245,29 +255,23 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="buttonSaveSolverProperty" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="483" max="32767" attributes="0"/>
-                          </Group>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="buttonSaveSolverProperty" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="0" pref="243" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
-                  <SubComponents>
-                    <Component class="javax.swing.JButton" name="buttonSaveSolverProperty">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="buttonSaveSolverProperty.text"/>
-                        <Property name="enabled" type="boolean" value="false"/>
-                        <Property name="name" type="java.lang.String" value="buttonSaveSolverProperty" noResource="true"/>
-                      </Properties>
-                    </Component>
-                  </SubComponents>
                 </Container>
+                <Component class="javax.swing.JButton" name="buttonSaveSolverProperty">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="buttonSaveSolverProperty.text"/>
+                    <Property name="enabled" type="boolean" value="false"/>
+                    <Property name="name" type="java.lang.String" value="buttonSaveSolverProperty" noResource="true"/>
+                  </Properties>
+                </Component>
                 <Container class="javax.swing.JPanel" name="panelManageSolverPropertyEditInput">
                   <Properties>
                     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -281,7 +285,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
+                          <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
@@ -292,10 +296,15 @@
                                       </Group>
                                       <EmptySpace min="-2" pref="71" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="1" attributes="0">
-                                          <Component id="jScrollPane1" alignment="1" pref="398" max="32767" attributes="1"/>
-                                          <Component id="textSolvertPropertyFieldPrefix" alignment="1" pref="398" max="32767" attributes="1"/>
-                                          <Component id="textSolverPropertyFieldName" alignment="1" pref="398" max="32767" attributes="1"/>
+                                          <Component id="jScrollPane1" alignment="1" pref="627" max="32767" attributes="1"/>
+                                          <Component id="textSolvertPropertyFieldPrefix" alignment="1" pref="627" max="32767" attributes="1"/>
+                                          <Component id="textSolverPropertyFieldName" alignment="1" pref="627" max="32767" attributes="1"/>
                                       </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="labeMultipleOccurrences" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace pref="666" max="32767" attributes="0"/>
                                   </Group>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Group type="103" groupAlignment="1" max="-2" attributes="0">
@@ -307,14 +316,17 @@
                                           <Group type="102" alignment="0" attributes="0">
                                               <Component id="labelSolverPropertyValuetype" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace min="-2" pref="71" max="-2" attributes="0"/>
-                                              <Component id="comboBoxSolverPropertyValuetype" min="-2" max="-2" attributes="0"/>
+                                              <Group type="103" groupAlignment="0" attributes="0">
+                                                  <Component id="checkBoxMultipleOccurrences" alignment="0" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="comboBoxSolverPropertyValuetype" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              </Group>
                                           </Group>
                                       </Group>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
                                       <Component id="buttonSolverPropertyAddValueType" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace pref="540" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
-                              <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -343,16 +355,21 @@
                               </Group>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="labeSolverPropertyType" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="comboBoxSolverPropertyType" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="comboBoxSolverPropertyValuetype" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="labelSolverPropertyValuetype" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="buttonSolverPropertyAddValueType" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="labeSolverPropertyType" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="comboBoxSolverPropertyType" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="labeMultipleOccurrences" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="checkBoxMultipleOccurrences" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <EmptySpace pref="12" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -446,6 +463,22 @@
                         <Property name="enabled" type="boolean" value="false"/>
                         <Property name="name" type="java.lang.String" value="comboBoxSolverPropertyType" noResource="true"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="comboBoxSolverPropertyTypeActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="labeMultipleOccurrences">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="labeMultipleOccurrences.text"/>
+                        <Property name="name" type="java.lang.String" value="labeMultipleOccurrences" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JCheckBox" name="checkBoxMultipleOccurrences">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="checkBoxMultipleOccurrences.text"/>
+                        <Property name="enabled" type="boolean" value="false"/>
+                        <Property name="name" type="java.lang.String" value="checkBoxMultipleOccurrences" noResource="true"/>
+                      </Properties>
                     </Component>
                   </SubComponents>
                 </Container>
@@ -455,5 +488,15 @@
         </Container>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JButton" name="buttonDone">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="buttonDone.text"/>
+        <Property name="horizontalAlignment" type="int" value="4"/>
+        <Property name="name" type="java.lang.String" value="buttonDone" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonDoneActionPerformed"/>
+      </Events>
+    </Component>
   </SubComponents>
 </Form>

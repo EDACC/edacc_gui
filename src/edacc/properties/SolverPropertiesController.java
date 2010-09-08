@@ -38,4 +38,8 @@ public class SolverPropertiesController {
        main.clearSolverPropertyEditField();
     }
 
+    public void SolverPropertyTypeChanged() {
+        main.SolverPropertyTypeChanged();
+    }
+
 }
