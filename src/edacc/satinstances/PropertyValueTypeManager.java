@@ -38,8 +38,13 @@ public class PropertyValueTypeManager {
         return instance;
     }
 
+    /**
+     * Returns the object of the PropertyValueType with the given name.
+     * @param name
+     * @return
+     */
     public PropertyValueType<?> getPropertyValueTypeByName(String name) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        return propertyTypes.get(name);
     }
 
     /**
