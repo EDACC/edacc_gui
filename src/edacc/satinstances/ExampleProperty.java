@@ -23,7 +23,11 @@ public class ExampleProperty implements Property {
 
     @Override
     public PropertyValueType<?> getPropertyValueType() {
-        return PropertyValueTypeManager.getInstance().getPropertyValueTypeByName("Integer");
+        try {
+            return PropertyValueTypeManager.getInstance().getPropertyValueTypeByName("Integer");
+        } catch (Exception e) {
+            return null;
+        }
     }
 
   

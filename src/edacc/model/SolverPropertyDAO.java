@@ -9,6 +9,7 @@ import edacc.properties.SolverPropertyType;
 import edacc.properties.SolverPropertyTypeNotExistException;
 import edacc.satinstances.PropertyValueType;
 import edacc.satinstances.PropertyValueTypeManager;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -55,7 +56,7 @@ public class SolverPropertyDAO {
      * @throws SQLException
      * @throws SolverPropertyNotInDBException
      */
-    public static SolverProperty getById(int id) throws NoConnectionToDBException, SQLException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException {
+    public static SolverProperty getById(int id) throws NoConnectionToDBException, SQLException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
         SolverProperty res = cache.getCached(id);
         if(res != null){
             return res;
