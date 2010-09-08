@@ -6,6 +6,7 @@
 package edacc.model;
 
 import edacc.properties.SolverPropertyTypeNotExistException;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -124,7 +125,7 @@ public class ExperimentResultHasSolverPropertyDAO {
      * @throws SolverPropertyNotInDBException
      */
     public Vector<ExperimentResultHasSolverProperty> getAllByExperimentResult(ExperimentResult expResult)
-            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException{
+            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException{
         Vector<ExperimentResultHasSolverProperty> res = new Vector<ExperimentResultHasSolverProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idER_h_RP " +
@@ -151,7 +152,7 @@ public class ExperimentResultHasSolverPropertyDAO {
      * @throws SolverPropertyNotInDBException
      */
     public Vector<ExperimentResultHasSolverProperty> getAllByResultProperty(SolverProperty solvProperty)
-            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException{
+            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException{
         Vector<ExperimentResultHasSolverProperty> res = new Vector<ExperimentResultHasSolverProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idER_h_RP " +
@@ -178,7 +179,7 @@ public class ExperimentResultHasSolverPropertyDAO {
      * @throws SolverPropertyNotInDBException
      */
     public ExperimentResultHasSolverProperty getById(int id)
-            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException {
+            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
         ExperimentResultHasSolverProperty res = cache.getCached(id);
         if(res != null){
             return res;
