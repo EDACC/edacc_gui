@@ -6,10 +6,7 @@ package edacc.satinstances;
 
 import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +21,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
 
 /**
  *
@@ -57,7 +52,7 @@ public class PropertyValueTypeManager {
     }
 
     /**
-     * Returns all LBVKeys from the LBVKeyManager.
+     * Returns all loaded PropertyValueType objects.
      *
      * @return 
      */
