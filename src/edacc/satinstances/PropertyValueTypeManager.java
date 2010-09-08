@@ -165,8 +165,8 @@ public class PropertyValueTypeManager {
                 propertyTypeClasses.size());
         for (Class<PropertyValueType<?>> propertyType : propertyTypeClasses) {
             try {
-                PropertyValueType<?> key = propertyType.newInstance();
-                propertyTypes.put(key.getName(), key);
+                PropertyValueType<?> type = propertyType.newInstance();
+                propertyTypes.put(type.getName(), type);
             } catch (InstantiationException e) {
                 System.err.println("Can't instantiate PropertyValueType: "
                         + propertyType.getName());
