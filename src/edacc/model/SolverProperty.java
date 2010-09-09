@@ -55,7 +55,7 @@ public class SolverProperty extends BaseModel implements IntegerPKModel{
     }
 
     public PropertyValueType<?> getPropertyValueType() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return this.valueType;
     }
 
     /**

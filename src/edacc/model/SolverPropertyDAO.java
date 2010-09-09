@@ -23,8 +23,8 @@ public class SolverPropertyDAO {
     protected static final String table = "SolverProperty";
     private static final ObjectCache<SolverProperty> cache = new ObjectCache<SolverProperty>();
     private static String deleteQuery = "DELETE FROM " + table + " WHERE idSolverProperty=?;";
-    private static String updateQuery = "UPDATE " + table + " SET name=?, prefix=?, description=?, PropertyValueType_name=?, propertyType=? WHERE idSolverProperty=?;";
-    private static String insertQuery = "INSERT INTO " + table + " (name, prefix, description, PropertyValueType_name, propertyType) VALUES (?, ?, ?, ?, ?);";
+    private static String updateQuery = "UPDATE " + table + " SET name=?, prefix=?, description=?, PropertyValueType_name=?, propertyType=?, multiple=? WHERE idSolverProperty=?;";
+    private static String insertQuery = "INSERT INTO " + table + " (name, prefix, description, PropertyValueType_name, propertyType, multiple) VALUES (?, ?, ?, ?, ?, ?);";
 
     /**
      * Creates a new  SolverProperty object, saves it into the database and cache, and returns it.
@@ -36,13 +36,14 @@ public class SolverPropertyDAO {
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    public static SolverProperty createResultProperty(String name, String prefix, String description, PropertyValueType valueType, SolverPropertyType type) throws NoConnectionToDBException, SQLException{
+    public static SolverProperty createResultProperty(String name, String prefix, String description, PropertyValueType valueType, SolverPropertyType type, boolean multiple) throws NoConnectionToDBException, SQLException{
         SolverProperty r = new SolverProperty();
         r.setName(name);
         r.setPrefix(prefix);
         r.setDescription(description);
         r.setValueType(valueType);
         r.setSolverPropertyType(type);
+        r.setMultiple(multiple);
         r.setNew();
         save(r);
         return r;
@@ -62,7 +63,7 @@ public class SolverPropertyDAO {
             return res;
         }else{
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                    "SELECT PropertyValueType_name, name, description, prefix, propertyType "
+                    "SELECT PropertyValueType_name, name, description, prefix, propertyType, multiple "
                     + "FROM " + table + " WHERE idSolverProperty=?");
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -74,6 +75,7 @@ public class SolverPropertyDAO {
             res.setDescription(rs.getString(3));
             res.setPrefix(rs.getString(4));
             res.setSolverPropertyType(rs.getInt(5));
+            res.setMultiple(rs.getBoolean(6));
             res.setSaved();
             cache.cache(res);
             return res;
@@ -101,7 +103,8 @@ public class SolverPropertyDAO {
             ps.setString(3, r.getDescription());
             ps.setString(4, r.getPropertyValueType().getName());
             ps.setInt(5, r.getSolverPropertyTypeDBRepresentation());
-            ps.setInt(6, r.getId());
+            ps.setBoolean(6, r.isMultiple());
+            ps.setInt(7, r.getId());
             ps.executeUpdate();
             ps.close();
             r.setSaved();
@@ -112,6 +115,7 @@ public class SolverPropertyDAO {
             ps.setString(3, r.getDescription());
             ps.setString(4, r.getPropertyValueType().getName());
             ps.setInt(5, r.getSolverPropertyTypeDBRepresentation());
+            ps.setBoolean(6, r.isMultiple());
             ps.executeUpdate();
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
