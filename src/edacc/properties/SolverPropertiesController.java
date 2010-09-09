@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 
 /**
- *
+ * Controller class of the EDACCManageSolverDialog
  * @author rretz
  */
 public class SolverPropertiesController {
@@ -27,30 +27,57 @@ public class SolverPropertiesController {
     private JPanel panel;
     private JTable tableSolverProperty;
 
+    /**
+     * Constructor of the SolverPropertiesController
+     * @param manage the EDACCManageSolverPropertyDialog to controll
+     * @param panelManageResultProperty main panel of the EDACCManagerSolverPropertyDialog
+     * @param tableResultProperty the table which contains the Overview over all SolverProperty objects.
+     */
     public SolverPropertiesController(EDACCManageSolverPropertyDialog manage, JPanel panelManageResultProperty, JTable tableResultProperty) {
         this.main = manage;
         this.panel = panelManageResultProperty;
         this.tableSolverProperty = tableResultProperty;
     }
 
-
+    /**
+     * Enables or disables all input fields of the GUI which are required for editing and creating new SolverProperties
+     * @param enable true for enable, false for disable
+     */
     public void showSolverPropertyEditField(boolean enable) {
         main.enableSolverPropertyEditField(enable);
     }
 
+    /**
+     * Clears and enables the input fields in the gui.
+     */
     public void NewSolverProperty() {
         showSolverPropertyEditField(true);
         clearSolverPropertyEditField();
     }
 
+    /**
+     * Clears the input fields of the gui.
+     */
     private void clearSolverPropertyEditField() {
        main.clearSolverPropertyEditField();
     }
 
+    /**
+     * Enables and disables some of the input fields of the gui controlled by the selected SolverPropertyType
+     */
     public void SolverPropertyTypeChanged() {
         main.SolverPropertyTypeChanged();
     }
 
+    /**
+     * 
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws SQLException
+     * @throws SolverPropertyNotInDBException
+     * @throws SolverPropertyTypeNotExistException
+     * @throws IOException
+     */
     public void loadSolverProperties() 
             throws NoConnectionToDBException, SQLException, SQLException, SolverPropertyNotInDBException,
         SolverPropertyTypeNotExistException, IOException {

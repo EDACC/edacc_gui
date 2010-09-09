@@ -63,12 +63,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         });
 
         controller = new SolverPropertiesController(this, panelManageSolverProperty, tableSolverProperty);
-
-        // initialize comboBoxSolverPropertyValuetype
-       /* solPropTypeValueComModel = new SolverPropertyValueComboBoxModel();
-        solPropTypeValueComModel.addPropertyValueTypes(PropertyValueTypeManager.getInstance().getAll());
-        comboBoxSolverPropertyValuetype.setModel(solPropTypeValueComModel);
-*/
+        
         // initialize comboBoxSolverPropertyType
         for(int i = 0; i < comboBoxSolPropType.length; i++){
             comboBoxSolverPropertyType.addItem(comboBoxSolPropType[i]);
