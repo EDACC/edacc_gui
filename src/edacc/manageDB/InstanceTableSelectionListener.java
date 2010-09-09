@@ -21,6 +21,7 @@ public class InstanceTableSelectionListener implements ListSelectionListener{
         this.table = table;
         this.controller = controller;
     }
+    @Override
     public void valueChanged(ListSelectionEvent e) {
         if (e.getSource() == table.getSelectionModel() && table.getRowSelectionAllowed() && table.getSelectedRowCount() != 0)
             controller.showInstanceButtons(true);

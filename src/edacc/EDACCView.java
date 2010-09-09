@@ -355,7 +355,7 @@ public class EDACCView extends FrameView implements Observer {
     }//GEN-LAST:event_helpMenuItemActionPerformed
 
     private void solverPropertyMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_solverPropertyMenuItemActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_solverPropertyMenuItemActionPerformed
 
     @Action
@@ -527,6 +527,7 @@ public class EDACCView extends FrameView implements Observer {
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
             manageSolverProperties = new EDACCManageSolverPropertyDialog(mainFrame, true);
             manageSolverProperties.setLocationRelativeTo(mainFrame);
+            manageSolverProperties.initialize();
       }
       manageSolverProperties.setVisible(true);
     }

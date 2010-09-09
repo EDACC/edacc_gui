@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Vector;
 
 
 /**
@@ -126,6 +127,27 @@ public class SolverPropertyDAO {
             r.setSaved();
             cache.cache(r);
         }
+    }
+
+    /**
+     *
+     * @return a Vector of all SolverProperty Objects which are in the database.
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws SolverPropertyNotInDBException
+     * @throws SolverPropertyTypeNotExistException
+     * @throws IOException
+     */
+    public static Vector<SolverProperty> getAll() throws NoConnectionToDBException, SQLException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException{
+        Vector<SolverProperty> res = new Vector<SolverProperty>();
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+            "SELECT idSolverProperty "
+            + "FROM " + table);
+        ResultSet rs = ps.executeQuery();
+        while(rs.next()){
+            res.add(SolverPropertyDAO.getById(rs.getInt(1)));
+        }
+        return res;
     }
 
 }

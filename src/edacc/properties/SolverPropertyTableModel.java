@@ -117,4 +117,9 @@ public class SolverPropertyTableModel extends AbstractTableModel {
         this.fireTableDataChanged();
     }
 
+    public void clear(){
+        this.rows.clear();
+        this.fireTableDataChanged();
+    }
+
 }

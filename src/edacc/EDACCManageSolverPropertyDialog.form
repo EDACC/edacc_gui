@@ -115,7 +115,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace min="-2" max="-2" attributes="0"/>
-                          <Component id="panelManageSolverPropertyTable" pref="145" max="32767" attributes="0"/>
+                          <Component id="panelManageSolverPropertyTable" pref="276" max="32767" attributes="0"/>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Component id="panelManageSolverPropertyShowButtons" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -300,12 +300,8 @@
                                           <Component id="textSolvertPropertyFieldPrefix" alignment="1" pref="627" max="32767" attributes="1"/>
                                           <Component id="textSolverPropertyFieldName" alignment="1" pref="627" max="32767" attributes="1"/>
                                       </Group>
-                                      <EmptySpace max="-2" attributes="0"/>
                                   </Group>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="labeMultipleOccurrences" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace pref="666" max="32767" attributes="0"/>
-                                  </Group>
+                                  <Component id="labeMultipleOccurrences" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Group type="103" groupAlignment="1" max="-2" attributes="0">
                                           <Group type="102" alignment="0" attributes="1">
@@ -314,7 +310,7 @@
                                               <Component id="comboBoxSolverPropertyType" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                           <Group type="102" alignment="0" attributes="0">
-                                              <Component id="labelSolverPropertyValuetype" min="-2" max="-2" attributes="0"/>
+                                              <Component id="labelSolverPropertyValueType" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace min="-2" pref="71" max="-2" attributes="0"/>
                                               <Group type="103" groupAlignment="0" attributes="0">
                                                   <Component id="checkBoxMultipleOccurrences" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -324,9 +320,9 @@
                                       </Group>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
                                       <Component id="buttonSolverPropertyAddValueType" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace pref="540" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
+                              <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -361,7 +357,7 @@
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="comboBoxSolverPropertyValuetype" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="labelSolverPropertyValuetype" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="labelSolverPropertyValueType" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="buttonSolverPropertyAddValueType" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -369,7 +365,7 @@
                                   <Component id="labeMultipleOccurrences" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="checkBoxMultipleOccurrences" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="12" max="32767" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -436,10 +432,10 @@
                         <Property name="name" type="java.lang.String" value="comboBoxSolverPropertyValuetype" noResource="true"/>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JLabel" name="labelSolverPropertyValuetype">
+                    <Component class="javax.swing.JLabel" name="labelSolverPropertyValueType">
                       <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="labelSolverPropertyValuetype.text"/>
-                        <Property name="name" type="java.lang.String" value="labelSolverPropertyValuetype" noResource="true"/>
+                        <Property name="text" type="java.lang.String" resourceKey="labelSolverPropertyValueType.text"/>
+                        <Property name="name" type="java.lang.String" value="labelSolverPropertyValueType" noResource="true"/>
                       </Properties>
                     </Component>
                     <Component class="javax.swing.JButton" name="buttonSolverPropertyAddValueType">
