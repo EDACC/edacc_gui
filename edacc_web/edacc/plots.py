@@ -9,9 +9,12 @@
     :license: MIT, see LICENSE for details.
 """
 
+import numpy
 from rpy2 import robjects
 from rpy2.robjects.packages import importr
-grdevices = importr('grDevices')
+grdevices = importr('grDevices') # plotting target devices
+np = importr('np') # non-parametric kernel smoothing methods
+
 #cairo = importr('Cairo')
 #cairo.CairoFonts(regular="Bitstream Vera Sans:style=Regular",
 #                 bold="Bitstream Vera Sans:style=Bold",
@@ -19,9 +22,9 @@ grdevices = importr('grDevices')
 #                 symbol="Symbol")
 
 def scatter(points, xlabel, ylabel, title, timeout, filename, format='png'):
-    """ Scatter plot of the points given in the list points.
-        Each element should be a dictionary containing a key x and a key y with
-        the data to be plotted.
+    """ Scatter plot of the points given in the list :points:
+        Each elemento of :points: should be a tuple (x, y).
+        Returns a list with the points in device coordinates.
     """
     if format == 'png':
         #cairo.CairoPNG(file=filename, units="px", width=600,
@@ -46,8 +49,8 @@ def scatter(points, xlabel, ylabel, title, timeout, filename, format='png'):
     # to be able to plot in the same graph again
     robjects.r.par(new=1)
 
-    xs = [p['x'] for p in points]
-    ys = [p['y'] for p in points]
+    xs = [p[0] for p in points]
+    ys = [p[1] for p in points]
 
     # plot running times
     robjects.r.plot(robjects.FloatVector(xs), robjects.FloatVector(ys),
@@ -56,11 +59,6 @@ def scatter(points, xlabel, ylabel, title, timeout, filename, format='png'):
                     xaxs='i', yaxs='i',
                     xlab='', ylab='', pch=3, tck=0.015,
                     **{'cex.axis': 1.2, 'cex.main': 1.5})
-
-    pts = zip(robjects.r.grconvertX(robjects.FloatVector(xs), "user", "device"),
-              robjects.r.grconvertY(robjects.FloatVector(ys), "user", "device"))
-    pts = [{'x': pts[i][0], 'y': pts[i][1], 'instance': points[i]['instance']} for i in xrange(len(pts))]
-
 
     # plot labels and axis
     robjects.r.axis(side=4, tck=0.015, las=1,
@@ -71,6 +69,8 @@ def scatter(points, xlabel, ylabel, title, timeout, filename, format='png'):
     robjects.r.mtext(xlabel, side=3, padj=0, line=3, cex=1.2) # top axis label
     robjects.r.mtext(title, padj=-1.7, side=3, line=3, cex=1.7) # plot title
 
+    pts = zip(robjects.r.grconvertX(robjects.FloatVector(xs), "user", "device"),
+              robjects.r.grconvertY(robjects.FloatVector(ys), "user", "device"))
     grdevices.dev_off()
     return pts
 
@@ -154,5 +154,43 @@ def box_plot(data, filename, format='png'):
         data[key] = robjects.FloatVector(data[key])
 
     robjects.r.boxplot(robjects.DataFrame(data), main="Boxplot", horizontal=True)
+
+    grdevices.dev_off()
+
+def hist(data, filename, format='png'):
+    if format == 'png':
+        #cairo.CairoPNG(file=filename, units="px", width=600,
+        #               height=600, bg="white", pointsize=14)
+        grdevices.png(file=filename, units="px", width=600,
+                      height=600, type="cairo")
+    elif format == 'pdf':
+        grdevices.bitmap(file=filename, type="pdfwrite")
+
+
+    #robjects.r.hist(robjects.FloatVector(data), main="Histogram", breaks=30,
+    #                xlab='CPU Time', probability=True)
+    d = np.npudens(robjects.FloatVector(data))
+    robjects.r.plot(d, main='Non-parametric kernel density estimation',
+                    xlab='CPU Time', ylab='P(solve)')
+
+    grdevices.dev_off()
+
+def ecdf(data, filename, format='png'):
+    if format == 'png':
+        #cairo.CairoPNG(file=filename, units="px", width=600,
+        #               height=600, bg="white", pointsize=14)
+        grdevices.png(file=filename, units="px", width=600,
+                      height=600, type="cairo")
+    elif format == 'pdf':
+        grdevices.bitmap(file=filename, type="pdfwrite")
+
+    robjects.r.plot(robjects.r.ecdf(robjects.FloatVector(data)),
+                    main="Empirical Cumulative Distribution Function",
+                    xlab='CPU time', ylab='P(solve)',
+                    xlim=robjects.r.c(0,max(data)), ylim=robjects.r.c(0,1.0))
+    #robjects.r.par(new=1)
+    #exp = robjects.r.pexp(robjects.FloatVector(range(int(max(data)))), rate=1.0/numpy.average(data))
+    #robjects.r.plot(exp, main='', xlab='', ylab='',
+    #                xlim=robjects.r.c(0,max(data)), ylim=robjects.r.c(0,1.0))
 
     grdevices.dev_off()
