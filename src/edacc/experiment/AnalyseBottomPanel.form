@@ -22,7 +22,9 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="btnGeneratePlot" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="288" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="btnShowPlots" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="183" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -30,7 +32,10 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="btnGeneratePlot" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="btnGeneratePlot" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnShowPlots" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -44,6 +49,18 @@
         </Property>
         <Property name="text" type="java.lang.String" resourceKey="btnGeneratePlot.text"/>
         <Property name="name" type="java.lang.String" value="btnGeneratePlot" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnShowPlots">
+      <Properties>
+        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+          <action class="edacc.experiment.AnalyseBottomPanel" id="btnShowPlots" methodName="btnShowPlots"/>
+        </Property>
+        <Property name="text" type="java.lang.String" resourceKey="btnShowPlots.text"/>
+        <Property name="name" type="java.lang.String" value="btnShowPlots" noResource="true"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[99, 23]"/>
+        </Property>
       </Properties>
     </Component>
   </SubComponents>

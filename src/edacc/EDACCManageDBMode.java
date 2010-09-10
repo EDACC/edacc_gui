@@ -10,6 +10,7 @@
  */
 package edacc;
 
+import edacc.events.TaskEvents;
 import edacc.manageDB.*;
 import edacc.model.InstanceNotInDBException;
 import edacc.model.InstanceClass;
@@ -45,7 +46,7 @@ import org.jdesktop.application.Action;
  *
  * @author rretz
  */
-public class EDACCManageDBMode extends javax.swing.JPanel implements EDACCTaskEvents {
+public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents {
 
     public boolean unsavedChanges;
     public ManageDBInstances manageDBInstances;

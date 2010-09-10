@@ -1,6 +1,7 @@
 package edacc.model;
 
-import edacc.EDACCPlotView;
+import edacc.experiment.AnalyseController;
+import edacc.experiment.plots.PlotPanel;
 import org.rosuda.javaGD.GDInterface;
 
 /**
@@ -8,8 +9,11 @@ import org.rosuda.javaGD.GDInterface;
  * @author simon
  */
 public class RPlotDevice extends GDInterface {
+    private PlotPanel view;
+
     @Override
     public void gdOpen(double w, double h) {
-        c = EDACCPlotView.gdc;
+        view = AnalyseController.lastPlotPanel;
+        c = view.gdc;
     }
 }

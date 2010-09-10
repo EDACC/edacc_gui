@@ -13,8 +13,8 @@ import org.rosuda.JRI.Rengine;
  * @author simon
  */
 public abstract class Plot {
-
     protected ExperimentController expController;
+    protected Rengine rengine;
     private HashMap<ResultIdentifier, ExperimentResult> resultMap;
 
     protected Plot(ExperimentController expController) {
@@ -102,6 +102,21 @@ public abstract class Plot {
         }
     }
 
+    public Vector<double[]> getPoints(Rengine re, double[] xs, double[] ys) {
+
+        Vector<double[]> res = new Vector<double[]>();
+        if (xs.length != ys.length) {
+            return res;
+        }
+        for (int i = 0; i < xs.length; i++) {
+            double[] tmp = new double[2];
+            tmp[0] = xs[i];
+            tmp[1] = ys[i];
+            res.add(tmp);
+        }
+        return res;
+    }
+
     /**
      * Will be called to reinitialize the dependency gui values.
      * @throws Exception can throw an exception
@@ -114,13 +129,15 @@ public abstract class Plot {
      */
     public abstract Dependency[] getDependencies();
 
+    public abstract String getTitle();
     /**
      * Plots the plot to the R-engine
      * @param engine
      * @throws SQLException
      * @throws DependencyException
      */
-    public void plot(Rengine engine) throws SQLException, DependencyException {
+    public void plot(Rengine engine, Vector<PointInformation> pointInformations) throws SQLException, DependencyException {
+        this.rengine = engine;
         initializeResults();
     }
 }

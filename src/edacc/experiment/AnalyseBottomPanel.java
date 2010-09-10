@@ -6,25 +6,25 @@
 
 package edacc.experiment;
 
-import edacc.EDACCApp;
-import edacc.EDACCPlotView;
+import edacc.EDACCPlotTabView;
 import edacc.experiment.plots.DependencyException;
 import edacc.experiment.plots.Plot;
-import java.awt.Dimension;
+import edacc.experiment.plots.PlotPanel;
 import java.sql.SQLException;
-import javax.swing.JFrame;
 import org.jdesktop.application.Action;
 
 /**
  *
  * @author simon
  */
-public class AnalyseBottomPanel extends javax.swing.JPanel {
+public class AnalyseBottomPanel extends javax.swing.JPanel implements edacc.events.PlotTabEvents {
     private AnalysePanel analysePanel;
     /** Creates new form AnalyseBottomPanel */
     public AnalyseBottomPanel(AnalysePanel analysePanel) {
         initComponents();
         this.analysePanel = analysePanel;
+        EDACCPlotTabView.addListener(this);
+        tabViewCountChanged(EDACCPlotTabView.getTabViewCount());
     }
 
     /** This method is called from within the constructor to
@@ -37,6 +37,7 @@ public class AnalyseBottomPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         btnGeneratePlot = new javax.swing.JButton();
+        btnShowPlots = new javax.swing.JButton();
 
         setName("Form"); // NOI18N
 
@@ -46,6 +47,11 @@ public class AnalyseBottomPanel extends javax.swing.JPanel {
         btnGeneratePlot.setText(resourceMap.getString("btnGeneratePlot.text")); // NOI18N
         btnGeneratePlot.setName("btnGeneratePlot"); // NOI18N
 
+        btnShowPlots.setAction(actionMap.get("btnShowPlots")); // NOI18N
+        btnShowPlots.setText(resourceMap.getString("btnShowPlots.text")); // NOI18N
+        btnShowPlots.setName("btnShowPlots"); // NOI18N
+        btnShowPlots.setPreferredSize(new java.awt.Dimension(99, 23));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -53,13 +59,17 @@ public class AnalyseBottomPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnGeneratePlot)
-                .addContainerGap(288, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnShowPlots, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(183, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnGeneratePlot)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnGeneratePlot)
+                    .addComponent(btnShowPlots, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -73,16 +83,11 @@ public class AnalyseBottomPanel extends javax.swing.JPanel {
         
         try {
             analysePanel.updateDependencies();
-            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            EDACCPlotView plotView = new EDACCPlotView(mainFrame);
-
-            plotView.setMaximumSize(new Dimension(65535, 65535));
-            plotView.setMinimumSize(new Dimension(0,0));
-                        plotView.setSize(new Dimension(580,640));
-            plotView.setPreferredSize(new Dimension(580,640));
-            plot.plot(AnalyseController.getREngine());
-            plotView.setLocationRelativeTo(mainFrame);
-            plotView.setVisible(true);
+            PlotPanel panel = new PlotPanel();
+            plot.plot(AnalyseController.getREngine(panel), panel.pointInformations);
+            panel.setDeviceNumber(AnalyseController.getCurrentDeviceNumber());
+            EDACCPlotTabView.addPanelInMainTabView(plot.getTitle(), panel);
+            EDACCPlotTabView.setTabViewsVisible(true);
         } catch (DependencyException ex) {
             javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage(), "Invalid input", javax.swing.JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
@@ -92,8 +97,36 @@ public class AnalyseBottomPanel extends javax.swing.JPanel {
         }
     }
 
+    @Action
+    public void btnShowPlots() {
+        if ("Hide Plots".equals(btnShowPlots.getText())) {
+            EDACCPlotTabView.setTabViewsVisible(false);
+        } else {
+            EDACCPlotTabView.setTabViewsVisible(true);
+        }
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGeneratePlot;
+    private javax.swing.JButton btnShowPlots;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void tabViewCountChanged(int count) {
+        if (count == 0) {
+            btnShowPlots.setEnabled(false);
+        } else {
+            btnShowPlots.setEnabled(true);
+        }
+    }
+
+    @Override
+    public void tabViewVisibilityChanged(boolean visible) {
+        if (visible) {
+            btnShowPlots.setText("Hide Plots");
+        } else {
+            btnShowPlots.setText("Show Plots");
+        }
+    }
 
 }

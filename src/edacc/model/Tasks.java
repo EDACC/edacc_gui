@@ -1,7 +1,7 @@
 package edacc.model;
 
 import edacc.EDACCApp;
-import edacc.EDACCTaskEvents;
+import edacc.events.TaskEvents;
 import edacc.EDACCTaskView;
 import javax.swing.SwingUtilities;
 import org.jdesktop.application.Task;
@@ -14,7 +14,7 @@ import org.jdesktop.application.ApplicationContext;
  */
 public class Tasks extends org.jdesktop.application.Task<Void, Void> {
 
-    private EDACCTaskEvents view;
+    private TaskEvents view;
     private String methodName;
     private Class[] signature;
     private Object[] parameters;
@@ -31,7 +31,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
      * @param target The target object in which this method is declared and set as public.
      * @param view The corresponding view which implements EDACCTaskEvents to have control over this task.
      */
-    public static void startTask(String methodName, Class[] signature, Object[] parameters, Object target, EDACCTaskEvents view, boolean withTaskView) {
+    public static void startTask(String methodName, Class[] signature, Object[] parameters, Object target, TaskEvents view, boolean withTaskView) {
         if (task != null) {
             return;
         }
@@ -64,7 +64,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
         appC.getTaskMonitor().setForegroundTask(task);
     }
 
-    public static void startTask(String methodName, Class[] signature, Object[] parameters, Object target, EDACCTaskEvents view) {
+    public static void startTask(String methodName, Class[] signature, Object[] parameters, Object target, TaskEvents view) {
         startTask(methodName, signature, parameters, target, view, true);
     }
     
@@ -75,15 +75,15 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
      * @param target
      * @param view
      */
-    public static void startTask(String methodName, Object target, EDACCTaskEvents view) {
+    public static void startTask(String methodName, Object target, TaskEvents view) {
         startTask(methodName, target, view, true);
     }
 
-    public static void startTask(String methodName, Object target, EDACCTaskEvents view, boolean withTaskView) {
+    public static void startTask(String methodName, Object target, TaskEvents view, boolean withTaskView) {
         startTask(methodName, new Class[]{}, new Object[]{}, target, view, withTaskView);
     }
 
-    private Tasks(EDACCApp app, String methodName, Class[] signature, Object[] parameters, Object target, EDACCTaskEvents view) {
+    private Tasks(EDACCApp app, String methodName, Class[] signature, Object[] parameters, Object target, TaskEvents view) {
         super(app);
         this.methodName = methodName;
         this.signature = signature;

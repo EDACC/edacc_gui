@@ -49,8 +49,8 @@ public class CactusPlot extends Plot {
     }
 
     @Override
-    public void plot(Rengine engine) throws SQLException, DependencyException {
-        super.plot(engine);
+    public void plot(Rengine engine, Vector<PointInformation> pointInformations) throws SQLException, DependencyException {
+        super.plot(engine, pointInformations);
         int run = -3;
         if ("average".equals(comboRun.getSelectedItem())) {
             run = AVERAGE;
@@ -179,5 +179,10 @@ public class CactusPlot extends Plot {
         instanceSelector.btnSelectAll();
         solverConfigurationSelector.setSolverConfigurations(SolverConfigurationDAO.getSolverConfigurationByExperimentId(expController.getActiveExperiment().getId()));
         solverConfigurationSelector.btnSelectAll();
+    }
+
+    @Override
+    public String getTitle() {
+        return "Cactus Plot (" + expController.getActiveExperiment().getName() + ")";
     }
 }

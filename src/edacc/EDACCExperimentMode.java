@@ -5,6 +5,7 @@
  */
 package edacc;
 
+import edacc.events.TaskEvents;
 import edacc.experiment.AnalysePanel;
 import edacc.experiment.ExperimentInstanceClassTableModel;
 import edacc.experiment.ExperimentController;
@@ -60,7 +61,7 @@ import javax.swing.table.TableModel;
  *
  * @author simon
  */
-public class EDACCExperimentMode extends javax.swing.JPanel implements EDACCTaskEvents {
+public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvents {
 
     public ExperimentController expController;
     public ExperimentTableModel expTableModel;

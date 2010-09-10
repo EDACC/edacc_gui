@@ -1,11 +1,11 @@
-package edacc;
+package edacc.events;
 
 /**
  * Implement this interface to use task events.
  * @author simon
  * @see edacc.model.Tasks
  */
-public interface EDACCTaskEvents {
+public interface TaskEvents {
     /**
      * Called if a task finished successfully.
      * @param methodName the name of the method which finished successfully

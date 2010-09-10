@@ -9,7 +9,6 @@ import edacc.model.SolverConfiguration;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
@@ -27,13 +26,14 @@ public class SolverComparison extends Plot {
     private JComboBox combo1, combo2, comboRun;
     private JTextField txtMaxValue;
     private InstanceSelector instanceSelector;
-
+    private String plotTitle;
     public SolverComparison(ExperimentController expController) {
         super(expController);
         combo1 = new JComboBox();
         combo2 = new JComboBox();
         final ActionListener loadMaxValue = new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     loadMaxValue();
@@ -57,6 +57,7 @@ public class SolverComparison extends Plot {
                 };
     }
 
+    @Override
     public Dependency[] getDependencies() {
         return dependencies;
     }
@@ -67,8 +68,8 @@ public class SolverComparison extends Plot {
     }
 
     @Override
-    public void plot(final Rengine re) throws SQLException, DependencyException {
-        super.plot(re);
+    public void plot(final Rengine re, Vector<PointInformation> pointInformations) throws SQLException, DependencyException {
+        super.plot(re, pointInformations);
         if (!(combo1.getSelectedItem() instanceof SolverConfiguration) || !(combo2.getSelectedItem() instanceof SolverConfiguration)) {
             throw new DependencyException("You have to select two solvers.");
         }
@@ -87,10 +88,7 @@ public class SolverComparison extends Plot {
         if (instances == null || instances.size() == 0) {
             throw new DependencyException("You have to select instances in order to plot.");
         }
-        HashSet<Integer> selectedInstanceIds = new HashSet<Integer>();
-        for (Instance i : instances) {
-            selectedInstanceIds.add(i.getId());
-        }
+        
         double maxValue;
         try {
             maxValue = Double.parseDouble(txtMaxValue.getText());
@@ -100,13 +98,14 @@ public class SolverComparison extends Plot {
 
         SolverConfiguration xSolverConfig = (SolverConfiguration) combo1.getSelectedItem();
         SolverConfiguration ySolverConfig = (SolverConfiguration) combo2.getSelectedItem();
-
+        plotTitle = xSolverConfig.getName() + " vs. " + ySolverConfig.getName() + " (" + expController.getActiveExperiment().getName() + ")";
         Vector<Float> xsVec = new Vector<Float>();
         Vector<Float> ysVec = new Vector<Float>();
-        for (Integer instanceId : selectedInstanceIds) {
+
+        for (Instance instance : instances) {
             if (run == AVERAGE) {
-                Vector<ExperimentResult> resultsX = getResults(xSolverConfig.getId(), instanceId);
-                Vector<ExperimentResult> resultsY = getResults(ySolverConfig.getId(), instanceId);
+                Vector<ExperimentResult> resultsX = getResults(xSolverConfig.getId(), instance.getId());
+                Vector<ExperimentResult> resultsY = getResults(ySolverConfig.getId(), instance.getId());
                 for (int j = resultsX.size() - 1; j >= 0; j--) {
                     if (resultsX.get(j).getStatus() != 1) {
                         resultsX.remove(j);
@@ -123,8 +122,8 @@ public class SolverComparison extends Plot {
                 xsVec.add(new Float(super.getAverageTime(resultsX)));
                 ysVec.add(new Float(super.getAverageTime(resultsY)));
             } else if (run == MEDIAN) {
-                Vector<ExperimentResult> resultsX = getResults(xSolverConfig.getId(), instanceId);
-                Vector<ExperimentResult> resultsY = getResults(ySolverConfig.getId(), instanceId);
+                Vector<ExperimentResult> resultsX = getResults(xSolverConfig.getId(), instance.getId());
+                Vector<ExperimentResult> resultsY = getResults(ySolverConfig.getId(), instance.getId());
                 for (int j = resultsX.size() - 1; j >= 0; j--) {
                     if (resultsX.get(j).getStatus() != 1) {
                         resultsX.remove(j);
@@ -141,8 +140,8 @@ public class SolverComparison extends Plot {
                 xsVec.add(new Float(super.getMedianTime(resultsX)));
                 ysVec.add(new Float(super.getMedianTime(resultsY)));
             } else {
-                ExperimentResult xRes = super.getResult(xSolverConfig.getId(), instanceId, run);
-                ExperimentResult yRes = super.getResult(xSolverConfig.getId(), instanceId, run);
+                ExperimentResult xRes = super.getResult(xSolverConfig.getId(), instance.getId(), run);
+                ExperimentResult yRes = super.getResult(xSolverConfig.getId(), instance.getId(), run);
                 if (xRes.getStatus() == yRes.getStatus() && xRes.getStatus() != 1) {
                     continue;
                 }
@@ -162,19 +161,31 @@ public class SolverComparison extends Plot {
         String title = xlabel + " vs " + ylabel;
         re.assign("xs", xs);
         re.assign("ys", ys);
-        re.assign("marValues", new double[]{3, 3, 10, 6});
-        re.eval("par(mar=marValues)");
         re.assign("maxValue", new double[]{0, maxValue});
-        re.eval("plot(maxValue, maxValue, type='l', col='black', lty=2, xlim=c(0," + maxValue + "), ylim=c(0," + maxValue + "), xaxs='i', yaxs='i',xaxt='n',yaxt='n', xlab='', ylab='')");
-        re.eval("par(new=1)");
+        // set margin
+        re.eval("par(mar=c(3,3,9,6))");
+        
         re.eval("plot(xs, ys, type='p', col='red', las = 1, xlim=c(0," + maxValue + "), ylim=c(0," + maxValue + "), xaxs='i', yaxs='i',xlab='',ylab='',pch=3, tck=0.015, cex.axis=1.2, cex.main=1.5)");
         re.eval("axis(side=4, tck=0.015, las=1, cex.axis=1.2, cex.main=1.5)");
         re.eval("axis(side=3, tck=0.015, las=1, cex.axis=1.2, cex.main=1.5)");
         re.eval("mtext('" + ylabel + "', side=4, line=3, cex=1.2)");
         re.eval("mtext('" + xlabel + "', side=3, padj=0, line=3, cex=1.2)");
         re.eval("mtext('" + title + "', padj=-1.7, side=3, line=3, cex=1.7)");
+        re.eval("par(new=1)");
+        re.eval("plot(maxValue, maxValue, type='l', col='black', lty=2, xlim=c(0," + maxValue + "), ylim=c(0," + maxValue + "), xaxs='i', yaxs='i',xaxt='n',yaxt='n', xlab='', ylab='')");
+
+        Vector<double[]> points = getPoints(rengine, xs, ys);
+        int k = 0;
+        for (double[] point : points) {
+            pointInformations.add(new PointInformation(point, "<html>" + 
+                    xlabel + ": " + (double)Math.round(xs[k]*100)/100 + " sec<br>" +
+                    ylabel + ": " + (double)Math.round(ys[k]*100)/100 +" sec<br>" +
+                    "Instance: " + instances.get(k).getName()));
+            k++;
+        }
     }
 
+    @Override
     public void loadDefaultValues() throws SQLException {
         loadMaxValue();
         comboRun.removeAllItems();
@@ -213,41 +224,9 @@ public class SolverComparison extends Plot {
         }
         txtMaxValue.setText("" + Math.round(maxValue));
     }
-}
-
-class RunInstance {
-
-    public int run;
-    public int instanceId;
-
-    public RunInstance(int run, int instanceId) {
-        this.run = run;
-        this.instanceId = instanceId;
-    }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final RunInstance other = (RunInstance) obj;
-        if (this.run != other.run) {
-            return false;
-        }
-        if (this.instanceId != other.instanceId) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 23 * hash + this.run;
-        hash = 23 * hash + this.instanceId;
-        return hash;
+    public String getTitle() {
+        return plotTitle;
     }
 }
