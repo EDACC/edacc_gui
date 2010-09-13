@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -37,8 +38,8 @@ import javax.swing.table.TableRowSorter;
 public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
     private SolverPropertiesController controller;
     private SolverPropertyTableModel solPropertyTableModel;
-    private SolverPropertyValueComboBoxModel solPropTypeValueComModel;
     private SolverPropertyType[] comboBoxSolPropType = {SolverPropertyType.ClientOutput, SolverPropertyType.ResultFile, SolverPropertyType.Parameter};
+    private EDACCManagePropertyValueTypesDialog PropertyValueTypesDialog;
 
     /** Creates new form EDACCManageSolverPropertyDialog */
     public EDACCManageSolverPropertyDialog(java.awt.Frame parent, boolean modal) {
@@ -251,6 +252,11 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         buttonSolverPropertyAddValueType.setText(resourceMap.getString("buttonSolverPropertyAddValueType.text")); // NOI18N
         buttonSolverPropertyAddValueType.setEnabled(false);
         buttonSolverPropertyAddValueType.setName("buttonSolverPropertyAddValueType"); // NOI18N
+        buttonSolverPropertyAddValueType.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonSolverPropertyAddValueTypeActionPerformed(evt);
+            }
+        });
 
         labeSolverPropertyType.setText(resourceMap.getString("labeSolverPropertyType.text")); // NOI18N
         labeSolverPropertyType.setName("labeSolverPropertyType"); // NOI18N
@@ -429,6 +435,16 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
     private void comboBoxSolverPropertyTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxSolverPropertyTypeActionPerformed
         controller.SolverPropertyTypeChanged();
     }//GEN-LAST:event_comboBoxSolverPropertyTypeActionPerformed
+
+    private void buttonSolverPropertyAddValueTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSolverPropertyAddValueTypeActionPerformed
+      if(PropertyValueTypesDialog == null){
+            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+            PropertyValueTypesDialog = new EDACCManagePropertyValueTypesDialog(mainFrame, true);
+            PropertyValueTypesDialog.setLocationRelativeTo(mainFrame);
+            PropertyValueTypesDialog.initialize();
+      }
+      PropertyValueTypesDialog.setVisible(true);
+    }//GEN-LAST:event_buttonSolverPropertyAddValueTypeActionPerformed
 
     /**
     * @param args the command line arguments
