@@ -9,6 +9,7 @@ import edacc.EDACCManagePropertyValueTypesDialog;
 import edacc.model.NoConnectionToDBException;
 import edacc.satinstances.PropertyValueType;
 import edacc.satinstances.PropertyValueTypeManager;
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Vector;
@@ -44,11 +45,13 @@ public class PropertyValueTypesController {
     }
 
     void showPropertyValueType(int convertRowIndexToModel) {
+        main.enablePropertyValueTypeInputFields(false);
         main.showPropertyValueType((PropertyValueType)tablePropertyValueTypes.getModel().getValueAt(1, convertRowIndexToModel));
     }
 
-    public void createNewPropertyValueType() {
-        throw new UnsupportedOperationException("Not yet implemented");
+
+    public void createNewPropertyValueType(File file, String name) throws IOException, NoConnectionToDBException, SQLException {
+        PropertyValueTypeManager.getInstance().createNewPropertyValueType(file, name);
     }
 
 

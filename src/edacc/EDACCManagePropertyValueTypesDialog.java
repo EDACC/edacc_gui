@@ -254,9 +254,22 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_buttonChooseClassFileActionPerformed
 
     private void buttonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSaveActionPerformed
-        if(file != null){
-            controller.createNewPropertyValueType();
-        }else {
+        if((file != null) && (!this.textFieldName.getText().equals(""))){
+            try {
+                controller.createNewPropertyValueType(file, this.textFieldName.getText());
+            } catch (IOException ex) {
+                Logger.getLogger(EDACCManagePropertyValueTypesDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoConnectionToDBException ex) {
+                Logger.getLogger(EDACCManagePropertyValueTypesDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(EDACCManagePropertyValueTypesDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else if(this.textFieldName.getText().equals("")){
+            JOptionPane.showMessageDialog(this,
+                "No name entered.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }else if(file == null){
             JOptionPane.showMessageDialog(this,
                 "No class type file selected.",
                 "Error",

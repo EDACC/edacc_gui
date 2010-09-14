@@ -184,4 +184,8 @@ public class PropertyValueTypeManager {
         }
         return propertyTypes;
     }
+
+    public void createNewPropertyValueType(File file, String name) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
 }
