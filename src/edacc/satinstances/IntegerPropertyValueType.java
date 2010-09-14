@@ -35,4 +35,9 @@ public class IntegerPropertyValueType extends PropertyValueType<Integer> {
         return "Integer";
     }
 
+    @Override
+    public boolean isDefault() {
+        return true;
+    }
+
 }

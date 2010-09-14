@@ -12,6 +12,7 @@ package edacc.satinstances;
 public abstract class PropertyValueType<T> {
 
     public abstract String getName();
+    public abstract boolean isDefault();
 
     /**
      * Returns the string representation of a PropertyValue p of the given type.
