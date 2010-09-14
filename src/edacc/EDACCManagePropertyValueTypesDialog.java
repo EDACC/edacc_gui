@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import javax.swing.table.TableRowSorter;
 
 /**
@@ -30,8 +29,6 @@ import javax.swing.table.TableRowSorter;
 public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
     private PropertyValueTypesController controller;
     private PropertyValueTypeTableModel propValueTypeTableModel;
-    private File file;
-
     /** Creates new form EDACCManagePropertyValueTypesDialog */
     public EDACCManagePropertyValueTypesDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -73,14 +70,9 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
         panelMain = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablePropertyValueTypes = new javax.swing.JTable();
-        panelInputFields = new javax.swing.JPanel();
-        labelName = new javax.swing.JLabel();
-        textFieldName = new javax.swing.JTextField();
-        labelTypeClass = new javax.swing.JLabel();
-        buttonChooseClassFile = new javax.swing.JButton();
-        buttonSave = new javax.swing.JButton();
         buttonDone = new javax.swing.JButton();
-        buttonNew = new javax.swing.JButton();
+        buttonChooseClassFile = new javax.swing.JButton();
+        buttonRemove = new javax.swing.JButton();
 
         jFileChooser1.setName("jFileChooser1"); // NOI18N
 
@@ -108,76 +100,6 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
         tablePropertyValueTypes.setName("tablePropertyValueTypes"); // NOI18N
         jScrollPane1.setViewportView(tablePropertyValueTypes);
 
-        panelInputFields.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
-        panelInputFields.setName("panelInputFields"); // NOI18N
-
-        labelName.setText(resourceMap.getString("labelName.text")); // NOI18N
-        labelName.setName("labelName"); // NOI18N
-
-        textFieldName.setText(resourceMap.getString("textFieldName.text")); // NOI18N
-        textFieldName.setEnabled(false);
-        textFieldName.setName("textFieldName"); // NOI18N
-
-        labelTypeClass.setText(resourceMap.getString("labelTypeClass.text")); // NOI18N
-        labelTypeClass.setName("labelTypeClass"); // NOI18N
-
-        buttonChooseClassFile.setText(resourceMap.getString("buttonChooseClassFile.text")); // NOI18N
-        buttonChooseClassFile.setEnabled(false);
-        buttonChooseClassFile.setName("buttonChooseClassFile"); // NOI18N
-        buttonChooseClassFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonChooseClassFileActionPerformed(evt);
-            }
-        });
-
-        buttonSave.setText(resourceMap.getString("buttonSave.text")); // NOI18N
-        buttonSave.setEnabled(false);
-        buttonSave.setName("buttonSave"); // NOI18N
-        buttonSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonSaveActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout panelInputFieldsLayout = new javax.swing.GroupLayout(panelInputFields);
-        panelInputFields.setLayout(panelInputFieldsLayout);
-        panelInputFieldsLayout.setHorizontalGroup(
-            panelInputFieldsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelInputFieldsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelInputFieldsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelInputFieldsLayout.createSequentialGroup()
-                        .addGroup(panelInputFieldsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(labelName)
-                            .addComponent(labelTypeClass))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
-                        .addGroup(panelInputFieldsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(buttonChooseClassFile)
-                            .addComponent(textFieldName, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(buttonSave))
-                .addContainerGap())
-        );
-
-        panelInputFieldsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {buttonChooseClassFile, buttonSave});
-
-        panelInputFieldsLayout.setVerticalGroup(
-            panelInputFieldsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelInputFieldsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelInputFieldsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelName)
-                    .addComponent(textFieldName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(13, 13, 13)
-                .addGroup(panelInputFieldsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(labelTypeClass)
-                    .addComponent(buttonChooseClassFile))
-                .addGap(18, 18, 18)
-                .addComponent(buttonSave)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        panelInputFieldsLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {buttonChooseClassFile, buttonSave});
-
         buttonDone.setText(resourceMap.getString("buttonDone.text")); // NOI18N
         buttonDone.setName("buttonDone"); // NOI18N
         buttonDone.addActionListener(new java.awt.event.ActionListener() {
@@ -186,11 +108,19 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
             }
         });
 
-        buttonNew.setText(resourceMap.getString("buttonNew.text")); // NOI18N
-        buttonNew.setName("buttonNew"); // NOI18N
-        buttonNew.addActionListener(new java.awt.event.ActionListener() {
+        buttonChooseClassFile.setText(resourceMap.getString("buttonChooseClassFile.text")); // NOI18N
+        buttonChooseClassFile.setName("buttonChooseClassFile"); // NOI18N
+        buttonChooseClassFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonNewActionPerformed(evt);
+                buttonChooseClassFileActionPerformed(evt);
+            }
+        });
+
+        buttonRemove.setText(resourceMap.getString("buttonRemove.text")); // NOI18N
+        buttonRemove.setName("buttonRemove"); // NOI18N
+        buttonRemove.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonRemoveActionPerformed(evt);
             }
         });
 
@@ -198,27 +128,35 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
         panelMain.setLayout(panelMainLayout);
         panelMainLayout.setHorizontalGroup(
             panelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelMainLayout.createSequentialGroup()
+            .addGroup(panelMainLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(panelInputFields, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE)
-                    .addComponent(buttonDone)
-                    .addComponent(buttonNew, javax.swing.GroupLayout.Alignment.LEADING))
+                .addGroup(panelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE)
+                    .addGroup(panelMainLayout.createSequentialGroup()
+                        .addComponent(buttonChooseClassFile)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(buttonRemove)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 142, Short.MAX_VALUE)
+                        .addComponent(buttonDone)))
                 .addContainerGap())
         );
+
+        panelMainLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {buttonChooseClassFile, buttonDone, buttonRemove});
+
         panelMainLayout.setVerticalGroup(
             panelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelMainLayout.createSequentialGroup()
+            .addGroup(panelMainLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(buttonNew)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(panelInputFields, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(buttonDone))
+                .addGroup(panelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(buttonChooseClassFile)
+                    .addComponent(buttonDone)
+                    .addComponent(buttonRemove))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        panelMainLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {buttonChooseClassFile, buttonDone, buttonRemove});
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -234,7 +172,7 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(panelMain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -244,38 +182,24 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
         this.setVisible(false);
     }//GEN-LAST:event_buttonDoneActionPerformed
 
-    private void buttonNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonNewActionPerformed
-        controller.newPropertyValueType();
-    }//GEN-LAST:event_buttonNewActionPerformed
-
     private void buttonChooseClassFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonChooseClassFileActionPerformed
-        int returnVal = jFileChooser1.showOpenDialog(this);
-        this.file = jFileChooser1.getSelectedFile();
+        try {
+            int returnVal = jFileChooser1.showOpenDialog(this);
+            File file = jFileChooser1.getSelectedFile();
+            controller.createNewPropertyValueType(file);
+            controller.loadPropertyValueTypes();
+        } catch (IOException ex) {
+            Logger.getLogger(EDACCManagePropertyValueTypesDialog.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoConnectionToDBException ex) {
+            Logger.getLogger(EDACCManagePropertyValueTypesDialog.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(EDACCManagePropertyValueTypesDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_buttonChooseClassFileActionPerformed
 
-    private void buttonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSaveActionPerformed
-        if((file != null) && (!this.textFieldName.getText().equals(""))){
-            try {
-                controller.createNewPropertyValueType(file, this.textFieldName.getText());
-            } catch (IOException ex) {
-                Logger.getLogger(EDACCManagePropertyValueTypesDialog.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (NoConnectionToDBException ex) {
-                Logger.getLogger(EDACCManagePropertyValueTypesDialog.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                Logger.getLogger(EDACCManagePropertyValueTypesDialog.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }else if(this.textFieldName.getText().equals("")){
-            JOptionPane.showMessageDialog(this,
-                "No name entered.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-        }else if(file == null){
-            JOptionPane.showMessageDialog(this,
-                "No class type file selected.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_buttonSaveActionPerformed
+    private void buttonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemoveActionPerformed
+        controller.removePropertyValueType(tablePropertyValueTypes.convertRowIndexToModel(tablePropertyValueTypes.getSelectedRow()));
+    }//GEN-LAST:event_buttonRemoveActionPerformed
 
     /**
     * @param args the command line arguments
@@ -297,27 +221,11 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonChooseClassFile;
     private javax.swing.JButton buttonDone;
-    private javax.swing.JButton buttonNew;
-    private javax.swing.JButton buttonSave;
+    private javax.swing.JButton buttonRemove;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel labelName;
-    private javax.swing.JLabel labelTypeClass;
-    private javax.swing.JPanel panelInputFields;
     private javax.swing.JPanel panelMain;
     private javax.swing.JTable tablePropertyValueTypes;
-    private javax.swing.JTextField textFieldName;
     // End of variables declaration//GEN-END:variables
 
-    public void enablePropertyValueTypeInputFields(boolean enable) {
-        this.textFieldName.setEnabled(enable);
-        this.buttonSave.setEnabled(enable);
-        this.buttonChooseClassFile.setEnabled(enable);
-        file = null;
-    }
-
-    public void showPropertyValueType(PropertyValueType propertyValueType) {
-        this.enablePropertyValueTypeInputFields(true);
-        this.textFieldName.setText(propertyValueType.getName());
-    }
 }
