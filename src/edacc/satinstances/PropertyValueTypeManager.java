@@ -83,7 +83,7 @@ public class PropertyValueTypeManager {
         LinkedList<File> files = new LinkedList<File>();
         LinkedList<Class<PropertyValueType<?>>> propertyValueTypes = new LinkedList<Class<PropertyValueType<?>>>();
         while (rs.next()) {
-            File f = new File(rs.getString("name"));
+            File f = new File(rs.getString("typeClassFileName"));
             FileOutputStream out = new FileOutputStream(f);
             InputStream in = rs.getBinaryStream("typeClass");
             int len = 0;
