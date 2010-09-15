@@ -14,7 +14,7 @@ import javax.swing.table.AbstractTableModel;
  * @author rretz
  */
 public class PropertyValueTypeTableModel extends AbstractTableModel{
-    String[] columns = {"Name"};
+    String[] columns = {"Name", "Default"};
     Vector<PropertyValueType> rows = new Vector<PropertyValueType>();
 
     @Override
@@ -40,6 +40,8 @@ public class PropertyValueTypeTableModel extends AbstractTableModel{
             case 0:
                 return rows.get(rowIndex).getName();
             case 1:
+                return rows.get(rowIndex).isDefault();
+            case 2:
                 return rows.get(rowIndex);
             default:
                 return "";

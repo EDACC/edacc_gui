@@ -7,6 +7,7 @@ package edacc.satinstances;
 import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +32,8 @@ public class PropertyValueTypeManager {
 
     private static PropertyValueTypeManager instance;
     private Hashtable<String, PropertyValueType<?>> propertyTypes;
+    private String table = "PropertyValueType";
+    private String insertQuery = "INSERT INTO " + table + " (name, typeClass, isDefault) VALUES (?, ?, ?);";
 
     public static PropertyValueTypeManager getInstance() throws IOException, NoConnectionToDBException, SQLException {
         if (instance == null) {
@@ -79,7 +83,7 @@ public class PropertyValueTypeManager {
         LinkedList<File> files = new LinkedList<File>();
         LinkedList<Class<PropertyValueType<?>>> propertyValueTypes = new LinkedList<Class<PropertyValueType<?>>>();
         while (rs.next()) {
-            File f = new File(rs.getString("name"));
+            File f = new File(rs.getString("typeClassFileName"));
             FileOutputStream out = new FileOutputStream(f);
             InputStream in = rs.getBinaryStream("typeClass");
             int len = 0;
@@ -185,7 +189,29 @@ public class PropertyValueTypeManager {
         return propertyTypes;
     }
 
-    public void createNewPropertyValueType(File file, String name) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    /**
+     * Creates a new PropertyValueType<?> from the given File and adds it to the database
+     * @param file
+     * @throws IOException
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @author rretz
+     */
+    public void createNewPropertyValueType(File file) throws IOException, NoConnectionToDBException, SQLException {
+            LinkedList<File> files = new LinkedList<File>();
+            files.add(file);
+            ClassLoader cl = new URLClassLoader(fileListToURLArray(files), PropertyValueType.class.getClassLoader());
+            List<Class<PropertyValueType<?>>> input = this.getClassesFromFiles(files, cl);
+
+            Enumeration<PropertyValueType<?>> toAdd =  createProeprtyValueTypeObjects(input).elements();
+            PropertyValueType<?> tmp = toAdd.nextElement();
+            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
+            ps.setString(1, tmp.getName());
+            ps.setBinaryStream(8, new FileInputStream(file));
+            ps.setBoolean(3, tmp.isDefault());
+
+            ps.executeUpdate();
+
+            this.propertyTypes.put(tmp.getName(), tmp);           
     }
 }
