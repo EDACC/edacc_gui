@@ -37,7 +37,7 @@ public class PropertyValueTypesController {
       */
     public void loadPropertyValueTypes() throws NoConnectionToDBException, SQLException, IOException {
         ((PropertyValueTypeTableModel) tablePropertyValueTypes.getModel()).clearTable();
-        ((PropertyValueTypeTableModel) tablePropertyValueTypes.getModel()).addPropertyValueTypes(new Vector<PropertyValueType>(PropertyValueTypeManager.getInstance().getAll()));
+        //((PropertyValueTypeTableModel) tablePropertyValueTypes.getModel()).addPropertyValueTypes(new Vector<PropertyValueType>(PropertyValueTypeManager.getInstance().getAll()));
     }
 
     public void createNewPropertyValueType(File file) throws IOException, NoConnectionToDBException, SQLException {
