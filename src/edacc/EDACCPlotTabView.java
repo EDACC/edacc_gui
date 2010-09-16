@@ -14,7 +14,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -36,7 +35,6 @@ import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -94,37 +92,29 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         });
 
         if (downArrow == null) {
-            //org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCPlotTabView.class);
-            // final ImageIcon downArrowIcon = resourceMap.getImageIcon("image.downArrow");
-            // final Image bi = downArrowIcon.getImage();
-
             downArrow = new JWindow() {
-
                 @Override
                 public void paint(Graphics g) {
                     // this will draw an arrow
-
                     AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-                            .0f);
-                    AlphaComposite ac2 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
                             .8f);
                     Color old = g.getColor();
                     Graphics2D g2d = (Graphics2D) g;
                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                             RenderingHints.VALUE_ANTIALIAS_ON);
                     Composite composite = g2d.getComposite();
-                    g2d.setComposite(ac);
-                    g2d.fillRect(0, 0, 11, 15);
-                    g2d.setComposite(composite);
+                    g2d.setColor(new Color(0,0,0,0));
+                    g2d.fillRect(0, 0, getWidth(), getHeight());
                     g2d.setColor(Color.blue);
-                    g2d.setComposite(ac2);
+                    g2d.setComposite(ac);
                     g2d.fillPolygon(new int[]{3, 3, 7, 7}, new int[]{0, 8, 8, 0}, 4);
                     g2d.fillPolygon(new int[]{0, 10, 5}, new int[]{8, 8, 12}, 3);
+                    g2d.setComposite(composite);
                     g2d.setColor(old);
+
                 }
             };
             downArrow.setSize(10, 13);
-            //downArrow.setSize(downArrowIcon.getIconWidth(), downArrowIcon.getIconHeight());
         }
 
         tabbedPanePlots.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -199,7 +189,12 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                 x = (int) rect.getX() + tabbedPanePlots.getLocationOnScreen().x + rect.width - downArrow.getWidth() / 2;
                 y = tabbedPanePlots.getLocationOnScreen().y - downArrow.getHeight();
             }
-
+            if (x < 0) {
+                x = 0;
+            }
+            if (y < 0) {
+                y = 0;
+            }
             if (x > tabbedPanePlots.getLocationOnScreen().x + tabbedPanePlots.getWidth()) {
                 dropIdx = -1;
                 dropView = null;
@@ -207,6 +202,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                 return;
             } else {
                 if (!downArrow.getLocation().equals(new Point(x, y))) {
+
                     downArrow.setLocation(x, y);
                     downArrow.setVisible(false);
                 }
@@ -243,13 +239,13 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
     }
 
     private static void tabViewCountChanged() {
-        for (PlotTabEvents pte: listeners) {
+        for (PlotTabEvents pte : listeners) {
             pte.tabViewCountChanged(getTabViewCount());
         }
     }
 
     private static void tabViewVisiblityChanged(boolean visible) {
-        for (PlotTabEvents pte: listeners) {
+        for (PlotTabEvents pte : listeners) {
             pte.tabViewVisibilityChanged(visible);
         }
     }
@@ -405,7 +401,12 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                     // Get a buffered Image with the right dimension
                     BufferedImage bufferedImage = new BufferedImage(plotPanel.gdc.getWidth(), plotPanel.gdc.getHeight(), BufferedImage.TYPE_INT_RGB);
                     // paint the image on the new buffered image
-                    plotPanel.gdc.paintAll(bufferedImage.createGraphics());
+                    Graphics g = bufferedImage.createGraphics();
+                    g.setColor(Color.WHITE);
+                    g.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
+                    plotPanel.gdc.invalidate();
+                    plotPanel.gdc.paintAll(g);
+                    plotPanel.gdc.paint(g);
                     // save the image to disk
                     ImageIO.write(bufferedImage, imgType, f);
                     tc.setTitle(name);
@@ -592,31 +593,42 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         public void mouseDragged(MouseEvent e) {
             if (dragWindow == null && tabbedPanePlots.getTabCount() > 0 && tabbedPanePlots.getTabComponentAt(tabbedPanePlots.getSelectedIndex()).getBounds().contains(e.getPoint())) {
                 // a tab is being dragged
-                // create a new dragWindow ("screenshot" of tab)
-                dragWindow = new JWindow(new Frame());
-                Component comp = tabbedPanePlots.getSelectedComponent();
-                BufferedImage bufferedImage = new BufferedImage(comp.getWidth(), comp.getHeight(), BufferedImage.TYPE_INT_RGB);
-                comp.paintAll(bufferedImage.createGraphics());
+                // create a new dragWindow ("screenshot" of the current selected tab)
+
+                final PlotPanel comp = (PlotPanel) tabbedPanePlots.getSelectedComponent();
+                final BufferedImage bufferedImage = new BufferedImage(comp.gdc.getWidth(), comp.gdc.getHeight(), BufferedImage.TYPE_INT_RGB);
+
+                Graphics g = bufferedImage.createGraphics();
+                g.setColor(Color.WHITE);
+                g.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
+                comp.gdc.invalidate();
+                comp.gdc.paintAll(g);
+                comp.gdc.paint(g);
                 int height = 150;
                 int width = bufferedImage.getWidth() / bufferedImage.getHeight() * height;
                 if (width == 0) {
                     width = 10;
                 }
                 final Image img = bufferedImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-                Component comp2 = new JComponent() {
+                dragWindow = new JWindow() {
 
                     @Override
                     public void paint(Graphics g) {
+                        if (getSize().width <= 0 || getSize().height <= 0) {
+                            return;
+                        }
                         g.drawImage(img, 0, 0, this);
+
                     }
                 };
-                comp2.setPreferredSize(new Dimension(width, height));
-                dragWindow.add(comp2);
+                dragWindow.setSize(new Dimension(width, height));
                 try {
-                    com.sun.awt.AWTUtilities.setWindowOpacity(dragWindow, 0.8f);
+                    try {
+                        com.sun.awt.AWTUtilities.setWindowOpacity(dragWindow, 0.8f);
+                    } catch (NoClassDefFoundError er) {
+                    }
                 } catch (Exception ex) {
                 }
-                dragWindow.pack();
                 dragWindow.setVisible(true);
             }
             if (dragWindow != null) {

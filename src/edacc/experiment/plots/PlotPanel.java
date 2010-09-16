@@ -31,6 +31,7 @@ public class PlotPanel extends JPanel {
         super();
         pointInformations = new Vector<PointInformation>();
         gdc = new GDCanvas(0, 0);
+
         gdc.setPreferredSize(new Dimension(0, 0));
         gdc.setMinimumSize(new Dimension(0, 0));
         gdc.setMaximumSize(new Dimension(65535, 65535));

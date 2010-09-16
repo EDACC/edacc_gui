@@ -90,6 +90,7 @@ public class CactusPlot extends Plot {
                             results.remove(j);
                         }
                     }
+                    if (results.size() == 0) continue;
                     resultTimes[k++] = getAverageTime(results);
                 } else if (run == MEDIAN) {
                     Vector<ExperimentResult> results = getResults(sc.getId(), instanceId);
@@ -98,6 +99,7 @@ public class CactusPlot extends Plot {
                             results.remove(j);
                         }
                     }
+                    if (results.size() == 0) continue;
                     resultTimes[k++] = getMedianTime(results);
                 } else {
                     resultTimes[k++] = getResult(sc.getId(), instanceId, run).getTime();
