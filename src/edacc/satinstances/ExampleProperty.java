@@ -30,6 +30,11 @@ public class ExampleProperty implements Property {
         }
     }
 
+    @Override
+    public String getDescription() {
+        return "An example for an instance property.";
+    }
+
   
 
 }
