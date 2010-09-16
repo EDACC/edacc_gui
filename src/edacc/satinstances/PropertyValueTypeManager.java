@@ -82,10 +82,18 @@ public class PropertyValueTypeManager {
         ResultSet rs = ps.executeQuery();
         LinkedList<File> files = new LinkedList<File>();
         LinkedList<Class<PropertyValueType<?>>> propertyValueTypes = new LinkedList<Class<PropertyValueType<?>>>();
+        // the tmp directory (base file for all tmp files created in the loading process)
+        File base = new File("touch").getAbsoluteFile().getParentFile();
         while (rs.next()) {
+            // create a new file in the tmp dir (base) with the right package
+            // structure (eg. edacc/satinstances/Foo.class for the class edacc.satinstances.Foo.class)
             File f = new File(rs.getString("typeClassFileName"));
+            f.getParentFile().mkdirs();
+
             FileOutputStream out = new FileOutputStream(f);
             InputStream in = rs.getBinaryStream("typeClass");
+            System.out.print("IN: ");
+            System.out.println(in);
             int len = 0;
             byte[] buffer = new byte[256 * 1024];
             while ((len = in.read(buffer)) > -1) {
@@ -99,13 +107,22 @@ public class PropertyValueTypeManager {
         // Create a new URLClassLoader for loading the PropertyValueTypes with the
         // ClassLoader of the PropertyValueTypes.class as parent (which is important because
         // the Classcast won't work with any other ClassLoader)
-        ClassLoader cl = new URLClassLoader(fileListToURLArray(files),
+        ClassLoader cl = new URLClassLoader(new URL[]{base.toURI().toURL()},
                 PropertyValueType.class.getClassLoader());
         List<Class<PropertyValueType<?>>> classes = getClassesFromFiles(files, cl);
+
         // clean up temporary files
-        for (File f : files)
-            f.delete();
+        for (File f : files) {
+            cleanupParents(base, f);
+        }
         return createProeprtyValueTypeObjects(classes);
+    }
+
+    private void cleanupParents(File base, File f) {
+        if (!base.getAbsolutePath().equals(f.getAbsolutePath())) {
+            f.delete();
+            cleanupParents(base.getAbsoluteFile(), f.getAbsoluteFile().getParentFile());
+        }
     }
 
     /**
@@ -115,16 +132,16 @@ public class PropertyValueTypeManager {
      * @return the new {@link URL} array
      * @throws MalformedURLException
      */
-    private URL[] fileListToURLArray(List<File> files)
-            throws MalformedURLException {
-        URL[] urls = new URL[files.size()];
-        int i = 0;
-        for (File f : files) {
-            urls[i++] = f.toURI().toURL();
-        }
-        return urls;
+    /*    private URL[] fileListToURLArray(List<File> files)
+    throws MalformedURLException {
+    URL[] urls = new URL[files.size()];
+    int i = 0;
+    for (File f : files) {
+    System.out.println(f.getParentFile().toURI().toURL());
+    urls[i++] = f.getParentFile().toURI().toURL();
     }
-
+    return urls;
+    } */
     /**
      * Extracts all pluggable PropertyValueType classes from a list of files.
      *
@@ -140,7 +157,8 @@ public class PropertyValueTypeManager {
         for (File f : files) {
             if (f.getName().toLowerCase().endsWith(".class")) {
                 try {
-                    Class<?> cls = cl.loadClass(f.getName().substring(0,
+                    System.out.println("Absolute Path: " + f.getAbsolutePath());
+                    Class<?> cls = cl.loadClass("edacc.satinstances." + f.getName().substring(0,
                             f.getName().length() - 6).replace('/', '.'));
                     if (isPluggableClass(cls)) {
                         classes.add((Class<PropertyValueType<?>>) cls);
@@ -198,20 +216,42 @@ public class PropertyValueTypeManager {
      * @author rretz
      */
     public void createNewPropertyValueType(File file) throws IOException, NoConnectionToDBException, SQLException {
-            LinkedList<File> files = new LinkedList<File>();
-            files.add(file);
-            ClassLoader cl = new URLClassLoader(fileListToURLArray(files), PropertyValueType.class.getClassLoader());
-            List<Class<PropertyValueType<?>>> input = this.getClassesFromFiles(files, cl);
+        LinkedList<File> files = new LinkedList<File>();
+        files.add(file);
+        // TODO change
+/*        ClassLoader cl = new URLClassLoader(fileListToURLArray(files), PropertyValueType.class.getClassLoader());
+        List<Class<PropertyValueType<?>>> input = this.getClassesFromFiles(files, cl);
 
-            Enumeration<PropertyValueType<?>> toAdd =  createProeprtyValueTypeObjects(input).elements();
-            PropertyValueType<?> tmp = toAdd.nextElement();
-            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
-            ps.setString(1, tmp.getName());
-            ps.setBinaryStream(8, new FileInputStream(file));
-            ps.setBoolean(3, tmp.isDefault());
+        Enumeration<PropertyValueType<?>> toAdd = createProeprtyValueTypeObjects(input).elements();
+        PropertyValueType<?> tmp = toAdd.nextElement();
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
+        ps.setString(1, tmp.getName());
+        ps.setBinaryStream(8, new FileInputStream(file));
+        ps.setBoolean(3, tmp.isDefault());
 
-            ps.executeUpdate();
+        ps.executeUpdate();
 
-            this.propertyTypes.put(tmp.getName(), tmp);           
+        this.propertyTypes.put(tmp.getName(), tmp);*/
+    }
+
+    public static void main(String[] args) throws IOException, NoConnectionToDBException, SQLException, ClassNotFoundException {
+        DatabaseConnector.getInstance().connect("localhost", 3306, "root", "EDACC", "s3cret");
+        PropertyValueType t = PropertyValueTypeManager.getInstance().getPropertyValueTypeByName("Test");
+        System.out.println(t.getName());
+        // Create a File object on the root of the directory containing the class file
+       /* File file = new File("/home/dgall/Projekte/EDACC/");
+        try {
+        // Convert File to a URL
+        URL url = file.toURL(); // file:/c:/myclasses/
+        URL[] urls = new URL[]{url};
+        for (URL u : urls)
+        System.out.println(u);
+        // Create a new class loader with the directory
+        ClassLoader cl = new URLClassLoader(urls);
+        // Load in the class; MyClass.class should be located in // the directory file:/c:/myclasses/com/mycompany
+        Class cls = cl.loadClass("edacc.satinstances.TestProperty");
+        System.out.println(cls.getName());
+        } catch (MalformedURLException e) {
+        } catch (ClassNotFoundException e) { }*/
     }
 }
