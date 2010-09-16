@@ -43,7 +43,7 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
     }
 
      /**
-     * Initialize and chargs the tableSolverPropertys and the comboBoxSolverPropertyValueType with the corresponding items.
+     * Initialize and chargs the tableSolverPropertys with the corresponding items.
      */
     public void initialize() {
         try {
