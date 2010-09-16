@@ -18,18 +18,22 @@ public class SolverTableModel extends AbstractTableModel {
     private final int BINNAME = 2;
     private final int MD5 = 3;
     private final int DESCRIPTION = 1;
+    private final int AUTHORS = 4;
+    private final int VERSION = 5;
 
-    private String[] columns = {"Name", "Description", "Binary Name", "MD5 hash"};
+    private String[] columns = {"Name", "Description", "Binary Name", "MD5 hash", "Authors", "Version"};
     private Vector<Solver> solvers;
 
     public SolverTableModel() {
         solvers = new Vector<Solver>();
     }
 
+    @Override
     public int getRowCount() {
         return solvers.size();
     }
 
+    @Override
     public int getColumnCount() {
         return columns.length;
     }
@@ -39,6 +43,7 @@ public class SolverTableModel extends AbstractTableModel {
         return columns[col];
     }
 
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         Solver s = solvers.get(rowIndex);
         switch (columnIndex) {
@@ -50,6 +55,10 @@ public class SolverTableModel extends AbstractTableModel {
                 return s.getMd5();
             case DESCRIPTION:
                 return s.getDescription();
+            case AUTHORS:
+                return s.getAuthors();
+            case VERSION:
+                return s.getVersion();
         }
         return null;
     }

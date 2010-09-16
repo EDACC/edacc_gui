@@ -26,10 +26,10 @@ import java.io.ByteArrayOutputStream;
 public class SolverDAO {
 
     protected static final String table = "Solver";
-    protected static final String insertQuery = "INSERT INTO " + table + " (`name`, `binaryName`, `binary`, `description`, `md5`, `code`) VALUES (?, ?, ?, ?, ?, ?)";
+    protected static final String insertQuery = "INSERT INTO " + table + " (`name`, `binaryName`, `binary`, `description`, `md5`, `code`, `authors`, `version`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     protected static final String updateQueryBin = "UPDATE " + table + " SET `binaryName`=?, `binary`=? WHERE `idSolver`=?";
     protected static final String updateQueryCode = "UPDATE " + table + " SET `code`=? WHERE `idSolver`=?";
-    protected static final String updateQuery = "UPDATE " + table + " SET `name`=?, `description`=?, `md5`=? WHERE `idSolver`=?";
+    protected static final String updateQuery = "UPDATE " + table + " SET `name`=?, `description`=?, `md5`=?, `authors`=?, `version`=? WHERE `idSolver`=?";
     protected static final String removeQuery = "DELETE FROM " + table + " WHERE idSolver=?";
     private static final ObjectCache<Solver> cache = new ObjectCache<Solver>();
 
@@ -71,6 +71,8 @@ public class SolverDAO {
             }
             else
                 ps.setNull(6, Types.BLOB);
+            ps.setString(7, solver.getAuthors());
+            ps.setString(8, solver.getVersion());
             ps.executeUpdate();
         } else {
             // if solver already in DB, then update it
@@ -79,7 +81,9 @@ public class SolverDAO {
             ps.setString(1, solver.getName());
             ps.setString(2, solver.getDescription());
             ps.setString(3, solver.getMd5());
-            ps.setInt(4, solver.getId());
+            ps.setString(4, solver.getAuthors());
+            ps.setString(5, solver.getVersion());
+            ps.setInt(6, solver.getId());
             ps.executeUpdate();
             // then update the solver binary if necessary
             if (solver.getBinaryFile() != null) { // if binary is null, don't update the solver binary
@@ -157,6 +161,8 @@ public class SolverDAO {
         i.setBinaryName(rs.getString("binaryName"));
         i.setDescription(rs.getString("description"));
         i.setMd5(rs.getString("md5"));
+        i.setAuthor(rs.getString("authors"));
+        i.setVersion(rs.getString("version"));
         return i;
     }
     
@@ -190,7 +196,7 @@ public class SolverDAO {
      */
     public static LinkedList<Solver> getAll() throws SQLException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        ResultSet rs = st.executeQuery("SELECT idSolver, name, binaryName, description, md5 FROM " + table);
+        ResultSet rs = st.executeQuery("SELECT idSolver, name, binaryName, description, md5, authors, version FROM " + table);
         LinkedList<Solver> res = new LinkedList<Solver>();
         while (rs.next()) {
             Solver c = cache.getCached(rs.getInt("idSolver"));
@@ -217,7 +223,7 @@ public class SolverDAO {
      */
     public static Solver solverAlreadyInDB(Solver s) throws NoConnectionToDBException, SQLException {
         PreparedStatement ps;
-        final String Query = "SELECT idSolver, name, binaryName, description, md5 FROM " + table + " WHERE md5 = ?";
+        final String Query = "SELECT idSolver, name, binaryName, description, md5, authors, version FROM " + table + " WHERE md5 = ?";
         ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
         ps.setString(1, s.getMd5());
         ResultSet rs = ps.executeQuery();

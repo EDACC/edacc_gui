@@ -54,10 +54,12 @@ public class ManageDBSolvers implements Observer {
      * @param name
      * @param description
      */
-    public void applySolver(String name, String description) {
+    public void applySolver(String name, String description, String author, String version) {
         if (currentSolver != null) {
             currentSolver.setName(name);
             currentSolver.setDescription(description);
+            currentSolver.setAuthor(author);
+            currentSolver.setVersion(version);
         }
     }
 
@@ -170,6 +172,7 @@ public class ManageDBSolvers implements Observer {
         SolverDAO.exportSolverCode(s, f);
     }
 
+    @Override
     public void update(Observable o, Object arg) {
         solverTableModel.clear();
     }
