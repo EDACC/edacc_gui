@@ -4,6 +4,7 @@ import edacc.experiment.plots.PlotPanel;
 import java.awt.Dimension;
 import java.util.HashMap;
 import org.rosuda.JRI.REXP;
+import org.rosuda.JRI.RMainLoopCallbacks;
 import org.rosuda.JRI.Rengine;
 
 /**
@@ -15,6 +16,7 @@ public class AnalyseController {
     private static Rengine re;
     private static HashMap<Integer, PlotPanel> plotPanels = new HashMap<Integer, PlotPanel>();
     public static Rengine getREngine(PlotPanel plotPanel) throws REngineInitializationException {
+
         try {
             if (re == null || !re.isAlive()) {
                 if (!Rengine.versionCheck()) {
@@ -25,6 +27,7 @@ public class AnalyseController {
                 if (!re.waitForR()) {
                     throw new REngineInitializationException("Cannot load R.");
                 }
+
                 if (re.eval("library(JavaGD)") == null) {
                     re.end();
                     re = null;

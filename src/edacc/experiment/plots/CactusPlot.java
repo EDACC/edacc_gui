@@ -24,8 +24,6 @@ class SolverInfos {
  * @author simon
  */
 public class CactusPlot extends Plot {
-    private static final int AVERAGE = -2;
-    private static final int MEDIAN = -1;
     private static final String[] colors = {"red", "green", "blue", "darkgoldenrod1", "darkolivegreen", "darkorchid", "deeppink", "darkgreen", "blue4"};
     private Dependency[] dependencies;
     private JComboBox comboRun;
@@ -51,15 +49,17 @@ public class CactusPlot extends Plot {
     @Override
     public void plot(Rengine engine, Vector<PointInformation> pointInformations) throws SQLException, DependencyException {
         super.plot(engine, pointInformations);
-        int run = -3;
-        if ("average".equals(comboRun.getSelectedItem())) {
+        int run = -4;
+        if ("all runs - average".equals(comboRun.getSelectedItem())) {
             run = AVERAGE;
-        } else if ("median".equals(comboRun.getSelectedItem())) {
+        } else if ("all runs - median".equals(comboRun.getSelectedItem())) {
             run = MEDIAN;
+        } else if ("all runs".equals(comboRun.getSelectedItem())) {
+            run = ALLRUNS;
         } else if (comboRun.getSelectedItem() instanceof Integer) {
             run = (Integer) comboRun.getSelectedItem();
         }
-        if (run == -3) {
+        if (run == -4) {
             throw new DependencyException("You have to select a run.");
         }
         Vector<Instance> instances = instanceSelector.getSelectedInstances();
@@ -80,27 +80,27 @@ public class CactusPlot extends Plot {
         for (int i = 0; i < solver.length; i++) {
             SolverConfiguration sc = solverConfigs.get(i);
 
-            double[] resultTimes = new double[selectedInstanceIds.size()];
+
+
+            double[] resultTimes;
+            if (run == ALLRUNS) {
+                resultTimes = new double[selectedInstanceIds.size() * expController.getActiveExperiment().getNumRuns()];
+            } else {
+                resultTimes = new double[selectedInstanceIds.size()];
+            }
             int k = 0;
             for (Integer instanceId : selectedInstanceIds) {
-                if (run == AVERAGE) {
-                    Vector<ExperimentResult> results = getResults(sc.getId(), instanceId);
-                    for (int j = results.size()-1; j >= 0; j--) {
-                        if (results.get(j).getStatus() != 1) {
-                            results.remove(j);
+                try {
+                    if (run == ALLRUNS) {
+                        Vector<ExperimentResult> tmp = getResults(sc.getId(), instanceId);
+                        for (ExperimentResult er : tmp) {
+                            resultTimes[k++] = er.getTime();
                         }
+                    } else {
+                        resultTimes[k++] = getCPUTime(sc.getId(), instanceId, run);
                     }
-                    resultTimes[k++] = getAverageTime(results);
-                } else if (run == MEDIAN) {
-                    Vector<ExperimentResult> results = getResults(sc.getId(), instanceId);
-                    for (int j = results.size()-1; j >= 0; j--) {
-                        if (results.get(j).getStatus() != 1) {
-                            results.remove(j);
-                        }
-                    }
-                    resultTimes[k++] = getMedianTime(results);
-                } else {
-                    resultTimes[k++] = getResult(sc.getId(), instanceId, run).getTime();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             java.util.Arrays.sort(resultTimes);
@@ -121,7 +121,12 @@ public class CactusPlot extends Plot {
             }
         }
         max_y = max_y * 1.05;
-        int max_x = (int)(selectedInstanceIds.size() * 1.1)+1;//(int) (ExperimentResultDAO.getAllInstanceIdsByExperimentId(expController.getActiveExperiment().getId()).size()*1.1);
+        int max_x;
+        if (run == ALLRUNS) {
+            max_x = (int)(selectedInstanceIds.size() * expController.getActiveExperiment().getNumRuns() * 1.1)+1;
+        } else {
+            max_x = (int)(selectedInstanceIds.size() * 1.1)+1;
+        }
         engine.eval("plot(c(), c(), type='p', col='red', las=1, xlim=c(0,"+max_x+"), ylim=c(0,"+max_y+"), xaxs='i', yaxs='i', xlab='', ylab='', cex.main=1.5)");
         engine.eval("par(new=1)");
         String[] used_colors = new String[solver.length];
@@ -168,8 +173,9 @@ public class CactusPlot extends Plot {
 
     public void loadDefaultValues() throws SQLException {
         comboRun.removeAllItems();
-        comboRun.addItem("average");
-        comboRun.addItem("median");
+        comboRun.addItem("all runs - average");
+        comboRun.addItem("all runs - median");
+        comboRun.addItem("all runs");
         for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
             comboRun.addItem(i);
         }

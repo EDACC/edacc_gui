@@ -11,6 +11,8 @@ public class Solver extends BaseModel implements IntegerPKModel {
     private String description;
     private String md5;
     private File[] codeFile;
+    private String authors;
+    private String version;
     
     public Solver() {
         this.setNew();
@@ -33,6 +35,28 @@ public class Solver extends BaseModel implements IntegerPKModel {
 
     public void setDescription(String description) {
         this.description = description;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public String getAuthors() {
+        return authors;
+    }
+
+    public void setAuthor(String author) {
+        this.authors = author;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
         if (this.isSaved()) {
             this.setModified();
         }

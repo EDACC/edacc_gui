@@ -92,7 +92,7 @@ public class SolverPropertyTableModel extends AbstractTableModel {
      * @param resProperties the SolverProperty objects to add
      */
     public void addResultProperties(Vector<SolverProperty> resProperties){
-        for(int i = 0; i <= resProperties.size(); i++){
+        for(int i = 0; i < resProperties.size(); i++){
             addResultProperty(resProperties.get(i));
         }
         this.fireTableDataChanged();

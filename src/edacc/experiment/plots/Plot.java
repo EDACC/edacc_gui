@@ -13,6 +13,10 @@ import org.rosuda.JRI.Rengine;
  * @author simon
  */
 public abstract class Plot {
+
+    public static int ALLRUNS = -3;
+    public static int AVERAGE = -2;
+    public static int MEDIAN = -1;
     protected ExperimentController expController;
     protected Rengine rengine;
     private HashMap<ResultIdentifier, ExperimentResult> resultMap;
@@ -117,6 +121,31 @@ public abstract class Plot {
         return res;
     }
 
+    public float getCPUTime(int solverConfigId, int instanceId, int run) throws Exception {
+        if (run == AVERAGE || run == MEDIAN) {
+            Vector<ExperimentResult> results = getResults(solverConfigId, instanceId);
+            for (int j = results.size() - 1; j >= 0; j--) {
+                if (results.get(j).getStatus() != 1) {
+                    results.remove(j);
+                }
+            }
+            if (results.size() == 0) {
+                throw new Exception("No results.");
+            }
+            if (run == AVERAGE) {
+                return new Float(getAverageTime(results));
+            } else {
+                return new Float(getMedianTime(results));
+            }
+        } else {
+            ExperimentResult res = getResult(solverConfigId, instanceId, run);
+            if (res.getStatus() != 1) {
+                throw new Exception("No results.");
+            }
+            return res.getTime();
+        }
+    }
+
     /**
      * Will be called to reinitialize the dependency gui values.
      * @throws Exception can throw an exception
@@ -130,6 +159,7 @@ public abstract class Plot {
     public abstract Dependency[] getDependencies();
 
     public abstract String getTitle();
+
     /**
      * Plots the plot to the R-engine
      * @param engine

@@ -37,21 +37,15 @@ public class PropertyValueTypesController {
       */
     public void loadPropertyValueTypes() throws NoConnectionToDBException, SQLException, IOException {
         ((PropertyValueTypeTableModel) tablePropertyValueTypes.getModel()).clearTable();
-        ((PropertyValueTypeTableModel) tablePropertyValueTypes.getModel()).addPropertyValueTypes(new Vector<PropertyValueType>(PropertyValueTypeManager.getInstance().getAll()));
+        //((PropertyValueTypeTableModel) tablePropertyValueTypes.getModel()).addPropertyValueTypes(new Vector<PropertyValueType>(PropertyValueTypeManager.getInstance().getAll()));
     }
 
-    public void newPropertyValueType() {
-        main.enablePropertyValueTypeInputFields(true);
+    public void createNewPropertyValueType(File file) throws IOException, NoConnectionToDBException, SQLException {
+        PropertyValueTypeManager.getInstance().createNewPropertyValueType(file);
     }
 
-    void showPropertyValueType(int convertRowIndexToModel) {
-        main.enablePropertyValueTypeInputFields(false);
-        main.showPropertyValueType((PropertyValueType)tablePropertyValueTypes.getModel().getValueAt(1, convertRowIndexToModel));
-    }
-
-
-    public void createNewPropertyValueType(File file, String name) throws IOException, NoConnectionToDBException, SQLException {
-        PropertyValueTypeManager.getInstance().createNewPropertyValueType(file, name);
+    public void removePropertyValueType(int convertRowIndexToModel) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
 

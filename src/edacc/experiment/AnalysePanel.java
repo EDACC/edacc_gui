@@ -35,11 +35,16 @@ public class AnalysePanel extends javax.swing.JPanel {
         comboType = new javax.swing.JComboBox();
         comboType.setModel(new javax.swing.DefaultComboBoxModel(new String[]{}));
 
-        comboType.addItem(new SolverComparison(expController));
+        comboType.addItem(new ScatterOnePropertyTwoSolvers(expController));
+      //  comboType.addItem(new ScatterTwoPropertiesOneSolver(expController));
+      //  comboType.addItem(new ScatterInstancePropertySolverProperty(expController));
         comboType.addItem(new CactusPlot(expController));
+        comboType.addItem(new RTDPlot(expController));
+       // comboType.addItem(new RTDsPlot(expController));
         
         comboType.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (comboType.getSelectedItem() instanceof Plot) {
                     initialize();

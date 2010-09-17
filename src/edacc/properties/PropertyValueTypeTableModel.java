@@ -14,8 +14,8 @@ import javax.swing.table.AbstractTableModel;
  * @author rretz
  */
 public class PropertyValueTypeTableModel extends AbstractTableModel{
-    String[] columns = {"Name"};
-    Vector<PropertyValueType> rows = new Vector<PropertyValueType>();
+    String[] columns = {"Name", "Default"};
+    Vector<PropertyValueType<?>> rows = new Vector<PropertyValueType<?>>();
 
     @Override
     public int getRowCount() {
@@ -40,6 +40,8 @@ public class PropertyValueTypeTableModel extends AbstractTableModel{
             case 0:
                 return rows.get(rowIndex).getName();
             case 1:
+                return rows.get(rowIndex).isDefault();
+            case 2:
                 return rows.get(rowIndex);
             default:
                 return "";
@@ -55,7 +57,7 @@ public class PropertyValueTypeTableModel extends AbstractTableModel{
      * Adds the given PropertyValueType objects to the TableModel and updates the view of the table.
      * @param toAdd the PropertyValueType objects to add
      */
-    public void addPropertyValueTypes(Vector<PropertyValueType> toAdd){
+    public void addPropertyValueTypes(Vector<PropertyValueType<?>> toAdd){
         for(int i = 0; i < toAdd.size(); i++){
             rows.add(toAdd.get(i));
         }
@@ -66,7 +68,7 @@ public class PropertyValueTypeTableModel extends AbstractTableModel{
      * Removes the given PropertyValueType objects to the TableModel and updates the view of the table.
      * @param toRemove the PropertyValueType objects to remove
      */
-    public void removePropertyValueTypes(Vector<PropertyValueType> toRemove){
+    public void removePropertyValueTypes(Vector<PropertyValueType<?>> toRemove){
         for(int i = 0; i < toRemove.size(); i++){
             rows.remove(toRemove.get(i));
         }
