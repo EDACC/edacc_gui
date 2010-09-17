@@ -111,6 +111,11 @@ public class Instance extends BaseModel implements IntegerPKModel {
             throw new InstanceClassMustBeSourceException();
         this.instanceClass = instanceClass;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
     
     private int id;
     private String name;

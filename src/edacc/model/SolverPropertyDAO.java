@@ -63,6 +63,7 @@ public class SolverPropertyDAO {
         if(res != null){
             return res;
         }else{
+            res = new SolverProperty();
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                     "SELECT PropertyValueType_name, name, description, prefix, propertyType, multiple "
                     + "FROM " + table + " WHERE idSolverProperty=?");

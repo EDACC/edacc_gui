@@ -6,6 +6,7 @@ import edacc.model.ExperimentResult;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -18,19 +19,19 @@ import org.rosuda.JRI.Rengine;
  *
  * @author simon
  */
-public class SolverComparison extends Plot {
+public class ScatterOnePropertyTwoSolvers extends Plot {
 
-    private static int AVERAGE = -2;
-    private static int MEDIAN = -1;
     private Dependency[] dependencies;
-    private JComboBox combo1, combo2, comboRun;
+    private JComboBox combo1, combo2, comboProperty, comboRun;
     private JTextField txtMaxValue;
     private InstanceSelector instanceSelector;
     private String plotTitle;
-    public SolverComparison(ExperimentController expController) {
+
+    public ScatterOnePropertyTwoSolvers(ExperimentController expController) {
         super(expController);
         combo1 = new JComboBox();
         combo2 = new JComboBox();
+        comboProperty = new JComboBox();
         final ActionListener loadMaxValue = new ActionListener() {
 
             @Override
@@ -51,6 +52,7 @@ public class SolverComparison extends Plot {
         dependencies = new Dependency[]{
                     new Dependency("First solver", combo1),
                     new Dependency("Second solver", combo2),
+                    new Dependency("Property", comboProperty),
                     new Dependency("Instances", instanceSelector),
                     new Dependency("Plot for run", comboRun),
                     new Dependency("Max x/y-value (sec)", txtMaxValue)
@@ -63,32 +65,33 @@ public class SolverComparison extends Plot {
     }
 
     @Override
-    public String toString() {
-        return "Comparison between two solvers";
-    }
-
-    @Override
     public void plot(final Rengine re, Vector<PointInformation> pointInformations) throws SQLException, DependencyException {
         super.plot(re, pointInformations);
+        if (comboProperty.getItemCount() == 0) {
+            throw new DependencyException("You have to select a property.");
+        }
+
         if (!(combo1.getSelectedItem() instanceof SolverConfiguration) || !(combo2.getSelectedItem() instanceof SolverConfiguration)) {
             throw new DependencyException("You have to select two solvers.");
         }
-        int run = -3;
-        if ("average".equals(comboRun.getSelectedItem())) {
+        int run = -4;
+        if ("all runs - average".equals(comboRun.getSelectedItem())) {
             run = AVERAGE;
-        } else if ("median".equals(comboRun.getSelectedItem())) {
+        } else if ("all runs - median".equals(comboRun.getSelectedItem())) {
             run = MEDIAN;
+        } else if ("all runs".equals(comboRun.getSelectedItem())) {
+            run = ALLRUNS;
         } else if (comboRun.getSelectedItem() instanceof Integer) {
             run = (Integer) comboRun.getSelectedItem();
         }
-        if (run == -3) {
+        if (run == -4) {
             throw new DependencyException("You have to select a run.");
         }
         Vector<Instance> instances = instanceSelector.getSelectedInstances();
         if (instances == null || instances.size() == 0) {
             throw new DependencyException("You have to select instances in order to plot.");
         }
-        
+
         double maxValue;
         try {
             maxValue = Double.parseDouble(txtMaxValue.getText());
@@ -103,50 +106,35 @@ public class SolverComparison extends Plot {
         Vector<Float> ysVec = new Vector<Float>();
 
         for (Instance instance : instances) {
-            if (run == AVERAGE) {
-                Vector<ExperimentResult> resultsX = getResults(xSolverConfig.getId(), instance.getId());
-                Vector<ExperimentResult> resultsY = getResults(ySolverConfig.getId(), instance.getId());
-                for (int j = resultsX.size() - 1; j >= 0; j--) {
-                    if (resultsX.get(j).getStatus() != 1) {
-                        resultsX.remove(j);
+            try {
+                if (run == ALLRUNS) {
+                    Vector<ExperimentResult> xRes = getResults(xSolverConfig.getId(), instance.getId());
+                    Vector<ExperimentResult> yRes = getResults(ySolverConfig.getId(), instance.getId());
+                    if (xRes.size() != yRes.size()) {
+                        continue;
                     }
-                }
-                for (int j = resultsY.size() - 1; j >= 0; j--) {
-                    if (resultsY.get(j).getStatus() != 1) {
-                        resultsY.remove(j);
+                    for (int i = 0; i < xRes.size(); i++) {
+                        if (xRes.get(i).getStatus() == 1 && yRes.get(i).getStatus() == 1) {
+                            xsVec.add(xRes.get(i).getTime());
+                            ysVec.add(yRes.get(i).getTime());
+                            pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>" +
+                                    xSolverConfig.toString() + ": " + (double) Math.round(xRes.get(i).getTime() * 100) / 100 + " sec<br>" +
+                                    ySolverConfig.toString() + ": " + (double) Math.round(yRes.get(i).getTime() * 100) / 100 + " sec<br>" +
+                                    "Run: " + xRes.get(i).getRun() + "<br>" +
+                                    "Instance: " + instance.getName()));
+                        }
                     }
+                } else {
+                    float xsTime = getCPUTime(xSolverConfig.getId(), instance.getId(), run);
+                    float ysTime = getCPUTime(ySolverConfig.getId(), instance.getId(), run);
+                    xsVec.add(xsTime);
+                    ysVec.add(ysTime);
+                    pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>" +
+                            xSolverConfig.toString() + ": " + (double) Math.round(xsTime * 100) / 100 + " sec<br>" +
+                            ySolverConfig.toString() + ": " + (double) Math.round(ysTime * 100) / 100 + " sec<br>" +
+                            "Instance: " + instance.getName()));
                 }
-                if (resultsX.size() == 0 || resultsY.size() == 0) {
-                    continue;
-                }
-                xsVec.add(new Float(super.getAverageTime(resultsX)));
-                ysVec.add(new Float(super.getAverageTime(resultsY)));
-            } else if (run == MEDIAN) {
-                Vector<ExperimentResult> resultsX = getResults(xSolverConfig.getId(), instance.getId());
-                Vector<ExperimentResult> resultsY = getResults(ySolverConfig.getId(), instance.getId());
-                for (int j = resultsX.size() - 1; j >= 0; j--) {
-                    if (resultsX.get(j).getStatus() != 1) {
-                        resultsX.remove(j);
-                    }
-                }
-                for (int j = resultsY.size() - 1; j >= 0; j--) {
-                    if (resultsY.get(j).getStatus() != 1) {
-                        resultsY.remove(j);
-                    }
-                }
-                if (resultsX.size() == 0 || resultsY.size() == 0) {
-                    continue;
-                }
-                xsVec.add(new Float(super.getMedianTime(resultsX)));
-                ysVec.add(new Float(super.getMedianTime(resultsY)));
-            } else {
-                ExperimentResult xRes = super.getResult(xSolverConfig.getId(), instance.getId(), run);
-                ExperimentResult yRes = super.getResult(xSolverConfig.getId(), instance.getId(), run);
-                if (xRes.getStatus() == yRes.getStatus() && xRes.getStatus() != 1) {
-                    continue;
-                }
-                xsVec.add(xRes.getTime());
-                ysVec.add(yRes.getTime());
+            } catch (Exception e) {
             }
         }
 
@@ -164,7 +152,7 @@ public class SolverComparison extends Plot {
         re.assign("maxValue", new double[]{0, maxValue});
         // set margin
         re.eval("par(mar=c(3,3,9,6))");
-        
+
         re.eval("plot(xs, ys, type='p', col='red', las = 1, xlim=c(0," + maxValue + "), ylim=c(0," + maxValue + "), xaxs='i', yaxs='i',xlab='',ylab='',pch=3, tck=0.015, cex.axis=1.2, cex.main=1.5)");
         re.eval("axis(side=4, tck=0.015, las=1, cex.axis=1.2, cex.main=1.5)");
         re.eval("axis(side=3, tck=0.015, las=1, cex.axis=1.2, cex.main=1.5)");
@@ -177,29 +165,30 @@ public class SolverComparison extends Plot {
         Vector<double[]> points = getPoints(rengine, xs, ys);
         int k = 0;
         for (double[] point : points) {
-            pointInformations.add(new PointInformation(point, "<html>" + 
-                    xlabel + ": " + (double)Math.round(xs[k]*100)/100 + " sec<br>" +
-                    ylabel + ": " + (double)Math.round(ys[k]*100)/100 +" sec<br>" +
-                    "Instance: " + instances.get(k).getName()));
+            pointInformations.get(k).getPoint()[0] = point[0];
+            pointInformations.get(k).getPoint()[1] = point[1];
             k++;
         }
     }
 
     @Override
-    public void loadDefaultValues() throws SQLException {
+    public void loadDefaultValues() throws Exception {
         loadMaxValue();
         comboRun.removeAllItems();
         combo1.removeAllItems();
         combo2.removeAllItems();
+        comboProperty.removeAllItems();
         for (SolverConfiguration solConfig : ExperimentDAO.getSolverConfigurationsInExperiment(expController.getActiveExperiment())) {
             combo1.addItem(solConfig);
             combo2.addItem(solConfig);
         }
-        comboRun.addItem("average");
-        comboRun.addItem("median");
+        comboRun.addItem("all runs - average");
+        comboRun.addItem("all runs - median");
+        comboRun.addItem("all runs");
         for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
             comboRun.addItem(i);
         }
+        comboProperty.addItem("CPU-Time");
         Vector<Instance> instances = new Vector<Instance>();
         instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
         instanceSelector.setInstances(instances);
@@ -228,5 +217,10 @@ public class SolverComparison extends Plot {
     @Override
     public String getTitle() {
         return plotTitle;
+    }
+
+    @Override
+    public String toString() {
+        return "Scatter plot - One result property of two solvers";
     }
 }
