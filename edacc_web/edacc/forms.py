@@ -103,7 +103,27 @@ class TwoSolversOnePropertyScatterPlotForm(Form):
     solver_config1 = QuerySelectField('First Solver Configuration')
     solver_config2 = QuerySelectField('Second Solver Configuration')
     instance_filter = TextField('Filter Instances')
-    #solver_property = SelectField('Property')
+    solver_property = SelectField('Property')
+    instances = QuerySelectMultipleField('Instances', get_pk=lambda i: i.idInstance)
+    scaling = RadioField('Axes scale', choices=[('none', 'none'), ('log', 'log'),
+                                             ('loglog', 'log-log')])
+    run = SelectField('Plot for run')
+
+class OneSolverTwoResultPropertiesPlotForm(Form):
+    solver_config = QuerySelectField('Solver Configuration')
+    solver_property1 = SelectField('First Result Property')
+    solver_property2 = SelectField('Second Result Property')
+    instance_filter = TextField('Filter Instances')
+    instances = QuerySelectMultipleField('Instances', get_pk=lambda i: i.idInstance)
+    scaling = RadioField('Axes scale', choices=[('none', 'none'), ('log', 'log'),
+                                             ('loglog', 'log-log')])
+    run = SelectField('Plot for run')
+
+class OneSolverInstanceAgainstResultPropertyPlotForm(Form):
+    solver_config = QuerySelectField('Solver Configuration')
+    solver_property = SelectField('Result Property')
+    instance_property = SelectField('Instance Property')
+    instance_filter = TextField('Filter Instances')
     instances = QuerySelectMultipleField('Instances', get_pk=lambda i: i.idInstance)
     scaling = RadioField('Axes scale', choices=[('none', 'none'), ('log', 'log'),
                                              ('loglog', 'log-log')])
@@ -119,3 +139,17 @@ class RTDComparisonForm(Form):
     solver_config2 = QuerySelectField('Second Solver Configuration')
     instance = QuerySelectField('Instance', get_pk=lambda i: i.idInstance)
     instance_filter = TextField('Filter Instances')
+
+class RTDPlotsForm(Form):
+    sc = QuerySelectMultipleField('Solver Configurations')
+    instance = QuerySelectField('Instance', get_pk=lambda i: i.idInstance)
+    instance_filter = TextField('Filter Instances')
+
+class RTDPlotForm(Form):
+    solver_config = QuerySelectField('Solver Configuration')
+    instance = QuerySelectField('Instance', get_pk=lambda i: i.idInstance)
+    instance_filter = TextField('Filter Instances')
+
+class ProbabilisticDominationForm(Form):
+    solver_config1 = QuerySelectField('First Solver Configuration')
+    solver_config2 = QuerySelectField('Second Solver Configuration')
