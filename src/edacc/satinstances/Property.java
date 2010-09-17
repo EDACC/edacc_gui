@@ -19,6 +19,11 @@ public interface Property {
     public String getName();
 
     /**
+     * @return the description of the property.
+     */
+    public String getDescription();
+
+    /**
      *
      * @param f
      * @return the value of the property for a given instance.

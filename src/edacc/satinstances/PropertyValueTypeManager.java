@@ -7,18 +7,15 @@ package edacc.satinstances;
 import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -92,8 +89,6 @@ public class PropertyValueTypeManager {
 
             FileOutputStream out = new FileOutputStream(f);
             InputStream in = rs.getBinaryStream("typeClass");
-            System.out.print("IN: ");
-            System.out.println(in);
             int len = 0;
             byte[] buffer = new byte[256 * 1024];
             while ((len = in.read(buffer)) > -1) {
