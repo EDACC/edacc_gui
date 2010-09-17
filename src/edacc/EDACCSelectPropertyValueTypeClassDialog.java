@@ -11,10 +11,18 @@
 
 package edacc;
 
+import edacc.model.NoConnectionToDBException;
+import edacc.properties.PropertyValueTypeSelectionModel;
 import edacc.properties.PropertyValueTypeTableModel;
 import edacc.properties.SelectPropertyValueTypeClassController;
 import edacc.satinstances.PropertyValueType;
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
 /**
@@ -23,7 +31,8 @@ import javax.swing.table.TableRowSorter;
  */
 public class EDACCSelectPropertyValueTypeClassDialog extends javax.swing.JDialog {
     private SelectPropertyValueTypeClassController controller;
-    private PropertyValueTypeTableModel propValueTypeTableModel;
+    private PropertyValueTypeSelectionModel propValueTypeTableModel;
+    private File file;
 
     /** Creates new form EDACCSelectPropertyValueTypeClassDialog */
     public EDACCSelectPropertyValueTypeClassDialog(java.awt.Frame parent, boolean modal) {
@@ -31,18 +40,11 @@ public class EDACCSelectPropertyValueTypeClassDialog extends javax.swing.JDialog
         initComponents();
 
         // initialize tablePropertyValueTypes
-        propValueTypeTableModel = new PropertyValueTypeTableModel();
+        propValueTypeTableModel = new PropertyValueTypeSelectionModel(new String[]{"name"});
         tablePropertyValueTypes.setModel(propValueTypeTableModel);
-        tablePropertyValueTypes.setRowSorter(new TableRowSorter<PropertyValueTypeTableModel>(propValueTypeTableModel));
+        tablePropertyValueTypes.setRowSorter(new TableRowSorter<PropertyValueTypeSelectionModel>(propValueTypeTableModel));
 
         controller = new SelectPropertyValueTypeClassController(this, tablePropertyValueTypes);
-    }
-
-     /**
-     * Initialize and chargs the tableSolverPropertys and the comboBoxSolverPropertyValueType with the corresponding items.
-     */
-    public void initialize(Vector<PropertyValueType<?>> located) {
-        propValueTypeTableModel.addPropertyValueTypes(located);
     }
 
     /** This method is called from within the constructor to
@@ -159,7 +161,15 @@ public class EDACCSelectPropertyValueTypeClassDialog extends javax.swing.JDialog
         for (int i = 0; i < selectedRows.length; i++){
             selectedRows[i] = tablePropertyValueTypes.convertRowIndexToModel(selectedRows[i]);
         }
-        controller.addPropertyValueTypes(selectedRows);
+        try {
+            controller.addPropertyValueTypes(selectedRows, file);
+        } catch (IOException ex) {
+            Logger.getLogger(EDACCSelectPropertyValueTypeClassDialog.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoConnectionToDBException ex) {
+            Logger.getLogger(EDACCSelectPropertyValueTypeClassDialog.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(EDACCSelectPropertyValueTypeClassDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
     }//GEN-LAST:event_buttonAddActionPerformed
 
@@ -187,5 +197,11 @@ public class EDACCSelectPropertyValueTypeClassDialog extends javax.swing.JDialog
     private javax.swing.JPanel panelMain;
     private javax.swing.JTable tablePropertyValueTypes;
     // End of variables declaration//GEN-END:variables
+
+    void initialize(File file) throws SQLException, NoConnectionToDBException, IOException {
+        this.file = file;
+        Vector<String> names = controller.readPropertyValueTypesFromFile(file);
+        propValueTypeTableModel.addRows(names);
+    }
 
 }

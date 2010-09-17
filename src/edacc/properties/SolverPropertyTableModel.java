@@ -84,7 +84,6 @@ public class SolverPropertyTableModel extends AbstractTableModel {
      */
     private void addResultProperty(SolverProperty resProperty){
         rows.add(resProperty);
-
     }
 
     /**

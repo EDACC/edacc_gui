@@ -6,6 +6,7 @@
 package edacc.properties;
 
 import edacc.EDACCManagePropertyValueTypesDialog;
+import edacc.EDACCSelectPropertyValueTypeClassDialog;
 import edacc.model.NoConnectionToDBException;
 import edacc.satinstances.PropertyValueType;
 import edacc.satinstances.PropertyValueTypeManager;
@@ -22,6 +23,7 @@ import javax.swing.JTable;
 public class PropertyValueTypesController {
     private EDACCManagePropertyValueTypesDialog main;
     private JTable tablePropertyValueTypes;
+    private EDACCSelectPropertyValueTypeClassDialog selectValueType;
 
 
      public PropertyValueTypesController(EDACCManagePropertyValueTypesDialog main, JTable tablePropertyValueTypes) {
@@ -41,7 +43,8 @@ public class PropertyValueTypesController {
     }
 
     public void createNewPropertyValueType(File file) throws IOException, NoConnectionToDBException, SQLException {
-        PropertyValueTypeManager.getInstance().createNewPropertyValueType(file);
+        PropertyValueTypeManager.getInstance().readNameFromJarFile(file);
+
     }
 
     public void removePropertyValueType(int convertRowIndexToModel) {

@@ -7,6 +7,7 @@ package edacc.satinstances;
 import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +21,10 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
+import sun.tools.jar.resources.jar;
 
 /**
  *
@@ -229,7 +234,7 @@ public class PropertyValueTypeManager {
         this.propertyTypes.put(tmp.getName(), tmp);*/
     }
 
-    public static void main(String[] args) throws IOException, NoConnectionToDBException, SQLException, ClassNotFoundException {
+   /* public static void main(String[] args) throws IOException, NoConnectionToDBException, SQLException, ClassNotFoundException {
         DatabaseConnector.getInstance().connect("localhost", 3306, "root", "EDACC", "s3cret");
         PropertyValueType t = PropertyValueTypeManager.getInstance().getPropertyValueTypeByName("Test");
         System.out.println(t.getName());
@@ -248,5 +253,33 @@ public class PropertyValueTypeManager {
         System.out.println(cls.getName());
         } catch (MalformedURLException e) {
         } catch (ClassNotFoundException e) { }*/
+   // }
+
+    public Vector<String> readNameFromJarFile(File file) throws IOException{
+        Vector<String> names = new Vector<String>();
+        JarInputStream jaris = new JarInputStream(new FileInputStream(file));
+        JarEntry ent = null;
+        ent = jaris.getNextJarEntry();
+        while ((ent = jaris.getNextJarEntry()) != null) {
+            if (ent.getName().toLowerCase().endsWith(".class")) {
+                names.add(ent.getName().substring(0, (ent.getName().length() - 6)));
+            }
+        }
+        return names;
+
+    }
+
+    public void addPropertyValueTypes(Vector<String> toAdd, File file) throws IOException {
+        JarInputStream jaris = new JarInputStream(new FileInputStream(file));
+        JarEntry ent = null;
+        ent = jaris.getNextJarEntry();
+        while ((ent = jaris.getNextJarEntry()) != null) {
+            for(int i = 0; i < toAdd.size(); i++){
+                if (ent.getName().toLowerCase().equals(toAdd.get(i)+ ".class")) {
+                   File test = new File(ent.toString());
+                }
+            }
+            
+        }
     }
 }

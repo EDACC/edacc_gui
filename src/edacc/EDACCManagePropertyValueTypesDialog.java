@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.table.TableRowSorter;
 
 /**
@@ -29,6 +30,7 @@ import javax.swing.table.TableRowSorter;
 public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
     private PropertyValueTypesController controller;
     private PropertyValueTypeTableModel propValueTypeTableModel;
+    private EDACCSelectPropertyValueTypeClassDialog selectValueType;
     /** Creates new form EDACCManagePropertyValueTypesDialog */
     public EDACCManagePropertyValueTypesDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -186,6 +188,11 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
         try {
             int returnVal = jFileChooser1.showOpenDialog(this);
             File file = jFileChooser1.getSelectedFile();
+            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+            selectValueType = new EDACCSelectPropertyValueTypeClassDialog(mainFrame, true);
+            selectValueType.setLocationRelativeTo(mainFrame);
+            selectValueType.initialize(file);
+            selectValueType.setVisible(true);
             controller.createNewPropertyValueType(file);
             controller.loadPropertyValueTypes();
         } catch (IOException ex) {

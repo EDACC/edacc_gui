@@ -28,7 +28,7 @@ public class PropertyValueTypeTableModel extends AbstractTableModel{
     }
 
     /**
-     *  Returns the value of the requested cell. If the columnIndex is 1, the PropertyValueObject from the table
+     *  Returns the value of the requested cell. If the columnIndex is 2, the PropertyValueObject from the table
      * is returned. On default the String "" is returned.
      * @param rowIndex
      * @param columnIndex

@@ -6,6 +6,13 @@
 package edacc.properties;
 
 import edacc.EDACCSelectPropertyValueTypeClassDialog;
+import edacc.model.NoConnectionToDBException;
+import edacc.satinstances.PropertyValueType;
+import edacc.satinstances.PropertyValueTypeManager;
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Vector;
 import javax.swing.JTable;
 
 /**
@@ -21,8 +28,17 @@ public class SelectPropertyValueTypeClassController {
         this.tablePropertyValueTypes = tablePropertyValueTypes;
     }
 
-    public void addPropertyValueTypes(int[] selectedRows) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    public void addPropertyValueTypes(int[] selectedRows, File file) throws IOException, NoConnectionToDBException, SQLException {
+        Vector<String> toAdd = new Vector<String>();
+        for(int i = 0; i < selectedRows.length; i++){
+            toAdd.add((String)((PropertyValueTypeSelectionModel)tablePropertyValueTypes.getModel()).getValueAt(selectedRows[i], 0));
+        }
+        PropertyValueTypeManager.getInstance().addPropertyValueTypes(toAdd, file);
+       
+    }
+
+    public Vector<String> readPropertyValueTypesFromFile(File file) throws SQLException, NoConnectionToDBException, IOException{
+        return  PropertyValueTypeManager.getInstance().readNameFromJarFile(file);
     }
 
 }
