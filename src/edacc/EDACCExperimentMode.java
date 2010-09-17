@@ -18,7 +18,6 @@ import edacc.experiment.SolverTableModel;
 import edacc.gridqueues.GridQueuesController;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
-import edacc.model.GridQueue;
 import edacc.model.Solver;
 import edacc.model.TaskCancelledException;
 import edacc.model.Tasks;
@@ -91,12 +90,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tableExperiments.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "");
         tableExperiments.addKeyListener(new KeyListener() {
 
+            @Override
             public void keyTyped(KeyEvent e) {
             }
 
+            @Override
             public void keyPressed(KeyEvent e) {
             }
 
+            @Override
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     btnLoadExperiment();
@@ -105,6 +107,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         });
         tableExperiments.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 boolean mod = false;
                 if (tableExperiments.getSelectedRow() != -1) {
@@ -183,25 +186,22 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         GridQueuesController.getInstance().addObserver(new Observer() {
 
+            @Override
             public void update(Observable o, Object arg) {
-                if (GridQueuesController.getInstance().getChosenQueue() == null) {
-                    btnGenerateJobs.setEnabled(false);
+                try {
+                    if (GridQueuesController.getInstance().getChosenQueuesByExperiment(expController.getActiveExperiment()).size() == 0) {
+                        btnGeneratePackage.setEnabled(false);
+                    } else {
+                        btnGeneratePackage.setEnabled(true);
+                    }
+                } catch (SQLException ex) {
                     btnGeneratePackage.setEnabled(false);
-                } else {
-                    btnGenerateJobs.setEnabled(true);
-                    btnGeneratePackage.setEnabled(true);
                 }
             }
         });
-        if (GridQueuesController.getInstance().getChosenQueue() == null) {
-            btnGenerateJobs.setEnabled(false);
-            btnGeneratePackage.setEnabled(false);
-        } else {
-            btnGenerateJobs.setEnabled(true);
-            btnGeneratePackage.setEnabled(true);
-        }
         DatabaseConnector.getInstance().addObserver(new Observer() {
 
+            @Override
             public void update(Observable o, Object arg) {
                 if (!DatabaseConnector.getInstance().isConnected()) {
                     if (((EDACCView) EDACCApp.getApplication().getMainView()).getMode() == EDACCExperimentMode.this) {
@@ -1293,6 +1293,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             // generate jobs tab
             lblCurNumRuns.setText("currently: " + String.valueOf(expController.getActiveExperiment().getNumRuns()));
             lblNumJobs.setText(String.valueOf(expController.getNumJobs()) + " jobs in the database");
+            try {
+                if (GridQueuesController.getInstance().getChosenQueuesByExperiment(expController.getActiveExperiment()).size() == 0) {
+                    btnGeneratePackage.setEnabled(false);
+                } else {
+                    btnGeneratePackage.setEnabled(true);
+                }
+            } catch (SQLException ex) {
+                btnGeneratePackage.setEnabled(false);
+            }
         } else if (manageExperimentPane.getSelectedIndex() == 4) {
             try {
                 // job browser tab
@@ -1344,8 +1353,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         }
 
-        File zipFile = new File(packageFileChooser.getSelectedFile().getAbsolutePath() + System.getProperty("file.separator") + expController.getActiveExperiment().getDate().toString() + " - " + expController.getActiveExperiment().getName() + ".zip");
-        Tasks.startTask("generatePackage", new Class[]{File.class, edacc.model.Tasks.class}, new Object[]{zipFile, null}, expController, this);
+        String location = packageFileChooser.getSelectedFile().getAbsolutePath() + System.getProperty("file.separator");
+        Tasks.startTask("generatePackage", new Class[]{String.class, edacc.model.Tasks.class}, new Object[]{location, null}, expController, this);
     }//GEN-LAST:event_btnGeneratePackage
 
     private void btnSelectAllInstanceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstanceClassesActionPerformed
@@ -1656,28 +1665,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         try {
             int numRuns = Integer.parseInt(txtNumRuns.getText());
             Tasks.startTask("generateJobs", new Class[]{int.class, edacc.model.Tasks.class}, new Object[]{numRuns, null}, expController, this);
-
-            // TODO assignment of more than one queue/write extra method!
-            // assign the default queue to this experiment
-            GridQueue q = GridQueuesController.getInstance().getChosenQueue(); // TODO not very nice; will be changed
-            if (q == null) {
-                throw new Exception("You have to specify the grid settings first!");
-            }
-            expController.assignQueueToExperiment(q);
         } catch (NumberFormatException ex) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
                     javax.swing.JOptionPane.showMessageDialog(null, "Expected integers for number of runs, timeout and max seed", "invalid data", javax.swing.JOptionPane.ERROR_MESSAGE);
-                }
-            });
-        } catch (final SQLException ex) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    javax.swing.JOptionPane.showMessageDialog(null, "An error occured while assigning a grid queue to the experiment: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
                 }
             });
         } catch (final Exception ex) {
@@ -1859,10 +1852,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter(new FileFilter() {
 
+            @Override
             public boolean accept(File f) {
                 return f.getName().toLowerCase().endsWith(".csv") || f.isDirectory();
             }
 
+            @Override
             public String getDescription() {
                 return "CSV Files (comma separated values)";
             }
@@ -1942,7 +1937,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Action
     public void btnSelectQueue() {
-        ((EDACCView) EDACCApp.getApplication().getMainView()).btnGridSettings();
+        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+        EDACCManageGridQueuesDialog manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true, expController);
+        manageGridQueues.setLocationRelativeTo(mainFrame);
+        manageGridQueues.setVisible(true);
     }
 
     @Action

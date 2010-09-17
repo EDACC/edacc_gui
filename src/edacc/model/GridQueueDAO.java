@@ -174,7 +174,7 @@ public class GridQueueDAO {
             q.setAvailNodes(rs.getInt("availNodes"));
             q.setMaxJobsQueue(rs.getInt("maxJobsQueue"));
             q.setDescription(rs.getString("description"));
-
+            q.setName(rs.getString("name"));
 
             q.setSaved();
             cache.cache(q);

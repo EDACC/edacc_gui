@@ -15,7 +15,6 @@ import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 import org.jdesktop.application.Action;

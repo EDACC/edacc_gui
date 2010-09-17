@@ -4,7 +4,6 @@ import edacc.EDACCApp;
 import edacc.EDACCExperimentMode;
 import edacc.EDACCSolverConfigEntry;
 import edacc.EDACCSolverConfigPanel;
-import edacc.gridqueues.GridQueuesController;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
@@ -41,6 +40,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -126,10 +126,6 @@ public class ExperimentController {
             main.sorter.setRowFilter(main.rowFilter);
         }
         main.solverConfigPanel.endUpdate();
-        Vector<GridQueue> queues = GridQueueDAO.getAllByExperiment(activeExperiment);
-        if (queues.size() > 0) {
-            GridQueuesController.getInstance().setChosenQueue(queues.get(0));
-        }
         main.afterExperimentLoaded();
     }
 
@@ -341,6 +337,7 @@ public class ExperimentController {
     public int generateJobs(int numRuns, final Tasks task) throws SQLException, TaskCancelledException {
         PropertyChangeListener cancelExperimentResultDAOStatementListener = new PropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("state".equals(evt.getPropertyName()) && task.isCancelled()) {
                     try {
@@ -563,99 +560,106 @@ public class ExperimentController {
     /**
      * Generates a ZIP archive with the necessary files for the grid.
      */
-    public void generatePackage(File zipFile, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException {
-        if (zipFile.exists()) {
-            zipFile.delete();
-        }
-        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile));
-        ZipEntry entry;
-
-        Tasks.getTaskView().setCancelable(true);
-        task.setOperationName("Generating Package");
-
-        Vector<Solver> solvers = ExperimentDAO.getSolversInExperiment(activeExperiment);
-        LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
-
-        int total = solvers.size() + instances.size();
-        int done = 0;
-
+    public void generatePackage(String location, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException {
         boolean foundSolverWithSameName = false;
-        HashSet<String> tmp = new HashSet<String>();
-        HashSet<String> solvernameMap = new HashSet<String>();
-        for (Solver s : solvers) {
-            if (tmp.contains(s.getBinaryName())) {
-                solvernameMap.add(s.getBinaryName());
-                foundSolverWithSameName = true;
-            } else {
-                tmp.add(s.getBinaryName());
-            }
-        }
-        // add solvers to zip file
-        for (Solver s : solvers) {
-            done++;
-            task.setTaskProgress((float) done / (float) total);
-            if (task.isCancelled()) {
-                task.setStatus("Cancelled");
-                break;
-            }
-            task.setStatus("Writing solver " + done + " of " + solvers.size());
-            File bin = SolverDAO.getBinaryFileOfSolver(s);
-            String filename;
-            if (solvernameMap.contains(s.getBinaryName())) {
-                filename = s.getBinaryName() + "_" + s.getMd5().substring(0, 3);
-            } else {
-                filename = s.getBinaryName();
-            }
-            entry = new ZipEntry("solvers" + System.getProperty("file.separator") + filename);
-            addFileToZIP(bin, entry, zos);
-        }
-
-        // add instances to zip file
-        for (Instance i : instances) {
-            done++;
-            task.setTaskProgress((float) done / (float) total);
-            if (task.isCancelled()) {
-                task.setStatus("Cancelled");
-                break;
-            }
-            task.setStatus("Writing instance " + (done - solvers.size()) + " of " + instances.size());
-            File f = InstanceDAO.getBinaryFileOfInstance(i);
-            entry = new ZipEntry("instances" + System.getProperty("file.separator") + i.getName());
-            addFileToZIP(f, entry, zos);
-        }
-
-        task.setStatus("Writing client");
-
-        // add PBS script
-        // TODO extend to multiple queue support
+        Calendar cal = Calendar.getInstance();
+        String dateStr = cal.get(Calendar.YEAR) + "" + (cal.get(Calendar.MONTH)<10?"0"+(cal.get(Calendar.MONTH)+1):(cal.get(Calendar.MONTH)+1)) + "" + (cal.get(Calendar.DATE)<10?"0"+cal.get(Calendar.DATE):cal.get(Calendar.DATE));
         Vector<ExperimentHasGridQueue> eqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(activeExperiment);
-        ExperimentHasGridQueue eq = eqs.get(eqs.size() - 1);
-        GridQueue q = GridQueueDAO.getById(eq.getIdGridQueue());
-        File f = GridQueueDAO.getPBS(q);
-        entry = new ZipEntry("start_client.pbs");
-        addFileToZIP(f, entry, zos);
+        int count = 0;
+        for (ExperimentHasGridQueue eq : eqs) {
+            GridQueue queue = GridQueueDAO.getById(eq.getIdGridQueue());
 
-        // add configuration File
-        addConfigurationFile(zos, activeExperiment, q);
+            File zipFile = new File(location + activeExperiment.getName() + "_" + queue.getName() + "_" + dateStr + ".zip");
+            if (zipFile.exists()) {
+                zipFile.delete();
+            }
+            ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile));
+            ZipEntry entry;
 
-        // add run script
-        addRunScript(zos, q);
+            Tasks.getTaskView().setCancelable(true);
+            task.setOperationName("Generating Package " + (++count) + " of " + eqs.size());
 
-        // add client binary
-        addClient(zos);
+            Vector<Solver> solvers = ExperimentDAO.getSolversInExperiment(activeExperiment);
+            LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
 
-        // add empty result library
-        entry = new ZipEntry("results" + System.getProperty("file.separator") + "~");
-        zos.putNextEntry(entry);
+            int total = solvers.size() + instances.size();
+            int done = 0;
 
-        zos.close();
 
-        // delete tmp directory
-        deleteDirectory(new File("tmp"));
+            HashSet<String> tmp = new HashSet<String>();
+            HashSet<String> solvernameMap = new HashSet<String>();
+            for (Solver s : solvers) {
+                if (tmp.contains(s.getBinaryName())) {
+                    solvernameMap.add(s.getBinaryName());
+                    foundSolverWithSameName = true;
+                } else {
+                    tmp.add(s.getBinaryName());
+                }
+            }
+            // add solvers to zip file
+            for (Solver s : solvers) {
+                done++;
+                task.setTaskProgress((float) done / (float) total);
+                if (task.isCancelled()) {
+                    task.setStatus("Cancelled");
+                    break;
+                }
+                task.setStatus("Writing solver " + done + " of " + solvers.size());
+                File bin = SolverDAO.getBinaryFileOfSolver(s);
+                String filename;
+                if (solvernameMap.contains(s.getBinaryName())) {
+                    filename = s.getBinaryName() + "_" + s.getMd5().substring(0, 3);
+                } else {
+                    filename = s.getBinaryName();
+                }
+                entry = new ZipEntry("solvers" + System.getProperty("file.separator") + filename);
+                addFileToZIP(bin, entry, zos);
+            }
 
+            // add instances to zip file
+            for (Instance i : instances) {
+                done++;
+                task.setTaskProgress((float) done / (float) total);
+                if (task.isCancelled()) {
+                    task.setStatus("Cancelled");
+                    break;
+                }
+                task.setStatus("Writing instance " + (done - solvers.size()) + " of " + instances.size());
+                File f = InstanceDAO.getBinaryFileOfInstance(i);
+                entry = new ZipEntry("instances" + System.getProperty("file.separator") + i.getName());
+                addFileToZIP(f, entry, zos);
+            }
+
+            task.setStatus("Writing client");
+
+            // add PBS script
+            // TODO extend to multiple queue support
+            File f = GridQueueDAO.getPBS(queue);
+            entry = new ZipEntry("start_client.pbs");
+            addFileToZIP(f, entry, zos);
+
+            // add configuration File
+            addConfigurationFile(zos, activeExperiment, queue);
+
+            // add run script
+            addRunScript(zos, queue);
+
+            // add client binary
+            addClient(zos);
+
+            // add empty result library
+            entry = new ZipEntry("results" + System.getProperty("file.separator") + "~");
+            zos.putNextEntry(entry);
+
+            zos.close();
+
+            // delete tmp directory
+            deleteDirectory(new File("tmp"));
+        }
         if (foundSolverWithSameName) {
             javax.swing.JOptionPane.showMessageDialog(null, "The resulting package file contains solvers with same names.", "Information", javax.swing.JOptionPane.INFORMATION_MESSAGE);
         }
+
     }
 
     private boolean deleteDirectory(File dir) {
@@ -692,17 +696,40 @@ public class ExperimentController {
     }
 
     /**
-     * Assigns a gridQueue to the active experiment.
-     * This means: It creates a new ExperimentHasGridQueue object and persists it in the db.
-     * @param q
+     * Assigns all gridQueues to the active experiment.
+     * This means: It creates a new ExperimentHasGridQueue object for each queue
+     * and deletes all ExperimentHasGridQueue objects which are not in queues vektor
+     * and persists it in the db
+     * @param queues
      * @throws SQLException
      */
-    public void assignQueueToExperiment(GridQueue q) throws SQLException {
-        // check if assignment already exists
-        if (ExperimentHasGridQueueDAO.getByExpAndQueue(activeExperiment, q) != null) {
-            return;
+    public void assignQueuesToExperiment(Vector<GridQueue> queues) throws SQLException {
+        // TODO: this operation should be atomic
+
+        // create all ExperimentHasGridQueue objects which do not exist
+        for (GridQueue q : queues) {
+            // check if assignment already exists
+            if (ExperimentHasGridQueueDAO.getByExpAndQueue(activeExperiment, q) != null) {
+                continue;
+            }
+            ExperimentHasGridQueueDAO.createExperimentHasGridQueue(activeExperiment, q);
         }
-        ExperimentHasGridQueue eq = ExperimentHasGridQueueDAO.createExperimentHasGridQueue(activeExperiment, q);
+
+        // remove all ExperimentHasGridQueue objects which are not in the queues vektor
+        Vector<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(activeExperiment);
+        for (ExperimentHasGridQueue egq : ehgqs) {
+            boolean found = false;
+            for (GridQueue q : queues) {
+                if (egq.getIdGridQueue() == q.getId()) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                ExperimentHasGridQueueDAO.removeExperimentHasGridQueue(egq);
+            }
+        }
+
     }
 
     public void selectAllInstanceClasses() {

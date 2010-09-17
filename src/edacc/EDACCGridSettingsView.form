@@ -330,7 +330,7 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnCancel" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="118" max="32767" attributes="0"/>
+                          <EmptySpace pref="125" max="32767" attributes="0"/>
                           <Component id="btnOk" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Component id="pbsScriptMessage" alignment="0" min="-2" max="-2" attributes="0"/>

@@ -8,9 +8,6 @@ import edacc.model.NoConnectionToDBException;
 import java.awt.Component;
 import java.sql.SQLException;
 import java.util.Observable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.help.HelpSetException;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
@@ -56,6 +53,7 @@ public class EDACCView extends FrameView implements Observer {
         int messageTimeout = resourceMap.getInteger("StatusBar.messageTimeout");
         messageTimer = new Timer(messageTimeout, new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 statusMessageLabel.setText("");
             }
@@ -67,6 +65,7 @@ public class EDACCView extends FrameView implements Observer {
         }
         busyIconTimer = new Timer(busyAnimationRate, new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
                 statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
@@ -80,11 +79,12 @@ public class EDACCView extends FrameView implements Observer {
         TaskMonitor taskMonitor = new TaskMonitor(getApplication().getContext());
         taskMonitor.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
 
+            @Override
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
                 if (evt.getSource() instanceof Tasks) {
-                    Tasks task = (Tasks)evt.getSource();
-                    if (task.getTaskView() != null) {
-                        return ;
+                    Tasks task = (Tasks) evt.getSource();
+                    if (Tasks.getTaskView() != null) {
+                        return;
                     }
                 }
                 String propertyName = evt.getPropertyName();
@@ -127,6 +127,7 @@ public class EDACCView extends FrameView implements Observer {
         updateConnectionStateView();
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 btnConnectToDB();
             }
@@ -355,7 +356,6 @@ public class EDACCView extends FrameView implements Observer {
     }//GEN-LAST:event_helpMenuItemActionPerformed
 
     private void solverPropertyMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_solverPropertyMenuItemActionPerformed
-        
     }//GEN-LAST:event_solverPropertyMenuItemActionPerformed
 
     @Action
@@ -367,7 +367,7 @@ public class EDACCView extends FrameView implements Observer {
         }
 
         EDACCApp.getApplication().show(databaseSettings);
-        statusMessageLabel.setText("Connected to database: "+DatabaseConnector.getInstance().getDatabase()+ " on host: "+DatabaseConnector.getInstance().getHostname());
+        statusMessageLabel.setText("Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
         manageDBMode();
 
     }
@@ -434,7 +434,7 @@ public class EDACCView extends FrameView implements Observer {
         mainPanelLayout.replace(mode, noMode);
         mode = noMode;
         statusMessageLabel.setText("No database connection established!");
-        
+
     }
 
     @Action
@@ -465,7 +465,7 @@ public class EDACCView extends FrameView implements Observer {
             mode = manageDBMode;
             manageDBModeMenuItem.setSelected(true);
             manageExperimentModeMenuItem.setSelected(false);
-            statusMessageLabel.setText("MANAGE DB MODE - Connected to database: "+DatabaseConnector.getInstance().getDatabase()+ " on host: "+DatabaseConnector.getInstance().getHostname());
+            statusMessageLabel.setText("MANAGE DB MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
         } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this.getComponent(), "You have to connect to the database before switching modes", "No database connection", JOptionPane.ERROR_MESSAGE);
             noMode();
@@ -509,29 +509,27 @@ public class EDACCView extends FrameView implements Observer {
             createDatabaseErrorMessage(ex);
             noMode();
         }
-        statusMessageLabel.setText("MANAGE EXPERIMENT MODE - Connected to database: "+DatabaseConnector.getInstance().getDatabase()+ " on host: "+DatabaseConnector.getInstance().getHostname());
+        statusMessageLabel.setText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
     }
 
     @Action
     public void btnGridSettings() {
-        if (manageGridQueues == null) {
-            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true);
-            manageGridQueues.setLocationRelativeTo(mainFrame);
-        }
+        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+        EDACCManageGridQueuesDialog manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true, null);
+        manageGridQueues.setLocationRelativeTo(mainFrame);
         manageGridQueues.setVisible(true);
     }
+
     @Action
     public void btnSolverProperties() {
-      if(manageSolverProperties == null){
+        if (manageSolverProperties == null) {
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
             manageSolverProperties = new EDACCManageSolverPropertyDialog(mainFrame, true);
             manageSolverProperties.setLocationRelativeTo(mainFrame);
             manageSolverProperties.initialize();
-      }
-      manageSolverProperties.setVisible(true);
+        }
+        manageSolverProperties.setVisible(true);
     }
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem connectToDBMenuItem;
     private javax.swing.JMenuItem disconnectMenuItem;
@@ -558,9 +556,9 @@ public class EDACCView extends FrameView implements Observer {
     private int busyIconIndex = 0;
     private JDialog aboutBox;
     private JDialog databaseSettings;
-    private EDACCManageGridQueuesDialog manageGridQueues;
     private EDACCManageSolverPropertyDialog manageSolverProperties;
 
+    @Override
     public void update(Observable o, Object arg) {
         // watch connection state
         updateConnectionStateView();

@@ -4,16 +4,18 @@
  */
 package edacc.gridqueues;
 
+import edacc.model.Experiment;
+import edacc.model.ExperimentHasGridQueue;
+import edacc.model.ExperimentHasGridQueueDAO;
 import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.Observable;
+import java.util.Vector;
 
 /**
- * At the moment only support of one queue!
- * This class will change a lot when adding support of multiple queues!
  * @author dgall
  */
 public class GridQueuesController extends Observable {
@@ -75,13 +77,17 @@ public class GridQueuesController extends Observable {
         tmpPBSScript = null;
     }
 
-    public void setChosenQueue(GridQueue q) {
-        this.chosenQueue = q;
-        setChanged();
-        notifyObservers();
+    public Vector<GridQueue> getChosenQueuesByExperiment(Experiment exp) throws SQLException {
+        Vector<GridQueue> res = new Vector<GridQueue>();
+        Vector<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(exp);
+        for (ExperimentHasGridQueue ehgq : ehgqs) {
+            res.add(GridQueueDAO.getById(ehgq.getIdGridQueue()));
+        }
+        return res;
     }
 
-    public GridQueue getChosenQueue() {
-        return chosenQueue;
+    public void gridQueueSelectionChanged() {
+        setChanged();
+        notifyObservers();
     }
 }
