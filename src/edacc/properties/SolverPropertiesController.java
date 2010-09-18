@@ -9,6 +9,7 @@ import edacc.EDACCManageSolverPropertyDialog;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.SolverProperty;
 import edacc.model.SolverPropertyDAO;
+import edacc.model.SolverPropertyIsUsedException;
 import edacc.model.SolverPropertyNotInDBException;
 import edacc.satinstances.PropertyValueType;
 import edacc.satinstances.PropertyValueTypeManager;
@@ -92,6 +93,12 @@ public class SolverPropertiesController {
             items.add(propValueTypes.get(i).getName());
         }
         main.setComboBoxPropertyValueTypesItems(items);
+    }
+
+    public void removeSolverProperty(int convertRowIndexToModel) throws NoConnectionToDBException, SQLException, SolverPropertyIsUsedException {
+        SolverProperty toRemove = (SolverProperty)((SolverPropertyTableModel)tableSolverProperty.getModel()).getValueAt(convertRowIndexToModel, 5);
+        SolverPropertyDAO.remove(toRemove);
+        ((SolverPropertyTableModel)tableSolverProperty.getModel()).removeSolverProperty(toRemove);
     }
 
 }

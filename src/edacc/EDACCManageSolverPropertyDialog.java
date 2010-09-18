@@ -12,13 +12,13 @@
 package edacc;
 
 import edacc.model.NoConnectionToDBException;
+import edacc.model.SolverPropertyIsUsedException;
 import edacc.model.SolverPropertyNotInDBException;
 import edacc.properties.SolverPropertiesController;
 import edacc.properties.SolverPropertyTableModel;
 import edacc.properties.SolverPropertyTableSelectionListener;
 import edacc.properties.SolverPropertyType;
 import edacc.properties.SolverPropertyTypeNotExistException;
-import edacc.properties.SolverPropertyValueComboBoxModel;
 import java.awt.Component;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
@@ -110,9 +111,10 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         buttonDone = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCManageSolverPropertyDialog.class);
+        setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCManageSolverPropertyDialog.class);
         panelManageSolverProperty.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("panelManageSolverProperty.border.title"))); // NOI18N
         panelManageSolverProperty.setName("panelManageSolverProperty"); // NOI18N
 
@@ -135,6 +137,11 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
 
         buttonRemoveSolverProperty.setText(resourceMap.getString("buttonRemoveSolverProperty.text")); // NOI18N
         buttonRemoveSolverProperty.setName("buttonRemoveSolverProperty"); // NOI18N
+        buttonRemoveSolverProperty.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonRemoveSolverPropertyActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelManageSolverPropertyShowButtonsLayout = new javax.swing.GroupLayout(panelManageSolverPropertyShowButtons);
         panelManageSolverPropertyShowButtons.setLayout(panelManageSolverPropertyShowButtonsLayout);
@@ -171,6 +178,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             }
         ));
         tableSolverProperty.setName("tableSolverProperty"); // NOI18N
+        tableSolverProperty.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         panelManageSolverPropertyTable.setViewportView(tableSolverProperty);
 
         javax.swing.GroupLayout panelMangeSolverPropertyShowLayout = new javax.swing.GroupLayout(panelMangeSolverPropertyShow);
@@ -188,7 +196,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             panelMangeSolverPropertyShowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelMangeSolverPropertyShowLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelManageSolverPropertyShowButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -341,7 +349,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
                 .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(labeMultipleOccurrences)
                     .addComponent(checkBoxMultipleOccurrences))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout panelManageSolverPropertyEditLayout = new javax.swing.GroupLayout(panelManageSolverPropertyEdit);
@@ -388,7 +396,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             panelManageSolverPropertyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelManageSolverPropertyLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 528, Short.MAX_VALUE)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 572, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -446,6 +454,28 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
       PropertyValueTypesDialog.setVisible(true);
     }//GEN-LAST:event_buttonSolverPropertyAddValueTypeActionPerformed
 
+    private void buttonRemoveSolverPropertyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemoveSolverPropertyActionPerformed
+        if(tableSolverProperty.getSelectedRow() == -1){
+                 JOptionPane.showMessageDialog(this,
+                "Nothing is selected. Select a solver property.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+            }else{
+            try {
+                controller.removeSolverProperty(tableSolverProperty.convertRowIndexToModel(tableSolverProperty.getSelectedRow()));
+            } catch (NoConnectionToDBException ex) {
+                Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SolverPropertyIsUsedException ex) {
+                JOptionPane.showMessageDialog(this,
+                "Cannot delete the solver property, because it's already in use.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+            }
+            }
+    }//GEN-LAST:event_buttonRemoveSolverPropertyActionPerformed
+
     /**
     * @param args the command line arguments
     */
@@ -500,11 +530,9 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         this.textSolverPropertyFieldName.setEnabled(enable);
         this.textAreaResultPropertyDescription.setEnabled(enable);
         this.textSolverPropertyFieldName.requestFocus();
-        if(!enable){
-           this.comboBoxSolverPropertyValuetype.setEnabled(false);
-           this.buttonSolverPropertyAddValueType.setEnabled(false);
-           this.checkBoxMultipleOccurrences.setEnabled(false);
-        }
+        this.comboBoxSolverPropertyValuetype.setEnabled(enable);
+        this.buttonSolverPropertyAddValueType.setEnabled(enable);
+        this.checkBoxMultipleOccurrences.setEnabled(enable);
     }
 
     public void clearSolverPropertyEditField() {
