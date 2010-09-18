@@ -25,6 +25,7 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
     private JComboBox combo1, combo2, comboProperty, comboRun;
     private JTextField txtMaxValue;
     private InstanceSelector instanceSelector;
+    private ScaleSelector scaleSelector;
     private String plotTitle;
 
     public ScatterOnePropertyTwoSolvers(ExperimentController expController) {
@@ -49,13 +50,15 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
         comboRun = new JComboBox();
         comboRun.addActionListener(loadMaxValue);
         instanceSelector = new InstanceSelector();
+        scaleSelector = new ScaleSelector();
         dependencies = new Dependency[]{
                     new Dependency("First solver", combo1),
                     new Dependency("Second solver", combo2),
                     new Dependency("Property", comboProperty),
                     new Dependency("Instances", instanceSelector),
                     new Dependency("Plot for run", comboRun),
-                    new Dependency("Max x/y-value (sec)", txtMaxValue)
+                    new Dependency("Max x/y-value (sec)", txtMaxValue),
+                    new Dependency("Axes scale", scaleSelector)
                 };
     }
 
@@ -104,7 +107,6 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
         plotTitle = xSolverConfig.getName() + " vs. " + ySolverConfig.getName() + " (" + expController.getActiveExperiment().getName() + ")";
         Vector<Float> xsVec = new Vector<Float>();
         Vector<Float> ysVec = new Vector<Float>();
-
         for (Instance instance : instances) {
             try {
                 if (run == ALLRUNS) {
@@ -149,19 +151,38 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
         String title = xlabel + " vs " + ylabel;
         re.assign("xs", xs);
         re.assign("ys", ys);
-        re.assign("maxValue", new double[]{0, maxValue});
-        // set margin
-        re.eval("par(mar=c(3,3,9,6))");
+        if (scaleSelector.isXScaleLog() || scaleSelector.isYScaleLog()) {
+            re.assign("limits", new double[]{0.01, maxValue});
+        } else {
+            re.assign("limits", new double[]{0, maxValue});
+        }
 
-        re.eval("plot(xs, ys, type='p', col='red', las = 1, xlim=c(0," + maxValue + "), ylim=c(0," + maxValue + "), xaxs='i', yaxs='i',xlab='',ylab='',pch=3, tck=0.015, cex.axis=1.2, cex.main=1.5)");
+        // set margin
+        re.eval("par(mar=c(2, 5, 5, 5) + 0.1, oma=c(0,0,1,2) )");
+        
+        String log = "";
+        if (scaleSelector.isYScaleLog()) {
+            log += "y";
+        }
+        if (scaleSelector.isXScaleLog()) {
+            log += "x";
+        }
+        re.eval("plot(xs, ys, log='" + log + "', type='p', col='red', las = 1, xlim=limits, ylim=limits, xaxs='i', yaxs='i',xlab='',ylab='',pch=3, tck=0.015, cex.axis=1.2, cex.main=1.5)");
         re.eval("axis(side=4, tck=0.015, las=1, cex.axis=1.2, cex.main=1.5)");
         re.eval("axis(side=3, tck=0.015, las=1, cex.axis=1.2, cex.main=1.5)");
-        re.eval("mtext('" + ylabel + "', side=4, line=3, cex=1.2)");
-        re.eval("mtext('" + xlabel + "', side=3, padj=0, line=3, cex=1.2)");
-        re.eval("mtext('" + title + "', padj=-1.7, side=3, line=3, cex=1.7)");
+        re.eval("mtext('" + ylabel + "', outer=TRUE, side=4, line=0, cex=1.2)");
+        re.eval("mtext('" + xlabel + "', side=3, padj=0, line=2, cex=1.2)");
+        re.eval("mtext('" + title + "', side=3, line=4, cex=1.7)");
         re.eval("par(new=1)");
-        re.eval("plot(maxValue, maxValue, type='l', col='black', lty=2, xlim=c(0," + maxValue + "), ylim=c(0," + maxValue + "), xaxs='i', yaxs='i',xaxt='n',yaxt='n', xlab='', ylab='')");
-
+        
+        // plot diagonal line
+        if (!log.equals("")) {
+            re.eval("x <- seq(0.1," + maxValue + ")");
+            re.eval("plot(x, x, log='" + log + "', type='l', col='black', lty=2, xlim=limits, ylim=limits, xaxs='i', yaxs='i',xaxt='n',yaxt='n', xlab='', ylab='')");
+        } else {
+            re.eval("plot(limits, limits, type='l', col='black', lty=2, xlim=limits, ylim=limits, xaxs='i', yaxs='i',xaxt='n',yaxt='n', xlab='', ylab='')");
+        }
+        
         Vector<double[]> points = getPoints(rengine, xs, ys);
         int k = 0;
         for (double[] point : points) {
