@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -63,9 +64,10 @@ public class EDACCSelectPropertyValueTypeClassDialog extends javax.swing.JDialog
         buttonDone = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCSelectPropertyValueTypeClassDialog.class);
+        setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCSelectPropertyValueTypeClassDialog.class);
         panelMain.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("panelMain.border.title"))); // NOI18N
         panelMain.setName("panelMain"); // NOI18N
 
@@ -158,19 +160,26 @@ public class EDACCSelectPropertyValueTypeClassDialog extends javax.swing.JDialog
 
     private void buttonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAddActionPerformed
         int[] selectedRows = tablePropertyValueTypes.getSelectedRows();
-        for (int i = 0; i < selectedRows.length; i++){
-            selectedRows[i] = tablePropertyValueTypes.convertRowIndexToModel(selectedRows[i]);
-        }
-        try {
-            controller.addPropertyValueTypes(selectedRows, file);
-        } catch (IOException ex) {
-            Logger.getLogger(EDACCSelectPropertyValueTypeClassDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoConnectionToDBException ex) {
-            Logger.getLogger(EDACCSelectPropertyValueTypeClassDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(EDACCSelectPropertyValueTypeClassDialog.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+        if(selectedRows.length == 0){
+            JOptionPane.showMessageDialog(this,
+                "Nothing is selected. Select a property value type.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        } else{
+            for (int i = 0; i < selectedRows.length; i++){
+                selectedRows[i] = tablePropertyValueTypes.convertRowIndexToModel(selectedRows[i]);
+            }
+            try {
+                controller.addPropertyValueTypes(selectedRows, file);
+                this.setVisible(false);
+            } catch (IOException ex) {
+                Logger.getLogger(EDACCSelectPropertyValueTypeClassDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoConnectionToDBException ex) {
+                Logger.getLogger(EDACCSelectPropertyValueTypeClassDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(EDACCSelectPropertyValueTypeClassDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }      
     }//GEN-LAST:event_buttonAddActionPerformed
 
     /**

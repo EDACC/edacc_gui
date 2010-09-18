@@ -15,12 +15,18 @@ import edacc.model.NoConnectionToDBException;
 import edacc.properties.PropertyValueTypeTableModel;
 import edacc.properties.PropertyValueTypesController;
 import edacc.satinstances.PropertyValueType;
+import edacc.satinstances.PropertyValueTypeInPropertyException;
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
 /**
@@ -40,7 +46,16 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
         propValueTypeTableModel = new PropertyValueTypeTableModel();
         tablePropertyValueTypes.setModel(propValueTypeTableModel);
         tablePropertyValueTypes.setRowSorter(new TableRowSorter<PropertyValueTypeTableModel>(propValueTypeTableModel));
+        tablePropertyValueTypes.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
 
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                lbl.setHorizontalAlignment(JLabel.CENTER);
+                return lbl;
+            }
+        });
         controller = new PropertyValueTypesController(this, tablePropertyValueTypes);
     }
 
@@ -100,6 +115,7 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
             }
         ));
         tablePropertyValueTypes.setName("tablePropertyValueTypes"); // NOI18N
+        tablePropertyValueTypes.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(tablePropertyValueTypes);
 
         buttonDone.setText(resourceMap.getString("buttonDone.text")); // NOI18N
@@ -187,14 +203,17 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
     private void buttonChooseClassFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonChooseClassFileActionPerformed
         try {
             int returnVal = jFileChooser1.showOpenDialog(this);
-            File file = jFileChooser1.getSelectedFile();
-            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            selectValueType = new EDACCSelectPropertyValueTypeClassDialog(mainFrame, true);
-            selectValueType.setLocationRelativeTo(mainFrame);
-            selectValueType.initialize(file);
-            selectValueType.setVisible(true);
-            controller.createNewPropertyValueType(file);
-            controller.loadPropertyValueTypes();
+            if(returnVal == jFileChooser1.APPROVE_OPTION){
+                File file = jFileChooser1.getSelectedFile();
+                JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+                selectValueType = new EDACCSelectPropertyValueTypeClassDialog(mainFrame, true);
+                selectValueType.setLocationRelativeTo(mainFrame);
+                selectValueType.initialize(file);
+                selectValueType.setVisible(true);
+                controller.createNewPropertyValueType(file);
+                controller.loadPropertyValueTypes();
+            }
+           
         } catch (IOException ex) {
             Logger.getLogger(EDACCManagePropertyValueTypesDialog.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoConnectionToDBException ex) {
@@ -205,7 +224,28 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_buttonChooseClassFileActionPerformed
 
     private void buttonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemoveActionPerformed
-        controller.removePropertyValueType(tablePropertyValueTypes.convertRowIndexToModel(tablePropertyValueTypes.getSelectedRow()));
+        try {
+            if(tablePropertyValueTypes.getSelectedRow() == -1){
+                 JOptionPane.showMessageDialog(this,
+                "Nothing is selected. Select a property value type.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+            }else{
+                controller.removePropertyValueType(tablePropertyValueTypes.convertRowIndexToModel(tablePropertyValueTypes.getSelectedRow()));
+            }
+
+        } catch (IOException ex) {
+            Logger.getLogger(EDACCManagePropertyValueTypesDialog.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoConnectionToDBException ex) {
+            Logger.getLogger(EDACCManagePropertyValueTypesDialog.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(EDACCManagePropertyValueTypesDialog.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (PropertyValueTypeInPropertyException ex) {
+            JOptionPane.showMessageDialog(this,
+                "The selected property value type cannot be deleted, because it's used by properties.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_buttonRemoveActionPerformed
 
     /**

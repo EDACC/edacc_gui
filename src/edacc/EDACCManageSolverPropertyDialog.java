@@ -509,7 +509,8 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
 
     public void clearSolverPropertyEditField() {
         this.comboBoxSolverPropertyType.setSelectedIndex(0);
-        this.comboBoxSolverPropertyValuetype.setSelectedIndex(0);
+        if(this.comboBoxSolverPropertyValuetype.getItemCount() != 0)
+            this.comboBoxSolverPropertyValuetype.setSelectedIndex(0);      
         this.checkBoxMultipleOccurrences.setSelected(false);
         this.textSolverPropertyFieldName.setText("");
         this.textSolvertPropertyFieldPrefix.setText("");

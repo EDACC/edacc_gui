@@ -27,6 +27,12 @@ public class PropertyValueTypeTableModel extends AbstractTableModel{
         return columns.length;
     }
 
+     @Override
+    public Class getColumnClass(int column){
+        if(column == 2 || column == 3) return Boolean.class;
+        return String.class;
+    }
+
     /**
      *  Returns the value of the requested cell. If the columnIndex is 2, the PropertyValueObject from the table
      * is returned. On default the String "" is returned.
@@ -40,7 +46,10 @@ public class PropertyValueTypeTableModel extends AbstractTableModel{
             case 0:
                 return rows.get(rowIndex).getName();
             case 1:
-                return rows.get(rowIndex).isDefault();
+                if(rows.get(rowIndex).isDefault())
+                    return "\u2713";
+                else
+                    return "";
             case 2:
                 return rows.get(rowIndex);
             default:
@@ -80,5 +89,14 @@ public class PropertyValueTypeTableModel extends AbstractTableModel{
      */
     public void clearTable(){
         rows.clear();
+    }
+
+    /**
+     * Removes the object at the given rowIndex.
+     * @param rowIndex of the object to remove.
+     */
+    public void remove(PropertyValueType<?> toRemove){
+        rows.remove(toRemove);
+        this.fireTableDataChanged();
     }
 }

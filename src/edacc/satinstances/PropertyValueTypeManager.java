@@ -6,6 +6,8 @@ package edacc.satinstances;
 
 import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -17,6 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,8 +38,8 @@ public class PropertyValueTypeManager {
     private static PropertyValueTypeManager instance;
     private Hashtable<String, PropertyValueType<?>> propertyTypes;
     private String table = "PropertyValueType";
-    private String insertQuery = "INSERT INTO " + table + " (name, typeClass, isDefault) VALUES (?, ?, ?);";
-
+    private String insertQuery = "INSERT INTO " + table + " (name, typeClass, isDefault, typeClassFileName) VALUES (?, ?, ?, ?);";
+    private String deleteQuery = "DELETE FROM " + table + " WHERE name=?;";
     public static PropertyValueTypeManager getInstance() throws IOException, NoConnectionToDBException, SQLException {
         if (instance == null) {
             instance = new PropertyValueTypeManager();
@@ -115,7 +118,7 @@ public class PropertyValueTypeManager {
         for (File f : files) {
             cleanupParents(base, f);
         }
-        return createProeprtyValueTypeObjects(classes);
+        return createPropertyValueTypeObjects(classes);
     }
 
     private void cleanupParents(File base, File f) {
@@ -186,7 +189,7 @@ public class PropertyValueTypeManager {
      * This method creates the PropertyValueType objects of all found ProeprtyValueTypes and adds them
      * to the list.
      */
-    private Hashtable<String, PropertyValueType<?>> createProeprtyValueTypeObjects(
+    private Hashtable<String, PropertyValueType<?>> createPropertyValueTypeObjects(
             List<Class<PropertyValueType<?>>> propertyTypeClasses) {
         Hashtable<String, PropertyValueType<?>> propertyTypes = new Hashtable<String, PropertyValueType<?>>(
                 propertyTypeClasses.size());
@@ -205,33 +208,6 @@ public class PropertyValueTypeManager {
             }
         }
         return propertyTypes;
-    }
-
-    /**
-     * Creates a new PropertyValueType<?> from the given File and adds it to the database
-     * @param file
-     * @throws IOException
-     * @throws NoConnectionToDBException
-     * @throws SQLException
-     * @author rretz
-     */
-    public void createNewPropertyValueType(File file) throws IOException, NoConnectionToDBException, SQLException {
-        LinkedList<File> files = new LinkedList<File>();
-        files.add(file);
-        // TODO change
-/*        ClassLoader cl = new URLClassLoader(fileListToURLArray(files), PropertyValueType.class.getClassLoader());
-        List<Class<PropertyValueType<?>>> input = this.getClassesFromFiles(files, cl);
-
-        Enumeration<PropertyValueType<?>> toAdd = createProeprtyValueTypeObjects(input).elements();
-        PropertyValueType<?> tmp = toAdd.nextElement();
-        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
-        ps.setString(1, tmp.getName());
-        ps.setBinaryStream(8, new FileInputStream(file));
-        ps.setBoolean(3, tmp.isDefault());
-
-        ps.executeUpdate();
-
-        this.propertyTypes.put(tmp.getName(), tmp);*/
     }
 
    /* public static void main(String[] args) throws IOException, NoConnectionToDBException, SQLException, ClassNotFoundException {
@@ -269,17 +245,92 @@ public class PropertyValueTypeManager {
 
     }
 
-    public void addPropertyValueTypes(Vector<String> toAdd, File file) throws IOException {
+    /**
+     * Searchs in the given file (jar) for class files with the names given in the toAdd Vector and adds them to
+     * the database and cache.
+     * @param toAdd the name of the class files to add
+     * @param file the file which contains the class files to add (has to be a jar file)
+     * @throws IOException
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @author rretz
+     */
+    public void addPropertyValueTypes(Vector<String> toAdd, File file) throws IOException, NoConnectionToDBException, SQLException {
+        JarFile jf = new JarFile(file);
+        LinkedList<File> files = new LinkedList<File>();
         JarInputStream jaris = new JarInputStream(new FileInputStream(file));
         JarEntry ent = null;
-        ent = jaris.getNextJarEntry();
+        File base = new File("touch").getAbsoluteFile().getParentFile();
+        ClassLoader cl = new URLClassLoader(new URL[]{base.toURI().toURL()},
+                 PropertyValueType.class.getClassLoader());
+        /* Checks every JarEntry if it is one of the searched class files.
+         * Load and Add the located classes to the database and cache.
+        */
         while ((ent = jaris.getNextJarEntry()) != null) {
             for(int i = 0; i < toAdd.size(); i++){
-                if (ent.getName().toLowerCase().equals(toAdd.get(i)+ ".class")) {
-                   File test = new File(ent.toString());
+                if (ent.getName().equals(toAdd.get(i)+ ".class")) {
+                    toAdd.remove(i);
+                    files.add(getFileOfJarEntry(new JarFile(file), ent));
+                    List<Class<PropertyValueType<?>>> classes = getClassesFromFiles(files, cl);
+                    Enumeration<PropertyValueType<?>> enumerationToAdd = createPropertyValueTypeObjects(classes).elements();
+
+                    if(enumerationToAdd.hasMoreElements()){
+                        PropertyValueType<?> tmp = enumerationToAdd.nextElement();
+                        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
+                        ps.setString(1, tmp.getName());
+                        ps.setBinaryStream(2, new FileInputStream(files.getFirst()));
+                        ps.setBoolean(3, tmp.isDefault());
+                        ps.setString(4, ent.getName());
+                        ps.executeUpdate();
+                        propertyTypes.put(tmp.getName(), tmp);
+                    }
+                    files.clear();
                 }
             }
             
         }
     }
+
+    /**
+     * Creates the file of the given JarEntry out from the given JarFile.
+     * @param jf JarFile which contains the JarEntry
+     * @param ent JarEntry from which the file is requested
+     * @return File of the given JarEntry
+     * @throws IOException
+     * @author rretz
+     */
+    private File getFileOfJarEntry(JarFile jf, JarEntry ent) throws IOException{
+        File input = new File(ent.getName());
+        BufferedInputStream bis = new BufferedInputStream(jf.getInputStream(ent));
+        File dir = new File(input.getParent());
+        dir.mkdirs();
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(input) );
+        for ( int c; ( c = bis.read() ) != -1; )
+        bos.write( (byte)c );
+        bos.close();
+        return input;
+    }
+
+    /**
+     * Removes the given PropertyValueType from the database and cache.
+     * @param toRemove the PropertyValueType object to remove.
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws PropertyValueTypeInPropertyException
+     */
+    public void remove(PropertyValueType<?> toRemove) throws NoConnectionToDBException, SQLException, PropertyValueTypeInPropertyException{
+        String query = "SELECT InstanceProperty.valueType, SolverProperty.PropertyValueType_name FROM InstanceProperty, SolverProperty;";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ResultSet rs = ps.executeQuery();
+        if(!rs.next()){
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
+            ps.setString(1, toRemove.getName());
+            ps.executeUpdate();
+            propertyTypes.remove(toRemove.getName());
+        }
+        else
+            throw new PropertyValueTypeInPropertyException();
+    }
+
+
 }
