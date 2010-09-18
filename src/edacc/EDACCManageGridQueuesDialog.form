@@ -28,13 +28,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="lblChosenQueue" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="lblSelected" min="-2" pref="124" max="-2" attributes="0"/>
-                      <EmptySpace pref="188" max="32767" attributes="0"/>
-                      <Component id="btnCancel" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="btnCancel" alignment="1" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -46,23 +40,13 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jPanel1" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="2" attributes="0">
-                  <Component id="lblChosenQueue" alignment="2" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblSelected" alignment="2" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnCancel" alignment="2" min="-2" max="-2" attributes="0"/>
-              </Group>
+              <Component id="btnCancel" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="lblChosenQueue">
-      <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="lblChosenQueue.text"/>
-        <Property name="name" type="java.lang.String" value="lblChosenQueue" noResource="true"/>
-      </Properties>
-    </Component>
     <Component class="javax.swing.JButton" name="btnCancel">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="btnCancel.text"/>
@@ -99,7 +83,7 @@
                           </Group>
                           <Component id="btnRemoveQueue" linkSize="1" alignment="1" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="btnChooseQueue" linkSize="1" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnChooseQueues" linkSize="1" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -117,7 +101,7 @@
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="btnRemoveQueue" min="-2" max="-2" attributes="0"/>
                           <EmptySpace pref="82" max="32767" attributes="0"/>
-                          <Component id="btnChooseQueue" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnChooseQueues" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Component id="jScrollPane1" alignment="0" pref="196" max="32767" attributes="0"/>
                   </Group>
@@ -158,14 +142,14 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCreateQueue"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="btnChooseQueue">
+        <Component class="javax.swing.JButton" name="btnChooseQueues">
           <Properties>
-            <Property name="text" type="java.lang.String" resourceKey="btnChooseQueue.text"/>
-            <Property name="toolTipText" type="java.lang.String" resourceKey="btnChooseQueue.toolTipText"/>
-            <Property name="name" type="java.lang.String" value="btnChooseQueue" noResource="true"/>
+            <Property name="text" type="java.lang.String" resourceKey="btnChooseQueues.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="btnChooseQueues.toolTipText"/>
+            <Property name="name" type="java.lang.String" value="btnChooseQueues" noResource="true"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnChooseQueue"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnChooseQueues"/>
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnRemoveQueue">
@@ -190,14 +174,5 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JLabel" name="lblSelected">
-      <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="lblSelected.text"/>
-        <Property name="name" type="java.lang.String" value="lblSelected" noResource="true"/>
-      </Properties>
-      <AccessibilityProperties>
-        <Property name="AccessibleContext.accessibleName" type="java.lang.String" resourceKey="jLabel1.AccessibleContext.accessibleName"/>
-      </AccessibilityProperties>
-    </Component>
   </SubComponents>
 </Form>

@@ -10,19 +10,24 @@
  */
 package edacc;
 
+import edacc.experiment.ExperimentController;
 import edacc.gridqueues.GridQueuesController;
 import edacc.gridqueues.QueueListModel;
 import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
 import edacc.model.NoConnectionToDBException;
-import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.SQLException;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Vector;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
@@ -33,17 +38,64 @@ import javax.swing.table.AbstractTableModel;
  */
 public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
 
+    private ExperimentController expController;
     private EDACCGridSettingsView gridSettings;
+    private QueueListModel queueListModel;
 
     /** Creates new form EDACCManageGridQueuesDialog */
-    public EDACCManageGridQueuesDialog(java.awt.Frame parent, boolean modal) {
+    public EDACCManageGridQueuesDialog(java.awt.Frame parent, boolean modal, ExperimentController expController) {
         super(parent, modal);
         gridSettings = new EDACCGridSettingsView(parent, true, this);
         initComponents();
-        lblSelected.setForeground(Color.red);
+        this.expController = expController;
+        if (expController == null) {
+            btnChooseQueues.setVisible(false);
+        } else {
+            btnRemoveQueue.setVisible(false);
+            btnEditQueue.setVisible(false);
+        }
         try {
-            listQueues.setModel(new QueueListModel());
+            queueListModel = new QueueListModel(expController);
+            listQueues.setModel(queueListModel);
             listQueues.addListSelectionListener(new QueueListSelectionListener());
+            listQueues.addMouseListener(new MouseAdapter() {
+
+                @Override
+                public void mouseClicked(MouseEvent event) {
+                    JList list = (JList) event.getSource();
+
+                    // Get index of item clicked
+                    int index = list.locationToIndex(event.getPoint());
+                    JCheckBox item = queueListModel.checkBoxes.get(index);
+                    // Toggle selected state
+                    item.setSelected(!item.isSelected());
+                    // Repaint cell
+                    list.repaint(list.getCellBounds(index, index));
+                }
+            });
+            listQueues.setCellRenderer(new ListCellRenderer() {
+
+                @Override
+                public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+
+                    if (EDACCManageGridQueuesDialog.this.expController != null) {
+                        return EDACCManageGridQueuesDialog.this.queueListModel.checkBoxes.get(index);
+                    } else {
+                        GridQueue queue = (GridQueue) value;
+                        JLabel lbl = new JLabel(queue.getName());
+                        lbl.setOpaque(true);
+                        if (isSelected) {
+                            lbl.setBackground(listQueues.getSelectionBackground());
+                            lbl.setForeground(listQueues.getSelectionForeground());
+                        } else {
+                            lbl.setBackground(listQueues.getBackground());
+                            lbl.setForeground(listQueues.getForeground());
+                        }
+                        return lbl;
+                    }
+                }
+            });
+            listQueues.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             // deselect all queues and set the edit/del/choose-buttons disabled
             listQueues.clearSelection();
             setButtonStates(false);
@@ -51,21 +103,6 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "A database error occured while loading the dialog: " + ex.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
-        }
-        GridQueuesController.getInstance().addObserver(new Observer() {
-
-            public void update(Observable o, Object arg) {
-                if (GridQueuesController.getInstance().getChosenQueue() != null) {
-                    lblSelected.setText(GridQueuesController.getInstance().getChosenQueue().getName());
-                } else {
-                    lblSelected.setText("None");
-                }
-            }
-        });
-        if (GridQueuesController.getInstance().getChosenQueue() != null) {
-            lblSelected.setText(GridQueuesController.getInstance().getChosenQueue().getName());
-        } else {
-            lblSelected.setText("None");
         }
     }
 
@@ -78,24 +115,19 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lblChosenQueue = new javax.swing.JLabel();
         btnCancel = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         listQueues = new javax.swing.JList();
         btnCreateQueue = new javax.swing.JButton();
-        btnChooseQueue = new javax.swing.JButton();
+        btnChooseQueues = new javax.swing.JButton();
         btnRemoveQueue = new javax.swing.JButton();
         btnEditQueue = new javax.swing.JButton();
-        lblSelected = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCManageGridQueuesDialog.class);
         setTitle(resourceMap.getString("dlgManageQueues.title")); // NOI18N
         setName("dlgManageQueues"); // NOI18N
-
-        lblChosenQueue.setText(resourceMap.getString("lblChosenQueue.text")); // NOI18N
-        lblChosenQueue.setName("lblChosenQueue"); // NOI18N
 
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
@@ -128,12 +160,12 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
             }
         });
 
-        btnChooseQueue.setText(resourceMap.getString("btnChooseQueue.text")); // NOI18N
-        btnChooseQueue.setToolTipText(resourceMap.getString("btnChooseQueue.toolTipText")); // NOI18N
-        btnChooseQueue.setName("btnChooseQueue"); // NOI18N
-        btnChooseQueue.addActionListener(new java.awt.event.ActionListener() {
+        btnChooseQueues.setText(resourceMap.getString("btnChooseQueues.text")); // NOI18N
+        btnChooseQueues.setToolTipText(resourceMap.getString("btnChooseQueues.toolTipText")); // NOI18N
+        btnChooseQueues.setName("btnChooseQueues"); // NOI18N
+        btnChooseQueues.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnChooseQueue(evt);
+                btnChooseQueues(evt);
             }
         });
 
@@ -169,11 +201,11 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
                             .addComponent(btnCreateQueue)
                             .addComponent(btnEditQueue))
                         .addComponent(btnRemoveQueue))
-                    .addComponent(btnChooseQueue))
+                    .addComponent(btnChooseQueues))
                 .addContainerGap())
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnChooseQueue, btnCreateQueue, btnEditQueue, btnRemoveQueue});
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnChooseQueues, btnCreateQueue, btnEditQueue, btnRemoveQueue});
 
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -186,14 +218,11 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
                         .addComponent(btnEditQueue)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnRemoveQueue)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 76, Short.MAX_VALUE)
-                        .addComponent(btnChooseQueue))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 82, Short.MAX_VALUE)
+                        .addComponent(btnChooseQueues))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE))
                 .addContainerGap())
         );
-
-        lblSelected.setText(resourceMap.getString("lblSelected.text")); // NOI18N
-        lblSelected.setName("lblSelected"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -203,12 +232,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblChosenQueue)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblSelected, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 157, Short.MAX_VALUE)
-                        .addComponent(btnCancel)))
+                    .addComponent(btnCancel, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -217,14 +241,9 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(lblChosenQueue)
-                    .addComponent(lblSelected)
-                    .addComponent(btnCancel))
+                .addComponent(btnCancel)
                 .addContainerGap())
         );
-
-        lblSelected.getAccessibleContext().setAccessibleName(resourceMap.getString("jLabel1.AccessibleContext.accessibleName")); // NOI18N
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -251,15 +270,14 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnEditQueue
 
-    private void btnChooseQueue(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseQueue
-        GridQueue selected = (GridQueue) listQueues.getSelectedValue();
-       // if (selected == null) {
-       //     return;
-       // }
-        GridQueuesController.getInstance().setChosenQueue(selected);
-        //lblChosenQueue.setText("Chosen queue: " + selected.getName());
-       // this.lblSelected.setText(selected.getName());
-    }//GEN-LAST:event_btnChooseQueue
+    private void btnChooseQueues(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseQueues
+        try {
+            expController.assignQueuesToExperiment(queueListModel.getSelectedGridQueues());
+            GridQueuesController.getInstance().gridQueueSelectionChanged();
+        } catch (SQLException ex) {
+            javax.swing.JOptionPane.showMessageDialog(null, "An error occured while assigning a grid queue to the experiment: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnChooseQueues
 
     private void btnCancel(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancel
         this.setVisible(false);
@@ -306,25 +324,15 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
     public void refreshView() throws NoConnectionToDBException, SQLException {
         // refresh list
         ((QueueListModel) listQueues.getModel()).refreshQueues();
-        // refresh "chosen queue" text
-        GridQueue selected = GridQueuesController.getInstance().getChosenQueue();
-        if (selected == null) {
-            lblChosenQueue.setText("Chosen queue: ");
-        } else //    lblChosenQueue.setText("Chosen queue: " + selected.getName());
-        {
-            this.lblSelected.setText(selected.getName());
-        }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnChooseQueue;
+    private javax.swing.JButton btnChooseQueues;
     private javax.swing.JButton btnCreateQueue;
     private javax.swing.JButton btnEditQueue;
     private javax.swing.JButton btnRemoveQueue;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel lblChosenQueue;
-    private javax.swing.JLabel lblSelected;
     private javax.swing.JList listQueues;
     // End of variables declaration//GEN-END:variables
 
@@ -336,14 +344,17 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
             this.queues = queues;
         }
 
+        @Override
         public int getRowCount() {
             return queues.size();
         }
 
+        @Override
         public int getColumnCount() {
             return 2;
         }
 
+        @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             if (columnIndex == 0) {
                 return queues.get(rowIndex).getName();
@@ -368,6 +379,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
 
     private class QueueListSelectionListener implements ListSelectionListener {
 
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             setButtonStates(((JList) e.getSource()).getSelectedValues().length > 0);
         }
@@ -380,7 +392,5 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
     private void setButtonStates(boolean enabled) {
         btnEditQueue.setEnabled(enabled);
         btnRemoveQueue.setEnabled(enabled);
-        btnChooseQueue.setEnabled(enabled);
-
     }
 }
