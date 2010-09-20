@@ -42,10 +42,22 @@ public class SolverPropertyTableModel extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int col) {
-        if (this.getRowCount() == 0)
-            return this.getClass();
-        else
-            return getValueAt(0, col).getClass();
+        switch(col){
+            case 0:
+                return String.class;
+            case 1:
+                return String.class;
+            case 2:
+                return String.class;
+            case 3:
+                return PropertyValueTypeSelectionModel.class;
+            case 4:
+                return SolverPropertyType.class;
+            case 5:
+                return Boolean.class;
+            default:
+                return null;
+        }
     }
 
     /**

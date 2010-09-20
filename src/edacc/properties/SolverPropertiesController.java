@@ -27,7 +27,7 @@ public class SolverPropertiesController {
     private EDACCManageSolverPropertyDialog main;
     private JPanel panel;
     private JTable tableSolverProperty;
-    private boolean editMode;
+    private int editId;
 
     /**
      * Constructor of the SolverPropertiesController
@@ -39,7 +39,7 @@ public class SolverPropertiesController {
         this.main = manage;
         this.panel = panelManageResultProperty;
         this.tableSolverProperty = tableResultProperty;
-        this.editMode = false;
+        this.editId = -1;
     }
 
     /**
@@ -56,7 +56,7 @@ public class SolverPropertiesController {
     public void NewSolverProperty() {
         showSolverPropertyEditField(true);
         clearSolverPropertyEditField();
-        this.editMode = false;
+        this.editId = -1;
     }
 
     /**
@@ -104,13 +104,30 @@ public class SolverPropertiesController {
         ((SolverPropertyTableModel)tableSolverProperty.getModel()).removeSolverProperty(toRemove);
     }
 
-    void showSolver(int convertRowIndexToModel) {
+    public void showSolver(int convertRowIndexToModel) {
         if(convertRowIndexToModel != -1){
-            SolverProperty toShow = (SolverProperty)((PropertyValueTypeTableModel)tableSolverProperty.getModel()).getValueAt(convertRowIndexToModel, 2);
+            SolverProperty toShow = (SolverProperty)((SolverPropertyTableModel)tableSolverProperty.getModel()).getValueAt(convertRowIndexToModel, 5);
             main.showSolverProperty(toShow);
-            this.editMode = true;
+            this.editId = toShow.getId();
         }else 
-            this.editMode = false;
+            this.editId = -1;
     }
+
+    public void saveSolverProperty(String name, String prefix, String description, SolverPropertyType propType, String valueType, boolean isMultiple)
+            throws NoConnectionToDBException, SQLException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException, SolverPropertyIsUsedException{
+
+        if(editId != -1){
+            SolverProperty toEdit = SolverPropertyDAO.getById(editId);
+            toEdit.setName(name);
+            toEdit.setPrefix(prefix);
+            toEdit.setDescription(description);
+            toEdit.setMultiple(isMultiple);
+            SolverPropertyDAO.save(toEdit);
+        }else {
+            SolverPropertyDAO.createResultProperty(name, prefix, description, PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(valueType), propType, isMultiple);
+        }
+        loadSolverProperties();
+    }
+      
 
 }
