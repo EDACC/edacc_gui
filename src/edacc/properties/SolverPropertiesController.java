@@ -27,6 +27,7 @@ public class SolverPropertiesController {
     private EDACCManageSolverPropertyDialog main;
     private JPanel panel;
     private JTable tableSolverProperty;
+    private boolean editMode;
 
     /**
      * Constructor of the SolverPropertiesController
@@ -38,6 +39,7 @@ public class SolverPropertiesController {
         this.main = manage;
         this.panel = panelManageResultProperty;
         this.tableSolverProperty = tableResultProperty;
+        this.editMode = false;
     }
 
     /**
@@ -54,6 +56,7 @@ public class SolverPropertiesController {
     public void NewSolverProperty() {
         showSolverPropertyEditField(true);
         clearSolverPropertyEditField();
+        this.editMode = false;
     }
 
     /**
@@ -99,6 +102,15 @@ public class SolverPropertiesController {
         SolverProperty toRemove = (SolverProperty)((SolverPropertyTableModel)tableSolverProperty.getModel()).getValueAt(convertRowIndexToModel, 5);
         SolverPropertyDAO.remove(toRemove);
         ((SolverPropertyTableModel)tableSolverProperty.getModel()).removeSolverProperty(toRemove);
+    }
+
+    void showSolver(int convertRowIndexToModel) {
+        if(convertRowIndexToModel != -1){
+            SolverProperty toShow = (SolverProperty)((PropertyValueTypeTableModel)tableSolverProperty.getModel()).getValueAt(convertRowIndexToModel, 2);
+            main.showSolverProperty(toShow);
+            this.editMode = true;
+        }else 
+            this.editMode = false;
     }
 
 }
