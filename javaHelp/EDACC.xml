@@ -36,232 +36,190 @@
 <!--
     <copyright>
       <year>2010</year>
-      <holder>Das super EDACC-Team</holder>
+      <holder></holder>
     </copyright>
 -->
   </bookinfo>
 
-<chapter>
-  <title>Getting started</title>
-
-  <!-- First section for the systemrequriements -->
-  <section>
-    <title>Systemrequirements</title>
-
-    <para>
-		To start EDACC you need the JRE version 6. <!-- oder niedriger? oder hoeher? -->
-		Additional you need a connection to a SQL-database (DB), where you have read and write access. 
-		The DB should be reachable from the grid (computer) where the client will run.
+  <!-- bild einfuegen 
+  		<mediaobject>
+			<imageobject>
+				<imagedata fileref="resource/test.png" format="PNG"/>
+			</imageobject>
+		</mediaobject>
+ -->
 		
-		
-    </para>
-	
-  </section>
-  
-  <!-- Second section -->
-  <section>
-    <title>How to start</title>
-
-    <para>
-		When you have downloaded and unziped the zip-file,
-		you have to start it on a Unix like operating system by navigate with the comand line to the folder and type: java -jar "EDACC.jar".
-    </para>
-	<para>
-		If you use Windows, you only have to execute the file EDACC.jar.
-	</para>
-	
-  </section>
-  
-  <!-- another section -->
-  <section>
-    <title>Connect to the Database</title>
-
-    <para>
-		When you have started EDACC correctly you will see now the "connect to DB"-dialog. 
-		Here you fill all fields with the correct data for your database.
-		At last you press the connect-button.
-		Without a connection to a database you can't do anything with EDACC.
-    </para>
-	
-  </section>
-  
-  <!-- another section -->
-  <section>
-    <title>Create the tables</title>
-
-    <para>
-		If there is a empty database (DB) without any tables, you can create them with this option.
-		First create a connection to your DB and make sure that you have required rights to create tables in the DB.
-		If this was successfull, now all tabels and relations are created which were needed.
-    </para>
-	
-  </section>
-  
-</chapter>
-
 <chapter>
 	<title>Introduction</title>
-	
-	<!-- verschachtelte sections -->
-	<sect1>
-		<title>What is EDACC</title>
-		<para>
-			EDACC (Experiment Design and Administration for Computer Clusters) is a tool to manage your solver with parameters, 
-			instances and experiments for SAT (Boolean satisfiability problem). 
-		</para>
-		<para>
-			EDACC is a queuing-tool for computer-cluster. It creats all files and skripts where have to exist. 
-		</para>
-			<sect2>
-				<title>Manage Solver, instances and experiments</title>
-				<para>
-					You can add all your solver's with every parameter to your database (DB). So you can 
-					manage and acess them from everywhere. 
-				</para>
-			</sect2>
-			
-			<sect2>
-				<title>queuing-tool</title>
-				<para>
-					If you want to solve a job on a grid (cluster-computer) you first have to add your job in the queuing-system.
-					This can be very complex, so you need all files on your cluster-device, a skript-file to start your jobs and somthing more.
-					EDACC will create all this things in a zip-file for	you.
-				</para>
-			</sect2>
-			
-			<sect2>
-				<title>Workflow example</title>
-				<para>
-					<itemizedlist>
-						<listitem><para>Load solver and parameter</para></listitem>
-						<listitem><para>Load instances</para></listitem>
-						<listitem><para>Create experiment</para></listitem>
-						<listitem><para>Select solver and set the parameter</para></listitem>
-						<listitem><para>Select Instaces</para></listitem>
-						<listitem><para>Set the number of runs</para></listitem>
-						<listitem><para>Create the jobs</para></listitem>
-						<listitem><para>Start the client on the grid</para></listitem>
-						<listitem><para>Export the results</para></listitem>
-					</itemizedlist>
-				</para>
-			</sect2>
-	</sect1>
-	
-	<sect1>
-		<title>Which informations does EDACC manage</title>
-		<para>
-			Here we will show the DB-modell and describe the components.
-		</para>
-		<sect2>
-			<title>Solver, Parameter</title>
-			<para>
-				A solver has a name, a description and parameters. All this things and additionaly the binary of the solver is saved in the DB. A solver is a algorithm to find a solution for a given formula (instance).
-			</para>
-		</sect2>
-		
-		<sect2>
-			<title>Instanceclasses</title>
-			<para>
-				The instanceclasses help you to manage your instances. Every instace has a sourceclass. 
-				The sourceclass is the class of the instances where you added from one folder where all instances have the same style (e.g. random 3-sat).
-				But you can also create userclasses. A userclass can contain variable instaces. 
-			</para>
-		</sect2>
-		
-		<sect2>
-			<title>Instances</title>
-			<para>
-				A instance is a formula for the SAT-problem. Every instance has a name, a number of klauses, a number of variables and belong to a sourceclass.
-				All this attributes plus the file from the instance were saved in the DB.
-			</para>
-		</sect2>
-		
-		<sect2>
-			<title>Experiment (benchmark)</title>
-			<para>
-				An experiment contains one oder more solver with different parameters, some instances and a number of runs. 
-				It creates all the jobs for the client.
-			</para>
-		</sect2>
-	</sect1>
-	
+	<para>
+		EDACC has three parts. 
+	</para>
+	<para>
+		The first part is a management-tool. EDACC manage all solvers with all parameters and all instances in a database. Also the jobs for an experiment and the results were saved.
+	</para>
+	<para>
+		The second part is a design-tool. For all selected solvers with paramters and instances, EDACC create the jobs (a job is declared in the "Experiment Mode") for an experiment with the given runs. 
+	</para>
+	<para>
+		The third and last part is a analyse-tool. All result from the database can be graphical represented. So the diffenence between two solvers, parameters or instances is seen easily.
+	</para>
 </chapter>
 
 <chapter>
-	<title>Manage DB Modus</title>
+	<title>Systemrequirements</title>
+	
+	<section>
+	<title>client</title>
+	
+		<para>
+			Hard: The client need a X86-achitecture to run (another architecture like 64-bit is not tested).
+		</para>
+		
+		<para>
+			Soft: The client run on a linux operating system and need some dynamic libs like the linux-vdso.so, libpthread.so and libc.so.
+			Addionaly is a connection to the database necessary.
+		</para>
+	</section>
+	
+	<section>
+	<title>GUI</title>
+	
+		<para>
+			Hard: To run the GUI you need: CPU with 800 MHZ, 512 MB RAM (or higher), 200 MB HDD-space and a display resolution of 1024 x 768.
+			To analyse the experiments in the experiment-mode some R - libs are requiered.
+		</para>
+		
+		<para>
+			Soft: To run the GUI the Java Virtual Machine version 6 is requiered.
+		</para>
+	</section>
+	
+	<section>
+	<title>DB</title>
+	
+		<para>
+			Hard:
+		</para>
+		
+		<para>
+			Soft: The database have to be a mySQL 5.1.
+		</para>
+	</section>
+	
+	<section>
+	<title>Web</title>
+	
+		<para>
+			Hard:
+		</para>
+		
+		<para>
+			Soft:
+		</para>
+	</section>
+</chapter>
+  
+<chapter>
+	<title>How to start</title>
+	
+	<itemizedlist>
+		<listitem><para>First you have to create a mySQL database with read and write access.</para></listitem>
+		<listitem><para>Now the GUI can be started. On Windows you only have to execute the EDACC.jar file. On a Linux-like operating system you have to navigate with the comand line to the folder and type: java -jar "EDACC.jar".</para></listitem>
+		<listitem><para>Then the tables can be created in the database. For this you start edacc. Then you connect to your database which was created in point one with your database-ip, the port, the database-name and the username + password. Now you can crate the tables with the menu. You select "File" -> "Generate tables". If you have write-access on the selected database, the required tables are created.</para></listitem>
+	</itemizedlist>
+	
+	<section>
+		<title>(typical) Workflow to create a new experiment</title>
+		
+		<para>
+			There exist 2 modis, in the menubar. The first mode is the "ManageDB mode". It contain all CRUD-operations (create, read, update, delet) for solvers and instances.
+			The second mode is the "Experiment mode". It manage the experiments.
+		</para>
+		Workflow:
+		<itemizedlist>
+			<listitem><para>Start the EDACC-GUI.</para></listitem>
+			<listitem><para>Connect to the database and optionaly create the tables if they not exist.</para></listitem>
+			<listitem><para>Select the "Manage DB mode".</para></listitem>
+			<listitem><para>Stay in the "Solvers"-Tab. Press the "new"-button on the left (solver) side.</para></listitem>
+			<listitem><para>Declare a name for your solver and a description in the fields.</para></listitem>
+			<listitem><para>Press the "Add binary"-button and add the compiled binary of the solver to the database.</para></listitem>
+			<listitem><para>Optionaly press the "Add source files"-button and add the sourcecode and so on to the database.</para></listitem>
+			<listitem><para>If your solver has parameters, add them now on the right (parameter) side. Click on the "new"-button and declare a name (or short description), the prefix for the comandline and the order of the parameters on the comandline.</para></listitem>
+			<listitem><para>If all solvers with their parameters are added, press the "Save to DB"-button and switch to the "instances"-tab.</para></listitem>
+			<listitem><para>Press the "Add"-button on the right side to add new instances. Select the option "Automatic source class generation", set the depth of recursive folders and press the "OK"-button. Select the root-folder of your instances and EDACC will automatic add all instances in all recursive folders until the depth is reached.</para></listitem>
+			<listitem><para>Now everything to create an experiment were added to the database. Change the mode to the "Experiment mode"</para></listitem>
+			<listitem><para>Press the "Create"-button to create a new experiment. Declare here a name and a description for the experiment.</para></listitem>
+			<listitem><para>The new experiment should be selected and then press the "Load"-button.</para></listitem>
+			<listitem><para>Declare the "Experiment Parameters" on the bottom.</para></listitem>
+			<listitem><para>Switch to the "Solvers"-tab. Select the solvers to test and press the "Choose"-button. Declare the parameters you need and set a value.</para></listitem>
+			<listitem><para>Press the "Save"-button and switch to the "Instances"-tab.</para></listitem>
+			<listitem><para>First select one or more instaceclass oder userclass. Than select the instances to test the solvers and press the "Save"-button.</para></listitem>
+			<listitem><para>Switch to the "Generate Jobs"-tab and declare the number of runs per solver and instance. Select a queue and generate the "cluster package". At last "Generate Jobs" for the database.</para></listitem>
+			<listitem><para>Now everything exist. All solvers and instances were in the created package and the jobs exist in the database. Copy the package on your device or folder where the skripts can access to (on the grid).</para></listitem>
+			<listitem><para>Start the created skripts. In the next "Experiment mode"-tab (it is the "Job Browser"-tag) the progress is shown.</para></listitem>
+		</itemizedlist>
+	</section>
+</chapter>
+  
+<chapter>
+	<title>Manage DB-Modus</title>
 	
 	<section>
 		<title>Solver</title>
 		<para>
-		Here we will save the name, the description and the binaray from a solver. You see a overview of all your solvers.
+			DB-Model <sbr/> <!-- das ist ein Zeilenumbruch -->
+			<mediaobject>
+			<imageobject>
+				<imagedata fileref="resource/Solver.png" format="PNG"/>
+			</imageobject>
+		</mediaobject>
+		</para>
 		
+		<para> 
+			Boundary Conditions <sbr/>
+			<itemizedlist>
+				<listitem><para>Every solver need a name and a version, because this tuple is unique.</para></listitem>
+				<listitem><para>The md5-checksum is also unique, so it is not possible to save one solver two times.</para></listitem>
+				<listitem><para>The source code and the description is optionaly.</para></listitem>
+			</itemizedlist>
 		</para>
+		
 	</section>
-	
 	<section>
-		<title>Paramter</title>
+		<title>Parameter</title>
 		<para>
-		Every parameter belong to a solver, a parameter can not exist without a solver. For each parameter there will be saved in the DB the name of the parameter, the prefix which is send with the solver (like -s) and the order of this parameters. The boolean-flag is for parameters without a flag.
-		The value of a parameter (if the boolean-flag is not set) will be set in the experiment-mode.
-		</para>
-	</section>
-	
-	<section>
-		<title>Instanceclasses</title>
-		<para>
-		There are two types of instance classes. The first type is the sorceclass. Every instance belong to a sourceclass. If a couple of instances (e.g. a folder) where added to EDACC, there have to set a sourceclass name for this instances. 
-		The second type is the userclass 
-		</para>
-	</section>
-	
-	<section>
-		<title>Instance</title>
-		<para>
-		contains variables and klauses
-		</para>
-	</section>
-</chapter>
-
-<chapter>
-	<title>Experiment Mode</title>
-	
-	<section>
-		<title>Experiment Management</title>
-		<para>
-			An experiment is identified about the name and the date where it is created. Also some things like max-memory or max-time usage were defined here. The max seed value is the upper bound for the autogenerated seed-value. The "generate seeds" - button create the seeds for the solver who need such a seed. If there are more solvers with this type ob seed you can cobine this seed-values with the "link seeds" - button, that all solvers get in one run the same seed.
+			DB-Model <sbr/> 
 			
 		</para>
-	</section>
-	
-	<section>
-		<title>...</title>
-		<para>
-		...
+		
+		<para> 
+			Boundary Conditions <sbr/>
+			
 		</para>
+		
+	</section>
+	<section>
+		<title>Instances and classes</title>
+		<para>
+			DB-Model <sbr/> 
+			
+		</para>
+		
+		<para> 
+			Boundary Conditions <sbr/>
+			
+		</para>
+		
 	</section>
 </chapter>
-
-<chapter>
-	<title>GridQueues</title>
-	
-	<section>
-		<title>was es da halt so gibt</title>
-		<para>
-		und dann schön erklärt
-		</para>
-	</section>
-</chapter>
-
-<chapter>
-	<title>Client</title>
-	
-	<section>
-		<title>ne section</title>
-		<para>
-		und dann was die da macht
-		</para>
-	</section>
-</chapter>
+  
+  
+  
+  
+  
+  
+  
+ 
 
 <!-- Via XInclude we can include document parts
      You can use Xalan's xpointer features to select parts of your included document
