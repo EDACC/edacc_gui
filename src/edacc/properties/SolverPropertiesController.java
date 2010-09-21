@@ -9,6 +9,7 @@ import edacc.EDACCManageSolverPropertyDialog;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.SolverProperty;
 import edacc.model.SolverPropertyDAO;
+import edacc.model.SolverPropertyIsUsedException;
 import edacc.model.SolverPropertyNotInDBException;
 import edacc.satinstances.PropertyValueType;
 import edacc.satinstances.PropertyValueTypeManager;
@@ -26,6 +27,7 @@ public class SolverPropertiesController {
     private EDACCManageSolverPropertyDialog main;
     private JPanel panel;
     private JTable tableSolverProperty;
+    private int editId;
 
     /**
      * Constructor of the SolverPropertiesController
@@ -37,6 +39,7 @@ public class SolverPropertiesController {
         this.main = manage;
         this.panel = panelManageResultProperty;
         this.tableSolverProperty = tableResultProperty;
+        this.editId = -1;
     }
 
     /**
@@ -53,6 +56,7 @@ public class SolverPropertiesController {
     public void NewSolverProperty() {
         showSolverPropertyEditField(true);
         clearSolverPropertyEditField();
+        this.editId = -1;
     }
 
     /**
@@ -93,5 +97,38 @@ public class SolverPropertiesController {
         }
         main.setComboBoxPropertyValueTypesItems(items);
     }
+
+    public void removeSolverProperty(int convertRowIndexToModel) throws NoConnectionToDBException, SQLException, SolverPropertyIsUsedException {
+        SolverProperty toRemove = (SolverProperty)((SolverPropertyTableModel)tableSolverProperty.getModel()).getValueAt(convertRowIndexToModel, 5);
+        SolverPropertyDAO.remove(toRemove);
+        ((SolverPropertyTableModel)tableSolverProperty.getModel()).removeSolverProperty(toRemove);
+    }
+
+    public void showSolver(int convertRowIndexToModel) {
+        if(convertRowIndexToModel != -1){
+            SolverProperty toShow = (SolverProperty)((SolverPropertyTableModel)tableSolverProperty.getModel()).getValueAt(convertRowIndexToModel, 5);
+            main.showSolverProperty(toShow);
+            this.editId = toShow.getId();
+        }else 
+            this.editId = -1;
+    }
+
+    public void saveSolverProperty(String name, String prefix, String description, SolverPropertyType propType, String valueType, boolean isMultiple)
+            throws NoConnectionToDBException, SQLException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException, SolverPropertyIsUsedException{
+
+        if(editId != -1){
+            SolverProperty toEdit = SolverPropertyDAO.getById(editId);
+            toEdit.setName(name);
+            toEdit.setPrefix(prefix);
+            toEdit.setDescription(description);
+            toEdit.setMultiple(isMultiple);
+            SolverPropertyDAO.save(toEdit);
+        }else {
+            SolverPropertyDAO.createResultProperty(name, prefix, description, PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(valueType), propType, isMultiple);
+        }
+        loadSolverProperties();
+        main.clearSolverPropertyEditField();
+    }
+      
 
 }

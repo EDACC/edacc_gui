@@ -37,7 +37,7 @@ public class SolverPropertyDAO {
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    public static SolverProperty createResultProperty(String name, String prefix, String description, PropertyValueType valueType, SolverPropertyType type, boolean multiple) throws NoConnectionToDBException, SQLException{
+    public static SolverProperty createResultProperty(String name, String prefix, String description, PropertyValueType valueType, SolverPropertyType type, boolean multiple) throws NoConnectionToDBException, SQLException, SolverPropertyIsUsedException{
         SolverProperty r = new SolverProperty();
         r.setName(name);
         r.setPrefix(prefix);
@@ -71,6 +71,7 @@ public class SolverPropertyDAO {
             ResultSet rs = ps.executeQuery();
             if(!rs.next())
                 throw new SolverPropertyNotInDBException();
+            int test = rs.getInt(5);
             res.setId(id);
             res.setValueType(PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(rs.getString(1)));
             res.setName(rs.getString(2));
@@ -91,9 +92,16 @@ public class SolverPropertyDAO {
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    private static void save(SolverProperty r) throws NoConnectionToDBException, SQLException {
+    public static void save(SolverProperty r) throws NoConnectionToDBException, SQLException, SolverPropertyIsUsedException {
         if(r.isDeleted()){
-            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
+            String query = "SELECT * FROM ExperimentResult_has_SolverProperty WHERE SolverProperty_idSolverProperty=?";
+            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+            ps.setInt(1, r.getId());
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                throw new SolverPropertyIsUsedException();
+            }
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
             ps.setInt(1, r.getId());
             ps.executeUpdate();
             ps.close();
@@ -111,7 +119,7 @@ public class SolverPropertyDAO {
             ps.close();
             r.setSaved();
         }else if(r.isNew()){
-            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
+            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setString(1, r.getName());
             ps.setString(2, r.getPrefix());
             ps.setString(3, r.getDescription());
@@ -149,6 +157,11 @@ public class SolverPropertyDAO {
             res.add(SolverPropertyDAO.getById(rs.getInt(1)));
         }
         return res;
+    }
+
+    public static void remove(SolverProperty solverProperty) throws NoConnectionToDBException, SQLException, SolverPropertyIsUsedException {
+        solverProperty.setDeleted();
+        save(solverProperty);
     }
 
 }

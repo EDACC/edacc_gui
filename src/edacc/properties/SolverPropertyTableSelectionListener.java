@@ -23,10 +23,13 @@ public class SolverPropertyTableSelectionListener implements ListSelectionListen
     }
 
     public void valueChanged(ListSelectionEvent e) {
-        if (e.getSource() == table.getSelectionModel() && table.getRowSelectionAllowed() && table.getSelectedRowCount() != 0)
-            controller.showSolverPropertyEditField(true);
-        else
-            controller.showSolverPropertyEditField(false);
+        if (e.getSource() == table.getSelectionModel() && table.getRowSelectionAllowed()) {
+            if (table.getSelectedRow() != -1) {
+                controller.showSolver(table.convertRowIndexToModel(table.getSelectedRow()));
+            } else
+                controller.showSolverPropertyEditField(false);
+            }
     }
+
 
 }

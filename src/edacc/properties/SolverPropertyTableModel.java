@@ -42,10 +42,22 @@ public class SolverPropertyTableModel extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int col) {
-        if (this.getRowCount() == 0)
-            return this.getClass();
-        else
-            return getValueAt(0, col).getClass();
+        switch(col){
+            case 0:
+                return String.class;
+            case 1:
+                return String.class;
+            case 2:
+                return String.class;
+            case 3:
+                return PropertyValueTypeSelectionModel.class;
+            case 4:
+                return SolverPropertyType.class;
+            case 5:
+                return Boolean.class;
+            default:
+                return null;
+        }
     }
 
     /**
@@ -101,24 +113,25 @@ public class SolverPropertyTableModel extends AbstractTableModel {
      * Removes the SolverProperty at the given position of the table.
      * @param rowIndex of the SolverProperty to remove
      */
-    private void removeResultProperty(int rowIndex){
+    public void removeResultProperty(int rowIndex){
         rows.remove(rowIndex);
-    }
-
-    /**
-     * Removes all the SolverProperty objects at the given position of the table.
-     * @param rowIndexes of all SolverProperty objects to remove
-     */
-    public void removeResultProperties(Vector<Integer> rowIndexes){
-        for(int i = 0; i <= rowIndexes.size(); i++){
-            removeResultProperty(rowIndexes.get(i));
-        }
         this.fireTableDataChanged();
     }
 
+    /**
+     * Removes all SolverProperty objects from the table.
+     */
     public void clear(){
         this.rows.clear();
         this.fireTableDataChanged();
     }
 
+    /**
+     * Removes the given SolverProperty object from the table
+     * @param toRemove the SolverProperty object to remove
+     */
+    public void removeSolverProperty(SolverProperty toRemove){
+        rows.remove(toRemove);
+        this.fireTableDataChanged();
+    }
 }

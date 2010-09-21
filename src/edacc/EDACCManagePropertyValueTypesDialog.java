@@ -233,7 +233,6 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
             }else{
                 controller.removePropertyValueType(tablePropertyValueTypes.convertRowIndexToModel(tablePropertyValueTypes.getSelectedRow()));
             }
-
         } catch (IOException ex) {
             Logger.getLogger(EDACCManagePropertyValueTypesDialog.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoConnectionToDBException ex) {

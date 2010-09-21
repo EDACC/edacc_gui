@@ -46,6 +46,7 @@ public class SolverProperty extends BaseModel implements IntegerPKModel{
 
 
     public void setName(String name){
+        this.name = name;
         if (this.isSaved())
             this.setModified();
     }
@@ -106,10 +107,13 @@ public class SolverProperty extends BaseModel implements IntegerPKModel{
         switch(typeId){
             case 0:
                 this.solvPropertyType = SolverPropertyType.ResultFile;
+                break;
             case 1:
                 this.solvPropertyType = SolverPropertyType.ClientOutput;
+                break;
             case 2:
                 this.solvPropertyType = SolverPropertyType.Parameter;
+                break;
             default:
                 throw new SolverPropertyTypeNotExistException();
 
