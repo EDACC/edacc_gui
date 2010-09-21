@@ -419,4 +419,18 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public Vector<ExperimentResult> getJobs() {
         return jobs;
     }
+
+    public int getJobsCount() {
+        return jobs.size();
+    }
+    
+    public int getJobsCount(ExperimentResultStatus status) {
+        int res = 0;
+        for (ExperimentResult j : jobs) {
+            if (j.getExperimentResultStatus().equals(status)) {
+                res++;
+            }
+        }
+        return res;
+    }
 }

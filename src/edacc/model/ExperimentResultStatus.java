@@ -5,10 +5,9 @@ package edacc.model;
  * @author simon
  */
 public enum ExperimentResultStatus {
-    CODE__2(-2), CODE__1(-1), CODE_0(0), CODE_1(1), CODE_2(2), CODE_3(3),UNKNOWN(4);
-
+    CODE__2(-2), CODE__1(-1), CODE_0(0), CODE_1(1), CODE_2(2), CODE_3(3),UNKNOWN(4),
+    NOTSTARTED(-1),RUNNING(0),SUCCESSFUL(1);
     int value;
-
     ExperimentResultStatus (int status) {
         value = status;
     }

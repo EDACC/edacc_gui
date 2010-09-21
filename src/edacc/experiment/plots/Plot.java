@@ -14,6 +14,7 @@ import org.rosuda.JRI.Rengine;
  */
 public abstract class Plot {
 
+    public static final String[] colors = {"red", "green", "blue", "darkgoldenrod1", "darkolivegreen", "darkorchid", "deeppink", "darkgreen", "blue4"};
     public static int ALLRUNS = -3;
     public static int AVERAGE = -2;
     public static int MEDIAN = -1;
@@ -55,7 +56,7 @@ public abstract class Plot {
     }
 
     /**
-     * Returns a ExperimentResult identified by solverConfig id, instance id and run for the current experiment
+     * Returns an ExperimentResult identified by solverConfig id, instance id and run for the current experiment.
      * @param solverConfigId the solverConfig id for the ExperimentResult
      * @param instanceId the instance id for the ExperimentResult
      * @param run the run
@@ -66,6 +67,38 @@ public abstract class Plot {
     }
 
     /**
+     * Returns the value (currently cpu-time) for a solver configuration on an instance
+     * on a specific run. run can be AVERAGE or MEDIAN or any non-negative number
+     * @param solverConfigId
+     * @param instanceId
+     * @param run
+     * @return
+     */
+    public Double getResultValue(int solverConfigId, int instanceId, int run) {
+        // TODO: return value for other properties..
+        if (run == ALLRUNS) {
+            throw new IllegalArgumentException();
+        } else if (run == MEDIAN || run == AVERAGE) {
+            Vector<ExperimentResult> results = getResults(solverConfigId, instanceId);
+            for (int j = results.size() - 1; j >= 0; j--) {
+                if (results.get(j).getStatus() != 1) {
+                    results.remove(j);
+                }
+            }
+            if (results.size() == 0) {
+                return null;
+            }
+            if (run == AVERAGE) {
+                return new Double(getAverageTime(results));
+            } else {
+                return new Double(getMedianTime(results));
+            }
+        } else {
+            ExperimentResult er = getResult(solverConfigId, instanceId, run);
+            return new Double(er.getTime());
+        }
+    }
+    /**
      * Calculates the average time for the given ExperimentResults, i.e. the sum of the times divided by the count
      * @param results
      * @return
@@ -74,10 +107,12 @@ public abstract class Plot {
         if (results.size() == 0) {
             throw new IllegalArgumentException("There are no results.");
         }
+
         double res = 0.;
         for (ExperimentResult result : results) {
             res += result.getTime();
         }
+
         res /= results.size();
         return res;
     }
@@ -91,11 +126,13 @@ public abstract class Plot {
         if (results.size() == 0) {
             throw new IllegalArgumentException("There are no results.");
         }
+
         float[] times = new float[results.size()];
         int k = 0;
         for (ExperimentResult res : results) {
             times[k++] = res.getTime();
         }
+
         java.util.Arrays.sort(times);
         if (times.length % 2 == 1) {
             // this is the median
@@ -104,6 +141,7 @@ public abstract class Plot {
             // we have two medians, so we use the average of both
             return (times[(times.length - 1) / 2] + times[times.length / 2]) / 2;
         }
+
     }
 
     public Vector<double[]> getPoints(Rengine re, double[] xs, double[] ys) {
@@ -112,38 +150,16 @@ public abstract class Plot {
         if (xs.length != ys.length) {
             return res;
         }
-        for (int i = 0; i < xs.length; i++) {
+
+        for (int i = 0; i <
+                xs.length; i++) {
             double[] tmp = new double[2];
             tmp[0] = xs[i];
             tmp[1] = ys[i];
             res.add(tmp);
         }
-        return res;
-    }
 
-    public float getCPUTime(int solverConfigId, int instanceId, int run) throws Exception {
-        if (run == AVERAGE || run == MEDIAN) {
-            Vector<ExperimentResult> results = getResults(solverConfigId, instanceId);
-            for (int j = results.size() - 1; j >= 0; j--) {
-                if (results.get(j).getStatus() != 1) {
-                    results.remove(j);
-                }
-            }
-            if (results.size() == 0) {
-                throw new Exception("No results.");
-            }
-            if (run == AVERAGE) {
-                return new Float(getAverageTime(results));
-            } else {
-                return new Float(getMedianTime(results));
-            }
-        } else {
-            ExperimentResult res = getResult(solverConfigId, instanceId, run);
-            if (res.getStatus() != 1) {
-                throw new Exception("No results.");
-            }
-            return res.getTime();
-        }
+        return res;
     }
 
     /**
@@ -169,6 +185,7 @@ public abstract class Plot {
     public void plot(Rengine engine, Vector<PointInformation> pointInformations) throws SQLException, DependencyException {
         this.rengine = engine;
         initializeResults();
+
     }
 }
 

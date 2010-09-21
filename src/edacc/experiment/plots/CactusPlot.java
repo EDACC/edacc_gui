@@ -2,18 +2,21 @@ package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentResult;
+import edacc.model.ExperimentResultStatus;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
 
 class SolverInfos {
+
     String name;
     int[] xs;
     double[] ys;
@@ -24,24 +27,25 @@ class SolverInfos {
  * @author simon
  */
 public class CactusPlot extends Plot {
-    private static final String[] colors = {"red", "green", "blue", "darkgoldenrod1", "darkolivegreen", "darkorchid", "deeppink", "darkgreen", "blue4"};
+
     private Dependency[] dependencies;
     private JComboBox comboRun;
     private InstanceSelector instanceSelector;
     private SolverConfigurationSelector solverConfigurationSelector;
-    
+
     public CactusPlot(ExperimentController expController) {
         super(expController);
         comboRun = new JComboBox();
         instanceSelector = new InstanceSelector();
         solverConfigurationSelector = new SolverConfigurationSelector();
-        dependencies = new Dependency[] {
-            new Dependency("Solvers", solverConfigurationSelector),
-            new Dependency("Instances", instanceSelector),
-            new Dependency("Plot for run", comboRun)
-        };
+        dependencies = new Dependency[]{
+                    new Dependency("Solvers", solverConfigurationSelector),
+                    new Dependency("Instances", instanceSelector),
+                    new Dependency("Plot for run", comboRun)
+                };
     }
 
+    @Override
     public Dependency[] getDependencies() {
         return dependencies;
     }
@@ -71,10 +75,10 @@ public class CactusPlot extends Plot {
             throw new DependencyException("You have to select solvers in order to plot.");
         }
         HashSet<Integer> selectedInstanceIds = new HashSet<Integer>();
-        for (Instance i: instances) {
+        for (Instance i : instances) {
             selectedInstanceIds.add(i.getId());
         }
-        
+
         SolverInfos[] solver = new SolverInfos[solverConfigs.size()];
         double max_y = 0;
         for (int i = 0; i < solver.length; i++) {
@@ -82,52 +86,57 @@ public class CactusPlot extends Plot {
 
 
 
-            double[] resultTimes;
-            if (run == ALLRUNS) {
-                resultTimes = new double[selectedInstanceIds.size() * expController.getActiveExperiment().getNumRuns()];
-            } else {
-                resultTimes = new double[selectedInstanceIds.size()];
-            }
+            Vector<Float> resultTimes = new Vector<Float>();
+
             int k = 0;
             for (Integer instanceId : selectedInstanceIds) {
                 try {
                     if (run == ALLRUNS) {
                         Vector<ExperimentResult> tmp = getResults(sc.getId(), instanceId);
                         for (ExperimentResult er : tmp) {
-                            resultTimes[k++] = er.getTime();
+                            if (er.getExperimentResultStatus().equals(ExperimentResultStatus.SUCCESSFUL)) {
+                                resultTimes.add(er.getTime());
+                            }
                         }
                     } else {
-                        resultTimes[k++] = getCPUTime(sc.getId(), instanceId, run);
+                      //  ExperimentResult er = getResult(sc.getId(), instanceId, run);
+                      //  if (er.getExperimentResultStatus().equals(ExperimentResultStatus.SUCCESSFUL)) {
+                      //      resultTimes.add(er.getTime());
+                      //  }
+                        // TODO: this might be senseless :-) -> will be changed with properties
+                        resultTimes.add(getResultValue(sc.getId(), instanceId, run).floatValue());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            java.util.Arrays.sort(resultTimes);
-            
+            Collections.sort(resultTimes);
+
             solver[i] = new SolverInfos();
             solver[i].name = SolverDAO.getById(sc.getSolver_id()).getName();
-            solver[i].xs = new int[resultTimes.length+1];
-            solver[i].ys = new double[resultTimes.length+1];
-            
+            solver[i].xs = new int[resultTimes.size() + 1];
+            solver[i].ys = new double[resultTimes.size() + 1];
+
             k = 1;
             solver[i].xs[0] = 0;
             solver[i].ys[0] = 0;
-            for (double time : resultTimes) {
+            for (Float time : resultTimes) {
                 solver[i].xs[k] = k;
                 solver[i].ys[k] = time;
-                if (time > max_y) max_y = time;
+                if (time > max_y) {
+                    max_y = time;
+                }
                 k++;
             }
         }
         max_y = max_y * 1.05;
         int max_x;
         if (run == ALLRUNS) {
-            max_x = (int)(selectedInstanceIds.size() * expController.getActiveExperiment().getNumRuns() * 1.1)+1;
+            max_x = (int) (selectedInstanceIds.size() * expController.getActiveExperiment().getNumRuns() * 1.1) + 1;
         } else {
-            max_x = (int)(selectedInstanceIds.size() * 1.1)+1;
+            max_x = (int) (selectedInstanceIds.size() * 1.1) + 1;
         }
-        engine.eval("plot(c(), c(), type='p', col='red', las=1, xlim=c(0,"+max_x+"), ylim=c(0,"+max_y+"), xaxs='i', yaxs='i', xlab='', ylab='', cex.main=1.5)");
+        engine.eval("plot(c(), c(), type='p', col='red', las=1, xlim=c(0," + max_x + "), ylim=c(0," + max_y + "), xaxs='i', yaxs='i', xlab='', ylab='', cex.main=1.5)");
         engine.eval("par(new=1)");
         String[] used_colors = new String[solver.length];
         int colNum = 0;
@@ -139,12 +148,12 @@ public class CactusPlot extends Plot {
 
             engine.assign("color", colors[colNum]);
             used_colors[colCnt++] = colors[colNum];
-            engine.eval("plot(xs,ys,type='p',col=color,pch="+colNum+",xlim=c(0,"+max_x+"),ylim=c(0,"+max_y+"), xaxs='i', yaxs='i', axes=False, xlab='', ylab='', cex.main=1.5)");
+            engine.eval("plot(xs,ys,type='p',col=color,pch=" + colNum + ",xlim=c(0," + max_x + "),ylim=c(0," + max_y + "), xaxs='i', yaxs='i', axes=False, xlab='', ylab='', cex.main=1.5)");
             engine.eval("par(new=1)");
             // plot lines
-            engine.eval("plot(xs, ys, type='l', col=color, lty=1, xlim=c(0,"+max_x+"),ylim=c(0,"+max_y+"),xaxs='i', yaxs='i', axes=False, xlab='', ylab='', cex.main=1.5)");
+            engine.eval("plot(xs, ys, type='l', col=color, lty=1, xlim=c(0," + max_x + "),ylim=c(0," + max_y + "),xaxs='i', yaxs='i', axes=False, xlab='', ylab='', cex.main=1.5)");
             engine.eval("par(new=1)");
-            colNum = (colNum +1)% colors.length;
+            colNum = (colNum + 1) % colors.length;
         }
 
         engine.eval("mtext('number of solved instances', side=1, line=3, cex=1.2)");
@@ -152,7 +161,7 @@ public class CactusPlot extends Plot {
         engine.eval("mtext('Number of instances solved within a given amount of time', padj=1, side=3, line=3, cex=1.7)");
         String[] lnames = new String[solver.length];
         int[] pchs = new int[solver.length];
-        int[] lty = new int[solver.length+1];
+        int[] lty = new int[solver.length + 1];
         for (int i = 0; i < solver.length; i++) {
             lnames[i] = solver[i].name;
             pchs[i] = i;
@@ -171,6 +180,7 @@ public class CactusPlot extends Plot {
         return "Number of instances solved within a given amount of time";
     }
 
+    @Override
     public void loadDefaultValues() throws SQLException {
         comboRun.removeAllItems();
         comboRun.addItem("all runs - average");

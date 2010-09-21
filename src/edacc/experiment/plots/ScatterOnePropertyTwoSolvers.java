@@ -107,6 +107,7 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
         plotTitle = xSolverConfig.getName() + " vs. " + ySolverConfig.getName() + " (" + expController.getActiveExperiment().getName() + ")";
         Vector<Float> xsVec = new Vector<Float>();
         Vector<Float> ysVec = new Vector<Float>();
+
         for (Instance instance : instances) {
             try {
                 if (run == ALLRUNS) {
@@ -127,8 +128,8 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
                         }
                     }
                 } else {
-                    float xsTime = getCPUTime(xSolverConfig.getId(), instance.getId(), run);
-                    float ysTime = getCPUTime(ySolverConfig.getId(), instance.getId(), run);
+                    float xsTime = getResultValue(xSolverConfig.getId(), instance.getId(), run).floatValue();
+                    float ysTime = getResultValue(ySolverConfig.getId(), instance.getId(), run).floatValue();
                     xsVec.add(xsTime);
                     ysVec.add(ysTime);
                     pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>" +
@@ -139,20 +140,30 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
             } catch (Exception e) {
             }
         }
-
+        if (maxValue == 0.) {
+            maxValue = 0.01;
+        }
+        double minValue = maxValue;
         double[] xs = new double[xsVec.size()];
         double[] ys = new double[ysVec.size()];
         for (int i = 0; i < xsVec.size(); i++) {
             xs[i] = xsVec.get(i);
             ys[i] = ysVec.get(i);
+            if (xs[i] > 0. && xs[i] < minValue) {
+                minValue = xs[i];
+            }
+           if (ys[i] > 0. && ys[i] < minValue) {
+                minValue = ys[i];
+            }
         }
+
         String xlabel = xSolverConfig.toString();
         String ylabel = ySolverConfig.toString();
         String title = xlabel + " vs " + ylabel;
         re.assign("xs", xs);
         re.assign("ys", ys);
         if (scaleSelector.isXScaleLog() || scaleSelector.isYScaleLog()) {
-            re.assign("limits", new double[]{0.01, maxValue});
+            re.assign("limits", new double[]{minValue, maxValue});
         } else {
             re.assign("limits", new double[]{0, maxValue});
         }
@@ -177,7 +188,7 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
         
         // plot diagonal line
         if (!log.equals("")) {
-            re.eval("x <- seq(0.1," + maxValue + ")");
+            re.eval("x <- seq(0.01," + maxValue + ")");
             re.eval("plot(x, x, log='" + log + "', type='l', col='black', lty=2, xlim=limits, ylim=limits, xaxs='i', yaxs='i',xaxt='n',yaxt='n', xlab='', ylab='')");
         } else {
             re.eval("plot(limits, limits, type='l', col='black', lty=2, xlim=limits, ylim=limits, xaxs='i', yaxs='i',xaxt='n',yaxt='n', xlab='', ylab='')");

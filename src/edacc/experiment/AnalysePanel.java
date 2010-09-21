@@ -39,8 +39,9 @@ public class AnalysePanel extends javax.swing.JPanel {
       //  comboType.addItem(new ScatterTwoPropertiesOneSolver(expController));
       //  comboType.addItem(new ScatterInstancePropertySolverProperty(expController));
         comboType.addItem(new CactusPlot(expController));
+        comboType.addItem(new KernelDensityPlot(expController));
         comboType.addItem(new RTDPlot(expController));
-       // comboType.addItem(new RTDsPlot(expController));
+        comboType.addItem(new RTDsPlot(expController));
         
         comboType.addActionListener(new ActionListener() {
 

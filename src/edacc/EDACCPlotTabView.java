@@ -65,7 +65,6 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
     public EDACCPlotTabView() {
         initComponents();
         this.setSize(new Dimension(800, 600));
-        this.setTitle(title);
         addWindowListener(new WindowAdapter() {
 
             @Override
@@ -93,6 +92,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
 
         if (downArrow == null) {
             downArrow = new JWindow() {
+
                 @Override
                 public void paint(Graphics g) {
                     // this will draw an arrow
@@ -103,7 +103,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                             RenderingHints.VALUE_ANTIALIAS_ON);
                     Composite composite = g2d.getComposite();
-                    g2d.setColor(new Color(0,0,0,0));
+                    g2d.setColor(new Color(0, 0, 0, 0));
                     g2d.fillRect(0, 0, getWidth(), getHeight());
                     g2d.setColor(Color.blue);
                     g2d.setComposite(ac);
@@ -123,7 +123,9 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
     }
 
     private void addPanel(TabComponent tabComp, PlotPanel pnl) {
-        tabbedPanePlots.addTab(null, pnl);
+        // title: null, icon: null, panel: pnl, tooltip: title
+        tabbedPanePlots.addTab(null, null, pnl, tabComp.getTitle());
+        // replace the tab component and select this new tab
         tabbedPanePlots.setTabComponentAt(tabbedPanePlots.getTabCount() - 1, tabComp);
         tabbedPanePlots.setSelectedIndex(tabbedPanePlots.getTabCount() - 1);
         requestFocus();
@@ -213,6 +215,21 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         }
     }
 
+    public void updateTitle(String title) {
+        String tmp = "";
+        if (tabViews.size() == 0 || tabViews.get(0) == this) {
+            tmp = mainWindowTitle;
+        } else {
+            tmp = title;
+        }
+        if ("".equals(title)) {
+            title = tmp;
+        } else {
+            title = tmp + " - " + title;
+        }
+        setTitle(title);
+    }
+
     /**
      * Adds a PlotPanel to the tab view.
      * @param pnl the panel to be added
@@ -228,6 +245,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
      */
     public void addPanel(String title, PlotPanel pnl) {
         addPanel(new TabComponent(this, title), pnl);
+        updateTitle(title);
     }
 
     public static void addListener(PlotTabEvents listener) {
@@ -268,7 +286,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
     public static EDACCPlotTabView getMainTabView() {
         if (tabViews.size() == 0) {
             EDACCPlotTabView tabView = new EDACCPlotTabView();
-            tabView.setTitle(mainWindowTitle);
+            tabView.updateTitle("");
             tabViews.add(tabView);
             tabViewCountChanged();
         }
@@ -308,7 +326,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         }
         tabViews.remove(tabView);
         if (tabViews.size() > 0) {
-            tabViews.get(0).setTitle(mainWindowTitle);
+            tabViews.get(0).updateTitle("");
         }
         tabView.dispose();
         tabViewCountChanged();
@@ -338,7 +356,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         if (tabViews.size() > 0) {
             tabView.setSize(tabViews.get(0).getSize());
         } else {
-            tabView.setTitle(mainWindowTitle);
+            tabView.updateTitle("");
         }
         tabViews.add(tabView);
         tabComp.setParent(tabView);
@@ -392,10 +410,10 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                 }
             }
             PlotPanel plotPanel = (PlotPanel) tabbedPanePlots.getSelectedComponent();
-            TabComponent tc = (TabComponent) tabbedPanePlots.getTabComponentAt(tabbedPanePlots.getSelectedIndex());
+            //  TabComponent tc = (TabComponent) tabbedPanePlots.getTabComponentAt(tabbedPanePlots.getSelectedIndex());
             if ("pdf".equals(imgType)) {
                 AnalyseController.saveToPdf(plotPanel, fileName);
-                tc.setTitle(name);
+                //     tc.setTitle(name);
             } else {
                 try {
                     // Get a buffered Image with the right dimension
@@ -409,7 +427,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                     plotPanel.gdc.paint(g);
                     // save the image to disk
                     ImageIO.write(bufferedImage, imgType, f);
-                    tc.setTitle(name);
+                    //  tc.setTitle(name);
 
                 } catch (IOException ex) {
                     javax.swing.JOptionPane.showMessageDialog(this, "Error while writing file: " + ex.getMessage(), "Error while writing file", javax.swing.JOptionPane.ERROR_MESSAGE);
@@ -461,6 +479,11 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         );
 
         tabbedPanePlots.setName("tabbedPanePlots"); // NOI18N
+        tabbedPanePlots.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                tabbedPanePlotsStateChanged(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -479,6 +502,16 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void tabbedPanePlotsStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tabbedPanePlotsStateChanged
+        if (tabbedPanePlots.getSelectedIndex() >= 0) {
+            TabComponent tabComponent = (TabComponent) tabbedPanePlots.getTabComponentAt(tabbedPanePlots.getSelectedIndex());
+            if (tabComponent == null) {
+                return;
+            }
+            this.updateTitle(tabComponent.getTitle());
+        }
+    }//GEN-LAST:event_tabbedPanePlotsStateChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSave;
     private javax.swing.JPanel jPanel2;
@@ -501,6 +534,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                 }
                 count++;
             }
+            this.setPreferredSize(new Dimension(120, 24));
             lblTitle = new JLabel(title);
             closeButton = new TabButton();
             closeButton.addActionListener(new ActionListener() {
@@ -512,6 +546,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
             });
             add(lblTitle);
             add(closeButton);
+            lblTitle.setPreferredSize(new Dimension(93, 17));
             repaint();
         }
 
@@ -521,6 +556,10 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
 
         public void setTitle(String title) {
             lblTitle.setText(title);
+        }
+
+        public String getTitle() {
+            return lblTitle.getText();
         }
     }
 

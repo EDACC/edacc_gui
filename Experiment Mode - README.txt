@@ -7,6 +7,7 @@ Linux:
 * install r
 * install rJava: in r type install.packages('rJava')
 * install JavaGD: in r type install.packages('JavaGD')
+* install np library for kernel density plot: in r type install.packages('np')
 
 The paths here are just examples. Depending on your setup they might differ.
 
@@ -21,6 +22,7 @@ Windows:
 * install r
 * install rJava: in r type install.packages('rJava')
 * install JavaGD: in r type install.packages('JavaGD')
+* install np library for kernel density plot: in r type install.packages('np')
 
 locate the r, rJava\jri and JavaGD\libs directory, add them to your PATH and set the R_LIBS variable.
 

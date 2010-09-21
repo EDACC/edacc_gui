@@ -67,7 +67,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
     public static void startTask(String methodName, Class[] signature, Object[] parameters, Object target, TaskEvents view) {
         startTask(methodName, signature, parameters, target, view, true);
     }
-    
+
     /**
      * Starts a task for a method without any parameters.
      * If there is currently a task running this methode does nothing.
@@ -100,17 +100,32 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
                     parameters[i] = this;
                 }
             }
-            view.onTaskStart(methodName);
+            try {
+                view.onTaskStart(methodName);
+            } catch (Exception e) {
+                EDACCApp.getLogger().logException(e);
+            }
             Object res = target.getClass().getDeclaredMethod(methodName, signature).invoke(target, parameters);
-            if (taskView != null)
-              taskView.dispose();
-            view.onTaskSuccessful(methodName, res);
+            if (taskView != null) {
+                taskView.dispose();
+            }
+            try {
+                view.onTaskSuccessful(methodName, res);
+            } catch (Exception ex) {
+                EDACCApp.getLogger().logException(ex);
+            }
         } catch (java.lang.reflect.InvocationTargetException e) {
-            if (taskView != null)
-              taskView.dispose();
-            view.onTaskFailed(methodName, e.getTargetException());
+            if (taskView != null) {
+                taskView.dispose();
+            }
+            try {
+                view.onTaskFailed(methodName, e.getTargetException());
+            } catch (Exception ex) {
+                EDACCApp.getLogger().logException(ex);
+            }
         } catch (Exception e) {
             System.out.println("This should not happen. Called a method which should not be called. Be sure that your method is declared as public. Exception as follows: " + e);
+            EDACCApp.getLogger().logException(e);
         }
         task = null;
         return null;
