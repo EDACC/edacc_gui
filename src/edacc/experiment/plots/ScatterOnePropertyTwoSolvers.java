@@ -230,7 +230,7 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
     private void loadMaxValue() throws SQLException {
         double maxValue;
         if (!(combo1.getSelectedItem() instanceof SolverConfiguration) || !(combo2.getSelectedItem() instanceof SolverConfiguration) || !(comboRun.getSelectedItem() instanceof Integer)) {
-            maxValue = expController.getActiveExperiment().getTimeOut();
+            maxValue = expController.getActiveExperiment().getCPUTimeLimit();
         } else {
             int run = (Integer) comboRun.getSelectedItem();
             maxValue = expController.getMaxCalculationTimeForSolverConfiguration((SolverConfiguration) combo1.getSelectedItem(), 1, run);
@@ -241,7 +241,7 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
             maxValue *= 1.1;
         }
         if (maxValue == 0.) {
-            maxValue = expController.getActiveExperiment().getTimeOut();
+            maxValue = expController.getActiveExperiment().getCPUTimeLimit();
         }
         txtMaxValue.setText("" + Math.round(maxValue));
     }

@@ -6,7 +6,7 @@ import edacc.model.Experiment;
 
 
 public class ExperimentTableModel extends AbstractTableModel {
-    private String[] columns = {"Name", "Date", "Number of runs", "Timeout", "Description"};
+    private String[] columns = {"Name", "Date", "Number of runs", "Description"};
     private Vector<Experiment> experiments;
 
     public ExperimentTableModel() {
@@ -54,10 +54,8 @@ public class ExperimentTableModel extends AbstractTableModel {
             case 2:
                 return experiments.get(rowIndex).getNumRuns();
             case 3:
-                return experiments.get(rowIndex).getTimeOut();
-            case 4:
                 return experiments.get(rowIndex).getDescription();
-            case 5:
+            case 4:
                 return experiments.get(rowIndex).getId();
             default:
                 return "";

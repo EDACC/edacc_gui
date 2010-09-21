@@ -2,7 +2,6 @@ package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentDAO;
-import edacc.model.ExperimentResult;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
@@ -19,8 +18,6 @@ import org.rosuda.JRI.Rengine;
  * @author simon
  */
 public class ScatterTwoPropertiesOneSolver extends Plot {
-    private static int AVERAGE = -2;
-    private static int MEDIAN = -1;
     private Dependency[] dependencies;
     private JComboBox combo1, combo2, comboSolver, comboRun;
     private JTextField txtMaxValue;
@@ -211,7 +208,7 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
     private void loadMaxValue() throws SQLException {
         double maxValue;
         if (!(combo1.getSelectedItem() instanceof SolverConfiguration) || !(combo2.getSelectedItem() instanceof SolverConfiguration) || !(comboRun.getSelectedItem() instanceof Integer)) {
-            maxValue = expController.getActiveExperiment().getTimeOut();
+            maxValue = expController.getActiveExperiment().getCPUTimeLimit();
         } else {
             int run = (Integer) comboRun.getSelectedItem();
             maxValue = expController.getMaxCalculationTimeForSolverConfiguration((SolverConfiguration) combo1.getSelectedItem(), 1, run);
@@ -222,7 +219,7 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
             maxValue *= 1.1;
         }
         if (maxValue == 0.) {
-            maxValue = expController.getActiveExperiment().getTimeOut();
+            maxValue = expController.getActiveExperiment().getCPUTimeLimit();
         }
         txtMaxValue.setText("" + Math.round(maxValue));
     }
