@@ -127,6 +127,7 @@ public class SolverPropertiesController {
             SolverPropertyDAO.createResultProperty(name, prefix, description, PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(valueType), propType, isMultiple);
         }
         loadSolverProperties();
+        main.clearSolverPropertyEditField();
     }
       
 
