@@ -20,7 +20,7 @@ public class ExperimentResultDAO {
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idJob=?";
     protected static final String selectQuery = "SELECT SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance, " +
             "idJob, run, seed, status, resultTime, resultCode, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN, " +
-            "solverExitCode, watcherExitCode, verifierExitCode, computeQueue, TIMEDIFF(curTime(), startTime) AS runningTime " +
+            "solverExitCode, watcherExitCode, verifierExitCode, computeQueue, TIMEDIFF(NOW(), startTime) AS runningTime " +
             "FROM " + table + " ";
 
     public static ExperimentResult createExperimentResult(int run, int status, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId) throws SQLException {
