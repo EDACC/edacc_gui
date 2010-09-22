@@ -3,6 +3,7 @@ package edacc.experiment.plots;
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentResult;
+import edacc.model.ExperimentResultStatus;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
@@ -117,12 +118,12 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
                         continue;
                     }
                     for (int i = 0; i < xRes.size(); i++) {
-                        if (xRes.get(i).getStatus() == 1 && yRes.get(i).getStatus() == 1) {
-                            xsVec.add(xRes.get(i).getTime());
-                            ysVec.add(yRes.get(i).getTime());
+                        if (xRes.get(i).getStatus() == ExperimentResultStatus.SUCCESSFUL && yRes.get(i).getStatus() == ExperimentResultStatus.SUCCESSFUL) {
+                            xsVec.add(xRes.get(i).getResultTime());
+                            ysVec.add(yRes.get(i).getResultTime());
                             pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>" +
-                                    xSolverConfig.toString() + ": " + (double) Math.round(xRes.get(i).getTime() * 100) / 100 + " sec<br>" +
-                                    ySolverConfig.toString() + ": " + (double) Math.round(yRes.get(i).getTime() * 100) / 100 + " sec<br>" +
+                                    xSolverConfig.toString() + ": " + (double) Math.round(xRes.get(i).getResultTime() * 100) / 100 + " sec<br>" +
+                                    ySolverConfig.toString() + ": " + (double) Math.round(yRes.get(i).getResultTime() * 100) / 100 + " sec<br>" +
                                     "Run: " + xRes.get(i).getRun() + "<br>" +
                                     "Instance: " + instance.getName()));
                         }

@@ -26,34 +26,19 @@ public class EDACCExperimentModeJobsCellRenderer extends DefaultTableCellRendere
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
         Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
         row = table.convertRowIndexToModel(row);
-        Integer status = ((ExperimentResultsBrowserTableModel) table.getModel()).getStatusCode(row);
+        Integer status = ((ExperimentResultsBrowserTableModel) table.getModel()).getStatus(row).getValue();
         if (status == null) {
             return null;
         }
-        switch (status) {
-            case -2: // error
+
+        if (status < -1)
                 comp.setBackground(Color.red);
-                break;
-            case -1: // waiting
-                // comp.setBackground(new Color(4*16+1,6*16+9,14*16+1));// Color.getColor("4169e1"));
-                //  comp.setBackground(new Color(10*16+13,13*16+8,14*16+6)); // add8e6 - light blue
-                // comp.setBackground(new Color(4*16+6,8*16+2,11*16+4)); // 4682B4 - steelblue
-                comp.setBackground(royalBlue); // 4169E1 - royal blue
-                //  comp.setBackground(Color.blue);
-                break;
-            case 0: // running
-                comp.setBackground(Color.orange);
-                break;
-            case 1: // finished
-            case 2:
-            case 3:
-                comp.setBackground(Color.green);
-                break;
-            default:
-                comp.setBackground(null);
-        }
-        //((JComponent)comp).setOpaque(true);
-        //comp.setForeground(Color.red);
+        else if (status == -1)
+            comp.setBackground(royalBlue);
+        else if (status == 0)
+            comp.setBackground(Color.orange);
+        else comp.setBackground(Color.green);
+
         return comp;
     }
 }

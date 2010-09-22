@@ -69,7 +69,7 @@ public class KernelDensityPlot extends Plot {
         Vector<ExperimentResult> expResults = getResults(sc.getId(), instance.getId());
         double[] results = new double[expResults.size()];
         for (int i = 0; i < expResults.size(); i++) {
-            results[i] = expResults.get(i).getTime();
+            results[i] = expResults.get(i).getResultTime();
         }
         
         engine.assign("results", results);

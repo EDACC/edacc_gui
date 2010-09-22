@@ -243,7 +243,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         resultBrowserRowFilter.setInstanceName(null);
         resultBrowserRowFilter.setSolverName(null);
-        resultBrowserRowFilter.setStatusCode(null);
+        resultBrowserRowFilter.setStatus(null);
         boolean[] columnVis = jobsTableModel.getColumnVisibility();
         for (int i = 0; i < columnVis.length; i++) {
             columnVis[i] = true;
@@ -1811,9 +1811,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     public void updateRuntimeEstimation() {
         int jobsCount = jobsTableModel.getJobsCount();
-        int jobsSuccessful = jobsTableModel.getJobsCount(ExperimentResultStatus.CODE_1);
-        int jobsWaiting = jobsTableModel.getJobsCount(ExperimentResultStatus.CODE__1);
-        int jobsRunning = jobsTableModel.getJobsCount(ExperimentResultStatus.CODE_0);
+        int jobsSuccessful = jobsTableModel.getJobsCount(ExperimentResultStatus.SUCCESSFUL);
+        int jobsWaiting = jobsTableModel.getJobsCount(ExperimentResultStatus.NOTSTARTED);
+        int jobsRunning = jobsTableModel.getJobsCount(ExperimentResultStatus.RUNNING);
         int jobsNotSuccessful = jobsCount - jobsSuccessful - jobsWaiting - jobsRunning;
         double percentage = (double)(jobsSuccessful + jobsNotSuccessful) / jobsCount;
         percentage = Math.round(percentage*100*100) / 100.;
@@ -1822,15 +1822,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         double avgTime = 0.;
         int curRunningTime = 0;
         for (ExperimentResult er : jobsTableModel.getJobs()) {
-            if (er.getExperimentResultStatus().equals(ExperimentResultStatus.CODE_1) ||
-                    er.getExperimentResultStatus().equals(ExperimentResultStatus.CODE_2) ||
-                    er.getExperimentResultStatus().equals(ExperimentResultStatus.CODE_3)) {
+            if (er.getStatus().getValue() >= 1) {
                 count ++;
-                avgTime += er.getTime();
-            } else if (er.getExperimentResultStatus().equals(ExperimentResultStatus.CODE_0) && er.getMaxTimeLeft() != null) {
-                curRunningTime += er.getMaxTimeLeft().getSeconds() +
-                        er.getMaxTimeLeft().getMinutes() * 60 +
-                        er.getMaxTimeLeft().getHours() * 60*60;
+                avgTime += er.getResultTime();
+            } else if (er.getStatus().equals(ExperimentResultStatus.RUNNING) && er.getRunningTime() != null) {
+                curRunningTime += er.getRunningTime().getSeconds() +
+                        er.getRunningTime().getMinutes() * 60 +
+                        er.getRunningTime().getHours() * 60*60;
             }
         }
         String ETA = null;
@@ -2234,8 +2232,8 @@ class ResultsBrowserTableRowSorter extends TableRowSorter<ExperimentResultsBrows
         @Override
         public Object getValueAt(int row, int column) {
             // this is the status column
-            if (((ExperimentResultsBrowserTableModel) this.getModel()).getIndexForColumn(column) == 8) {
-                return "" + (char) (((ExperimentResultsBrowserTableModel) this.getModel()).getStatusCode(row) + 68);
+            if (((ExperimentResultsBrowserTableModel) this.getModel()).getIndexForColumn(column) == ExperimentResultsBrowserTableModel.COL_STATUS) {
+                return "" + (char) (((ExperimentResultsBrowserTableModel) this.getModel()).getStatus(row).getValue() + 68);
             }
             return ((ExperimentResultsBrowserTableModel) this.getModel()).getValueAt(row, column);
         }

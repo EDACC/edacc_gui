@@ -68,7 +68,7 @@ public class RTDsPlot extends Plot {
             Vector<ExperimentResult> res = getResults(sc.getId(), instance.getId());
             double[] tmp = new double[res.size()];
             for (int i = 0; i < res.size(); i++) {
-                tmp[i] = res.get(i).getTime();
+                tmp[i] = res.get(i).getResultTime();
                 if (tmp[i] > max_x) {
                     max_x = tmp[i];
                 }

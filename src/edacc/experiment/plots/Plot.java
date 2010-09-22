@@ -3,6 +3,7 @@ package edacc.experiment.plots;
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
+import edacc.model.ExperimentResultStatus;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Vector;
@@ -81,7 +82,7 @@ public abstract class Plot {
         } else if (run == MEDIAN || run == AVERAGE) {
             Vector<ExperimentResult> results = getResults(solverConfigId, instanceId);
             for (int j = results.size() - 1; j >= 0; j--) {
-                if (results.get(j).getStatus() != 1) {
+                if (results.get(j).getStatus() != ExperimentResultStatus.SUCCESSFUL) {
                     results.remove(j);
                 }
             }
@@ -95,7 +96,7 @@ public abstract class Plot {
             }
         } else {
             ExperimentResult er = getResult(solverConfigId, instanceId, run);
-            return new Double(er.getTime());
+            return new Double(er.getResultTime());
         }
     }
     /**
@@ -110,7 +111,7 @@ public abstract class Plot {
 
         double res = 0.;
         for (ExperimentResult result : results) {
-            res += result.getTime();
+            res += result.getResultTime();
         }
 
         res /= results.size();
@@ -130,7 +131,7 @@ public abstract class Plot {
         float[] times = new float[results.size()];
         int k = 0;
         for (ExperimentResult res : results) {
-            times[k++] = res.getTime();
+            times[k++] = res.getResultTime();
         }
 
         java.util.Arrays.sort(times);

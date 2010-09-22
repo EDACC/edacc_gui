@@ -94,8 +94,8 @@ public class CactusPlot extends Plot {
                     if (run == ALLRUNS) {
                         Vector<ExperimentResult> tmp = getResults(sc.getId(), instanceId);
                         for (ExperimentResult er : tmp) {
-                            if (er.getExperimentResultStatus().equals(ExperimentResultStatus.SUCCESSFUL)) {
-                                resultTimes.add(er.getTime());
+                            if (er.getStatus() == ExperimentResultStatus.SUCCESSFUL) {
+                                resultTimes.add(er.getResultTime());
                             }
                         }
                     } else {

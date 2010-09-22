@@ -1,10 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package edacc.experiment;
 
+import edacc.model.ExperimentResultStatus;
 import javax.swing.RowFilter;
 import javax.swing.RowFilter.Entry;
 
@@ -16,7 +12,7 @@ public class ExperimentResultsBrowserTableModelRowFilter extends RowFilter<Exper
 
     private String instanceName = null;
     private String solverName = null;
-    private Integer statusCode = null;
+    private ExperimentResultStatus statusCode = null;
 
     public void setInstanceName(String instanceName) {
         this.instanceName = instanceName;
@@ -26,7 +22,7 @@ public class ExperimentResultsBrowserTableModelRowFilter extends RowFilter<Exper
         this.solverName = solverName;
     }
 
-    public void setStatusCode(Integer statusCode) {
+    public void setStatus(ExperimentResultStatus statusCode) {
         this.statusCode = statusCode;
     }
 
@@ -38,7 +34,7 @@ public class ExperimentResultsBrowserTableModelRowFilter extends RowFilter<Exper
         return solverName;
     }
 
-    public Integer getStatusCode() {
+    public ExperimentResultStatus getStatus() {
         return statusCode;
     }
 
@@ -47,6 +43,6 @@ public class ExperimentResultsBrowserTableModelRowFilter extends RowFilter<Exper
         return (entry != null)
                 && (instanceName == null || instanceName.equals(entry.getModel().getInstance(entry.getIdentifier()).getName()))
                 && (solverName == null || solverName.equals(entry.getModel().getSolver(entry.getIdentifier()).getName()))
-                && (statusCode == null || statusCode.equals(entry.getModel().getStatusCode(entry.getIdentifier())));
+                && (statusCode == null || statusCode.equals(entry.getModel().getStatus(entry.getIdentifier())));
     }
 }

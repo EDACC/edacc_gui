@@ -26,9 +26,17 @@ import javax.swing.SwingUtilities;
  * @author daniel
  */
 public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
-
+    public static int COL_ID = 0;
+    public static int COL_SOLVER = 1;
+    public static int COL_PARAMETERS = 2;
+    public static int COL_INSTANCE = 3;
+    public static int COL_RUN = 4;
+    public static int COL_TIME = 5;
+    public static int COL_SEED = 6;
+    public static int COL_STATUS = 7;
+    public static int COL_RESULTCODE = 8;
     private Vector<ExperimentResult> jobs;
-    private String[] columns = {"ID", "Solver", "Parameters", "Instance", "Run", "Result File", "Time", "Seed", "Status"};
+    private String[] columns = {"ID", "Solver", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code"};
     private boolean[] visible = {true, true, true, true, true, true, true, true, true};
     private HashMap<Integer, Vector<ParameterInstance>> parameterInstances;
 
@@ -78,24 +86,6 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     }
 
     /**
-     * Returns the result file name
-     * @param row
-     * @return
-     */
-    public String getResultFileName(int row) {
-        return jobs.get(row).getResultFileName();
-    }
-
-    /**
-     * Returns the time
-     * @param row
-     * @return
-     */
-    public Float getTime(int row) {
-        return jobs.get(row).getTime();
-    }
-
-    /**
      * Returns the seed
      * @param row
      * @return
@@ -105,24 +95,17 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     }
 
     /**
-     * Returns the status code
+     * Returns the status
      * @param row
      * @return
      */
-    public Integer getStatusCode(int row) {
+    public ExperimentResultStatus getStatus(int row) {
         if (row < 0 || row >= getRowCount()) {
             return null;
         }
         return jobs.get(row).getStatus();
     }
-
-    public ExperimentResultStatus getExperimentResultStatus(int row) {
-        if (row < 0 || row >= getRowCount()) {
-            return null;
-        }
-        return jobs.get(row).getExperimentResultStatus();
-    }
-
+    
     /**
      * Returns all parameter instances for that job
      * @param row
@@ -216,6 +199,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
         Runnable updateTable = new Runnable() {
 
+            @Override
             public void run() {
                 ExperimentResultsBrowserTableModel.this.jobs = jobs;
                 parameterInstances = new HashMap<Integer, Vector<ParameterInstance>>();
@@ -344,17 +328,17 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             case 4:
                 return j.getRun();
             case 5:
-                return j.getResultFileName();
+                return j.getResultTime();
             case 6:
-                return j.getTime();
-            case 7:
                 return j.getSeed();
-            case 8:
-                String status = j.getExperimentResultStatus().toString();
-                if (j.getStatus() == 0 && j.getMaxTimeLeft() != null) {
-                    status += " (" + j.getMaxTimeLeft() + ")";
+            case 7:
+                String status = j.getStatus().toString();
+                if (j.getStatus() == ExperimentResultStatus.RUNNING && j.getRunningTime() != null) {
+                    status += " (" + j.getRunningTime() + ")";
                 }
                 return status;
+            case 8:
+                return j.getResultCode().toString();
             default:
                 return "";
         }
@@ -393,8 +377,8 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         Vector<ExperimentResultStatus> res = new Vector<ExperimentResultStatus>();
         HashSet<ExperimentResultStatus> tmp = new HashSet<ExperimentResultStatus>();
         for (int i = 0; i < getRowCount(); i++) {
-            if (!tmp.contains(getExperimentResultStatus(i))) {
-                tmp.add(getExperimentResultStatus(i));
+            if (!tmp.contains(getStatus(i))) {
+                tmp.add(getStatus(i));
             }
         }
         res.addAll(tmp);
@@ -427,7 +411,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public int getJobsCount(ExperimentResultStatus status) {
         int res = 0;
         for (ExperimentResult j : jobs) {
-            if (j.getExperimentResultStatus().equals(status)) {
+            if (j.getStatus().equals(status)) {
                 res++;
             }
         }

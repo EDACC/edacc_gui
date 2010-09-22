@@ -9,17 +9,22 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.util.Vector;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class ExperimentResultDAO {
 
     protected static PreparedStatement curSt = null;
     protected static final String table = "ExperimentResults";
-    protected static final String insertQuery = "INSERT INTO " + table + " (run, status, seed, resultFileName, time, statusCode, " +
-            "SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance) VALUES (?,?,?,?,?,?,?,?,?)";
+    protected static final String insertQuery = "INSERT INTO " + table + " (SolverConfig_idSolverConfig, Experiment_idExperiment," +
+            "Instances_idInstance, run, status, seed, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN) VALUES (?,?,?,?,?,?,?,?,?,?)";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idJob=?";
+    protected static final String selectQuery = "SELECT SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance, " +
+            "idJob, run, seed, status, resultTime, resultCode, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN, " +
+            "solverExitCode, watcherExitCode, verifierExitCode, computeQueue, TIMEDIFF(curTime(), startTime) AS runningTime " +
+            "FROM " + table + " ";
 
-    public static ExperimentResult createExperimentResult(int run, int status, int seed, float time, int statusCode, int SolverConfigId, int ExperimentId, int InstanceId) throws SQLException {
-        ExperimentResult r = new ExperimentResult(run, status, seed, time, statusCode, SolverConfigId, ExperimentId, InstanceId);
+    public static ExperimentResult createExperimentResult(int run, int status, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId) throws SQLException {
+        ExperimentResult r = new ExperimentResult(run, status, seed, time, SolverConfigId, ExperimentId, InstanceId);
         r.setNew();
         return r;
     }
@@ -31,15 +36,16 @@ public class ExperimentResultDAO {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
             curSt = st;
             for (ExperimentResult r : v) {
-                st.setInt(1, r.getRun());
-                st.setInt(2, r.getStatus());
-                st.setInt(3, r.getSeed());
-                st.setString(4, r.getResultFileName());
-                st.setFloat(5, r.getTime());
-                st.setInt(6, r.getStatusCode());
-                st.setInt(7, r.getSolverConfigId());
-                st.setInt(8, r.getExperimentId());
-                st.setInt(9, r.getInstanceId());
+                st.setInt(1, r.getSolverConfigId());
+                st.setInt(2, r.getExperimentId());
+                st.setInt(3, r.getInstanceId());
+                st.setInt(4, r.getRun());
+                st.setInt(5, r.getStatus().getValue());
+                st.setInt(6, r.getSeed());
+                st.setString(7, r.getSolverOutputFilename());
+                st.setString(8, r.getLauncherOutputFilename());
+                st.setString(9, r.getWatcherOutputFilename());
+                st.setString(10, r.getVerifierOutputFilename());
                 st.addBatch();
                 r.setSaved();
                 /* this should only be done if the batch save actually
@@ -131,25 +137,34 @@ public class ExperimentResultDAO {
 
     private static ExperimentResult getExperimentResultFromResultSet(ResultSet rs) throws SQLException {
         ExperimentResult r = new ExperimentResult();
-        r.setId(rs.getInt("idJob"));
-        r.setRun(rs.getInt("run"));
-        r.setStatus(rs.getInt("status"));
-        r.setSeed(rs.getInt("seed"));
-        r.setResultFileName(rs.getString("resultFileName"));
-        r.setTime(rs.getFloat("time"));
-        r.setStatusCode(rs.getInt("statusCode"));
         r.setSolverConfigId(rs.getInt("SolverConfig_idSolverConfig"));
         r.setInstanceId(rs.getInt("Instances_idInstance"));
         r.setExperimentId(rs.getInt("Experiment_idExperiment"));
-        if (r.getStatus() == 0) {
+        r.setId(rs.getInt("idJob"));
+        r.setRun(rs.getInt("run"));
+        r.setSeed(rs.getInt("seed"));
+        r.setStatus(rs.getInt("status"));
+        r.setResultTime(rs.getFloat("resultTime"));
+        Integer resultCode = rs.getInt("resultCode");
+        if (resultCode == null) resultCode = -1;
+        r.setResultCode(resultCode);
+        r.setSolverOutputFilename(rs.getString("solverOutputFN"));
+        r.setLauncherOutputFilename(rs.getString("launcherOutputFN"));
+        r.setWatcherOutputFilename(rs.getString("watcherOutputFN"));
+        r.setVerifierOutputFilename(rs.getString("verifierOutputFN"));
+        r.setSolverExitCode(rs.getInt("solverExitCode"));
+        r.setWatcherExitCode(rs.getInt("watcherExitCode"));
+        r.setVerifierExitCode(rs.getInt("verifierExitCode"));
+        r.setComputeQueue(rs.getInt("computeQueue"));
+
+        if (r.getStatus() == ExperimentResultStatus.RUNNING) {
             try {
-                r.setMaxTimeLeft(rs.getTime("maxTimeLeft"));
+                r.setRunningTime(rs.getTime("runningTime"));
             } catch (Exception e) {
-                // happens if the maxTimeLeft field is negative
-                r.setMaxTimeLeft(null);
+                r.setRunningTime(null);
             }
         } else {
-            r.setMaxTimeLeft(null);
+            r.setRunningTime(null);
         }
         return r;
     }
@@ -225,8 +240,7 @@ public class ExperimentResultDAO {
     public static Vector<ExperimentResult> getAllByExperimentId(int id) throws SQLException {
         Vector<ExperimentResult> v = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idJob, run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
-                "Experiment_idExperiment, Instances_idInstance, TIMEDIFF(curTime(), startTime) AS maxTimeLeft FROM " + table + " " +
+                selectQuery +
                 "WHERE Experiment_idExperiment=?;");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
@@ -308,9 +322,7 @@ public class ExperimentResultDAO {
     public static Vector<ExperimentResult> getAllByExperimentIdAndRun(int eid, int run) throws SQLException {
         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idJob, run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
-                "Experiment_idExperiment, Instances_idInstance, TIMEDIFF(curTime(), startTime) AS maxTimeLeft FROM " + table + " " +
-                "WHERE Experiment_idExperiment=? AND run=?;");
+                selectQuery + "WHERE Experiment_idExperiment=? AND run=?;");
         st.setInt(1, eid);
         st.setInt(2, run);
         ResultSet rs = st.executeQuery();
@@ -323,28 +335,26 @@ public class ExperimentResultDAO {
     }
 
     public static int getInstanceCountByExperimentId(int id) throws SQLException {
-        Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT COUNT(*) FROM " + table + " " +
                 "WHERE Experiment_idExperiment=? " +
                 "GROUP BY Instance_idInstance");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
-        while (rs.next()) {
+        if (rs.next()) {
             return rs.getInt(1);
         }
         return 0;
     }
 
     public static int getSolverConfigCountByExperimentId(int id) throws SQLException {
-        Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT COUNT(*) FROM " + table + " " +
                 "WHERE Experiment_idExperiment=? " +
                 "GROUP BY SolverConfig_idSolverConfig");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
-        while (rs.next()) {
+        if (rs.next()) {
             return rs.getInt(1);
         }
         return 0;
@@ -353,9 +363,7 @@ public class ExperimentResultDAO {
     public static Vector<ExperimentResult> getAllBySolverConfiguration(SolverConfiguration sc) throws SQLException {
         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idJob, run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
-                "Experiment_idExperiment, Instances_idInstance, TIMEDIFF(curTime(), startTime) AS maxTimeLeft FROM " + table + " " +
-                "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=?;");
+                selectQuery + "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=?;");
         st.setInt(1, sc.getExperiment_id());
         st.setInt(2, sc.getId());
         ResultSet rs = st.executeQuery();
@@ -370,9 +378,7 @@ public class ExperimentResultDAO {
     public static Vector<ExperimentResult> getAllBySolverConfigurationAndStatus(SolverConfiguration sc, int status) throws SQLException {
         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idJob, run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
-                "Experiment_idExperiment, Instances_idInstance, TIMEDIFF(curTime(), startTime) AS maxTimeLeft FROM " + table + " " +
-                "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=? AND status=?;");
+                selectQuery + "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=? AND status=?;");
         st.setInt(1, sc.getExperiment_id());
         st.setInt(2, sc.getId());
         st.setInt(3, status);
@@ -384,7 +390,6 @@ public class ExperimentResultDAO {
         }
         return res;
     }
-
 
     public static double getMaxCalculationTimeForSolverConfiguration(SolverConfiguration sc, int status, int run) throws SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
@@ -405,9 +410,7 @@ public class ExperimentResultDAO {
     public static Vector<ExperimentResult> getAllByExperimentHasInstance(ExperimentHasInstance ehi) throws SQLException {
         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idJob, run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
-                "Experiment_idExperiment, Instances_idInstance, TIMEDIFF(curTime(), startTime) AS maxTimeLeft FROM " + table + " " +
-                "WHERE Experiment_idExperiment=? AND Instances_idInstance=?;");
+                selectQuery + "WHERE Experiment_idExperiment=? AND Instances_idInstance=?;");
         st.setInt(1, ehi.getExperiment_id());
         st.setInt(2, ehi.getInstances_id());
         ResultSet rs = st.executeQuery();
@@ -422,8 +425,7 @@ public class ExperimentResultDAO {
     public static Vector<ExperimentResult> getAllBySolverConfigurationAndRunAndStatusOrderByTime(SolverConfiguration sc, int run, int status) throws SQLException {
         Vector<ExperimentResult> res = new Vector<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idJob, run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
-                "Experiment_idExperiment, Instances_idInstance, TIMEDIFF(curTime(), startTime) AS maxTimeLeft FROM " + table + " " +
+                selectQuery +
                 "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=? AND status=? AND run=? " +
                 "ORDER BY time");
         st.setInt(1, sc.getExperiment_id());
@@ -463,34 +465,15 @@ public class ExperimentResultDAO {
      */
     public static ExperimentResult getById(int id) throws NoConnectionToDBException, SQLException, ExperimentResultNotInDBException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idJob run, status, seed, resultFileName, time, statusCode, SolverConfig_idSolverConfig, " +
-                "Experiment_idExperiment, Instances_idInstance, TIMEDIFF(curTime(), startTime) AS maxTimeLeft FROM " + table + " " +
+                selectQuery +
                 "WHERE idJob=?;");
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
-        if(!rs.next())
+        if (!rs.next()) {
             throw new ExperimentResultNotInDBException();
+        }
         return getExperimentResultFromResultSet(rs);
     }
-
-    /**
-     * Copies the binary file of the result file of a ExperimentResult to a temporary location on the file system and retuns a File
-     * reference on it.
-     * @param expRes expRes ExperimentResult from which the binary file is copied
-     * @return reference of the binary file of the result file of the given ExperimentResult
-     * @throws NoConnectionToDBException
-     * @throws SQLException
-     * @throws FileNotFoundException
-     * @throws IOException
-     */
-    public static File getClientOutput(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
-         File f = new File("tmp" + System.getProperty("file.separator") + expRes.getId() + "_" + expRes.getResultFileName());
-        // create missing directories
-        f.getParentFile().mkdirs();
-        getClientOutput(expRes.getId(), f);
-        return f;
-    }
-
 
     /**
      * Copies the binary file of the client output of a ExperimentResult to a temporary location on the file system and retuns a File
@@ -502,14 +485,67 @@ public class ExperimentResultDAO {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public static File getResultFile(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
-        File f = new File("tmp" + System.getProperty("file.separator") + expRes.getId() + "_" + expRes.getResultFileName());
+    public static File getSolverOutputFile(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        File f = new File("tmp" + System.getProperty("file.separator") + expRes.getId() + "_" + expRes.getSolverOutputFilename());
         // create missing directories
         f.getParentFile().mkdirs();
-        getResultFile(expRes.getId(), f);
+        getSolverOutput(expRes.getId(), f);
         return f;
     }
 
+    /**
+     * Copies the binary file of the launcher file of a ExperimentResult to a temporary location on the file system and retuns a File
+     * reference on it.
+     * @param expRes expRes ExperimentResult from which the binary file is copied
+     * @return reference of the binary file of the result file of the given ExperimentResult
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static File getLauncherOutputFile(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        File f = new File("tmp" + System.getProperty("file.separator") + expRes.getId() + "_" + expRes.getLauncherOutputFilename());
+        // create missing directories
+        f.getParentFile().mkdirs();
+        getLauncherOutput(expRes.getId(), f);
+        return f;
+    }
+
+    /**
+     * Copies the binary file of the verifier file of a ExperimentResult to a temporary location on the file system and retuns a File
+     * reference on it.
+     * @param expRes expRes ExperimentResult from which the binary file is copied
+     * @return reference of the binary file of the result file of the given ExperimentResult
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static File getVerifierOutputFile(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        File f = new File("tmp" + System.getProperty("file.separator") + expRes.getId() + "_" + expRes.getVerifierOutputFilename());
+        // create missing directories
+        f.getParentFile().mkdirs();
+        getVerifierOutput(expRes.getId(), f);
+        return f;
+    }
+
+    /**
+     * Copies the binary file of the watcher file of a ExperimentResult to a temporary location on the file system and retuns a File
+     * reference on it.
+     * @param expRes expRes ExperimentResult from which the binary file is copied
+     * @return reference of the binary file of the result file of the given ExperimentResult
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static File getWatcherOutputFile(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        File f = new File("tmp" + System.getProperty("file.separator") + expRes.getId() + "_" + expRes.getWatcherOutputFilename());
+        // create missing directories
+        f.getParentFile().mkdirs();
+        getWatcherOutput(expRes.getId(), f);
+        return f;
+    }
 
     /**
      * Copies the binary file of a result file of an ExperimentResult to a specified location on the filesystem.
@@ -520,20 +556,20 @@ public class ExperimentResultDAO {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public static void getResultFile(int id, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
-         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT resultFile " +
+    public static void getSolverOutput(int id, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT solverOutput " +
                 "FROM " + table + " " +
                 "WHERE idJob=?;");
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
             FileOutputStream out = new FileOutputStream(f);
-            InputStream in = rs.getBinaryStream("resultFile");
+            InputStream in = rs.getBinaryStream("solverOutput");
             int len;
-            byte[] buf = new byte[256*1024];
+            byte[] buf = new byte[256 * 1024];
             while ((len = in.read(buf)) > -1) {
-                out.write(buf,0,len);
+                out.write(buf, 0, len);
             }
             out.close();
             in.close();
@@ -541,7 +577,7 @@ public class ExperimentResultDAO {
     }
 
     /**
-     * Copies the binary file of a client output of an ExperimentResult to a specified location on the filesystem.
+     * Copies the binary file of the launcher output of an ExperimentResult to a specified location on the filesystem.
      * @param id th id of the ExperimentResult
      * @param f the file in which the binary file is copied
      * @throws NoConnectionToDBException
@@ -549,20 +585,78 @@ public class ExperimentResultDAO {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    private static void getClientOutput(int id, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+    private static void getLauncherOutput(int id, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT clientOutput " +
+                "SELECT lancherOutput " +
                 "FROM " + table + " " +
                 "WHERE idJob=?;");
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
             FileOutputStream out = new FileOutputStream(f);
-            InputStream in = rs.getBinaryStream("resultFile");
+            InputStream in = rs.getBinaryStream("lancherOutput");
             int len;
-            byte[] buf = new byte[256*1024];
+            byte[] buf = new byte[256 * 1024];
             while ((len = in.read(buf)) > -1) {
-                out.write(buf,0,len);
+                out.write(buf, 0, len);
+            }
+            out.close();
+            in.close();
+        }
+    }
+
+    /**
+     * Copies the binary file of the watcher output of an ExperimentResult to a specified location on the filesystem.
+     * @param id th id of the ExperimentResult
+     * @param f the file in which the binary file is copied
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    private static void getWatcherOutput(int id, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT watcherOutput " +
+                "FROM " + table + " " +
+                "WHERE idJob=?;");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            FileOutputStream out = new FileOutputStream(f);
+            InputStream in = rs.getBinaryStream("watcherOutput");
+            int len;
+            byte[] buf = new byte[256 * 1024];
+            while ((len = in.read(buf)) > -1) {
+                out.write(buf, 0, len);
+            }
+            out.close();
+            in.close();
+        }
+    }
+
+    /**
+     * Copies the binary file of the verifier output of an ExperimentResult to a specified location on the filesystem.
+     * @param id th id of the ExperimentResult
+     * @param f the file in which the binary file is copied
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    private static void getVerifierOutput(int id, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT verifierOutput " +
+                "FROM " + table + " " +
+                "WHERE idJob=?;");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            FileOutputStream out = new FileOutputStream(f);
+            InputStream in = rs.getBinaryStream("verifierOutput");
+            int len;
+            byte[] buf = new byte[256 * 1024];
+            while ((len = in.read(buf)) > -1) {
+                out.write(buf, 0, len);
             }
             out.close();
             in.close();

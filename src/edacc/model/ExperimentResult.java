@@ -6,29 +6,42 @@ public class ExperimentResult extends BaseModel {
 
     private int id;
     private int run;
-    private int status;
+    private ExperimentResultStatus status;
+    private ExperimentResultResultCode resultCode;
     private int seed;
-    private String resultFileName;
-    private float time;
-    private int statusCode;
+    private float resultTime;
     private int SolverConfigId;
     private int ExperimentId;
     private int InstanceId;
-    private Time maxTimeLeft;
+    private Time runningTime;
+
+    private String solverOutputFilename;
+    private String launcherOutputFilename;
+    private String watcherOutputFilename;
+    private String verifierOutputFilename;
+
+    private int solverExitCode;
+    private int watcherExitCode;
+    private int verifierExitCode;
+
+    private int computeQueue;
 
     protected ExperimentResult() {
     }
 
-    protected ExperimentResult(int run, int status, int seed, float time, int statusCode, int SolverConfigId, int ExperimentId, int InstanceId) {
+    protected ExperimentResult(int run, int status, int seed, float resultTime, int SolverConfigId, int ExperimentId, int InstanceId) {
         this.run = run;
-        this.status = status;
+        this.status = ExperimentResultStatus.getExperimentResultStatus(status);
         this.seed = seed;
-        this.time = time;
-        this.statusCode = statusCode;
+        this.resultTime = resultTime;
         this.SolverConfigId = SolverConfigId;
         this.ExperimentId = ExperimentId;
         this.InstanceId = InstanceId;
-        this.resultFileName = "results/" + this.ExperimentId + "_" + this.SolverConfigId + "_" + this.InstanceId + "_R" + this.run + ".res";
+        String filename = "results/" + this.ExperimentId + "_" + this.SolverConfigId + "_" + this.InstanceId + "_R" + this.run + ".res";
+        this.solverOutputFilename = filename + ".solver";
+        this.launcherOutputFilename = filename + ".launcher";
+        this.watcherOutputFilename = filename + ".watcher";
+        this.verifierOutputFilename = filename + ".verifier";
 
     }
 
@@ -108,17 +121,6 @@ public class ExperimentResult extends BaseModel {
         this.id = id;
     }
 
-    public String getResultFileName() {
-        return resultFileName;
-    }
-
-    public void setResultFileName(String resultFileName) {
-        this.resultFileName = resultFileName;
-        if (this.isSaved()) {
-            this.setModified();
-        }
-    }
-
     public int getRun() {
         return run;
     }
@@ -141,50 +143,105 @@ public class ExperimentResult extends BaseModel {
         }
     }
 
-    public int getStatus() {
+    public ExperimentResultStatus getStatus() {
         return status;
     }
 
     public void setStatus(int status) {
-        this.status = status;
+        this.status = ExperimentResultStatus.getExperimentResultStatus(status);
         if (this.isSaved()) {
             this.setModified();
         }
     }
 
-    public int getStatusCode() {
-        return statusCode;
+    public float getResultTime() {
+        return resultTime;
     }
 
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
+    public void setResultTime(float resultTime) {
+        this.resultTime = resultTime;
         if (this.isSaved()) {
             this.setModified();
         }
     }
 
-    public float getTime() {
-        return time;
+    public Time getRunningTime() {
+        return runningTime;
     }
 
-    public void setTime(float time) {
-        this.time = time;
-        if (this.isSaved()) {
-            this.setModified();
-        }
+    public void setRunningTime(Time maxTimeLeft) {
+        this.runningTime = maxTimeLeft;
     }
 
-    public ExperimentResultStatus getExperimentResultStatus() {
-        return ExperimentResultStatus.fromValue(status);
+    public int getComputeQueue() {
+        return computeQueue;
     }
 
-    public Time getMaxTimeLeft() {
-        return maxTimeLeft;
+    public void setComputeQueue(int computeQueue) {
+        this.computeQueue = computeQueue;
     }
 
-    public void setMaxTimeLeft(Time maxTimeLeft) {
-        this.maxTimeLeft = maxTimeLeft;
+    public String getLauncherOutputFilename() {
+        return launcherOutputFilename;
     }
 
-    
+    public void setLauncherOutputFilename(String launcherOutputFilename) {
+        this.launcherOutputFilename = launcherOutputFilename;
+    }
+
+    public int getSolverExitCode() {
+        return solverExitCode;
+    }
+
+    public void setSolverExitCode(int solverExitCode) {
+        this.solverExitCode = solverExitCode;
+    }
+
+    public String getSolverOutputFilename() {
+        return solverOutputFilename;
+    }
+
+    public void setSolverOutputFilename(String solverOutputFilename) {
+        this.solverOutputFilename = solverOutputFilename;
+    }
+
+    public int getVerifierExitCode() {
+        return verifierExitCode;
+    }
+
+    public void setVerifierExitCode(int verifierExitCode) {
+        this.verifierExitCode = verifierExitCode;
+    }
+
+    public String getVerifierOutputFilename() {
+        return verifierOutputFilename;
+    }
+
+    public void setVerifierOutputFilename(String verifierOutputFilename) {
+        this.verifierOutputFilename = verifierOutputFilename;
+    }
+
+    public int getWatcherExitCode() {
+        return watcherExitCode;
+    }
+
+    public void setWatcherExitCode(int watcherExitCode) {
+        this.watcherExitCode = watcherExitCode;
+    }
+
+    public String getWatcherOutputFilename() {
+        return watcherOutputFilename;
+    }
+
+    public void setWatcherOutputFilename(String watcherOutputFilename) {
+        this.watcherOutputFilename = watcherOutputFilename;
+    }
+
+    public ExperimentResultResultCode getResultCode() {
+        return resultCode;
+    }
+
+    public void setResultCode(int resultCode) {
+        this.resultCode = ExperimentResultResultCode.getExperimentResultResultCode(resultCode);
+    }
 }

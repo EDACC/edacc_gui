@@ -35,7 +35,7 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
         }
         String selectedInstance = main.resultBrowserRowFilter.getInstanceName() == null ? "All" : main.resultBrowserRowFilter.getInstanceName();
         String selectedSolver = main.resultBrowserRowFilter.getSolverName() == null ? "All" : main.resultBrowserRowFilter.getSolverName();
-        ExperimentResultStatus selectedStatusCode = main.resultBrowserRowFilter.getStatusCode() == null ? null : ExperimentResultStatus.fromValue(main.resultBrowserRowFilter.getStatusCode());
+        ExperimentResultStatus selectedStatusCode = main.resultBrowserRowFilter.getStatus();
         comboInstances.setSelectedItem(selectedInstance);
         comboSolvers.setSelectedItem(selectedSolver);
         if (selectedStatusCode == null) {
@@ -165,11 +165,7 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
         }
         main.resultBrowserRowFilter.setInstanceName(instance);
         main.resultBrowserRowFilter.setSolverName(solver);
-
-        if (statusCode == null)
-            main.resultBrowserRowFilter.setStatusCode(null);
-        else
-            main.resultBrowserRowFilter.setStatusCode(statusCode.getValue());
+        main.resultBrowserRowFilter.setStatus(statusCode);
 
         main.jobsTableModel.fireTableDataChanged();
         boolean filtersApplied = solver != null || instance != null || statusCode != null;

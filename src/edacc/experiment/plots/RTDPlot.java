@@ -75,14 +75,14 @@ public class RTDPlot extends Plot {
         double[] resultsDouble1 = new double[results1.size()];
         double[] resultsDouble2 = new double[results2.size()];
         for (int i = 0; i < results1.size(); i++) {
-            double tmp = results1.get(i).getTime();
+            double tmp = results1.get(i).getResultTime();
             resultsDouble1[i] = tmp;
             if (tmp > max_x) {
                 max_x = tmp;
             }
         }
         for (int i = 0; i < results2.size(); i++) {
-            double tmp = results2.get(i).getTime();
+            double tmp = results2.get(i).getResultTime();
             resultsDouble2[i] = tmp;
             if (tmp > max_x) {
                 max_x = tmp;

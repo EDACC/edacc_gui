@@ -41,9 +41,9 @@ public class FilePropertyParser {
     public Vector<String> parse(SolverProperty solvProp, ExperimentResult expResult) throws FileNotFoundException, IOException, NoAllowedSolverPropertyTypeException, NoConnectionToDBException, SQLException{
         File file;
         if(solvProp.getSolverPropertyType() == SolverPropertyType.ResultFile)
-            file = ExperimentResultDAO.getResultFile(expResult);
+            file = ExperimentResultDAO.getSolverOutputFile(expResult);
         else if(solvProp.getSolverPropertyType() == SolverPropertyType.ClientOutput)
-            file = ExperimentResultDAO.getClientOutput(expResult);
+            file = ExperimentResultDAO.getLauncherOutputFile(expResult);
         else
             throw new NoAllowedSolverPropertyTypeException();
         
