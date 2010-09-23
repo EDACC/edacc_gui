@@ -11,6 +11,8 @@
     :license: MIT, see LICENSE for details.
 """
 
+import pylzma
+
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import mapper, sessionmaker, scoped_session, deferred
@@ -20,7 +22,7 @@ from edacc import config, constants
 
 
 class EDACCDatabase(object):
-    """ Encapsulates a single EDACC database connection """
+    """ Encapsulates a single EDACC database connection. """
     def __init__(self, username, password, database, label):
         self.database = database
         self.username = username
@@ -34,9 +36,15 @@ class EDACCDatabase(object):
         self.engine = create_engine(url, convert_unicode=True)
         self.metadata = metadata = MetaData(bind=self.engine)
 
-        class Solver(object): pass
+        class Solver(object):
+            """ Maps the Solver table """
+            pass
 
         class SolverConfiguration(object):
+            """ Solver configuration mapping the SolverConfig table.
+                A solver configuration consists of a solver and a set of
+                parameters and their values.
+            """
             def get_number(self):
                 """ Returns an integer i if `self` is the i-th of the solver configurations of the same solver
                     in the experiment `self` is in. If there's only one solver configuration of the solver this
@@ -49,6 +57,7 @@ class EDACCDatabase(object):
                     return same_solvers.index(self) + 1
 
             def get_name(self):
+                """ Returns the name of the solver configuration. """
                 n = self.get_number()
                 if n == 0:
                     return self.solver.name
@@ -58,33 +67,54 @@ class EDACCDatabase(object):
             def __str__(self):
                 return self.get_name()
 
-        class Parameter(object): pass
+        class Parameter(object):
+            """ Maps the Parameters table. """
+            pass
 
-        class ParameterInstance(object): pass
+        class ParameterInstance(object):
+            """ Maps the n:m association table SolverConfig_has_Parameters,
+                which for a parameter specifies its value in the corresponding
+                solver configuration.
+            """
+            pass
 
         class Instance(object):
+            """ Maps the Instances table. """
             def __str__(self):
                 return self.name
 
             def get_property_value(self, property, db):
                 """ Returns the value of the property with the given name. """
-                if property == 'numAtoms':
-                    return self.numAtoms
-                else:
+                try:
                     property = db.session.query(db.InstanceProperty).get(property)
                     pv = db.session.query(db.InstanceProperties).filter_by(property=property, instance=self).first()
                     return pv.get_value()
+                except:
+                    return None
+
+            def get_instance(self):
+                """ Decompresses the instance blob and returns it as string """
+                return pylzma.decompress(self.instance)
+
+            def set_instance(self, uncompressed_instance):
+                """ Compresses the instance and sets the instance blob attribute """
+                self.instance = pylzma.compress(uncompressed_instance)
+
 
         class Experiment(object):
+            """ Maps the Experiment table. """
             def is_finished(self):
                 """ Returns whether this experiment is finished (true if there are any jobs and all of them are terminated) """
                 if len(self.experiment_results) == 0: return False
                 return all(j.status in constants.JOB_FINISHED or j.status in constants.JOB_ERROR
                            for j in self.experiment_results)
+
             def is_running(self):
                 """ Returns true if there are any running jobs """
                 return any(j.status in constants.JOB_RUNNING for j in self.experiment_results)
+
             def get_num_runs(self, db):
+                """ Returns the number of runs of the experiment """
                 num_results = db.session.query(db.ExperimentResult).filter_by(experiment=self).count()
                 num_solver_configs = db.session.query(db.SolverConfiguration).filter_by(experiment=self).count()
                 num_instances = db.session.query(db.Instance).filter(db.Instance.experiments.contains(self)).count()
@@ -92,13 +122,26 @@ class EDACCDatabase(object):
                     return 0
                 return num_results / num_solver_configs / num_instances
 
+            def get_solved_instances(self, db):
+                """ Returns the instances of the experiment that all solvers solved in every run """
+                num_jobs_per_instance = db.session.query(db.ExperimentResult).filter_by(experiment=self).count() / \
+                                        db.session.query(db.Instance).filter(db.Instance.experiments.contains(self)).count()
+                instances = []
+                for i in self.instances:
+                    if db.session.query(db.ExperimentResult).filter(db.ExperimentResult.resultCode.like('1%')).filter_by(experiment=self, instance=i, status=1).count() == num_jobs_per_instance:
+                        instances.append(i)
+                return instances
+
         class ExperimentResult(object):
+            """ Maps the ExperimentResult table. Provides a function
+                to obtain a result property of a job.
+            """
             def get_time(self):
                 """ Returns the CPU time needed for this result or the
                     experiment's timeOut value if the status is
-                    not "finished" (correct).
+                    not correct (certified SAT/UNSAT answer).
                 """
-                return self.time if self.status == 1 else self.experiment.timeOut
+                return self.resultTime if self.resultCode in (10, 11) else self.experiment.CPUTimeLimit
 
             def get_property_value(self, property, db):
                 """ Returns the value of the property with the given name.
@@ -109,9 +152,13 @@ class EDACCDatabase(object):
                 if property == 'cputime':
                     return self.get_time()
                 else:
-                    property = db.session.query(db.SolverProperty).get(int(property))
-                    pv = db.session.query(db.ExperimentResultSolverProperty).filter_by(solver_property=property, experiment_result=self).first()
-                    return pv.get_value()
+                    try:
+                        property = db.session.query(db.SolverProperty).get(int(property))
+                        pv = db.session.query(db.ExperimentResultSolverProperty).filter_by(solver_property=property, experiment_result=self).first()
+                        return pv.get_value()
+                    except:
+                        # if the property or property value doesn't exist return None
+                        return None
 
         class InstanceClass(object):
             def __str__(self):
@@ -247,8 +294,14 @@ class EDACCDatabase(object):
         )
         mapper(ExperimentResult, metadata.tables['ExperimentResults'],
             properties = {
-                'resultFile': deferred(metadata.tables['ExperimentResults'].c.resultFile),
-                'clientOutput': deferred(metadata.tables['ExperimentResults'].c.clientOutput),
+                'solverOutput': deferred(metadata.tables['ExperimentResults'].c.solverOutput),
+                'launcherOutput': deferred(metadata.tables['ExperimentResults'].c.launcherOutput),
+                'watcherOutput': deferred(metadata.tables['ExperimentResults'].c.watcherOutput),
+                'verifierOutput': deferred(metadata.tables['ExperimentResults'].c.verifierOutput),
+                'solverOutputFN': deferred(metadata.tables['ExperimentResults'].c.solverOutputFN),
+                'launcherOutputFN': deferred(metadata.tables['ExperimentResults'].c.launcherOutputFN),
+                'watcherOutputFN': deferred(metadata.tables['ExperimentResults'].c.watcherOutputFN),
+                'verifierOutputFN': deferred(metadata.tables['ExperimentResults'].c.verifierOutputFN),
                 'solver_configuration': relation(SolverConfiguration),
                 'solver_properties': relationship(ExperimentResultSolverProperty, backref='experiment_result'),
                 'experiment': relation(Experiment, backref='experiment_results'),
