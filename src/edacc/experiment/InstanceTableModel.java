@@ -16,7 +16,7 @@ import java.util.Vector;
  * @author daniel
  */
 public class InstanceTableModel extends AbstractTableModel {
-    private String[] columns = {"Name", "numAtoms", "numClauses", "ratio", "maxClauseLength", "selected"};
+    private String[] columns = {"Name", "selected"};
     protected Vector<Instance> instances;
     protected Vector<ExperimentHasInstance> experimentHasInstances;
 
@@ -170,18 +170,10 @@ public class InstanceTableModel extends AbstractTableModel {
             case 0:
                 return instances.get(rowIndex).getName();
             case 1:
-                return instances.get(rowIndex).getNumAtoms();
-            case 2:
-                return instances.get(rowIndex).getNumClauses();
-            case 3:
-                return instances.get(rowIndex).getRatio();
-            case 4:
-                return instances.get(rowIndex).getMaxClauseLength();
-            case 5:
                 return selectedInstances.containsKey(instances.get(rowIndex).getId()); //selected.get(rowIndex);
-            case 6:
+            case 2:
                 return experimentHasInstances.get(rowIndex);
-            case 7:
+            case 3:
                 return instances.get(rowIndex);
             default:
                 return "";

@@ -13,9 +13,7 @@ public class Instance extends BaseModel implements IntegerPKModel {
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof Instance) {
             Instance o = (Instance) obj;
-            return (o.name.equals(name) && o.maxClauseLength == maxClauseLength
-                    && o.md5.equals(md5) && o.numAtoms == numAtoms && o.numClauses == numClauses
-                    && o.ratio == ratio && o.id == id);
+            return (o.name.equals(name) && o.md5.equals(md5) && o.id == id);
         }
         return false;
     }
@@ -26,14 +24,6 @@ public class Instance extends BaseModel implements IntegerPKModel {
 
     protected void setId(int id) {
         this.id = id;
-    }
-
-    public int getMaxClauseLength() {
-        return maxClauseLength;
-    }
-
-    public void setMaxClauseLength(int maxClauseLength) {
-        this.maxClauseLength = maxClauseLength;
     }
 
     public String getMd5() {
@@ -50,37 +40,6 @@ public class Instance extends BaseModel implements IntegerPKModel {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getNumAtoms() {
-        return numAtoms;
-    }
-
-    public void setNumAtoms(int numAtoms) {
-        this.numAtoms = numAtoms;
-    }
-
-    public int getNumClauses() {
-        return numClauses;
-    }
-
-    public void setNumClauses(int numClauses) {
-        this.numClauses = numClauses;
-    }
-
-    public float getRatio() {
-        return ratio;
-    }
-
-    public void setRatio(float ratio) {
-        this.ratio = ratio;
-    }
-
-    protected Instance() {
-        id = numAtoms = numClauses = maxClauseLength = 0;
-        ratio = 0;
-        name = md5 = "";
-        file = null;
     }
 
     protected File getFile() {
@@ -120,10 +79,6 @@ public class Instance extends BaseModel implements IntegerPKModel {
     private int id;
     private String name;
     private String md5;
-    private int numAtoms;
-    private int numClauses;
-    private float ratio;
-    private int maxClauseLength;
     private File file;
 
 

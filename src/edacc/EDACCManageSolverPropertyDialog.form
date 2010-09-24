@@ -72,7 +72,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jSplitPane1" pref="588" max="32767" attributes="0"/>
+                  <Component id="jSplitPane1" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -239,15 +239,10 @@
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Component id="panelManageSolverPropertyEditButtons" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" attributes="0">
-                                  <Component id="panelManageSolverPropertyEditInput" max="32767" attributes="0"/>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="panelManageSolverPropertyEditButtons" min="-2" max="-2" attributes="0"/>
+                              <Component id="panelManageSolverPropertyEditInput" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
                           <Component id="buttonSaveSolverProperty" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -326,12 +321,14 @@
                                               <Group type="103" groupAlignment="0" attributes="0">
                                                   <Component id="checkBoxMultipleOccurrences" alignment="0" min="-2" max="-2" attributes="0"/>
                                                   <Component id="comboBoxSolverPropertyValuetype" alignment="0" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="comboxParameter" alignment="0" min="-2" max="-2" attributes="0"/>
                                               </Group>
                                           </Group>
                                       </Group>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
                                       <Component id="buttonSolverPropertyAddValueType" min="-2" max="-2" attributes="0"/>
                                   </Group>
+                                  <Component id="labelParameter" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -376,7 +373,12 @@
                                   <Component id="labeMultipleOccurrences" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="checkBoxMultipleOccurrences" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="31" max="32767" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="labelParameter" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="comboxParameter" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -488,6 +490,21 @@
                         <Property name="text" type="java.lang.String" resourceKey="checkBoxMultipleOccurrences.text"/>
                         <Property name="enabled" type="boolean" value="false"/>
                         <Property name="name" type="java.lang.String" value="checkBoxMultipleOccurrences" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="labelParameter">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="labelParameter.text"/>
+                        <Property name="name" type="java.lang.String" value="labelParameter" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JComboBox" name="comboxParameter">
+                      <Properties>
+                        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                          <StringArray count="0"/>
+                        </Property>
+                        <Property name="enabled" type="boolean" value="false"/>
+                        <Property name="name" type="java.lang.String" value="comboxParameter" noResource="true"/>
                       </Properties>
                     </Component>
                   </SubComponents>

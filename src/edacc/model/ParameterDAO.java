@@ -155,4 +155,8 @@ public class ParameterDAO {
         ResultSet rs = st.executeQuery();
         return rs.next();
     }
+
+    public static Vector<Parameter> getAll() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
 }

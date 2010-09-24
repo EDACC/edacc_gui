@@ -22,12 +22,16 @@ public class InstanceDAO {
     /**
      * Instance factory method. Checks if the instance is already in the Datebase and if so,
      * throws an InstanceAlreadyInDBException
+     * @param file
+     * @param name
      * @param md5
+     * @param instanceClass
      * @return new Instance object
-     * @throws SQLException, FileNotFoundException, InstanceAlreadyInDBException
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws InstanceAlreadyInDBException
      */
-    public static Instance createInstance(File file, String name, int numAtoms, int numClauses,
-            float ratio, int maxClauseLength, String md5, InstanceClass instanceClass) throws SQLException, FileNotFoundException,
+    public static Instance createInstance(File file, String name, String md5, InstanceClass instanceClass) throws SQLException, FileNotFoundException,
             InstanceAlreadyInDBException {
         PreparedStatement ps;
         final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ? OR name = ?";
@@ -41,10 +45,6 @@ public class InstanceDAO {
         Instance i = new Instance();
         i.setFile(file);
         i.setName(name);
-        i.setNumAtoms(numAtoms);
-        i.setNumClauses(numClauses);
-        i.setRatio(ratio);
-        i.setMaxClauseLength(maxClauseLength);
         i.setMd5(md5);
         i.setInstanceClass(instanceClass);
         rs.close();
@@ -78,8 +78,8 @@ public class InstanceDAO {
             // insert query, set ID!
             // TODO insert instance blob
             // insert instance into db
-            final String insertQuery = "INSERT INTO " + table + " (name, md5, numAtoms, numClauses, ratio, maxClauseLength, instanceClass_idinstanceClass, instance) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            final String insertQuery = "INSERT INTO " + table + " (name, md5, instanceClass_idinstanceClass, instance) "
+                    + "VALUES (?, ?, ?, ?)";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             if (instance.getFile() != null) {
                 ps.setBinaryStream(8, new FileInputStream(instance.getFile()));
@@ -88,11 +88,11 @@ public class InstanceDAO {
             }
         } else if (instance.isModified()) {
             // update query
-            final String updateQuery = "UPDATE " + table + " SET name=?, md5=?, numAtoms=?, numClauses=?, ratio=?, maxClauseLength=?, instanceClass_idinstanceClass=? "
+            final String updateQuery = "UPDATE " + table + " SET name=?, md5=?, instanceClass_idinstanceClass=? "
                     + "WHERE idInstance=?";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
 
-            ps.setInt(8, instance.getId());
+            ps.setInt(4, instance.getId());
 
         } else {
             return;
@@ -100,14 +100,10 @@ public class InstanceDAO {
 
         ps.setString(1, instance.getName());
         ps.setString(2, instance.getMd5());
-        ps.setInt(3, instance.getNumAtoms());
-        ps.setInt(4, instance.getNumClauses());
-        ps.setFloat(5, instance.getRatio());
-        ps.setInt(6, instance.getMaxClauseLength());
         if (instance.getInstanceClass() != null) {
-            ps.setInt(7, instance.getInstanceClass().getInstanceClassID());
+            ps.setInt(3, instance.getInstanceClass().getInstanceClassID());
         } else {
-            ps.setNull(7, Types.INTEGER);
+            ps.setNull(3, Types.INTEGER);
         }
 
         ps.executeUpdate();
@@ -134,18 +130,15 @@ public class InstanceDAO {
         Instance c = cache.getCached(id);
         if (c != null) return c;
 
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idInstance, maxClauseLength, md5, name, numAtoms, numClauses, ratio, instanceClass_idinstanceClass FROM " + table + " WHERE idInstance=?");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT idInstance,  md5, name, instanceClass_idinstanceClass FROM " + table + " WHERE idInstance=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         Instance i = new Instance();
         if (rs.next()) {
-            i.setId(rs.getInt("idInstance"));
-            i.setMaxClauseLength(rs.getInt("maxClauseLength"));
+            i.setId(rs.getInt("idInstance"));           
             i.setMd5(rs.getString("md5"));
-            i.setName(rs.getString("name"));
-            i.setNumAtoms(rs.getInt("numAtoms"));
-            i.setNumClauses(rs.getInt("numClauses"));
-            i.setRatio(rs.getFloat("ratio"));
+            i.setName(rs.getString("name"));          
             Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
             i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
@@ -165,17 +158,13 @@ public class InstanceDAO {
     public static LinkedList<Instance> getAll() throws SQLException, InstanceClassMustBeSourceException {
         // return linked list with all instances
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        ResultSet rs = st.executeQuery("SELECT idInstance, maxClauseLength, md5, name, numAtoms, numClauses, ratio, instanceClass_idinstanceClass FROM " + table);
+        ResultSet rs = st.executeQuery("SELECT idInstance, md5, name, instanceClass_idinstanceClass FROM " + table);
         LinkedList<Instance> res = new LinkedList<Instance>();
         while (rs.next()) {
             Instance i = new Instance();
             i.setId(rs.getInt("idInstance"));
-            i.setMaxClauseLength(rs.getInt("maxClauseLength"));
             i.setMd5(rs.getString("md5"));
             i.setName(rs.getString("name"));
-            i.setNumAtoms(rs.getInt("numAtoms"));
-            i.setNumClauses(rs.getInt("numClauses"));
-            i.setRatio(rs.getFloat("ratio"));
             Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
             i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
@@ -194,7 +183,7 @@ public class InstanceDAO {
 
     public static LinkedList<Instance> getAllByExperimentId(int id) throws SQLException, InstanceClassMustBeSourceException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT DISTINCT i.idInstance, i.maxClauseLength, i.md5, i.name, i.numAtoms, i.numClauses, i.ratio, i.instanceClass_idinstanceClass FROM " + table + " as i JOIN Experiment_has_Instances as ei ON "
+                "SELECT DISTINCT i.idInstance, i.md5, i.name, i.instanceClass_idinstanceClass FROM " + table + " as i JOIN Experiment_has_Instances as ei ON "
                 + "i.idInstance = ei.Instances_idInstance WHERE ei.Experiment_idExperiment = ?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
@@ -207,12 +196,8 @@ public class InstanceDAO {
             else {
                 Instance i = new Instance();
                 i.setId(rs.getInt("i.idInstance"));
-                i.setMaxClauseLength(rs.getInt("i.maxClauseLength"));
                 i.setMd5(rs.getString("i.md5"));
                 i.setName(rs.getString("i.name"));
-                i.setNumAtoms(rs.getInt("i.numAtoms"));
-                i.setNumClauses(rs.getInt("i.numClauses"));
-                i.setRatio(rs.getFloat("i.ratio"));
                 Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
                 i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
@@ -268,8 +253,8 @@ public class InstanceDAO {
      */
     public static LinkedList<Instance> getAllByInstanceClasses(Vector<InstanceClass> allChoosen) throws NoConnectionToDBException, SQLException {
         if (!allChoosen.isEmpty()) {
-            String query = "SELECT i.idInstance, i.maxClauseLength, i.md5, i.name, i.numAtoms, i.numClauses,"
-                    + " i.ratio, i.instanceClass_idinstanceClass FROM " + table + " as i "
+            String query = "SELECT i.idInstance, i.md5, i.name,"
+                    + " i.instanceClass_idinstanceClass FROM " + table + " as i "
                     + " LEFT JOIN Instances_has_instanceClass as ii ON i.idInstance = ii.Instances_idInstance "
                     + " WHERE i.instanceClass_idinstanceClass = " + allChoosen.get(0).getInstanceClassID()
                     + " OR ii.instanceClass_idinstanceClass = " + allChoosen.get(0).getInstanceClassID();
@@ -289,13 +274,9 @@ public class InstanceDAO {
                     continue;
                 }
                 Instance i = new Instance();
-                i.setId(rs.getInt("i.idInstance"));
-                i.setMaxClauseLength(rs.getInt("i.maxClauseLength"));
+                i.setId(rs.getInt("i.idInstance"));;
                 i.setMd5(rs.getString("i.md5"));
                 i.setName(rs.getString("i.name"));
-                i.setNumAtoms(rs.getInt("i.numAtoms"));
-                i.setNumClauses(rs.getInt("i.numClauses"));
-                i.setRatio(rs.getFloat("i.ratio"));
                 Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
                 i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
                 i.setSaved();

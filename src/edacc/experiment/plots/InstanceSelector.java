@@ -50,10 +50,10 @@ public class InstanceSelector extends JPanel {
         TableColumnModel colModel = table.getColumnModel();
         colModel.getColumn(0).setPreferredWidth(350);
         colModel.getColumn(1).setPreferredWidth(15);
-        colModel.getColumn(2).setPreferredWidth(15);
+ /*       colModel.getColumn(2).setPreferredWidth(15);
         colModel.getColumn(3).setPreferredWidth(15);
         colModel.getColumn(4).setPreferredWidth(15);
-        colModel.getColumn(5).setPreferredWidth(15);
+        colModel.getColumn(5).setPreferredWidth(15);*/
         scrollPane = new JScrollPane(table);
         lblFilter = new JLabel("");
         lblFilter.setForeground(Color.red);

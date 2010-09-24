@@ -7,6 +7,8 @@ package edacc.properties;
 
 import edacc.EDACCManageSolverPropertyDialog;
 import edacc.model.NoConnectionToDBException;
+import edacc.model.Parameter;
+import edacc.model.ParameterDAO;
 import edacc.model.SolverProperty;
 import edacc.model.SolverPropertyDAO;
 import edacc.model.SolverPropertyIsUsedException;
@@ -128,6 +130,11 @@ public class SolverPropertiesController {
         }
         loadSolverProperties();
         main.clearSolverPropertyEditField();
+    }
+
+    public void loadParameters() {
+        Vector<Parameter> load = new Vector<Parameter>();
+        ParameterDAO.getAll();
     }
       
 

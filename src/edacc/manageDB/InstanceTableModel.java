@@ -14,7 +14,7 @@ import javax.swing.table.AbstractTableModel;
  * @author rretz
  */
 public class InstanceTableModel extends AbstractTableModel{
-    private String[] columns = {"Name", "numAtoms", "numClauses", "ratio", "maxClauseLength"};
+    private String[] columns = {"Name"};
     protected Vector<Instance> instances;
 
     public InstanceTableModel(){
@@ -77,7 +77,7 @@ public class InstanceTableModel extends AbstractTableModel{
     /**
      *
      * @param rowIndex
-     * @param columnIndex For columnIndex = 5 the instance at rowIndex is returned
+     * @param columnIndex For columnIndex = 1 the instance at rowIndex is returned
      * @return the Object from the choosen cell; return == "" when columnIndex is out of columnRange
      */
     public Object getValueAt(int rowIndex, int columnIndex) {
@@ -85,14 +85,6 @@ public class InstanceTableModel extends AbstractTableModel{
             case 0:
                 return instances.get(rowIndex).getName();
             case 1:
-                return instances.get(rowIndex).getNumAtoms();
-            case 2:
-                return instances.get(rowIndex).getNumClauses();
-            case 3:
-                return instances.get(rowIndex).getRatio();
-            case 4:
-                return instances.get(rowIndex).getMaxClauseLength();
-            case 5:
                 return instances.get(rowIndex);
             default:
                 return "";
