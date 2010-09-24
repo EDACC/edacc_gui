@@ -23,7 +23,10 @@
         }
         $(document).ready(function(){
             var JOB_STATUS_COLOR = {
-                'error':            'red',
+                'launcher crash':   'red',
+                'watcher crash':    'red',
+                'solver crash':     'red',
+                'verifier crash':   'red',
                 'not started':      '#4169E1',
                 'running':          'orange',
                 'finished':         '#00CC33',
@@ -36,12 +39,15 @@
                     "sZeroRecords": "No matching results"
                 },
                 "bAutoWidth": false,
+                "bServerSide": true,
+                "iDisplayLength": 50,
+                "aLengthMenu": [10, 25, 50, 100, 500, 1000, 5000, 10000],
                 "bStateSave": true,
                 "bProcessing": true,
                 "sAjaxSource": "{{url_for('experiment_progress_ajax', database=database, experiment_id=experiment.idExperiment)}}",
 		"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
                     $('td:eq(0)', nRow).html('<a style="color: black;" href="/{{database}}/experiment/{{experiment.idExperiment}}/result/'+aData[0]+'">'+aData[0]+'</a>');
-                    $(nRow).attr("bgcolor", JOB_STATUS_COLOR[$('td:eq(7)', nRow).html()]);
+                    $(nRow).attr("bgcolor", JOB_STATUS_COLOR[$('td:eq(6)', nRow).html()]);
                     return nRow;
 		},
                 "aoColumns": [null, null, null, null, null, null, null, null]
@@ -95,6 +101,7 @@
         Progress
     </div>
     <h2>Experiment progress</h2>
+    <!--
     <div style="margin-bottom: 10px;">
         The table below shows an overview of the individual benchmarks that are performed in this experiment. An experiment can be described as the cartesian product
         of a set of solvers, a set of instances and an integer number of runs n (labeled 0 through n - 1) of one particular solver on an instance.
@@ -103,6 +110,7 @@
         <br/>
         Notice that the F5 key was overriden on this page to use Ajax to refresh the table data without having to reload the whole page. You can also use the following link or set a periodic refresh interval:
     </div>
+    -->
 
     <a id="refresh" href="#">Refresh Data</a> <strong>Refresh Interval:</strong>
     <select id="refresh_interval"><option value="-" selected="selected">-</option><option value="2">2s</option><option value="5">5s</option><option value="10">10s</option><option value="30">30s</option></select>
@@ -112,16 +120,16 @@
             <tr>
                 <th>ID</th>
                 <th>Solver</th>
-                <th>Parameters</th>
                 <th>Instance</th>
                 <th>Run</th>
                 <th>Time</th>
                 <th>Seed</th>
                 <th>Status</th>
+                <th>Result</th>
             </tr>
         </thead>
         <tbody>
-            <tr><td colspan="8">this table requires JavaScript to be enabled</td></tr>
+            <tr><td colspan="8">This table requires JavaScript to be enabled. You might also see this while the data is loading.</td></tr>
         </tbody>
     </table>
     </div>

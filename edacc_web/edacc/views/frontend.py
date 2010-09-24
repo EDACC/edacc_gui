@@ -189,7 +189,7 @@ def experiment_results(database, experiment_id):
                         .filter_by(instance=instance) \
                         .all()
             completed = len(filter(lambda j: j.status in JOB_FINISHED or j.status in JOB_ERROR, jobs))
-            runtimes = [j.time for j in jobs]
+            runtimes = [j.get_time() for j in jobs]
             time_max = max(runtimes)
             time_min = min(runtimes)
             row.append({'time_avg': numpy.average(runtimes),
@@ -238,7 +238,7 @@ def experiment_results_by_solver(database, experiment_id):
             csv_writer = csv.writer(csv_response)
             csv_writer.writerow(['Instance', 'Runs'])
             for res in results:
-                csv_writer.writerow([res[0].name] + [r.time for r in res[1]])
+                csv_writer.writerow([res[0].name] + [r.get_time() for r in res[1]])
             csv_response.seek(0)
 
             headers = Headers()
@@ -283,7 +283,7 @@ def experiment_results_by_instance(database, experiment_id):
             csv_writer = csv.writer(csv_response)
             csv_writer.writerow(['Solver', 'Runs'])
             for res in results:
-                csv_writer.writerow([str(res[0])] + [r.time for r in res[1]])
+                csv_writer.writerow([str(res[0])] + [r.get_time() for r in res[1]])
             csv_response.seek(0)
 
             headers = Headers()
@@ -311,35 +311,86 @@ def experiment_progress(database, experiment_id):
 @require_phase(phases=(3, 4, 5, 6, 7))
 @require_login
 def experiment_progress_ajax(database, experiment_id):
-    """ Returns JSON-serialized data of the experiment results. Used by the jQuery datatable as ajax data source """
+    """ Returns JSON-serialized data of the experiment results.
+        Used by the jQuery datatable as ajax data source with server side processing.
+        Parses the GET parameters and constructs an apropriate SQL query to fetch
+        the data.
+    """
     db = models.get_database(database) or abort(404)
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
-    query = db.session.query(db.ExperimentResult).enable_eagerloads(True).options(joinedload(db.ExperimentResult.instance))
-    query.options(joinedload(db.ExperimentResult.solver_configuration))
+    columns = ["ExperimentResults.idJob", "SolverConfig.idSolverConfig", "Instances.name",
+               "ExperimentResults.run", "ExperimentResults.resultTime", "ExperimentResults.seed",
+               "ExperimentResults.status", "ExperimentResults.resultCode"]
 
-    import time
-    start = time.clock()
-    jobs = query.filter_by(experiment=experiment).all()
-    print "db: ", time.clock() - start, 's'
+    params = []
+    where_clause = ""
+    if request.args.has_key('sSearch') and request.args.get('sSearch') != '':
+        where_clause += "(ExperimentResults.idJob LIKE %s OR "
+        where_clause += "Instances.name LIKE %s OR "
+        where_clause += "ExperimentResults.run LIKE %s OR "
+        where_clause += "ExperimentResults.resultTime LIKE %s OR "
+        where_clause += "ExperimentResults.seed LIKE %s OR "
+        where_clause += "ExperimentResults.status LIKE %s) OR "
+        where_clause += "ExperimentResults.resultCode LIKE %s) "
+        params += ['%' + request.args.get('sSearch') + '%'] * 7 # 7 conditions
+
+    if where_clause != "": where_clause += " AND "
+    where_clause += "ExperimentResults.Experiment_idExperiment = %s "
+    params.append(experiment.idExperiment)
+
+    order = ""
+    if request.args.get('iSortCol_0', '') != '' and int(request.args.get('iSortingCols', 0)) > 0:
+        order = "ORDER BY "
+        for i in xrange(int(request.args.get('iSortingCols', 0))):
+            order += columns[int(request.args.get('iSortCol_' + str(i)))] + " "
+            direction = request.args.get('sSortDir_' + str(i))
+            if direction in ('asc', 'desc'):
+                order += direction + ", "
+        order = order[:-2]
+
+    limit = ""
+    if request.args.get('iDisplayStart', '') != '' and int(request.args.get('iDisplayLength', -1)) != -1:
+        limit = "LIMIT %s, %s"
+        params.append(int(request.args.get('iDisplayStart')))
+        params.append(int(request.args.get('iDisplayLength')))
+
+    conn = db.session.connection()
+    res = conn.execute("""SELECT SQL_CALC_FOUND_ROWS ExperimentResults.idJob, SolverConfig.idSolverConfig,
+                 Instances.name, ExperimentResults.run, ExperimentResults.resultTime, ExperimentResults.seed,
+                 ExperimentResults.status, ExperimentResults.resultCode
+                 FROM ExperimentResults
+                    LEFT JOIN SolverConfig ON ExperimentResults.SolverConfig_idSolverConfig = SolverConfig.idSolverConfig
+                    LEFT JOIN Instances ON ExperimentResults.Instances_idInstance = Instances.idInstance
+                 WHERE """ + where_clause + " " + order + " " + limit, tuple(params))
+
+    jobs = res.fetchall()
+
+    res = conn.execute("SELECT FOUND_ROWS()")
+    numFiltered = res.fetchone()[0]
+    res = conn.execute("SELECT COUNT(ExperimentResults.idJob) FROM ExperimentResults WHERE Experiment_idExperiment = %s", experiment.idExperiment)
+    numTotal = res.fetchone()[0]
+
     # if competition db, show only own solvers unless phase is 6 or 7
     if not is_admin() and db.is_competition() and db.competition_phase() not in (6, 7):
-        jobs = filter(lambda j: j.solver_configuration.solver.user == g.User, jobs)
+        jobs = filter(lambda j: db.session.query(db.SolverConfiguration).get(j[1]).solver.user == g.User, jobs)
 
-    start = time.clock()
+    # cache solver configuration names in a dictionary
+    solver_config_names = {}
+    for solver_config in experiment.solver_configurations:
+        solver_config_names[solver_config.idSolverConfig] = solver_config.get_name()
+
     aaData = []
     for job in jobs:
-        iname = job.instance.name
-        if len(iname) > 30: iname = iname[0:30] + '...'
-        aaData.append([job.idJob, job.solver_configuration.get_name(), utils.parameter_string(job.solver_configuration),
-               iname, job.run, job.time, job.seed, utils.job_status(job.status)])
-    print "conversion: ", time.clock() - start, 's'
+        aaData.append([job.idJob, solver_config_names[job[1]], job[2], job[3],
+                job[4], job[5], utils.job_status(job[6]), utils.result_code(job[7])])
 
-    start = time.clock()
-    dump = json.dumps({'aaData': aaData})
-    print "json: ", time.clock() - start, 's'
-    return dump
-
+    return json.dumps({
+        'aaData': aaData,
+        'sEcho': request.args.get('sEcho'),
+        'iTotalRecords': str(numTotal),
+        'iTotalDisplayRecords': str(numFiltered),
+    })
 
 @frontend.route('/<database>/experiment/<int:experiment_id>/result/<int:solver_configuration_id>/<int:instance_id>')
 @require_phase(phases=(3, 4, 5, 6, 7))
@@ -445,34 +496,26 @@ def experiment_result(database, experiment_id, result_id):
     if not is_admin() and db.is_competition() and not db.competition_phase() in (6, 7):
         if result.solver_configuration.solver.user != g.User: abort(401)
 
-    resultFile = result.resultFile
-    clientOutput = result.clientOutput
+    solverOutput = result.solverOutput
+    launcherOutput = result.launcherOutput
+    watcherOutput = result.watcherOutput
+    verifierOutput = result.verifierOutput
 
-    if clientOutput is not None:
-        if len(clientOutput) > 4*1024:
-            # show only the first and last 2048 characters if the resultFile is larger than 4kB
-            clientOutput_text = clientOutput[:2048] + "\n\n... [truncated " + str(int((len(clientOutput) - 4096) / 1024.0)) + " kB]\n\n" + clientOutput[-2048:]
-        else:
-            clientOutput_text = clientOutput
-    else: clientOutput_text = "No output"
-
-    if resultFile is not None:
-        if len(resultFile) > 4*1024:
-            # show only the first and last 2048 characters if the resultFile is larger than 4kB
-            resultFile_text = resultFile[:2048] + "\n\n... [truncated " + str(int((len(resultFile) - 4096) / 1024.0)) + " kB]\n\n" + resultFile[-2048:]
-        else:
-            resultFile_text = resultFile
-    else: resultFile_text = "No result"
+    solverOutput_text = utils.formatOutputFile(solverOutput)
+    launcherOutput_text = utils.formatOutputFile(launcherOutput)
+    watcherOutput_text = utils.formatOutputFile(watcherOutput)
+    verifierOutput_text = utils.formatOutputFile(verifierOutput)
 
     return render('result_details.html', experiment=experiment, result=result, solver=result.solver_configuration.solver,
-                  solver_config=result.solver_configuration, instance=result.instance, resultFile_text=resultFile_text,
-                  clientOutput_text=clientOutput_text, database=database, db=db)
+                  solver_config=result.solver_configuration, instance=result.instance, solverOutput_text=solverOutput_text,
+                  launcherOutput_text=launcherOutput_text, watcherOutput_text=watcherOutput_text,
+                  verifierOutput_text=verifierOutput_text, database=database, db=db)
 
 
-@frontend.route('/<database>/experiment/<int:experiment_id>/result/<int:result_id>/download')
+@frontend.route('/<database>/experiment/<int:experiment_id>/result/<int:result_id>/download-solver-output')
 @require_phase(phases=(3, 4, 5, 6, 7))
 @require_login
-def experiment_result_download(database, experiment_id, result_id):
+def solver_output_download(database, experiment_id, result_id):
     """ Returns the specified job client output file as HTTP response """
     db = models.get_database(database) or abort(404)
     result = db.session.query(db.ExperimentResult).get(result_id) or abort(404)
@@ -484,14 +527,14 @@ def experiment_result_download(database, experiment_id, result_id):
     headers.add('Content-Type', 'text/plain')
     headers.add('Content-Disposition', 'attachment', filename=result.resultFileName)
 
-    return Response(response=result.resultFile, headers=headers)
+    return Response(response=result.solverOutput, headers=headers)
 
 
-@frontend.route('/<database>/experiment/<int:experiment_id>/result/<int:result_id>/download-client-output')
+@frontend.route('/<database>/experiment/<int:experiment_id>/result/<int:result_id>/download-launcher-output')
 @require_phase(phases=(3, 4, 5, 6, 7))
 @require_login
-def experiment_result_download_client_output(database, experiment_id, result_id):
-    """ Returns the specified job client output as HTTP response """
+def launcher_output_download(database, experiment_id, result_id):
+    """ Returns the specified job client output file as HTTP response """
     db = models.get_database(database) or abort(404)
     result = db.session.query(db.ExperimentResult).get(result_id) or abort(404)
 
@@ -500,6 +543,42 @@ def experiment_result_download_client_output(database, experiment_id, result_id)
 
     headers = Headers()
     headers.add('Content-Type', 'text/plain')
-    headers.add('Content-Disposition', 'attachment', filename="client_output_"+result.resultFileName)
+    headers.add('Content-Disposition', 'attachment', filename=result.resultFileName)
 
-    return Response(response=result.clientOutput, headers=headers)
+    return Response(response=result.launcherOutput, headers=headers)
+
+
+@frontend.route('/<database>/experiment/<int:experiment_id>/result/<int:result_id>/download-watcher-output')
+@require_phase(phases=(3, 4, 5, 6, 7))
+@require_login
+def watcher_output_download(database, experiment_id, result_id):
+    """ Returns the specified job client output file as HTTP response """
+    db = models.get_database(database) or abort(404)
+    result = db.session.query(db.ExperimentResult).get(result_id) or abort(404)
+
+    if not is_admin() and db.is_competition() and not db.competition_phase() in (6, 7):
+        if result.solver_configuration.solver.user != g.User: abort(401)
+
+    headers = Headers()
+    headers.add('Content-Type', 'text/plain')
+    headers.add('Content-Disposition', 'attachment', filename=result.resultFileName)
+
+    return Response(response=result.watcherOutput, headers=headers)
+
+
+@frontend.route('/<database>/experiment/<int:experiment_id>/result/<int:result_id>/download-verifier-output')
+@require_phase(phases=(3, 4, 5, 6, 7))
+@require_login
+def verifier_output_download(database, experiment_id, result_id):
+    """ Returns the specified job client output file as HTTP response """
+    db = models.get_database(database) or abort(404)
+    result = db.session.query(db.ExperimentResult).get(result_id) or abort(404)
+
+    if not is_admin() and db.is_competition() and not db.competition_phase() in (6, 7):
+        if result.solver_configuration.solver.user != g.User: abort(401)
+
+    headers = Headers()
+    headers.add('Content-Type', 'text/plain')
+    headers.add('Content-Disposition', 'attachment', filename=result.resultFileName)
+
+    return Response(response=result.verifierOutput, headers=headers)

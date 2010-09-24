@@ -6,11 +6,6 @@
     This module implements some possible ranking schemes that can be used
     by the ranking view in the analysis module.
 
-    The ranking view handler calls the function :rank_solvers: of this module,
-    which has to accept the experiment of which the solver configurations should
-    be ranked as parameter and return a list with the solver configurations
-    ordered from best to worst.
-
     :copyright: (c) 2010 by Daniel Diepold.
     :license: MIT, see LICENSE for details.
 """
@@ -33,10 +28,14 @@ def avg_point_biserial_correlation_ranking(experiment):
         d = 0.0
         num = 0
         for i in experiment.instances:
-            res1 = [res.get_time() for res in experiment.results if res.SolverConfig_idSolverConfig == s1.idSolverConfig and res.Instances_idInstance == i.idInstance]
-            res2 = [res.get_time() for res in experiment.results if res.SolverConfig_idSolverConfig == s2.idSolverConfig and res.Instances_idInstance == i.idInstance]
+            res1 = [res.get_time() for res in experiment.results \
+                    if res.SolverConfig_idSolverConfig == s1.idSolverConfig \
+                    and res.Instances_idInstance == i.idInstance]
+            res2 = [res.get_time() for res in experiment.results \
+                    if res.SolverConfig_idSolverConfig == s2.idSolverConfig \
+                    and res.Instances_idInstance == i.idInstance]
             ranked_data = list(stats.stats.rankdata(res1 + res2))
-            
+
             r, p = stats.pointbiserialr([1] * len(res1) + [0] * len(res2), ranked_data)
             # only take instances with significant differences into account
             if p < alpha:
@@ -65,5 +64,3 @@ def number_of_solved_instances_ranking(experiment):
     """
     return list(reversed(sorted(experiment.solver_configurations,
                                 key=lambda s: len([r for r in experiment.results if r.status == 1]))))
-
-rank_solvers = avg_point_biserial_correlation_ranking

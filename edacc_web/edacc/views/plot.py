@@ -18,39 +18,18 @@ import numpy
 import StringIO
 import csv
 
-from flask import Module
-from flask import render_template as render
-from flask import render_template, url_for
-from flask import Response, abort, request, g
+from flask import Module, render_template as render
+from flask import Response, abort, request, g, url_for
 from werkzeug import Headers
 
-from edacc import plots, config, models, forms, ranking
+from edacc import plots, config, models, statistics
 from sqlalchemy.orm import joinedload
 from edacc.views.helpers import require_phase, require_login
 
 plot = Module(__name__)
 
 
-@plot.route('/<database>/experiment/<int:experiment_id>/scatter-plot-1property/')
-@require_phase(phases=(5, 6, 7))
-@require_login
-def scatter_2solver_1property(database, experiment_id):
-    """ description """
-    db = models.get_database(database) or abort(404)
-    exp = db.session.query(db.Experiment).get(experiment_id) or abort(404)
-
-    s1 = int(request.args['solver_config1'])
-    s2 = int(request.args['solver_config2'])
-    instances = [db.session.query(db.Instance).filter_by(idInstance=int(id)).first() for id in request.args.getlist('instances')]
-    run = request.args['run']
-    scaling = request.args['scaling']
-    solver_property = request.args['solver_property']
-    if solver_property != 'cputime':
-        solver_prop = db.session.query(db.SolverProperty).get(int(solver_property))
-
-    sc1 = db.session.query(db.SolverConfiguration).get(s1) or abort(404)
-    sc2 = db.session.query(db.SolverConfiguration).get(s2) or abort(404)
-
+def scatter_2solver_1property_points(db, exp, sc1, sc2, instances, solver_property, run):
     results1 = db.session.query(db.ExperimentResult)
     results1.enable_eagerloads(True).options(joinedload(db.ExperimentResult.instance, db.ExperimentResult.solver_configuration))
     results1.options(joinedload(db.ExperimentResult.solver_properties), joinedload(db.ExperimentResult.instance))
@@ -87,9 +66,48 @@ def scatter_2solver_1property(database, experiment_id):
                 instance
             ))
 
-    max_x = max([p[0] for p in points])
-    max_y = max([p[1] for p in points])
+    return points
 
+@plot.route('/<database>/experiment/<int:experiment_id>/scatter-plot-1property/')
+@require_phase(phases=(5, 6, 7))
+@require_login
+def scatter_2solver_1property(database, experiment_id):
+    """ Returns an image with a scatter plot of the result property of two
+        solver configurations' results on instances as HTTP response.
+
+        The data to be plotted has to be specified as GET parameters:
+
+        solver_config1: id of the first solver configuration
+        solver_config2: id of the second solver configuratio
+        instances: id of an instance, multiple occurences allowed.
+        run: 'average', 'median', 'all', or an integer of the run.
+                If the value is 'all', all runs of the solvers will be plotted.
+                If the value is 'average' or 'median', these values will be calculated
+                across multiple runs of one solver on an instance.
+                If the value is an integer, the data of this specific run is used.
+        solver_property: id of a solver property (SolverProperty table) or the special case
+                         'cputime' for the time column of the ExperimentResult table.
+    """
+    db = models.get_database(database) or abort(404)
+    exp = db.session.query(db.Experiment).get(experiment_id) or abort(404)
+
+    s1 = int(request.args['solver_config1'])
+    s2 = int(request.args['solver_config2'])
+    instances = [db.session.query(db.Instance).filter_by(idInstance=int(id)).first() for id in request.args.getlist('instances')]
+    run = request.args['run']
+    xscale = request.args['xscale']
+    yscale = request.args['yscale']
+    solver_property = request.args['solver_property']
+    if solver_property != 'cputime':
+        solver_prop = db.session.query(db.SolverProperty).get(int(solver_property))
+
+    sc1 = db.session.query(db.SolverConfiguration).get(s1) or abort(404)
+    sc2 = db.session.query(db.SolverConfiguration).get(s2) or abort(404)
+
+    points = scatter_2solver_1property_points(db, exp, sc1, sc2, instances, solver_property, run)
+
+    max_x = max([p[0] for p in points] or [0])
+    max_y = max([p[1] for p in points] or [0])
     max_x = max_y = max(max_x, max_y) * 1.1
 
     title = sc1.solver.name + ' vs. ' + sc2.solver.name
@@ -115,7 +133,7 @@ def scatter_2solver_1property(database, experiment_id):
 
     elif request.args.has_key('pdf'):
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + '.pdf'
-        plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, format='pdf', scaling=scaling, diagonal_line=True)
+        plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, format='pdf', xscale=xscale, yscale=yscale, diagonal_line=True)
         headers = Headers()
         headers.add('Content-Disposition', 'attachment', filename=sc1.solver.name + '_vs_' + sc2.solver.name + '.pdf')
         response = Response(response=open(filename, 'rb').read(), mimetype='application/pdf', headers=headers)
@@ -123,7 +141,7 @@ def scatter_2solver_1property(database, experiment_id):
         return response
     else:
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + '.png'
-        pts = plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, scaling=scaling, diagonal_line=True)
+        pts = plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, xscale=xscale, yscale=yscale, diagonal_line=True)
         points = [(pts[i][0], pts[i][1], points[i][0], points[i][1], points[i][2]) for i in xrange(len(points))]
         if request.args.has_key('imagemap'):
             return render('/analysis/imagemap_2solver_1property.html', database=database, points=points, sc1=sc1, sc2=sc2)
@@ -133,30 +151,7 @@ def scatter_2solver_1property(database, experiment_id):
         return response
 
 
-@plot.route('/<database>/experiment/<int:experiment_id>/scatter-plot-instance-vs-result/')
-@require_phase(phases=(5, 6, 7))
-@require_login
-def scatter_1solver_instance_vs_result_property(database, experiment_id):
-    """ description """
-    db = models.get_database(database) or abort(404)
-    exp = db.session.query(db.Experiment).get(experiment_id) or abort(404)
-
-    solver_config = int(request.args['solver_config'])
-    run = request.args['run']
-    scaling = request.args['scaling']
-    solver_property = request.args['solver_property']
-    instance_property = request.args['instance_property']
-
-    instances = [db.session.query(db.Instance).filter_by(idInstance=int(id)).first() for id in request.args.getlist('instances')]
-
-    if solver_property != 'cputime':
-        solver_prop = db.session.query(db.SolverProperty).get(int(solver_property))
-
-    if instance_property != 'numAtoms':
-        instance_prop = db.session.query(db.InstanceProperty).get(instance_property)
-
-    solver_config = db.session.query(db.SolverConfiguration).get(solver_config) or abort(404)
-
+def scatter_1solver_instance_vs_result_property_points(db, exp, solver_config, instances, instance_property, solver_property, run):
     results = db.session.query(db.ExperimentResult)
     results.enable_eagerloads(True).options(joinedload(db.ExperimentResult.instance, db.ExperimentResult.solver_configuration))
     results = results.filter_by(experiment=exp, solver_configuration=solver_config)
@@ -187,6 +182,35 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
                 instance
             ))
 
+    return points
+
+
+@plot.route('/<database>/experiment/<int:experiment_id>/scatter-plot-instance-vs-result/')
+@require_phase(phases=(5, 6, 7))
+@require_login
+def scatter_1solver_instance_vs_result_property(database, experiment_id):
+    """ description """
+    db = models.get_database(database) or abort(404)
+    exp = db.session.query(db.Experiment).get(experiment_id) or abort(404)
+
+    solver_config = int(request.args['solver_config'])
+    run = request.args['run']
+    xscale = request.args['xscale']
+    yscale = request.args['yscale']
+    solver_property = request.args['solver_property']
+    instance_property = request.args['instance_property']
+
+    instances = [db.session.query(db.Instance).filter_by(idInstance=int(id)).first() for id in request.args.getlist('instances')]
+
+    if solver_property != 'cputime':
+        solver_prop = db.session.query(db.SolverProperty).get(int(solver_property))
+
+    instance_prop = db.session.query(db.InstanceProperty).get(instance_property)
+
+    solver_config = db.session.query(db.SolverConfiguration).get(solver_config) or abort(404)
+
+    points = scatter_1solver_instance_vs_result_property_points(db, exp, solver_config, instances, instance_property, solver_property, run)
+
     if instance_property == 'numAtoms':
         xlabel = 'Number of Atoms'
     else:
@@ -199,8 +223,8 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
 
     title = str(solver_config)
 
-    max_x = max([p[0] for p in points]) * 1.1
-    max_y = max([p[1] for p in points]) * 1.1
+    max_x = max([p[0] for p in points] or [0]) * 1.1
+    max_y = max([p[1] for p in points] or [0]) * 1.1
 
     if request.args.has_key('csv'):
         csv_response = StringIO.StringIO()
@@ -217,7 +241,7 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
 
     elif request.args.has_key('pdf'):
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + '.pdf'
-        plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, format='pdf', scaling=scaling)
+        plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, format='pdf', xscale=xscale, yscale=yscale)
         headers = Headers()
         headers.add('Content-Disposition', 'attachment', filename=str(solver_config) + '.pdf')
         response = Response(response=open(filename, 'rb').read(), mimetype='application/pdf', headers=headers)
@@ -225,7 +249,7 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
         return response
     else:
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + '.png'
-        pts = plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, scaling=scaling)
+        pts = plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, xscale=xscale, yscale=yscale)
         points = [(pts[i][0], pts[i][1], points[i][0], points[i][1], points[i][2]) for i in xrange(len(points))]
         if request.args.has_key('imagemap'):
             return render('/analysis/imagemap_instance_vs_result.html', database=database, points=points, sc=solver_config)
@@ -234,30 +258,8 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
         os.remove(filename)
         return response
 
-@plot.route('/<database>/experiment/<int:experiment_id>/scatter-plot-2properties/')
-@require_phase(phases=(5, 6, 7))
-@require_login
-def scatter_1solver_result_vs_result_property(database, experiment_id):
-    """ description """
-    db = models.get_database(database) or abort(404)
-    exp = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
-    solver_config = int(request.args['solver_config'])
-    run = request.args['run']
-    scaling = request.args['scaling']
-    solver_property1 = request.args['solver_property1']
-    solver_property2 = request.args['solver_property2']
-
-    instances = [db.session.query(db.Instance).filter_by(idInstance=int(id)).first() for id in request.args.getlist('instances')]
-
-    if solver_property1 != 'cputime':
-        solver_prop1 = db.session.query(db.SolverProperty).get(int(solver_property1))
-
-    if solver_property2 != 'cputime':
-        solver_prop2 = db.session.query(db.SolverProperty).get(int(solver_property2))
-
-    solver_config = db.session.query(db.SolverConfiguration).get(solver_config) or abort(404)
-
+def scatter_1solver_result_vs_result_property_plot(db, exp, solver_config, instances, solver_property1, solver_property2, run):
     results = db.session.query(db.ExperimentResult)
     results.enable_eagerloads(True).options(joinedload(db.ExperimentResult.instance, db.ExperimentResult.solver_configuration))
     results = results.filter_by(experiment=exp, solver_configuration=solver_config)
@@ -287,6 +289,35 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
                 instance
             ))
 
+    return points
+
+@plot.route('/<database>/experiment/<int:experiment_id>/scatter-plot-2properties/')
+@require_phase(phases=(5, 6, 7))
+@require_login
+def scatter_1solver_result_vs_result_property(database, experiment_id):
+    """ description """
+    db = models.get_database(database) or abort(404)
+    exp = db.session.query(db.Experiment).get(experiment_id) or abort(404)
+
+    solver_config = int(request.args['solver_config'])
+    run = request.args['run']
+    xscale = request.args['xscale']
+    yscale = request.args['yscale']
+    solver_property1 = request.args['solver_property1']
+    solver_property2 = request.args['solver_property2']
+
+    instances = [db.session.query(db.Instance).filter_by(idInstance=int(id)).first() for id in request.args.getlist('instances')]
+
+    if solver_property1 != 'cputime':
+        solver_prop1 = db.session.query(db.SolverProperty).get(int(solver_property1))
+
+    if solver_property2 != 'cputime':
+        solver_prop2 = db.session.query(db.SolverProperty).get(int(solver_property2))
+
+    solver_config = db.session.query(db.SolverConfiguration).get(solver_config) or abort(404)
+
+    points = scatter_1solver_result_vs_result_property_plot(db, exp, solver_config, instances, solver_property1, solver_property2, run)
+
     if solver_property1 == 'cputime':
         xlabel = 'CPU Time'
     else:
@@ -299,8 +330,8 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
 
     title = str(solver_config)
 
-    max_x = max([p[0] for p in points]) * 1.1
-    max_y = max([p[1] for p in points]) * 1.1
+    max_x = max([p[0] for p in points] or [0]) * 1.1
+    max_y = max([p[1] for p in points] or [0]) * 1.1
 
     if request.args.has_key('csv'):
         csv_response = StringIO.StringIO()
@@ -317,7 +348,7 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
 
     elif request.args.has_key('pdf'):
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + '.pdf'
-        plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, format='pdf', scaling=scaling)
+        plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, format='pdf', xscale=xscale, yscale=yscale)
         headers = Headers()
         headers.add('Content-Disposition', 'attachment', filename=str(solver_config) + '.pdf')
         response = Response(response=open(filename, 'rb').read(), mimetype='application/pdf', headers=headers)
@@ -325,22 +356,10 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
         return response
     else:
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + '.png'
-        pts = plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, scaling=scaling)
+        pts = plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, xscale=xscale, yscale=yscale)
+        points = [(pts[i][0], pts[i][1], points[i][0], points[i][1], points[i][2]) for i in xrange(len(points))]
         if request.args.has_key('imagemap'):
-            mapdata = []
-            for i in xrange(len(points)):
-                mapdata.append(
-                    {'x': pts[i][0],
-                     'y': pts[i][1],
-                     'url': url_for('frontend.instance_details',
-                                    database=database,
-                                    instance_id=points[i][2].idInstance),
-                     'alt': points[i][2].name
-                    }
-                )
-            return json.dumps({
-                'data': mapdata
-            })
+            return render('/analysis/imagemap_result_vs_result.html', database=database, points=points, sc=solver_config)
         else:
             response = Response(response=open(filename, 'rb').read(), mimetype='image/png')
         os.remove(filename)
@@ -417,6 +436,7 @@ def rtd_comparison_plot(database, experiment_id):
     instance = db.session.query(db.Instance).filter_by(idInstance=int(request.args['instance'])).first() or abort(404)
     s1 = db.session.query(db.SolverConfiguration).get(int(request.args['solver_config1'])) or abort(404)
     s2 = db.session.query(db.SolverConfiguration).get(int(request.args['solver_config2'])) or abort(404)
+    dim = int(request.args.get('dim', 700))
 
     results1 = [r.get_time() for r in db.session.query(db.ExperimentResult)
                                     .filter_by(experiment=exp,
@@ -429,7 +449,7 @@ def rtd_comparison_plot(database, experiment_id):
 
     if request.args.has_key('pdf'):
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'rtdcomp.png'
-        plots.rtd_comparison(results1, results2, str(s1), str(s2), filename, format='pdf')
+        plots.rtd_comparison(results1, results2, str(s1), str(s2), filename, format='pdf', dim=dim)
         headers = Headers()
         headers.add('Content-Disposition', 'attachment', filename='rtdcomp.pdf')
         response = Response(response=open(filename, 'rb').read(), mimetype='application/pdf', headers=headers)
@@ -437,7 +457,7 @@ def rtd_comparison_plot(database, experiment_id):
         return response
     else:
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'rtdcomp.png'
-        plots.rtd_comparison(results1, results2, str(s1), str(s2), filename, 'png')
+        plots.rtd_comparison(results1, results2, str(s1), str(s2), filename, 'png', dim=dim)
         response = Response(response=open(filename, 'rb').read(), mimetype='image/png')
         os.remove(filename)
         return response
