@@ -71,7 +71,6 @@ public class SolverPropertyDAO {
             ResultSet rs = ps.executeQuery();
             if(!rs.next())
                 throw new SolverPropertyNotInDBException();
-            int test = rs.getInt(5);
             res.setId(id);
             res.setValueType(PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(rs.getString(1)));
             res.setName(rs.getString(2));
