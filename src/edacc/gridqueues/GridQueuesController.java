@@ -22,7 +22,6 @@ public class GridQueuesController extends Observable {
 
     private static GridQueuesController instance;
     private File tmpPBSScript;
-    private GridQueue chosenQueue;
 
     private GridQueuesController() {
     }

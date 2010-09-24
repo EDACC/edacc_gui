@@ -143,39 +143,24 @@ public class InstanceSelector extends JPanel {
 
     public void btnSelectAll() {
         for (int i = 0; i < tableModel.getRowCount(); i++) {
-            if (rowFilter.include((String) tableModel.getValueAt(i, 0),
-                    (Integer) tableModel.getValueAt(i, 1),
-                    (Integer) tableModel.getValueAt(i, 2),
-                    (Float) tableModel.getValueAt(i, 3),
-                    (Integer) tableModel.getValueAt(i, 4),
-                    0)) {
-                tableModel.setValueAt(true, i, 5);
+            if (rowFilter.include((String) tableModel.getValueAt(i, 0),0)) {
+                tableModel.setValueAt(true, i, 1);
             }
         }
     }
 
     public void btnDeselectAll() {
         for (int i = 0; i < tableModel.getRowCount(); i++) {
-            if (rowFilter.include((String) tableModel.getValueAt(i, 0),
-                    (Integer) tableModel.getValueAt(i, 1),
-                    (Integer) tableModel.getValueAt(i, 2),
-                    (Float) tableModel.getValueAt(i, 3),
-                    (Integer) tableModel.getValueAt(i, 4),
-                    0)) {
-                tableModel.setValueAt(false, i, 5);
+            if (rowFilter.include((String) tableModel.getValueAt(i, 0),0)) {
+                tableModel.setValueAt(false, i, 1);
             }
         }
     }
 
     public void btnInvert() {
         for (int i = 0; i < tableModel.getRowCount(); i++) {
-            if (rowFilter.include((String) tableModel.getValueAt(i, 0),
-                    (Integer) tableModel.getValueAt(i, 1),
-                    (Integer) tableModel.getValueAt(i, 2),
-                    (Float) tableModel.getValueAt(i, 3),
-                    (Integer) tableModel.getValueAt(i, 4),
-                    0)) {
-                tableModel.setValueAt(!((Boolean) tableModel.getValueAt(i, 5)), i, 5);
+            if (rowFilter.include((String) tableModel.getValueAt(i, 0),0)) {
+                tableModel.setValueAt(!((Boolean) tableModel.getValueAt(i, 1)), i, 1);
             }
         }
     }

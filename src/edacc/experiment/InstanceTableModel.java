@@ -146,13 +146,13 @@ public class InstanceTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int col) {
-        if (col == 5) return true;
+        if (col == 1) return true;
         else return false;
     }
 
     @Override
     public void setValueAt(Object value, int row, int col) {
-        if (col == 5) {
+        if (col == 1) {
             if ((Boolean) value) {
                 selectedInstances.put(instances.get(row).getId(), experimentHasInstances.get(row));
             } else {

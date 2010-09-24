@@ -1706,12 +1706,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public void btnSelectAllInstances() {
         for (int i = 0; i < insTableModel.getRowCount(); i++) {
             if (rowFilter.include((String) insTableModel.getValueAt(i, 0),
-                    (Integer) insTableModel.getValueAt(i, 1),
-                    (Integer) insTableModel.getValueAt(i, 2),
-                    (Float) insTableModel.getValueAt(i, 3),
-                    (Integer) insTableModel.getValueAt(i, 4),
                     insTableModel.getInstanceAt(i).getInstanceClass().getId())) {
-                insTableModel.setValueAt(true, i, 5);
+                insTableModel.setValueAt(true, i, 1);
             }
         }
     }
@@ -1720,12 +1716,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public void btnDeselectAllInstances() {
         for (int i = 0; i < insTableModel.getRowCount(); i++) {
             if (rowFilter.include((String) insTableModel.getValueAt(i, 0),
-                    (Integer) insTableModel.getValueAt(i, 1),
-                    (Integer) insTableModel.getValueAt(i, 2),
-                    (Float) insTableModel.getValueAt(i, 3),
-                    (Integer) insTableModel.getValueAt(i, 4),
                     insTableModel.getInstanceAt(i).getInstanceClass().getId())) {
-                insTableModel.setValueAt(false, i, 5);
+                insTableModel.setValueAt(false, i, 1);
             }
         }
     }
@@ -1734,12 +1726,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public void btnInvertSelection() {
         for (int i = 0; i < insTableModel.getRowCount(); i++) {
             if (rowFilter.include((String) insTableModel.getValueAt(i, 0),
-                    (Integer) insTableModel.getValueAt(i, 1),
-                    (Integer) insTableModel.getValueAt(i, 2),
-                    (Float) insTableModel.getValueAt(i, 3),
-                    (Integer) insTableModel.getValueAt(i, 4),
                     insTableModel.getInstanceAt(i).getInstanceClass().getId())) {
-                insTableModel.setValueAt(!((Boolean) insTableModel.getValueAt(i, 5)), i, 5);
+                insTableModel.setValueAt(!((Boolean) insTableModel.getValueAt(i, 1)), i, 1);
             }
         }
     }
@@ -2150,7 +2138,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public void btnSelectedInstances() {
         btnSelectAllInstanceClassesActionPerformed(null);
         LinkedList<SortKey> sortKeys = new LinkedList<SortKey>();
-        sortKeys.add(new SortKey(5, SortOrder.DESCENDING));
+        sortKeys.add(new SortKey(1, SortOrder.DESCENDING));
         tableInstances.getRowSorter().setSortKeys(sortKeys);
     }
 
@@ -2166,12 +2154,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         LinkedList<Integer> idxs = new LinkedList<Integer>();
         for (int i = 0; i < insTableModel.getRowCount(); i++) {
             if (rowFilter.include((String) insTableModel.getValueAt(i, 0),
-                    (Integer) insTableModel.getValueAt(i, 1),
-                    (Integer) insTableModel.getValueAt(i, 2),
-                    (Float) insTableModel.getValueAt(i, 3),
-                    (Integer) insTableModel.getValueAt(i, 4),
                     insTableModel.getInstanceAt(i).getInstanceClass().getId())) {
-                if (!(Boolean) insTableModel.getValueAt(i, 5)) {
+                if (!(Boolean) insTableModel.getValueAt(i, 1)) {
                     idxs.add(i);
                 }
             }
@@ -2181,7 +2165,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         Random random = new Random();
         while (count-- > 0) {
-           insTableModel.setValueAt(true, idxs.get(random.nextInt(idxs.size())), 5);
+           insTableModel.setValueAt(true, idxs.get(random.nextInt(idxs.size())), 1);
         }
         insTableModel.fireTableDataChanged();
     }

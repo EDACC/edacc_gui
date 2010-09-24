@@ -82,9 +82,9 @@ public class InstanceDAO {
                     + "VALUES (?, ?, ?, ?)";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             if (instance.getFile() != null) {
-                ps.setBinaryStream(8, new FileInputStream(instance.getFile()));
+                ps.setBinaryStream(4, new FileInputStream(instance.getFile()));
             } else {
-                ps.setNull(8, Types.BLOB);
+                ps.setNull(4, Types.BLOB);
             }
         } else if (instance.isModified()) {
             // update query
