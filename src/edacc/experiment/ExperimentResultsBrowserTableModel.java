@@ -156,6 +156,10 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         }
     }
 
+    public ExperimentResult getExperimentResult(int row) {
+        return jobs.get(row);
+    }
+
     /**
      * Sets the jobs for that model
      * @param jobs

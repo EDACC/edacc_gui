@@ -1,10 +1,15 @@
 package edacc.model;
 
+import java.io.BufferedReader;
+import java.io.CharArrayReader;
+import java.io.CharArrayWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.CharBuffer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
@@ -146,7 +151,9 @@ public class ExperimentResultDAO {
         r.setStatus(rs.getInt("status"));
         r.setResultTime(rs.getFloat("resultTime"));
         Integer resultCode = rs.getInt("resultCode");
-        if (resultCode == null) resultCode = -1;
+        if (resultCode == null) {
+            resultCode = -1;
+        }
         r.setResultCode(resultCode);
         r.setSolverOutputFilename(rs.getString("solverOutputFN"));
         r.setLauncherOutputFilename(rs.getString("launcherOutputFN"));
@@ -661,5 +668,47 @@ public class ExperimentResultDAO {
             out.close();
             in.close();
         }
+    }
+
+    public static String getOutputText(int type, ExperimentResult er) throws NoConnectionToDBException, SQLException, IOException {
+        String col = null;
+        switch (type) {
+            case ExperimentResult.SOLVER_OUTPUT:
+                col = "solverOutput";
+                break;
+            case ExperimentResult.LAUNCHER_OUTPUT:
+                col = "launcherOutput";
+                break;
+            case ExperimentResult.VERIFIER_OUTPUT:
+                col = "verifierOutput";
+                break;
+            case ExperimentResult.WATCHER_OUTPUT:
+                col = "watcherOutput";
+        }
+        if (col == null) {
+            return null;
+        }
+
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT " + col + " " +
+                "FROM " + table + " " +
+                "WHERE idJob=?;");
+        ps.setInt(1, er.getId());
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            StringBuilder sb = new StringBuilder();
+            InputStream in = rs.getBinaryStream(1);
+            if (in == null) {
+                return null;
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + '\n');
+            }
+            in.close();
+            return sb.toString();
+        }
+        return null;
     }
 }

@@ -893,4 +893,8 @@ public class ExperimentController {
             throw new REngineInitializationException(e.getMessage());
         }
     }
+
+    public String getExperimentResultOutput(int type, ExperimentResult er) throws SQLException, NoConnectionToDBException, IOException {
+        return ExperimentResultDAO.getOutputText(type, er);
+    }
 }
