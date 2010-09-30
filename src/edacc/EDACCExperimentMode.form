@@ -1378,6 +1378,9 @@
                   <Events>
                     <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tableJobsMouseClicked"/>
                   </Events>
+                  <AuxValues>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="tableJobs = new JTable() {&#xd;&#xa;&#xd;&#xa;            @Override&#xd;&#xa;            protected void processMouseEvent(MouseEvent e) {&#xd;&#xa;                super.processMouseEvent(e);&#xd;&#xa;                tableJobsProcessMouseEvent(e);&#xd;&#xa;            }&#xd;&#xa;&#xd;&#xa;            @Override&#xd;&#xa;            protected void processMouseMotionEvent(MouseEvent e) {&#xd;&#xa;                super.processMouseMotionEvent(e);&#xd;&#xa;                tableJobsProcessMouseMotionEvent(e);&#xd;&#xa;            }&#xd;&#xa;        };"/>
+                  </AuxValues>
                 </Component>
               </SubComponents>
             </Container>

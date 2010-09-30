@@ -25,8 +25,12 @@ import edacc.model.TaskCancelledException;
 import edacc.model.Tasks;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -44,6 +48,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
@@ -52,6 +57,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.TableRowSorter;
 import org.jdesktop.application.Action;
 import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
 import javax.swing.event.ListSelectionListener;
@@ -75,6 +81,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public TableRowSorter<InstanceTableModel> sorter;
     public InstanceTableModelRowFilter rowFilter;
     public ExperimentResultsBrowserTableModelRowFilter resultBrowserRowFilter;
+    private EDACCOutputViewer outputViewer;
+    private EDACCExperimentModeJobsCellRenderer tableJobsStringRenderer;
     private ResultsBrowserTableRowSorter resultsBrowserTableRowSorter;
     private EDACCInstanceFilter dialogFilter;
     private AnalysePanel analysePanel;
@@ -168,8 +176,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         resultsBrowserTableRowSorter.setRowFilter(resultBrowserRowFilter);
         tableJobs.setRowSorter(resultsBrowserTableRowSorter);
         resultsBrowserTableRowSorter.setSortsOnUpdates(true);
+        tableJobsStringRenderer = new EDACCExperimentModeJobsCellRenderer();
         tableJobs.setDefaultRenderer(Object.class, new EDACCExperimentModeJobsCellRenderer());
-        tableJobs.setDefaultRenderer(String.class, new EDACCExperimentModeJobsCellRenderer());
+        tableJobs.setDefaultRenderer(String.class, tableJobsStringRenderer);
         tableJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.setDefaultRenderer(Float.class, new EDACCExperimentModeJobsCellRenderer());
         /* -------------------------------- end of jobs browser tab -------------------------------- */
@@ -218,6 +227,75 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
             }
         });
+    }
+
+    protected void jobsTableRepaintRow(int rowIndex) {
+        final int cols1 = tableJobs.getColumnCount();
+        Rectangle rect;
+        if (cols1 > 0) {
+            rect = tableJobs.getCellRect(rowIndex, 0, true);
+            if (cols1 > 1) {
+                rect = rect.union(tableJobs.getCellRect(rowIndex, cols1 - 1, true));
+            }
+            tableJobs.repaint(rect);
+        }
+    }
+
+    protected void tableJobsProcessMouseEvent(MouseEvent e) {
+        final int eventId = e.getID();
+        if (eventId == MouseEvent.MOUSE_EXITED || eventId == MouseEvent.MOUSE_ENTERED) {
+            tableJobs.setCursor(Cursor.getDefaultCursor());
+            if (tableJobsStringRenderer.markRow != -1) {
+                int row = tableJobs.convertRowIndexToView(tableJobsStringRenderer.markRow);
+                jobsTableRepaintRow(row);
+                tableJobsStringRenderer.markRow = -1;
+            }
+        } else if (eventId == MouseEvent.MOUSE_CLICKED) {
+            int col_view = tableJobs.columnAtPoint(e.getPoint());
+            int col = jobsTableModel.getIndexForColumn(tableJobs.convertColumnIndexToModel(col_view));
+            if (col == ExperimentResultsBrowserTableModel.COL_SOLVER_OUTPUT ||
+                    col == ExperimentResultsBrowserTableModel.COL_LAUNCHER_OUTPUT ||
+                    col == ExperimentResultsBrowserTableModel.COL_WATCHER_OUTPUT ||
+                    col == ExperimentResultsBrowserTableModel.COL_VERIFIER_OUTPUT) {
+                int row = tableJobs.convertRowIndexToModel(tableJobs.rowAtPoint(e.getPoint()));
+                if (outputViewer == null) {
+                    outputViewer = new EDACCOutputViewer(EDACCApp.getApplication().getMainFrame(), false, expController);
+                    outputViewer.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+                }
+                if (!outputViewer.isVisible()) {
+                    outputViewer.setVisible(true);
+                }
+                outputViewer.updateContent(col, jobsTableModel.getExperimentResult(row));
+            }
+        }
+    }
+
+    protected void tableJobsProcessMouseMotionEvent(MouseEvent e) {
+        int col_view = tableJobs.columnAtPoint(e.getPoint());
+        int col = jobsTableModel.getIndexForColumn(tableJobs.convertColumnIndexToModel(col_view));
+        if (col == ExperimentResultsBrowserTableModel.COL_SOLVER_OUTPUT ||
+                col == ExperimentResultsBrowserTableModel.COL_LAUNCHER_OUTPUT ||
+                col == ExperimentResultsBrowserTableModel.COL_WATCHER_OUTPUT ||
+                col == ExperimentResultsBrowserTableModel.COL_VERIFIER_OUTPUT) {
+            int row_view = tableJobs.rowAtPoint(e.getPoint());
+            int row = tableJobs.convertRowIndexToModel(row_view);
+            tableJobs.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            if (tableJobsStringRenderer.markRow != -1) {
+                int old_row = tableJobs.convertRowIndexToView(tableJobsStringRenderer.markRow);
+                jobsTableRepaintRow(old_row);
+            }
+            tableJobsStringRenderer.markCol = col_view;
+            tableJobsStringRenderer.markRow = row;
+            jobsTableRepaintRow(row_view);
+
+        } else {
+            tableJobs.setCursor(Cursor.getDefaultCursor());
+            if (tableJobsStringRenderer.markRow != -1) {
+                int row = tableJobs.convertRowIndexToView(tableJobsStringRenderer.markRow);
+                jobsTableRepaintRow(row);
+            }
+            tableJobsStringRenderer.markRow = -1;
+        }
     }
 
     public void reinitializeGUI() {
@@ -385,7 +463,20 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnSelectQueue = new javax.swing.JButton();
         panelJobBrowser = new javax.swing.JPanel();
         jScrollPane6 = new javax.swing.JScrollPane();
-        tableJobs = new javax.swing.JTable();
+        tableJobs = tableJobs = new JTable() {
+
+            @Override
+            protected void processMouseEvent(MouseEvent e) {
+                super.processMouseEvent(e);
+                tableJobsProcessMouseEvent(e);
+            }
+
+            @Override
+            protected void processMouseMotionEvent(MouseEvent e) {
+                super.processMouseMotionEvent(e);
+                tableJobsProcessMouseMotionEvent(e);
+            }
+        };
         btnRefreshJobs = new javax.swing.JButton();
         btnBrowserColumnSelection = new javax.swing.JButton();
         btnFilterJobs = new javax.swing.JButton();
@@ -1352,14 +1443,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     public boolean experimentIsModified() {
         try {
-            return expController.getActiveExperiment().getCPUTimeLimit() != Integer.parseInt(txtCPUTimeLimit.getText())
-                    || expController.getActiveExperiment().getMaxSeed() != Integer.parseInt(txtMaxSeeds.getText())
-                    || expController.getActiveExperiment().getMemoryLimit() != Integer.parseInt(txtMemoryLimit.getText())
-                    || expController.getActiveExperiment().isAutoGeneratedSeeds() != chkGenerateSeeds.isSelected()
-                    || expController.getActiveExperiment().isLinkSeeds() != chkLinkSeeds.isSelected()
-                    || expController.getActiveExperiment().getWallClockTimeLimit() != Integer.parseInt(txtWallClockTimeLimit.getText())
-                    || expController.getActiveExperiment().getStackSizeLimit() != Integer.parseInt(txtStackSizeLimit.getText())
-                    || expController.getActiveExperiment().getOutputSizeLimit() != Integer.parseInt(txtOutputSizeLimit.getText());
+            return expController.getActiveExperiment().getCPUTimeLimit() != Integer.parseInt(txtCPUTimeLimit.getText()) || expController.getActiveExperiment().getMaxSeed() != Integer.parseInt(txtMaxSeeds.getText()) || expController.getActiveExperiment().getMemoryLimit() != Integer.parseInt(txtMemoryLimit.getText()) || expController.getActiveExperiment().isAutoGeneratedSeeds() != chkGenerateSeeds.isSelected() || expController.getActiveExperiment().isLinkSeeds() != chkLinkSeeds.isSelected() || expController.getActiveExperiment().getWallClockTimeLimit() != Integer.parseInt(txtWallClockTimeLimit.getText()) || expController.getActiveExperiment().getStackSizeLimit() != Integer.parseInt(txtStackSizeLimit.getText()) || expController.getActiveExperiment().getOutputSizeLimit() != Integer.parseInt(txtOutputSizeLimit.getText());
         } catch (Exception e) {
             return true;
         }
@@ -1525,12 +1609,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }//GEN-LAST:event_txtJobsTimerKeyReleased
 
     private void tableJobsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableJobsMouseClicked
-        if (evt.getClickCount() >= 2 && evt.getButton() == java.awt.event.MouseEvent.BUTTON1) {
-            ExperimentResult res = jobsTableModel.getExperimentResult(tableJobs.getSelectedRow());
-            EDACCOutputViewer viewer = new EDACCOutputViewer(EDACCApp.getApplication().getMainFrame(), true, res, expController);
-            viewer.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
-            viewer.setVisible(true);
-        }
     }//GEN-LAST:event_tableJobsMouseClicked
 
     public void stopJobsTimer() {
@@ -1817,20 +1895,20 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         int jobsWaiting = jobsTableModel.getJobsCount(ExperimentResultStatus.NOTSTARTED);
         int jobsRunning = jobsTableModel.getJobsCount(ExperimentResultStatus.RUNNING);
         int jobsNotSuccessful = jobsCount - jobsSuccessful - jobsWaiting - jobsRunning;
-        double percentage = (double)(jobsSuccessful + jobsNotSuccessful) / jobsCount;
-        percentage = Math.round(percentage*100*100) / 100.;
+        double percentage = (double) (jobsSuccessful + jobsNotSuccessful) / jobsCount;
+        percentage = Math.round(percentage * 100 * 100) / 100.;
 
         int count = 0;
         double avgTime = 0.;
         int curRunningTime = 0;
         for (ExperimentResult er : jobsTableModel.getJobs()) {
             if (er.getStatus().getValue() >= 1) {
-                count ++;
+                count++;
                 avgTime += er.getResultTime();
             } else if (er.getStatus().equals(ExperimentResultStatus.RUNNING) && er.getRunningTime() != null) {
                 curRunningTime += er.getRunningTime().getSeconds() +
                         er.getRunningTime().getMinutes() * 60 +
-                        er.getRunningTime().getHours() * 60*60;
+                        er.getRunningTime().getHours() * 60 * 60;
             }
         }
         String ETA = null;
@@ -1853,11 +1931,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             int hours = timeleft % 24;
             timeleft /= 24;
             int days = timeleft;
-            ETA = "" + days + "d " + (hours<10?"0"+hours:""+hours) + "h " + (minutes<10?"0"+minutes:""+minutes) + "m " + (seconds<10?"0"+seconds:""+seconds) + "s";
+            ETA = "" + days + "d " + (hours < 10 ? "0" + hours : "" + hours) + "h " + (minutes < 10 ? "0" + minutes : "" + minutes) + "m " + (seconds < 10 ? "0" + seconds : "" + seconds) + "s";
         }
-        String text = "" + (jobsSuccessful+jobsNotSuccessful) + " (" + jobsNotSuccessful + ") / " + jobsCount + " jobs (" + percentage + "%) finished. " + jobsRunning + " jobs are running.";
+        String text = "" + (jobsSuccessful + jobsNotSuccessful) + " (" + jobsNotSuccessful + ") / " + jobsCount + " jobs (" + percentage + "%) finished. " + jobsRunning + " jobs are running.";
         if (ETA != null) {
-            text+= " ETA: " + ETA;
+            text += " ETA: " + ETA;
         }
         lblETA.setText(text);
     }
@@ -2179,7 +2257,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         Random random = new Random();
         while (count-- > 0) {
-           insTableModel.setValueAt(true, idxs.get(random.nextInt(idxs.size())), 1);
+            insTableModel.setValueAt(true, idxs.get(random.nextInt(idxs.size())), 1);
         }
         insTableModel.fireTableDataChanged();
     }

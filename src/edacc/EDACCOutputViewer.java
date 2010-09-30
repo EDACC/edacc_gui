@@ -3,11 +3,11 @@
  *
  * Created on 29.09.2010, 19:06:52
  */
-
 package edacc;
 
 import edacc.events.TaskEvents;
 import edacc.experiment.ExperimentController;
+import edacc.experiment.ExperimentResultsBrowserTableModel;
 import edacc.model.ExperimentResult;
 import edacc.model.Tasks;
 import java.sql.SQLException;
@@ -19,22 +19,11 @@ import java.sql.SQLException;
 public class EDACCOutputViewer extends javax.swing.JDialog implements TaskEvents {
 
     /** Creates new form EDACCOutputViewer */
-    private static final String SOLVER_OUTPUT = "Solver output";
-    private static final String VERIFIER_OUTPUT = "Verifier output";
-    private static final String WATCHER_OUTPUT = "Watcher output";
-    private static final String LAUNCHER_OUTPUT = "Launcher output";
     private ExperimentController expController;
-    private ExperimentResult expResult;
-    public EDACCOutputViewer(java.awt.Frame parent, boolean modal, ExperimentResult expResult, ExperimentController expController) {
+    public EDACCOutputViewer(java.awt.Frame parent, boolean modal, ExperimentController expController) {
         super(parent, modal);
         initComponents();
         this.expController = expController;
-        this.expResult = expResult;
-        comboOutputType.removeAllItems();
-        comboOutputType.addItem(SOLVER_OUTPUT);
-        comboOutputType.addItem(LAUNCHER_OUTPUT);
-        comboOutputType.addItem(WATCHER_OUTPUT);
-        comboOutputType.addItem(VERIFIER_OUTPUT);
     }
 
     /** This method is called from within the constructor to
@@ -46,8 +35,6 @@ public class EDACCOutputViewer extends javax.swing.JDialog implements TaskEvents
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        comboOutputType = new javax.swing.JComboBox();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtContent = new javax.swing.JTextArea();
@@ -56,31 +43,6 @@ public class EDACCOutputViewer extends javax.swing.JDialog implements TaskEvents
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCOutputViewer.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
-
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel1.border.title"))); // NOI18N
-        jPanel1.setName("jPanel1"); // NOI18N
-
-        comboOutputType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        comboOutputType.setName("comboOutputType"); // NOI18N
-        comboOutputType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                comboOutputTypeActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(comboOutputType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(533, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(comboOutputType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel2.border.title"))); // NOI18N
         jPanel2.setName("jPanel2"); // NOI18N
@@ -101,61 +63,27 @@ public class EDACCOutputViewer extends javax.swing.JDialog implements TaskEvents
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void comboOutputTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboOutputTypeActionPerformed
-        if (comboOutputType.getSelectedItem() instanceof String) {
-            String outputType = (String) comboOutputType.getSelectedItem();
-            int ot = -1;
-            if (outputType == SOLVER_OUTPUT) {
-                ot = ExperimentResult.SOLVER_OUTPUT;
-            } else if (outputType == VERIFIER_OUTPUT) {
-                ot = ExperimentResult.VERIFIER_OUTPUT;
-            } else if (outputType == WATCHER_OUTPUT) {
-                ot = ExperimentResult.WATCHER_OUTPUT;
-            } else if (outputType == LAUNCHER_OUTPUT) {
-                ot = ExperimentResult.LAUNCHER_OUTPUT;
-            }
-            if (ot != -1) {
-                Tasks.startTask("getExperimentResultOutput", new Class[] {int.class, ExperimentResult.class}, new Object[] {ot, expResult}, expController, this);
-            }
-        }
-    }//GEN-LAST:event_comboOutputTypeActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox comboOutputType;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea txtContent;
     // End of variables declaration//GEN-END:variables
-
-    public String getOutputType() {
-        if (comboOutputType.getSelectedItem() instanceof String) {
-            return (String) comboOutputType.getSelectedItem();
-        } else {
-            return null;
-        }
-    }
 
     public void setContent(String text) {
         if (text == null) {
@@ -164,17 +92,39 @@ public class EDACCOutputViewer extends javax.swing.JDialog implements TaskEvents
         txtContent.setText(text);
     }
 
+    public void updateContent(int column, ExperimentResult expResult) {
+        String title = "Output Viewer - ";
+        int ot = -1;
+        if (column == ExperimentResultsBrowserTableModel.COL_SOLVER_OUTPUT) {
+            ot = ExperimentResult.SOLVER_OUTPUT;
+            title += "solver output - " + expResult.getSolverOutputFilename();
+            } else if (column == ExperimentResultsBrowserTableModel.COL_VERIFIER_OUTPUT) {
+            ot = ExperimentResult.VERIFIER_OUTPUT;
+            title += "verifier output - " + expResult.getVerifierOutputFilename();
+            } else if (column == ExperimentResultsBrowserTableModel.COL_WATCHER_OUTPUT) {
+            ot = ExperimentResult.WATCHER_OUTPUT;
+            title += "watcher output - " + expResult.getWatcherOutputFilename();
+            } else if (column == ExperimentResultsBrowserTableModel.COL_LAUNCHER_OUTPUT) {
+            ot = ExperimentResult.LAUNCHER_OUTPUT;
+            title += "launcher output - " + expResult.getLauncherOutputFilename();
+        }
+        setTitle(title);
+        if (ot != -1) {
+            Tasks.startTask("getExperimentResultOutput", new Class[]{int.class, ExperimentResult.class}, new Object[]{ot, expResult}, expController, this);
+        }
+    }
+
     @Override
     public void onTaskSuccessful(String methodName, Object result) {
         if (methodName.equals("getExperimentResultOutput")) {
-            setContent((String)result);
+            setContent((String) result);
         }
     }
 
     @Override
     public void onTaskStart(String methodName) {
         if (methodName.equals("getExperimentResultOutput")) {
-        setContent("Loading..");
+            setContent("Loading..");
         }
     }
 
