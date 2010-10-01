@@ -622,7 +622,7 @@ public class ExperimentController {
             } else {
                 instances = new LinkedList<Instance>();
             }
-            
+
             int total = solvers.size() + instances.size();
             int done = 0;
 
@@ -689,7 +689,7 @@ public class ExperimentController {
                 addConfigurationFile(zos, activeExperiment, queue);
 
                 // add run script
-                addRunScript(zos, queue);
+                addRunScript(zos, exportInstances, exportSolvers, queue);
 
                 // add client binary
                 addClient(zos);
@@ -813,16 +813,16 @@ public class ExperimentController {
         zos.closeEntry();
     }
 
-    private void addRunScript(ZipOutputStream zos, GridQueue q) throws IOException {
+    private void addRunScript(ZipOutputStream zos, boolean hasInstances, boolean hasSolvers, GridQueue q) throws IOException {
         String sRun = "#!/bin/bash\n"
                 + "chmod a-rwx client\n"
                 + "chmod u+rwx client\n"
                 + "chmod a-rwx config\n"
                 + "chmod u+rw config\n"
-                + "chmod a-rwx solvers/*\n"
-                + "chmod u+rwx solvers/*\n"
-                + "chmod a-rwx instances/*\n"
-                + "chmod u+wr instances/*\n"
+                + (hasSolvers ? "chmod a-rwx solvers/*\n" : "")
+                + (hasSolvers ? "chmod u+rwx solvers/*\n" : "")
+                + (hasInstances ? "chmod a-rwx instances/*\n" : "")
+                + (hasInstances ? "chmod u+rw instances/*\n" : "")
                 + "for (( i = 0; i < " + q.getNumNodes() + "; i++ ))\n"
                 + "do\n"
                 + "    qsub start_client.pbs\n"
