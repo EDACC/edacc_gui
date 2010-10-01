@@ -44,7 +44,6 @@ public class EDACCExperimentModeJobsCellRenderer extends DefaultTableCellRendere
 
         if (row == markRow && col == markCol) {
             comp.setBackground(Color.GRAY);
-           // comp.getGraphics().drawLine(2, 2, 2, 20);
         } 
         return comp;
     }

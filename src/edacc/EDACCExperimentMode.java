@@ -1510,23 +1510,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }//GEN-LAST:event_manageExperimentPaneStateChanged
 
     private void btnGeneratePackage(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGeneratePackage
-        JFileChooser packageFileChooser = new JFileChooser();
-        packageFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        if (packageFileChooser.showDialog(this, "Select Package Location") != JFileChooser.APPROVE_OPTION) {
-            return;
-        }
-        File folder = new File(packageFileChooser.getSelectedFile().getAbsolutePath());
-        if (!folder.exists()) {
-            int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), "The directory " + folder.getAbsolutePath() + " doesn't exist. Should it be created?", "Generate cluster package", javax.swing.JOptionPane.YES_NO_OPTION);
-            if (userInput == 1) {
-                return;
-            } else {
-                folder.mkdirs();
-            }
-        }
-
-        String location = packageFileChooser.getSelectedFile().getAbsolutePath() + System.getProperty("file.separator");
-        Tasks.startTask("generatePackage", new Class[]{String.class, edacc.model.Tasks.class}, new Object[]{location, null}, expController, this);
+       EDACCGeneratePackageFileChooser packageFileChooser = new EDACCGeneratePackageFileChooser(EDACCApp.getApplication().getMainFrame(), true, expController);
+       packageFileChooser.setVisible(true);
     }//GEN-LAST:event_btnGeneratePackage
 
     private void btnSelectAllInstanceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstanceClassesActionPerformed
@@ -2063,8 +2048,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             if (e instanceof IOException) {
                 javax.swing.JOptionPane.showMessageDialog(null, "I/O Exception during CSV export:\n\n" + e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
-        } else if (methodName.equals("generatePackage")) {
-            javax.swing.JOptionPane.showMessageDialog(null, "Excpetion during package generation:\n\n" + e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }
 
