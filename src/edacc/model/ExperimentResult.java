@@ -3,7 +3,10 @@ package edacc.model;
 import java.sql.Time;
 
 public class ExperimentResult extends BaseModel {
-
+    public static final int SOLVER_OUTPUT = 0;
+    public static final int LAUNCHER_OUTPUT = 1;
+    public static final int WATCHER_OUTPUT = 2;
+    public static final int VERIFIER_OUTPUT = 3;
     private int id;
     private int run;
     private ExperimentResultStatus status;

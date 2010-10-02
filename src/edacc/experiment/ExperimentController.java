@@ -41,12 +41,12 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Vector;
@@ -357,7 +357,7 @@ public class ExperimentController {
         Vector<SolverConfiguration> vsc = SolverConfigurationDAO.getSolverConfigurationByExperimentId(activeExperiment.getId());
 
         int experiments_added = 0;
-        Hashtable<SeedGroup, Integer> linked_seeds = new Hashtable<SeedGroup, Integer>();
+        HashMap<SeedGroup, Integer> linked_seeds = new HashMap<SeedGroup, Integer>();
         Vector<ExperimentResult> experiment_results = new Vector<ExperimentResult>();
 
         int elements = listInstances.size() * vsc.size() * numRuns;
@@ -447,7 +447,7 @@ public class ExperimentController {
                             // the same seeds as already existing jobs
                             int seed = ExperimentResultDAO.getSeedValue(run, c.getId(), i.getId(), activeExperiment.getId());
                             SeedGroup sg = new SeedGroup(c.getSeed_group(), i.getId(), run);
-                            if (!linked_seeds.contains(sg)) {
+                            if (!linked_seeds.containsKey(sg)) {
                                 linked_seeds.put(sg, new Integer(seed));
                             }
                         }
@@ -562,29 +562,66 @@ public class ExperimentController {
     }
 
     /**
+     * Deletes all illegal characters of filename and returns the result.
+     * @param filename
+     * @return
+     */
+    private String getFilename(String filename) {
+        final char[] ILLEGAL_CHARACTERS = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':', ' '};
+        String res = "";
+        for (char c : filename.toCharArray()) {
+            boolean illegal = false;
+            for (char i : ILLEGAL_CHARACTERS) {
+                if (c == i) {
+                    illegal = true;
+                }
+            }
+            if (illegal) {
+                res += "_";
+            } else {
+                res += c;
+            }
+        }
+        return res;
+    }
+
+    /**
      * Generates a ZIP archive with the necessary files for the grid.
      */
-    public void generatePackage(String location, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException {
+    public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException {
         boolean foundSolverWithSameName = false;
+        File tmpDir = new File("tmp");
+        tmpDir.mkdir();
+        Tasks.getTaskView().setCancelable(true);
         Calendar cal = Calendar.getInstance();
-        String dateStr = cal.get(Calendar.YEAR) + "" + (cal.get(Calendar.MONTH)<10?"0"+(cal.get(Calendar.MONTH)+1):(cal.get(Calendar.MONTH)+1)) + "" + (cal.get(Calendar.DATE)<10?"0"+cal.get(Calendar.DATE):cal.get(Calendar.DATE));
+        String dateStr = cal.get(Calendar.YEAR) + "" + (cal.get(Calendar.MONTH) < 9 ? "0" + (cal.get(Calendar.MONTH) + 1) : (cal.get(Calendar.MONTH) + 1)) + "" + (cal.get(Calendar.DATE) < 10 ? "0" + cal.get(Calendar.DATE) : cal.get(Calendar.DATE));
         Vector<ExperimentHasGridQueue> eqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(activeExperiment);
         int count = 0;
         for (ExperimentHasGridQueue eq : eqs) {
             GridQueue queue = GridQueueDAO.getById(eq.getIdGridQueue());
 
-            File zipFile = new File(location + activeExperiment.getName() + "_" + queue.getName() + "_" + dateStr + ".zip");
+            File zipFile = new File(location + getFilename(activeExperiment.getName() + "_" + queue.getName() + "_" + dateStr + ".zip"));
             if (zipFile.exists()) {
                 zipFile.delete();
             }
             ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile));
             ZipEntry entry;
 
-            Tasks.getTaskView().setCancelable(true);
-            task.setOperationName("Generating Package " + (++count) + " of " + eqs.size());
 
-            Vector<Solver> solvers = ExperimentDAO.getSolversInExperiment(activeExperiment);
-            LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
+            task.setOperationName("Generating Package " + (++count) + " of " + eqs.size());
+            Vector<Solver> solvers;
+            if (exportSolvers) {
+                solvers = ExperimentDAO.getSolversInExperiment(activeExperiment);
+            } else {
+                solvers = new Vector<Solver>();
+            }
+
+            LinkedList<Instance> instances;
+            if (exportInstances) {
+                instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
+            } else {
+                instances = new LinkedList<Instance>();
+            }
 
             int total = solvers.size() + instances.size();
             int done = 0;
@@ -593,68 +630,74 @@ public class ExperimentController {
             HashSet<String> tmp = new HashSet<String>();
             HashSet<String> solvernameMap = new HashSet<String>();
             for (Solver s : solvers) {
-                if (tmp.contains(s.getBinaryName())) {
-                    solvernameMap.add(s.getBinaryName());
+                if (tmp.contains(s.getBinaryName() + "_" + s.getVersion())) {
+                    solvernameMap.add(s.getBinaryName() + "_" + s.getVersion());
                     foundSolverWithSameName = true;
                 } else {
-                    tmp.add(s.getBinaryName());
+                    tmp.add(s.getBinaryName() + "_" + s.getVersion());
                 }
-            }
-            // add solvers to zip file
-            for (Solver s : solvers) {
-                done++;
-                task.setTaskProgress((float) done / (float) total);
-                if (task.isCancelled()) {
-                    task.setStatus("Cancelled");
-                    break;
-                }
-                task.setStatus("Writing solver " + done + " of " + solvers.size());
-                File bin = SolverDAO.getBinaryFileOfSolver(s);
-                String filename;
-                if (solvernameMap.contains(s.getBinaryName())) {
-                    filename = s.getBinaryName() + "_" + s.getMd5().substring(0, 3);
-                } else {
-                    filename = s.getBinaryName();
-                }
-                entry = new ZipEntry("solvers" + System.getProperty("file.separator") + filename);
-                addFileToZIP(bin, entry, zos);
             }
 
-            // add instances to zip file
-            for (Instance i : instances) {
-                done++;
-                task.setTaskProgress((float) done / (float) total);
-                if (task.isCancelled()) {
-                    task.setStatus("Cancelled");
-                    break;
+            if (!task.isCancelled() && exportSolvers) {
+                // add solvers to zip file
+                for (Solver s : solvers) {
+                    done++;
+                    task.setTaskProgress((float) done / (float) total);
+                    if (task.isCancelled()) {
+                        task.setStatus("Cancelled");
+                        break;
+                    }
+                    task.setStatus("Writing solver " + done + " of " + solvers.size());
+                    File bin = SolverDAO.getBinaryFileOfSolver(s);
+                    String filename;
+                    if (solvernameMap.contains(s.getBinaryName())) {
+                        filename = s.getBinaryName() + "_" + s.getVersion() + "_" + s.getMd5().substring(0, 3);
+                    } else {
+                        filename = s.getBinaryName() + "_" + s.getVersion();
+                    }
+                    entry = new ZipEntry("solvers" + System.getProperty("file.separator") + filename);
+                    addFileToZIP(bin, entry, zos);
                 }
-                task.setStatus("Writing instance " + (done - solvers.size()) + " of " + instances.size());
-                File f = InstanceDAO.getBinaryFileOfInstance(i);
-                entry = new ZipEntry("instances" + System.getProperty("file.separator") + i.getName());
+            }
+
+            if (!task.isCancelled() && exportInstances) {
+                // add instances to zip file
+                for (Instance i : instances) {
+                    done++;
+                    task.setTaskProgress((float) done / (float) total);
+                    if (task.isCancelled()) {
+                        task.setStatus("Cancelled");
+                        break;
+                    }
+                    task.setStatus("Writing instance " + (done - solvers.size()) + " of " + instances.size());
+                    File f = InstanceDAO.getBinaryFileOfInstance(i);
+                    entry = new ZipEntry("instances" + System.getProperty("file.separator") + i.getName());
+                    addFileToZIP(f, entry, zos);
+                }
+            }
+
+            if (!task.isCancelled()) {
+                task.setStatus("Writing client");
+
+                // add PBS script
+                // TODO extend to multiple queue support
+                File f = GridQueueDAO.getPBS(queue);
+                entry = new ZipEntry("start_client.pbs");
                 addFileToZIP(f, entry, zos);
+
+                // add configuration File
+                addConfigurationFile(zos, activeExperiment, queue);
+
+                // add run script
+                addRunScript(zos, exportInstances, exportSolvers, queue);
+
+                // add client binary
+                addClient(zos);
+
+                // add empty result library
+                entry = new ZipEntry("results" + System.getProperty("file.separator") + "~");
+                zos.putNextEntry(entry);
             }
-
-            task.setStatus("Writing client");
-
-            // add PBS script
-            // TODO extend to multiple queue support
-            File f = GridQueueDAO.getPBS(queue);
-            entry = new ZipEntry("start_client.pbs");
-            addFileToZIP(f, entry, zos);
-
-            // add configuration File
-            addConfigurationFile(zos, activeExperiment, queue);
-
-            // add run script
-            addRunScript(zos, queue);
-
-            // add client binary
-            addClient(zos);
-
-            // add empty result library
-            entry = new ZipEntry("results" + System.getProperty("file.separator") + "~");
-            zos.putNextEntry(entry);
-
             zos.close();
 
             // delete tmp directory
@@ -770,20 +813,20 @@ public class ExperimentController {
         zos.closeEntry();
     }
 
-    private void addRunScript(ZipOutputStream zos, GridQueue q) throws IOException {
-        String sRun = "#!/bin/bash\n" +
-                "chmod a-rwx client\n" +
-                "chmod u+rwx client\n" +
-                "chmod a-rwx config\n" +
-                "chmod u+rw config\n" +
-                "chmod a-rwx solvers/*\n" +
-                "chmod u+rwx solvers/*\n" +
-                "chmod a-rwx instances/*\n" +
-                "chmod u+wr instances/*\n" +
-                "for (( i = 0; i < " + q.getNumNodes() + "; i++ ))\n" +
-                "do\n" +
-                "    qsub start_client.pbs\n" +
-                "done\n";
+    private void addRunScript(ZipOutputStream zos, boolean hasInstances, boolean hasSolvers, GridQueue q) throws IOException {
+        String sRun = "#!/bin/bash\n"
+                + "chmod a-rwx client\n"
+                + "chmod u+rwx client\n"
+                + "chmod a-rwx config\n"
+                + "chmod u+rw config\n"
+                + (hasSolvers ? "chmod a-rwx solvers/*\n" : "")
+                + (hasSolvers ? "chmod u+rwx solvers/*\n" : "")
+                + (hasInstances ? "chmod a-rwx instances/*\n" : "")
+                + (hasInstances ? "chmod u+rw instances/*\n" : "")
+                + "for (( i = 0; i < " + q.getNumNodes() + "; i++ ))\n"
+                + "do\n"
+                + "    qsub start_client.pbs\n"
+                + "done\n";
 
         // write file into zip archive
         ZipEntry entry = new ZipEntry("run.sh");
@@ -892,5 +935,9 @@ public class ExperimentController {
         } catch (Throwable e) {
             throw new REngineInitializationException(e.getMessage());
         }
+    }
+
+    public String getExperimentResultOutput(int type, ExperimentResult er) throws SQLException, NoConnectionToDBException, IOException {
+        return ExperimentResultDAO.getOutputText(type, er);
     }
 }

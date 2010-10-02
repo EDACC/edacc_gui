@@ -123,9 +123,8 @@ public class InstanceDAO {
                 } catch (Exception ex) {
                     Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
             } else {
-                ps.setNull(8, Types.BLOB);
+                ps.setNull(4, Types.BLOB);
             }
         } else if (instance.isModified()) {
             // update query

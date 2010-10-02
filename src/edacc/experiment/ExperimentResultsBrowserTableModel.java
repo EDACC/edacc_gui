@@ -35,9 +35,13 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public static int COL_SEED = 6;
     public static int COL_STATUS = 7;
     public static int COL_RESULTCODE = 8;
+    public static int COL_SOLVER_OUTPUT = 9;
+    public static int COL_LAUNCHER_OUTPUT = 10;
+    public static int COL_WATCHER_OUTPUT = 11;
+    public static int COL_VERIFIER_OUTPUT = 12;
     private Vector<ExperimentResult> jobs;
-    private String[] columns = {"ID", "Solver", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code"};
-    private boolean[] visible = {true, true, true, true, true, true, true, true, true};
+    private String[] columns = {"ID", "Solver", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
+    private boolean[] visible = {false, true, true, true, true, true, true, true, true, true, true, true, true};
     private HashMap<Integer, Vector<ParameterInstance>> parameterInstances;
 
     /**
@@ -154,6 +158,10 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public ExperimentResult getExperimentResult(int row) {
+        return jobs.get(row);
     }
 
     /**
@@ -339,6 +347,14 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 return status;
             case 8:
                 return j.getResultCode().toString();
+            case 9:
+                return j.getSolverOutputFilename();
+            case 10:
+                return j.getLauncherOutputFilename();
+            case 11:
+                return j.getWatcherOutputFilename();
+            case 12:
+                return j.getVerifierOutputFilename();
             default:
                 return "";
         }

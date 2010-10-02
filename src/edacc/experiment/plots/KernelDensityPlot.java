@@ -71,7 +71,7 @@ public class KernelDensityPlot extends Plot {
         for (int i = 0; i < expResults.size(); i++) {
             results[i] = expResults.get(i).getResultTime();
         }
-        
+
         engine.assign("results", results);
         engine.eval("plot(npudens(results),main='', xaxt='n', yaxt='n',xlab='', ylab='', xaxs='i', yaxs='i', las=1)");
 

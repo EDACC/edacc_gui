@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edacc.experiment;
 
 import edacc.model.Parameter;
@@ -135,7 +131,7 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
             case 1:
                 return parameters[rowIndex].getName();
             case 2:
-                return parameters[rowIndex].getPrefix();
+                return parameters[rowIndex].getPrefix()==null?"":parameters[rowIndex].getPrefix();
             case 3:
                 if (parameters[rowIndex].getHasValue()) {
                     return values[rowIndex];
