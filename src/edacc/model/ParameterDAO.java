@@ -156,7 +156,20 @@ public class ParameterDAO {
         return rs.next();
     }
 
-    public static Vector<Parameter> getAll() {
-        throw new UnsupportedOperationException("Not yet implemented");
+    /**
+     *
+     * @return the names of all parameter grouped by the name
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @author rretz
+     */
+    public static Vector<String> getAllNames() throws NoConnectionToDBException, SQLException {
+        Vector<String> ret = new Vector<String>();
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT name FROM " + table + " GROUP BY name;");
+        ResultSet rs = ps.executeQuery();
+        while(rs.next()){
+            ret.add(rs.getString(1));
+        }
+        return ret;
     }
 }

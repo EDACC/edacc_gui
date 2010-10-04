@@ -13,6 +13,7 @@ package edacc;
 
 import edacc.model.NoConnectionToDBException;
 import edacc.model.SolverProperty;
+import edacc.model.SolverPropertyHasParameter;
 import edacc.model.SolverPropertyIsUsedException;
 import edacc.model.SolverPropertyNotInDBException;
 import edacc.properties.SolverPropertiesController;
@@ -110,7 +111,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         labeMultipleOccurrences = new javax.swing.JLabel();
         checkBoxMultipleOccurrences = new javax.swing.JCheckBox();
         labelParameter = new javax.swing.JLabel();
-        comboxParameter = new javax.swing.JComboBox();
+        comboBoxParameter = new javax.swing.JComboBox();
         buttonDone = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -296,8 +297,13 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         labelParameter.setText(resourceMap.getString("labelParameter.text")); // NOI18N
         labelParameter.setName("labelParameter"); // NOI18N
 
-        comboxParameter.setEnabled(false);
-        comboxParameter.setName("comboxParameter"); // NOI18N
+        comboBoxParameter.setEnabled(false);
+        comboBoxParameter.setName("comboBoxParameter"); // NOI18N
+        comboBoxParameter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboBoxParameterActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelManageSolverPropertyEditInputLayout = new javax.swing.GroupLayout(panelManageSolverPropertyEditInput);
         panelManageSolverPropertyEditInput.setLayout(panelManageSolverPropertyEditInputLayout);
@@ -329,7 +335,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
                                 .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(checkBoxMultipleOccurrences)
                                     .addComponent(comboBoxSolverPropertyValuetype, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(comboxParameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addComponent(comboBoxParameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addGap(18, 18, 18)
                         .addComponent(buttonSolverPropertyAddValueType))
                     .addComponent(labelParameter))
@@ -369,7 +375,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(labelParameter)
-                    .addComponent(comboxParameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(comboBoxParameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -511,16 +517,27 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
                 "You must select a solver property type for the solver property.",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-        }else if(comboBoxSolverPropertyType.getSelectedItem().equals(SolverPropertyType.Parameter) && comboBoxSolverPropertyValuetype.getSelectedIndex() == -1){
+        }else if(!comboBoxSolverPropertyType.getSelectedItem().equals(SolverPropertyType.Parameter) && comboBoxSolverPropertyValuetype.getSelectedIndex() == -1){
             JOptionPane.showMessageDialog(this,
                 "You must select a  property value type for the solver property.",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
+        }else if(comboBoxSolverPropertyType.getSelectedItem().equals(SolverPropertyType.Parameter) && comboBoxParameter.getSelectedIndex() == -1){
+            JOptionPane.showMessageDialog(this,
+                "You must select a  parameter for the solver property.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
         }else{
             try {
-                controller.saveSolverProperty(textSolverPropertyFieldName.getText(), textSolvertPropertyFieldPrefix.getText(), textAreaResultPropertyDescription.getText(),
+                if(!comboBoxSolverPropertyType.getSelectedItem().equals(SolverPropertyType.Parameter)){
+                     controller.saveSolverProperty(textSolverPropertyFieldName.getText(), textSolvertPropertyFieldPrefix.getText(), textAreaResultPropertyDescription.getText(),
                     (SolverPropertyType) comboBoxSolverPropertyType.getSelectedItem(), (String) comboBoxSolverPropertyValuetype.getSelectedItem(),
                     checkBoxMultipleOccurrences.isSelected());
+                } else{
+                     controller.saveSolverProperty(textSolverPropertyFieldName.getText(), textSolvertPropertyFieldPrefix.getText(), textAreaResultPropertyDescription.getText(),
+                    (SolverPropertyType) comboBoxSolverPropertyType.getSelectedItem(), (String) comboBoxParameter.getSelectedItem());
+                }
+
             } catch (NoConnectionToDBException ex) {
                 Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
@@ -536,6 +553,10 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             }
         }
     }//GEN-LAST:event_buttonSaveSolverPropertyActionPerformed
+
+    private void comboBoxParameterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxParameterActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_comboBoxParameterActionPerformed
 
     /**
     * @param args the command line arguments
@@ -561,9 +582,9 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
     private javax.swing.JButton buttonSaveSolverProperty;
     private javax.swing.JButton buttonSolverPropertyAddValueType;
     private javax.swing.JCheckBox checkBoxMultipleOccurrences;
+    private javax.swing.JComboBox comboBoxParameter;
     private javax.swing.JComboBox comboBoxSolverPropertyType;
     private javax.swing.JComboBox comboBoxSolverPropertyValuetype;
-    private javax.swing.JComboBox comboxParameter;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JLabel labeMultipleOccurrences;
@@ -609,18 +630,19 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
     }
 
     public void SolverPropertyTypeChanged() {
-        if(this.comboBoxSolverPropertyType.getSelectedItem() != SolverPropertyType.Parameter &&
+        if(!this.comboBoxSolverPropertyType.getSelectedItem().equals(SolverPropertyType.Parameter) &&
                 this.comboBoxSolverPropertyType.isEnabled() && !editing){
             this.comboBoxSolverPropertyValuetype.setEnabled(true);
             this.buttonSolverPropertyAddValueType.setEnabled(true);
             this.checkBoxMultipleOccurrences.setEnabled(true);
             this.buttonSaveSolverProperty.setEnabled(true);
-            this.comboxParameter.setEnabled(false);
-        }else{
+            this.comboBoxParameter.setEnabled(false);
+        }else if(this.comboBoxSolverPropertyType.getSelectedItem().equals(SolverPropertyType.Parameter) &&
+                this.comboBoxSolverPropertyType.isEnabled() && !editing){
            this.comboBoxSolverPropertyValuetype.setEnabled(false);
            this.buttonSolverPropertyAddValueType.setEnabled(false);
            this.checkBoxMultipleOccurrences.setEnabled(false);
-           this.comboxParameter.setEnabled(true);
+           this.comboBoxParameter.setEnabled(true);
         }
     }
 
@@ -673,11 +695,30 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         this.enableEditing();
     }
 
+    public void showSolverProperty(SolverProperty toShow, SolverPropertyHasParameter solverPropertyType) {
+        this.editing = true;
+        this.textSolverPropertyFieldName.setText(toShow.getName());
+        this.textSolvertPropertyFieldPrefix.setText(toShow.getPrefix());
+        this.textAreaResultPropertyDescription.setText(toShow.getDescription());
+        this.comboBoxSolverPropertyType.setSelectedItem(toShow.getSolverPropertyType());
+        this.comboBoxParameter.setSelectedItem(solverPropertyType.getParameter());
+        this.enableEditing();
+    }
+
     private void enableEditing() {
         this.textSolverPropertyFieldName.setEnabled(true);
         this.textSolvertPropertyFieldPrefix.setEnabled(true);
         this.textAreaResultPropertyDescription.setEnabled(true);
         this.buttonSaveSolverProperty.setEnabled(true);
     }
+
+    public void setComboBoxParameters(Vector<String> allNames) {
+        this.comboBoxParameter.removeAllItems();
+        for(int i = 0; i < allNames.size(); i++){
+            this.comboBoxParameter.addItem(allNames.get(i));
+        }
+    }
+
+
 
 }

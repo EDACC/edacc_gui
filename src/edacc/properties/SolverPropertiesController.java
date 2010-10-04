@@ -11,6 +11,8 @@ import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.SolverProperty;
 import edacc.model.SolverPropertyDAO;
+import edacc.model.SolverPropertyHasParameterDAO;
+import edacc.model.SolverPropertyHasParameterNotInDBException;
 import edacc.model.SolverPropertyIsUsedException;
 import edacc.model.SolverPropertyNotInDBException;
 import edacc.satinstances.PropertyValueType;
@@ -18,6 +20,8 @@ import edacc.satinstances.PropertyValueTypeManager;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 
@@ -108,14 +112,32 @@ public class SolverPropertiesController {
 
     public void showSolver(int convertRowIndexToModel) {
         if(convertRowIndexToModel != -1){
-            SolverProperty toShow = (SolverProperty)((SolverPropertyTableModel)tableSolverProperty.getModel()).getValueAt(convertRowIndexToModel, 5);
-            main.showSolverProperty(toShow);
-            this.editId = toShow.getId();
+            try {
+                SolverProperty toShow = (SolverProperty) ((SolverPropertyTableModel)tableSolverProperty.getModel()).getValueAt(convertRowIndexToModel, 5);
+                if (!toShow.getSolverPropertyType().equals(SolverPropertyType.Parameter)) {
+                    main.showSolverProperty(toShow);
+                } else {
+                    main.showSolverProperty(toShow, SolverPropertyHasParameterDAO.getBySolverProperty(toShow));
+                }
+                this.editId = toShow.getId();
+            } catch (NoConnectionToDBException ex) {
+                Logger.getLogger(SolverPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(SolverPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SolverPropertyHasParameterNotInDBException ex) {
+                Logger.getLogger(SolverPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SolverPropertyNotInDBException ex) {
+                Logger.getLogger(SolverPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SolverPropertyTypeNotExistException ex) {
+                Logger.getLogger(SolverPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(SolverPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }else 
             this.editId = -1;
     }
 
-    public void saveSolverProperty(String name, String prefix, String description, SolverPropertyType propType, String valueType, boolean isMultiple)
+    public void saveSolverProperty(String name, String prefix, String description, SolverPropertyType propType, String parameter)
             throws NoConnectionToDBException, SQLException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException, SolverPropertyIsUsedException{
 
         if(editId != -1){
@@ -123,18 +145,32 @@ public class SolverPropertiesController {
             toEdit.setName(name);
             toEdit.setPrefix(prefix);
             toEdit.setDescription(description);
-            toEdit.setMultiple(isMultiple);
+            SolverPropertyDAO.save(toEdit);
+        }else {
+            SolverPropertyDAO.createResultProperty(name, prefix, description, propType, parameter);
+        }
+        loadSolverProperties();
+        main.clearSolverPropertyEditField();
+    }
+
+    public void loadParameters() throws NoConnectionToDBException, SQLException {
+        main.setComboBoxParameters(ParameterDAO.getAllNames());
+    }
+
+     public void saveSolverProperty(String name, String prefix, String description, SolverPropertyType propType, String valueType, boolean isMultiple)
+            throws NoConnectionToDBException, SQLException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException, SolverPropertyIsUsedException{
+
+        if(editId != -1){
+            SolverProperty toEdit = SolverPropertyDAO.getById(editId);
+            toEdit.setName(name);
+            toEdit.setPrefix(prefix);
+            toEdit.setDescription(description);
             SolverPropertyDAO.save(toEdit);
         }else {
             SolverPropertyDAO.createResultProperty(name, prefix, description, PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(valueType), propType, isMultiple);
         }
         loadSolverProperties();
         main.clearSolverPropertyEditField();
-    }
-
-    public void loadParameters() {
-        Vector<Parameter> load = new Vector<Parameter>();
-        //ParameterDAO.getAll();
     }
       
 

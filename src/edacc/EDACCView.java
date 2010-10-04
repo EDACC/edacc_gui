@@ -526,8 +526,8 @@ public class EDACCView extends FrameView implements Observer {
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
             manageSolverProperties = new EDACCManageSolverPropertyDialog(mainFrame, true);
             manageSolverProperties.setLocationRelativeTo(mainFrame);
-            manageSolverProperties.initialize();
         }
+        manageSolverProperties.initialize();
         manageSolverProperties.setVisible(true);
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables

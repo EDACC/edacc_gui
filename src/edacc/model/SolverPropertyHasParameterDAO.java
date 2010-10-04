@@ -19,8 +19,8 @@ public class SolverPropertyHasParameterDAO {
     private static final String table = "SolverProperty_has_Parameter";
     private static final ObjectCache<SolverPropertyHasParameter> cache = new ObjectCache<SolverPropertyHasParameter>();
     private static String deleteQuery = "DELETE FROM " + table + " WHERE idSP=?;";
-    private static String updateQuery = "UPDATE " + table + " SET SolverProperty_idSolverProperty=?, Parameters_idParameter=? WHERE idSP=?;";
-    private static String insertQuery = "INSERT INTO " + table + " (SolverProperty_idSolverProperty, Parameters_idParameter) VALUES (?, ?);";
+    private static String updateQuery = "UPDATE " + table + " SET SolverProperty_idSolverProperty=?, Parameter=? WHERE idSP=?;";
+    private static String insertQuery = "INSERT INTO " + table + " (SolverProperty_idSolverProperty, Parameter) VALUES (?, ?);";
 
     /**
      * Creates a new  SolverPropertyHasParameter object, saves it into the database and cache, and returns it.
@@ -30,7 +30,7 @@ public class SolverPropertyHasParameterDAO {
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    public static SolverPropertyHasParameter createSolverPropertyHasParamter(SolverProperty solvProperty, Parameter parameter) throws NoConnectionToDBException, SQLException{
+    public static SolverPropertyHasParameter createSolverPropertyHasParamter(SolverProperty solvProperty, String parameter) throws NoConnectionToDBException, SQLException{
         SolverPropertyHasParameter s = new SolverPropertyHasParameter();
         s.setSolvProperty(solvProperty);
         s.setParameter(parameter);
@@ -56,7 +56,7 @@ public class SolverPropertyHasParameterDAO {
         }else if(s.isModified()){
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);            
             ps.setInt(1, s.getSolvProperty().getId());
-            ps.setInt(2, s.getParameter().getId());
+            ps.setString(2, s.getParameter());
             ps.setInt(3, s.getId());
             ps.executeUpdate();
             ps.close();
@@ -64,7 +64,7 @@ public class SolverPropertyHasParameterDAO {
         }else if(s.isNew()){
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setInt(1, s.getSolvProperty().getId());
-            ps.setInt(2, s.getParameter().getId());
+            ps.setString(2, s.getParameter());
             ps.executeUpdate();
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -88,7 +88,7 @@ public class SolverPropertyHasParameterDAO {
      * @throws SolverPropertyTypeNotExistException
      * @throws IOException
      */
-    public SolverPropertyHasParameter getBySolverProperty(SolverProperty solvProperty) throws NoConnectionToDBException, SQLException, SolverPropertyHasParameterNotInDBException,
+    public static SolverPropertyHasParameter getBySolverProperty(SolverProperty solvProperty) throws NoConnectionToDBException, SQLException, SolverPropertyHasParameterNotInDBException,
             SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException{
         return getBySolverProperty(solvProperty.getId());
 
@@ -105,7 +105,7 @@ public class SolverPropertyHasParameterDAO {
      * @throws SolverPropertyTypeNotExistException
      * @throws IOException
      */
-    public SolverPropertyHasParameter getBySolverProperty(int id) throws NoConnectionToDBException, SQLException, SolverPropertyHasParameterNotInDBException,
+    public static SolverPropertyHasParameter getBySolverProperty(int id) throws NoConnectionToDBException, SQLException, SolverPropertyHasParameterNotInDBException,
             SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException{
 
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
@@ -130,7 +130,7 @@ public class SolverPropertyHasParameterDAO {
      * @throws SolverPropertyTypeNotExistException
      * @throws IOException
      */
-    public SolverPropertyHasParameter getById(int id) throws NoConnectionToDBException, SQLException, SolverPropertyHasParameterNotInDBException,
+    public static SolverPropertyHasParameter getById(int id) throws NoConnectionToDBException, SQLException, SolverPropertyHasParameterNotInDBException,
             SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
         SolverPropertyHasParameter res = cache.getCached(id);
         if(res != null){
@@ -138,7 +138,7 @@ public class SolverPropertyHasParameterDAO {
         }else{
             res = new SolverPropertyHasParameter();
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                    "SELECT SolverProperty_idSolverProperty, Parameters_idParameter "
+                    "SELECT SolverProperty_idSolverProperty, Parameter "
                     + "FROM " + table + " WHERE idSP=?");
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -146,7 +146,7 @@ public class SolverPropertyHasParameterDAO {
                 throw new SolverPropertyHasParameterNotInDBException();
             res.setId(id);
             res.setSolvProperty(SolverPropertyDAO.getById(rs.getInt("SolverProperty_idSolverProperty")));
-            res.setParameter(ParameterDAO.getById(rs.getInt("Parameters_idParameter")));
+            res.setParameter(rs.getString("Parameter"));
             res.setSaved();
             cache.cache(res);
             return res;

@@ -37,7 +37,9 @@ public class SolverPropertyDAO {
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    public static SolverProperty createResultProperty(String name, String prefix, String description, PropertyValueType valueType, SolverPropertyType type, boolean multiple) throws NoConnectionToDBException, SQLException, SolverPropertyIsUsedException{
+    public static SolverProperty createResultProperty(String name, String prefix, String description, PropertyValueType valueType, 
+            SolverPropertyType type, boolean multiple)
+            throws NoConnectionToDBException, SQLException, SolverPropertyIsUsedException{
         SolverProperty r = new SolverProperty();
         r.setName(name);
         r.setPrefix(prefix);
@@ -47,7 +49,20 @@ public class SolverPropertyDAO {
         r.setMultiple(multiple);
         r.setNew();
         save(r);
+
         return r;
+    }
+
+    public static void createResultProperty(String name, String prefix, String description, SolverPropertyType type, String parameter) 
+            throws NoConnectionToDBException, SQLException, SolverPropertyIsUsedException {
+        SolverProperty r = new SolverProperty();
+        r.setName(name);
+        r.setPrefix(prefix);
+        r.setDescription(description);
+        r.setSolverPropertyType(type);
+        r.setNew();
+        save(r);
+        SolverPropertyHasParameterDAO.createSolverPropertyHasParamter(r, parameter);
     }
 
     /**
@@ -72,12 +87,17 @@ public class SolverPropertyDAO {
             if(!rs.next())
                 throw new SolverPropertyNotInDBException();
             res.setId(id);
-            res.setValueType(PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(rs.getString(1)));
             res.setName(rs.getString(2));
             res.setDescription(rs.getString(3));
             res.setPrefix(rs.getString(4));
             res.setSolverPropertyType(rs.getInt(5));
-            res.setMultiple(rs.getBoolean(6));
+            if(!res.getSolverPropertyType().equals(SolverPropertyType.Parameter)){
+                res.setValueType(PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(rs.getString(1)));
+                res.setMultiple(rs.getBoolean(6));
+            }else{
+                res.setValueType(null);
+                res.setMultiple(false);
+            }
             res.setSaved();
             cache.cache(res);
             return res;
@@ -110,9 +130,14 @@ public class SolverPropertyDAO {
             ps.setString(1, r.getName());
             ps.setString(2, r.getPrefix());
             ps.setString(3, r.getDescription());
-            ps.setString(4, r.getPropertyValueType().getName());
+            if(r.getSolverPropertyType().equals(SolverPropertyType.Parameter)){
+               ps.setNull(4, java.sql.Types.NULL);
+               ps.setNull(6, java.sql.Types.NULL);
+            }else {
+                ps.setString(4, r.getPropertyValueType().getName());
+                ps.setBoolean(6, r.isMultiple());
+            }
             ps.setInt(5, r.getSolverPropertyTypeDBRepresentation());
-            ps.setBoolean(6, r.isMultiple());
             ps.setInt(7, r.getId());
             ps.executeUpdate();
             ps.close();
@@ -122,9 +147,15 @@ public class SolverPropertyDAO {
             ps.setString(1, r.getName());
             ps.setString(2, r.getPrefix());
             ps.setString(3, r.getDescription());
-            ps.setString(4, r.getPropertyValueType().getName());
+            if(r.getSolverPropertyType().equals(SolverPropertyType.Parameter)){
+               ps.setNull(4, java.sql.Types.NULL);
+               ps.setNull(6, java.sql.Types.NULL);
+            }else {
+                ps.setString(4, r.getPropertyValueType().getName());
+                ps.setBoolean(6, r.isMultiple());
+            }
+
             ps.setInt(5, r.getSolverPropertyTypeDBRepresentation());
-            ps.setBoolean(6, r.isMultiple());
             ps.executeUpdate();
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -162,5 +193,7 @@ public class SolverPropertyDAO {
         solverProperty.setDeleted();
         save(solverProperty);
     }
+
+
 
 }

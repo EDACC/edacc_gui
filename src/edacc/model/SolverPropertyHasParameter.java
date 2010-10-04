@@ -12,11 +12,11 @@ package edacc.model;
 public class SolverPropertyHasParameter extends BaseModel implements IntegerPKModel{
     private int id;
     private SolverProperty solvProperty;
-    private Parameter parameter;
+    private String parameter;
 
     @Override
     public int getId() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return id;
     }
 
     public void setId(int id){
@@ -25,11 +25,11 @@ public class SolverPropertyHasParameter extends BaseModel implements IntegerPKMo
             this.setModified();
     }
 
-    public Parameter getParameter() {
+    public String getParameter() {
         return parameter;
     }
 
-    public void setParameter(Parameter parameter) {
+    public void setParameter(String parameter) {
         this.parameter = parameter;
         if (this.isSaved())
             this.setModified();
