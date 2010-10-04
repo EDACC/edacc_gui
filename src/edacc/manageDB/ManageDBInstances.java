@@ -380,7 +380,7 @@ public class ManageDBInstances implements Observer{
         if (!errorsAdd.isEmpty()) {
             FileNameTableModel tmp = new FileNameTableModel();
             tmp.setAll(errorsAdd);
-             EDACCExtendedWarning.showMessageDialog(
+            EDACCExtendedWarning.showMessageDialog(
                      EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
                      "By adding the following instances an error occured.",
                      new JTable(tmp));

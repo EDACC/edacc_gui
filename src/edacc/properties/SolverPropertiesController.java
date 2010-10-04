@@ -134,7 +134,7 @@ public class SolverPropertiesController {
 
     public void loadParameters() {
         Vector<Parameter> load = new Vector<Parameter>();
-        ParameterDAO.getAll();
+        //ParameterDAO.getAll();
     }
       
 

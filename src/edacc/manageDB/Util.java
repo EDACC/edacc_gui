@@ -4,6 +4,8 @@
  */
 package edacc.manageDB;
 
+import SevenZip.Compression.LZMA.Decoder;
+import SevenZip.Compression.LZMA.Encoder;
 import edacc.model.ExperimentDAO;
 import edacc.model.GridQueueDAO;
 import edacc.model.InstanceClassDAO;
@@ -43,7 +45,10 @@ public class Util {
         }
         byte[] md5sum = digest.digest();
         BigInteger bigInt = new BigInteger(1, md5sum);
-        return bigInt.toString(16);
+        if(md5sum[0] == '0')
+            return "0" + bigInt.toString(16);
+        else
+            return bigInt.toString(16);
     }
 
     public static ByteArrayOutputStream zipDirectoryToByteStream(File dir) throws IOException {
@@ -141,6 +146,64 @@ public class Util {
         SolverDAO.clearCache();
         ParameterInstanceDAO.clearCache();
         ParameterDAO.clearCache();
+    }
+
+    public static void sevenZipEncode(File input, File output) throws FileNotFoundException, Exception {
+        java.io.BufferedInputStream inStream = new java.io.BufferedInputStream(new java.io.FileInputStream(input));
+        java.io.BufferedOutputStream outStream = new java.io.BufferedOutputStream(new java.io.FileOutputStream(output.getAbsolutePath()));
+        Encoder encoder = new Encoder();
+        if (!encoder.SetAlgorithm(-1)) {
+            throw new Exception("Incorrect compression mode");
+        }
+        if (!encoder.SetDictionarySize(23)) {
+            throw new Exception("Incorrect dictionary size");
+        }
+        if (!encoder.SetNumFastBytes(128)) {
+            throw new Exception("Incorrect -fb value");
+        }
+        if (!encoder.SetMatchFinder(1)) {
+            throw new Exception("Incorrect -mf value");
+        }
+        if (!encoder.SetLcLpPb(3, 0, 2)) {
+            throw new Exception("Incorrect -lc or -lp or -pb value");
+        }
+        encoder.SetEndMarkerMode(false);
+        encoder.WriteCoderProperties(outStream);
+
+        long fileSize = input.length();
+        for (int i = 0; i < 8; i++) {
+            outStream.write((int) (fileSize >>> (8 * i)) & 0xFF);
+        }
+        encoder.Code(inStream, outStream, -1, -1, null);
+        outStream.flush();
+        outStream.close();
+        inStream.close();
+    }
+
+    public static void sevenZipDecode(File input, File f) throws FileNotFoundException, IOException, Exception {
+
+        // Decode the instance file
+        java.io.BufferedInputStream inStream = new java.io.BufferedInputStream(new java.io.FileInputStream(input));
+        java.io.BufferedOutputStream outStream = new java.io.BufferedOutputStream(new java.io.FileOutputStream(f));
+        int propertiesSize = 5;
+        byte[] properties = new byte[propertiesSize];
+        if (inStream.read(properties, 0, propertiesSize) != propertiesSize) {
+            throw new Exception("input .lzma file is too short");
+        }
+        Decoder decoder = new Decoder();
+        if (!decoder.SetDecoderProperties(properties)) {
+            throw new Exception("Incorrect stream properties");
+        }
+        long outSize = 0;
+        for (int j = 0; j < 8; j++) {
+            int v = inStream.read();
+            outSize |= ((long) v) << (8 * j);
+        }
+        if (!decoder.Code(inStream, outStream, outSize))
+            throw new Exception("Error in data stream");
+        outStream.flush();
+        outStream.close();
+        inStream.close();
     }
 }
 

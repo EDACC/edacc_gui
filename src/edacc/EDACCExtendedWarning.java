@@ -63,6 +63,7 @@ public class EDACCExtendedWarning extends javax.swing.JDialog {
             this.jPanel1.remove(this.cancelButton);
         this.jPanel1.setLayout(fl);
         this.setSize(640, 480);
+        this.setAlwaysOnTop(true);
     }
 
 

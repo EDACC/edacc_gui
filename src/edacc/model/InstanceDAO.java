@@ -2,6 +2,7 @@ package edacc.model;
 
 import SevenZip.Compression.LZMA.Decoder;
 import SevenZip.Compression.LZMA.Encoder;
+import edacc.manageDB.Util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -79,85 +80,74 @@ public class InstanceDAO {
     public static void save(Instance instance) throws SQLException, FileNotFoundException, IOException {
         PreparedStatement ps;
         if (instance.isNew()) {
-            // insert query, set ID!
-            // TODO insert instance blob
-            // insert instance into db
-            final String insertQuery = "INSERT INTO " + table + " (name, md5, instanceClass_idinstanceClass, instance) "
-                    + "VALUES (?, ?, ?, ?)";
-            ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
-            if (instance.getFile() != null) {
-                try {
-                    File input = instance.getFile();
-                    File output = new File(instance.getFile().getName() + "test");
-                    java.io.BufferedInputStream inStream = new java.io.BufferedInputStream(new java.io.FileInputStream(input));
-                    java.io.BufferedOutputStream outStream = new java.io.BufferedOutputStream(new java.io.FileOutputStream(output));
-                    Encoder encoder = new Encoder();
-                    if (!encoder.SetAlgorithm(-1)) {
-                        throw new Exception("Incorrect compression mode");
+            try {
+                // insert query, set ID!
+                // TODO insert instance blob
+                // insert instance into db
+                final String insertQuery = "INSERT INTO " + table + " (name, md5, instanceClass_idinstanceClass, instance) "
+                        + "VALUES (?, ?, ?, ?)";
+                ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+                ps.setString(1, instance.getName());
+                ps.setString(2, instance.getMd5());
+                if (instance.getInstanceClass() != null) {
+                    ps.setInt(3, instance.getInstanceClass().getInstanceClassID());
+                } else {
+                    ps.setNull(3, Types.INTEGER);
+                }
+
+                File input = null;
+                File output = null;
+                FileInputStream fInStream = null;
+                
+                if (instance.getFile() != null) {
+
+                        input = instance.getFile();
+                        output = new File(instance.getFile().getName());
+                        Util.sevenZipEncode(input, output);
+                        fInStream = new FileInputStream(output);
+
+                        ps.setBinaryStream(4, fInStream);
+
+                } else {
+                    ps.setNull(4, Types.BLOB);
+                }
+
+                ps.executeUpdate();
+
+                if (instance.isNew()) {
+                    ResultSet rs = ps.getGeneratedKeys();
+                    if (rs.next()) {
+                        instance.setId(rs.getInt(1));
                     }
-                    if (!encoder.SetDictionarySize(23)) {
-                        throw new Exception("Incorrect dictionary size");
-                    }
-                    if (!encoder.SetNumFastBytes(128)) {
-                        throw new Exception("Incorrect -fb value");
-                    }
-                    if (!encoder.SetMatchFinder(1)) {
-                        throw new Exception("Incorrect -mf value");
-                    }
-                    if (!encoder.SetLcLpPb(3, 0, 2)) {
-                        throw new Exception("Incorrect -lc or -lp or -pb value");
-                    }
-                    encoder.SetEndMarkerMode(false);
-                    encoder.WriteCoderProperties(outStream);
-                    
-                    long fileSize = input.length();
-                    for (int i = 0; i < 8; i++) {
-                        outStream.write((int) (fileSize >>> (8 * i)) & 0xFF);
-                    }
-                    encoder.Code(inStream, outStream, -1, -1, null);
-                    outStream.flush();
-                    outStream.close();
-                    inStream.close();
-                    instance.setFile(output);
-                    ps.setBinaryStream(4, new FileInputStream(instance.getFile()));
-                } catch (Exception ex) {
+                    cache.cache(instance);
+                }
+                ps.close();
+                instance.setSaved();
+
+                fInStream.close();
+                output.delete();
+                input.delete();
+            } catch (Exception ex) {
                     Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } else {
-                ps.setNull(4, Types.BLOB);
-            }
         } else if (instance.isModified()) {
             // update query
             final String updateQuery = "UPDATE " + table + " SET name=?, md5=?, instanceClass_idinstanceClass=? "
                     + "WHERE idInstance=?";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
-
+            ps.setString(1, instance.getName());
+            ps.setString(2, instance.getMd5());
+            if (instance.getInstanceClass() != null) {
+                ps.setInt(3, instance.getInstanceClass().getInstanceClassID());
+            } else {
+                ps.setNull(3, Types.INTEGER);
+            }
             ps.setInt(4, instance.getId());
+            ps.executeUpdate();
 
         } else {
             return;
         }
-
-        ps.setString(1, instance.getName());
-        ps.setString(2, instance.getMd5());
-        if (instance.getInstanceClass() != null) {
-            ps.setInt(3, instance.getInstanceClass().getInstanceClassID());
-        } else {
-            ps.setNull(3, Types.INTEGER);
-        }
-
-        ps.executeUpdate();
-
-        // set id
-        if (instance.isNew()) {
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                instance.setId(rs.getInt(1));
-            }
-            cache.cache(instance);
-        }
-        ps.close();
-        instance.setSaved();
     }
 
     /**
@@ -360,39 +350,18 @@ public class InstanceDAO {
         File input = new File(f.getAbsolutePath() + "test");
         input.getParentFile().mkdirs();
         if (rs.next()) {
-            try {
-                FileOutputStream out = new FileOutputStream(input);
-                InputStream in = rs.getBinaryStream("instance");
-                int len;
-                byte[] buf = new byte[256 * 1024];
-                while ((len = in.read(buf)) > -1) {
-                    out.write(buf, 0, len);
-                }
-                out.flush();
-                out.close();
-                in.close();
-                // Decode the instance file
-                java.io.BufferedInputStream inStream = new java.io.BufferedInputStream(new java.io.FileInputStream(input));
-                java.io.BufferedOutputStream outStream = new java.io.BufferedOutputStream(new java.io.FileOutputStream(f));
-                int propertiesSize = 5;
-                byte[] properties = new byte[propertiesSize];
-                if (inStream.read(properties, 0, propertiesSize) != propertiesSize) {
-                    throw new Exception("input .lzma file is too short");
-                }
-                Decoder decoder = new Decoder();
-                if (!decoder.SetDecoderProperties(properties)) {
-                    throw new Exception("Incorrect stream properties");
-                }
-                long outSize = 0;
-                for (int j = 0; j < 8; j++) {
-                    int v = inStream.read();
-                    outSize |= ((long) v) << (8 * j);
-                }
-                if (!decoder.Code(inStream, outStream, outSize))
-                    throw new Exception("Error in data stream");
-                outStream.flush();
-                outStream.close();
-                inStream.close();
+        FileOutputStream out = new FileOutputStream(input);
+        InputStream in = rs.getBinaryStream("instance");
+        int len;
+        byte[] buf = new byte[256 * 1024];
+        while ((len = in.read(buf)) > -1) {
+            out.write(buf, 0, len);
+        }
+        out.flush();
+        out.close();
+        in.close();
+            try{
+                Util.sevenZipDecode(input, f);
             } catch (Exception ex) {
                 Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
