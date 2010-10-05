@@ -3,8 +3,9 @@ package edacc.experiment;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import javax.swing.table.AbstractTableModel;
-import java.util.Vector;
 import edacc.model.ExperimentResult;
+import edacc.model.ExperimentResultHasSolverProperty;
+import edacc.model.ExperimentResultHasSolverPropertyDAO;
 import edacc.model.ExperimentResultStatus;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
@@ -16,6 +17,11 @@ import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
+import edacc.model.SolverProperty;
+import edacc.model.SolverPropertyDAO;
+import edacc.properties.FilePropertyParser;
+import edacc.properties.SolverPropertyType;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import javax.swing.SwingUtilities;
@@ -26,6 +32,7 @@ import javax.swing.SwingUtilities;
  * @author daniel
  */
 public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
+
     public static int COL_ID = 0;
     public static int COL_SOLVER = 1;
     public static int COL_PARAMETERS = 2;
@@ -39,10 +46,42 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public static int COL_LAUNCHER_OUTPUT = 10;
     public static int COL_WATCHER_OUTPUT = 11;
     public static int COL_VERIFIER_OUTPUT = 12;
-    private Vector<ExperimentResult> jobs;
-    private String[] columns = {"ID", "Solver", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
-    private boolean[] visible = {false, true, true, true, true, true, true, true, true, true, true, true, true};
-    private HashMap<Integer, Vector<ParameterInstance>> parameterInstances;
+    public static int COL_PROPERTY = 13;
+    private static final FilePropertyParser parser = new FilePropertyParser(); // just for now
+    private ArrayList<ExperimentResult> jobs;
+    private String[] CONST_COLUMNS = {"ID", "Solver", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
+    private boolean[] CONST_VISIBLE = {false, true, true, true, true, true, true, true, true, false, false, false, false};
+    private String[] columns;
+    private ArrayList<SolverProperty> solverProperties;
+    private ArrayList<ExperimentResultHasSolverProperty> propertyValues;
+    private boolean[] visible;
+    private HashMap<Integer, ArrayList<ParameterInstance>> parameterInstances;
+
+    public ExperimentResultsBrowserTableModel() {
+        columns = new String[CONST_COLUMNS.length];
+        visible = new boolean[columns.length];
+        for (int i = 0; i < columns.length; i++) {
+            columns[i] = CONST_COLUMNS[i];
+            visible[i] = CONST_VISIBLE[i];
+        }
+    }
+
+    public void updateSolverProperties() {
+        solverProperties = new ArrayList<SolverProperty>();
+        try {
+            solverProperties.addAll(SolverPropertyDAO.getAll());
+        } catch (Exception e) {
+        }
+        columns = java.util.Arrays.copyOf(columns, CONST_COLUMNS.length + solverProperties.size());
+        visible = java.util.Arrays.copyOf(visible, CONST_VISIBLE.length + solverProperties.size());
+        int j = 0;
+        for (int i = CONST_COLUMNS.length; i < columns.length; i++) {
+            columns[i] = solverProperties.get(j).getName();
+            visible[i] = true;
+            j++;
+        }
+        this.fireTableStructureChanged();
+    }
 
     /**
      * Returns the job id
@@ -109,16 +148,16 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         }
         return jobs.get(row).getStatus();
     }
-    
+
     /**
      * Returns all parameter instances for that job
      * @param row
      * @return null, if there was an error
      */
-    public Vector<ParameterInstance> getParameters(int row) {
+    public ArrayList<ParameterInstance> getParameters(int row) {
         try {
             SolverConfiguration sc = SolverConfigurationDAO.getSolverConfigurationById(jobs.get(row).getSolverConfigId());
-            Vector<ParameterInstance> params = parameterInstances.get(sc.getId());
+            ArrayList<ParameterInstance> params = parameterInstances.get(sc.getId());
             if (params == null) {
                 params = ParameterInstanceDAO.getBySolverConfigId(sc.getId());
                 parameterInstances.put(sc.getId(), params);
@@ -136,7 +175,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
      */
     public String getParameterString(int row) {
         try {
-            Vector<ParameterInstance> params = getParameters(row);
+            ArrayList<ParameterInstance> params = getParameters(row);
             if (params == null) {
                 return "";
             }
@@ -150,7 +189,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                     paramString += solverParameter.getPrefix() + " ";
                 }
 
-                if (params.lastElement() != param) {
+                if (params.get(params.size() - 1) != param) {
                     paramString += " ";
                 }
             }
@@ -169,7 +208,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
      * @param jobs
      * @throws SQLException
      */
-    public void setJobs(final Vector<ExperimentResult> jobs) throws SQLException {
+    public void setJobs(final ArrayList<ExperimentResult> jobs) throws SQLException {
 
         /*   boolean fullUpdate = false;
         if (this.jobs == null || jobs == null || this.jobs.size() != jobs.size()) {
@@ -210,7 +249,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             @Override
             public void run() {
                 ExperimentResultsBrowserTableModel.this.jobs = jobs;
-                parameterInstances = new HashMap<Integer, Vector<ParameterInstance>>();
+                parameterInstances = new HashMap<Integer, ArrayList<ParameterInstance>>();
                 ExperimentResultsBrowserTableModel.this.fireTableDataChanged();
             }
         };
@@ -356,7 +395,33 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             case 12:
                 return j.getVerifierOutputFilename();
             default:
-                return "";
+                int property = columnIndex - COL_PROPERTY;
+                if (solverProperties.size() < property) {
+                    return "";
+                }
+                ExperimentResultHasSolverProperty erp = jobs.get(rowIndex).getPropertyValues().get(solverProperties.get(property).getId());
+                if (erp != null && !erp.getValue().isEmpty()) {
+                    return erp.getValue().get(0);
+                } else {
+                    return "not yet calculated";
+                }
+            /*if (solverProperties.get(property).getSolverPropertyType() == SolverPropertyType.ClientOutput
+            || solverProperties.get(property).getSolverPropertyType() == SolverPropertyType.ResultFile) {
+            // calculate property value, very inefficent because it is called too often .. mir egal :-)
+            ArrayList<String> result = new ArrayList<String>();
+            try {
+            java.util.Vector<String> res = parser.parse(solverProperties.get(property), jobs.get(rowIndex));
+            result.addAll(res);
+            } catch (Exception e) {
+            return "";
+            }
+            if (result.size() > 0) {
+            return result.get(0);
+            } else {
+            return "";
+            }
+            } else {
+            }*/
         }
     }
 
@@ -364,73 +429,116 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
      * Returns all disjunct instance names which are currently in that model
      * @return
      */
-    public Vector<String> getInstances() {
-        Vector<String> res = new Vector<String>();
+    public ArrayList<String> getInstances() {
+        ArrayList<String> res = new ArrayList<String>();
+
+
         if (getRowCount() == 0) {
             return res;
+
+
         }
         int experimentId = jobs.get(0).getExperimentId();
+
+
         try {
             LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(experimentId);
 
             HashSet<String> tmp = new HashSet<String>();
+
+
             for (Instance i : instances) {
                 if (!tmp.contains(i.getName())) {
                     tmp.add(i.getName());
+
+
                 }
             }
             res.addAll(tmp);
+
+
             return res;
+
+
         } catch (Exception ex) {
             return res;
+
+
         }
     }
 
     /**
      * Returns all disjunct status codes which are currently in that model
      */
-    public Vector<ExperimentResultStatus> getStatusEnums() {
-        Vector<ExperimentResultStatus> res = new Vector<ExperimentResultStatus>();
+    public ArrayList<ExperimentResultStatus> getStatusEnums() {
+        ArrayList<ExperimentResultStatus> res = new ArrayList<ExperimentResultStatus>();
         HashSet<ExperimentResultStatus> tmp = new HashSet<ExperimentResultStatus>();
-        for (int i = 0; i < getRowCount(); i++) {
+
+
+        for (int i = 0; i
+                < getRowCount(); i++) {
             if (!tmp.contains(getStatus(i))) {
                 tmp.add(getStatus(i));
+
+
             }
         }
         res.addAll(tmp);
+
+
         return res;
+
+
     }
 
     /**
      * Returns all disjunct solver names which are currently in that model
      */
-    public Vector<String> getSolvers() {
-        Vector<String> res = new Vector<String>();
+    public ArrayList<String> getSolvers() {
+        ArrayList<String> res = new ArrayList<String>();
         HashSet<String> tmp = new HashSet<String>();
-        for (int i = 0; i < getRowCount(); i++) {
+
+
+        for (int i = 0; i
+                < getRowCount(); i++) {
             if (!tmp.contains(getSolver(i).getName())) {
                 tmp.add(getSolver(i).getName());
+
+
             }
         }
         res.addAll(tmp);
+
+
         return res;
+
+
     }
 
-    public Vector<ExperimentResult> getJobs() {
+    public ArrayList<ExperimentResult> getJobs() {
         return jobs;
+
+
     }
 
     public int getJobsCount() {
         return jobs.size();
+
+
     }
-    
+
     public int getJobsCount(ExperimentResultStatus status) {
         int res = 0;
+
+
         for (ExperimentResult j : jobs) {
             if (j.getStatus().equals(status)) {
                 res++;
+
+
             }
         }
         return res;
+
     }
 }

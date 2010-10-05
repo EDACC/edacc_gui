@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * EDACCSolverConfigEntry.java
  *
  * Created on 30.12.2009, 20:11:16
@@ -21,7 +16,7 @@ import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import java.awt.Component;
 import java.sql.SQLException;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
@@ -70,7 +65,9 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         this.title = solver.getName();
         this.border = new TitledBorder(title);
         this.setBorder(border);
-        solverConfigEntryTableModel.setParameters(ParameterDAO.getParameterFromSolverId(solver.getId()));
+        ArrayList<Parameter> params = new ArrayList<Parameter>();
+        params.addAll(ParameterDAO.getParameterFromSolverId(solver.getId()));
+        solverConfigEntryTableModel.setParameters(params);
         this.solverConfiguration = null;
         solverConfigEntryTableModel.addTableModelListener(new TableModelListener() {
 
@@ -153,7 +150,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
      * @throws SQLException
      */
     public void saveParameterInstances() throws SQLException {
-        Vector<ParameterInstance> parameterVector = new Vector<ParameterInstance>();
+        ArrayList<ParameterInstance> parameterVector = new ArrayList<ParameterInstance>();
         for (int i = 0; i < solverConfigEntryTableModel.getRowCount(); i++) {
             if ((Boolean) solverConfigEntryTableModel.getValueAt(i, 0)) {
                 Parameter p = (Parameter) solverConfigEntryTableModel.getValueAt(i, 5);
@@ -282,7 +279,6 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         try {
             parent.replicateEntry(this);
         } catch (SQLException ex) {
-            ex.printStackTrace();
         }
     }
 

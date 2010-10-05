@@ -1,26 +1,35 @@
 /*
- * AnalyseBottomPanel.java
+ * AnalysisBottomPanel.java
  *
  * Created on 29.06.2010, 11:52:39
  */
-
 package edacc.experiment;
 
 import edacc.EDACCPlotTabView;
+import edacc.events.TaskEvents;
 import edacc.experiment.plots.DependencyException;
 import edacc.experiment.plots.Plot;
 import edacc.experiment.plots.PlotPanel;
+import edacc.experiment.plots.PointInformation;
+import edacc.model.Tasks;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import javax.swing.SwingUtilities;
 import org.jdesktop.application.Action;
+import org.rosuda.JRI.Rengine;
 
 /**
  *
  * @author simon
  */
-public class AnalyseBottomPanel extends javax.swing.JPanel implements edacc.events.PlotTabEvents {
-    private AnalysePanel analysePanel;
-    /** Creates new form AnalyseBottomPanel */
-    public AnalyseBottomPanel(AnalysePanel analysePanel) {
+public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.events.PlotTabEvents, TaskEvents {
+
+    private AnalysisPanel analysePanel;
+    private PlotPanel panel;
+    private Plot plot;
+
+    /** Creates new form AnalysisBottomPanel */
+    public AnalysisBottomPanel(AnalysisPanel analysePanel) {
         initComponents();
         this.analysePanel = analysePanel;
         EDACCPlotTabView.addListener(this);
@@ -41,9 +50,9 @@ public class AnalyseBottomPanel extends javax.swing.JPanel implements edacc.even
 
         setName("Form"); // NOI18N
 
-        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(AnalyseBottomPanel.class, this);
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(AnalysisBottomPanel.class, this);
         btnGeneratePlot.setAction(actionMap.get("btnGeneratePlot")); // NOI18N
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(AnalyseBottomPanel.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(AnalysisBottomPanel.class);
         btnGeneratePlot.setText(resourceMap.getString("btnGeneratePlot.text")); // NOI18N
         btnGeneratePlot.setName("btnGeneratePlot"); // NOI18N
 
@@ -76,25 +85,20 @@ public class AnalyseBottomPanel extends javax.swing.JPanel implements edacc.even
 
     @Action
     public void btnGeneratePlot() {
-        Plot plot = analysePanel.getSelectedPlot();
+        plot = analysePanel.getSelectedPlot();
         if (plot == null) {
             return;
         }
-        
+
         try {
-            analysePanel.updateDependencies();
-            PlotPanel panel = new PlotPanel();
-            plot.plot(AnalyseController.getREngine(panel), panel.pointInformations);
-            panel.setDeviceNumber(AnalyseController.getCurrentDeviceNumber());
-            EDACCPlotTabView.addPanelInMainTabView(plot.getTitle(), panel);
-            EDACCPlotTabView.setTabViewsVisible(true);
-        } catch (DependencyException ex) {
-            javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage(), "Invalid input", javax.swing.JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage(), "Database error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            panel = new PlotPanel(plot);
+            final Rengine re = AnalysisController.getREngine(panel);
+            panel.setDeviceNumber(AnalysisController.getCurrentDeviceNumber());
+            Tasks.startTask("plot", new Class[]{Rengine.class, new ArrayList<PointInformation>().getClass()}, new Object[]{re, panel.pointInformations}, plot, AnalysisBottomPanel.this);
         } catch (REngineInitializationException ex) {
             javax.swing.JOptionPane.showMessageDialog(null, "Error while initializing R: " + ex.getMessage(), "Initialization Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
+
     }
 
     @Action
@@ -105,14 +109,13 @@ public class AnalyseBottomPanel extends javax.swing.JPanel implements edacc.even
             EDACCPlotTabView.setTabViewsVisible(true);
         }
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGeneratePlot;
     private javax.swing.JButton btnShowPlots;
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public void tabViewCountChanged(int count) {
+    public final void tabViewCountChanged(int count) {
         if (count == 0) {
             btnShowPlots.setEnabled(false);
         } else {
@@ -129,4 +132,35 @@ public class AnalyseBottomPanel extends javax.swing.JPanel implements edacc.even
         }
     }
 
+    @Override
+    public void onTaskSuccessful(String methodName, Object result) {
+        if ("plot".equals(methodName)) {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    EDACCPlotTabView.addPanelInMainTabView(plot.getPlotTitle(), panel);
+                    EDACCPlotTabView.setTabViewsVisible(true);
+                }
+            });
+
+        }
+    }
+
+    @Override
+    public void onTaskStart(String methodName) {
+    }
+
+    @Override
+    public void onTaskFailed(String methodName, Throwable e) {
+        if ("plot".equals(methodName)) {
+            if (e instanceof DependencyException) {
+                javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Invalid input", javax.swing.JOptionPane.ERROR_MESSAGE);
+            } else if (e instanceof SQLException) {
+                javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Database error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(null, e, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
 }

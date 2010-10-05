@@ -7,9 +7,8 @@ package edacc.model;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
 
 /**
  *
@@ -59,7 +58,7 @@ public class SolverConfigurationDAO {
         }
     }
 
-    public static Vector<ParameterInstance> getSolverConfigurationParameters(SolverConfiguration i) throws SQLException {
+    public static ArrayList<ParameterInstance> getSolverConfigurationParameters(SolverConfiguration i) throws SQLException {
         return ParameterInstanceDAO.getBySolverConfigId(i.getId());
     }
 
@@ -81,8 +80,8 @@ public class SolverConfigurationDAO {
         return i;
     }
 
-    public static Vector<SolverConfiguration> getSolverConfigurationByExperimentId(int experimentId) throws SQLException {
-        Vector<SolverConfiguration> res = new Vector<SolverConfiguration>();
+    public static ArrayList<SolverConfiguration> getSolverConfigurationByExperimentId(int experimentId) throws SQLException {
+        ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Experiment_IdExperiment=? ORDER BY Solver_IdSolver");
         st.setInt(1, experimentId);
         ResultSet rs = st.executeQuery();
@@ -130,8 +129,8 @@ public class SolverConfigurationDAO {
      * @return vector of solver config ids
      * @throws SQLException
      */
-    public static Vector<Integer> getAllSolverConfigIdsByExperimentId(int id) throws SQLException {
-        Vector<Integer> res = new Vector<Integer>();
+    public static ArrayList<Integer> getAllSolverConfigIdsByExperimentId(int id) throws SQLException {
+        ArrayList<Integer> res = new ArrayList<Integer>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idSolverConfig " +
                 "FROM " + table + " " +
@@ -161,8 +160,8 @@ public class SolverConfigurationDAO {
      * Returns a vector of all solver configurations which are marked as deleted.
      * @return a vector of solver configurations
      */
-    public static Vector<SolverConfiguration> getAllDeleted() {
-        Vector<SolverConfiguration> res = new Vector<SolverConfiguration>();
+    public static ArrayList<SolverConfiguration> getAllDeleted() {
+        ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
         Enumeration<SolverConfiguration> e = cache.elements();
         while (e.hasMoreElements()) {
             SolverConfiguration sc = e.nextElement();
@@ -191,8 +190,8 @@ public class SolverConfigurationDAO {
         return false;
     }
 
-    public static Vector<SolverConfiguration> getAllCached() {
-        Vector<SolverConfiguration> res = new Vector<SolverConfiguration>();
+    public static ArrayList<SolverConfiguration> getAllCached() {
+        ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
         for (SolverConfiguration sc : cache.values()) {
             res.add(sc);
         }

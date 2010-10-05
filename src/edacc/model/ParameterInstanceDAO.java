@@ -7,8 +7,8 @@ package edacc.model;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -20,7 +20,7 @@ public class ParameterInstanceDAO {
     private static final String deleteQuery = "DELETE FROM " + table + " WHERE SolverConfig_IdSolverConfig=? AND Parameters_IdParameter=?";
     private static final String insertQuery = "INSERT INTO " + table + " (SolverConfig_IdSolverConfig, Parameters_IdParameter, value) VALUES (?,?,?)";
     private static final String updateQuery = "UPDATE "+ table+" SET value=? WHERE SolverConfig_IdSolverConfig=? AND Parameters_IdParameter=?";
-    private static final Hashtable<ParameterInstance, ParameterInstance> cache = new Hashtable<ParameterInstance, ParameterInstance>();
+    private static final HashMap<ParameterInstance, ParameterInstance> cache = new HashMap<ParameterInstance, ParameterInstance>();
 
     /**
      * ParameterInstance factory method. Saves the new object in the database.
@@ -108,8 +108,8 @@ public class ParameterInstanceDAO {
      * @return
      * @throws SQLException
      */
-    public static Vector<ParameterInstance> getBySolverConfigId(int id) throws SQLException {
-        Vector<ParameterInstance> res = new Vector<ParameterInstance>();
+    public static ArrayList<ParameterInstance> getBySolverConfigId(int id) throws SQLException {
+        ArrayList<ParameterInstance> res = new ArrayList<ParameterInstance>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE SolverConfig_idSolverConfig=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();

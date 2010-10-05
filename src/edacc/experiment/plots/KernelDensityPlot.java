@@ -7,7 +7,7 @@ import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import java.sql.SQLException;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
 
@@ -17,22 +17,29 @@ import org.rosuda.JRI.Rengine;
  */
 public class KernelDensityPlot extends Plot {
 
-    private JComboBox comboSolver, comboInstance;
-    private Dependency[] dependencies;
+    private static JComboBox comboSolver, comboInstance;
+    private SolverConfiguration sc;
+    private Instance instance;
     private String title;
 
     public KernelDensityPlot(ExperimentController expController) {
         super(expController);
-        comboSolver = new JComboBox();
-        comboInstance = new JComboBox();
-        dependencies = new Dependency[]{
+    }
+
+    public static Dependency[] getDependencies() {
+        if (comboSolver == null) {
+            comboSolver = new JComboBox();
+        }
+        if (comboInstance == null) {
+            comboInstance = new JComboBox();
+        }
+        return new Dependency[]{
                     new Dependency("Solver", comboSolver),
                     new Dependency("Instance", comboInstance)
                 };
     }
 
-    @Override
-    public void loadDefaultValues() throws Exception {
+    public static void loadDefaultValues(ExperimentController expController) throws Exception {
         comboSolver.removeAllItems();
         comboInstance.removeAllItems();
         for (SolverConfiguration sc : ExperimentDAO.getSolverConfigurationsInExperiment(expController.getActiveExperiment())) {
@@ -44,29 +51,27 @@ public class KernelDensityPlot extends Plot {
     }
 
     @Override
-    public Dependency[] getDependencies() {
-        return dependencies;
-    }
+    public void plot(Rengine engine, ArrayList<PointInformation> pointInformations) throws Exception {
+        
+        if (sc == null || instance == null) {
+            if (!(comboSolver.getSelectedItem() instanceof SolverConfiguration)) {
+                throw new DependencyException("You have to select a solver.");
+            }
+            if (!(comboInstance.getSelectedItem() instanceof Instance)) {
+                throw new DependencyException("You have to select an instance.");
+            }
+            if (engine.eval("library('np')") == null) {
+                throw new DependencyException("Did not find np library which is needed for this plot. "
+                        + "Please install the np library in r by typing install.packages('np').");
+            }
 
-    @Override
-    public void plot(Rengine engine, Vector<PointInformation> pointInformations) throws SQLException, DependencyException {
-        super.plot(engine, pointInformations);
-        if (!(comboSolver.getSelectedItem() instanceof SolverConfiguration)) {
-            throw new DependencyException("You have to select a solver.");
+            sc = (SolverConfiguration) comboSolver.getSelectedItem();
+            instance = (Instance) comboInstance.getSelectedItem();
         }
-        if (!(comboInstance.getSelectedItem() instanceof Instance)) {
-            throw new DependencyException("You have to select an instance.");
-        }
-        if (engine.eval("library('np')") == null) {
-            throw new DependencyException("Did not find np library which is needed for this plot. " +
-                    "Please install the np library in r by typing install.packages('np').");
-        }
-        SolverConfiguration sc = (SolverConfiguration) comboSolver.getSelectedItem();
-        Instance instance = (Instance) comboInstance.getSelectedItem();
-
+        initializeResults();
         title = "Kernel density estimation for " + sc.getName() + " on " + instance.getName() + " (" + expController.getActiveExperiment().getName() + ")";
 
-        Vector<ExperimentResult> expResults = getResults(sc.getId(), instance.getId());
+        ArrayList<ExperimentResult> expResults = getResults(sc.getId(), instance.getId());
         double[] results = new double[expResults.size()];
         for (int i = 0; i < expResults.size(); i++) {
             results[i] = expResults.get(i).getResultTime();
@@ -79,13 +84,12 @@ public class KernelDensityPlot extends Plot {
         engine.eval("mtext('Nonparametric kernel density estimation',padj=1, side=3, line=3, cex=1.7)"); // plot title
     }
 
-    @Override
-    public String toString() {
+    public static String getTitle() {
         return "Kernel density estimation for a solver on an instance";
     }
 
     @Override
-    public String getTitle() {
+    public String getPlotTitle() {
         return title;
     }
 }

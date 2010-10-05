@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
-import java.util.Vector;
+import java.util.ArrayList;
 
 public class ExperimentResultDAO {
 
@@ -30,7 +30,7 @@ public class ExperimentResultDAO {
         return r;
     }
 
-    public static void batchSave(Vector<ExperimentResult> v) throws SQLException {
+    public static void batchSave(ArrayList<ExperimentResult> v) throws SQLException {
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         try {
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
@@ -73,7 +73,7 @@ public class ExperimentResultDAO {
      * @param v vector of ExperimentResults to be updated
      * @throws SQLException
      */
-    public static void batchUpdateRun(Vector<ExperimentResult> v) throws SQLException {
+    public static void batchUpdateRun(ArrayList<ExperimentResult> v) throws SQLException {
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         try {
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
@@ -108,7 +108,7 @@ public class ExperimentResultDAO {
      * @param experimentResults the experiment results to be deleted
      * @throws SQLException
      */
-    public static void deleteExperimentResults(Vector<ExperimentResult> experimentResults) throws SQLException {
+    public static void deleteExperimentResults(ArrayList<ExperimentResult> experimentResults) throws SQLException {
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         try {
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
@@ -240,8 +240,8 @@ public class ExperimentResultDAO {
      * @return ExperimentResults vector
      * @throws SQLException
      */
-    public static Vector<ExperimentResult> getAllByExperimentId(int id) throws SQLException {
-        Vector<ExperimentResult> v = new Vector<ExperimentResult>();
+    public static ArrayList<ExperimentResult> getAllByExperimentId(int id) throws SQLException {
+        ArrayList<ExperimentResult> v = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery +
                 "WHERE Experiment_idExperiment=?;");
@@ -257,14 +257,16 @@ public class ExperimentResultDAO {
         return v;
     }
 
+
+
     /**
      * Returns all runs for an experiment specified by id
      * @param id the experiment id
      * @return vector of run numbers
      * @throws SQLException
      */
-    public static Vector<Integer> getAllRunsByExperimentId(int id) throws SQLException {
-        Vector<Integer> res = new Vector<Integer>();
+    public static ArrayList<Integer> getAllRunsByExperimentId(int id) throws SQLException {
+        ArrayList<Integer> res = new ArrayList<Integer>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT run " +
                 "FROM " + table + " " +
@@ -285,8 +287,8 @@ public class ExperimentResultDAO {
      * @return vector of solver config ids
      * @throws SQLException
      */
-    public static Vector<Integer> getAllInstanceIdsByExperimentId(int id) throws SQLException {
-        Vector<Integer> res = new Vector<Integer>();
+    public static ArrayList<Integer> getAllInstanceIdsByExperimentId(int id) throws SQLException {
+        ArrayList<Integer> res = new ArrayList<Integer>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT Instances_idInstance " +
                 "FROM " + table + " " +
@@ -307,8 +309,8 @@ public class ExperimentResultDAO {
      * @return vector of solver config ids
      * @throws SQLException
      */
-    public static Vector<Integer> getAllSolverConfigIdsByExperimentId(int id) throws SQLException {
-        Vector<Integer> res = new Vector<Integer>();
+    public static ArrayList<Integer> getAllSolverConfigIdsByExperimentId(int id) throws SQLException {
+        ArrayList<Integer> res = new ArrayList<Integer>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT SolverConfig_idSolverConfig " +
                 "FROM " + table + " " +
@@ -322,8 +324,8 @@ public class ExperimentResultDAO {
         return res;
     }
 
-    public static Vector<ExperimentResult> getAllByExperimentIdAndRun(int eid, int run) throws SQLException {
-        Vector<ExperimentResult> res = new Vector<ExperimentResult>();
+    public static ArrayList<ExperimentResult> getAllByExperimentIdAndRun(int eid, int run) throws SQLException {
+        ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery + "WHERE Experiment_idExperiment=? AND run=?;");
         st.setInt(1, eid);
@@ -363,8 +365,8 @@ public class ExperimentResultDAO {
         return 0;
     }
 
-    public static Vector<ExperimentResult> getAllBySolverConfiguration(SolverConfiguration sc) throws SQLException {
-        Vector<ExperimentResult> res = new Vector<ExperimentResult>();
+    public static ArrayList<ExperimentResult> getAllBySolverConfiguration(SolverConfiguration sc) throws SQLException {
+        ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery + "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=?;");
         st.setInt(1, sc.getExperiment_id());
@@ -378,8 +380,8 @@ public class ExperimentResultDAO {
         return res;
     }
 
-    public static Vector<ExperimentResult> getAllBySolverConfigurationAndStatus(SolverConfiguration sc, int status) throws SQLException {
-        Vector<ExperimentResult> res = new Vector<ExperimentResult>();
+    public static ArrayList<ExperimentResult> getAllBySolverConfigurationAndStatus(SolverConfiguration sc, int status) throws SQLException {
+        ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery + "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=? AND status=?;");
         st.setInt(1, sc.getExperiment_id());
@@ -410,8 +412,8 @@ public class ExperimentResultDAO {
         }
     }
 
-    public static Vector<ExperimentResult> getAllByExperimentHasInstance(ExperimentHasInstance ehi) throws SQLException {
-        Vector<ExperimentResult> res = new Vector<ExperimentResult>();
+    public static ArrayList<ExperimentResult> getAllByExperimentHasInstance(ExperimentHasInstance ehi) throws SQLException {
+        ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery + "WHERE Experiment_idExperiment=? AND Instances_idInstance=?;");
         st.setInt(1, ehi.getExperiment_id());
@@ -425,8 +427,8 @@ public class ExperimentResultDAO {
         return res;
     }
 
-    public static Vector<ExperimentResult> getAllBySolverConfigurationAndRunAndStatusOrderByTime(SolverConfiguration sc, int run, int status) throws SQLException {
-        Vector<ExperimentResult> res = new Vector<ExperimentResult>();
+    public static ArrayList<ExperimentResult> getAllBySolverConfigurationAndRunAndStatusOrderByTime(SolverConfiguration sc, int run, int status) throws SQLException {
+        ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery +
                 "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=? AND status=? AND run=? " +
@@ -700,7 +702,7 @@ public class ExperimentResultDAO {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line;
             while ((line = reader.readLine()) != null) {
-                sb.append(line + '\n');
+                sb.append(line).append('\n');
             }
             in.close();
             return sb.toString();

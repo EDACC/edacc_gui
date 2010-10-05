@@ -7,7 +7,7 @@ import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
 import edacc.model.NoConnectionToDBException;
 import java.sql.SQLException;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.swing.AbstractListModel;
 import javax.swing.JCheckBox;
 
@@ -17,8 +17,8 @@ import javax.swing.JCheckBox;
  */
 public class QueueListModel extends AbstractListModel {
 
-    public Vector<JCheckBox> checkBoxes;
-    private Vector<GridQueue> queues;
+    public ArrayList<JCheckBox> checkBoxes;
+    private ArrayList<GridQueue> queues;
     private ExperimentController expController;
 
     public QueueListModel(ExperimentController expController) throws NoConnectionToDBException, SQLException {
@@ -39,12 +39,12 @@ public class QueueListModel extends AbstractListModel {
     public void refreshQueues() throws NoConnectionToDBException, SQLException {
 
         queues = GridQueueDAO.getAll();
-        checkBoxes = new Vector<JCheckBox>();
+        checkBoxes = new ArrayList<JCheckBox>();
         for (GridQueue q : queues) {
             JCheckBox checkBox = new JCheckBox(q.getName());
             checkBoxes.add(checkBox);
             if (expController != null) {
-                Vector<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(expController.getActiveExperiment());
+                ArrayList<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(expController.getActiveExperiment());
                 for (ExperimentHasGridQueue ehgq : ehgqs) {
                     if (ehgq.getIdGridQueue() == q.getId()) {
                         checkBox.setSelected(true);
@@ -56,8 +56,8 @@ public class QueueListModel extends AbstractListModel {
         fireContentsChanged(queues, 0, queues.size() - 1);
     }
 
-    public Vector<GridQueue> getSelectedGridQueues() {
-        Vector<GridQueue> res = new Vector<GridQueue>();
+    public ArrayList<GridQueue> getSelectedGridQueues() {
+        ArrayList<GridQueue> res = new ArrayList<GridQueue>();
         for (int i = 0; i < queues.size(); i++) {
             if (checkBoxes.get(i).isSelected()) {
                 res.add(queues.get(i));

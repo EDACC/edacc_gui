@@ -15,8 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  *
@@ -188,11 +187,11 @@ public class GridQueueDAO {
         return null;
     }
 
-    public static Vector<GridQueue> getAll() throws NoConnectionToDBException, SQLException {
+    public static ArrayList<GridQueue> getAll() throws NoConnectionToDBException, SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT * FROM " + table);
         ResultSet rs = st.executeQuery();
-        Vector<GridQueue> res = new Vector<GridQueue>();
+        ArrayList<GridQueue> res = new ArrayList<GridQueue>();
         while (rs.next()) {
             GridQueue c = cache.getCached(rs.getInt("idgridQueue"));
             if (c != null) {
@@ -218,13 +217,13 @@ public class GridQueueDAO {
         return res;
     }
 
-    public static Vector<GridQueue> getAllByExperiment(Experiment e) throws SQLException {
+    public static ArrayList<GridQueue> getAllByExperiment(Experiment e) throws SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT * FROM " + table + " as q JOIN Experiment_has_gridQueue as eq ON "
                 + "q.idgridQueue = eq.gridQueue_idgridQueue WHERE eq.Experiment_idExperiment = ?");
         st.setInt(1, e.getId());
         ResultSet rs = st.executeQuery();
-        Vector<GridQueue> res = new Vector<GridQueue>();
+        ArrayList<GridQueue> res = new ArrayList<GridQueue>();
         while (rs.next()) {
             GridQueue c = cache.getCached(rs.getInt("idgridQueue"));
             if (c != null) {

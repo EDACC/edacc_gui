@@ -1,7 +1,7 @@
 package edacc.experiment;
 
 import javax.swing.table.AbstractTableModel;
-import java.util.Vector;
+import java.util.ArrayList;
 import edacc.model.Solver;
 
 /**
@@ -10,14 +10,14 @@ import edacc.model.Solver;
  */
 public class SolverTableModel extends AbstractTableModel {
     private String[] columns = {"Name", "binary name", "md5", "description","Selected"};
-    private Vector<Solver> solvers;
+    private ArrayList<Solver> solvers;
     private Boolean[] selected;
     
     public SolverTableModel() {
-        this.solvers = new Vector<Solver>();
+        this.solvers = new ArrayList<Solver>();
     }
 
-    public void setSolvers(Vector<Solver> solvers) {
+    public void setSolvers(ArrayList<Solver> solvers) {
         this.solvers = solvers;
         this.selected = new Boolean[solvers.size()];
         for (int i = 0; i < solvers.size(); i++) {

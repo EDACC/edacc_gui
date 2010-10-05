@@ -1,7 +1,7 @@
 package edacc;
 
 import edacc.model.ExperimentResultStatus;
-import java.util.Vector;
+import java.util.ArrayList;
 import org.jdesktop.application.Action;
 
 /**
@@ -15,9 +15,9 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.main = main;
-        Vector<String> instances = main.jobsTableModel.getInstances();
-        Vector<String> solvers = main.jobsTableModel.getSolvers();
-        Vector<ExperimentResultStatus> statusCodes = main.jobsTableModel.getStatusEnums();
+        ArrayList<String> instances = main.jobsTableModel.getInstances();
+        ArrayList<String> solvers = main.jobsTableModel.getSolvers();
+        ArrayList<ExperimentResultStatus> statusCodes = main.jobsTableModel.getStatusEnums();
         comboSolvers.removeAllItems();
         comboInstances.removeAllItems();
         comboStatusCodes.removeAllItems();

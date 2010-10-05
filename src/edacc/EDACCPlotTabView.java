@@ -6,7 +6,7 @@
 package edacc;
 
 import edacc.events.PlotTabEvents;
-import edacc.experiment.AnalyseController;
+import edacc.experiment.AnalysisController;
 import edacc.experiment.plots.PlotPanel;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -14,6 +14,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -40,6 +41,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JWindow;
+import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicButtonUI;
 import org.jdesktop.application.Action;
@@ -50,6 +53,7 @@ import org.jdesktop.application.Action;
  */
 public class EDACCPlotTabView extends javax.swing.JFrame {
 
+    private String warning;
     private static final String title = "Plots";
     private static final String mainWindowTitle = "Plots - main window";
     private static JWindow dragWindow = null;
@@ -120,6 +124,8 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         tabbedPanePlots.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabbedPanePlots.addMouseMotionListener(new TabbedPaneMouseMotionListener());
         tabbedPanePlots.addMouseListener(new TabbedPaneMouseListener());
+
+        btnWarning.setVisible(false);
     }
 
     private void addPanel(TabComponent tabComp, PlotPanel pnl) {
@@ -136,7 +142,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
             if (tabbedPanePlots.getTabComponentAt(i) == tabComponent) {
                 PlotPanel plotPanel = (PlotPanel) tabbedPanePlots.getComponentAt(i);
                 if (closeDevice) {
-                    AnalyseController.closeDevice(plotPanel.getDeviceNumber());
+                    AnalysisController.closeDevice(plotPanel.getDeviceNumber());
                 }
                 tabbedPanePlots.remove(i);
                 break;
@@ -169,9 +175,9 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
             }
         }
 
-        if (dropIdx == -1 &&
-                locX >= 0 && locY >= 0 &&
-                locX <= tabbedPanePlots.getWidth() && locY <= tabbedPanePlots.getTabComponentAt(tabbedPanePlots.getSelectedIndex()).getHeight()) {
+        if (dropIdx == -1
+                && locX >= 0 && locY >= 0
+                && locX <= tabbedPanePlots.getWidth() && locY <= tabbedPanePlots.getTabComponentAt(tabbedPanePlots.getSelectedIndex()).getHeight()) {
             dropIdx = tabbedPanePlots.getTabCount() - 1;
             dropBegin = false;
         }
@@ -230,6 +236,15 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         setTitle(title);
     }
 
+    public void updateWarning(PlotPanel plotPanel) {
+        if (plotPanel.getPlot().getWarning() != null) {
+            warning = plotPanel.getPlot().getWarning();
+            btnWarning.setVisible(true);
+        } else {
+            btnWarning.setVisible(false);
+        }
+    }
+
     /**
      * Adds a PlotPanel to the tab view.
      * @param pnl the panel to be added
@@ -246,6 +261,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
     public void addPanel(String title, PlotPanel pnl) {
         addPanel(new TabComponent(this, title), pnl);
         updateTitle(title);
+        updateWarning(pnl);
     }
 
     public static void addListener(PlotTabEvents listener) {
@@ -322,7 +338,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
     public static void removeTabView(EDACCPlotTabView tabView) {
         for (int i = 0; i < tabView.tabbedPanePlots.getTabCount(); i++) {
             PlotPanel plotPanel = (PlotPanel) tabView.tabbedPanePlots.getComponentAt(i);
-            AnalyseController.closeDevice(plotPanel.getDeviceNumber());
+            AnalysisController.closeDevice(plotPanel.getDeviceNumber());
         }
         tabViews.remove(tabView);
         if (tabViews.size() > 0) {
@@ -412,7 +428,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
             PlotPanel plotPanel = (PlotPanel) tabbedPanePlots.getSelectedComponent();
             //  TabComponent tc = (TabComponent) tabbedPanePlots.getTabComponentAt(tabbedPanePlots.getSelectedIndex());
             if ("pdf".equals(imgType)) {
-                AnalyseController.saveToPdf(plotPanel, fileName);
+                AnalysisController.saveToPdf(plotPanel, fileName);
                 //     tc.setTitle(name);
             } else {
                 try {
@@ -448,6 +464,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
 
         jPanel2 = new javax.swing.JPanel();
         btnSave = new javax.swing.JButton();
+        btnWarning = new javax.swing.JButton();
         tabbedPanePlots = new javax.swing.JTabbedPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -462,6 +479,10 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         btnSave.setText(resourceMap.getString("btnSave.text")); // NOI18N
         btnSave.setName("btnSave"); // NOI18N
 
+        btnWarning.setAction(actionMap.get("btnWarning")); // NOI18N
+        btnWarning.setText(resourceMap.getString("btnWarning.text")); // NOI18N
+        btnWarning.setName("btnWarning"); // NOI18N
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -469,12 +490,16 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnSave)
-                .addContainerGap(484, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 401, Short.MAX_VALUE)
+                .addComponent(btnWarning)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(btnSave)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSave)
+                    .addComponent(btnWarning))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -509,11 +534,14 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
             if (tabComponent == null) {
                 return;
             }
+            PlotPanel plotPanel = (PlotPanel) tabbedPanePlots.getComponentAt(tabbedPanePlots.getSelectedIndex());
+            updateWarning(plotPanel);
             this.updateTitle(tabComponent.getTitle());
         }
     }//GEN-LAST:event_tabbedPanePlotsStateChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSave;
+    private javax.swing.JButton btnWarning;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTabbedPane tabbedPanePlots;
     // End of variables declaration//GEN-END:variables
@@ -778,5 +806,10 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
             }
             return false;
         }
+    }
+
+    @Action
+    public void btnWarning() {
+        javax.swing.JOptionPane.showMessageDialog(null, warning, "Warning", javax.swing.JOptionPane.WARNING_MESSAGE);
     }
 }

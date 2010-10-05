@@ -367,9 +367,10 @@ public class EDACCView extends FrameView implements Observer {
         }
 
         EDACCApp.getApplication().show(databaseSettings);
-        statusMessageLabel.setText("Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
-        manageDBMode();
-
+        if (DatabaseConnector.getInstance().isConnected()) {
+            statusMessageLabel.setText("Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+            manageDBMode();
+        }
     }
 
     @Action
@@ -578,4 +579,3 @@ public class EDACCView extends FrameView implements Observer {
         return mode;
     }
 }
-

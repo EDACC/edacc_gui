@@ -1,12 +1,12 @@
 package edacc.experiment.plots;
 
-import edacc.experiment.AnalyseController;
+import edacc.experiment.AnalysisController;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -24,12 +24,14 @@ import org.rosuda.javaGD.GDCanvas;
 public class PlotPanel extends JPanel {
 
     public GDCanvas gdc;
-    public Vector<PointInformation> pointInformations;
+    private Plot plot;
+    public ArrayList<PointInformation> pointInformations;
     private int deviceNumber;
 
-    public PlotPanel() {
+    public PlotPanel(Plot plot) {
         super();
-        pointInformations = new Vector<PointInformation>();
+        this.plot = plot;
+        pointInformations = new ArrayList<PointInformation>();
         gdc = new GDCanvas(0, 0);
 
         gdc.setPreferredSize(new Dimension(0, 0));
@@ -48,8 +50,10 @@ public class PlotPanel extends JPanel {
     public int getDeviceNumber() {
         return deviceNumber;
     }
-    
 
+    public Plot getPlot() {
+        return plot;
+    }
 }
 class PointScanner extends MouseInputAdapter {
 
@@ -81,7 +85,7 @@ class PointScanner extends MouseInputAdapter {
         String str = null;
         double dist = 65535.; // infinity
         for (PointInformation info : graphicComponent.pointInformations) {
-            double[] point = AnalyseController.convertPoint(graphicComponent.getDeviceNumber(), info.getPoint());
+            double[] point = AnalysisController.convertPoint(graphicComponent.getDeviceNumber(), info.getPoint());
             Point p2 = new Point((int)point[0], (int)point[1]);
             double tmpdist = p.distance(p2);
             if (p.distance(p2) < 5.) {

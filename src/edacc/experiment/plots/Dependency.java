@@ -9,12 +9,10 @@ import java.awt.Component;
 public class Dependency {
     private String description;
     private Component guiObject;
-    private Object value;
 
     public Dependency(String description, Component guiObject) {
         this.description = description;
         this.guiObject = guiObject;
-        value = null;
     }
 
     public String getDescription() {
@@ -23,13 +21,5 @@ public class Dependency {
 
     public Component getGuiObject() {
         return guiObject;
-    }
-
-    public Object getValue() {
-        return value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
     }
 }

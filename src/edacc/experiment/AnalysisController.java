@@ -1,20 +1,27 @@
 package edacc.experiment;
 
 import edacc.experiment.plots.PlotPanel;
-import java.awt.Dimension;
 import java.util.HashMap;
 import org.rosuda.JRI.REXP;
-import org.rosuda.JRI.RMainLoopCallbacks;
 import org.rosuda.JRI.Rengine;
 
 /**
  *
  * @author simon
  */
-public class AnalyseController {
+public class AnalysisController {
     public static PlotPanel lastPlotPanel; // for the RPlotDevice .. see edacc.model.RPlotDevice.java
     private static Rengine re;
     private static HashMap<Integer, PlotPanel> plotPanels = new HashMap<Integer, PlotPanel>();
+
+    public static void checkForR() throws REngineInitializationException {
+        try {
+            System.loadLibrary("jri");
+        } catch (Throwable e) {
+            throw new REngineInitializationException(e.getMessage());
+        }
+    }
+    
     public static Rengine getREngine(PlotPanel plotPanel) throws REngineInitializationException {
 
         try {
@@ -27,7 +34,6 @@ public class AnalyseController {
                 if (!re.waitForR()) {
                     throw new REngineInitializationException("Cannot load R.");
                 }
-
                 if (re.eval("library(JavaGD)") == null) {
                     re.end();
                     re = null;

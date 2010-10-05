@@ -1,16 +1,10 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * EDACCExperimentModeNewSolver.java
  *
  * Created on 14.06.2010, 11:47:44
  */
 package edacc;
 
-import edacc.model.Experiment;
 import java.awt.event.KeyEvent;
 
 /**
@@ -19,8 +13,8 @@ import java.awt.event.KeyEvent;
  */
 public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
 
-    public String ExpName;
-    public String ExpDesc;
+    public String expName;
+    public String expDesc;
     public boolean canceled;
 
     /** Creates new form EDACCExperimentModeNewExp */
@@ -163,8 +157,8 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCreateExperimentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateExperimentActionPerformed
-        this.ExpName = this.txtExperimentName.getText();
-        this.ExpDesc = this.txtExperimentDescription.getText();
+        this.expName = this.txtExperimentName.getText();
+        this.expDesc = this.txtExperimentDescription.getText();
         this.canceled = false;
         this.setVisible(false);
     }//GEN-LAST:event_btnCreateExperimentActionPerformed
@@ -177,8 +171,8 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
 }//GEN-LAST:event_btnCancelActionPerformed
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-        this.ExpName = "";
-        this.ExpDesc = "";
+        this.expName = "";
+        this.expDesc = "";
     }//GEN-LAST:event_formWindowActivated
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed

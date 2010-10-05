@@ -5,8 +5,8 @@ import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstance;
 import edacc.model.ParameterInstanceDAO;
 import edacc.model.SolverConfiguration;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -16,13 +16,15 @@ import javax.swing.table.AbstractTableModel;
 public class SolverConfigurationTableModel extends AbstractTableModel {
     private String[] columns = {"Selected", "Solvername", "Parameters"};
     public boolean[] selected;
-    private Vector<SolverConfiguration> solverConfigurations;
-    private HashMap<Integer, Vector<ParameterInstance>> parameterInstances;
+    private ArrayList<SolverConfiguration> solverConfigurations;
+    private HashMap<Integer, ArrayList<ParameterInstance>> parameterInstances;
     
+    @Override
     public int getRowCount() {
         return solverConfigurations==null?0:solverConfigurations.size();
     }
 
+    @Override
     public int getColumnCount() {
         return columns.length;
     }
@@ -32,10 +34,10 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
      * @param row
      * @return null, if there was an error
      */
-    public Vector<ParameterInstance> getParameters(int row) {
+    public ArrayList<ParameterInstance> getParameters(int row) {
         try {
             SolverConfiguration sc = solverConfigurations.get(row);
-            Vector<ParameterInstance> params = parameterInstances.get(sc.getId());
+            ArrayList<ParameterInstance> params = parameterInstances.get(sc.getId());
             if (params == null) {
                 params = ParameterInstanceDAO.getBySolverConfigId(sc.getId());
                 parameterInstances.put(sc.getId(), params);
@@ -53,7 +55,7 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
      */
     public String getParameterString(int row) {
         try {
-            Vector<ParameterInstance> params = getParameters(row);
+            ArrayList<ParameterInstance> params = getParameters(row);
             if (params == null) {
                 return "";
             }
@@ -66,7 +68,7 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
                 else
                     paramString += solverParameter.getPrefix()+ " ";
 
-                if (params.lastElement() != param) {
+                if (params.get(params.size()-1) != param) {
                     paramString += " ";
                 }
             }
@@ -114,16 +116,16 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
         }
     }
 
-    public void setSolverConfigurations(Vector<SolverConfiguration> solverConfigurations) {
-        parameterInstances = new HashMap<Integer, Vector<ParameterInstance>>();
+    public void setSolverConfigurations(ArrayList<SolverConfiguration> solverConfigurations) {
+        parameterInstances = new HashMap<Integer, ArrayList<ParameterInstance>>();
         selected = new boolean[solverConfigurations.size()];
         for (int i = 0; i < selected.length; i++)
             selected[i] = false;
         this.solverConfigurations = solverConfigurations;
     }
 
-    public Vector<SolverConfiguration> getSelectedSolverConfigurations() {
-        Vector<SolverConfiguration> res = new Vector<SolverConfiguration>();
+    public ArrayList<SolverConfiguration> getSelectedSolverConfigurations() {
+        ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
         for (int i = 0; i < solverConfigurations.size(); i++) {
             if (selected[i]) {
                 res.add(solverConfigurations.get(i));
