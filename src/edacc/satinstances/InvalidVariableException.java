@@ -9,7 +9,7 @@ package edacc.satinstances;
  *
  * @author dgall
  */
-class InvalidVariableException extends Exception {
+public class InvalidVariableException extends Exception {
 
     public InvalidVariableException() {
     }
