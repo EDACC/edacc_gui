@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package edacc.model;
 
 import edacc.satinstances.ConvertException;
@@ -65,6 +64,13 @@ public class InstanceHasInstancePropertyDAO {
         st.setString(2, i.getInstanceProperty().getName());
         st.executeUpdate();
 
+        // set id if necessary
+        if (i.isSaved()) {
+            ResultSet rs = st.getGeneratedKeys();
+            if (rs.next()) {
+                i.setId(rs.getInt(1));
+            }
+        }
     }
 
     /**
@@ -103,7 +109,7 @@ public class InstanceHasInstancePropertyDAO {
         return new InstanceHasInstanceProperty(i, p, value);
     }
 
-     private static Vector<InstanceHasInstanceProperty> getInstanceHasInstancePropertyByInstanceId(int id) throws SQLException, InstanceClassMustBeSourceException, IOException {
+    private static Vector<InstanceHasInstanceProperty> getInstanceHasInstancePropertyByInstanceId(int id) throws SQLException, InstanceClassMustBeSourceException, IOException {
         Vector<InstanceHasInstanceProperty> res = new Vector<InstanceHasInstanceProperty>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idInstance=?");
         st.setInt(1, id);

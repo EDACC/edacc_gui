@@ -42,4 +42,8 @@ public class InstanceHasInstanceProperty extends BaseModel implements IntegerPKM
     public int getId() {
         return id;
     }
+
+    protected void setId(int id) {
+        this.id = id;
+    }
 }
