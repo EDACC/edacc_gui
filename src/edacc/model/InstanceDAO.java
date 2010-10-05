@@ -96,15 +96,15 @@ public class InstanceDAO {
                 }
 
                 File input = null;
-                File output = null;
+          //      File output = null;
                 FileInputStream fInStream = null;
                 
                 if (instance.getFile() != null) {
 
                         input = instance.getFile();
-                        output = new File(instance.getFile().getName());
-                        Util.sevenZipEncode(input, output);
-                        fInStream = new FileInputStream(output);
+                        //output = new File(instance.getFile().getName());
+                        //Util.sevenZipEncode(input, output);
+                        fInStream = new FileInputStream(input);
 
                         ps.setBinaryStream(4, fInStream);
 
@@ -114,19 +114,19 @@ public class InstanceDAO {
 
                 ps.executeUpdate();
 
-                if (instance.isNew()) {
-                    ResultSet rs = ps.getGeneratedKeys();
-                    if (rs.next()) {
-                        instance.setId(rs.getInt(1));
-                    }
-                    cache.cache(instance);
+                
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    instance.setId(rs.getInt(1));
                 }
+                cache.cache(instance);
+                
                 ps.close();
                 instance.setSaved();
 
                 fInStream.close();
-                output.delete();
-                input.delete();
+    //                output.delete();
+                //input.delete();
             } catch (Exception ex) {
                     Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -304,7 +304,7 @@ public class InstanceDAO {
                     continue;
                 }
                 Instance i = new Instance();
-                i.setId(rs.getInt("i.idInstance"));;
+                i.setId(rs.getInt("i.idInstance"));
                 i.setMd5(rs.getString("i.md5"));
                 i.setName(rs.getString("i.name"));
                 Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
@@ -343,10 +343,48 @@ public class InstanceDAO {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public static void getBinaryFileOfInstance(Instance i, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
-        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `instance` FROM " + table + " WHERE idInstance=?");
-        ps.setInt(1, i.getId());
-        ResultSet rs = ps.executeQuery();
+    public static void getBinaryFileOfInstance(Instance i, File f) throws NoConnectionToDBException, FileNotFoundException, IOException {
+        try {
+            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `instance` FROM " + table + " WHERE idInstance=?");
+
+            ps.setInt(1, i.getId());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                FileOutputStream out = new FileOutputStream(f);
+                InputStream in = rs.getBinaryStream(1);
+                int len = 0;
+                byte[] buffer = new byte[256*1024];
+                while ((len = in.read(buffer)) > -1) {
+                    out.write(buffer, 0, len);
+                }
+                out.close();
+                in.close();
+            }
+            /*
+            File input = new File(f.getAbsolutePath() + "test");
+            input.getParentFile().mkdirs();
+            if (rs.next()) {
+            FileOutputStream out = new FileOutputStream(input);
+            InputStream in = rs.getBinaryStream("instance");
+            int len;
+            byte[] buf = new byte[256 * 1024];
+            while ((len = in.read(buf)) > -1) {
+            out.write(buf, 0, len);
+            }
+            out.flush();
+            out.close();
+            in.close();
+            try{
+            Util.sevenZipDecode(input, f);
+            } catch (Exception ex) {
+            Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            input.delete();
+            }*/
+        } catch (SQLException ex) {
+            Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        /*
         File input = new File(f.getAbsolutePath() + "test");
         input.getParentFile().mkdirs();
         if (rs.next()) {
@@ -360,13 +398,14 @@ public class InstanceDAO {
         out.flush();
         out.close();
         in.close();
+
             try{
-                Util.sevenZipDecode(input, f);
+               Util.sevenZipDecode(input, f);
             } catch (Exception ex) {
                 Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
             input.delete();
-        }
+        }*/
     }
 
     public static void clearCache() {

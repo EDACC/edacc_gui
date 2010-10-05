@@ -237,8 +237,8 @@ public class ManageDBInstances implements Observer{
            task.setStatus(i + " of " + rows.length + " instances are exported");
            task.setTaskProgress((float)i/(float)rows.length);
            if (!md5File.equals(temp.getMd5())){
-            //    md5Error.add(temp);
-            //    f.delete();
+               md5Error.add(temp);
+               f.delete();
            }
         }
 
