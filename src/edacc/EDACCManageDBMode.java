@@ -1191,8 +1191,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
                 this.addInstanceDialog = new EDACCAddNewInstanceSelectClassDialog(mainFrame, true);
                 this.addInstanceDialog.setLocationRelativeTo(mainFrame);
-            } else
-                addInstanceDialog.refresh();
+            } 
+            addInstanceDialog.refresh();
             EDACCApp.getApplication().show(this.addInstanceDialog);
             InstanceClass input = this.addInstanceDialog.getInput();
             int searchDepth = this.addInstanceDialog.getSearchDepth();
