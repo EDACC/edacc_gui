@@ -5,6 +5,8 @@ import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.ExperimentResultHasSolverProperty;
 import edacc.model.ExperimentResultHasSolverPropertyDAO;
+import edacc.model.Instance;
+import edacc.model.InstanceProperty;
 import edacc.model.SolverProperty;
 import edacc.model.SolverPropertyDAO;
 import edacc.satinstances.ConvertException;
@@ -114,6 +116,11 @@ public abstract class Plot {
             }
             return res;
         }
+    }
+
+    public Double getValue(Instance instance, InstanceProperty property) {
+        //InstanceHasInstanceProperty ihip = instance.get
+        return 0.;
     }
 
     /**

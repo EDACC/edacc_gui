@@ -5,8 +5,9 @@ import java.util.LinkedList;
 import javax.swing.table.AbstractTableModel;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultHasSolverProperty;
-import edacc.model.ExperimentResultHasSolverPropertyDAO;
 import edacc.model.ExperimentResultStatus;
+import edacc.model.GridQueue;
+import edacc.model.GridQueueDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.Parameter;
@@ -20,7 +21,6 @@ import edacc.model.SolverDAO;
 import edacc.model.SolverProperty;
 import edacc.model.SolverPropertyDAO;
 import edacc.properties.FilePropertyParser;
-import edacc.properties.SolverPropertyType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,28 +34,30 @@ import javax.swing.SwingUtilities;
 public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
     public static int COL_ID = 0;
-    public static int COL_SOLVER = 1;
-    public static int COL_PARAMETERS = 2;
-    public static int COL_INSTANCE = 3;
-    public static int COL_RUN = 4;
-    public static int COL_TIME = 5;
-    public static int COL_SEED = 6;
-    public static int COL_STATUS = 7;
-    public static int COL_RESULTCODE = 8;
-    public static int COL_SOLVER_OUTPUT = 9;
-    public static int COL_LAUNCHER_OUTPUT = 10;
-    public static int COL_WATCHER_OUTPUT = 11;
-    public static int COL_VERIFIER_OUTPUT = 12;
-    public static int COL_PROPERTY = 13;
+    public static int COL_COMPUTEQUEUE = 1;
+    public static int COL_SOLVER = 2;
+    public static int COL_PARAMETERS = 3;
+    public static int COL_INSTANCE = 4;
+    public static int COL_RUN = 5;
+    public static int COL_TIME = 6;
+    public static int COL_SEED = 7;
+    public static int COL_STATUS = 8;
+    public static int COL_RESULTCODE = 9;
+    public static int COL_SOLVER_OUTPUT = 10;
+    public static int COL_LAUNCHER_OUTPUT = 11;
+    public static int COL_WATCHER_OUTPUT = 12;
+    public static int COL_VERIFIER_OUTPUT = 13;
+    public static int COL_PROPERTY = 14;
     private static final FilePropertyParser parser = new FilePropertyParser(); // just for now
     private ArrayList<ExperimentResult> jobs;
-    private String[] CONST_COLUMNS = {"ID", "Solver", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
-    private boolean[] CONST_VISIBLE = {false, true, true, true, true, true, true, true, true, false, false, false, false};
+    private String[] CONST_COLUMNS = {"ID", "Compute Queue", "Solver", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
+    private boolean[] CONST_VISIBLE = {false, true, true, true, true, true, true, true, true, true, false, false, false, false};
     private String[] columns;
     private ArrayList<SolverProperty> solverProperties;
-    private ArrayList<ExperimentResultHasSolverProperty> propertyValues;
+    private ExperimentResultHasSolverProperty[][] propertyValues;
     private boolean[] visible;
     private HashMap<Integer, ArrayList<ParameterInstance>> parameterInstances;
+    private String[] gridQueues;
 
     public ExperimentResultsBrowserTableModel() {
         columns = new String[CONST_COLUMNS.length];
@@ -71,6 +73,11 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         try {
             solverProperties.addAll(SolverPropertyDAO.getAll());
         } catch (Exception e) {
+        }
+        for (int i = solverProperties.size() - 1; i >= 0; i--) {
+            if (solverProperties.get(i).isMultiple()) {
+                solverProperties.remove(i);
+            }
         }
         columns = java.util.Arrays.copyOf(columns, CONST_COLUMNS.length + solverProperties.size());
         visible = java.util.Arrays.copyOf(visible, CONST_VISIBLE.length + solverProperties.size());
@@ -249,7 +256,32 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             @Override
             public void run() {
                 ExperimentResultsBrowserTableModel.this.jobs = jobs;
-                parameterInstances = new HashMap<Integer, ArrayList<ParameterInstance>>();
+                if (jobs != null) {
+                    if (solverProperties.size() > 0) {
+                        propertyValues = new ExperimentResultHasSolverProperty[jobs.size()][];
+                        for (int i = 0; i < jobs.size(); i++) {
+                            propertyValues[i] = new ExperimentResultHasSolverProperty[solverProperties.size()];
+                            for (int j = 0; j < solverProperties.size(); j++) {
+                                propertyValues[i][j] = jobs.get(i).getPropertyValues().get(solverProperties.get(j).getId());
+                            }
+                        }
+                    }
+                    parameterInstances = new HashMap<Integer, ArrayList<ParameterInstance>>();
+                    gridQueues = new String[jobs.size()];
+                    try {
+                        ArrayList<GridQueue> queues = GridQueueDAO.getAll();
+                        HashMap<Integer, GridQueue> queueMap = new HashMap<Integer, GridQueue>();
+                        for (GridQueue q : queues) {
+                            queueMap.put(q.getId(), q);
+                        }
+                        for (int i = 0; i < jobs.size(); i++) {
+                            GridQueue q = queueMap.get(jobs.get(i).getComputeQueue());
+                            gridQueues[i] = q != null ? q.getName() : "none";
+                        }
+                    } catch (Exception e) {
+                    }
+
+                }
                 ExperimentResultsBrowserTableModel.this.fireTableDataChanged();
             }
         };
@@ -365,41 +397,43 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             case 0:
                 return j.getId();
             case 1:
+                return gridQueues[rowIndex];
+            case 2:
                 Solver solver = getSolver(rowIndex);
                 return solver == null ? "" : solver.getName();
-            case 2:
-                return getParameterString(rowIndex);
             case 3:
+                return getParameterString(rowIndex);
+            case 4:
                 Instance instance = getInstance(rowIndex);
                 return instance == null ? "" : instance.getName();
-            case 4:
-                return j.getRun();
             case 5:
-                return j.getResultTime();
+                return j.getRun();
             case 6:
-                return j.getSeed();
+                return j.getResultTime();
             case 7:
+                return j.getSeed();
+            case 8:
                 String status = j.getStatus().toString();
                 if (j.getStatus() == ExperimentResultStatus.RUNNING && j.getRunningTime() != null) {
                     status += " (" + j.getRunningTime() + ")";
                 }
                 return status;
-            case 8:
-                return j.getResultCode().toString();
             case 9:
-                return j.getSolverOutputFilename();
+                return j.getResultCode().toString();
             case 10:
-                return j.getLauncherOutputFilename();
+                return j.getSolverOutputFilename();
             case 11:
-                return j.getWatcherOutputFilename();
+                return j.getLauncherOutputFilename();
             case 12:
+                return j.getWatcherOutputFilename();
+            case 13:
                 return j.getVerifierOutputFilename();
             default:
-                int property = columnIndex - COL_PROPERTY;
-                if (solverProperties.size() < property) {
+                int propertyIdx = columnIndex - COL_PROPERTY;
+                if (solverProperties.size() < propertyIdx) {
                     return "";
                 }
-                ExperimentResultHasSolverProperty erp = jobs.get(rowIndex).getPropertyValues().get(solverProperties.get(property).getId());
+                ExperimentResultHasSolverProperty erp = propertyValues[rowIndex][propertyIdx];
                 if (erp != null && !erp.getValue().isEmpty()) {
                     return erp.getValue().get(0);
                 } else {
@@ -431,39 +465,22 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
      */
     public ArrayList<String> getInstances() {
         ArrayList<String> res = new ArrayList<String>();
-
-
         if (getRowCount() == 0) {
             return res;
-
-
         }
         int experimentId = jobs.get(0).getExperimentId();
-
-
         try {
             LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(experimentId);
-
             HashSet<String> tmp = new HashSet<String>();
-
-
             for (Instance i : instances) {
                 if (!tmp.contains(i.getName())) {
                     tmp.add(i.getName());
-
-
                 }
             }
             res.addAll(tmp);
-
-
             return res;
-
-
         } catch (Exception ex) {
             return res;
-
-
         }
     }
 
@@ -473,22 +490,14 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public ArrayList<ExperimentResultStatus> getStatusEnums() {
         ArrayList<ExperimentResultStatus> res = new ArrayList<ExperimentResultStatus>();
         HashSet<ExperimentResultStatus> tmp = new HashSet<ExperimentResultStatus>();
-
-
         for (int i = 0; i
                 < getRowCount(); i++) {
             if (!tmp.contains(getStatus(i))) {
                 tmp.add(getStatus(i));
-
-
             }
         }
         res.addAll(tmp);
-
-
         return res;
-
-
     }
 
     /**
@@ -497,48 +506,31 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public ArrayList<String> getSolvers() {
         ArrayList<String> res = new ArrayList<String>();
         HashSet<String> tmp = new HashSet<String>();
-
-
         for (int i = 0; i
                 < getRowCount(); i++) {
             if (!tmp.contains(getSolver(i).getName())) {
                 tmp.add(getSolver(i).getName());
-
-
             }
         }
         res.addAll(tmp);
-
-
         return res;
-
-
     }
 
     public ArrayList<ExperimentResult> getJobs() {
         return jobs;
-
-
     }
 
     public int getJobsCount() {
         return jobs.size();
-
-
     }
 
     public int getJobsCount(ExperimentResultStatus status) {
         int res = 0;
-
-
         for (ExperimentResult j : jobs) {
             if (j.getStatus().equals(status)) {
                 res++;
-
-
             }
         }
         return res;
-
     }
 }
