@@ -185,6 +185,13 @@ public class ExperimentResultHasSolverPropertyDAO {
         return res;
     }
 
+    /**
+     * Assigns the ExperimentResultHasSolverProperty objects to the experiment results.
+     * @param expResults
+     * @param experimentId
+     * @throws SQLException
+     * @throws Exception
+     */
     public static void assign(ArrayList<ExperimentResult> expResults, int experimentId) throws SQLException, Exception {
         HashMap<Integer, ExperimentResult> experimentResults = new HashMap<Integer, ExperimentResult>();
         for (ExperimentResult er : expResults) {
