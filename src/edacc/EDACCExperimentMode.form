@@ -1475,17 +1475,17 @@
             </Component>
           </SubComponents>
         </Container>
-        <Container class="javax.swing.JScrollPane" name="panelAnalyse">
+        <Container class="javax.swing.JScrollPane" name="panelAnalysis">
           <Properties>
-            <Property name="name" type="java.lang.String" value="panelAnalyse" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="panelAnalysis" noResource="true"/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="panelAnalyse.setViewportView(analysePanel);&#xa;panelAnalyse.getVerticalScrollBar().setUnitIncrement(30);"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="panelAnalysis.setViewportView(analysePanel);&#xa;panelAnalysis.getVerticalScrollBar().setUnitIncrement(30);"/>
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Analyse">
-                <Property name="tabTitle" type="java.lang.String" resourceKey="panelAnalyse.TabConstraints.tabTitle"/>
+              <JTabbedPaneConstraints tabName="Analysis">
+                <Property name="tabTitle" type="java.lang.String" resourceKey="panelAnalysis.TabConstraints.tabTitle"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>

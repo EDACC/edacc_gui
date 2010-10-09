@@ -3,14 +3,13 @@ package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentDAO;
-import edacc.model.ExperimentResult;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import org.rosuda.JRI.Rengine;
@@ -20,9 +19,6 @@ import org.rosuda.JRI.Rengine;
  * @author simon
  */
 public class ScatterInstancePropertySolverProperty extends Plot {
-    private static int AVERAGE = -2;
-    private static int MEDIAN = -1;
-    private Dependency[] dependencies;
     private JComboBox comboInstanceProperty, comboSolverProperty, comboSolver, comboRun;
     private JTextField txtMaxValue;
     private InstanceSelector instanceSelector;
@@ -49,24 +45,19 @@ public class ScatterInstancePropertySolverProperty extends Plot {
         comboRun = new JComboBox();
         comboRun.addActionListener(loadMaxValue);
         instanceSelector = new InstanceSelector();
-        dependencies = new Dependency[]{
+       /* dependencies = new Dependency[]{
                     new Dependency("Instance property", comboInstanceProperty),
                     new Dependency("Solver property", comboSolverProperty),
                     new Dependency("Solver", comboSolver),
                     new Dependency("Instances", instanceSelector),
                     new Dependency("Plot for run", comboRun),
                     new Dependency("Max x/y-value (sec)", txtMaxValue)
-                };
+                };*/
     }
 
     @Override
-    public Dependency[] getDependencies() {
-        return dependencies;
-    }
-
-    @Override
-    public void plot(final Rengine re, Vector<PointInformation> pointInformations) throws SQLException, DependencyException {
-        super.plot(re, pointInformations);
+    public void plot(final Rengine re, ArrayList<PointInformation> pointInformations) throws Exception {
+        initializeResults();
         if (comboInstanceProperty.getItemCount() == 0) {
             throw new DependencyException("You have to select two properties.");
         }
@@ -87,8 +78,8 @@ public class ScatterInstancePropertySolverProperty extends Plot {
         if (run == -4) {
             throw new DependencyException("You have to select a run.");
         }
-        Vector<Instance> instances = instanceSelector.getSelectedInstances();
-        if (instances == null || instances.size() == 0) {
+        ArrayList<Instance> instances = instanceSelector.getSelectedInstances();
+        if (instances == null || instances.isEmpty()) {
             throw new DependencyException("You have to select instances in order to plot.");
         }
 
@@ -101,8 +92,8 @@ public class ScatterInstancePropertySolverProperty extends Plot {
 
         SolverConfiguration solverConfig = (SolverConfiguration) comboSolver.getSelectedItem();
        // plotTitle = xSolverConfig.getName() + " vs. " + ySolverConfig.getName() + " (" + expController.getActiveExperiment().getName() + ")";
-        Vector<Float> xsVec = new Vector<Float>();
-        Vector<Float> ysVec = new Vector<Float>();
+        ArrayList<Float> xsVec = new ArrayList<Float>();
+        ArrayList<Float> ysVec = new ArrayList<Float>();
 
        /* for (Instance instance : instances) {
             if (run == AVERAGE) {
@@ -176,7 +167,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
         re.eval("par(new=1)");
         re.eval("plot(maxValue, maxValue, type='l', col='black', lty=2, xlim=c(0," + maxValue + "), ylim=c(0," + maxValue + "), xaxs='i', yaxs='i',xaxt='n',yaxt='n', xlab='', ylab='')");
 
-        Vector<double[]> points = getPoints(rengine, xs, ys);
+        ArrayList<double[]> points = getPoints(re, xs, ys);
         int k = 0;
         for (double[] point : points) {
             pointInformations.add(new PointInformation(point, "<html>" +
@@ -187,7 +178,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
         }
     }
 
-    @Override
+/*    @Override
     public void loadDefaultValues() throws SQLException {
         loadMaxValue();
         comboRun.removeAllItems();
@@ -203,12 +194,12 @@ public class ScatterInstancePropertySolverProperty extends Plot {
         for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
             comboRun.addItem(i);
         }
-        Vector<Instance> instances = new Vector<Instance>();
+        ArrayList<Instance> instances = new ArrayList<Instance>();
         instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
         instanceSelector.setInstances(instances);
         instanceSelector.btnSelectAll();
     }
-
+*/
     private void loadMaxValue() throws SQLException {
        /* double maxValue;
         if (!(comboSolver.getSelectedItem() instanceof SolverConfiguration) || !(comboRun.getSelectedItem() instanceof Integer)) {
@@ -229,12 +220,11 @@ public class ScatterInstancePropertySolverProperty extends Plot {
     }
 
     @Override
-    public String getTitle() {
+    public String getPlotTitle() {
         return plotTitle;
     }
 
-    @Override
-    public String toString() {
+    public static String getTitle() {
         return "Scatter plot - Result property against instance property";
     }
 }

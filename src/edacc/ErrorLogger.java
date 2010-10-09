@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edacc;
 
 import java.awt.AWTEvent;
@@ -18,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ErrorLogger extends EventQueue implements Thread.UncaughtExceptionHandler {
+    private static boolean DEBUG = true; // DEBUG = true => log exceptions to file and to stdout
     File log = null;
     Writer writer = null;
 
@@ -30,6 +27,7 @@ public class ErrorLogger extends EventQueue implements Thread.UncaughtExceptionH
         }
     }
 
+    @Override
     public void uncaughtException(Thread t, Throwable e) {
         e.printStackTrace(System.out);
         logException(e);
@@ -55,12 +53,15 @@ public class ErrorLogger extends EventQueue implements Thread.UncaughtExceptionH
         }
     }
 
+    @Override
     protected void dispatchEvent(AWTEvent newEvent) {
         try {
             super.dispatchEvent(newEvent);
         } catch (Throwable t) {
             logException(t);
-            t.printStackTrace(System.out);
+            if (DEBUG) {
+                t.printStackTrace(System.out);
+            }
         }
     }
 }

@@ -9,7 +9,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -80,6 +80,7 @@ public class SolverConfigurationSelector extends JPanel {
 
         btnSelectAll.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 btnSelectAll();
             }
@@ -87,6 +88,7 @@ public class SolverConfigurationSelector extends JPanel {
 
         btnDeselectAll.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 btnDeselectAll();
             }
@@ -94,6 +96,7 @@ public class SolverConfigurationSelector extends JPanel {
 
         btnInvert.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 btnInvert();
             }
@@ -121,11 +124,11 @@ public class SolverConfigurationSelector extends JPanel {
         tableModel.fireTableDataChanged();
     }
 
-    public void setSolverConfigurations(Vector<SolverConfiguration> solverConfigurations) {
+    public void setSolverConfigurations(ArrayList<SolverConfiguration> solverConfigurations) {
         tableModel.setSolverConfigurations(solverConfigurations);
     }
 
-    public Vector<SolverConfiguration> getSelectedSolverConfigurations() {
+    public ArrayList<SolverConfiguration> getSelectedSolverConfigurations() {
         return tableModel.getSelectedSolverConfigurations();
     }
 }

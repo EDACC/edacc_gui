@@ -11,7 +11,7 @@
 
 import random
 from edacc.web import app
-from edacc.constants import JOB_STATUS, JOB_STATUS_COLOR, JOB_RESULT_CODE
+from edacc.constants import JOB_STATUS, JOB_STATUS_COLOR, JOB_RESULT_CODE, JOB_RESULT_CODE_COLOR
 
 def download_size(value):
     """ Takes an integer number of bytes and returns a pretty string representation """
@@ -37,21 +37,28 @@ def result_code(value):
 def job_status_color(value):
     """ Returns an HTML conform color string for the job status """
     if value not in JOB_STATUS:
-        return ''
+        return 'grey'
     else:
         return JOB_STATUS_COLOR[value]
+
+def job_result_code_color(value):
+    """ Returns an HTML conform color string for the job result code """
+    if value not in JOB_RESULT_CODE_COLOR:
+        return 'grey'
+    else:
+        return JOB_RESULT_CODE_COLOR[value]
 
 def parameter_string(solver_config):
     """ Returns a string of the solver configuration parameters """
     parameters = solver_config.parameter_instances
     args = []
     for p in parameters:
-        args.append(p.parameter.prefix)
+        args.append(p.parameter.prefix or "")
         if p.parameter.hasValue:
             if p.value == "": # if value not set, use default value from parameters table
-                args.append(p.parameter.value)
+                args.append(p.parameter.value or "")
             else:
-                args.append(p.value)
+                args.append(p.value or "")
     return " ".join(args)
 
 def launch_command(solver_config):
@@ -75,8 +82,9 @@ def competition_phase(value):
 
 app.jinja_env.filters['download_size'] = download_size
 app.jinja_env.filters['job_status'] = job_status
-app.jinja_env.filters['result_code'] = job_status
+app.jinja_env.filters['result_code'] = result_code
 app.jinja_env.filters['job_status_color'] = job_status_color
+app.jinja_env.filters['job_result_code_color'] = job_result_code_color
 app.jinja_env.filters['launch_command'] = launch_command
 app.jinja_env.filters['datetimeformat'] = datetimeformat
 app.jinja_env.filters['competition_phase'] = competition_phase

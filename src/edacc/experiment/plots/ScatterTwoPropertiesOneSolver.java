@@ -8,6 +8,7 @@ import edacc.model.SolverConfiguration;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
@@ -18,7 +19,6 @@ import org.rosuda.JRI.Rengine;
  * @author simon
  */
 public class ScatterTwoPropertiesOneSolver extends Plot {
-    private Dependency[] dependencies;
     private JComboBox combo1, combo2, comboSolver, comboRun;
     private JTextField txtMaxValue;
     private InstanceSelector instanceSelector;
@@ -45,24 +45,19 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
         comboRun = new JComboBox();
         comboRun.addActionListener(loadMaxValue);
         instanceSelector = new InstanceSelector();
-        dependencies = new Dependency[]{
+      /*  dependencies = new Dependency[]{
                     new Dependency("First property", combo1),
                     new Dependency("Second property", combo2),
                     new Dependency("Solver", comboSolver),
                     new Dependency("Instances", instanceSelector),
                     new Dependency("Plot for run", comboRun),
                     new Dependency("Max x/y-value (sec)", txtMaxValue)
-                };
+                };*/
     }
 
     @Override
-    public Dependency[] getDependencies() {
-        return dependencies;
-    }
-
-    @Override
-    public void plot(final Rengine re, Vector<PointInformation> pointInformations) throws SQLException, DependencyException {
-        super.plot(re, pointInformations);
+    public void plot(final Rengine re, ArrayList<PointInformation> pointInformations) throws Exception {
+        initializeResults();
         if (combo1.getItemCount() == 0) {
             throw new DependencyException("You have to select two properties.");
         }
@@ -83,7 +78,7 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
         if (run == -4) {
             throw new DependencyException("You have to select a run.");
         }
-        Vector<Instance> instances = instanceSelector.getSelectedInstances();
+        ArrayList<Instance> instances = instanceSelector.getSelectedInstances();
         if (instances == null || instances.size() == 0) {
             throw new DependencyException("You have to select instances in order to plot.");
         }
@@ -172,7 +167,7 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
         re.eval("par(new=1)");
         re.eval("plot(maxValue, maxValue, type='l', col='black', lty=2, xlim=c(0," + maxValue + "), ylim=c(0," + maxValue + "), xaxs='i', yaxs='i',xaxt='n',yaxt='n', xlab='', ylab='')");
 
-        Vector<double[]> points = getPoints(rengine, xs, ys);
+        ArrayList<double[]> points = getPoints(re, xs, ys);
         int k = 0;
         for (double[] point : points) {
             pointInformations.add(new PointInformation(point, "<html>" +
@@ -183,7 +178,7 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
         }
     }
 
-    @Override
+   /* @Override
     public void loadDefaultValues() throws SQLException {
         loadMaxValue();
         comboRun.removeAllItems();
@@ -199,11 +194,11 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
         for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
             comboRun.addItem(i);
         }
-        Vector<Instance> instances = new Vector<Instance>();
+        ArrayList<Instance> instances = new ArrayList<Instance>();
         instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
         instanceSelector.setInstances(instances);
         instanceSelector.btnSelectAll();
-    }
+    }*/
 
     private void loadMaxValue() throws SQLException {
         double maxValue;
@@ -225,12 +220,11 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
     }
 
     @Override
-    public String getTitle() {
+    public String getPlotTitle() {
         return plotTitle;
     }
 
-    @Override
-    public String toString() {
+    public static String getTitle() {
         return "Scatter plot - Two result properties of a solver";
     }
 }

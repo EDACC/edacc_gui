@@ -7,9 +7,8 @@ import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import java.sql.SQLException;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.swing.JComboBox;
-import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.Rengine;
 
 /**
@@ -18,23 +17,32 @@ import org.rosuda.JRI.Rengine;
  */
 public class RTDPlot extends Plot {
 
-    private Dependency[] dependencies;
-    private JComboBox combo1, combo2, comboInstance;
+    private static JComboBox combo1, combo2, comboInstance;
+    private SolverConfiguration sc1, sc2;
+    private Instance instance;
 
     public RTDPlot(ExperimentController expController) {
         super(expController);
-        combo1 = new JComboBox();
-        combo2 = new JComboBox();
-        comboInstance = new JComboBox();
-        dependencies = new Dependency[]{
+    }
+
+    public static Dependency[] getDependencies() {
+        if (combo1 == null) {
+            combo1 = new JComboBox();
+        }
+        if (combo2 == null) {
+            combo2 = new JComboBox();
+        }
+        if (comboInstance == null) {
+            comboInstance = new JComboBox();
+        }
+        return new Dependency[]{
                     new Dependency("First solver", combo1),
                     new Dependency("Second solver", combo2),
                     new Dependency("Instance", comboInstance)
                 };
     }
 
-    @Override
-    public void loadDefaultValues() throws Exception {
+    public static void loadDefaultValues(ExperimentController expController) throws Exception {
         combo1.removeAllItems();
         combo2.removeAllItems();
         comboInstance.removeAllItems();
@@ -49,27 +57,22 @@ public class RTDPlot extends Plot {
     }
 
     @Override
-    public Dependency[] getDependencies() {
-        return dependencies;
-    }
+    public void plot(Rengine engine, ArrayList<PointInformation> pointInformations) throws Exception {
+        if (sc1 == null || sc2 == null || instance == null) {
+            if (!(combo1.getSelectedItem() instanceof SolverConfiguration) || !(combo2.getSelectedItem() instanceof SolverConfiguration)) {
+                throw new DependencyException("You have to select two solvers.");
+            }
+            if (!(comboInstance.getSelectedItem() instanceof Instance)) {
+                throw new DependencyException("You have to select an instance.");
+            }
 
-    @Override
-    public void plot(Rengine engine, Vector<PointInformation> pointInformations) throws SQLException, DependencyException {
-        super.plot(engine, pointInformations);
-
-        if (!(combo1.getSelectedItem() instanceof SolverConfiguration) || !(combo2.getSelectedItem() instanceof SolverConfiguration)) {
-            throw new DependencyException("You have to select two solvers.");
+            sc1 = (SolverConfiguration) combo1.getSelectedItem();
+            sc2 = (SolverConfiguration) combo2.getSelectedItem();
+            instance = (Instance) comboInstance.getSelectedItem();
         }
-        if (!(comboInstance.getSelectedItem() instanceof Instance)) {
-            throw new DependencyException("You have to select an instance.");
-        }
-
-        SolverConfiguration sc1 = (SolverConfiguration) combo1.getSelectedItem();
-        SolverConfiguration sc2 = (SolverConfiguration) combo2.getSelectedItem();
-        Instance instance = (Instance) comboInstance.getSelectedItem();
-
-        Vector<ExperimentResult> results1 = getResults(sc1.getId(), instance.getId());
-        Vector<ExperimentResult> results2 = getResults(sc2.getId(), instance.getId());
+        initializeResults();
+        ArrayList<ExperimentResult> results1 = getResults(sc1.getId(), instance.getId());
+        ArrayList<ExperimentResult> results2 = getResults(sc2.getId(), instance.getId());
 
         double max_x = 0;
         double[] resultsDouble1 = new double[results1.size()];
@@ -92,21 +95,21 @@ public class RTDPlot extends Plot {
 
         engine.assign("results1", resultsDouble1);
         engine.assign("results2", resultsDouble2);
-        engine.assign("legendNames", new String[] {sc1.toString(), sc2.toString()});
+        engine.assign("legendNames", new String[]{sc1.toString(), sc2.toString()});
         // plot without data to create the frame
         engine.eval("plot(c(), c(), type='p', col='red', las=1, xlim=c(0," + max_x + ") , ylim=c(-0.05,1.05), xaxs='i', yaxs='i', xlab='', ylab='', cex.main=1.5)");
         engine.eval("par(new=1)");
 
         // plot the two distributions
-        engine.eval("plot(ecdf(results1)," +
-                "main=''," +
-                "xlab='', ylab='', xaxs='i', yaxs='i', las=1, col='red'," +
-                "xlim=c(0.0," + max_x + "), ylim=c(-0.05,1.05))");
+        engine.eval("plot(ecdf(results1),"
+                + "main='',"
+                + "xlab='', ylab='', xaxs='i', yaxs='i', las=1, col='red',"
+                + "xlim=c(0.0," + max_x + "), ylim=c(-0.05,1.05))");
         engine.eval("par(new=1)");
-        engine.eval("plot(ecdf(results2)," +
-                "main=''," +
-                "xlab='', ylab='', xaxs='i', yaxs='i', las=1, col='blue'," +
-                "xlim=c(0.0," + max_x + "), ylim=c(-0.05,1.05))");
+        engine.eval("plot(ecdf(results2),"
+                + "main='',"
+                + "xlab='', ylab='', xaxs='i', yaxs='i', las=1, col='blue',"
+                + "xlim=c(0.0," + max_x + "), ylim=c(-0.05,1.05))");
 
         // plot labels and axes
         engine.eval("mtext('CPU Time (s)', side=1, line=3, cex=1.2)");                      // bottom axis label
@@ -114,19 +117,18 @@ public class RTDPlot extends Plot {
         engine.eval("mtext('RTD Comparison', padj=1, side=3, line=3, cex=1.7)");            // plot title
 
         // plot legend
-        engine.eval("legend('bottomright',"+
-        "legend=legendNames,"+
-        "col=c('red', 'blue'),"+
-        "pch=c(0,1), lty=1)");
+        engine.eval("legend('bottomright',"
+                + "legend=legendNames,"
+                + "col=c('red', 'blue'),"
+                + "pch=c(0,1), lty=1)");
     }
 
     @Override
-    public String getTitle() {
-        return "RTD Comparison (" +expController.getActiveExperiment().getName()+")";
+    public String getPlotTitle() {
+        return "RTD Comparison (" + expController.getActiveExperiment().getName() + ")";
     }
 
-    @Override
-    public String toString() {
+    public static String getTitle() {
         return "RTD Comparison of two solvers on an instance";
     }
 }

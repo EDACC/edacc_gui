@@ -12,7 +12,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -42,14 +42,15 @@ public class InstanceSelector extends JPanel {
         Dimension dimensionButton = new Dimension(109, 25);
         tableModel = new InstanceTableModel();
         table = new JTable(tableModel);
+        table.moveColumn(0,1);
         rowFilter = new InstanceTableModelRowFilter();
         rowFilter.setFilterInstanceClasses(false);
         sorter = new TableRowSorter<InstanceTableModel>(tableModel);
         table.setRowSorter(sorter);
         sorter.setRowFilter(rowFilter);
         TableColumnModel colModel = table.getColumnModel();
-        colModel.getColumn(0).setPreferredWidth(350);
-        colModel.getColumn(1).setPreferredWidth(15);
+        colModel.getColumn(0).setPreferredWidth(20);
+        colModel.getColumn(1).setPreferredWidth(1000);
  /*       colModel.getColumn(2).setPreferredWidth(15);
         colModel.getColumn(3).setPreferredWidth(15);
         colModel.getColumn(4).setPreferredWidth(15);
@@ -96,6 +97,7 @@ public class InstanceSelector extends JPanel {
 
         btnFilter.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 btnFilter();
             }
@@ -103,6 +105,7 @@ public class InstanceSelector extends JPanel {
 
         btnSelectAll.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 btnSelectAll();
             }
@@ -110,6 +113,7 @@ public class InstanceSelector extends JPanel {
 
         btnDeselectAll.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 btnDeselectAll();
             }
@@ -117,6 +121,7 @@ public class InstanceSelector extends JPanel {
 
         btnInvert.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 btnInvert();
             }
@@ -165,11 +170,11 @@ public class InstanceSelector extends JPanel {
         }
     }
 
-    public void setInstances(Vector<Instance> instances) {
+    public void setInstances(ArrayList<Instance> instances) {
         tableModel.setInstances(instances);
     }
 
-    public Vector<Instance> getSelectedInstances() {
+    public ArrayList<Instance> getSelectedInstances() {
         return tableModel.getSelectedInstances();
     }
 }

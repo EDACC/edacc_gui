@@ -13,6 +13,7 @@ import edacc.model.ExperimentHasInstance;
 import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
+import edacc.model.ExperimentResultHasSolverPropertyDAO;
 import edacc.model.ExperimentResultStatus;
 import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
@@ -64,7 +65,7 @@ public class ExperimentController {
     EDACCExperimentMode main;
     EDACCSolverConfigPanel solverConfigPanel;
     private Experiment activeExperiment;
-    private Vector<Experiment> experiments;
+    private ArrayList<Experiment> experiments;
     private static RandomNumberGenerator rnd = new JavaRandom();
 
     /**
@@ -82,7 +83,7 @@ public class ExperimentController {
      * @throws SQLException
      */
     public void initialize() throws SQLException {
-        Vector<Experiment> v = new Vector<Experiment>();
+        ArrayList<Experiment> v = new ArrayList<Experiment>();
         v.addAll(ExperimentDAO.getAll());
         experiments = v;
         main.expTableModel.setExperiments(experiments);
@@ -90,7 +91,7 @@ public class ExperimentController {
         Vector<InstanceClass> vic = new Vector<InstanceClass>();
         vic.addAll(InstanceClassDAO.getAll());
         main.instanceClassModel.setClasses(vic);
-        Vector<Instance> instances = new Vector<Instance>();
+        ArrayList<Instance> instances = new ArrayList<Instance>();
         instances.addAll(InstanceDAO.getAll());
         main.insTableModel.setInstances(instances);
 
@@ -107,13 +108,13 @@ public class ExperimentController {
         SolverConfigurationDAO.clearCache();
         task.setStatus("Loading solvers..");
         activeExperiment = ExperimentDAO.getById(id);
-        Vector<Solver> vs = new Vector<Solver>();
+        ArrayList<Solver> vs = new ArrayList<Solver>();
         vs.addAll(SolverDAO.getAll());
         main.solTableModel.setSolvers(vs);
         task.setTaskProgress(.33f);
 
         task.setStatus("Loading solver configurations..");
-        Vector<SolverConfiguration> vss = SolverConfigurationDAO.getSolverConfigurationByExperimentId(id);
+        ArrayList<SolverConfiguration> vss = SolverConfigurationDAO.getSolverConfigurationByExperimentId(id);
         for (int i = 0; i < vss.size(); i++) {
             main.solverConfigPanel.addSolverConfiguration(vss.get(i));
         }
@@ -189,8 +190,8 @@ public class ExperimentController {
     public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException {
 
         task.setStatus("Checking jobs..");
-        Vector<SolverConfiguration> deletedSolverConfigurations = SolverConfigurationDAO.getAllDeleted();
-        final Vector<ExperimentResult> deletedJobs = new Vector<ExperimentResult>();
+        ArrayList<SolverConfiguration> deletedSolverConfigurations = SolverConfigurationDAO.getAllDeleted();
+        final ArrayList<ExperimentResult> deletedJobs = new ArrayList<ExperimentResult>();
         for (SolverConfiguration sc : deletedSolverConfigurations) {
             deletedJobs.addAll(ExperimentResultDAO.getAllBySolverConfiguration(sc));
         }
@@ -251,7 +252,7 @@ public class ExperimentController {
     public void undoSolverConfigurations(Tasks task) throws SQLException {
         main.solverConfigPanel.beginUpdate();
         main.solverConfigPanel.removeAll();
-        Vector<SolverConfiguration> solverConfigurations = SolverConfigurationDAO.getAllCached();
+        ArrayList<SolverConfiguration> solverConfigurations = SolverConfigurationDAO.getAllCached();
         Collections.sort(solverConfigurations, new Comparator<SolverConfiguration>() {
 
             @Override
@@ -273,9 +274,9 @@ public class ExperimentController {
      */
     public void saveExperimentHasInstances(Tasks task) throws SQLException, InterruptedException, InvocationTargetException {
         task.setStatus("Checking jobs..");
-        Vector<ExperimentHasInstance> deletedInstances = main.insTableModel.getDeletedExperimentHasInstances();
+        ArrayList<ExperimentHasInstance> deletedInstances = main.insTableModel.getDeletedExperimentHasInstances();
         if (deletedInstances.size() > 0) {
-            Vector<ExperimentResult> deletedJobs = new Vector<ExperimentResult>();
+            ArrayList<ExperimentResult> deletedJobs = new ArrayList<ExperimentResult>();
             for (ExperimentHasInstance ehi : deletedInstances) {
                 deletedJobs.addAll(ExperimentResultDAO.getAllByExperimentHasInstance(ehi));
             }
@@ -354,11 +355,11 @@ public class ExperimentController {
         LinkedList<Instance> listInstances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
 
         // get solver configurations of this experiment
-        Vector<SolverConfiguration> vsc = SolverConfigurationDAO.getSolverConfigurationByExperimentId(activeExperiment.getId());
+        ArrayList<SolverConfiguration> vsc = SolverConfigurationDAO.getSolverConfigurationByExperimentId(activeExperiment.getId());
 
         int experiments_added = 0;
         HashMap<SeedGroup, Integer> linked_seeds = new HashMap<SeedGroup, Integer>();
-        Vector<ExperimentResult> experiment_results = new Vector<ExperimentResult>();
+        ArrayList<ExperimentResult> experiment_results = new ArrayList<ExperimentResult>();
 
         int elements = listInstances.size() * vsc.size() * numRuns;
         ExperimentDAO.updateNumRuns(activeExperiment);
@@ -366,18 +367,18 @@ public class ExperimentController {
             // We have to delete jobs
             int runsToDelete = activeExperiment.getNumRuns() - numRuns;
             task.setStatus("Preparing..");
-            Vector<Integer> runs = ExperimentResultDAO.getAllRunsByExperimentId(activeExperiment.getId());
-            Vector<Integer> deleteRuns = new Vector<Integer>();
+            ArrayList<Integer> runs = ExperimentResultDAO.getAllRunsByExperimentId(activeExperiment.getId());
+            ArrayList<Integer> deleteRuns = new ArrayList<Integer>();
             Random random = new Random();
             for (int i = 0; i < runsToDelete; i++) {
-                if (runs.size() == 0) {
+                if (runs.isEmpty()) {
                     break;
                 }
                 int index = random.nextInt(runs.size());
                 deleteRuns.add(runs.get(index));
                 runs.remove(index);
             }
-            Vector<ExperimentResult> deletedJobs = new Vector<ExperimentResult>();
+            ArrayList<ExperimentResult> deletedJobs = new ArrayList<ExperimentResult>();
             for (int i = 0; i < deleteRuns.size(); i++) {
                 int run = deleteRuns.get(i);
                 if (task.isCancelled()) {
@@ -398,12 +399,12 @@ public class ExperimentController {
                     ExperimentResultDAO.setAutoCommit(false);
                     ExperimentResultDAO.deleteExperimentResults(deletedJobs);
                     task.setStatus("Updating existing jobs..");
-                    Vector<ExperimentResult> updateJobs = new Vector<ExperimentResult>();
+                    ArrayList<ExperimentResult> updateJobs = new ArrayList<ExperimentResult>();
                     for (int i = 0; i < runs.size(); i++) {
                         if (task.isCancelled()) {
                             throw new TaskCancelledException();
                         }
-                        Vector<ExperimentResult> tmp = ExperimentResultDAO.getAllByExperimentIdAndRun(activeExperiment.getId(), runs.get(i));
+                        ArrayList<ExperimentResult> tmp = ExperimentResultDAO.getAllByExperimentIdAndRun(activeExperiment.getId(), runs.get(i));
                         for (ExperimentResult er : tmp) {
                             er.setRun(i);
                         }
@@ -427,7 +428,7 @@ public class ExperimentController {
             }
             Tasks.getTaskView().setCancelable(true);
         }
-        Vector<ExperimentResult> res = ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId());
+        ArrayList<ExperimentResult> res = ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId());
         HashMap<ExperimentResult, ExperimentResult> existingResults = new HashMap<ExperimentResult, ExperimentResult>();
         for (ExperimentResult e : res) {
             existingResults.put(e, e);
@@ -549,13 +550,15 @@ public class ExperimentController {
         try {
 
 
-            Vector<ExperimentResult> jobs = ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId());
+            ArrayList<ExperimentResult> jobs = ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId());
+            ExperimentResultHasSolverPropertyDAO.assign(jobs, activeExperiment.getId());
             final ExperimentResultsBrowserTableModel sync = main.jobsTableModel;
             synchronized (sync) {
                 main.jobsTableModel.setJobs(jobs);
             }
             System.gc();
         } catch (Exception e) {
+            e.printStackTrace();
             // TODO: shouldn't happen but show message if it does
         }
 
@@ -595,7 +598,7 @@ public class ExperimentController {
         Tasks.getTaskView().setCancelable(true);
         Calendar cal = Calendar.getInstance();
         String dateStr = cal.get(Calendar.YEAR) + "" + (cal.get(Calendar.MONTH) < 9 ? "0" + (cal.get(Calendar.MONTH) + 1) : (cal.get(Calendar.MONTH) + 1)) + "" + (cal.get(Calendar.DATE) < 10 ? "0" + cal.get(Calendar.DATE) : cal.get(Calendar.DATE));
-        Vector<ExperimentHasGridQueue> eqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(activeExperiment);
+        ArrayList<ExperimentHasGridQueue> eqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(activeExperiment);
         int count = 0;
         for (ExperimentHasGridQueue eq : eqs) {
             GridQueue queue = GridQueueDAO.getById(eq.getIdGridQueue());
@@ -609,11 +612,11 @@ public class ExperimentController {
 
 
             task.setOperationName("Generating Package " + (++count) + " of " + eqs.size());
-            Vector<Solver> solvers;
+            ArrayList<Solver> solvers;
             if (exportSolvers) {
                 solvers = ExperimentDAO.getSolversInExperiment(activeExperiment);
             } else {
-                solvers = new Vector<Solver>();
+                solvers = new ArrayList<Solver>();
             }
 
             LinkedList<Instance> instances;
@@ -750,7 +753,7 @@ public class ExperimentController {
      * @param queues
      * @throws SQLException
      */
-    public void assignQueuesToExperiment(Vector<GridQueue> queues) throws SQLException {
+    public void assignQueuesToExperiment(ArrayList<GridQueue> queues) throws SQLException {
         // TODO: this operation should be atomic
 
         // create all ExperimentHasGridQueue objects which do not exist
@@ -763,7 +766,7 @@ public class ExperimentController {
         }
 
         // remove all ExperimentHasGridQueue objects which are not in the queues vektor
-        Vector<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(activeExperiment);
+        ArrayList<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(activeExperiment);
         for (ExperimentHasGridQueue egq : ehgqs) {
             boolean found = false;
             for (GridQueue q : queues) {
@@ -913,11 +916,11 @@ public class ExperimentController {
             if (numRuns != activeExperiment.getNumRuns()) {
                 return true;
             }
-            Vector<Integer> solverConfigIds = ExperimentResultDAO.getAllSolverConfigIdsByExperimentId(activeExperiment.getId());
-            if (solverConfigIds.size() == 0) {
+            ArrayList<Integer> solverConfigIds = ExperimentResultDAO.getAllSolverConfigIdsByExperimentId(activeExperiment.getId());
+            if (solverConfigIds.isEmpty()) {
                 return false;
             }
-            Vector<Integer> instanceIds = ExperimentResultDAO.getAllInstanceIdsByExperimentId(activeExperiment.getId());
+            ArrayList<Integer> instanceIds = ExperimentResultDAO.getAllInstanceIdsByExperimentId(activeExperiment.getId());
             if (!SolverConfigurationDAO.getAllSolverConfigIdsByExperimentId(activeExperiment.getId()).equals(solverConfigIds)) {
                 return true;
             }
@@ -927,14 +930,6 @@ public class ExperimentController {
         } catch (SQLException _) {
         }
         return false;
-    }
-
-    public void checkForR() throws REngineInitializationException {
-        try {
-            System.loadLibrary("jri");
-        } catch (Throwable e) {
-            throw new REngineInitializationException(e.getMessage());
-        }
     }
 
     public String getExperimentResultOutput(int type, ExperimentResult er) throws SQLException, NoConnectionToDBException, IOException {

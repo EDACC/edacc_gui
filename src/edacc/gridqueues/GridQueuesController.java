@@ -12,8 +12,8 @@ import edacc.model.GridQueueDAO;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Observable;
-import java.util.Vector;
 
 /**
  * @author dgall
@@ -76,9 +76,9 @@ public class GridQueuesController extends Observable {
         tmpPBSScript = null;
     }
 
-    public Vector<GridQueue> getChosenQueuesByExperiment(Experiment exp) throws SQLException {
-        Vector<GridQueue> res = new Vector<GridQueue>();
-        Vector<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(exp);
+    public ArrayList<GridQueue> getChosenQueuesByExperiment(Experiment exp) throws SQLException {
+        ArrayList<GridQueue> res = new ArrayList<GridQueue>();
+        ArrayList<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(exp);
         for (ExperimentHasGridQueue ehgq : ehgqs) {
             res.add(GridQueueDAO.getById(ehgq.getIdGridQueue()));
         }

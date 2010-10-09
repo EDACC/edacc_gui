@@ -8,10 +8,11 @@ import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
+import edacc.model.SolverProperty;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Vector;
 import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
 
@@ -28,114 +29,160 @@ class SolverInfos {
  */
 public class CactusPlot extends Plot {
 
-    private Dependency[] dependencies;
-    private JComboBox comboRun;
-    private InstanceSelector instanceSelector;
-    private SolverConfigurationSelector solverConfigurationSelector;
+    private static JComboBox comboRun, comboProperty;
+    private static InstanceSelector instanceSelector;
+    private static SolverConfigurationSelector solverConfigurationSelector;
+    private Integer run;
+    private SolverProperty property;
+    private ArrayList<Instance> instances;
+    private ArrayList<SolverConfiguration> solverConfigs;
+    private HashSet<Integer> selectedInstanceIds;
 
     public CactusPlot(ExperimentController expController) {
         super(expController);
-        comboRun = new JComboBox();
-        instanceSelector = new InstanceSelector();
-        solverConfigurationSelector = new SolverConfigurationSelector();
-        dependencies = new Dependency[]{
+    }
+
+    public static Dependency[] getDependencies() {
+        if (comboRun == null) {
+            comboRun = new JComboBox();
+        }
+        if (comboProperty == null) {
+            comboProperty = new JComboBox();
+        }
+        if (instanceSelector == null) {
+            instanceSelector = new InstanceSelector();
+        }
+        if (solverConfigurationSelector == null) {
+            solverConfigurationSelector = new SolverConfigurationSelector();
+        }
+        return new Dependency[]{
                     new Dependency("Solvers", solverConfigurationSelector),
                     new Dependency("Instances", instanceSelector),
+                    new Dependency("Property", comboProperty),
                     new Dependency("Plot for run", comboRun)
                 };
     }
 
-    @Override
-    public Dependency[] getDependencies() {
-        return dependencies;
+    public static void loadDefaultValues(ExperimentController expController) throws Exception {
+        comboRun.removeAllItems();
+        comboRun.addItem("all runs - average");
+        comboRun.addItem("all runs - median");
+        comboRun.addItem("all runs");
+        for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
+            comboRun.addItem(i);
+        }
+        comboProperty.removeAllItems();
+        for (SolverProperty sp : getSolverProperties()) {
+            comboProperty.addItem(sp);
+        }
+        ArrayList<Instance> instances = new ArrayList<Instance>();
+        instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
+        instanceSelector.setInstances(instances);
+        instanceSelector.btnSelectAll();
+        solverConfigurationSelector.setSolverConfigurations(SolverConfigurationDAO.getSolverConfigurationByExperimentId(expController.getActiveExperiment().getId()));
+        solverConfigurationSelector.btnSelectAll();
     }
 
     @Override
-    public void plot(Rengine engine, Vector<PointInformation> pointInformations) throws SQLException, DependencyException {
-        super.plot(engine, pointInformations);
-        int run = -4;
-        if ("all runs - average".equals(comboRun.getSelectedItem())) {
-            run = AVERAGE;
-        } else if ("all runs - median".equals(comboRun.getSelectedItem())) {
-            run = MEDIAN;
-        } else if ("all runs".equals(comboRun.getSelectedItem())) {
-            run = ALLRUNS;
-        } else if (comboRun.getSelectedItem() instanceof Integer) {
-            run = (Integer) comboRun.getSelectedItem();
+    public void plot(Rengine engine, ArrayList<PointInformation> pointInformations) throws Exception {
+        if (run == null || property == null || instances == null || solverConfigs == null || selectedInstanceIds == null) {
+            run = -4;
+            if ("all runs - average".equals(comboRun.getSelectedItem())) {
+                run = AVERAGE;
+            } else if ("all runs - median".equals(comboRun.getSelectedItem())) {
+                run = MEDIAN;
+            } else if ("all runs".equals(comboRun.getSelectedItem())) {
+                run = ALLRUNS;
+            } else if (comboRun.getSelectedItem() instanceof Integer) {
+                run = (Integer) comboRun.getSelectedItem();
+            }
+            if (run == -4) {
+                throw new DependencyException("You have to select a run.");
+            }
+            instances = instanceSelector.getSelectedInstances();
+            if (instances == null || instances.isEmpty()) {
+                throw new DependencyException("You have to select instances in order to plot.");
+            }
+            solverConfigs = solverConfigurationSelector.getSelectedSolverConfigurations();
+            if (solverConfigs.isEmpty()) {
+                throw new DependencyException("You have to select solvers in order to plot.");
+            }
+            if (!(comboProperty.getSelectedItem() instanceof SolverProperty)) {
+                throw new DependencyException("You have to select a property.");
+            }
+            property = (SolverProperty) comboProperty.getSelectedItem();
+            selectedInstanceIds = new HashSet<Integer>();
+            for (Instance i : instances) {
+                selectedInstanceIds.add(i.getId());
+            }
         }
-        if (run == -4) {
-            throw new DependencyException("You have to select a run.");
-        }
-        Vector<Instance> instances = instanceSelector.getSelectedInstances();
-        if (instances == null || instances.size() == 0) {
-            throw new DependencyException("You have to select instances in order to plot.");
-        }
-        Vector<SolverConfiguration> solverConfigs = solverConfigurationSelector.getSelectedSolverConfigurations();
-        if (solverConfigs.size() == 0) {
-            throw new DependencyException("You have to select solvers in order to plot.");
-        }
-        HashSet<Integer> selectedInstanceIds = new HashSet<Integer>();
-        for (Instance i : instances) {
-            selectedInstanceIds.add(i.getId());
-        }
-
+        initializeResults();
         SolverInfos[] solver = new SolverInfos[solverConfigs.size()];
         double max_y = 0;
+        int max_x = 0;
         for (int i = 0; i < solver.length; i++) {
             SolverConfiguration sc = solverConfigs.get(i);
-
-
-
-            Vector<Float> resultTimes = new Vector<Float>();
-
+            ArrayList<Double> resultValues = new ArrayList<Double>();
             int k = 0;
             for (Integer instanceId : selectedInstanceIds) {
-                try {
-                    if (run == ALLRUNS) {
-                        Vector<ExperimentResult> tmp = getResults(sc.getId(), instanceId);
-                        for (ExperimentResult er : tmp) {
-                            if (er.getStatus() == ExperimentResultStatus.SUCCESSFUL) {
-                                resultTimes.add(er.getResultTime());
-                            }
+                if (run == ALLRUNS) {
+                    ArrayList<ExperimentResult> tmp = getResults(sc.getId(), instanceId);
+                    for (ExperimentResult er : tmp) {
+                        Double value = getValue(er, property);
+                        if (value != null) {
+                            resultValues.add(value);
                         }
-                    } else {
-                      //  ExperimentResult er = getResult(sc.getId(), instanceId, run);
-                      //  if (er.getExperimentResultStatus().equals(ExperimentResultStatus.SUCCESSFUL)) {
-                      //      resultTimes.add(er.getTime());
-                      //  }
-                        // TODO: this might be senseless :-) -> will be changed with properties
-                        resultTimes.add(getResultValue(sc.getId(), instanceId, run).floatValue());
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } else if (run == MEDIAN || run == AVERAGE) {
+                    ArrayList<ExperimentResult> results = getResults(sc.getId(), instanceId);
+                    Double value;
+                    if (run == MEDIAN) {
+                        value = getMedian(results, property);
+                    } else {
+                        value = getAverage(results, property);
+                    }
+                    if (value != null) {
+                        resultValues.add(value);
+                    }
+                    if (value == null || results.size() != expController.getActiveExperiment().getNumRuns()) {
+                        // TODO: warning
+                    }
+                } else {
+                    ExperimentResult res = getResult(sc.getId(), instanceId, run);
+                    if (res == null) {
+                        continue;
+                    }
+                    Double value = getValue(res, property);
+                    if (value == null) {
+                        continue;
+                    }
+                    resultValues.add(value);
                 }
             }
-            Collections.sort(resultTimes);
+            Collections.sort(resultValues);
 
             solver[i] = new SolverInfos();
             solver[i].name = SolverDAO.getById(sc.getSolver_id()).getName();
-            solver[i].xs = new int[resultTimes.size() + 1];
-            solver[i].ys = new double[resultTimes.size() + 1];
+            solver[i].xs = new int[resultValues.size() + 1];
+            solver[i].ys = new double[resultValues.size() + 1];
 
             k = 1;
             solver[i].xs[0] = 0;
             solver[i].ys[0] = 0;
-            for (Float time : resultTimes) {
+            for (Double value : resultValues) {
                 solver[i].xs[k] = k;
-                solver[i].ys[k] = time;
-                if (time > max_y) {
-                    max_y = time;
+                solver[i].ys[k] = value;
+                if (value > max_y) {
+                    max_y = value;
                 }
                 k++;
             }
+            if (resultValues.size() > max_x) {
+                max_x = resultValues.size();
+            }
         }
         max_y = max_y * 1.05;
-        int max_x;
-        if (run == ALLRUNS) {
-            max_x = (int) (selectedInstanceIds.size() * expController.getActiveExperiment().getNumRuns() * 1.1) + 1;
-        } else {
-            max_x = (int) (selectedInstanceIds.size() * 1.1) + 1;
-        }
+        max_x = (int) (max_x * 1.1) + 1;
         engine.eval("plot(c(), c(), type='p', col='red', las=1, xlim=c(0," + max_x + "), ylim=c(0," + max_y + "), xaxs='i', yaxs='i', xlab='', ylab='', cex.main=1.5)");
         engine.eval("par(new=1)");
         String[] used_colors = new String[solver.length];
@@ -157,8 +204,8 @@ public class CactusPlot extends Plot {
         }
 
         engine.eval("mtext('number of solved instances', side=1, line=3, cex=1.2)");
-        engine.eval("mtext('CPU Time (s)', side=2, padj=0, line=3, cex=1.2)");
-        engine.eval("mtext('Number of instances solved within a given amount of time', padj=1, side=3, line=3, cex=1.7)");
+        engine.eval("mtext('" + property.getName() + "', side=2, padj=0, line=3, cex=1.2)");
+        engine.eval("mtext('Number of instances solved within a given amount of " + property.getName() + "', padj=1, side=3, line=3, cex=1.7)");
         String[] lnames = new String[solver.length];
         int[] pchs = new int[solver.length];
         int[] lty = new int[solver.length + 1];
@@ -175,30 +222,12 @@ public class CactusPlot extends Plot {
         engine.eval("legend(1, " + (max_y - (max_y * .3)) + ", legend=lnames, col=colors, pch=pchs, lty=ltys)");
     }
 
-    @Override
-    public String toString() {
-        return "Number of instances solved within a given amount of time";
+    public static String getTitle() {
+        return "Number of instances solved within a given amount of a property";
     }
 
     @Override
-    public void loadDefaultValues() throws SQLException {
-        comboRun.removeAllItems();
-        comboRun.addItem("all runs - average");
-        comboRun.addItem("all runs - median");
-        comboRun.addItem("all runs");
-        for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
-            comboRun.addItem(i);
-        }
-        Vector<Instance> instances = new Vector<Instance>();
-        instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
-        instanceSelector.setInstances(instances);
-        instanceSelector.btnSelectAll();
-        solverConfigurationSelector.setSolverConfigurations(SolverConfigurationDAO.getSolverConfigurationByExperimentId(expController.getActiveExperiment().getId()));
-        solverConfigurationSelector.btnSelectAll();
-    }
-
-    @Override
-    public String getTitle() {
+    public String getPlotTitle() {
         return "Cactus Plot (" + expController.getActiveExperiment().getName() + ")";
     }
 }

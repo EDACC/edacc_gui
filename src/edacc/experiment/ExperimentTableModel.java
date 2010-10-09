@@ -1,19 +1,19 @@
 package edacc.experiment;
 
 import javax.swing.table.AbstractTableModel;
-import java.util.Vector;
+import java.util.ArrayList;
 import edacc.model.Experiment;
 
 
 public class ExperimentTableModel extends AbstractTableModel {
     private String[] columns = {"Name", "Date", "Number of runs", "Description"};
-    private Vector<Experiment> experiments;
+    private ArrayList<Experiment> experiments;
 
     public ExperimentTableModel() {
-        this.experiments = new Vector<Experiment>();
+        this.experiments = new ArrayList<Experiment>();
     }
 
-    public void setExperiments(Vector<Experiment> experiments) {
+    public void setExperiments(ArrayList<Experiment> experiments) {
         this.experiments = experiments;
         this.fireTableDataChanged();
     }
@@ -35,7 +35,7 @@ public class ExperimentTableModel extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int col) {
-        if (experiments==null || experiments.size() == 0) {
+        if (experiments==null || experiments.isEmpty()) {
             return String.class;
         }
         return getValueAt(0, col).getClass();

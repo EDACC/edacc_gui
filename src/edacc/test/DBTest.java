@@ -6,8 +6,7 @@ package edacc.test;
  */
 
 import edacc.model.*;
-import java.util.LinkedList;
-import java.util.Vector;
+import java.util.ArrayList;
 /**
  *
  * @author daniel
@@ -20,7 +19,7 @@ public class DBTest {
     public static void main(String[] args) throws Exception {
         DatabaseConnector.getInstance().connect("localhost", 3306, "root", "EDACC", "" );
 
-        Vector<ExperimentResult> v = ExperimentResultDAO.getAllByExperimentId(10);
+        ArrayList<ExperimentResult> v = ExperimentResultDAO.getAllByExperimentId(10);
 
         System.out.println(v.get(0).getId());
 

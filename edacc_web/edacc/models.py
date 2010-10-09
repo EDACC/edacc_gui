@@ -124,13 +124,20 @@ class EDACCDatabase(object):
 
             def get_solved_instances(self, db):
                 """ Returns the instances of the experiment that all solvers solved in every run """
-                num_jobs_per_instance = db.session.query(db.ExperimentResult).filter_by(experiment=self).count() / \
-                                        db.session.query(db.Instance).filter(db.Instance.experiments.contains(self)).count()
+                numInstances = db.session.query(db.Instance).filter(db.Instance.experiments.contains(self)).count()
+                if numInstances == 0: return 0
+                num_jobs_per_instance = db.session.query(db.ExperimentResult).filter_by(experiment=self).count() / numInstances
                 instances = []
                 for i in self.instances:
                     if db.session.query(db.ExperimentResult).filter(db.ExperimentResult.resultCode.like('1%')).filter_by(experiment=self, instance=i, status=1).count() == num_jobs_per_instance:
                         instances.append(i)
                 return instances
+
+            def get_num_solver_configs(self, db):
+                return db.session.query(db.SolverConfiguration).filter_by(experiment=self).count()
+
+            def get_num_instances(self, db):
+                return db.session.query(db.Instance).filter(db.Instance.experiments.contains(self)).count()
 
         class ExperimentResult(object):
             """ Maps the ExperimentResult table. Provides a function
@@ -141,7 +148,11 @@ class EDACCDatabase(object):
                     experiment's timeOut value if the status is
                     not correct (certified SAT/UNSAT answer).
                 """
-                return self.resultTime if self.resultCode in (10, 11) else self.experiment.CPUTimeLimit
+                if self.resultTime is None or self.resultCode not in (10, 11):
+                    return self.experiment.CPUTimeLimit
+                else:
+                    return self.resultTime
+
 
             def get_property_value(self, property, db):
                 """ Returns the value of the property with the given name.

@@ -4,7 +4,6 @@
  */
 package edacc.model;
 
-import com.mysql.jdbc.NotImplemented;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,8 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  *
@@ -27,37 +25,6 @@ public class GridQueueDAO {
     protected static final String table = "gridQueue";
     private static final ObjectCache<GridQueue> cache = new ObjectCache<GridQueue>();
 
-//    /**
-//     * Grid Queue factory method, ensures that the created instance is persisted and assigned an ID
-//     * so it can be referenced by related objects. Checks if the instance is already in the Datebase.
-//     * @param md5
-//     * @return new Instance object
-//     * @throws SQLException, FileNotFoundException, InstanceAlreadyInDBException
-//     */
-//     public static GridQueue createQueue(File file, String name, int numAtoms, int numClauses ,
-//             float ratio, int maxClauseLength, String md5, InstanceClass instanceClass) throws SQLException, FileNotFoundException,
-//             InstanceAlreadyInDBException {
-//         PreparedStatement ps;
-//         final String Query = "SELECT * FROM " + table +" WHERE md5 = ?";
-//         ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
-//         ps.setString(1, md5);
-//         ResultSet rs = ps.executeQuery();
-//         if(rs.next()){
-//            throw new InstanceAlreadyInDBException();
-//         }
-//         Instance i = new Instance();
-//        i.setFile(file);
-//        i.setName(name);
-//        i.setNumAtoms(numAtoms);
-//        i.setNumClauses(numClauses);
-//        i.setRatio(ratio);
-//        i.setMaxClauseLength(maxClauseLength);
-//        i.setMd5(md5);
-//        i.setInstanceClass(instanceClass);
-//        save(i);
-//        cacheInstance(i);
-//        return i;
-//     }
     public static void delete(GridQueue q) throws NoConnectionToDBException, SQLException, InstanceIsInExperimentException {
         if (!isInAnyExperiment(q)) {
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM " + table + " WHERE idgridQueue=?");
@@ -182,17 +149,17 @@ public class GridQueueDAO {
             st.close();
             return q;
 
-        }
+        } 
         rs.close();
         st.close();
         return null;
     }
 
-    public static Vector<GridQueue> getAll() throws NoConnectionToDBException, SQLException {
+    public static ArrayList<GridQueue> getAll() throws NoConnectionToDBException, SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT * FROM " + table);
         ResultSet rs = st.executeQuery();
-        Vector<GridQueue> res = new Vector<GridQueue>();
+        ArrayList<GridQueue> res = new ArrayList<GridQueue>();
         while (rs.next()) {
             GridQueue c = cache.getCached(rs.getInt("idgridQueue"));
             if (c != null) {
@@ -218,13 +185,13 @@ public class GridQueueDAO {
         return res;
     }
 
-    public static Vector<GridQueue> getAllByExperiment(Experiment e) throws SQLException {
+    public static ArrayList<GridQueue> getAllByExperiment(Experiment e) throws SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT * FROM " + table + " as q JOIN Experiment_has_gridQueue as eq ON "
                 + "q.idgridQueue = eq.gridQueue_idgridQueue WHERE eq.Experiment_idExperiment = ?");
         st.setInt(1, e.getId());
         ResultSet rs = st.executeQuery();
-        Vector<GridQueue> res = new Vector<GridQueue>();
+        ArrayList<GridQueue> res = new ArrayList<GridQueue>();
         while (rs.next()) {
             GridQueue c = cache.getCached(rs.getInt("idgridQueue"));
             if (c != null) {

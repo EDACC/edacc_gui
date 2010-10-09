@@ -2,7 +2,7 @@ package edacc.experiment;
 
 import edacc.model.Parameter;
 import edacc.model.ParameterInstance;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -23,7 +23,7 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
         this.values = new String[0];
     }
 
-    public void setParameters(Vector<Parameter> parameters) {
+    public void setParameters(ArrayList<Parameter> parameters) {
         this.parameters = new Parameter[parameters.size()];
         this.parameterInstances = new ParameterInstance[parameters.size()];
         this.selected = new Boolean[parameters.size()];
@@ -57,7 +57,7 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
         return false;
     }
 
-    public void setParameterInstances(Vector<ParameterInstance> params) {
+    public void setParameterInstances(ArrayList<ParameterInstance> params) {
         for (int i = 0; i < params.size(); i++) {
             for (int j = 0; j < parameters.length; j++) {
 

@@ -1,6 +1,7 @@
 package edacc.model;
 
 import java.sql.Time;
+import java.util.HashMap;
 
 public class ExperimentResult extends BaseModel {
     public static final int SOLVER_OUTPUT = 0;
@@ -29,6 +30,8 @@ public class ExperimentResult extends BaseModel {
 
     private int computeQueue;
 
+    private HashMap<Integer, ExperimentResultHasSolverProperty> propertyValues;
+
     protected ExperimentResult() {
     }
 
@@ -45,7 +48,6 @@ public class ExperimentResult extends BaseModel {
         this.launcherOutputFilename = filename + ".launcher";
         this.watcherOutputFilename = filename + ".watcher";
         this.verifierOutputFilename = filename + ".verifier";
-
     }
 
     @Override
@@ -246,5 +248,13 @@ public class ExperimentResult extends BaseModel {
 
     public void setResultCode(int resultCode) {
         this.resultCode = ExperimentResultResultCode.getExperimentResultResultCode(resultCode);
+    }
+
+    public HashMap<Integer, ExperimentResultHasSolverProperty> getPropertyValues() {
+        return propertyValues;
+    }
+
+    public void setPropertyValues(HashMap<Integer, ExperimentResultHasSolverProperty> propertyValues) {
+        this.propertyValues = propertyValues;
     }
 }

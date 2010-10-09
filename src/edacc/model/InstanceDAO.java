@@ -2,7 +2,9 @@ package edacc.model;
 
 import SevenZip.Compression.LZMA.Decoder;
 import SevenZip.Compression.LZMA.Encoder;
-import edacc.manageDB.Util;
+import edacc.manageDB.InstanceParser.InstanceParser;
+import edacc.satinstances.InvalidVariableException;
+import edacc.satinstances.SATInstance;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -410,5 +412,9 @@ public class InstanceDAO {
 
     public static void clearCache() {
         cache.clear();
+    }
+
+    public static SATInstance getSATFormulaOfInstance(Instance i) throws IOException, InvalidVariableException, InstanceNotInDBException, SQLException {
+        return edacc.satinstances.InstanceParser.getInstance().parseInstance(getBinary(i.getId()).getBinaryStream());
     }
 }

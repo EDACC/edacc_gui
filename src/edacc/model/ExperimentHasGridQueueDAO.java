@@ -8,8 +8,7 @@ package edacc.model;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  *
@@ -60,8 +59,8 @@ public class ExperimentHasGridQueueDAO {
         save(q);
     }
 
-    public static Vector<ExperimentHasGridQueue> getExperimentHasGridQueueByExperiment(Experiment e) throws SQLException {
-        Vector<ExperimentHasGridQueue> res = new Vector<ExperimentHasGridQueue>();
+    public static ArrayList<ExperimentHasGridQueue> getExperimentHasGridQueueByExperiment(Experiment e) throws SQLException {
+        ArrayList<ExperimentHasGridQueue> res = new ArrayList<ExperimentHasGridQueue>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Experiment_idExperiment=?");
         st.setInt(1, e.getId());
         ResultSet rs = st.executeQuery();

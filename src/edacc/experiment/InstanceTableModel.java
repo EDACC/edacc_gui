@@ -7,6 +7,7 @@ package edacc.experiment;
 
 import edacc.model.ExperimentHasInstance;
 import edacc.model.Instance;
+import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
 import java.util.Vector;
@@ -17,13 +18,13 @@ import java.util.Vector;
  */
 public class InstanceTableModel extends AbstractTableModel {
     private String[] columns = {"Name", "selected"};
-    protected Vector<Instance> instances;
+    protected ArrayList<Instance> instances;
     protected Vector<ExperimentHasInstance> experimentHasInstances;
 
     protected HashMap<Integer, ExperimentHasInstance> selectedInstances;
     protected Vector<ExperimentHasInstance> savedExperimentInstances;
 
-    public void setInstances(Vector<Instance> instances) {
+    public void setInstances(ArrayList<Instance> instances) {
         this.instances = instances;
         experimentHasInstances = new Vector<ExperimentHasInstance>();
         experimentHasInstances.setSize(instances.size());
@@ -84,8 +85,8 @@ public class InstanceTableModel extends AbstractTableModel {
      * were specified by setExperimentHasInstances()
      * @return
      */
-    public Vector<ExperimentHasInstance> getDeletedExperimentHasInstances() {
-        Vector<ExperimentHasInstance> res = new Vector<ExperimentHasInstance>();
+    public ArrayList<ExperimentHasInstance> getDeletedExperimentHasInstances() {
+        ArrayList<ExperimentHasInstance> res = new ArrayList<ExperimentHasInstance>();
         if (savedExperimentInstances == null) {
             return res;
         }
@@ -106,13 +107,13 @@ public class InstanceTableModel extends AbstractTableModel {
     }
 
     public InstanceTableModel() {
-        this.instances = new Vector<Instance>();
+        this.instances = new ArrayList<Instance>();
         this.experimentHasInstances = new Vector<ExperimentHasInstance>();
         selectedInstances = new HashMap<Integer, ExperimentHasInstance>();
     }
 
-    public Vector<Instance> getSelectedInstances() {
-        Vector<Instance> res = new Vector<Instance>();
+    public ArrayList<Instance> getSelectedInstances() {
+        ArrayList<Instance> res = new ArrayList<Instance>();
         for (Instance instance: instances) {
             if (selectedInstances.containsKey(instance.getId())) {
                 res.add(instance);

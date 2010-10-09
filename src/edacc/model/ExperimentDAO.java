@@ -2,7 +2,7 @@ package edacc.model;
 
 import java.util.LinkedList;
 import java.sql.*;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  *
@@ -194,12 +194,12 @@ public class ExperimentDAO {
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    public static Vector<Solver> getSolversInExperiment(Experiment e) throws NoConnectionToDBException, SQLException {
+    public static ArrayList<Solver> getSolversInExperiment(Experiment e) throws NoConnectionToDBException, SQLException {
         final String query = "SELECT DISTINCT Solver_idSolver FROM SolverConfig WHERE Experiment_idExperiment=?";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.setInt(1, e.getId());
         ResultSet rs = ps.executeQuery();
-        Vector<Solver> solvers = new Vector<Solver>();
+        ArrayList<Solver> solvers = new ArrayList<Solver>();
         while (rs.next()) {
             int id = rs.getInt("Solver_idSolver");
             Solver s = SolverDAO.getById(id);
@@ -210,12 +210,12 @@ public class ExperimentDAO {
         return solvers;
     }
 
-    public static Vector<SolverConfiguration> getSolverConfigurationsInExperiment(Experiment e) throws SQLException {
+    public static ArrayList<SolverConfiguration> getSolverConfigurationsInExperiment(Experiment e) throws SQLException {
         final String query = "SELECT DISTINCT idSolverConfig FROM SolverConfig WHERE Experiment_idExperiment=?";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.setInt(1, e.getId());
         ResultSet rs = ps.executeQuery();
-        Vector<SolverConfiguration> solverConfigs = new Vector<SolverConfiguration>();
+        ArrayList<SolverConfiguration> solverConfigs = new ArrayList<SolverConfiguration>();
         while (rs.next()) {
             int id = rs.getInt("idSolverConfig");
             SolverConfiguration s = SolverConfigurationDAO.getSolverConfigurationById(id);

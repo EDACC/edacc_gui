@@ -6,7 +6,8 @@
 package edacc;
 
 import edacc.events.TaskEvents;
-import edacc.experiment.AnalysePanel;
+import edacc.experiment.AnalysisController;
+import edacc.experiment.AnalysisPanel;
 import edacc.experiment.ExperimentInstanceClassTableModel;
 import edacc.experiment.ExperimentController;
 import edacc.experiment.ExperimentResultsBrowserTableModel;
@@ -29,7 +30,6 @@ import java.awt.Cursor;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +48,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
@@ -57,7 +56,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.TableRowSorter;
 import org.jdesktop.application.Action;
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
 import javax.swing.event.ListSelectionListener;
@@ -85,7 +83,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private EDACCExperimentModeJobsCellRenderer tableJobsStringRenderer;
     private ResultsBrowserTableRowSorter resultsBrowserTableRowSorter;
     private EDACCInstanceFilter dialogFilter;
-    private AnalysePanel analysePanel;
+    private AnalysisPanel analysePanel;
     private Timer jobsTimer = null;
     private Integer resultBrowserETA;
     private boolean jobsTimerWasActive = false;
@@ -183,8 +181,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tableJobs.setDefaultRenderer(Float.class, new EDACCExperimentModeJobsCellRenderer());
         /* -------------------------------- end of jobs browser tab -------------------------------- */
         /* -------------------------------- analyze tab -------------------------------- */
-        analysePanel = new AnalysePanel(expController);
-        panelAnalyse.setViewportView(analysePanel);
+        analysePanel = new AnalysisPanel(expController);
+        panelAnalysis.setViewportView(analysePanel);
         /* -------------------------------- end of analyze tab -------------------------------- */
 
 
@@ -202,7 +200,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             @Override
             public void update(Observable o, Object arg) {
                 try {
-                    if (GridQueuesController.getInstance().getChosenQueuesByExperiment(expController.getActiveExperiment()).size() == 0) {
+                    if (GridQueuesController.getInstance().getChosenQueuesByExperiment(expController.getActiveExperiment()).isEmpty()) {
                         btnGeneratePackage.setEnabled(false);
                     } else {
                         btnGeneratePackage.setEnabled(true);
@@ -339,7 +337,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         expController.initialize();
     }
 
-    public void disableEditExperiment() {
+    private void disableEditExperiment() {
         pnlEditExperiment.setEnabled(false);
         txtMemoryLimit.setText("");
         txtMemoryLimit.setEnabled(false);
@@ -486,7 +484,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         chkJobsTimer = new javax.swing.JCheckBox();
         jLabel5 = new javax.swing.JLabel();
         lblETA = new javax.swing.JLabel();
-        panelAnalyse = new javax.swing.JScrollPane();
+        panelAnalysis = new javax.swing.JScrollPane();
 
         setName("Form"); // NOI18N
         setPreferredSize(new java.awt.Dimension(500, 500));
@@ -1382,10 +1380,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         manageExperimentPane.addTab(resourceMap.getString("panelJobBrowser.TabConstraints.tabTitle"), panelJobBrowser); // NOI18N
 
-        panelAnalyse.setName("panelAnalyse"); // NOI18N
-        panelAnalyse.setViewportView(analysePanel);
-        panelAnalyse.getVerticalScrollBar().setUnitIncrement(30);
-        manageExperimentPane.addTab(resourceMap.getString("panelAnalyse.TabConstraints.tabTitle"), panelAnalyse); // NOI18N
+        panelAnalysis.setName("panelAnalysis"); // NOI18N
+        panelAnalysis.setViewportView(analysePanel);
+        panelAnalysis.getVerticalScrollBar().setUnitIncrement(30);
+        manageExperimentPane.addTab(resourceMap.getString("panelAnalysis.TabConstraints.tabTitle"), panelAnalysis); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -1464,7 +1462,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             lblCurNumRuns.setText("currently: " + String.valueOf(expController.getActiveExperiment().getNumRuns()));
             lblNumJobs.setText(String.valueOf(expController.getNumJobs()) + " jobs in the database");
             try {
-                if (GridQueuesController.getInstance().getChosenQueuesByExperiment(expController.getActiveExperiment()).size() == 0) {
+                if (GridQueuesController.getInstance().getChosenQueuesByExperiment(expController.getActiveExperiment()).isEmpty()) {
                     btnGeneratePackage.setEnabled(false);
                 } else {
                     btnGeneratePackage.setEnabled(true);
@@ -1477,9 +1475,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 // job browser tab
                 resultBrowserETA = null;
                 lblETA.setText("");
+                jobsTableModel.updateSolverProperties();
                 jobsTableModel.setJobs(null);
             } catch (SQLException ex) {
-                Logger.getLogger(EDACCExperimentMode.class.getName()).log(Level.SEVERE, null, ex);
+                // TODO: ...
             }
             // first draw the results browser, then load the jobs (SwingUtilites)
             SwingUtilities.invokeLater(new Runnable() {
@@ -1492,7 +1491,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         } else if (manageExperimentPane.getSelectedIndex() == 5) {
             // Analyse tab
             try {
-                expController.checkForR();
+                AnalysisController.checkForR();
             } catch (Exception e) {
                 javax.swing.JOptionPane.showMessageDialog(null, "Error while initializing R: " + e.getMessage(), "Analyse", javax.swing.JOptionPane.ERROR_MESSAGE);
                 return;
@@ -1680,16 +1679,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 if (dialogNewExp.canceled) {
                     break;
                 }
-                if ("".equals(dialogNewExp.ExpName)) {
+                if ("".equals(dialogNewExp.expName)) {
                     javax.swing.JOptionPane.showMessageDialog(null, "The experiment must have a name.", "Create experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
-                } else if (expController.getExperiment(dialogNewExp.ExpName) != null) {
+                } else if (expController.getExperiment(dialogNewExp.expName) != null) {
                     javax.swing.JOptionPane.showMessageDialog(null, "There exists already an experiment with the same name.", "Create experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
                 } else {
                     break;
                 }
             }
             if (!dialogNewExp.canceled) {
-                expController.createExperiment(dialogNewExp.ExpName, dialogNewExp.ExpDesc);
+                expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc);
                 tableExperiments.getSelectionModel().setSelectionInterval(tableExperiments.getRowCount() - 1, tableExperiments.getRowCount() - 1);
                 tableExperiments.requestFocusInWindow();
             }
@@ -1986,7 +1985,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JLabel lblJobsFilterStatus;
     private javax.swing.JLabel lblNumJobs;
     private javax.swing.JTabbedPane manageExperimentPane;
-    private javax.swing.JScrollPane panelAnalyse;
+    private javax.swing.JScrollPane panelAnalysis;
     private javax.swing.JPanel panelChooseInstances;
     private javax.swing.JPanel panelChooseSolver;
     private javax.swing.JPanel panelExperimentParams;
@@ -2174,9 +2173,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 if (dialogEditExp.canceled) {
                     break;
                 }
-                if ("".equals(dialogEditExp.ExpName)) {
+                if ("".equals(dialogEditExp.expName)) {
                     javax.swing.JOptionPane.showMessageDialog(null, "The experiment must have a name.", "Edit experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
-                } else if (expController.getExperiment(dialogEditExp.ExpName) != null && expController.getExperiment(dialogEditExp.ExpName) != exp) {
+                } else if (expController.getExperiment(dialogEditExp.expName) != null && expController.getExperiment(dialogEditExp.expName) != exp) {
                     javax.swing.JOptionPane.showMessageDialog(null, "There exists already an experiment with the same name.", "Edit experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
                 } else {
                     break;
@@ -2185,8 +2184,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             if (!dialogEditExp.canceled) {
                 String oldName = exp.getName();
                 String oldDescr = exp.getDescription();
-                exp.setName(dialogEditExp.ExpName);
-                exp.setDescription(dialogEditExp.ExpDesc);
+                exp.setName(dialogEditExp.expName);
+                exp.setDescription(dialogEditExp.expDesc);
                 try {
                     expController.saveExperiment(exp);
                 } catch (SQLException ex) {

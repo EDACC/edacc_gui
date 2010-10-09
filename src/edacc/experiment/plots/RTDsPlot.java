@@ -7,7 +7,7 @@ import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import java.sql.SQLException;
-import java.util.Vector;
+import java.util.ArrayList;
 import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
 
@@ -17,22 +17,29 @@ import org.rosuda.JRI.Rengine;
  */
 public class RTDsPlot extends Plot {
 
-    private Dependency[] dependencies;
-    private SolverConfigurationSelector solverSelector;
-    private JComboBox comboInstance;
+    private static SolverConfigurationSelector solverSelector;
+    private static JComboBox comboInstance;
+    private ArrayList<SolverConfiguration> scs;
+    private Instance instance;
 
     public RTDsPlot(ExperimentController expController) {
         super(expController);
-        solverSelector = new SolverConfigurationSelector();
-        comboInstance = new JComboBox();
-        dependencies = new Dependency[]{
+    }
+
+    public static Dependency[] getDependencies() {
+        if (solverSelector == null) {
+            solverSelector = new SolverConfigurationSelector();
+        }
+        if (comboInstance == null) {
+            comboInstance = new JComboBox();
+        }
+        return new Dependency[]{
                     new Dependency("Solvers", solverSelector),
                     new Dependency("Instance", comboInstance)
                 };
     }
 
-    @Override
-    public void loadDefaultValues() throws Exception {
+    public static void loadDefaultValues(ExperimentController expController) throws Exception {
         solverSelector.setSolverConfigurations(ExperimentDAO.getSolverConfigurationsInExperiment(expController.getActiveExperiment()));
         solverSelector.btnSelectAll();
         for (Instance i : InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId())) {
@@ -41,31 +48,29 @@ public class RTDsPlot extends Plot {
     }
 
     @Override
-    public Dependency[] getDependencies() {
-        return dependencies;
-    }
+    public void plot(Rengine engine, ArrayList<PointInformation> pointInformations) throws Exception {
 
-    @Override
-    public void plot(Rengine engine, Vector<PointInformation> pointInformations) throws SQLException, DependencyException {
-        super.plot(engine, pointInformations);
-        if (solverSelector.getSelectedSolverConfigurations().size() == 0) {
-            throw new DependencyException("You have to select solvers in order to plot.");
+        if (scs == null || instance == null) {
+            if (solverSelector.getSelectedSolverConfigurations().isEmpty()) {
+                throw new DependencyException("You have to select solvers in order to plot.");
+            }
+
+            if (!(comboInstance.getSelectedItem() instanceof Instance)) {
+                throw new DependencyException("You have to select an instance.");
+            }
+
+            scs = solverSelector.getSelectedSolverConfigurations();
+            instance = (Instance) comboInstance.getSelectedItem();
         }
-
-        if (!(comboInstance.getSelectedItem() instanceof Instance)) {
-            throw new DependencyException("You have to select an instance.");
-        }
-
-        Vector<SolverConfiguration> scs = solverSelector.getSelectedSolverConfigurations();
-        Instance instance = (Instance) comboInstance.getSelectedItem();
+        initializeResults();
         double max_x = 0.;
 
-        Vector<double[]> results = new Vector<double[]>();
+        ArrayList<double[]> results = new ArrayList<double[]>();
         String[] legendNames = new String[scs.size()];
         String[] legendColors = new String[scs.size()];
         int k = 0;
         for (SolverConfiguration sc : scs) {
-            Vector<ExperimentResult> res = getResults(sc.getId(), instance.getId());
+            ArrayList<ExperimentResult> res = getResults(sc.getId(), instance.getId());
             double[] tmp = new double[res.size()];
             for (int i = 0; i < res.size(); i++) {
                 tmp[i] = res.get(i).getResultTime();
@@ -85,11 +90,11 @@ public class RTDsPlot extends Plot {
         // plot the distributions
         for (int i = 0; i < results.size(); i++) {
             engine.assign("results", results.get(i));
-            engine.eval("plot(ecdf(results)," +
-                    "main='', col='" + legendColors[i] + "', pch=" + i + "," +
-                    "xlab='', ylab='', xaxs='i', yaxs='i', las=1," +
-                    "xaxt='n', yaxt='n'," +
-                    "xlim=c(0.0," + max_x + "), ylim=c(-0.05, 1.05))");
+            engine.eval("plot(ecdf(results),"
+                    + "main='', col='" + legendColors[i] + "', pch=" + i + ","
+                    + "xlab='', ylab='', xaxs='i', yaxs='i', las=1,"
+                    + "xaxt='n', yaxt='n',"
+                    + "xlim=c(0.0," + max_x + "), ylim=c(-0.05, 1.05))");
             engine.eval("par(new=1)");
         }
         // plot labels and axes
@@ -100,20 +105,18 @@ public class RTDsPlot extends Plot {
         // plot legend
         engine.assign("legendNames", legendNames);
         engine.assign("legendColors", legendColors);
-        engine.eval("legend('bottomright', inset=.01," +
-                "legend=legendNames," +
-                "col=legendColors," +
-                "pch=c(0," + scs.size() + "), lty=1)");
+        engine.eval("legend('bottomright', inset=.01,"
+                + "legend=legendNames,"
+                + "col=legendColors,"
+                + "pch=c(0," + scs.size() + "), lty=1)");
     }
 
     @Override
-    public String getTitle() {
-        return "RTDs ("+expController.getActiveExperiment().getName()+")";
+    public String getPlotTitle() {
+        return "RTDs (" + expController.getActiveExperiment().getName() + ")";
     }
 
-    @Override
-    public String toString() {
+    public static String getTitle() {
         return "Plot of the runtime distributions of solvers on an instance";
     }
 }
-

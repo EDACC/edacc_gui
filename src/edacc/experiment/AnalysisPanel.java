@@ -1,5 +1,5 @@
 /*
- * AnalysePanel.java
+ * AnalysisPanel.java
  *
  * Created on 29.06.2010, 10:43:45
  */
@@ -17,42 +17,63 @@ import javax.swing.JLabel;
  *
  * @author simon
  */
-public class AnalysePanel extends javax.swing.JPanel {
+public class AnalysisPanel extends javax.swing.JPanel {
 
     public JComboBox comboType;
     private JLabel jLabel1;
     private java.awt.GridBagConstraints gridBagConstraints;
-    private AnalyseBottomPanel bottom;
+    private AnalysisBottomPanel bottom;
     private ExperimentController expController;
-    
-    /** Creates new form AnalysePanel */
-    public AnalysePanel(ExperimentController controller) {
+    private Dependency[][] dependencies;
+    private static Class<Plot>[] plotClasses = (Class<Plot>[]) new Class<?>[]{
+                BoxPlot.class, ScatterOnePropertyTwoSolvers.class,
+                // ScatterTwoPropertiesOneSolver.class, ScatterInstancePropertySolverProperty.class,
+                CactusPlot.class, KernelDensityPlot.class,
+                RTDPlot.class, RTDsPlot.class
+            };
+
+    /** Creates new form AnalysisPanel */
+    public AnalysisPanel(ExperimentController controller) {
         initComponents();
         this.expController = controller;
-        bottom = new AnalyseBottomPanel(this);
+        bottom = new AnalysisBottomPanel(this);
         jLabel1 = new javax.swing.JLabel();
         jLabel1.setText("Plot type:");
         comboType = new javax.swing.JComboBox();
         comboType.setModel(new javax.swing.DefaultComboBoxModel(new String[]{}));
+        for (Class<Plot> plotClass : plotClasses) {
+            comboType.addItem(new ComboTypeEntry(plotClass));
+        }
+        dependencies = new Dependency[plotClasses.length][];
+        for (int i = 0; i < plotClasses.length; i++) {
+            try {
+                dependencies[i] = (Dependency[]) plotClasses[i].getMethod("getDependencies", new Class[]{}).invoke(null);
+            } catch (Exception e) {
+                e.printStackTrace();
 
-        comboType.addItem(new ScatterOnePropertyTwoSolvers(expController));
-      //  comboType.addItem(new ScatterTwoPropertiesOneSolver(expController));
-      //  comboType.addItem(new ScatterInstancePropertySolverProperty(expController));
-        comboType.addItem(new CactusPlot(expController));
-        comboType.addItem(new KernelDensityPlot(expController));
-        comboType.addItem(new RTDPlot(expController));
-        comboType.addItem(new RTDsPlot(expController));
-        
+                // TODO: error!
+            }
+        }
+
         comboType.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (comboType.getSelectedItem() instanceof Plot) {
-                    initialize();
+                if (comboType.getSelectedItem() instanceof ComboTypeEntry) {
+                    ComboTypeEntry cte = (ComboTypeEntry) comboType.getSelectedItem();
+                   /// Class<Plot> plotClass = (Class<Plot>) cte.plotClass;
                     try {
-                        initializePlotType((Plot) comboType.getSelectedItem());
-                    } catch (SQLException _) {
+                   //     if (cte.plot == null) {
+                           // cte.plot = (Plot) plotClass.getConstructor(ExperimentController.class).newInstance(expController);
+                   //     }
+                   //     cte.plot.loadDefaultValues();
+                        initialize();
+                        cte.plotClass.getMethod("loadDefaultValues", new Class[] {ExperimentController.class}).invoke(null, expController);
+                        initializePlotType(dependencies[comboType.getSelectedIndex()]);
+
+                    } catch (Exception ex) {
                         //TODO: show error message
+                        ex.printStackTrace();
                         initialize();
                     }
                 }
@@ -63,15 +84,6 @@ public class AnalysePanel extends javax.swing.JPanel {
 
     public void initialize() {
         this.removeAll();
-        try {
-                if (comboType.getSelectedItem() instanceof Plot) {
-                    Plot plot = (Plot) comboType.getSelectedItem();
-                    plot.loadDefaultValues();
-                }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            // TODO: ERROR MESSAGE!
-        }
         setLayout(new java.awt.GridBagLayout());
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -93,8 +105,8 @@ public class AnalysePanel extends javax.swing.JPanel {
         add(jLabel1, gridBagConstraints);
     }
 
-    public void initializePlotType(Plot plotType) throws SQLException {
-        for (Dependency dependency : plotType.getDependencies()) {
+    public void initializePlotType(Dependency[] dependencies) throws SQLException {
+        for (Dependency dependency : dependencies) {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy++;
             JLabel label = new JLabel(dependency.getDescription() + ":");
@@ -116,22 +128,14 @@ public class AnalysePanel extends javax.swing.JPanel {
     }
 
     public Plot getSelectedPlot() {
-        if (comboType.getSelectedItem() instanceof Plot) {
-            return (Plot) comboType.getSelectedItem();
-        } else {
-            return null;
+        try {
+        if (comboType.getSelectedItem() instanceof ComboTypeEntry) {
+            ComboTypeEntry cte = (ComboTypeEntry) comboType.getSelectedItem();
+            return (Plot) cte.plotClass.getConstructor(ExperimentController.class).newInstance(expController);
         }
-    }
-
-    public void updateDependencies() {
-        Plot plot = getSelectedPlot();
-        if (plot != null) {
-            for (Dependency dep : plot.getDependencies()) {
-                if (dep.getGuiObject() instanceof JComboBox) {
-                    dep.setValue(((JComboBox) dep.getGuiObject()).getSelectedItem());
-                }
-            }
+        } catch (Exception e) {
         }
+        return null;
     }
 
     /** This method is called from within the constructor to
@@ -142,7 +146,6 @@ public class AnalysePanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         setName("Form"); // NOI18N
 
@@ -159,4 +162,22 @@ public class AnalysePanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
+
+    class ComboTypeEntry {
+
+        public Class<?> plotClass;
+
+        public ComboTypeEntry(Class<?> plotClass) {
+            this.plotClass = plotClass;
+        }
+
+        @Override
+        public String toString() {
+            try {
+                return (String) plotClass.getDeclaredMethod("getTitle", new Class[]{}).invoke(null, new Object[]{});
+            } catch (Exception e) {
+                return "Error while initializing";
+            }
+        }
+    }
 }

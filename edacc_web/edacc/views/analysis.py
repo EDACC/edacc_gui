@@ -10,6 +10,7 @@
 """
 
 import math
+import numpy
 
 from flask import Module
 from flask import render_template
@@ -18,9 +19,9 @@ from flask import abort, request
 from edacc import models, forms, ranking, statistics
 from edacc.views.helpers import require_phase, require_login
 from edacc.views import plot
+from edacc.forms import EmptyQuery
 
 analysis = Module(__name__)
-
 
 def render(*args, **kwargs):
     from tidylib import tidy_document
@@ -39,13 +40,33 @@ def solver_ranking(database, experiment_id):
     db = models.get_database(database) or abort(404)
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
-    ranked_solvers = ranking.number_of_solved_instances_ranking(experiment)
+    num_runs_per_solver = experiment.get_num_runs(db) * len(experiment.instances)
 
+    ranked_solvers = ranking.number_of_solved_instances_ranking(experiment)
+    data = [('Virtual Best Solver (VBS)',   # name of the solver
+             len(experiment.instances) * experiment.get_num_runs(db),     # number of successful runs
+             1.0,                           # % of all runs
+             0,                             # cumulated CPU time
+             0,                             # average CPU time per successful run
+             )]
+    for solver in ranked_solvers:
+        successful_runs = db.session.query(db.ExperimentResult).filter(db.ExperimentResult.resultCode.like('1%')) \
+                                    .filter_by(experiment=experiment, solver_configuration=solver, status=1).all()
+        num_successful_runs = len(successful_runs)
+        data.append((
+            solver.get_name(),
+            num_successful_runs,
+            num_successful_runs / float(num_runs_per_solver),
+            sum(j.get_time() for j in successful_runs),
+            numpy.average([j.get_time() for j in successful_runs])
+        ))
 
     return render('/analysis/ranking.html', database=database, db=db,
-                  experiment=experiment, ranked_solvers=ranked_solvers)
+                  experiment=experiment, ranked_solvers=ranked_solvers,
+                  data=data)
 
-@analysis.route('/<database>/experiment/<int:experiment_id>/evaluation-solved-instances/')
+
+@analysis.route('/<database>/experiment/<int:experiment_id>/cactus/')
 @require_phase(phases=(5, 6, 7))
 @require_login
 def cactus_plot(database, experiment_id):
@@ -60,7 +81,7 @@ def cactus_plot(database, experiment_id):
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
     form = forms.CactusPlotForm(request.args)
-    form.instances.query = sorted(experiment.get_solved_instances(db), key=lambda i: i.name)
+    form.instances.query = sorted(experiment.instances, key=lambda i: i.name)
     result_properties = db.get_result_properties()
     result_properties = zip([p.idSolverProperty for p in result_properties], [p.name for p in result_properties])
     form.solver_property.choices = [('cputime', 'CPU Time')] + result_properties
@@ -69,6 +90,7 @@ def cactus_plot(database, experiment_id):
 
     return render('/analysis/solved_instances.html', database=database,
                   experiment=experiment, db=db, form=form, GET_data=GET_data)
+
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/rtd-comparison/')
 @require_phase(phases=(5, 6, 7))
@@ -90,9 +112,9 @@ def rtd_comparison(database, experiment_id):
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
     form = forms.RTDComparisonForm(request.args)
-    form.instance.query = experiment.get_solved_instances(db)
-    form.solver_config1.query = experiment.solver_configurations
-    form.solver_config2.query = experiment.solver_configurations
+    form.instance.query = experiment.instances or EmptyQuery()
+    form.solver_config1.query = experiment.solver_configurations or EmptyQuery()
+    form.solver_config2.query = experiment.solver_configurations or EmptyQuery()
     GET_data = "&".join(['='.join(list(t)) for t in request.args.items(multi=True)])
 
     if form.solver_config1.data and form.solver_config2.data and form.instance.data:
@@ -143,8 +165,8 @@ def rtds(database, experiment_id):
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
     form = forms.RTDPlotsForm(request.args)
-    form.instance.query = experiment.get_solved_instances(db)
-    form.sc.query = experiment.solver_configurations
+    form.instance.query = experiment.instances or EmptyQuery()
+    form.sc.query = experiment.solver_configurations or EmptyQuery()
     GET_data = "&".join(['='.join(list(t)) for t in request.args.items(multi=True)])
 
     return render('/analysis/rtds.html', database=database,
@@ -168,9 +190,9 @@ def scatter_2solver_1property(database, experiment_id):
     runs = zip(range(numRuns), ["#" + str(i) for i in range(numRuns)])
 
     form = forms.TwoSolversOnePropertyScatterPlotForm(request.args)
-    form.solver_config1.query = experiment.solver_configurations
-    form.solver_config2.query = experiment.solver_configurations
-    form.instances.query = sorted(experiment.get_solved_instances(db), key=lambda i: i.name)
+    form.solver_config1.query = experiment.solver_configurations or EmptyQuery()
+    form.solver_config2.query = experiment.solver_configurations or EmptyQuery()
+    form.instances.query = sorted(experiment.instances, key=lambda i: i.name) or EmptyQuery()
     form.run.choices = [('average', 'All runs - average'),
                         ('median', 'All runs - median'),
                         ('all', 'All runs')
@@ -199,7 +221,7 @@ def scatter_2solver_1property(database, experiment_id):
                   pearson_r=pearson_r, pearson_p_value=pearson_p_value)
 
 
-@analysis.route('/<database>/experiment/<int:experiment_id>/scatter-one-solver-instance-vs-result/')
+@analysis.route('/<database>/experiment/<int:experiment_id>/scatter-instance-vs-result/')
 @require_phase(phases=(5, 6, 7))
 @require_login
 def scatter_1solver_instance_vs_result_property(database, experiment_id):
@@ -220,10 +242,10 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
     runs = zip(range(numRuns), ["#" + str(i) for i in range(numRuns)])
 
     form = forms.OneSolverInstanceAgainstResultPropertyPlotForm(request.args)
-    form.solver_config.query = experiment.solver_configurations
+    form.solver_config.query = experiment.solver_configurations or EmptyQuery()
     form.solver_property.choices = [('cputime', 'CPU Time')] + result_properties
     form.instance_property.choices = instance_properties
-    form.instances.query = sorted(experiment.get_solved_instances(db), key=lambda i: i.name)
+    form.instances.query = sorted(experiment.instances, key=lambda i: i.name) or EmptyQuery()
     form.run.choices = [('average', 'All runs - average'),
                         ('median', 'All runs - median'),
                         ('all', 'All runs')
@@ -252,7 +274,7 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
                   pearson_r=pearson_r, pearson_p_value=pearson_p_value)
 
 
-@analysis.route('/<database>/experiment/<int:experiment_id>/scatter-one-solver-result-vs-result/')
+@analysis.route('/<database>/experiment/<int:experiment_id>/scatter-result-vs-result/')
 @require_phase(phases=(5, 6, 7))
 @require_login
 def scatter_1solver_result_vs_result_property(database, experiment_id):
@@ -270,10 +292,10 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
     runs = zip(range(numRuns), ["#" + str(i) for i in range(numRuns)])
 
     form = forms.OneSolverTwoResultPropertiesPlotForm(request.args)
-    form.solver_config.query = experiment.solver_configurations
+    form.solver_config.query = experiment.solver_configurations or EmptyQuery()
     form.solver_property1.choices = [('cputime', 'CPU Time')] + result_properties
     form.solver_property2.choices = [('cputime', 'CPU Time')] + result_properties
-    form.instances.query = sorted(experiment.get_solved_instances(db), key=lambda i: i.name)
+    form.instances.query = sorted(experiment.instances, key=lambda i: i.name) or EmptyQuery()
     form.run.choices = [('average', 'All runs - average'),
                         ('median', 'All runs - median'),
                         ('all', 'All runs')
@@ -313,8 +335,8 @@ def rtd(database, experiment_id):
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
     form = forms.RTDPlotForm(request.args)
-    form.instance.query = experiment.get_solved_instances(db)
-    form.solver_config.query = experiment.solver_configurations
+    form.instance.query = experiment.instances or EmptyQuery()
+    form.solver_config.query = experiment.solver_configurations or EmptyQuery()
     GET_data = "&".join(['='.join(list(t)) for t in request.args.items(multi=True)])
 
     return render('/analysis/rtd.html', database=database, experiment=experiment,
@@ -337,8 +359,8 @@ def probabilistic_domination(database, experiment_id):
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
     form = forms.ProbabilisticDominationForm(request.args)
-    form.solver_config1.query = experiment.solver_configurations
-    form.solver_config2.query = experiment.solver_configurations
+    form.solver_config1.query = experiment.solver_configurations or EmptyQuery()
+    form.solver_config2.query = experiment.solver_configurations or EmptyQuery()
     if form.solver_config1.data and form.solver_config2.data:
         sc1 = form.solver_config1.data
         sc2 = form.solver_config2.data
@@ -347,7 +369,7 @@ def probabilistic_domination(database, experiment_id):
         sc2_dom_sc1 = set()
         no_dom = set()
 
-        for instance in experiment.get_solved_instances(db):
+        for instance in experiment.instances:
             res1 = [r.get_time() for r in db.session.query(db.ExperimentResult).filter_by(experiment=experiment, instance=instance, solver_configuration=sc1).all()]
             res2 = [r.get_time() for r in db.session.query(db.ExperimentResult).filter_by(experiment=experiment, instance=instance, solver_configuration=sc2).all()]
             d = statistics.prob_domination(res1, res2)
@@ -365,3 +387,22 @@ def probabilistic_domination(database, experiment_id):
 
     return render('/analysis/probabilistic_domination.html', database=database, db=db,
                   experiment=experiment, form=form)
+
+
+@analysis.route('/<database>/experiment/<int:experiment_id>/box-plots/')
+@require_phase(phases=(5, 6, 7))
+@require_login
+def box_plots(database, experiment_id):
+    """ Displays a page allowing the user to plot box plots with the results of all runs
+        of some solvers on some instances
+    """
+    db = models.get_database(database) or abort(404)
+    experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
+
+    form = forms.BoxPlotForm(request.args)
+    form.solver_configs.query = experiment.solver_configurations or EmptyQuery()
+    form.instances.query = experiment.instances or EmptyQuery()
+    GET_data = "&".join(['='.join(list(t)) for t in request.args.items(multi=True)])
+
+    return render('/analysis/box_plots.html', database=database, db=db,
+                  experiment=experiment, form=form, GET_data=GET_data)

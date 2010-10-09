@@ -7,6 +7,7 @@ package edacc.model;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -99,8 +100,8 @@ public class ExperimentHasInstanceDAO {
      * @return vector of instance ids
      * @throws SQLException
      */
-    public static Vector<Integer> getAllInstanceIdsByExperimentId(int id) throws SQLException {
-        Vector<Integer> res = new Vector<Integer>();
+    public static ArrayList<Integer> getAllInstanceIdsByExperimentId(int id) throws SQLException {
+        ArrayList<Integer> res = new ArrayList<Integer>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT Instances_idInstance " +
                 "FROM " + table + " " +
