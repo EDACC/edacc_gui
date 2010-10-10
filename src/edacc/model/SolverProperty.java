@@ -106,13 +106,19 @@ public class SolverProperty extends BaseModel implements IntegerPKModel{
     public void setSolverPropertyType(int typeId) throws SolverPropertyTypeNotExistException{
         switch(typeId){
             case 0:
-                this.solvPropertyType = SolverPropertyType.ResultFile;
+                this.solvPropertyType = SolverPropertyType.LauncherOutput;
                 break;
             case 1:
-                this.solvPropertyType = SolverPropertyType.ClientOutput;
+                this.solvPropertyType = SolverPropertyType.Parameter;
                 break;
             case 2:
-                this.solvPropertyType = SolverPropertyType.Parameter;
+                this.solvPropertyType = SolverPropertyType.SolverOutput;
+                break;
+            case 3:
+                this.solvPropertyType = SolverPropertyType.VerifierOutput;
+                break;
+            case 4:
+                this.solvPropertyType = SolverPropertyType.WatcherOutput;
                 break;
             default:
                 throw new SolverPropertyTypeNotExistException();
@@ -129,12 +135,16 @@ public class SolverProperty extends BaseModel implements IntegerPKModel{
  */
     public int getSolverPropertyTypeDBRepresentation(){
         switch(solvPropertyType){
-            case ResultFile:
+            case LauncherOutput:
                 return 0;
-            case ClientOutput:
-                return 1;
             case Parameter:
+                return 1;
+            case SolverOutput:
                 return 2;
+            case VerifierOutput:
+                return 3;
+            case WatcherOutput:
+                return 4;
             default:
                 return -1;
         }

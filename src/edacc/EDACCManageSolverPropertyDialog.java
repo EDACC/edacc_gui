@@ -40,7 +40,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
     private SolverPropertiesController controller;
     private SolverPropertyTableModel solPropertyTableModel;
-    private SolverPropertyType[] comboBoxSolPropType = {SolverPropertyType.ClientOutput, SolverPropertyType.ResultFile, SolverPropertyType.Parameter};
+    private SolverPropertyType[] comboBoxSolPropType = {SolverPropertyType.LauncherOutput, SolverPropertyType.Parameter, SolverPropertyType.SolverOutput, SolverPropertyType.VerifierOutput, SolverPropertyType.WatcherOutput};
     private EDACCManagePropertyValueTypesDialog PropertyValueTypesDialog;
     private boolean editing = false;
 
@@ -541,7 +541,10 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             } catch (NoConnectionToDBException ex) {
                 Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
-                Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(this,
+                    "A database error occurred. " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
             } catch (SolverPropertyNotInDBException ex) {
                 Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SolverPropertyTypeNotExistException ex) {

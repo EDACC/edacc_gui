@@ -14,5 +14,5 @@ package edacc.properties;
  * @author rretz
  */
 public enum SolverPropertyType {
-    ResultFile, ClientOutput, Parameter
+    LauncherOutput, Parameter, SolverOutput, VerifierOutput, WatcherOutput;
 }
