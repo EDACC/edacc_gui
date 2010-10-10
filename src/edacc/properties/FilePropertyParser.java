@@ -39,14 +39,14 @@ public class FilePropertyParser {
      * @throws NoAllowedSolverPropertyTypeException
      */
     public Vector<String> parse(SolverProperty solvProp, ExperimentResult expResult) throws FileNotFoundException, IOException, NoAllowedSolverPropertyTypeException, NoConnectionToDBException, SQLException{
-        File file;
-        if(solvProp.getSolverPropertyType() == SolverPropertyType.ResultFile)
+        File file = null;
+/*        if(solvProp.getSolverPropertyType() == SolverPropertyType.ResultFile)
             file = ExperimentResultDAO.getSolverOutputFile(expResult);
         else if(solvProp.getSolverPropertyType() == SolverPropertyType.ClientOutput)
             file = ExperimentResultDAO.getLauncherOutputFile(expResult);
         else
             throw new NoAllowedSolverPropertyTypeException();
-        
+        */
         BufferedReader br = new BufferedReader(new FileReader(file));
         Vector<String> res = new Vector<String>();
         boolean found = false;
