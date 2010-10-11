@@ -13,16 +13,15 @@
 """
 
 import os
-import json
 import numpy
 import StringIO
 import csv
 
 from flask import Module, render_template as render
-from flask import Response, abort, request, g, url_for
+from flask import Response, abort, request, g
 from werkzeug import Headers
 
-from edacc import plots, config, models, statistics
+from edacc import plots, config, models
 from sqlalchemy.orm import joinedload
 from edacc.views.helpers import require_phase, require_login
 
@@ -67,6 +66,7 @@ def scatter_2solver_1property_points(db, exp, sc1, sc2, instances, solver_proper
             ))
 
     return points
+
 
 @plot.route('/<database>/experiment/<int:experiment_id>/scatter-plot-1property/')
 @require_phase(phases=(5, 6, 7))
@@ -211,10 +211,7 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
 
     points = scatter_1solver_instance_vs_result_property_points(db, exp, solver_config, instances, instance_property, solver_property, run)
 
-    if instance_property == 'numAtoms':
-        xlabel = 'Number of Atoms'
-    else:
-        xlabel = instance_prop.name
+    xlabel = instance_prop.name
 
     if solver_property == 'cputime':
         ylabel = 'CPU Time'
@@ -291,6 +288,7 @@ def scatter_1solver_result_vs_result_property_plot(db, exp, solver_config, insta
 
     return points
 
+
 @plot.route('/<database>/experiment/<int:experiment_id>/scatter-plot-2properties/')
 @require_phase(phases=(5, 6, 7))
 @require_login
@@ -365,6 +363,7 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
         os.remove(filename)
         return response
 
+
 @plot.route('/<database>/experiment/<int:experiment_id>/cactus-plot/')
 @require_phase(phases=(5, 6, 7))
 @require_login
@@ -390,11 +389,11 @@ def cactus_plot(database, experiment_id):
 
     for sc in exp.solver_configurations:
         s = {'xs': [], 'ys': [], 'name': sc.get_name()}
-        sc_res = results.filter_by(solver_configuration=sc, status=1).all()
+        sc_res = results.filter_by(solver_configuration=sc, status=1).filter(db.ExperimentResult.resultCode.like('1%')).all()
         sc_res = sorted(sc_res, key=lambda r: r.get_property_value(solver_property, db))
         i = 1
         for r in sc_res:
-            if r.Instances_idInstance in instances or instances == []:
+            if r.Instances_idInstance in instances:
                 s['ys'].append(r.get_property_value(solver_property, db))
                 s['xs'].append(i)
                 i += 1
@@ -409,6 +408,20 @@ def cactus_plot(database, experiment_id):
     else:
         ylabel = solver_prop.name
         title = 'Number of solved instances within a given amount of ' + solver_prop.name
+
+    if request.args.has_key('csv'):
+        csv_response = StringIO.StringIO()
+        csv_writer = csv.writer(csv_response)
+        for s in solvers:
+            csv_writer.writerow([s['name']])
+            csv_writer.writerow(['number of solved instances'] + map(str, s['xs']))
+            csv_writer.writerow(['CPU Time (s)'] + map(str, s['ys']))
+        csv_response.seek(0)
+
+        headers = Headers()
+        headers.add('Content-Type', 'text/csv')
+        headers.add('Content-Disposition', 'attachment', filename="data.csv")
+        return Response(response=csv_response.read(), headers=headers)
 
     if request.args.has_key('pdf'):
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'cactus.pdf'
@@ -447,6 +460,20 @@ def rtd_comparison_plot(database, experiment_id):
                                                solver_configuration=s2,
                                                instance=instance).all()]
 
+    if request.args.has_key('csv'):
+        csv_response = StringIO.StringIO()
+        csv_writer = csv.writer(csv_response)
+        csv_writer.writerow(['Runtimes of the two solver configurations on ' + str(instance)])
+        csv_writer.writerow([str(s1), str(s2)])
+        for i in xrange(min(len(results1), len(results2))):
+            csv_writer.writerow(map(str, [results1[i], results2[i]]))
+        csv_response.seek(0)
+
+        headers = Headers()
+        headers.add('Content-Type', 'text/csv')
+        headers.add('Content-Disposition', 'attachment', filename="data.csv")
+        return Response(response=csv_response.read(), headers=headers)
+
     if request.args.has_key('pdf'):
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'rtdcomp.png'
         plots.rtd_comparison(results1, results2, str(s1), str(s2), filename, format='pdf', dim=dim)
@@ -480,6 +507,19 @@ def rtds_plot(database, experiment_id):
                                    solver_configuration=sc).all()
         results.append((sc, [j.get_time() for j in sc_results]))
 
+    if request.args.has_key('csv'):
+        csv_response = StringIO.StringIO()
+        csv_writer = csv.writer(csv_response)
+        csv_writer.writerow(['Runtimes of the listed solver configurations on ' + str(instance)])
+        for res in results:
+            csv_writer.writerow([str(res[0])] + map(str, res[1]))
+        csv_response.seek(0)
+
+        headers = Headers()
+        headers.add('Content-Type', 'text/csv')
+        headers.add('Content-Disposition', 'attachment', filename="data.csv")
+        return Response(response=csv_response.read(), headers=headers)
+
     if request.args.has_key('pdf'):
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'rtds.png'
         plots.rtds(results, filename, 'pdf')
@@ -510,6 +550,18 @@ def rtd(database, experiment_id):
                                                solver_configuration=sc,
                                                instance=instance).all()]
 
+    if request.args.has_key('csv'):
+        csv_response = StringIO.StringIO()
+        csv_writer = csv.writer(csv_response)
+        csv_writer.writerow(['Runtimes of ' + str(sc) + ' on ' + str(instance)])
+        csv_writer.writerow(map(str, results))
+        csv_response.seek(0)
+
+        headers = Headers()
+        headers.add('Content-Type', 'text/csv')
+        headers.add('Content-Disposition', 'attachment', filename="data.csv")
+        return Response(response=csv_response.read(), headers=headers)
+
     filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'rtd.png'
     plots.rtd(results, filename, 'png')
     response = Response(response=open(filename, 'rb').read(), mimetype='image/png')
@@ -531,6 +583,18 @@ def kerneldensity(database, experiment_id):
                                                solver_configuration=sc,
                                                instance=instance).all()]
 
+    if request.args.has_key('csv'):
+        csv_response = StringIO.StringIO()
+        csv_writer = csv.writer(csv_response)
+        csv_writer.writerow(['Runtimes of ' + str(sc) + ' on ' + str(instance)])
+        csv_writer.writerow(map(str, results))
+        csv_response.seek(0)
+
+        headers = Headers()
+        headers.add('Content-Type', 'text/csv')
+        headers.add('Content-Disposition', 'attachment', filename="data.csv")
+        return Response(response=csv_response.read(), headers=headers)
+
     filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'kerneldens.png'
     plots.kerneldensity(results, filename, 'png')
     response = Response(response=open(filename, 'rb').read(), mimetype='image/png')
@@ -538,43 +602,37 @@ def kerneldensity(database, experiment_id):
     return response
 
 
+@plot.route('/<database>/experiment/<int:experiment_id>/box-plots-plot/')
+@require_phase(phases=(6, 7))
+@require_login
+def box_plots(database, experiment_id):
+    db = models.get_database(database) or abort(404)
+    exp = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
-#@plot.route('/<database>/experiment/<int:experiment_id>/box-plot/')
-#@require_phase(phases=(6, 7))
-#@require_login
-#def box_plot(database, experiment_id):
-#    db = models.get_database(database) or abort(404)
-#    exp = db.session.query(db.Experiment).get(experiment_id) or abort(404)
-#
-#    results = {}
-#    for sc in exp.solver_configurations:
-#        results[str(sc)] = [res.get_time() for res in db.session.query(db.ExperimentResult)
-#                                    .filter_by(experiment=exp,
-#                                               solver_configuration=sc).all()]
-#
-#    filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'boxplot.png'
-#    plots.box_plot(results, filename, 'png')
-#    response = Response(response=open(filename, 'rb').read(), mimetype='image/png')
-#    os.remove(filename)
-#    return response
-#
-#
-#@plot.route('/<database>/experiment/<int:experiment_id>/histogram/<int:solver_configuration_id>/<int:instance_id>/')
-#@require_phase(phases=(6, 7))
-#@require_login
-#def histogram(database, experiment_id, solver_configuration_id, instance_id):
-#    db = models.get_database(database) or abort(404)
-#    exp = db.session.query(db.Experiment).get(experiment_id) or abort(404)
-#    sc = db.session.query(db.SolverConfiguration).get(solver_configuration_id) or abort(404)
-#    instance = db.session.query(db.Instance).filter_by(idInstance=instance_id).first() or abort(404)
-#
-#    results = [r.get_time() for r in db.session.query(db.ExperimentResult)
-#                                    .filter_by(experiment=exp,
-#                                               solver_configuration=sc,
-#                                               instance=instance).all()]
-#
-#    filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'hist.png'
-#    plots.hist(results, filename, 'png')
-#    response = Response(response=open(filename, 'rb').read(), mimetype='image/png')
-#    os.remove(filename)
-#    return response
+    instances = [db.session.query(db.Instance).filter_by(idInstance=int(id)).first() for id in request.args.getlist('instances')]
+    solver_configs = [db.session.query(db.SolverConfiguration).get(int(id)) for id in request.args.getlist('solver_configs')]
+
+    results = {}
+    for sc in solver_configs:
+        points = []
+        for instance in instances:
+            points += [res.get_time() for res in db.session.query(db.ExperimentResult).filter_by(experiment=exp, instance=instance, solver_configuration=sc).all()]
+        results[str(sc)] = points
+
+    if request.args.has_key('csv'):
+        csv_response = StringIO.StringIO()
+        csv_writer = csv.writer(csv_response)
+        for k, v in results.iteritems():
+            csv_writer.writerow([k] + map(str, v))
+        csv_response.seek(0)
+
+        headers = Headers()
+        headers.add('Content-Type', 'text/csv')
+        headers.add('Content-Disposition', 'attachment', filename="data.csv")
+        return Response(response=csv_response.read(), headers=headers)
+
+    filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'boxplot.png'
+    plots.box_plot(results, filename, 'png')
+    response = Response(response=open(filename, 'rb').read(), mimetype='image/png')
+    os.remove(filename)
+    return response

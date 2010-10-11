@@ -14,6 +14,7 @@ import json
 import csv
 import StringIO
 import numpy
+import datetime
 
 from flask import Module
 from flask import render_template
@@ -22,10 +23,11 @@ from werkzeug import Headers
 
 from edacc import utils, models
 from sqlalchemy.orm import joinedload
-from edacc.constants import JOB_FINISHED, JOB_ERROR
+from edacc.constants import JOB_FINISHED, JOB_ERROR, JOB_RUNNING, JOB_STATUS, JOB_RESULT_CODE, JOB_STATUS_COLOR
 from edacc.views.helpers import require_phase, require_competition
 from edacc.views.helpers import require_login, is_admin
 from edacc import forms
+from edacc.forms import EmptyQuery
 
 frontend = Module(__name__)
 
@@ -47,7 +49,7 @@ def index():
 
 @frontend.route('/<database>/index')
 @frontend.route('/<database>/experiments/')
-@require_phase(phases=(2, 3, 4, 5, 6, 7))
+@require_phase(phases=(1, 2, 3, 4, 5, 6, 7))
 def experiments_index(database):
     """ Show a list of all experiments in the database """
     db = models.get_database(database) or abort(404)
@@ -109,7 +111,8 @@ def experiment(database, experiment_id):
     db = models.get_database(database) or abort(404)
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
-    return render('experiment.html', experiment=experiment, database=database, db=db)
+    return render('experiment.html', experiment=experiment, database=database,
+                  db=db)
 
 
 @frontend.route('/<database>/experiment/<int:experiment_id>/solvers')
@@ -128,7 +131,8 @@ def experiment_solvers(database, experiment_id):
     if not is_admin() and db.is_competition() and not db.competition_phase() in (6, 7):
         solvers = filter(lambda s: s.user == g.User, solvers)
 
-    return render('experiment_solvers.html', solvers=solvers, experiment=experiment, database=database, db=db)
+    return render('experiment_solvers.html', solvers=solvers,
+                  experiment=experiment, database=database, db=db)
 
 
 @frontend.route('/<database>/experiment/<int:experiment_id>/solver-configurations')
@@ -146,7 +150,9 @@ def experiment_solver_configurations(database, experiment_id):
     if not is_admin() and db.is_competition() and not db.competition_phase() in (6, 7):
         solver_configurations = filter(lambda sc: sc.solver.user == g.User, solver_configurations)
 
-    return render('experiment_solver_configurations.html', experiment=experiment, solver_configurations=solver_configurations, database=database, db=db)
+    return render('experiment_solver_configurations.html', experiment=experiment,
+                  solver_configurations=solver_configurations,
+                  database=database, db=db)
 
 
 @frontend.route('/<database>/experiment/<int:experiment_id>/instances')
@@ -160,7 +166,8 @@ def experiment_instances(database, experiment_id):
     instances = experiment.instances
     instances.sort(key=lambda i: i.name)
 
-    return render('experiment_instances.html', instances=instances, experiment=experiment, database=database, db=db)
+    return render('experiment_instances.html', instances=instances,
+                  experiment=experiment, database=database, db=db)
 
 
 @frontend.route('/<database>/experiment/<int:experiment_id>/results/')
@@ -183,7 +190,9 @@ def experiment_results(database, experiment_id):
         row = []
         for solver_config in solver_configs:
             query = db.session.query(db.ExperimentResult)
-            query.enable_eagerloads(True).options(joinedload(db.ExperimentResult.instance, db.ExperimentResult.solver_configuration))
+            query.enable_eagerloads(True)
+            query.options(joinedload(db.ExperimentResult.instance,
+                                     db.ExperimentResult.solver_configuration))
             jobs = query.filter_by(experiment=experiment) \
                         .filter_by(solver_configuration=solver_config) \
                         .filter_by(instance=instance) \
@@ -223,14 +232,17 @@ def experiment_results_by_solver(database, experiment_id):
         solver_configs = filter(lambda sc: sc.solver.user == g.User, solver_configs)
 
     form = forms.ResultBySolverForm(request.args)
-    form.solver_config.query = solver_configs
+    form.solver_config.query = solver_configs or EmptyQuery()
 
     results = []
     if form.solver_config.data:
         solver_config = form.solver_config.data
         instances = experiment.instances
         for i in instances:
-            runs = db.session.query(db.ExperimentResult).filter_by(experiment=experiment, solver_configuration=solver_config).filter_by(instance=i).all()
+            runs = db.session.query(db.ExperimentResult) \
+                        .filter_by(experiment=experiment,
+                                   solver_configuration=solver_config) \
+                        .filter_by(instance=i).all()
             results.append((i, runs))
 
         if 'csv' in request.args:
@@ -243,7 +255,8 @@ def experiment_results_by_solver(database, experiment_id):
 
             headers = Headers()
             headers.add('Content-Type', 'text/csv')
-            headers.add('Content-Disposition', 'attachment', filename=("results_%s.csv" % (str(solver_config),)))
+            headers.add('Content-Disposition', 'attachment',
+                        filename=("results_%s.csv" % (str(solver_config),)))
             return Response(response=csv_response.read(), headers=headers)
 
     return render('experiment_results_by_solver.html', db=db, database=database,
@@ -288,7 +301,8 @@ def experiment_results_by_instance(database, experiment_id):
 
             headers = Headers()
             headers.add('Content-Type', 'text/csv')
-            headers.add('Content-Disposition', 'attachment', filename=("results_%s.csv" % (str(instance),)))
+            headers.add('Content-Disposition', 'attachment',
+                        filename=("results_%s.csv" % (str(instance),)))
             return Response(response=csv_response.read(), headers=headers)
 
 
@@ -304,10 +318,14 @@ def experiment_progress(database, experiment_id):
     """ Show a live information table of the experiment's progress """
     db = models.get_database(database) or abort(404)
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
-    return render('experiment_progress.html', experiment=experiment, database=database, db=db)
+
+    JS_colors = ','.join(["'%d': '%s'" % (k, v) for k, v in JOB_STATUS_COLOR.iteritems()])
+
+    return render('experiment_progress.html', experiment=experiment,
+                  database=database, db=db, JS_colors=JS_colors)
 
 
-@frontend.route('/<database>/experiment/<int:experiment_id>/progress-ajax')
+@frontend.route('/<database>/experiment/<int:experiment_id>/progress-ajax/')
 @require_phase(phases=(3, 4, 5, 6, 7))
 @require_login
 def experiment_progress_ajax(database, experiment_id):
@@ -319,9 +337,25 @@ def experiment_progress_ajax(database, experiment_id):
     db = models.get_database(database) or abort(404)
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
+    # list of columns of the SQL query
+    # dummy column ("") in the middle for correct indexing in the ORDER part since
+    # that column is hidden in the jquery table
     columns = ["ExperimentResults.idJob", "SolverConfig.idSolverConfig", "Instances.name",
                "ExperimentResults.run", "ExperimentResults.resultTime", "ExperimentResults.seed",
-               "ExperimentResults.status", "ExperimentResults.resultCode"]
+               "ExperimentResults.status", "ExperimentResults.resultCode", ""] + \
+              ["`"+prop.name+"_value`.value" for prop in db.get_result_properties()]
+
+    # build the query part for the result properties that should be included
+    prop_columns = ','.join(["CASE WHEN `"+prop.name+"_value`.value IS NULL THEN 'not yet calculated' ELSE `"+prop.name+"_value`.value END" for prop in db.get_result_properties()])
+    prop_joins = ""
+    for prop in db.get_result_properties():
+        prop_joins += """LEFT JOIN ExperimentResult_has_SolverProperty as `%s_hasP` ON
+                         `%s_hasP`.ExperimentResults_idJob = idJob AND
+                         `%s_hasP`.SolverProperty_idSolverProperty = %d
+                      """ % (prop.name, prop.name, prop.name, prop.idSolverProperty)
+        prop_joins += """LEFT JOIN SolverPropertyValue as `%s_value` ON
+                        `%s_value`.ExperimentResult_has_SolverProperty_idER_h_SP = `%s_hasP`.idER_h_SP
+                      """ % (prop.name, prop.name, prop.name)
 
     params = []
     where_clause = ""
@@ -331,9 +365,17 @@ def experiment_progress_ajax(database, experiment_id):
         where_clause += "ExperimentResults.run LIKE %s OR "
         where_clause += "ExperimentResults.resultTime LIKE %s OR "
         where_clause += "ExperimentResults.seed LIKE %s OR "
-        where_clause += "ExperimentResults.status LIKE %s) OR "
-        where_clause += "ExperimentResults.resultCode LIKE %s) "
-        params += ['%' + request.args.get('sSearch') + '%'] * 7 # 7 conditions
+        where_clause += "ExperimentResults.status LIKE %s OR "
+        where_clause += "ExperimentResults.resultCode LIKE %s OR "
+        where_clause += """
+                    CASE ExperimentResults.status
+                        """ + '\n'.join(["WHEN %d THEN '%s'" % (k, v) for k, v in JOB_STATUS.iteritems()]) + """
+                    END LIKE %s
+                    OR
+                    CASE ExperimentResults.resultCode
+                        """ + '\n'.join(["WHEN %d THEN '%s'" % (k, v) for k, v in JOB_RESULT_CODE.iteritems()]) + """
+                    END LIKE %s) """
+        params += ['%' + request.args.get('sSearch') + '%'] * 9 # 9 conditions
 
     if where_clause != "": where_clause += " AND "
     where_clause += "ExperimentResults.Experiment_idExperiment = %s "
@@ -356,19 +398,26 @@ def experiment_progress_ajax(database, experiment_id):
         params.append(int(request.args.get('iDisplayLength')))
 
     conn = db.session.connection()
-    res = conn.execute("""SELECT SQL_CALC_FOUND_ROWS ExperimentResults.idJob, SolverConfig.idSolverConfig,
-                 Instances.name, ExperimentResults.run, ExperimentResults.resultTime, ExperimentResults.seed,
-                 ExperimentResults.status, ExperimentResults.resultCode
+    res = conn.execute("""SELECT SQL_CALC_FOUND_ROWS ExperimentResults.idJob,
+                       SolverConfig.idSolverConfig, Instances.name,
+                       ExperimentResults.run, ExperimentResults.resultTime,
+                       ExperimentResults.seed, ExperimentResults.status,
+                       ExperimentResults.resultCode,
+                       TIMESTAMPDIFF(SECOND, ExperimentResults.startTime, NOW()) AS runningTime
+                       """ + (',' if prop_columns else '') + prop_columns + """
                  FROM ExperimentResults
                     LEFT JOIN SolverConfig ON ExperimentResults.SolverConfig_idSolverConfig = SolverConfig.idSolverConfig
                     LEFT JOIN Instances ON ExperimentResults.Instances_idInstance = Instances.idInstance
+                    """+prop_joins+"""
                  WHERE """ + where_clause + " " + order + " " + limit, tuple(params))
 
     jobs = res.fetchall()
 
     res = conn.execute("SELECT FOUND_ROWS()")
     numFiltered = res.fetchone()[0]
-    res = conn.execute("SELECT COUNT(ExperimentResults.idJob) FROM ExperimentResults WHERE Experiment_idExperiment = %s", experiment.idExperiment)
+    res = conn.execute("""SELECT COUNT(ExperimentResults.idJob)
+                       FROM ExperimentResults WHERE Experiment_idExperiment = %s""",
+                       experiment.idExperiment)
     numTotal = res.fetchone()[0]
 
     # if competition db, show only own solvers unless phase is 6 or 7
@@ -382,8 +431,18 @@ def experiment_progress_ajax(database, experiment_id):
 
     aaData = []
     for job in jobs:
+        status = utils.job_status(job[6])
+        if job[6] in JOB_RUNNING:
+            try:
+                seconds_running = int(job[8])
+            except:
+                seconds_running = 0
+            status += ' (' + str(datetime.timedelta(seconds=seconds_running)) + ')'
         aaData.append([job.idJob, solver_config_names[job[1]], job[2], job[3],
-                job[4], job[5], utils.job_status(job[6]), utils.result_code(job[7])])
+                job[4], job[5], status, utils.result_code(job[7]), str(job[6])] \
+                + [job[i] for i in xrange(9, 9+len(db.get_result_properties()))]
+            )
+
 
     return json.dumps({
         'aaData': aaData,
@@ -414,36 +473,52 @@ def solver_config_results(database, experiment_id, solver_configuration_id, inst
                     .all()
 
     completed = len(filter(lambda j: j.status in JOB_FINISHED or j.status in JOB_ERROR, jobs))
+    correct = len(filter(lambda j: j.status in JOB_FINISHED and str(j.resultCode).startswith('1'), jobs))
 
-    return render('solver_config_results.html', experiment=experiment, solver_configuration=solver_configuration,
-                  instance=instance, results=jobs, completed=completed, database=database, db=db)
+    return render('solver_config_results.html', experiment=experiment,
+                  solver_configuration=solver_configuration, instance=instance,
+                  correct=correct, results=jobs, completed=completed,
+                  database=database, db=db)
 
 
 @frontend.route('/<database>/instance/<int:instance_id>')
-@require_phase(phases=(6, 7))
 @require_login
 def instance_details(database, instance_id):
     """ Show instance details """
     db = models.get_database(database) or abort(404)
     instance = db.session.query(db.Instance).filter_by(idInstance=instance_id).first() or abort(404)
 
+    if db.is_competition() and db.competition_phase() not in (6, 7):
+        if instance.source_class.user != g.User:
+            abort(403)
+
     instance_blob = instance.instance
     if len(instance_blob) > 1024:
         # show only the first and last 512 characters if the instance is larger than 1kB
-        instance_text = instance_blob[:512] + "\n\n... [truncated " + utils.download_size(len(instance_blob) - 1024) + "]\n\n" + instance_blob[-512:]
+        instance_text = instance_blob[:512] + "\n\n... [truncated " + \
+                         utils.download_size(len(instance_blob) - 1024) + \
+                        "]\n\n" + instance_blob[-512:]
     else:
         instance_text = instance_blob
 
-    return render('instance_details.html', instance=instance, instance_text=instance_text, blob_size=len(instance.instance), database=database, db=db)
+    instance_properties = db.get_instance_properties()
+
+    return render('instance_details.html', instance=instance,
+                  instance_text=instance_text, blob_size=len(instance.instance),
+                  database=database, db=db,
+                  instance_properties=instance_properties)
 
 
 @frontend.route('/<database>/instance/<int:instance_id>/download')
-@require_phase(phases=(6, 7))
 @require_login
 def instance_download(database, instance_id):
     """ Return HTTP-Response containing the instance blob """
     db = models.get_database(database) or abort(404)
     instance = db.session.query(db.Instance).filter_by(idInstance=instance_id).first() or abort(404)
+
+    if db.is_competition() and db.competition_phase() not in (6, 7):
+        if instance.source_class.user != g.User:
+            abort(403)
 
     headers = Headers()
     headers.add('Content-Type', 'text/plain')
@@ -472,6 +547,7 @@ def solver_details(database, solver_id):
 def solver_configuration_details(database, experiment_id, solver_configuration_id):
     """ Show solver configuration details """
     db = models.get_database(database) or abort(404)
+    experiment = db.session.query(db.Experiment).get(experiment_id)
     solver_config = db.session.query(db.SolverConfiguration).get(solver_configuration_id) or abort(404)
     solver = solver_config.solver
 
@@ -481,7 +557,9 @@ def solver_configuration_details(database, experiment_id, solver_configuration_i
     parameters = solver_config.parameter_instances
     parameters.sort(key=lambda p: p.parameter.order)
 
-    return render('solver_configuration_details.html', solver_config=solver_config, solver=solver, parameters=parameters, database=database, db=db)
+    return render('solver_configuration_details.html', solver_config=solver_config,
+                  solver=solver, parameters=parameters, database=database, db=db,
+                  experiment=experiment)
 
 
 @frontend.route('/<database>/experiment/<int:experiment_id>/result/<int:result_id>')
@@ -525,7 +603,7 @@ def solver_output_download(database, experiment_id, result_id):
 
     headers = Headers()
     headers.add('Content-Type', 'text/plain')
-    headers.add('Content-Disposition', 'attachment', filename=result.resultFileName)
+    headers.add('Content-Disposition', 'attachment', filename="result.txt")
 
     return Response(response=result.solverOutput, headers=headers)
 
@@ -543,7 +621,7 @@ def launcher_output_download(database, experiment_id, result_id):
 
     headers = Headers()
     headers.add('Content-Type', 'text/plain')
-    headers.add('Content-Disposition', 'attachment', filename=result.resultFileName)
+    headers.add('Content-Disposition', 'attachment', filename="result.txt")
 
     return Response(response=result.launcherOutput, headers=headers)
 
@@ -561,7 +639,7 @@ def watcher_output_download(database, experiment_id, result_id):
 
     headers = Headers()
     headers.add('Content-Type', 'text/plain')
-    headers.add('Content-Disposition', 'attachment', filename=result.resultFileName)
+    headers.add('Content-Disposition', 'attachment', filename="result.txt")
 
     return Response(response=result.watcherOutput, headers=headers)
 
@@ -579,6 +657,6 @@ def verifier_output_download(database, experiment_id, result_id):
 
     headers = Headers()
     headers.add('Content-Type', 'text/plain')
-    headers.add('Content-Disposition', 'attachment', filename=result.resultFileName)
+    headers.add('Content-Disposition', 'attachment', filename="result.txt")
 
     return Response(response=result.verifierOutput, headers=headers)

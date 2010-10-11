@@ -213,6 +213,7 @@ table.results th {
     border-color: black;
     border-collapse: collapse;
     padding: 3px;
+    background-color: #e6EEFF;
 }
 
 table.results td {
@@ -222,6 +223,39 @@ table.results td {
     border-collapse: collapse;
     padding: 3px;
 }
+
+table.results td.odd {
+    background-color: #ddd;
+}
+
+table.results td.even {
+    background-color: #eee;
+}
+
+table.results tr.odd {
+    background-color: #ddd;
+}
+
+table.results tr.even {
+    background-color: #eee;
+}
+
+table.details td.odd {
+    background-color: #ddd;
+}
+
+table.details td.even {
+    background-color: #eee;
+}
+
+table.details tr.odd {
+    background-color: #ddd;
+}
+
+table.details tr.even {
+    background-color: #eee;
+}
+
 
 div.navigation {
     font-size: 14px;

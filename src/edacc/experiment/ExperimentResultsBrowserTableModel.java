@@ -366,6 +366,9 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         } else {
             if (getIndexForColumn(col) >= COL_PROPERTY) {
                 int propertyIdx = getIndexForColumn(col) - COL_PROPERTY;
+                if (solverProperties.get(propertyIdx).getPropertyValueType() == null) {
+                    return String.class;
+                }
                 return solverProperties.get(propertyIdx).getPropertyValueType().getJavaType();
             } else {
                 return getValueAt(0, col).getClass();
@@ -446,6 +449,9 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 ExperimentResultHasSolverProperty erp = propertyValues[rowIndex][propertyIdx];
                 if (erp != null && !erp.getValue().isEmpty()) {
                     try {
+                        if (solverProperties.get(propertyIdx).getPropertyValueType() == null) {
+                            return erp.getValue().get(0);
+                        }
                         return solverProperties.get(propertyIdx).getPropertyValueType().getJavaTypeRepresentation(erp.getValue().get(0));
                     } catch (ConvertException ex) {
                         return null;
