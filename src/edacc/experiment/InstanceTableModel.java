@@ -7,6 +7,13 @@ package edacc.experiment;
 
 import edacc.model.ExperimentHasInstance;
 import edacc.model.Instance;
+import edacc.model.InstanceHasInstanceProperty;
+import edacc.model.InstanceProperty;
+import edacc.model.NoConnectionToDBException;
+import edacc.satinstances.InstancePropertyManager;
+import edacc.satinstances.PropertyValueTypeManager;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
@@ -17,18 +24,32 @@ import java.util.Vector;
  * @author daniel
  */
 public class InstanceTableModel extends AbstractTableModel {
+    public static int COL_NAME = 0;
+    public static int COL_SELECTED = 1;
+    public static int COL_PROP = 2;
     private String[] columns = {"Name", "selected"};
+    ArrayList<InstanceProperty> properties;
     protected ArrayList<Instance> instances;
     protected Vector<ExperimentHasInstance> experimentHasInstances;
 
     protected HashMap<Integer, ExperimentHasInstance> selectedInstances;
     protected Vector<ExperimentHasInstance> savedExperimentInstances;
 
-    public void setInstances(ArrayList<Instance> instances) {
+    public void setInstances(ArrayList<Instance> instances) throws IOException, NoConnectionToDBException, SQLException {
+        updateProperties();
         this.instances = instances;
         experimentHasInstances = new Vector<ExperimentHasInstance>();
         experimentHasInstances.setSize(instances.size());
-        this.fireTableDataChanged();
+        this.fireTableStructureChanged();
+    }
+
+    private void updateProperties() throws IOException, NoConnectionToDBException, SQLException {
+        properties = new ArrayList<InstanceProperty>();
+        properties.addAll(InstancePropertyManager.getInstance().getAll());
+        columns = java.util.Arrays.copyOf(columns, COL_PROP + properties.size());
+        for (int i = COL_PROP; i < columns.length; i++) {
+            columns[i] = properties.get(i - COL_PROP).getName();
+        }
     }
 
     /**
@@ -163,7 +184,13 @@ public class InstanceTableModel extends AbstractTableModel {
         this.fireTableCellUpdated(row, col);
     }
 
+    public ExperimentHasInstance getExperimentHasInstance(int rowIndex) {
+        return experimentHasInstances.get(rowIndex);
+    }
 
+    public Instance getInstance(int rowIndex) {
+        return instances.get(rowIndex);
+    }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
@@ -172,12 +199,13 @@ public class InstanceTableModel extends AbstractTableModel {
                 return instances.get(rowIndex).getName();
             case 1:
                 return selectedInstances.containsKey(instances.get(rowIndex).getId()); //selected.get(rowIndex);
-            case 2:
-                return experimentHasInstances.get(rowIndex);
-            case 3:
-                return instances.get(rowIndex);
             default:
-                return "";
+                int propertyIdx = columnIndex - COL_PROP;
+                if (properties.size() < propertyIdx || instances.get(rowIndex).getPropertyValues() == null) {
+                    return "-";
+                }
+                InstanceHasInstanceProperty ip = instances.get(rowIndex).getPropertyValues().get(properties.get(propertyIdx).getName());
+                return ip!=null? ip.getValue() : "-";
         }
     }
 }

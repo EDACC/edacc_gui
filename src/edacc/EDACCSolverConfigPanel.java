@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * EDACCSolverConfigPanel.java
  *
  * Created on 30.12.2009, 21:31:12
@@ -69,9 +64,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
                 if (e.getSolverId() != oldId) {
                     if (old != null && count == 1) {
                         old.setTitleNumber(0);
-                        if (old.getSolverConfiguration() != null) {
-                            old.getSolverConfiguration().setName(((TitledBorder) old.getBorder()).getTitle());
-                        }
+                        setSolverConfigurationName(old);
                     }
                     oldId = e.getSolverId();
                     count = 1;
@@ -79,20 +72,26 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
                     count++;
                 }
                 e.setTitleNumber(count);
-                if (e.getSolverConfiguration() != null) {
-                    e.getSolverConfiguration().setName(((TitledBorder) e.getBorder()).getTitle());
-                }
+                setSolverConfigurationName(e);
                 old = e;
             }
             if (old != null && count == 1) {
                 old.setTitleNumber(0);
-                if (old.getSolverConfiguration() != null) {
-                    old.getSolverConfiguration().setName(((TitledBorder) old.getBorder()).getTitle());
-                }
+                setSolverConfigurationName(old);
             }
             this.repaint();
             this.revalidate();
             setTitles();
+        }
+    }
+
+    /**
+     * This will set the name of the solver configuration (in case it is not null) for the given Solver config entry.
+     * @param e
+     */
+    public void setSolverConfigurationName(EDACCSolverConfigEntry e) {
+        if (e.getSolverConfiguration() != null) {
+            e.getSolverConfiguration().setName(((TitledBorder) e.getBorder()).getTitle());
         }
     }
 

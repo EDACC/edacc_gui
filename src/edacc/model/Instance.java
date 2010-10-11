@@ -1,6 +1,7 @@
 package edacc.model;
 
 import java.io.File;
+import java.util.HashMap;
 
 public class Instance extends BaseModel implements IntegerPKModel {
 
@@ -71,6 +72,14 @@ public class Instance extends BaseModel implements IntegerPKModel {
         this.instanceClass = instanceClass;
     }
 
+    public HashMap<String, InstanceHasInstanceProperty> getPropertyValues() {
+        return propertyValues;
+    }
+
+    public void setPropertyValues(HashMap<String, InstanceHasInstanceProperty> instancePropertyValues) {
+        this.propertyValues = instancePropertyValues;
+    }
+
     @Override
     public String toString() {
         return name;
@@ -87,4 +96,6 @@ public class Instance extends BaseModel implements IntegerPKModel {
      * @see InstanceHasInstanceClass for user defined instance classes.
      */
     private InstanceClass instanceClass;
+
+    private HashMap<String, InstanceHasInstanceProperty> propertyValues;
 }

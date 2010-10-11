@@ -509,6 +509,8 @@ public class EDACCView extends FrameView implements Observer {
         } catch (SQLException ex) {
             createDatabaseErrorMessage(ex);
             noMode();
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
         statusMessageLabel.setText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
     }

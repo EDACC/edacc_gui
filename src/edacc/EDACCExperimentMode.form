@@ -158,19 +158,16 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
-                                  <Group type="103" groupAlignment="1" attributes="0">
-                                      <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabel3" pref="121" max="32767" attributes="1"/>
-                                      <Group type="103" alignment="1" groupAlignment="1" max="-2" attributes="0">
-                                          <Component id="jLabel4" alignment="1" max="32767" attributes="1"/>
-                                          <Component id="jLabel2" alignment="1" max="32767" attributes="1"/>
-                                      </Group>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="jLabel8" alignment="1" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel7" alignment="1" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel6" alignment="1" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel3" alignment="1" pref="121" max="32767" attributes="1"/>
+                                      <Component id="jLabel4" alignment="1" min="-2" max="-2" attributes="1"/>
+                                      <Component id="jLabel2" alignment="0" pref="121" max="32767" attributes="1"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="txtCPUTimeLimit" alignment="1" pref="1072" max="32767" attributes="2"/>
                                       <Component id="txtMemoryLimit" alignment="1" pref="1072" max="32767" attributes="2"/>
                                       <Component id="txtMaxSeeds" alignment="0" pref="1072" max="32767" attributes="0"/>
                                       <Component id="chkGenerateSeeds" alignment="0" pref="1072" max="32767" attributes="1"/>
@@ -178,6 +175,7 @@
                                       <Component id="txtWallClockTimeLimit" alignment="0" pref="1072" max="32767" attributes="0"/>
                                       <Component id="txtStackSizeLimit" alignment="0" pref="1072" max="32767" attributes="0"/>
                                       <Component id="txtOutputSizeLimit" alignment="0" pref="1072" max="32767" attributes="0"/>
+                                      <Component id="txtCPUTimeLimit" alignment="0" pref="1072" max="32767" attributes="2"/>
                                   </Group>
                               </Group>
                               <Group type="102" alignment="1" attributes="0">
@@ -193,9 +191,9 @@
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="2" attributes="0">
-                              <Component id="jLabel2" alignment="2" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtCPUTimeLimit" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtCPUTimeLimit" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="2" attributes="0">
@@ -351,18 +349,27 @@
                     <Property name="text" type="java.lang.String" resourceKey="txtOutputSizeLimit.text"/>
                     <Property name="name" type="java.lang.String" value="txtOutputSizeLimit" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtOutputSizeLimitKeyReleased"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JTextField" name="txtStackSizeLimit">
                   <Properties>
                     <Property name="text" type="java.lang.String" resourceKey="txtStackSizeLimit.text"/>
                     <Property name="name" type="java.lang.String" value="txtStackSizeLimit" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtStackSizeLimitKeyReleased"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JTextField" name="txtWallClockTimeLimit">
                   <Properties>
                     <Property name="text" type="java.lang.String" resourceKey="txtWallClockTimeLimit.text"/>
                     <Property name="name" type="java.lang.String" value="txtWallClockTimeLimit" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtWallClockTimeLimitKeyReleased"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel6">
                   <Properties>
@@ -590,7 +597,7 @@
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="jScrollPane3" pref="1189" max="32767" attributes="0"/>
+                              <Component id="jScrollPane3" pref="992" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -1309,7 +1316,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnFilterJobs" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="btnCSVExport" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnExport" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="lblETA" min="-2" max="-2" attributes="0"/>
                       <EmptySpace pref="599" max="32767" attributes="0"/>
@@ -1340,7 +1347,7 @@
                           <Component id="btnRefreshJobs" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnBrowserColumnSelection" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnFilterJobs" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="btnCSVExport" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnExport" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="chkJobsTimer" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="txtJobsTimer" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -1380,6 +1387,7 @@
                   </Events>
                   <AuxValues>
                     <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="tableJobs = new JTable() {&#xd;&#xa;&#xd;&#xa;            @Override&#xd;&#xa;            protected void processMouseEvent(MouseEvent e) {&#xd;&#xa;                super.processMouseEvent(e);&#xd;&#xa;                tableJobsProcessMouseEvent(e);&#xd;&#xa;            }&#xd;&#xa;&#xd;&#xa;            @Override&#xd;&#xa;            protected void processMouseMotionEvent(MouseEvent e) {&#xd;&#xa;                super.processMouseMotionEvent(e);&#xd;&#xa;                tableJobsProcessMouseMotionEvent(e);&#xd;&#xa;            }&#xd;&#xa;        };"/>
+                    <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -1423,14 +1431,14 @@
                 </Property>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="btnCSVExport">
+            <Component class="javax.swing.JButton" name="btnExport">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="edacc.EDACCExperimentMode" id="btnCSVExport" methodName="btnCSVExport"/>
                 </Property>
-                <Property name="toolTipText" type="java.lang.String" resourceKey="btnCSVExport.toolTipText"/>
-                <Property name="label" type="java.lang.String" resourceKey="btnCSVExport.label"/>
-                <Property name="name" type="java.lang.String" value="btnCSVExport" noResource="true"/>
+                <Property name="text" type="java.lang.String" resourceKey="btnExport.text"/>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="btnExport.toolTipText"/>
+                <Property name="name" type="java.lang.String" value="btnExport" noResource="true"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[103, 25]"/>
                 </Property>

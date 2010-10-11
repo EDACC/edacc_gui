@@ -27,7 +27,7 @@ public class AnalysisPanel extends javax.swing.JPanel {
     private Dependency[][] dependencies;
     private static Class<Plot>[] plotClasses = (Class<Plot>[]) new Class<?>[]{
                 BoxPlot.class, ScatterOnePropertyTwoSolvers.class,
-                // ScatterTwoPropertiesOneSolver.class, ScatterInstancePropertySolverProperty.class,
+                ScatterTwoPropertiesOneSolver.class, ScatterInstancePropertySolverProperty.class,
                 CactusPlot.class, KernelDensityPlot.class,
                 RTDPlot.class, RTDsPlot.class
             };
@@ -49,9 +49,7 @@ public class AnalysisPanel extends javax.swing.JPanel {
             try {
                 dependencies[i] = (Dependency[]) plotClasses[i].getMethod("getDependencies", new Class[]{}).invoke(null);
             } catch (Exception e) {
-                e.printStackTrace();
-
-                // TODO: error!
+                javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Error while generating form", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
         }
 
@@ -61,19 +59,13 @@ public class AnalysisPanel extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
                 if (comboType.getSelectedItem() instanceof ComboTypeEntry) {
                     ComboTypeEntry cte = (ComboTypeEntry) comboType.getSelectedItem();
-                   /// Class<Plot> plotClass = (Class<Plot>) cte.plotClass;
                     try {
-                   //     if (cte.plot == null) {
-                           // cte.plot = (Plot) plotClass.getConstructor(ExperimentController.class).newInstance(expController);
-                   //     }
-                   //     cte.plot.loadDefaultValues();
                         initialize();
                         cte.plotClass.getMethod("loadDefaultValues", new Class[] {ExperimentController.class}).invoke(null, expController);
                         initializePlotType(dependencies[comboType.getSelectedIndex()]);
 
                     } catch (Exception ex) {
-                        //TODO: show error message
-                        ex.printStackTrace();
+                        javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
                         initialize();
                     }
                 }

@@ -13,21 +13,23 @@ import edacc.model.ExperimentHasInstance;
 import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
-import edacc.model.ExperimentResultHasSolverPropertyDAO;
 import edacc.model.ExperimentResultStatus;
 import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassDAO;
+import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.InstanceDAO;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
+import edacc.model.SolverPropertyNotInDBException;
 import edacc.model.TaskCancelledException;
 import edacc.model.Tasks;
+import edacc.properties.SolverPropertyTypeNotExistException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
@@ -42,6 +44,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -82,10 +85,18 @@ public class ExperimentController {
      * Initializes the experiment controller. Loads the experiments and the instances classes.
      * @throws SQLException
      */
-    public void initialize() throws SQLException {
+    public void initialize() throws SQLException, InstanceClassMustBeSourceException, IOException {
         ArrayList<Experiment> v = new ArrayList<Experiment>();
         v.addAll(ExperimentDAO.getAll());
         experiments = v;
+       /* VirtualExperiment test = new VirtualExperiment();
+        test.setSaved();
+        test.setName("test virtexp");
+        test.setDescription("Test descr");
+        LinkedList<Experiment> testExp = new LinkedList<Experiment>();
+        testExp.add(experiments.get(0));
+        test.setExperiments(testExp);
+        experiments.add(test);*/
         main.expTableModel.setExperiments(experiments);
 
         Vector<InstanceClass> vic = new Vector<InstanceClass>();
@@ -93,7 +104,12 @@ public class ExperimentController {
         main.instanceClassModel.setClasses(vic);
         ArrayList<Instance> instances = new ArrayList<Instance>();
         instances.addAll(InstanceDAO.getAll());
-        main.insTableModel.setInstances(instances);
+        try {
+            main.insTableModel.setInstances(instances);
+        } catch (IOException e) {
+            throw new SQLException(e.getMessage());
+        }
+
 
     }
 
@@ -102,28 +118,40 @@ public class ExperimentController {
      * @param id
      * @throws SQLException
      */
-    public void loadExperiment(int id, Tasks task) throws SQLException {
+    public void loadExperiment(Experiment exp, Tasks task) throws SQLException {
+        activeExperiment = exp;
         main.solverConfigPanel.beginUpdate();
         solverConfigPanel.removeAll();
         SolverConfigurationDAO.clearCache();
-        task.setStatus("Loading solvers..");
-        activeExperiment = ExperimentDAO.getById(id);
         ArrayList<Solver> vs = new ArrayList<Solver>();
+        ArrayList<SolverConfiguration> vss = new ArrayList<SolverConfiguration>();
+        Vector<ExperimentHasInstance> ehi = new Vector<ExperimentHasInstance>();
+        task.setStatus("Loading solvers..");
         vs.addAll(SolverDAO.getAll());
-        main.solTableModel.setSolvers(vs);
         task.setTaskProgress(.33f);
-
-        task.setStatus("Loading solver configurations..");
-        ArrayList<SolverConfiguration> vss = SolverConfigurationDAO.getSolverConfigurationByExperimentId(id);
+     /*   if (exp instanceof VirtualExperiment) {
+            VirtualExperiment vexp = (VirtualExperiment) exp;
+            task.setStatus("Loading solver configurations..");
+            for (Experiment e : vexp.getExperiments()) {
+                vss.addAll(SolverConfigurationDAO.getSolverConfigurationByExperimentId(e.getId()));
+            }
+            task.setTaskProgress(.66f);
+            task.setStatus("Loading instances..");
+            // select instances for the experiment
+            ehi.addAll(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
+        } else {*/
+            task.setStatus("Loading solver configurations..");
+            vss.addAll(SolverConfigurationDAO.getSolverConfigurationByExperimentId(exp.getId()));
+            task.setTaskProgress(.66f);
+            task.setStatus("Loading instances..");
+            // select instances for the experiment
+            ehi.addAll(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
+       // }
+        main.solTableModel.setSolvers(vs);
         for (int i = 0; i < vss.size(); i++) {
             main.solverConfigPanel.addSolverConfiguration(vss.get(i));
         }
-        task.setTaskProgress(.66f);
-        task.setStatus("Loading instances..");
-
-        // select instances for the experiment
-        main.insTableModel.setExperimentHasInstances(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
-
+        main.insTableModel.setExperimentHasInstances(ehi);
         if (main.insTableModel.getRowCount() > 0) {
             main.sorter.setRowFilter(main.rowFilter);
         }
@@ -137,7 +165,7 @@ public class ExperimentController {
      * @return
      * @throws SQLException
      */
-    public void removeExperiment(int id) throws SQLException {
+    public void removeExperiment(int id) throws SQLException, InstanceClassMustBeSourceException, IOException {
         Experiment e = ExperimentDAO.getById(id);
         if (e.equals(activeExperiment)) {
             unloadExperiment();
@@ -187,7 +215,7 @@ public class ExperimentController {
      * config panel.
      * @throws SQLException
      */
-    public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException {
+    public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
 
         task.setStatus("Checking jobs..");
         ArrayList<SolverConfiguration> deletedSolverConfigurations = SolverConfigurationDAO.getAllDeleted();
@@ -231,6 +259,7 @@ public class ExperimentController {
             }
             if (entry.getSolverConfiguration() == null) {
                 entry.setSolverConfiguration(SolverConfigurationDAO.createSolverConfiguration(entry.getSolverId(), activeExperiment.getId(), seed_group));
+                solverConfigPanel.setSolverConfigurationName(entry);
             } else {
                 entry.getSolverConfiguration().setSeed_group(seed_group);
                 entry.getSolverConfiguration().setModified();
@@ -272,7 +301,7 @@ public class ExperimentController {
      * saves the instances selection of the currently loaded experiment
      * @throws SQLException
      */
-    public void saveExperimentHasInstances(Tasks task) throws SQLException, InterruptedException, InvocationTargetException {
+    public void saveExperimentHasInstances(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
         task.setStatus("Checking jobs..");
         ArrayList<ExperimentHasInstance> deletedInstances = main.insTableModel.getDeletedExperimentHasInstances();
         if (deletedInstances.size() > 0) {
@@ -336,7 +365,7 @@ public class ExperimentController {
      * @return number of jobs added to the experiment results table
      * @throws SQLException
      */
-    public int generateJobs(int numRuns, final Tasks task) throws SQLException, TaskCancelledException {
+    public int generateJobs(int numRuns, final Tasks task) throws SQLException, TaskCancelledException, IOException, SolverPropertyTypeNotExistException, SolverPropertyNotInDBException {
         PropertyChangeListener cancelExperimentResultDAOStatementListener = new PropertyChangeListener() {
 
             @Override
@@ -513,7 +542,7 @@ public class ExperimentController {
         return experiments_added;
     }
 
-    public void saveExperimentParameters(Integer CPUTimeLimit, Integer wallClockTimeLimit, Integer memoryLimit, Integer stackSizeLimit, Integer outputSizeLimit, Integer maxSeed, boolean generateSeeds, boolean linkSeeds) throws SQLException {
+    public void saveExperimentParameters(Integer CPUTimeLimit, Integer wallClockTimeLimit, Integer memoryLimit, Integer stackSizeLimit, Integer outputSizeLimit, Integer maxSeed, boolean generateSeeds, boolean linkSeeds) throws SQLException, InstanceClassMustBeSourceException, IOException {
         activeExperiment.setCPUTimeLimit(CPUTimeLimit);
         activeExperiment.setWallClockTimeLimit(wallClockTimeLimit);
         activeExperiment.setMemoryLimit(memoryLimit);
@@ -548,17 +577,34 @@ public class ExperimentController {
 
     public void loadJobs() {
         try {
-
-
-            ArrayList<ExperimentResult> jobs = ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId());
-            ExperimentResultHasSolverPropertyDAO.assign(jobs, activeExperiment.getId());
             final ExperimentResultsBrowserTableModel sync = main.jobsTableModel;
+            Timestamp timestamp = ExperimentResultDAO.getCurrentTimestamp();
             synchronized (sync) {
-                main.jobsTableModel.setJobs(jobs);
+                ArrayList<ExperimentResult> results = main.jobsTableModel.getJobs();
+                if (results == null) {
+                    main.jobsTableModel.setJobs(ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId()));
+                } else {
+                    ArrayList<ExperimentResult> modified = ExperimentResultDAO.getAllModifiedByExperimentId(activeExperiment.getId(), main.jobsTableModel.lastUpdated);
+                    if (modified.size() > 0) {
+                        HashMap<Integer, ExperimentResult> map = new HashMap<Integer, ExperimentResult>();
+                        for (ExperimentResult er : modified) {
+                            map.put(er.getId(), er);
+                        }
+                        for (int i = 0; i < results.size(); i++) {
+                            ExperimentResult er = map.get(results.get(i).getId());
+                            if (er != null) {
+                                results.set(i, er);
+                                // main.jobsTableModel.fireTableRowsUpdated(i, i); // doesn't work with sorted columns :-\
+                            }
+                        }
+                        main.jobsTableModel.fireTableDataChanged();
+                    }
+                }
             }
+            main.jobsTableModel.lastUpdated = timestamp;
             System.gc();
         } catch (Exception e) {
-            e.printStackTrace();
+            //   e.printStackTrace();
             // TODO: shouldn't happen but show message if it does
         }
 
@@ -683,7 +729,6 @@ public class ExperimentController {
                 task.setStatus("Writing client");
 
                 // add PBS script
-                // TODO extend to multiple queue support
                 File f = GridQueueDAO.getPBS(queue);
                 entry = new ZipEntry("start_client.pbs");
                 addFileToZIP(f, entry, zos);
@@ -754,32 +799,38 @@ public class ExperimentController {
      * @throws SQLException
      */
     public void assignQueuesToExperiment(ArrayList<GridQueue> queues) throws SQLException {
-        // TODO: this operation should be atomic
-
-        // create all ExperimentHasGridQueue objects which do not exist
-        for (GridQueue q : queues) {
-            // check if assignment already exists
-            if (ExperimentHasGridQueueDAO.getByExpAndQueue(activeExperiment, q) != null) {
-                continue;
-            }
-            ExperimentHasGridQueueDAO.createExperimentHasGridQueue(activeExperiment, q);
-        }
-
-        // remove all ExperimentHasGridQueue objects which are not in the queues vektor
-        ArrayList<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(activeExperiment);
-        for (ExperimentHasGridQueue egq : ehgqs) {
-            boolean found = false;
+        boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
+        try {
+            DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+            // create all ExperimentHasGridQueue objects which do not exist
             for (GridQueue q : queues) {
-                if (egq.getIdGridQueue() == q.getId()) {
-                    found = true;
-                    break;
+                // check if assignment already exists
+                if (ExperimentHasGridQueueDAO.getByExpAndQueue(activeExperiment, q) != null) {
+                    continue;
+                }
+                ExperimentHasGridQueueDAO.createExperimentHasGridQueue(activeExperiment, q);
+            }
+
+            // remove all ExperimentHasGridQueue objects which are not in the queues vektor
+            ArrayList<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(activeExperiment);
+            for (ExperimentHasGridQueue egq : ehgqs) {
+                boolean found = false;
+                for (GridQueue q : queues) {
+                    if (egq.getIdGridQueue() == q.getId()) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    ExperimentHasGridQueueDAO.removeExperimentHasGridQueue(egq);
                 }
             }
-            if (!found) {
-                ExperimentHasGridQueueDAO.removeExperimentHasGridQueue(egq);
-            }
+        } catch (SQLException e) {
+            DatabaseConnector.getInstance().getConn().rollback();
+            throw e;
+        } finally {
+            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
         }
-
     }
 
     public void selectAllInstanceClasses() {
@@ -870,7 +921,8 @@ public class ExperimentController {
 
         PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
         for (int i = 0; i < main.jobsTableModel.getColumnCount(); i++) {
-            out.write("\"" + main.jobsTableModel.getColumnName(i) + "\"");
+            int vis_col = main.tableJobs.convertColumnIndexToModel(i);
+            out.write("\"" + main.jobsTableModel.getColumnName(vis_col) + "\"");
             if (i < main.jobsTableModel.getColumnCount() - 1) {
                 out.write(",");
             }
@@ -879,36 +931,107 @@ public class ExperimentController {
 
         int total = main.getTableJobs().getRowCount();
         int done = 0;
-        for (int i = 0; i < main.jobsTableModel.getJobs().size(); i++) {
-            int vis = main.getTableJobs().convertRowIndexToView(i);
-            if (vis != -1) {
-                done++;
-                task.setTaskProgress((float) done / (float) total);
-                if (task.isCancelled()) {
-                    task.setStatus("Cancelled");
-                    break;
-                }
-                task.setStatus("Exporting row " + done + " of " + total);
-                for (int col = 0; col < main.jobsTableModel.getColumnCount(); col++) {
-                    out.write("\"" + main.jobsTableModel.getValueAt(i, col).toString() + "\"");
-                    if (col < main.jobsTableModel.getColumnCount() - 1) {
-                        out.write(",");
-                    }
-                }
-                out.write('\n');
+        for (int i = 0; i < main.tableJobs.getRowCount(); i++) {
+            int vis = main.getTableJobs().convertRowIndexToModel(i);
+            done++;
+            task.setTaskProgress((float) done / (float) total);
+            if (task.isCancelled()) {
+                task.setStatus("Cancelled");
+                break;
             }
+            task.setStatus("Exporting row " + done + " of " + total);
+            for (int col = 0; col < main.jobsTableModel.getColumnCount(); col++) {
+                int vis_col = main.tableJobs.convertColumnIndexToModel(col);
+                if (main.jobsTableModel.getValueAt(vis, vis_col) == null) {
+                    out.write("\"-\"");
+                } else {
+                    out.write("\"" + main.jobsTableModel.getValueAt(vis, vis_col).toString() + "\"");
+                }
+                if (col < main.jobsTableModel.getColumnCount() - 1) {
+                    out.write(",");
+                }
+            }
+            out.write('\n');
         }
 
         out.flush();
         out.close();
     }
 
-    public Experiment getExperiment(String name) throws SQLException {
-        return ExperimentDAO.getExperimentByName(name);
+    /**
+     * Exports all jobs and all columns currently visible to a TeX file.
+     * @param file
+     * @throws IOException
+     */
+    public void exportTeX(File file, Tasks task) throws IOException {
+        Tasks.getTaskView().setCancelable(true);
+        task.setOperationName("Exporting jobs to TeX file");
+
+        if (file.exists()) {
+            file.delete();
+        }
+
+        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+
+        String format = "|";
+        String columns = "";
+        for (int i = 0; i < main.jobsTableModel.getColumnCount(); i++) {
+            int vis_col = main.tableJobs.convertColumnIndexToModel(i);
+            columns += main.jobsTableModel.getColumnName(vis_col);
+            if (main.jobsTableModel.getColumnClass(vis_col) == Integer.class
+                    || main.jobsTableModel.getColumnClass(vis_col) == Double.class
+                    || main.jobsTableModel.getColumnClass(vis_col) == Float.class
+                    || main.jobsTableModel.getColumnClass(vis_col) == int.class
+                    || main.jobsTableModel.getColumnClass(vis_col) == double.class
+                    || main.jobsTableModel.getColumnClass(vis_col) == float.class) {
+                format += "r|";
+            } else {
+                format += "l|";
+            }
+            if (i < main.jobsTableModel.getColumnCount() - 1) {
+                columns += "&";
+            }
+        }
+        out.write("\\documentclass[a4paper]{report}\n");
+        out.write("\\title{Results of " + activeExperiment.getName() + "}\n");
+        out.write("\\begin{document}\n");
+        out.write("\\begin{tabular}[h]{" + format + "}\n");
+        out.write("\\hline\n");
+        out.write(columns + " \\\\\n");
+        out.write("\\hline\n");
+        int total = main.getTableJobs().getRowCount();
+        int done = 0;
+        for (int i = 0; i < main.tableJobs.getRowCount(); i++) {
+            int vis = main.getTableJobs().convertRowIndexToModel(i);
+            done++;
+            task.setTaskProgress((float) done / (float) total);
+            if (task.isCancelled()) {
+                task.setStatus("Cancelled");
+                break;
+            }
+            task.setStatus("Exporting row " + done + " of " + total);
+            for (int col = 0; col < main.jobsTableModel.getColumnCount(); col++) {
+                int vis_col = main.tableJobs.convertColumnIndexToModel(col);
+                if (main.jobsTableModel.getValueAt(vis, vis_col) == null) {
+                    out.write("-");
+                } else {
+                    out.write(main.jobsTableModel.getValueAt(vis, vis_col).toString());
+                }
+                if (col < main.jobsTableModel.getColumnCount() - 1) {
+                    out.write(" & ");
+                }
+            }
+            out.write("\\\\\n");
+        }
+        out.write("\\hline\n");
+        out.write("\\end{tabular}\n");
+        out.write("\\end{document}\n");
+        out.flush();
+        out.close();
     }
 
-    public double getMaxCalculationTimeForSolverConfiguration(SolverConfiguration sc, int status, int run) throws SQLException {
-        return ExperimentResultDAO.getMaxCalculationTimeForSolverConfiguration(sc, status, run);
+    public Experiment getExperiment(String name) throws SQLException {
+        return ExperimentDAO.getExperimentByName(name);
     }
 
     public boolean experimentResultsIsModified(int numRuns) {

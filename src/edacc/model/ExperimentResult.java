@@ -31,7 +31,7 @@ public class ExperimentResult extends BaseModel {
     private int computeQueue;
 
     private HashMap<Integer, ExperimentResultHasSolverProperty> propertyValues;
-
+    
     protected ExperimentResult() {
     }
 

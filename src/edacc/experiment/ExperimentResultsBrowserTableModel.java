@@ -1,7 +1,10 @@
 package edacc.experiment;
 
+import edacc.satinstances.ConvertException;
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultHasSolverProperty;
@@ -21,6 +24,7 @@ import edacc.model.SolverDAO;
 import edacc.model.SolverProperty;
 import edacc.model.SolverPropertyDAO;
 import edacc.properties.FilePropertyParser;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +52,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public static int COL_WATCHER_OUTPUT = 12;
     public static int COL_VERIFIER_OUTPUT = 13;
     public static int COL_PROPERTY = 14;
+    public Timestamp lastUpdated;
     private static final FilePropertyParser parser = new FilePropertyParser(); // just for now
     private ArrayList<ExperimentResult> jobs;
     private String[] CONST_COLUMNS = {"ID", "Compute Queue", "Solver", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
@@ -359,7 +364,12 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         if (getRowCount() == 0) {
             return String.class;
         } else {
-            return getValueAt(0, col).getClass();
+            if (getIndexForColumn(col) >= COL_PROPERTY) {
+                int propertyIdx = getIndexForColumn(col) - COL_PROPERTY;
+                return solverProperties.get(propertyIdx).getPropertyValueType().getJavaType();
+            } else {
+                return getValueAt(0, col).getClass();
+            }
         }
     }
 
@@ -431,13 +441,17 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             default:
                 int propertyIdx = columnIndex - COL_PROPERTY;
                 if (solverProperties.size() < propertyIdx) {
-                    return "";
+                    return null;
                 }
                 ExperimentResultHasSolverProperty erp = propertyValues[rowIndex][propertyIdx];
                 if (erp != null && !erp.getValue().isEmpty()) {
-                    return erp.getValue().get(0);
+                    try {
+                        return solverProperties.get(propertyIdx).getPropertyValueType().getJavaTypeRepresentation(erp.getValue().get(0));
+                    } catch (ConvertException ex) {
+                        return null;
+                    }
                 } else {
-                    return "not yet calculated";
+                    return null;
                 }
             /*if (solverProperties.get(property).getSolverPropertyType() == SolverPropertyType.ClientOutput
             || solverProperties.get(property).getSolverPropertyType() == SolverPropertyType.ResultFile) {
@@ -532,5 +546,12 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             }
         }
         return res;
+    }
+
+    public void resetColumnVisibility() {
+        System.arraycopy(CONST_VISIBLE, 0, visible, 0, CONST_VISIBLE.length);
+        for (int i = CONST_VISIBLE.length; i < visible.length; i++) {
+            visible[i] = true;
+        }
     }
 }

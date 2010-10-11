@@ -176,8 +176,8 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
                     xsVec.add(xsValue);
                     ysVec.add(ysValue);
                     pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>"
-                            + xSolverConfig.toString() + ": " + (double) Math.round(xsValue * 100) / 100 + " sec<br>"
-                            + ySolverConfig.toString() + ": " + (double) Math.round(ysValue * 100) / 100 + " sec<br>"
+                            + xSolverConfig.toString() + ": " + (double) Math.round(xsValue * 100) / 100 + "<br>"
+                            + ySolverConfig.toString() + ": " + (double) Math.round(ysValue * 100) / 100 + "<br>"
                             + "Run: " + xres.getRun() + "<br>"
                             + "Instance: " + instance.getName()
                             + "</html>"));
@@ -226,8 +226,8 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
                 xsVec.add(xsValue);
                 ysVec.add(ysValue);
                 pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>"
-                        + xSolverConfig.toString() + ": " + (double) Math.round(xsValue * 100) / 100 + " sec<br>"
-                        + ySolverConfig.toString() + ": " + (double) Math.round(ysValue * 100) / 100 + " sec<br>"
+                        + xSolverConfig.toString() + ": " + (double) Math.round(xsValue * 100) / 100 + "<br>"
+                        + ySolverConfig.toString() + ": " + (double) Math.round(ysValue * 100) / 100 + "<br>"
                         + "Instance: " + instance.getName()
                         + "</html>"));
             } else {
@@ -266,8 +266,8 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
                 xsVec.add(xsValue);
                 ysVec.add(ysValue);
                 pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>"
-                        + xSolverConfig.toString() + ": " + (double) Math.round(xsValue * 100) / 100 + " sec<br>"
-                        + ySolverConfig.toString() + ": " + (double) Math.round(ysValue * 100) / 100 + " sec<br>"
+                        + xSolverConfig.toString() + ": " + (double) Math.round(xsValue * 100) / 100 + "<br>"
+                        + ySolverConfig.toString() + ": " + (double) Math.round(ysValue * 100) / 100 + "<br>"
                         + "Instance: " + instance.getName()
                         + "</html>"));
             }

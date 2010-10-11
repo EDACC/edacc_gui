@@ -3,6 +3,7 @@ package edacc.model;
 import SevenZip.Compression.LZMA.Decoder;
 import SevenZip.Compression.LZMA.Encoder;
 import edacc.manageDB.InstanceParser.InstanceParser;
+import edacc.satinstances.InstancePropertyManager;
 import edacc.satinstances.InvalidVariableException;
 import edacc.satinstances.SATInstance;
 import java.io.File;
@@ -13,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,6 +28,38 @@ public class InstanceDAO {
 
     protected static final String table = "Instances";
     private static final ObjectCache<Instance> cache = new ObjectCache<Instance>();
+
+    private static String getPropertySelect(Vector<InstanceProperty> props) {
+        String select = " ";
+        int tbl = 0;
+        for (InstanceProperty p : props) {
+            select += ", tbl_" + tbl++ + ".value";
+        }
+        return select + " ";
+    }
+
+    private static String getPropertyFrom(Vector<InstanceProperty> props) throws IOException, NoConnectionToDBException, SQLException {
+        String from = " ";
+        int tbl = 0;
+        for (InstanceProperty p : props) {
+            from += "JOIN (SELECT idInstance, value FROM Instance_has_InstanceProperty WHERE idInstanceProperty = \"" + p.getName() + "\") AS tbl_" + tbl++ + " USING (idInstance) ";
+        }
+        return from;
+    }
+
+    private static Instance getInstance(ResultSet rs, Vector<InstanceProperty> props) throws IOException, NoConnectionToDBException, SQLException {
+        Instance i = new Instance();
+        i.setId(rs.getInt("idInstance"));
+        i.setMd5(rs.getString("md5"));
+        i.setName(rs.getString("name"));
+        Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
+        i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
+        i.setPropertyValues(new HashMap<String, InstanceHasInstanceProperty>());
+        for (int prop = 0; prop < props.size(); prop++) {
+            i.getPropertyValues().put(props.get(prop).getName(), new InstanceHasInstanceProperty(i, props.get(prop), rs.getString("tbl_" + prop + ".value")));
+        }
+        return i;
+    }
 
     /**
      * Instance factory method. Checks if the instance is already in the Datebase and if so,
@@ -98,17 +133,17 @@ public class InstanceDAO {
                 }
 
                 File input = null;
-          //      File output = null;
+                //      File output = null;
                 FileInputStream fInStream = null;
-                
+
                 if (instance.getFile() != null) {
 
-                        input = instance.getFile();
-                        //output = new File(instance.getFile().getName());
-                        //Util.sevenZipEncode(input, output);
-                        fInStream = new FileInputStream(input);
+                    input = instance.getFile();
+                    //output = new File(instance.getFile().getName());
+                    //Util.sevenZipEncode(input, output);
+                    fInStream = new FileInputStream(input);
 
-                        ps.setBinaryStream(4, fInStream);
+                    ps.setBinaryStream(4, fInStream);
 
                 } else {
                     ps.setNull(4, Types.BLOB);
@@ -116,22 +151,22 @@ public class InstanceDAO {
 
                 ps.executeUpdate();
 
-                
+
                 ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
                     instance.setId(rs.getInt(1));
                 }
                 cache.cache(instance);
-                
+
                 ps.close();
                 instance.setSaved();
 
                 fInStream.close();
-    //                output.delete();
+                //                output.delete();
                 //input.delete();
             } catch (Exception ex) {
-                    Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else if (instance.isModified()) {
             // update query
             final String updateQuery = "UPDATE " + table + " SET name=?, md5=?, instanceClass_idinstanceClass=? "
@@ -160,7 +195,9 @@ public class InstanceDAO {
      */
     public static Instance getById(int id) throws SQLException, InstanceClassMustBeSourceException {
         Instance c = cache.getCached(id);
-        if (c != null) return c;
+        if (c != null) {
+            return c;
+        }
 
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idInstance,  md5, name, instanceClass_idinstanceClass FROM " + table + " WHERE idInstance=?");
@@ -168,16 +205,21 @@ public class InstanceDAO {
         ResultSet rs = st.executeQuery();
         Instance i = new Instance();
         if (rs.next()) {
-            i.setId(rs.getInt("idInstance"));           
+            i.setId(rs.getInt("idInstance"));
             i.setMd5(rs.getString("md5"));
-            i.setName(rs.getString("name"));          
+            i.setName(rs.getString("name"));
             Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
             i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
+
+            ArrayList<Instance> tmp = new ArrayList<Instance>();
+            tmp.add(c);
+            InstanceHasInstancePropertyDAO.assign(tmp);
 
             i.setSaved();
             cache.cache(i);
             return i;
         }
+
         rs.close();
         return null;
     }
@@ -187,36 +229,34 @@ public class InstanceDAO {
      * @return all instances in a List
      * @throws SQLException
      */
-    public static LinkedList<Instance> getAll() throws SQLException, InstanceClassMustBeSourceException {
+    public static LinkedList<Instance> getAll() throws SQLException, InstanceClassMustBeSourceException, IOException {
         // return linked list with all instances
+        Vector<InstanceProperty> props = InstancePropertyManager.getInstance().getAll();
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        ResultSet rs = st.executeQuery("SELECT idInstance, md5, name, instanceClass_idinstanceClass FROM " + table);
+        ResultSet rs = st.executeQuery("SELECT i.idInstance, i.md5, i.name, i.instanceClass_idinstanceClass" + getPropertySelect(props)
+                + "FROM " + table + " AS i " + getPropertyFrom(props));
         LinkedList<Instance> res = new LinkedList<Instance>();
         while (rs.next()) {
-            Instance i = new Instance();
-            i.setId(rs.getInt("idInstance"));
-            i.setMd5(rs.getString("md5"));
-            i.setName(rs.getString("name"));
-            Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
-            i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
-
-            Instance c = cache.getCached(i.getId());
+            Instance c = cache.getCached(rs.getInt("i.idInstance"));
             if (c != null) {
                 res.add(c);
-            } else {
-                i.setSaved();
-                cache.cache(i);
-                res.add(i);
+                continue;
             }
+            Instance i = getInstance(rs, props);
+            i.setSaved();
+            cache.cache(i);
+            res.add(i);
         }
         rs.close();
         return res;
     }
 
-    public static LinkedList<Instance> getAllByExperimentId(int id) throws SQLException, InstanceClassMustBeSourceException {
+    public static LinkedList<Instance> getAllByExperimentId(int id) throws SQLException, InstanceClassMustBeSourceException, IOException {
+        Vector<InstanceProperty> props = InstancePropertyManager.getInstance().getAll();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT DISTINCT i.idInstance, i.md5, i.name, i.instanceClass_idinstanceClass FROM " + table + " as i JOIN Experiment_has_Instances as ei ON "
-                + "i.idInstance = ei.Instances_idInstance WHERE ei.Experiment_idExperiment = ?");
+                "SELECT DISTINCT i.idInstance, i.md5, i.name, i.instanceClass_idinstanceClass" + getPropertySelect(props)
+                + "FROM " + table + " as i JOIN Experiment_has_Instances as ei ON "
+                + "i.idInstance = ei.Instances_idInstance " + getPropertyFrom(props) + " WHERE ei.Experiment_idExperiment = ?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         LinkedList<Instance> res = new LinkedList<Instance>();
@@ -224,21 +264,16 @@ public class InstanceDAO {
             Instance c = cache.getCached(rs.getInt("i.idInstance"));
             if (c != null) {
                 res.add(c);
-            }
-            else {
-                Instance i = new Instance();
-                i.setId(rs.getInt("i.idInstance"));
-                i.setMd5(rs.getString("i.md5"));
-                i.setName(rs.getString("i.name"));
-                Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
-                i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
-
+            } else {
+                Instance i = getInstance(rs, props);
                 i.setSaved();
                 cache.cache(i);
                 res.add(i);
             }
         }
         rs.close();
+
+
         return res;
     }
 
@@ -297,7 +332,7 @@ public class InstanceDAO {
             Statement st = DatabaseConnector.getInstance().getConn().createStatement();
             ResultSet rs = st.executeQuery(query);
             LinkedList<Instance> res = new LinkedList<Instance>();
-
+            ArrayList<Instance> instanceHasPropertyAssignList = new ArrayList<Instance>();
             while (rs.next()) {
 
                 Instance c = cache.getCached(rs.getInt("i.idInstance"));
@@ -314,8 +349,10 @@ public class InstanceDAO {
                 i.setSaved();
                 cache.cache(i);
                 res.add(i);
+                instanceHasPropertyAssignList.add(i);
             }
             rs.close();
+            InstanceHasInstancePropertyDAO.assign(instanceHasPropertyAssignList);
             return res;
         }
 
@@ -355,7 +392,7 @@ public class InstanceDAO {
                 FileOutputStream out = new FileOutputStream(f);
                 InputStream in = rs.getBinaryStream(1);
                 int len = 0;
-                byte[] buffer = new byte[256*1024];
+                byte[] buffer = new byte[256 * 1024];
                 while ((len = in.read(buffer)) > -1) {
                     out.write(buffer, 0, len);
                 }
@@ -395,18 +432,18 @@ public class InstanceDAO {
         int len;
         byte[] buf = new byte[256 * 1024];
         while ((len = in.read(buf)) > -1) {
-            out.write(buf, 0, len);
+        out.write(buf, 0, len);
         }
         out.flush();
         out.close();
         in.close();
 
-            try{
-               Util.sevenZipDecode(input, f);
-            } catch (Exception ex) {
-                Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            input.delete();
+        try{
+        Util.sevenZipDecode(input, f);
+        } catch (Exception ex) {
+        Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        input.delete();
         }*/
     }
 

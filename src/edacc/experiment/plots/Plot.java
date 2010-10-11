@@ -6,10 +6,15 @@ import edacc.model.ExperimentResultDAO;
 import edacc.model.ExperimentResultHasSolverProperty;
 import edacc.model.ExperimentResultHasSolverPropertyDAO;
 import edacc.model.Instance;
+import edacc.model.InstanceDAO;
+import edacc.model.InstanceHasInstanceProperty;
+import edacc.model.InstanceHasInstancePropertyDAO;
 import edacc.model.InstanceProperty;
 import edacc.model.SolverProperty;
 import edacc.model.SolverPropertyDAO;
 import edacc.satinstances.ConvertException;
+import edacc.satinstances.InstancePropertyManager;
+import edacc.satinstances.PropertyValueType;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +37,7 @@ public abstract class Plot {
     // "constants" for solver properties
     public static SolverProperty PROP_CPUTIME;
     private HashMap<ResultIdentifier, ExperimentResult> resultMap;
+    private HashMap<Integer, Instance> instanceMap;
 
     protected Plot(ExperimentController expController) {
         this.expController = expController;
@@ -43,10 +49,20 @@ public abstract class Plot {
         } else {
             resultMap.clear();
         }
+        if (instanceMap == null) {
+            instanceMap = new HashMap<Integer, Instance>();
+        } else {
+            instanceMap.clear();
+        }
         ArrayList<ExperimentResult> results = ExperimentResultDAO.getAllByExperimentId(expController.getActiveExperiment().getId());
-        ExperimentResultHasSolverPropertyDAO.assign(results, expController.getActiveExperiment().getId());
         for (ExperimentResult result : results) {
             resultMap.put(new ResultIdentifier(result.getSolverConfigId(), result.getInstanceId(), result.getRun()), result);
+        }
+
+        ArrayList<Instance> instances = new ArrayList<Instance>();
+        instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
+        for (Instance i : instances) {
+            instanceMap.put(i.getId(), i);
         }
     }
 
@@ -58,6 +74,12 @@ public abstract class Plot {
         }
         res.add(PROP_CPUTIME);
         res.addAll(SolverPropertyDAO.getAll());
+        return res;
+    }
+
+    public static ArrayList<InstanceProperty> getInstanceProperties() throws Exception {
+        ArrayList<InstanceProperty> res = new ArrayList<InstanceProperty>();
+        res.addAll(InstancePropertyManager.getInstance().getAll());
         return res;
     }
 
@@ -94,6 +116,22 @@ public abstract class Plot {
         return res;
     }
 
+    private Double transformPropertyValueTypeToDouble(PropertyValueType type, String value) {
+            Double res = null;
+            try {
+                if (type.getJavaType() == Integer.class) {
+                    res = new Double((Integer) type.getJavaTypeRepresentation(value));
+                } else if (type.getJavaType() == Float.class) {
+                    res = new Double((Float) type.getJavaTypeRepresentation(value));
+                } else if (type.getJavaType() == Double.class) {
+                    res = (Double) type.getJavaTypeRepresentation(value);
+                }
+            } catch (ConvertException ex) {
+                return null;
+            }
+            return res;
+    }
+
     public Double getValue(ExperimentResult result, SolverProperty property) {
         if (property == PROP_CPUTIME) {
             return Double.valueOf(result.getResultTime());
@@ -102,25 +140,16 @@ public abstract class Plot {
             if (erhsp == null || erhsp.getValue().isEmpty()) {
                 return null;
             }
-            Double res = null;
-            try {
-                if (property.getPropertyValueType().getJavaType() == Integer.class) {
-                    res = new Double((Integer) property.getPropertyValueType().getJavaTypeRepresentation(erhsp.getValue().get(0)));
-                } else if (property.getPropertyValueType().getJavaType() == Float.class) {
-                    res = new Double((Float) property.getPropertyValueType().getJavaTypeRepresentation(erhsp.getValue().get(0)));
-                } else if (property.getPropertyValueType().getJavaType() == Double.class) {
-                    res = (Double) property.getPropertyValueType().getJavaTypeRepresentation(erhsp.getValue().get(0));
-                }
-            } catch (ConvertException ex) {
-                return null;
-            }
-            return res;
+            return transformPropertyValueTypeToDouble(property.getPropertyValueType(), erhsp.getValue().get(0));
         }
     }
 
     public Double getValue(Instance instance, InstanceProperty property) {
-        //InstanceHasInstanceProperty ihip = instance.get
-        return 0.;
+        InstanceHasInstanceProperty ihip = instance.getPropertyValues().get(property.getName());
+        if (ihip == null) {
+            return null;
+        }
+        return transformPropertyValueTypeToDouble(property.getPropertyValueType(), ihip.getValue());
     }
 
     /**

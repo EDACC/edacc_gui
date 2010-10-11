@@ -4,6 +4,7 @@
  */
 package edacc.model;
 
+import edacc.model.InstanceProperty;
 import edacc.satinstances.ConvertException;
 import edacc.satinstances.InstancePropertyManager;
 import edacc.satinstances.InvalidVariableException;
@@ -12,6 +13,8 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -126,5 +129,47 @@ public class InstanceHasInstancePropertyDAO {
             }
         }
         return res;
+    }
+
+    public static void assign(ArrayList<Instance> inst) throws SQLException {
+        HashMap<Integer, Instance> instances = new HashMap<Integer, Instance>();
+        for (Instance i : inst) {
+            i.setPropertyValues(new HashMap<String, InstanceHasInstanceProperty>());
+            instances.put(i.getId(), i);
+        }
+
+        HashMap<String, InstanceProperty> instanceProperties = new HashMap<String, InstanceProperty>();
+        try {
+            for (InstanceProperty ip : InstancePropertyManager.getInstance().getAll()) {
+                instanceProperties.put(ip.getName(), ip);
+            }
+        } catch (Exception e) {
+            throw new SQLException(e.getMessage());
+        }
+
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT ihip.id, ihip.idInstance, ihip.idInstanceProperty, ihip.value "
+                + "FROM Instance_has_InstanceProperty AS ihip "
+                + "LEFT JOIN Instances AS i ON (ihip.idInstance = i.idInstance)");
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            int id = rs.getInt(1);
+            int idInstance = rs.getInt(2);
+            String idInstanceProperty = rs.getString(3);
+            String value = rs.getString(4);
+            Instance instance = instances.get(idInstance);
+            if (instance != null) {
+                InstanceHasInstanceProperty ihip = cache.getCached(id);
+                if (ihip == null) {
+                    InstanceProperty ip = instanceProperties.get(idInstanceProperty);
+                    if (ip == null) {
+                        continue;
+                    }
+                    ihip = new InstanceHasInstanceProperty(instance, ip, value);
+                    cache.cache(ihip);
+                }
+                instance.getPropertyValues().put(idInstanceProperty, ihip);
+            }
+        }
     }
 }

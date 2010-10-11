@@ -34,4 +34,8 @@ public abstract class InstanceProperty {
 
     public abstract PropertyValueType<?> getPropertyValueType();
 
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

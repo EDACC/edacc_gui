@@ -1,17 +1,16 @@
-
 package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentDAO;
+import edacc.model.ExperimentResult;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
+import edacc.model.InstanceProperty;
 import edacc.model.SolverConfiguration;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import edacc.model.SolverProperty;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.JComboBox;
-import javax.swing.JTextField;
 import org.rosuda.JRI.Rengine;
 
 /**
@@ -19,168 +18,52 @@ import org.rosuda.JRI.Rengine;
  * @author simon
  */
 public class ScatterInstancePropertySolverProperty extends Plot {
-    private JComboBox comboInstanceProperty, comboSolverProperty, comboSolver, comboRun;
-    private JTextField txtMaxValue;
-    private InstanceSelector instanceSelector;
-    private String plotTitle;
+
+    private static JComboBox comboInstanceProperty, comboSolverProperty, comboSolver, comboRun;
+    private static ScaleSelector scaleSelector;
+    private static InstanceSelector instanceSelector;
+    private String warning, plotTitle;
+    private SolverConfiguration solverConfig;
+    private ArrayList<Instance> instances;
+    private SolverProperty solverProperty;
+    private InstanceProperty instanceProperty;
+    private Integer run;
+    private Boolean xlog, ylog;
+
     public ScatterInstancePropertySolverProperty(ExperimentController expController) {
         super(expController);
-        comboInstanceProperty = new JComboBox();
-        comboSolverProperty = new JComboBox();
-        comboSolver = new JComboBox();
-        final ActionListener loadMaxValue = new ActionListener() {
+    }
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    loadMaxValue();
-                } catch (SQLException ex) {
-                    txtMaxValue.setText("0");
-                }
-            }
-        };
-        comboInstanceProperty.addActionListener(loadMaxValue);
-        comboSolverProperty.addActionListener(loadMaxValue);
-        txtMaxValue = new JTextField();
-        comboRun = new JComboBox();
-        comboRun.addActionListener(loadMaxValue);
-        instanceSelector = new InstanceSelector();
-       /* dependencies = new Dependency[]{
+    public static Dependency[] getDependencies() {
+        if (comboInstanceProperty == null) {
+            comboInstanceProperty = new JComboBox();
+        }
+        if (comboSolverProperty == null) {
+            comboSolverProperty = new JComboBox();
+        }
+        if (comboSolver == null) {
+            comboSolver = new JComboBox();
+        }
+        if (comboRun == null) {
+            comboRun = new JComboBox();
+        }
+        if (instanceSelector == null) {
+            instanceSelector = new InstanceSelector();
+        }
+        if (scaleSelector == null) {
+            scaleSelector = new ScaleSelector();
+        }
+        return new Dependency[]{
+                    new Dependency("Solver", comboSolver),
                     new Dependency("Instance property", comboInstanceProperty),
                     new Dependency("Solver property", comboSolverProperty),
-                    new Dependency("Solver", comboSolver),
                     new Dependency("Instances", instanceSelector),
                     new Dependency("Plot for run", comboRun),
-                    new Dependency("Max x/y-value (sec)", txtMaxValue)
-                };*/
+                    new Dependency("Axes scale", scaleSelector)
+                };
     }
 
-    @Override
-    public void plot(final Rengine re, ArrayList<PointInformation> pointInformations) throws Exception {
-        initializeResults();
-        if (comboInstanceProperty.getItemCount() == 0) {
-            throw new DependencyException("You have to select two properties.");
-        }
-
-        if (!(comboSolver.getSelectedItem() instanceof SolverConfiguration)) {
-            throw new DependencyException("You have to select a solver.");
-        }
-        int run = -4;
-        if ("all runs - average".equals(comboRun.getSelectedItem())) {
-            run = AVERAGE;
-        } else if ("all runs - median".equals(comboRun.getSelectedItem())) {
-            run = MEDIAN;
-        } else if ("all runs".equals(comboRun.getSelectedItem())) {
-            run = ALLRUNS;
-        } else if (comboRun.getSelectedItem() instanceof Integer) {
-            run = (Integer) comboRun.getSelectedItem();
-        }
-        if (run == -4) {
-            throw new DependencyException("You have to select a run.");
-        }
-        ArrayList<Instance> instances = instanceSelector.getSelectedInstances();
-        if (instances == null || instances.isEmpty()) {
-            throw new DependencyException("You have to select instances in order to plot.");
-        }
-
-        double maxValue;
-        try {
-            maxValue = Double.parseDouble(txtMaxValue.getText());
-        } catch (NumberFormatException ex) {
-            throw new DependencyException("Expected double value for max value.");
-        }
-
-        SolverConfiguration solverConfig = (SolverConfiguration) comboSolver.getSelectedItem();
-       // plotTitle = xSolverConfig.getName() + " vs. " + ySolverConfig.getName() + " (" + expController.getActiveExperiment().getName() + ")";
-        ArrayList<Float> xsVec = new ArrayList<Float>();
-        ArrayList<Float> ysVec = new ArrayList<Float>();
-
-       /* for (Instance instance : instances) {
-            if (run == AVERAGE) {
-                Vector<ExperimentResult> resultsX = getResults(xSolverConfig.getId(), instance.getId());
-                Vector<ExperimentResult> resultsY = getResults(ySolverConfig.getId(), instance.getId());
-                for (int j = resultsX.size() - 1; j >= 0; j--) {
-                    if (resultsX.get(j).getStatus() != 1) {
-                        resultsX.remove(j);
-                    }
-                }
-                for (int j = resultsY.size() - 1; j >= 0; j--) {
-                    if (resultsY.get(j).getStatus() != 1) {
-                        resultsY.remove(j);
-                    }
-                }
-                if (resultsX.size() == 0 || resultsY.size() == 0) {
-                    continue;
-                }
-                xsVec.add(new Float(super.getAverageTime(resultsX)));
-                ysVec.add(new Float(super.getAverageTime(resultsY)));
-            } else if (run == MEDIAN) {
-                Vector<ExperimentResult> resultsX = getResults(xSolverConfig.getId(), instance.getId());
-                Vector<ExperimentResult> resultsY = getResults(ySolverConfig.getId(), instance.getId());
-                for (int j = resultsX.size() - 1; j >= 0; j--) {
-                    if (resultsX.get(j).getStatus() != 1) {
-                        resultsX.remove(j);
-                    }
-                }
-                for (int j = resultsY.size() - 1; j >= 0; j--) {
-                    if (resultsY.get(j).getStatus() != 1) {
-                        resultsY.remove(j);
-                    }
-                }
-                if (resultsX.size() == 0 || resultsY.size() == 0) {
-                    continue;
-                }
-                xsVec.add(new Float(super.getMedianTime(resultsX)));
-                ysVec.add(new Float(super.getMedianTime(resultsY)));
-            } else {
-                ExperimentResult xRes = super.getResult(xSolverConfig.getId(), instance.getId(), run);
-                ExperimentResult yRes = super.getResult(xSolverConfig.getId(), instance.getId(), run);
-                if (xRes.getStatus() == yRes.getStatus() && xRes.getStatus() != 1) {
-                    continue;
-                }
-                xsVec.add(xRes.getTime());
-                ysVec.add(yRes.getTime());
-            }
-        }*/
-
-        double[] xs = new double[xsVec.size()];
-        double[] ys = new double[ysVec.size()];
-        for (int i = 0; i < xsVec.size(); i++) {
-            xs[i] = xsVec.get(i);
-            ys[i] = ysVec.get(i);
-        }
-        String xlabel = solverConfig.toString();
-        String ylabel = solverConfig.toString();
-        String title = xlabel + " vs " + ylabel;
-        re.assign("xs", xs);
-        re.assign("ys", ys);
-        re.assign("maxValue", new double[]{0, maxValue});
-        // set margin
-        re.eval("par(mar=c(3,3,9,6))");
-
-        re.eval("plot(xs, ys, type='p', col='red', las = 1, xlim=c(0," + maxValue + "), ylim=c(0," + maxValue + "), xaxs='i', yaxs='i',xlab='',ylab='',pch=3, tck=0.015, cex.axis=1.2, cex.main=1.5)");
-        re.eval("axis(side=4, tck=0.015, las=1, cex.axis=1.2, cex.main=1.5)");
-        re.eval("axis(side=3, tck=0.015, las=1, cex.axis=1.2, cex.main=1.5)");
-        re.eval("mtext('" + ylabel + "', side=4, line=3, cex=1.2)");
-        re.eval("mtext('" + xlabel + "', side=3, padj=0, line=3, cex=1.2)");
-        re.eval("mtext('" + title + "', padj=-1.7, side=3, line=3, cex=1.7)");
-        re.eval("par(new=1)");
-        re.eval("plot(maxValue, maxValue, type='l', col='black', lty=2, xlim=c(0," + maxValue + "), ylim=c(0," + maxValue + "), xaxs='i', yaxs='i',xaxt='n',yaxt='n', xlab='', ylab='')");
-
-        ArrayList<double[]> points = getPoints(re, xs, ys);
-        int k = 0;
-        for (double[] point : points) {
-            pointInformations.add(new PointInformation(point, "<html>" +
-                    xlabel + ": " + (double)Math.round(xs[k]*100)/100 + " sec<br>" +
-                    ylabel + ": " + (double)Math.round(ys[k]*100)/100 +" sec<br>" +
-                    "Instance: " + instances.get(k).getName()));
-            k++;
-        }
-    }
-
-/*    @Override
-    public void loadDefaultValues() throws SQLException {
-        loadMaxValue();
+    public static void loadDefaultValues(ExperimentController expController) throws SQLException, Exception {
         comboRun.removeAllItems();
         comboInstanceProperty.removeAllItems();
         comboSolverProperty.removeAllItems();
@@ -194,29 +77,221 @@ public class ScatterInstancePropertySolverProperty extends Plot {
         for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
             comboRun.addItem(i);
         }
+        for (SolverProperty sProp : getSolverProperties()) {
+            comboSolverProperty.addItem(sProp);
+        }
+        for (InstanceProperty iProp : getInstanceProperties()) {
+            comboInstanceProperty.addItem(iProp);
+        }
         ArrayList<Instance> instances = new ArrayList<Instance>();
         instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
         instanceSelector.setInstances(instances);
         instanceSelector.btnSelectAll();
     }
-*/
-    private void loadMaxValue() throws SQLException {
-       /* double maxValue;
-        if (!(comboSolver.getSelectedItem() instanceof SolverConfiguration) || !(comboRun.getSelectedItem() instanceof Integer)) {
-            maxValue = expController.getActiveExperiment().getTimeOut();
-        } else {
-            int run = (Integer) comboRun.getSelectedItem();
-            maxValue = expController.getMaxCalculationTimeForSolverConfiguration((SolverConfiguration) combo1.getSelectedItem(), 1, run);
-            double tmp = expController.getMaxCalculationTimeForSolverConfiguration((SolverConfiguration) combo2.getSelectedItem(), 1, run);
-            if (tmp > maxValue) {
-                maxValue = tmp;
+
+    @Override
+    public void plot(final Rengine re, ArrayList<PointInformation> pointInformations) throws Exception {
+
+        if (run == null || solverConfig == null || instanceProperty == null || solverProperty == null || instances == null || xlog == null || ylog == null) {
+            if (!(comboSolverProperty.getSelectedItem() instanceof SolverProperty)) {
+                throw new DependencyException("You have to select a solver property.");
             }
-            maxValue *= 1.1;
+            if (!(comboInstanceProperty.getSelectedItem() instanceof InstanceProperty)) {
+                throw new DependencyException("You have to select an instance property.");
+            }
+            if (!(comboSolver.getSelectedItem() instanceof SolverConfiguration)) {
+                throw new DependencyException("You have to select a solver.");
+            }
+            run = -4;
+            if ("all runs - average".equals(comboRun.getSelectedItem())) {
+                run = AVERAGE;
+            } else if ("all runs - median".equals(comboRun.getSelectedItem())) {
+                run = MEDIAN;
+            } else if ("all runs".equals(comboRun.getSelectedItem())) {
+                run = ALLRUNS;
+            } else if (comboRun.getSelectedItem() instanceof Integer) {
+                run = (Integer) comboRun.getSelectedItem();
+            }
+            if (run == -4) {
+                throw new DependencyException("You have to select a run.");
+            }
+            instances = instanceSelector.getSelectedInstances();
+            if (instances == null || instances.isEmpty()) {
+                throw new DependencyException("You have to select instances in order to plot.");
+            }
+
+            solverConfig = (SolverConfiguration) comboSolver.getSelectedItem();
+            instanceProperty = (InstanceProperty) comboInstanceProperty.getSelectedItem();
+            solverProperty = (SolverProperty) comboSolverProperty.getSelectedItem();
+            xlog = scaleSelector.isXScaleLog();
+            ylog = scaleSelector.isYScaleLog();
         }
-        if (maxValue == 0.) {
-            maxValue = expController.getActiveExperiment().getTimeOut();
+        initializeResults();
+        warning = null;
+        double ymax = 0.;
+        double xmax = 0.;
+        plotTitle = solverConfig.getName() + ": " + instanceProperty + " vs. " + solverProperty + " (" + expController.getActiveExperiment().getName() + ")";
+        ArrayList<Double> xsVec = new ArrayList<Double>();
+        ArrayList<Double> ysVec = new ArrayList<Double>();
+
+        int xNoResult = 0, yNoResult = 0;
+        int xNoProp = 0, yNoProp = 0;
+        for (Instance instance : instances) {
+            if (run == ALLRUNS) {
+                ArrayList<ExperimentResult> ysResults = getResults(solverConfig.getId(), instance.getId());
+                for (ExperimentResult yres : ysResults) {
+                    Double xsValue = this.getValue(instance, instanceProperty);
+                    Double ysValue = getValue(yres, solverProperty);
+                    if (xsValue == null || ysValue == null) {
+                        if (xsValue == null) {
+                            xNoProp++;
+                        }
+                        if (ysValue == null) {
+                            yNoProp++;
+                        }
+                        continue;
+                    }
+                    if (xsValue > xmax) {
+                        xmax = xsValue;
+                    }
+                    if (ysValue > ymax) {
+                        ymax = ysValue;
+                    }
+                    // add the values and set the point information; the right point coordinates will be set later
+                    xsVec.add(xsValue);
+                    ysVec.add(ysValue);
+                    pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>"
+                            + instance.getName() + " (" + instanceProperty + "): " + (double) Math.round(xsValue * 100) / 100 + "<br>"
+                            + solverConfig.toString() + " (" + solverProperty + "): " + (double) Math.round(ysValue * 100) / 100 + "<br>"
+                            + "Run: " + yres.getRun() + "<br>"
+                            + "Instance: " + instance.getName()
+                            + "</html>"));
+                }
+            } else if (run == MEDIAN || run == AVERAGE) {
+                // get the x/y results and calculate the count of the not verified jobs
+                ArrayList<ExperimentResult> ysResults = getResults(solverConfig.getId(), instance.getId());
+                Double xsValue = getValue(instance, instanceProperty);
+                Double ysValue;
+                if (run == MEDIAN) {
+                    ysValue = getMedian(ysResults, solverProperty);
+                } else {
+                    ysValue = getAverage(ysResults, solverProperty);
+                }
+                if (xsValue == null || ysValue == null) {
+                    continue;
+                }
+                if (xsValue > xmax) {
+                    xmax = xsValue;
+                }
+                if (ysValue > ymax) {
+                    ymax = ysValue;
+                }
+                // add the values and specify the point information
+                xsVec.add(xsValue);
+                ysVec.add(ysValue);
+                pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>"
+                        + instance.getName() + " (" + instanceProperty + "): " + (double) Math.round(xsValue * 100) / 100 + "<br>"
+                        + solverConfig.toString() + " (" + solverProperty + "): " + (double) Math.round(ysValue * 100) / 100 + "<br>"
+                        + "Instance: " + instance.getName()
+                        + "</html>"));
+            } else {
+                // get the x/y results, this is for a particular run
+                ExperimentResult ysResult = getResult(solverConfig.getId(), instance.getId(), run);
+
+                if (ysResult == null) {
+                    yNoResult++;
+                    continue;
+                }
+
+                Double xsValue = getValue(instance, instanceProperty);
+                Double ysValue = getValue(ysResult, solverProperty);
+                if (xsValue == null || ysValue == null) {
+                    if (xsValue == null) {
+                        xNoProp++;
+                    }
+                    if (ysValue == null) {
+                        yNoProp++;
+                    }
+                    continue;
+                }
+                if (xsValue > xmax) {
+                    xmax = xsValue;
+                }
+                if (ysValue > ymax) {
+                    ymax = ysValue;
+                }
+                // add the values and specify the point information
+                xsVec.add(xsValue);
+                ysVec.add(ysValue);
+                pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>"
+                        + instance.getName() + " (" + instanceProperty + "): " + (double) Math.round(xsValue * 100) / 100 + "<br>"
+                        + solverConfig.toString() + " (" + solverProperty + "): " + (double) Math.round(ysValue * 100) / 100 + "<br>"
+                        + "Instance: " + instance.getName()
+                        + "</html>"));
+            }
         }
-        txtMaxValue.setText("" + Math.round(maxValue));*/
+        if (xmax == 0.) {
+            xmax = 0.01;
+        }
+        if (ymax == 0.) {
+            ymax = 0.01;
+        }
+        xmax *= 1.01;
+        ymax *= 1.01;
+        // min value is needed for logarithmic scale -> cannot be 0
+        double xmin = xmax;
+        double ymin = ymax;
+        double[] xs = new double[xsVec.size()];
+        double[] ys = new double[ysVec.size()];
+        for (int i = 0; i < xsVec.size(); i++) {
+            xs[i] = xsVec.get(i);
+            ys[i] = ysVec.get(i);
+            if (xs[i] > 0. && xs[i] < xmin) {
+                xmin = xs[i];
+            }
+            if (ys[i] > 0. && ys[i] < ymin) {
+                ymin = ys[i];
+            }
+        }
+
+        String xlabel = instanceProperty.toString();
+        String ylabel = solverProperty.toString();
+        String title = solverConfig.toString();
+        re.assign("xs", xs);
+        re.assign("ys", ys);
+        if (xlog || ylog) {
+            re.assign("x_limits", new double[]{xmin, xmax});
+            re.assign("y_limits", new double[]{ymin, ymax});
+        } else {
+            re.assign("x_limits", new double[]{0, xmax});
+            re.assign("y_limits", new double[]{0, ymax});
+        }
+
+        // set margin
+        re.eval("par(mar=c(2, 5, 5, 5) + 0.1, oma=c(0,0,1,2) )");
+
+        String log = "";
+        if (ylog) {
+            log += "y";
+        }
+        if (xlog) {
+            log += "x";
+        }
+        re.eval("plot(xs, ys, log='" + log + "', type='p', col='red', las = 1, xlim=x_limits, ylim=y_limits, xaxs='i', yaxs='i',xlab='',ylab='',pch=3, tck=0.015, cex.axis=1.2, cex.main=1.5)");
+        re.eval("axis(side=4, tck=0.015, las=1, cex.axis=1.2, cex.main=1.5)");
+        re.eval("axis(side=3, tck=0.015, las=1, cex.axis=1.2, cex.main=1.5)");
+        re.eval("mtext('" + ylabel + "', outer=TRUE, side=4, line=0, cex=1.2)");
+        re.eval("mtext('" + xlabel + "', side=3, padj=0, line=2, cex=1.2)");
+        re.eval("mtext('" + title + "', side=3, line=4, cex=1.7)");
+        re.eval("par(new=1)");
+
+        ArrayList<double[]> points = getPoints(re, xs, ys);
+        int k = 0;
+        for (double[] point : points) {
+            pointInformations.get(k).getPoint()[0] = point[0];
+            pointInformations.get(k).getPoint()[1] = point[1];
+            k++;
+        }
     }
 
     @Override
@@ -228,5 +303,3 @@ public class ScatterInstancePropertySolverProperty extends Plot {
         return "Scatter plot - Result property against instance property";
     }
 }
-
-

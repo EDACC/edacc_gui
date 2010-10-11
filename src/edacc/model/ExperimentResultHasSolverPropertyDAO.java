@@ -192,7 +192,7 @@ public class ExperimentResultHasSolverPropertyDAO {
      * @throws SQLException
      * @throws Exception
      */
-    public static void assign(ArrayList<ExperimentResult> expResults, int experimentId) throws SQLException, Exception {
+    public static void assign(ArrayList<ExperimentResult> expResults, int experimentId) throws SQLException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
         HashMap<Integer, ExperimentResult> experimentResults = new HashMap<Integer, ExperimentResult>();
         for (ExperimentResult er : expResults) {
             er.setPropertyValues(new HashMap<Integer, ExperimentResultHasSolverProperty>());

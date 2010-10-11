@@ -72,7 +72,7 @@ public class ManageDBInstances implements Observer{
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    public void loadInstances() throws NoConnectionToDBException, SQLException, InstanceClassMustBeSourceException {
+    public void loadInstances() throws NoConnectionToDBException, SQLException, InstanceClassMustBeSourceException, IOException {
         main.instanceTableModel.instances.clear();
         main.instanceTableModel.addInstances(new Vector<Instance>(InstanceDAO.getAll()));
         main.instanceTableModel.fireTableDataChanged();

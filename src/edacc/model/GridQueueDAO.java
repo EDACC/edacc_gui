@@ -220,7 +220,6 @@ public class GridQueueDAO {
 
     /**
      * @author dgall
-     * TODO implement
      * Checks if Queue is used in an experiment.
      * @return if the Queue is used in an experiment
      * @throws NoConnectionToDBException if no connection to database exists.

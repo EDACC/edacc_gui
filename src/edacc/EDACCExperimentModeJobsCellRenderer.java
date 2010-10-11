@@ -3,7 +3,6 @@ package edacc;
 import edacc.experiment.ExperimentResultsBrowserTableModel;
 import java.awt.Color;
 import java.awt.Component;
-import java.util.HashSet;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -23,9 +22,11 @@ public class EDACCExperimentModeJobsCellRenderer extends DefaultTableCellRendere
         this.setOpaque(true);
     }
 
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
         final Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+        
         row = table.convertRowIndexToModel(row);
         Integer status = ((ExperimentResultsBrowserTableModel) table.getModel()).getStatus(row).getValue();
         if (status == null) {
@@ -41,9 +42,6 @@ public class EDACCExperimentModeJobsCellRenderer extends DefaultTableCellRendere
         } else {
             comp.setBackground(green);
         }
-
-
-
         if (row == markRow && col == markCol) {
             comp.setBackground(Color.GRAY);
         }

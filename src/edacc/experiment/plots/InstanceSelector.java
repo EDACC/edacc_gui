@@ -171,7 +171,11 @@ public class InstanceSelector extends JPanel {
     }
 
     public void setInstances(ArrayList<Instance> instances) {
+        try {
         tableModel.setInstances(instances);
+        } catch (Exception e) {
+            
+        }
     }
 
     public ArrayList<Instance> getSelectedInstances() {
