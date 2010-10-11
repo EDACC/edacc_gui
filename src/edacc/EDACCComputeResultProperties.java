@@ -11,10 +11,13 @@
 
 package edacc;
 
+import edacc.model.SolverProperty;
 import edacc.properties.ComputeResultPropertiesController;
 import edacc.properties.ResultPropertySelectionTableModel;
 import java.awt.Component;
+import java.util.Vector;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -30,22 +33,13 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
 
+        controller = new ComputeResultPropertiesController(this, tableSelectResultProperties);
+
         // initate the result property table
         tableModel = new ResultPropertySelectionTableModel();
         tableSelectResultProperties.setModel(tableModel);
-        tableSelectResultProperties.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
-
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-                JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                lbl.setHorizontalAlignment(JLabel.CENTER);
-                return lbl;
-            }
-        });
-
-
-        initalize();
+       
+       initalize();
     }
 
     /** This method is called from within the constructor to
@@ -112,6 +106,11 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog {
 
         buttonCompute.setText(resourceMap.getString("buttonCompute.text")); // NOI18N
         buttonCompute.setName("buttonCompute"); // NOI18N
+        buttonCompute.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonComputeActionPerformed(evt);
+            }
+        });
 
         buttonCancel.setText(resourceMap.getString("buttonCancel.text")); // NOI18N
         buttonCancel.setName("buttonCancel"); // NOI18N
@@ -153,6 +152,18 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog {
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
         this.setVisible(false);
     }//GEN-LAST:event_buttonCancelActionPerformed
+
+    private void buttonComputeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonComputeActionPerformed
+        Vector<SolverProperty> toCalculate = tableModel.getAllChoosen();
+        if(toCalculate.isEmpty()){
+            JOptionPane.showMessageDialog(this,
+                "No result property selected.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }else {
+            controller.computeResultProperties(toCalculate, this.checkBoxReCompute.isSelected());
+        }
+    }//GEN-LAST:event_buttonComputeActionPerformed
 
     /**
     * @param args the command line arguments

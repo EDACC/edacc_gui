@@ -54,7 +54,7 @@ public class ExperimentResultHasSolverPropertyDAO {
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    private static void save(ExperimentResultHasSolverProperty e) throws NoConnectionToDBException, SQLException {
+    public static void save(ExperimentResultHasSolverProperty e) throws NoConnectionToDBException, SQLException {
         if (e.isDeleted()) {
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteValueQuery);
             ps.setInt(1, e.getId());

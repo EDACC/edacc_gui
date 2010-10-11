@@ -7,10 +7,12 @@ package edacc.properties;
 
 import edacc.EDACCComputeResultProperties;
 import edacc.model.NoConnectionToDBException;
+import edacc.model.SolverProperty;
 import edacc.model.SolverPropertyDAO;
 import edacc.model.SolverPropertyNotInDBException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTable;
@@ -42,5 +44,9 @@ public class ComputeResultPropertiesController {
         } catch (IOException ex) {
             Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void computeResultProperties(Vector<SolverProperty> toCalculate, boolean recompute) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

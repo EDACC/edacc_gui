@@ -34,7 +34,7 @@ public class ResultPropertySelectionTableModel extends AbstractTableModel{
             case 0:
                 return rows.get(rowIndex).getName();
             case 1:
-                return rows.get(rowIndex);
+                return selected.get(rowIndex);
             default:
                 return "";
         }
@@ -63,7 +63,7 @@ public class ResultPropertySelectionTableModel extends AbstractTableModel{
     }
     
     public void setValueAt(Object value, int row, int col) {
-        if(col == 3){
+        if(col == 1){
             selected.set(row, (Boolean) value);
             fireTableCellUpdated(row, col);
         }
@@ -81,5 +81,19 @@ public class ResultPropertySelectionTableModel extends AbstractTableModel{
             addResultProperty(toAdd.get(i));
         }
         this.fireTableDataChanged();
+    }
+
+    public boolean isCellEditable(int rowIndex, int columnIndex){
+        if( columnIndex == 1) return true;
+        return false;
+    }
+
+    public Vector<SolverProperty> getAllChoosen(){
+        Vector<SolverProperty> choosen = new Vector<SolverProperty>();
+        for(int i = 0; i < selected.size(); i++){
+            if(selected.get(i))
+                choosen.add(rows.get(i));
+        }
+        return choosen;
     }
 }
