@@ -177,7 +177,7 @@ public class EDACCView extends FrameView implements Observer {
         javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
         helpMenuItem = new javax.swing.JMenuItem();
         propertyMenu = new javax.swing.JMenu();
-        solverPropertyMenuItem = new javax.swing.JMenuItem();
+        ManagePropertyMenuItem = new javax.swing.JMenuItem();
         statusPanel = new javax.swing.JPanel();
         javax.swing.JSeparator statusPanelSeparator = new javax.swing.JSeparator();
         statusMessageLabel = new javax.swing.JLabel();
@@ -283,15 +283,15 @@ public class EDACCView extends FrameView implements Observer {
         propertyMenu.setText(resourceMap.getString("propertyMenu.text")); // NOI18N
         propertyMenu.setName("propertyMenu"); // NOI18N
 
-        solverPropertyMenuItem.setAction(actionMap.get("btnSolverProperties")); // NOI18N
-        solverPropertyMenuItem.setText(resourceMap.getString("solverPropertyMenuItem.text")); // NOI18N
-        solverPropertyMenuItem.setName("solverPropertyMenuItem"); // NOI18N
-        solverPropertyMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        ManagePropertyMenuItem.setAction(actionMap.get("btnSolverProperties")); // NOI18N
+        ManagePropertyMenuItem.setText(resourceMap.getString("ManagePropertyMenuItem.text")); // NOI18N
+        ManagePropertyMenuItem.setName("ManagePropertyMenuItem"); // NOI18N
+        ManagePropertyMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                solverPropertyMenuItemActionPerformed(evt);
+                ManagePropertyMenuItemActionPerformed(evt);
             }
         });
-        propertyMenu.add(solverPropertyMenuItem);
+        propertyMenu.add(ManagePropertyMenuItem);
 
         menuBar.add(propertyMenu);
 
@@ -355,8 +355,8 @@ public class EDACCView extends FrameView implements Observer {
         edacc.setVisible(true);
     }//GEN-LAST:event_helpMenuItemActionPerformed
 
-    private void solverPropertyMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_solverPropertyMenuItemActionPerformed
-    }//GEN-LAST:event_solverPropertyMenuItemActionPerformed
+    private void ManagePropertyMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ManagePropertyMenuItemActionPerformed
+    }//GEN-LAST:event_ManagePropertyMenuItemActionPerformed
 
     @Action
     public void btnConnectToDB() {
@@ -527,13 +527,14 @@ public class EDACCView extends FrameView implements Observer {
     public void btnSolverProperties() {
         if (manageSolverProperties == null) {
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            manageSolverProperties = new EDACCManageSolverPropertyDialog(mainFrame, true);
+            manageSolverProperties = new EDACCManagePropertyDialog(mainFrame, true);
             manageSolverProperties.setLocationRelativeTo(mainFrame);
         }
         manageSolverProperties.initialize();
         manageSolverProperties.setVisible(true);
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem ManagePropertyMenuItem;
     private javax.swing.JMenuItem connectToDBMenuItem;
     private javax.swing.JMenuItem disconnectMenuItem;
     private javax.swing.JMenuItem generateDBMenuItem;
@@ -547,7 +548,6 @@ public class EDACCView extends FrameView implements Observer {
     private javax.swing.JProgressBar progressBar;
     private javax.swing.JMenu propertyMenu;
     private javax.swing.JMenuItem settingsMenuItem;
-    private javax.swing.JMenuItem solverPropertyMenuItem;
     private javax.swing.JLabel statusAnimationLabel;
     private javax.swing.JLabel statusMessageLabel;
     private javax.swing.JPanel statusPanel;
@@ -559,7 +559,7 @@ public class EDACCView extends FrameView implements Observer {
     private int busyIconIndex = 0;
     private JDialog aboutBox;
     private JDialog databaseSettings;
-    private EDACCManageSolverPropertyDialog manageSolverProperties;
+    private EDACCManagePropertyDialog manageSolverProperties;
 
     @Override
     public void update(Observable o, Object arg) {

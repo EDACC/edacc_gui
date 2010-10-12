@@ -4,7 +4,7 @@
  */
 
 /*
- * EDACCManageSolverPropertyDialog.java
+ * EDACCManagePropertyDialog.java
  *
  * Created on 07.09.2010, 14:37:06
  */
@@ -37,15 +37,15 @@ import javax.swing.table.DefaultTableCellRenderer;
  *
  * @author rretz
  */
-public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
+public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     private SolverPropertiesController controller;
     private SolverPropertyTableModel solPropertyTableModel;
     private SolverPropertyType[] comboBoxSolPropType = {SolverPropertyType.LauncherOutput, SolverPropertyType.Parameter, SolverPropertyType.SolverOutput, SolverPropertyType.VerifierOutput, SolverPropertyType.WatcherOutput};
     private EDACCManagePropertyValueTypesDialog PropertyValueTypesDialog;
     private boolean editing = false;
 
-    /** Creates new form EDACCManageSolverPropertyDialog */
-    public EDACCManageSolverPropertyDialog(java.awt.Frame parent, boolean modal) {
+    /** Creates new form EDACCManagePropertyDialog */
+    public EDACCManagePropertyDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
          controller = new SolverPropertiesController(this, panelManageSolverProperty, tableSolverProperty);
@@ -68,9 +68,9 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
 
        
         
-        // initialize comboBoxSolverPropertyType
+        // initialize comboBoxPropertySource
         for(int i = 0; i < comboBoxSolPropType.length; i++){
-            comboBoxSolverPropertyType.addItem(comboBoxSolPropType[i]);
+            comboBoxPropertySource.addItem(comboBoxSolPropType[i]);
         }
 
     }
@@ -93,29 +93,35 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         panelManageSolverPropertyTable = new javax.swing.JScrollPane();
         tableSolverProperty = new javax.swing.JTable();
         panelManageSolverPropertyEdit = new javax.swing.JPanel();
-        panelManageSolverPropertyEditButtons = new javax.swing.JPanel();
         buttonSaveSolverProperty = new javax.swing.JButton();
         panelManageSolverPropertyEditInput = new javax.swing.JPanel();
         textSolverPropertyFieldName = new javax.swing.JTextField();
         labelSolverPropertyname = new javax.swing.JLabel();
         textSolvertPropertyFieldPrefix = new javax.swing.JTextField();
-        labelSolverPropertyPrefix = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         textAreaResultPropertyDescription = new javax.swing.JTextArea();
         labelSolverPropertyDescription = new javax.swing.JLabel();
-        comboBoxSolverPropertyValuetype = new javax.swing.JComboBox();
-        labelSolverPropertyValueType = new javax.swing.JLabel();
-        buttonSolverPropertyAddValueType = new javax.swing.JButton();
-        labeSolverPropertyType = new javax.swing.JLabel();
-        comboBoxSolverPropertyType = new javax.swing.JComboBox();
+        comboBoxPropertyValuetype = new javax.swing.JComboBox();
+        labelPropertyValueType = new javax.swing.JLabel();
+        buttonPropertyAddValueType = new javax.swing.JButton();
+        labelPropertySource = new javax.swing.JLabel();
+        comboBoxPropertySource = new javax.swing.JComboBox();
         labeMultipleOccurrences = new javax.swing.JLabel();
         checkBoxMultipleOccurrences = new javax.swing.JCheckBox();
         labelParameter = new javax.swing.JLabel();
         comboBoxParameter = new javax.swing.JComboBox();
+        comboBoxPropertyType = new javax.swing.JComboBox();
+        labelPropertyType = new javax.swing.JLabel();
+        comboBoxComputationMethod = new javax.swing.JComboBox();
+        buttonNewComputationMethod = new javax.swing.JButton();
+        radioBtnRegExpression = new javax.swing.JRadioButton();
+        radioBtnComputationMethod = new javax.swing.JRadioButton();
+        labelComputationMethodParameters = new javax.swing.JLabel();
+        textFieldComputationmethodParameter = new javax.swing.JTextField();
         buttonDone = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCManageSolverPropertyDialog.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCManagePropertyDialog.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
 
@@ -156,7 +162,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
                 .addComponent(buttonNewSolverProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonRemoveSolverProperty)
-                .addContainerGap(641, Short.MAX_VALUE))
+                .addContainerGap(667, Short.MAX_VALUE))
         );
         panelManageSolverPropertyShowButtonsLayout.setVerticalGroup(
             panelManageSolverPropertyShowButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -190,19 +196,19 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         panelMangeSolverPropertyShow.setLayout(panelMangeSolverPropertyShowLayout);
         panelMangeSolverPropertyShowLayout.setHorizontalGroup(
             panelMangeSolverPropertyShowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelMangeSolverPropertyShowLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelMangeSolverPropertyShowLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelMangeSolverPropertyShowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.DEFAULT_SIZE, 785, Short.MAX_VALUE)
-                    .addComponent(panelManageSolverPropertyShowButtons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(panelMangeSolverPropertyShowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 811, Short.MAX_VALUE)
+                    .addComponent(panelManageSolverPropertyShowButtons, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelMangeSolverPropertyShowLayout.setVerticalGroup(
             panelMangeSolverPropertyShowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelMangeSolverPropertyShowLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(panelManageSolverPropertyShowButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -210,19 +216,6 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         jSplitPane1.setLeftComponent(panelMangeSolverPropertyShow);
 
         panelManageSolverPropertyEdit.setName("panelManageSolverPropertyEdit"); // NOI18N
-
-        panelManageSolverPropertyEditButtons.setName("panelManageSolverPropertyEditButtons"); // NOI18N
-
-        javax.swing.GroupLayout panelManageSolverPropertyEditButtonsLayout = new javax.swing.GroupLayout(panelManageSolverPropertyEditButtons);
-        panelManageSolverPropertyEditButtons.setLayout(panelManageSolverPropertyEditButtonsLayout);
-        panelManageSolverPropertyEditButtonsLayout.setHorizontalGroup(
-            panelManageSolverPropertyEditButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        panelManageSolverPropertyEditButtonsLayout.setVerticalGroup(
-            panelManageSolverPropertyEditButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 243, Short.MAX_VALUE)
-        );
 
         buttonSaveSolverProperty.setText(resourceMap.getString("buttonSaveSolverProperty.text")); // NOI18N
         buttonSaveSolverProperty.setEnabled(false);
@@ -245,9 +238,6 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         textSolvertPropertyFieldPrefix.setEnabled(false);
         textSolvertPropertyFieldPrefix.setName("textSolvertPropertyFieldPrefix"); // NOI18N
 
-        labelSolverPropertyPrefix.setText(resourceMap.getString("labelSolverPropertyPrefix.text")); // NOI18N
-        labelSolverPropertyPrefix.setName("labelSolverPropertyPrefix"); // NOI18N
-
         jScrollPane1.setEnabled(false);
         jScrollPane1.setName("jScrollPane1"); // NOI18N
 
@@ -261,29 +251,29 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         labelSolverPropertyDescription.setText(resourceMap.getString("labelSolverPropertyDescription.text")); // NOI18N
         labelSolverPropertyDescription.setName("labelSolverPropertyDescription"); // NOI18N
 
-        comboBoxSolverPropertyValuetype.setEnabled(false);
-        comboBoxSolverPropertyValuetype.setName("comboBoxSolverPropertyValuetype"); // NOI18N
+        comboBoxPropertyValuetype.setEnabled(false);
+        comboBoxPropertyValuetype.setName("comboBoxPropertyValuetype"); // NOI18N
 
-        labelSolverPropertyValueType.setText(resourceMap.getString("labelSolverPropertyValueType.text")); // NOI18N
-        labelSolverPropertyValueType.setName("labelSolverPropertyValueType"); // NOI18N
+        labelPropertyValueType.setText(resourceMap.getString("labelPropertyValueType.text")); // NOI18N
+        labelPropertyValueType.setName("labelPropertyValueType"); // NOI18N
 
-        buttonSolverPropertyAddValueType.setText(resourceMap.getString("buttonSolverPropertyAddValueType.text")); // NOI18N
-        buttonSolverPropertyAddValueType.setEnabled(false);
-        buttonSolverPropertyAddValueType.setName("buttonSolverPropertyAddValueType"); // NOI18N
-        buttonSolverPropertyAddValueType.addActionListener(new java.awt.event.ActionListener() {
+        buttonPropertyAddValueType.setText(resourceMap.getString("buttonPropertyAddValueType.text")); // NOI18N
+        buttonPropertyAddValueType.setEnabled(false);
+        buttonPropertyAddValueType.setName("buttonPropertyAddValueType"); // NOI18N
+        buttonPropertyAddValueType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonSolverPropertyAddValueTypeActionPerformed(evt);
+                buttonPropertyAddValueTypeActionPerformed(evt);
             }
         });
 
-        labeSolverPropertyType.setText(resourceMap.getString("labeSolverPropertyType.text")); // NOI18N
-        labeSolverPropertyType.setName("labeSolverPropertyType"); // NOI18N
+        labelPropertySource.setText(resourceMap.getString("labelPropertySource.text")); // NOI18N
+        labelPropertySource.setName("labelPropertySource"); // NOI18N
 
-        comboBoxSolverPropertyType.setEnabled(false);
-        comboBoxSolverPropertyType.setName("comboBoxSolverPropertyType"); // NOI18N
-        comboBoxSolverPropertyType.addActionListener(new java.awt.event.ActionListener() {
+        comboBoxPropertySource.setEnabled(false);
+        comboBoxPropertySource.setName("comboBoxPropertySource"); // NOI18N
+        comboBoxPropertySource.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                comboBoxSolverPropertyTypeActionPerformed(evt);
+                comboBoxPropertySourceActionPerformed(evt);
             }
         });
 
@@ -305,6 +295,28 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             }
         });
 
+        comboBoxPropertyType.setName("comboBoxPropertyType"); // NOI18N
+
+        labelPropertyType.setText(resourceMap.getString("labelPropertyType.text")); // NOI18N
+        labelPropertyType.setName("labelPropertyType"); // NOI18N
+
+        comboBoxComputationMethod.setName("comboBoxComputationMethod"); // NOI18N
+
+        buttonNewComputationMethod.setText(resourceMap.getString("buttonNewComputationMethod.text")); // NOI18N
+        buttonNewComputationMethod.setName("buttonNewComputationMethod"); // NOI18N
+
+        radioBtnRegExpression.setText(resourceMap.getString("radioBtnRegExpression.text")); // NOI18N
+        radioBtnRegExpression.setName("radioBtnRegExpression"); // NOI18N
+
+        radioBtnComputationMethod.setText(resourceMap.getString("radioBtnComputationMethod.text")); // NOI18N
+        radioBtnComputationMethod.setName("radioBtnComputationMethod"); // NOI18N
+
+        labelComputationMethodParameters.setText(resourceMap.getString("labelComputationMethodParameters.text")); // NOI18N
+        labelComputationMethodParameters.setName("labelComputationMethodParameters"); // NOI18N
+
+        textFieldComputationmethodParameter.setText(resourceMap.getString("textFieldComputationmethodParameter.text")); // NOI18N
+        textFieldComputationmethodParameter.setName("textFieldComputationmethodParameter"); // NOI18N
+
         javax.swing.GroupLayout panelManageSolverPropertyEditInputLayout = new javax.swing.GroupLayout(panelManageSolverPropertyEditInput);
         panelManageSolverPropertyEditInput.setLayout(panelManageSolverPropertyEditInputLayout);
         panelManageSolverPropertyEditInputLayout.setHorizontalGroup(
@@ -314,69 +326,88 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
                 .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelManageSolverPropertyEditInputLayout.createSequentialGroup()
                         .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(labelSolverPropertyPrefix)
+                            .addComponent(labelPropertyType)
                             .addComponent(labelSolverPropertyname)
-                            .addComponent(labelSolverPropertyDescription))
-                        .addGap(71, 71, 71)
-                        .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)
-                            .addComponent(textSolvertPropertyFieldPrefix, javax.swing.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)
-                            .addComponent(textSolverPropertyFieldName, javax.swing.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)))
-                    .addComponent(labeMultipleOccurrences)
+                            .addComponent(labelSolverPropertyDescription)
+                            .addComponent(radioBtnRegExpression)
+                            .addComponent(radioBtnComputationMethod)
+                            .addComponent(labelPropertySource)
+                            .addComponent(labelParameter)
+                            .addComponent(labelPropertyValueType))
+                        .addGap(27, 27, 27)
+                        .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panelManageSolverPropertyEditInputLayout.createSequentialGroup()
+                                .addComponent(comboBoxPropertyValuetype, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(buttonPropertyAddValueType))
+                            .addComponent(comboBoxParameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(comboBoxPropertySource, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(panelManageSolverPropertyEditInputLayout.createSequentialGroup()
+                                .addComponent(comboBoxComputationMethod, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(buttonNewComputationMethod)
+                                .addGap(18, 18, 18)
+                                .addComponent(labelComputationMethodParameters)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(textFieldComputationmethodParameter, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE))
+                            .addComponent(comboBoxPropertyType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(textSolverPropertyFieldName, javax.swing.GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE)
+                            .addComponent(textSolvertPropertyFieldPrefix, javax.swing.GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE)))
                     .addGroup(panelManageSolverPropertyEditInputLayout.createSequentialGroup()
-                        .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelManageSolverPropertyEditInputLayout.createSequentialGroup()
-                                .addComponent(labeSolverPropertyType)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(comboBoxSolverPropertyType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelManageSolverPropertyEditInputLayout.createSequentialGroup()
-                                .addComponent(labelSolverPropertyValueType)
-                                .addGap(71, 71, 71)
-                                .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(checkBoxMultipleOccurrences)
-                                    .addComponent(comboBoxSolverPropertyValuetype, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(comboBoxParameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(labeMultipleOccurrences)
                         .addGap(18, 18, 18)
-                        .addComponent(buttonSolverPropertyAddValueType))
-                    .addComponent(labelParameter))
+                        .addComponent(checkBoxMultipleOccurrences)))
                 .addContainerGap())
         );
         panelManageSolverPropertyEditInputLayout.setVerticalGroup(
             panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelManageSolverPropertyEditInputLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelManageSolverPropertyEditInputLayout.createSequentialGroup()
-                        .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(labelSolverPropertyname)
-                            .addComponent(textSolverPropertyFieldName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(textSolvertPropertyFieldPrefix, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panelManageSolverPropertyEditInputLayout.createSequentialGroup()
-                        .addGap(32, 32, 32)
-                        .addComponent(labelSolverPropertyPrefix)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelPropertyType)
+                    .addComponent(comboBoxPropertyType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelSolverPropertyname)
+                    .addComponent(textSolverPropertyFieldName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(labelSolverPropertyDescription)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(17, 17, 17)
+                .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textSolvertPropertyFieldPrefix, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(radioBtnRegExpression))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labeSolverPropertyType)
-                    .addComponent(comboBoxSolverPropertyType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(radioBtnComputationMethod)
+                    .addComponent(comboBoxComputationMethod, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonNewComputationMethod)
+                    .addComponent(labelComputationMethodParameters)
+                    .addComponent(textFieldComputationmethodParameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(comboBoxSolverPropertyValuetype, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(labelSolverPropertyValueType)
-                    .addComponent(buttonSolverPropertyAddValueType))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelPropertySource)
+                    .addComponent(comboBoxPropertySource, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelManageSolverPropertyEditInputLayout.createSequentialGroup()
+                        .addGap(49, 49, 49)
+                        .addComponent(labelPropertyValueType))
+                    .addGroup(panelManageSolverPropertyEditInputLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(comboBoxParameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(labelParameter))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(comboBoxPropertyValuetype, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(buttonPropertyAddValueType))))
+                .addGap(9, 9, 9)
+                .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(labeMultipleOccurrences)
                     .addComponent(checkBoxMultipleOccurrences))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panelManageSolverPropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelParameter)
-                    .addComponent(comboBoxParameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout panelManageSolverPropertyEditLayout = new javax.swing.GroupLayout(panelManageSolverPropertyEdit);
@@ -386,10 +417,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             .addGroup(panelManageSolverPropertyEditLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelManageSolverPropertyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManageSolverPropertyEditLayout.createSequentialGroup()
-                        .addComponent(panelManageSolverPropertyEditInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(panelManageSolverPropertyEditButtons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(panelManageSolverPropertyEditInput, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(buttonSaveSolverProperty))
                 .addContainerGap())
         );
@@ -397,10 +425,8 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             panelManageSolverPropertyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManageSolverPropertyEditLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelManageSolverPropertyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelManageSolverPropertyEditButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(panelManageSolverPropertyEditInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(11, 11, 11)
+                .addComponent(panelManageSolverPropertyEditInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonSaveSolverProperty)
                 .addContainerGap())
         );
@@ -420,7 +446,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             panelManageSolverPropertyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelManageSolverPropertyLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 683, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -465,11 +491,11 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
        this.setVisible(false);
     }//GEN-LAST:event_buttonDoneActionPerformed
 
-    private void comboBoxSolverPropertyTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxSolverPropertyTypeActionPerformed
+    private void comboBoxPropertySourceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxPropertySourceActionPerformed
         controller.SolverPropertyTypeChanged();
-    }//GEN-LAST:event_comboBoxSolverPropertyTypeActionPerformed
+    }//GEN-LAST:event_comboBoxPropertySourceActionPerformed
 
-    private void buttonSolverPropertyAddValueTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSolverPropertyAddValueTypeActionPerformed
+    private void buttonPropertyAddValueTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPropertyAddValueTypeActionPerformed
       if(PropertyValueTypesDialog == null){
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
             PropertyValueTypesDialog = new EDACCManagePropertyValueTypesDialog(mainFrame, true);
@@ -477,7 +503,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             PropertyValueTypesDialog.initialize();
       }
       PropertyValueTypesDialog.setVisible(true);
-    }//GEN-LAST:event_buttonSolverPropertyAddValueTypeActionPerformed
+    }//GEN-LAST:event_buttonPropertyAddValueTypeActionPerformed
 
     private void buttonRemoveSolverPropertyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemoveSolverPropertyActionPerformed
         if(tableSolverProperty.getSelectedRow() == -1){
@@ -489,9 +515,9 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             try {
                 controller.removeSolverProperty(tableSolverProperty.convertRowIndexToModel(tableSolverProperty.getSelectedRow()));
             } catch (NoConnectionToDBException ex) {
-                Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
-                Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SolverPropertyIsUsedException ex) {
                 JOptionPane.showMessageDialog(this,
                 "Cannot delete the solver property, because it's already in use.",
@@ -512,47 +538,47 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
                 "You must specify a prefix for the solver property.",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-        }else if(comboBoxSolverPropertyType.getSelectedIndex() == -1){
+        }else if(comboBoxPropertySource.getSelectedIndex() == -1){
             JOptionPane.showMessageDialog(this,
                 "You must select a solver property type for the solver property.",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-        }else if(!comboBoxSolverPropertyType.getSelectedItem().equals(SolverPropertyType.Parameter) && comboBoxSolverPropertyValuetype.getSelectedIndex() == -1){
+        }else if(!comboBoxPropertySource.getSelectedItem().equals(SolverPropertyType.Parameter) && comboBoxPropertyValuetype.getSelectedIndex() == -1){
             JOptionPane.showMessageDialog(this,
                 "You must select a  property value type for the solver property.",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-        }else if(comboBoxSolverPropertyType.getSelectedItem().equals(SolverPropertyType.Parameter) && comboBoxParameter.getSelectedIndex() == -1){
+        }else if(comboBoxPropertySource.getSelectedItem().equals(SolverPropertyType.Parameter) && comboBoxParameter.getSelectedIndex() == -1){
             JOptionPane.showMessageDialog(this,
                 "You must select a  parameter for the solver property.",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
         }else{
             try {
-                if(!comboBoxSolverPropertyType.getSelectedItem().equals(SolverPropertyType.Parameter)){
+                if(!comboBoxPropertySource.getSelectedItem().equals(SolverPropertyType.Parameter)){
                      controller.saveSolverProperty(textSolverPropertyFieldName.getText(), textSolvertPropertyFieldPrefix.getText(), textAreaResultPropertyDescription.getText(),
-                    (SolverPropertyType) comboBoxSolverPropertyType.getSelectedItem(), (String) comboBoxSolverPropertyValuetype.getSelectedItem(),
+                    (SolverPropertyType) comboBoxPropertySource.getSelectedItem(), (String) comboBoxPropertyValuetype.getSelectedItem(),
                     checkBoxMultipleOccurrences.isSelected());
                 } else{
                      controller.saveSolverProperty(textSolverPropertyFieldName.getText(), textSolvertPropertyFieldPrefix.getText(), textAreaResultPropertyDescription.getText(),
-                    (SolverPropertyType) comboBoxSolverPropertyType.getSelectedItem(), (String) comboBoxParameter.getSelectedItem());
+                    (SolverPropertyType) comboBoxPropertySource.getSelectedItem(), (String) comboBoxParameter.getSelectedItem());
                 }
 
             } catch (NoConnectionToDBException ex) {
-                Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this,
                     "A database error occurred. " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
             } catch (SolverPropertyNotInDBException ex) {
-                Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SolverPropertyTypeNotExistException ex) {
-                Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SolverPropertyIsUsedException ex) {
-                Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }//GEN-LAST:event_buttonSaveSolverPropertyActionPerformed
@@ -567,7 +593,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                EDACCManageSolverPropertyDialog dialog = new EDACCManageSolverPropertyDialog(new javax.swing.JFrame(), true);
+                EDACCManagePropertyDialog dialog = new EDACCManagePropertyDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
@@ -580,52 +606,58 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonDone;
+    private javax.swing.JButton buttonNewComputationMethod;
     private javax.swing.JButton buttonNewSolverProperty;
+    private javax.swing.JButton buttonPropertyAddValueType;
     private javax.swing.JButton buttonRemoveSolverProperty;
     private javax.swing.JButton buttonSaveSolverProperty;
-    private javax.swing.JButton buttonSolverPropertyAddValueType;
     private javax.swing.JCheckBox checkBoxMultipleOccurrences;
+    private javax.swing.JComboBox comboBoxComputationMethod;
     private javax.swing.JComboBox comboBoxParameter;
-    private javax.swing.JComboBox comboBoxSolverPropertyType;
-    private javax.swing.JComboBox comboBoxSolverPropertyValuetype;
+    private javax.swing.JComboBox comboBoxPropertySource;
+    private javax.swing.JComboBox comboBoxPropertyType;
+    private javax.swing.JComboBox comboBoxPropertyValuetype;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JLabel labeMultipleOccurrences;
-    private javax.swing.JLabel labeSolverPropertyType;
+    private javax.swing.JLabel labelComputationMethodParameters;
     private javax.swing.JLabel labelParameter;
+    private javax.swing.JLabel labelPropertySource;
+    private javax.swing.JLabel labelPropertyType;
+    private javax.swing.JLabel labelPropertyValueType;
     private javax.swing.JLabel labelSolverPropertyDescription;
-    private javax.swing.JLabel labelSolverPropertyPrefix;
-    private javax.swing.JLabel labelSolverPropertyValueType;
     private javax.swing.JLabel labelSolverPropertyname;
     private javax.swing.JPanel panelManageSolverProperty;
     private javax.swing.JPanel panelManageSolverPropertyEdit;
-    private javax.swing.JPanel panelManageSolverPropertyEditButtons;
     private javax.swing.JPanel panelManageSolverPropertyEditInput;
     private javax.swing.JPanel panelManageSolverPropertyShowButtons;
     private javax.swing.JScrollPane panelManageSolverPropertyTable;
     private javax.swing.JPanel panelMangeSolverPropertyShow;
+    private javax.swing.JRadioButton radioBtnComputationMethod;
+    private javax.swing.JRadioButton radioBtnRegExpression;
     private javax.swing.JTable tableSolverProperty;
     private javax.swing.JTextArea textAreaResultPropertyDescription;
+    private javax.swing.JTextField textFieldComputationmethodParameter;
     private javax.swing.JTextField textSolverPropertyFieldName;
     private javax.swing.JTextField textSolvertPropertyFieldPrefix;
     // End of variables declaration//GEN-END:variables
 
     public void enableSolverPropertyEditField(boolean enable) {
-        this.comboBoxSolverPropertyType.setEnabled(enable);       
+        this.comboBoxPropertySource.setEnabled(enable);
         this.buttonSaveSolverProperty.setEnabled(enable);
         this.textSolvertPropertyFieldPrefix.setEnabled(enable);
         this.textSolverPropertyFieldName.setEnabled(enable);
         this.textAreaResultPropertyDescription.setEnabled(enable);
         this.textSolverPropertyFieldName.requestFocus();
-        this.comboBoxSolverPropertyValuetype.setEnabled(enable);
-        this.buttonSolverPropertyAddValueType.setEnabled(enable);
+        this.comboBoxPropertyValuetype.setEnabled(enable);
+        this.buttonPropertyAddValueType.setEnabled(enable);
         this.checkBoxMultipleOccurrences.setEnabled(enable);
     }
 
     public void clearSolverPropertyEditField() {
-        this.comboBoxSolverPropertyType.setSelectedIndex(0);
-        if(this.comboBoxSolverPropertyValuetype.getItemCount() != 0)
-            this.comboBoxSolverPropertyValuetype.setSelectedIndex(0);      
+        this.comboBoxPropertySource.setSelectedIndex(0);
+        if(this.comboBoxPropertyValuetype.getItemCount() != 0)
+            this.comboBoxPropertyValuetype.setSelectedIndex(0);
         this.checkBoxMultipleOccurrences.setSelected(false);
         this.textSolverPropertyFieldName.setText("");
         this.textSolvertPropertyFieldPrefix.setText("");
@@ -633,24 +665,24 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
     }
 
     public void SolverPropertyTypeChanged() {
-        if(!this.comboBoxSolverPropertyType.getSelectedItem().equals(SolverPropertyType.Parameter) &&
-                this.comboBoxSolverPropertyType.isEnabled() && !editing){
-            this.comboBoxSolverPropertyValuetype.setEnabled(true);
-            this.buttonSolverPropertyAddValueType.setEnabled(true);
+        if(!this.comboBoxPropertySource.getSelectedItem().equals(SolverPropertyType.Parameter) &&
+                this.comboBoxPropertySource.isEnabled() && !editing){
+            this.comboBoxPropertyValuetype.setEnabled(true);
+            this.buttonPropertyAddValueType.setEnabled(true);
             this.checkBoxMultipleOccurrences.setEnabled(true);
             this.buttonSaveSolverProperty.setEnabled(true);
             this.comboBoxParameter.setEnabled(false);
-        }else if(this.comboBoxSolverPropertyType.getSelectedItem().equals(SolverPropertyType.Parameter) &&
-                this.comboBoxSolverPropertyType.isEnabled() && !editing){
-           this.comboBoxSolverPropertyValuetype.setEnabled(false);
-           this.buttonSolverPropertyAddValueType.setEnabled(false);
+        }else if(this.comboBoxPropertySource.getSelectedItem().equals(SolverPropertyType.Parameter) &&
+                this.comboBoxPropertySource.isEnabled() && !editing){
+           this.comboBoxPropertyValuetype.setEnabled(false);
+           this.buttonPropertyAddValueType.setEnabled(false);
            this.checkBoxMultipleOccurrences.setEnabled(false);
            this.comboBoxParameter.setEnabled(true);
         }
     }
 
     /**
-     * Initialize and chargs the tableSolverPropertys and the comboBoxSolverPropertyValueType with the corresponding items.
+     * Initialize and chargs the tableSolverPropertys and the comboBoxPropertyValuetype with the corresponding items.
      */
     public void initialize() {
         try {
@@ -658,15 +690,15 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
             controller.loadPropertyValueTypes();
             controller.loadParameters();
         } catch (NoConnectionToDBException ex) {
-            Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SolverPropertyNotInDBException ex) {
-            Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SolverPropertyTypeNotExistException ex) {
-            Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(EDACCManageSolverPropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -675,9 +707,9 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
      * @param items to add to the combobox
      */
     public void setComboBoxPropertyValueTypesItems(Vector<String> items){
-        this.comboBoxSolverPropertyValuetype.removeAllItems();
+        this.comboBoxPropertyValuetype.removeAllItems();
         for(int i = 0; i < items.size(); i++){
-            this.comboBoxSolverPropertyValuetype.addItem(items.get(i));
+            this.comboBoxPropertyValuetype.addItem(items.get(i));
         }
     }
 
@@ -690,9 +722,9 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         this.textSolverPropertyFieldName.setText(toShow.getName());
         this.textSolvertPropertyFieldPrefix.setText(toShow.getPrefix());
         this.textAreaResultPropertyDescription.setText(toShow.getDescription());
-        this.comboBoxSolverPropertyType.setSelectedItem(toShow.getSolverPropertyType());
+        this.comboBoxPropertySource.setSelectedItem(toShow.getSolverPropertyType());
         if(!toShow.getSolverPropertyType().equals(SolverPropertyType.Parameter)){
-            this.comboBoxSolverPropertyValuetype.setSelectedItem(toShow.getPropertyValueType());
+            this.comboBoxPropertyValuetype.setSelectedItem(toShow.getPropertyValueType());
             this.checkBoxMultipleOccurrences.setSelected(toShow.isMultiple());
         }
         this.enableEditing();
@@ -703,7 +735,7 @@ public class EDACCManageSolverPropertyDialog extends javax.swing.JDialog {
         this.textSolverPropertyFieldName.setText(toShow.getName());
         this.textSolvertPropertyFieldPrefix.setText(toShow.getPrefix());
         this.textAreaResultPropertyDescription.setText(toShow.getDescription());
-        this.comboBoxSolverPropertyType.setSelectedItem(toShow.getSolverPropertyType());
+        this.comboBoxPropertySource.setSelectedItem(toShow.getSolverPropertyType());
         this.comboBoxParameter.setSelectedItem(solverPropertyType.getParameter());
         this.enableEditing();
     }

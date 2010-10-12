@@ -5,7 +5,7 @@
 
 package edacc.properties;
 
-import edacc.EDACCManageSolverPropertyDialog;
+import edacc.EDACCManagePropertyDialog;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
@@ -30,18 +30,18 @@ import javax.swing.JTable;
  * @author rretz
  */
 public class SolverPropertiesController {
-    private EDACCManageSolverPropertyDialog main;
+    private EDACCManagePropertyDialog main;
     private JPanel panel;
     private JTable tableSolverProperty;
     private int editId;
 
     /**
      * Constructor of the SolverPropertiesController
-     * @param manage the EDACCManageSolverPropertyDialog to controll
+     * @param manage the EDACCManagePropertyDialog to controll
      * @param panelManageResultProperty main panel of the EDACCManagerSolverPropertyDialog
      * @param tableResultProperty the table which contains the Overview over all SolverProperty objects.
      */
-    public SolverPropertiesController(EDACCManageSolverPropertyDialog manage, JPanel panelManageResultProperty, JTable tableResultProperty) {
+    public SolverPropertiesController(EDACCManagePropertyDialog manage, JPanel panelManageResultProperty, JTable tableResultProperty) {
         this.main = manage;
         this.panel = panelManageResultProperty;
         this.tableSolverProperty = tableResultProperty;
