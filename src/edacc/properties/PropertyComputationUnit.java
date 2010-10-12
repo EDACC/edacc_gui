@@ -25,18 +25,52 @@ import java.util.logging.Logger;
  *
  * @author rretz
  */
-class ResultPropertyParser implements Runnable {
+class PropertyComputationUnit implements Runnable {
     ExperimentResultHasSolverProperty toParse;
-    ParserController callback;
+    PropertyComputationController callback;
 
-    ResultPropertyParser(ExperimentResultHasSolverProperty toParse, ParserController callback) {
+    PropertyComputationUnit(ExperimentResultHasSolverProperty toParse, PropertyComputationController callback) {
         this.toParse = toParse;
         this.callback = callback;
     }
 
     @Override
     public void run() {
-        SolverProperty property = toParse.getSolvProperty();
+       // try {
+            /*SolverProperty property = toParse.getSolvProperty();
+            if(property.getSolverPropertyType().equals(SolverPropertyType.Parameter)){
+            processParameter();
+            }else {
+            try {
+            switch(property.getSolverPropertyType()){
+            case LauncherOutput:
+            parse(ExperimentResultDAO.getLauncherOutputFile(toParse.getExpResult()));
+            break;
+            case SolverOutput:
+            parse(ExperimentResultDAO.getSolverOutputFile(toParse.getExpResult()));
+            break;
+            case VerifierOutput:
+            parse(ExperimentResultDAO.getVerifierOutputFile(toParse.getExpResult()));
+            break;
+            case WatcherOutput:
+            parse(ExperimentResultDAO.getWatcherOutputFile(toParse.getExpResult()));
+            break;
+            }
+            } catch (NoConnectionToDBException ex) {
+            Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+            Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (FileNotFoundException ex) {
+            Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+            Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            }
+            callback.callback();*/
+    /*    } catch (InterruptedException ex) {
+            Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        /*SolverProperty property = toParse.getSolvProperty();
         if(property.getSolverPropertyType().equals(SolverPropertyType.Parameter)){
             processParameter();
         }else {
@@ -56,15 +90,15 @@ class ResultPropertyParser implements Runnable {
                         break;
                 }
              } catch (NoConnectionToDBException ex) {
-                Logger.getLogger(ResultPropertyParser.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
-                Logger.getLogger(ResultPropertyParser.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
             } catch (FileNotFoundException ex) {
-                Logger.getLogger(ResultPropertyParser.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                Logger.getLogger(ResultPropertyParser.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+        }*/
         callback.callback();
     }
 

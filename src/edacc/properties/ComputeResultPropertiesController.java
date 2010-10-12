@@ -47,6 +47,13 @@ public class ComputeResultPropertiesController {
     }
 
     public void computeResultProperties(Vector<SolverProperty> toCalculate, boolean recompute) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        try {
+            Thread compute = new Thread(new PropertyComputationController(null, null, true));
+            compute.start();
+        } catch (NoConnectionToDBException ex) {
+            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
