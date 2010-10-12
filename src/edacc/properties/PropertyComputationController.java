@@ -56,7 +56,7 @@ public class PropertyComputationController implements Runnable{
         }
     }
 
-    private void createParserJobs() throws NoConnectionToDBException, SQLException {
+    private void createParserJobs() throws NoConnectionToDBException, SQLException, SolverPropertyTypeNotExistException, IOException, SolverPropertyNotInDBException {
         queue = new Vector<ExperimentResultHasSolverProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idJob FROM " +
                 "ExperimentResults WHERE Experiment_idExperiment=?;");
