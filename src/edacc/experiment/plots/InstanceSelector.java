@@ -4,6 +4,7 @@ import edacc.EDACCApp;
 import edacc.EDACCInstanceFilter;
 import edacc.experiment.InstanceTableModel;
 import edacc.experiment.InstanceTableModelRowFilter;
+import edacc.filter.InstanceFilter;
 import edacc.model.Instance;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
@@ -33,7 +35,7 @@ public class InstanceSelector extends JPanel {
     private InstanceTableModel tableModel;
     private JButton btnFilter, btnSelectAll, btnDeselectAll, btnInvert;
     private EDACCInstanceFilter dialogFilter;
-    private InstanceTableModelRowFilter rowFilter;
+    private InstanceFilter rowFilter;
     private TableRowSorter<InstanceTableModel> sorter;
     private JLabel lblFilter;
 
@@ -42,23 +44,29 @@ public class InstanceSelector extends JPanel {
         Dimension dimensionButton = new Dimension(109, 25);
         tableModel = new InstanceTableModel();
         table = new JTable(tableModel);
-        table.moveColumn(0,1);
-        rowFilter = new InstanceTableModelRowFilter();
-        rowFilter.setFilterInstanceClasses(false);
+        table.moveColumn(0, 1);
         sorter = new TableRowSorter<InstanceTableModel>(tableModel);
         table.setRowSorter(sorter);
-        sorter.setRowFilter(rowFilter);
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                rowFilter = new InstanceFilter(EDACCApp.getApplication().getMainFrame(), true, table);
+                rowFilter.setFilterInstanceClasses(false);
+            }
+        });
+
         TableColumnModel colModel = table.getColumnModel();
         colModel.getColumn(0).setPreferredWidth(20);
         colModel.getColumn(1).setPreferredWidth(1000);
- /*       colModel.getColumn(2).setPreferredWidth(15);
+        /*       colModel.getColumn(2).setPreferredWidth(15);
         colModel.getColumn(3).setPreferredWidth(15);
         colModel.getColumn(4).setPreferredWidth(15);
         colModel.getColumn(5).setPreferredWidth(15);*/
         scrollPane = new JScrollPane(table);
         lblFilter = new JLabel("");
         lblFilter.setForeground(Color.red);
-        scrollPane.setMinimumSize(new Dimension(0,250));
+        scrollPane.setMinimumSize(new Dimension(0, 250));
         scrollPane.setPreferredSize(new Dimension(0, 250));
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(5, 5, 5, 5);
@@ -129,17 +137,9 @@ public class InstanceSelector extends JPanel {
     }
 
     public void btnFilter() {
-        if (dialogFilter == null) {
-            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            dialogFilter = new EDACCInstanceFilter(mainFrame, true, rowFilter);
-            dialogFilter.setLocationRelativeTo(mainFrame);
-        }
-        dialogFilter.loadValues();
-        EDACCApp.getApplication().show(dialogFilter);
+        EDACCApp.getApplication().show(rowFilter);
         tableModel.fireTableDataChanged();
-        if (rowFilter.filter_name || rowFilter.filter_numAtoms ||
-                rowFilter.filter_numClauses || rowFilter.filter_ratio ||
-                rowFilter.filter_maxClauseLength) {
+        if (rowFilter.hasFiltersApplied()) {
             lblFilter.setText("This list of instances has filters applied to it. Use the filter button below to modify.");
         } else {
             lblFilter.setText("");
@@ -147,34 +147,27 @@ public class InstanceSelector extends JPanel {
     }
 
     public void btnSelectAll() {
-        for (int i = 0; i < tableModel.getRowCount(); i++) {
-            if (rowFilter.include((String) tableModel.getValueAt(i, 0),0)) {
-                tableModel.setValueAt(true, i, 1);
-            }
+        for (int i = 0; i < table.getRowCount(); i++) {
+            table.setValueAt(true, i, table.convertColumnIndexToView(InstanceTableModel.COL_SELECTED));
         }
     }
 
     public void btnDeselectAll() {
-        for (int i = 0; i < tableModel.getRowCount(); i++) {
-            if (rowFilter.include((String) tableModel.getValueAt(i, 0),0)) {
-                tableModel.setValueAt(false, i, 1);
-            }
+        for (int i = 0; i < table.getRowCount(); i++) {
+            table.setValueAt(false, i, table.convertColumnIndexToView(InstanceTableModel.COL_SELECTED));
         }
     }
 
     public void btnInvert() {
-        for (int i = 0; i < tableModel.getRowCount(); i++) {
-            if (rowFilter.include((String) tableModel.getValueAt(i, 0),0)) {
-                tableModel.setValueAt(!((Boolean) tableModel.getValueAt(i, 1)), i, 1);
-            }
+        for (int i = 0; i < table.getRowCount(); i++) {
+            table.setValueAt(!((Boolean) table.getValueAt(i, table.convertColumnIndexToView(InstanceTableModel.COL_SELECTED))), i, table.convertColumnIndexToView(InstanceTableModel.COL_SELECTED));
         }
     }
 
     public void setInstances(ArrayList<Instance> instances) {
         try {
-        tableModel.setInstances(instances);
+            tableModel.setInstances(instances);
         } catch (Exception e) {
-            
         }
     }
 

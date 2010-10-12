@@ -366,6 +366,9 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         } else {
             if (getIndexForColumn(col) >= COL_PROPERTY) {
                 int propertyIdx = getIndexForColumn(col) - COL_PROPERTY;
+                if (propertyIdx >= solverProperties.size()) {
+                    return String.class;
+                }
                 if (solverProperties.get(propertyIdx).getPropertyValueType() == null) {
                     return String.class;
                 }
@@ -380,12 +383,14 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
      * Sets the column visibility.
      * @param visible a boolean array - length must equal getAllCoulumnNames().length or this method does nothing.
      */
-    public void setColumnVisibility(boolean[] visible) {
+    public void setColumnVisibility(boolean[] visible, boolean updateTable) {
         if (columns.length != visible.length) {
             return;
         }
         this.visible = visible;
-        this.fireTableStructureChanged();
+        if (updateTable) {
+            this.fireTableStructureChanged();
+        }
     }
 
     /**
@@ -443,7 +448,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 return j.getVerifierOutputFilename();
             default:
                 int propertyIdx = columnIndex - COL_PROPERTY;
-                if (solverProperties.size() < propertyIdx) {
+                if (solverProperties.size() <= propertyIdx) {
                     return null;
                 }
                 ExperimentResultHasSolverProperty erp = propertyValues[rowIndex][propertyIdx];

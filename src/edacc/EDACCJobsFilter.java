@@ -33,7 +33,7 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
         for (ExperimentResultStatus val : statusCodes) {
             comboStatusCodes.addItem(val);
         }
-        String selectedInstance = main.resultBrowserRowFilter.getInstanceName() == null ? "All" : main.resultBrowserRowFilter.getInstanceName();
+       /* String selectedInstance = main.resultBrowserRowFilter.getInstanceName() == null ? "All" : main.resultBrowserRowFilter.getInstanceName();
         String selectedSolver = main.resultBrowserRowFilter.getSolverName() == null ? "All" : main.resultBrowserRowFilter.getSolverName();
         ExperimentResultStatus selectedStatusCode = main.resultBrowserRowFilter.getStatus();
         comboInstances.setSelectedItem(selectedInstance);
@@ -42,7 +42,7 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
             comboStatusCodes.setSelectedItem("All");
         } else {
             comboStatusCodes.setSelectedItem(selectedStatusCode);
-        }
+        }*/
         pack();
     }
 
@@ -163,9 +163,9 @@ public class EDACCJobsFilter extends javax.swing.JDialog {
         if (!"All".equals(comboStatusCodes.getSelectedItem())) {
             statusCode = (ExperimentResultStatus) comboStatusCodes.getSelectedItem();
         }
-        main.resultBrowserRowFilter.setInstanceName(instance);
+        /*main.resultBrowserRowFilter.setInstanceName(instance);
         main.resultBrowserRowFilter.setSolverName(solver);
-        main.resultBrowserRowFilter.setStatus(statusCode);
+        main.resultBrowserRowFilter.setStatus(statusCode);*/
 
         main.jobsTableModel.fireTableDataChanged();
         boolean filtersApplied = solver != null || instance != null || statusCode != null;

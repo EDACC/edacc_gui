@@ -133,7 +133,7 @@ public class EDACCResultsBrowserColumnSelection extends javax.swing.JDialog {
         for (int i = 0; i < visibility.length; i++) {
             visibility[i] = checkboxes[i].isSelected();
         }
-        model.setColumnVisibility(visibility);
+        model.setColumnVisibility(visibility, true);
         this.dispose();
     }
 

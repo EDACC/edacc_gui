@@ -98,9 +98,9 @@ public class ExperimentController {
         test.setExperiments(testExp);
         experiments.add(test);*/
         main.expTableModel.setExperiments(experiments);
-
         Vector<InstanceClass> vic = new Vector<InstanceClass>();
         vic.addAll(InstanceClassDAO.getAll());
+        
         main.instanceClassModel.setClasses(vic);
         ArrayList<Instance> instances = new ArrayList<Instance>();
         instances.addAll(InstanceDAO.getAll());
@@ -109,7 +109,6 @@ public class ExperimentController {
         } catch (IOException e) {
             throw new SQLException(e.getMessage());
         }
-
 
     }
 
@@ -152,9 +151,6 @@ public class ExperimentController {
             main.solverConfigPanel.addSolverConfiguration(vss.get(i));
         }
         main.insTableModel.setExperimentHasInstances(ehi);
-        if (main.insTableModel.getRowCount() > 0) {
-            main.sorter.setRowFilter(main.rowFilter);
-        }
         main.solverConfigPanel.endUpdate();
         main.afterExperimentLoaded();
     }

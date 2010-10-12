@@ -16,6 +16,9 @@ import edacc.experiment.ExperimentTableModel;
 import edacc.experiment.InstanceTableModel;
 import edacc.experiment.InstanceTableModelRowFilter;
 import edacc.experiment.SolverTableModel;
+import edacc.filter.Filter;
+import edacc.filter.InstanceFilter;
+import edacc.filter.JobsFilter;
 import edacc.gridqueues.GridQueuesController;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
@@ -77,9 +80,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public ExperimentResultsBrowserTableModel jobsTableModel;
     public EDACCSolverConfigPanel solverConfigPanel;
     public TableRowSorter<InstanceTableModel> sorter;
-    public InstanceTableModelRowFilter rowFilter;
-    public ExperimentResultsBrowserTableModelRowFilter resultBrowserRowFilter;
-  //  private EDACCExperimentModeVirtualExperimentSettings pnlVirtualExperimentSettings = new EDACCExperimentModeVirtualExperimentSettings();
+    public JobsFilter resultBrowserRowFilter;
+    //  private EDACCExperimentModeVirtualExperimentSettings pnlVirtualExperimentSettings = new EDACCExperimentModeVirtualExperimentSettings();
+    private InstanceFilter instanceFilter;
     private EDACCOutputViewer outputViewer;
     private EDACCExperimentModeJobsCellRenderer tableJobsStringRenderer;
     private ResultsBrowserTableRowSorter resultsBrowserTableRowSorter;
@@ -146,11 +149,17 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         });
         tableInstances.setModel(insTableModel);
         sorter = new TableRowSorter<InstanceTableModel>(insTableModel);
-        rowFilter = new InstanceTableModelRowFilter();
         tableInstances.setRowSorter(sorter);
-        sorter.setRowFilter(rowFilter);
-        instanceClassModel = new ExperimentInstanceClassTableModel(insTableModel, rowFilter, expController);
-        tableInstanceClasses.setModel(instanceClassModel);
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                instanceFilter = new InstanceFilter(EDACCApp.getApplication().getMainFrame(), true, tableInstances);
+                instanceClassModel = new ExperimentInstanceClassTableModel(insTableModel, instanceFilter, expController);
+                tableInstanceClasses.setModel(instanceClassModel);
+            }
+        });
+
         // center third column
         tableInstanceClasses.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
 
@@ -172,10 +181,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tableJobs.setModel(jobsTableModel);
         resultsBrowserTableRowSorter = new ResultsBrowserTableRowSorter(jobsTableModel);
         resultsBrowserTableRowSorter.setSortsOnUpdates(true);
-        resultBrowserRowFilter = new ExperimentResultsBrowserTableModelRowFilter();
-        resultsBrowserTableRowSorter.setRowFilter(resultBrowserRowFilter);
         tableJobs.setRowSorter(resultsBrowserTableRowSorter);
-        resultsBrowserTableRowSorter.setSortsOnUpdates(true);
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                resultBrowserRowFilter = new JobsFilter(EDACCApp.getApplication().getMainFrame(), true, tableJobs);
+            }
+        });
+
         tableJobsStringRenderer = new EDACCExperimentModeJobsCellRenderer();
         tableJobs.setDefaultRenderer(Object.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.setDefaultRenderer(String.class, tableJobsStringRenderer);
@@ -306,12 +320,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         /* end of experiment tab */
         /* instance tab */
         btnDeselectAllInstnaceClassesActionPerformed(null);
-        rowFilter.filter_maxClauseLength = false;
-        rowFilter.filter_name = false;
-        rowFilter.filter_numAtoms = false;
-        rowFilter.filter_numClauses = false;
-        rowFilter.filter_ratio = false;
-        rowFilter.clearInstanceClassIds();
+        instanceFilter.clearFilters();
         lblFilterStatus.setText("");
         /* end of instance tab */
         /* job browser tab */
@@ -319,9 +328,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             jobsTableModel.setJobs(null);
         } catch (SQLException ex) {
         }
-        resultBrowserRowFilter.setInstanceName(null);
-        resultBrowserRowFilter.setSolverName(null);
-        resultBrowserRowFilter.setStatus(null);
+        resultBrowserRowFilter.clearFilters();
 
         jobsTableModel.resetColumnVisibility();
         setJobsFilterStatus("");
@@ -360,11 +367,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }
 
     public void enableEditExperiment(Integer CPUTimeLimit, Integer wallClockTimeLimit, Integer memoryLimit, Integer stackSizeLimit, Integer outputSizeLimit, Integer maxSeed, boolean generateSeeds, boolean linkSeeds) {
-       /* try {
-            javax.swing.GroupLayout layout = (javax.swing.GroupLayout) panelManageExperiment.getLayout();
-            layout.replace(pnlVirtualExperimentSettings, pnlEditExperiment);
+        /* try {
+        javax.swing.GroupLayout layout = (javax.swing.GroupLayout) panelManageExperiment.getLayout();
+        layout.replace(pnlVirtualExperimentSettings, pnlEditExperiment);
         } catch (java.lang.IllegalArgumentException e) {
-            // happens if we have already the edit experiment settings panel
+        // happens if we have already the edit experiment settings panel
         }*/
         pnlEditExperiment.setEnabled(true);
         txtMemoryLimit.setText(memoryLimit.toString());
@@ -388,14 +395,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }
 
     /*public void enableVirtualExperiment() {
-        try {
-            javax.swing.GroupLayout layout = (javax.swing.GroupLayout) panelManageExperiment.getLayout();
-            layout.replace(pnlEditExperiment, pnlVirtualExperimentSettings);
-        } catch (java.lang.IllegalArgumentException e) {
-            // happens if we have already the virtual experiment settings panel
-        }
+    try {
+    javax.swing.GroupLayout layout = (javax.swing.GroupLayout) panelManageExperiment.getLayout();
+    layout.replace(pnlEditExperiment, pnlVirtualExperimentSettings);
+    } catch (java.lang.IllegalArgumentException e) {
+    // happens if we have already the virtual experiment settings panel
+    }
     }*/
-
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -1757,15 +1763,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         manageExperimentPane.setEnabledAt(3, true);
         manageExperimentPane.setEnabledAt(4, true);
         manageExperimentPane.setEnabledAt(5, true);
-     /*   if (expController.getActiveExperiment() instanceof VirtualExperiment) {
-            enableVirtualExperiment();
+        /*   if (expController.getActiveExperiment() instanceof VirtualExperiment) {
+        enableVirtualExperiment();
 
         } else {*/
-            enableEditExperiment(expController.getActiveExperiment().getCPUTimeLimit(), expController.getActiveExperiment().getWallClockTimeLimit(),
-                    expController.getActiveExperiment().getMemoryLimit(), expController.getActiveExperiment().getStackSizeLimit(),
-                    expController.getActiveExperiment().getOutputSizeLimit(), expController.getActiveExperiment().getMaxSeed(),
-                    expController.getActiveExperiment().isAutoGeneratedSeeds(), expController.getActiveExperiment().isLinkSeeds());
-    //    }
+        enableEditExperiment(expController.getActiveExperiment().getCPUTimeLimit(), expController.getActiveExperiment().getWallClockTimeLimit(),
+                expController.getActiveExperiment().getMemoryLimit(), expController.getActiveExperiment().getStackSizeLimit(),
+                expController.getActiveExperiment().getOutputSizeLimit(), expController.getActiveExperiment().getMaxSeed(),
+                expController.getActiveExperiment().isAutoGeneratedSeeds(), expController.getActiveExperiment().isLinkSeeds());
+        //    }
         setTitles();
         btnDiscardExperiment.setEnabled(true);
     }
@@ -1921,31 +1927,22 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Action
     public void btnSelectAllInstances() {
-        for (int i = 0; i < insTableModel.getRowCount(); i++) {
-            if (rowFilter.include((String) insTableModel.getValueAt(i, 0),
-                    insTableModel.getInstanceAt(i).getInstanceClass().getId())) {
-                insTableModel.setValueAt(true, i, 1);
-            }
+        for (int i = 0; i < tableInstances.getRowCount(); i++) {
+            tableInstances.setValueAt(true, i, tableInstances.convertColumnIndexToView(InstanceTableModel.COL_SELECTED));
         }
     }
 
     @Action
     public void btnDeselectAllInstances() {
-        for (int i = 0; i < insTableModel.getRowCount(); i++) {
-            if (rowFilter.include((String) insTableModel.getValueAt(i, 0),
-                    insTableModel.getInstanceAt(i).getInstanceClass().getId())) {
-                insTableModel.setValueAt(false, i, 1);
-            }
+        for (int i = 0; i < tableInstances.getRowCount(); i++) {
+            tableInstances.setValueAt(false, i, tableInstances.convertColumnIndexToView(InstanceTableModel.COL_SELECTED));
         }
     }
 
     @Action
     public void btnInvertSelection() {
-        for (int i = 0; i < insTableModel.getRowCount(); i++) {
-            if (rowFilter.include((String) insTableModel.getValueAt(i, 0),
-                    insTableModel.getInstanceAt(i).getInstanceClass().getId())) {
-                insTableModel.setValueAt(!((Boolean) insTableModel.getValueAt(i, 1)), i, 1);
-            }
+        for (int i = 0; i < tableInstances.getRowCount(); i++) {
+            tableInstances.setValueAt(!((Boolean) tableInstances.getValueAt(i, tableInstances.convertColumnIndexToView(InstanceTableModel.COL_SELECTED))), i, tableInstances.convertColumnIndexToView(InstanceTableModel.COL_SELECTED));
         }
     }
 
@@ -1983,22 +1980,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Action
     public void btnInstanceFilter() {
-        if (dialogFilter == null) {
-            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            dialogFilter = new EDACCInstanceFilter(mainFrame, true, this.rowFilter);
-            dialogFilter.setLocationRelativeTo(mainFrame);
-        }
-        dialogFilter.loadValues();
-        EDACCApp.getApplication().show(dialogFilter);
+        EDACCApp.getApplication().show(instanceFilter);
         insTableModel.fireTableDataChanged();
-        if (rowFilter.filter_name || rowFilter.filter_numAtoms
-                || rowFilter.filter_numClauses || rowFilter.filter_ratio
-                || rowFilter.filter_maxClauseLength) {
+        if (instanceFilter.hasFiltersApplied()) {
             setFilterStatus("This list of instances has filters applied to it. Use the filter button below to modify.");
         } else {
             setFilterStatus("");
         }
-
     }
 
     @Action
@@ -2195,9 +2183,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Action
     public void btnFilterJobs() {
-        EDACCJobsFilter jobsFilter = new EDACCJobsFilter(EDACCApp.getApplication().getMainFrame(), true, this);
-        jobsFilter.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
-        jobsFilter.setVisible(true);
+        // EDACCJobsFilter jobsFilter = new EDACCJobsFilter(EDACCApp.getApplication().getMainFrame(), true, this);
+        // jobsFilter.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+        EDACCApp.getApplication().show(resultBrowserRowFilter);
+        if (resultBrowserRowFilter.hasFiltersApplied()) {
+            setJobsFilterStatus("This list of jobs has filters applied to it. Use the filter button below to modify.");
+        } else {
+            setJobsFilterStatus("");
+        }
+        jobsTableModel.fireTableDataChanged();
+        // jobsFilter.setVisible(true);
     }
 
     @Action
@@ -2392,12 +2387,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     public void randomInstanceSelection(int count) throws Exception {
         LinkedList<Integer> idxs = new LinkedList<Integer>();
-        for (int i = 0; i < insTableModel.getRowCount(); i++) {
-            if (rowFilter.include((String) insTableModel.getValueAt(i, 0),
-                    insTableModel.getInstanceAt(i).getInstanceClass().getId())) {
-                if (!(Boolean) insTableModel.getValueAt(i, 1)) {
-                    idxs.add(i);
-                }
+        for (int i = 0; i < tableInstances.getRowCount(); i++) {
+            if (!(Boolean) tableInstances.getValueAt(i, tableInstances.convertColumnIndexToView(InstanceTableModel.COL_SELECTED))) {
+                idxs.add(i);
             }
         }
         if (idxs.size() < count) {
@@ -2405,7 +2397,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         Random random = new Random();
         while (count-- > 0) {
-            insTableModel.setValueAt(true, idxs.get(random.nextInt(idxs.size())), 1);
+            int sel = random.nextInt(idxs.size());
+            tableInstances.setValueAt(true, idxs.get(sel), tableInstances.convertColumnIndexToView(InstanceTableModel.COL_SELECTED));
+            idxs.remove(sel);
         }
         insTableModel.fireTableDataChanged();
     }

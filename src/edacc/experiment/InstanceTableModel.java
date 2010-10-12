@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package edacc.experiment;
 
 import edacc.model.ExperimentHasInstance;
@@ -10,12 +9,15 @@ import edacc.model.Instance;
 import edacc.model.InstanceHasInstanceProperty;
 import edacc.model.InstanceProperty;
 import edacc.model.NoConnectionToDBException;
+import edacc.satinstances.ConvertException;
 import edacc.satinstances.InstancePropertyManager;
 import edacc.satinstances.PropertyValueTypeManager;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 import java.util.Vector;
 
@@ -24,6 +26,7 @@ import java.util.Vector;
  * @author daniel
  */
 public class InstanceTableModel extends AbstractTableModel {
+
     public static int COL_NAME = 0;
     public static int COL_SELECTED = 1;
     public static int COL_PROP = 2;
@@ -31,7 +34,6 @@ public class InstanceTableModel extends AbstractTableModel {
     ArrayList<InstanceProperty> properties;
     protected ArrayList<Instance> instances;
     protected Vector<ExperimentHasInstance> experimentHasInstances;
-
     protected HashMap<Integer, ExperimentHasInstance> selectedInstances;
     protected Vector<ExperimentHasInstance> savedExperimentInstances;
 
@@ -40,7 +42,11 @@ public class InstanceTableModel extends AbstractTableModel {
         this.instances = instances;
         experimentHasInstances = new Vector<ExperimentHasInstance>();
         experimentHasInstances.setSize(instances.size());
-        this.fireTableStructureChanged();
+        try {
+            this.fireTableStructureChanged();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateProperties() throws IOException, NoConnectionToDBException, SQLException {
@@ -60,7 +66,7 @@ public class InstanceTableModel extends AbstractTableModel {
     public void setExperimentHasInstances(Vector<ExperimentHasInstance> experimentHasInstances) {
         this.savedExperimentInstances = experimentHasInstances;
         selectedInstances.clear();
-        for (ExperimentHasInstance ehi: experimentHasInstances) {
+        for (ExperimentHasInstance ehi : experimentHasInstances) {
             selectedInstances.put(ehi.getInstances_id(), ehi);
         }
         for (int i = 0; i < this.experimentHasInstances.size(); i++) {
@@ -135,7 +141,7 @@ public class InstanceTableModel extends AbstractTableModel {
 
     public ArrayList<Instance> getSelectedInstances() {
         ArrayList<Instance> res = new ArrayList<Instance>();
-        for (Instance instance: instances) {
+        for (Instance instance : instances) {
             if (selectedInstances.containsKey(instance.getId())) {
                 res.add(instance);
             }
@@ -160,16 +166,28 @@ public class InstanceTableModel extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int col) {
-        if (this.getRowCount() == 0)
-            return this.getClass();
-        else
+        if (this.getRowCount() == 0) {
+            return String.class;
+        } else {
+            if (col >= COL_PROP) {
+                int propertyIdx = col - COL_PROP;
+                if (propertyIdx < properties.size()) {
+                    return properties.get(propertyIdx).getPropertyValueType().getJavaType();
+                } else {
+                    return String.class;
+                }
+            }
             return getValueAt(0, col).getClass();
+        }
     }
 
     @Override
     public boolean isCellEditable(int row, int col) {
-        if (col == 1) return true;
-        else return false;
+        if (col == 1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -180,7 +198,7 @@ public class InstanceTableModel extends AbstractTableModel {
             } else {
                 selectedInstances.remove(instances.get(row).getId());
             }
-        } 
+        }
         this.fireTableCellUpdated(row, col);
     }
 
@@ -201,11 +219,15 @@ public class InstanceTableModel extends AbstractTableModel {
                 return selectedInstances.containsKey(instances.get(rowIndex).getId()); //selected.get(rowIndex);
             default:
                 int propertyIdx = columnIndex - COL_PROP;
-                if (properties.size() < propertyIdx || instances.get(rowIndex).getPropertyValues() == null) {
-                    return "-";
+                if (properties.size() <= propertyIdx || instances.get(rowIndex).getPropertyValues() == null) {
+                    return null;
                 }
                 InstanceHasInstanceProperty ip = instances.get(rowIndex).getPropertyValues().get(properties.get(propertyIdx).getName());
-                return ip!=null? ip.getValue() : "-";
+                try {
+                    return properties.get(propertyIdx).getPropertyValueType().getJavaTypeRepresentation(ip.getValue());
+                } catch (ConvertException ex) {
+                    return null;
+                }
         }
     }
 }

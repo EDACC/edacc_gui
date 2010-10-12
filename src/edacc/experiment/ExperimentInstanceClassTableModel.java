@@ -4,6 +4,7 @@
  */
 package edacc.experiment;
 
+import edacc.filter.InstanceFilter;
 import edacc.model.Instance;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceDAO;
@@ -22,12 +23,12 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel {
     private String[] columns = {"Name", "Description", "Source", "Show"};
     protected Vector<InstanceClass> classes;
     protected Vector<Boolean> classSelect;
-    protected InstanceTableModelRowFilter filter;
+    protected InstanceFilter filter;
     protected InstanceTableModel model;
     protected ExperimentController expController;
     private boolean update;
 
-    public ExperimentInstanceClassTableModel(InstanceTableModel model, InstanceTableModelRowFilter filter, ExperimentController expController) {
+    public ExperimentInstanceClassTableModel(InstanceTableModel model, InstanceFilter filter, ExperimentController expController) {
         this.expController = expController;
         this.filter = filter;
         this.model = model;
