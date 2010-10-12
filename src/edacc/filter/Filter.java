@@ -84,20 +84,20 @@ public class Filter extends javax.swing.JDialog {
             //int k = table.convertColumnIndexToModel(i);
              c.gridx = 0;
             if (colFilter.containsKey(i)) {
-                c.weightx = 1;
+                c.weightx = .1;
                 pnlFilter.add(new JLabel(table.getModel().getColumnName(i) + ": "), c);
                 c.gridx = 1;
-                c.weightx = 0.5;
+                c.weightx = 1000;
                 pnlFilter.add((JPanel) colFilter.get(i), c);
                 c.gridy++;
                 continue;
             }
            
             if (BooleanFilter.accept(table.getModel().getColumnClass(i))) {
-                c.weightx = 1;
+                c.weightx = .1;
                 pnlFilter.add(new JLabel(table.getModel().getColumnName(i) + ": "), c);
                 c.gridx = 1;
-                c.weightx = 0.5;
+                c.weightx = 1000;
                 BooleanFilter filter = new BooleanFilter(table.getModel().getColumnName(i));
                 pnlFilter.add(filter, c);
                 c.gridy++;
@@ -105,10 +105,10 @@ public class Filter extends javax.swing.JDialog {
             }
 
             if (NumberFilter.accept(table.getModel().getColumnClass(i))) {
-                c.weightx = 1;
+                c.weightx = .1;
                 pnlFilter.add(new JLabel(table.getModel().getColumnName(i) + ": "), c);
                 c.gridx = 1;
-                c.weightx = 0.5;
+                c.weightx = 1000;
                 NumberFilter filter = new NumberFilter(table.getModel().getColumnName(i));
                 pnlFilter.add(filter, c);
                 c.gridy++;
@@ -117,10 +117,10 @@ public class Filter extends javax.swing.JDialog {
 
 
             if (StringFilter.accept(table.getModel().getColumnClass(i))) {
-                c.weightx = 1;
+                c.weightx = .1;
                 pnlFilter.add(new JLabel(table.getModel().getColumnName(i) + ": "), c);
                 c.gridx = 1;
-                c.weightx = 0.5;
+                c.weightx = 1000;
                 StringFilter filter = new StringFilter(table.getModel().getColumnName(i));
                 pnlFilter.add(filter, c);
                 c.gridy++;

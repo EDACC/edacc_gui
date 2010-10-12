@@ -22,7 +22,7 @@
           <Group type="102" alignment="1" attributes="0">
               <Component id="lblContains" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="txtString" pref="301" max="32767" attributes="0"/>
+              <Component id="txtRegexp" pref="296" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="chkActivate" min="-2" max="-2" attributes="0"/>
           </Group>
@@ -33,7 +33,7 @@
           <Group type="103" groupAlignment="3" attributes="0">
               <Component id="chkActivate" alignment="3" min="-2" max="-2" attributes="0"/>
               <Component id="lblContains" alignment="3" min="-2" max="-2" attributes="0"/>
-              <Component id="txtString" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="txtRegexp" alignment="3" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -51,10 +51,10 @@
         <Property name="name" type="java.lang.String" value="lblContains" noResource="true"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="txtString">
+    <Component class="javax.swing.JTextField" name="txtRegexp">
       <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="txtString.text"/>
-        <Property name="name" type="java.lang.String" value="txtString" noResource="true"/>
+        <Property name="text" type="java.lang.String" resourceKey="txtRegexp.text"/>
+        <Property name="name" type="java.lang.String" value="txtRegexp" noResource="true"/>
       </Properties>
     </Component>
   </SubComponents>

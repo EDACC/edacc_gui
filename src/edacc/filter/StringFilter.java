@@ -10,6 +10,8 @@
  */
 package edacc.filter;
 
+import java.util.regex.Matcher;
+
 /**
  *
  * @author simon
@@ -32,7 +34,7 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
 
         chkActivate = new javax.swing.JCheckBox();
         lblContains = new javax.swing.JLabel();
-        txtString = new javax.swing.JTextField();
+        txtRegexp = new javax.swing.JTextField();
 
         setName("Form"); // NOI18N
 
@@ -43,8 +45,8 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
         lblContains.setText(resourceMap.getString("lblContains.text")); // NOI18N
         lblContains.setName("lblContains"); // NOI18N
 
-        txtString.setText(resourceMap.getString("txtString.text")); // NOI18N
-        txtString.setName("txtString"); // NOI18N
+        txtRegexp.setText(resourceMap.getString("txtRegexp.text")); // NOI18N
+        txtRegexp.setName("txtRegexp"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -53,7 +55,7 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(lblContains)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtString, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
+                .addComponent(txtRegexp, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkActivate))
         );
@@ -62,7 +64,7 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                 .addComponent(chkActivate)
                 .addComponent(lblContains)
-                .addComponent(txtString, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(txtRegexp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -73,7 +75,11 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
         }
         if (value instanceof String) {
             String val = (String) value;
-            return val.contains(txtString.getText());
+            try {
+                return val.matches(txtRegexp.getText());
+            } catch (Exception e) {
+                return false;
+            }
         }
         return true;
     }
@@ -84,7 +90,7 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox chkActivate;
     private javax.swing.JLabel lblContains;
-    private javax.swing.JTextField txtString;
+    private javax.swing.JTextField txtRegexp;
     // End of variables declaration//GEN-END:variables
 
     @Override
