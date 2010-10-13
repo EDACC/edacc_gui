@@ -8,7 +8,7 @@ import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
-import edacc.model.SolverProperty;
+import edacc.model.Property;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +33,7 @@ public class CactusPlot extends Plot {
     private static InstanceSelector instanceSelector;
     private static SolverConfigurationSelector solverConfigurationSelector;
     private Integer run;
-    private SolverProperty property;
+    private Property property;
     private ArrayList<Instance> instances;
     private ArrayList<SolverConfiguration> solverConfigs;
     private HashSet<Integer> selectedInstanceIds;
@@ -72,7 +72,7 @@ public class CactusPlot extends Plot {
             comboRun.addItem(i);
         }
         comboProperty.removeAllItems();
-        for (SolverProperty sp : getSolverProperties()) {
+        for (Property sp : getSolverProperties()) {
             comboProperty.addItem(sp);
         }
         ArrayList<Instance> instances = new ArrayList<Instance>();
@@ -107,10 +107,10 @@ public class CactusPlot extends Plot {
             if (solverConfigs.isEmpty()) {
                 throw new DependencyException("You have to select solvers in order to plot.");
             }
-            if (!(comboProperty.getSelectedItem() instanceof SolverProperty)) {
+            if (!(comboProperty.getSelectedItem() instanceof Property)) {
                 throw new DependencyException("You have to select a property.");
             }
-            property = (SolverProperty) comboProperty.getSelectedItem();
+            property = (Property) comboProperty.getSelectedItem();
             selectedInstanceIds = new HashSet<Integer>();
             for (Instance i : instances) {
                 selectedInstanceIds.add(i.getId());

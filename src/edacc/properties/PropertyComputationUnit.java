@@ -7,9 +7,9 @@ package edacc.properties;
 
 import edacc.model.ExperimentResultDAO;
 import edacc.model.ExperimentResultHasSolverProperty;
-import edacc.model.ExperimentResultHasSolverPropertyDAO;
+import edacc.model.ExperimentResultHasPropertyDAO;
 import edacc.model.NoConnectionToDBException;
-import edacc.model.SolverProperty;
+import edacc.model.Property;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,12 +37,12 @@ class PropertyComputationUnit implements Runnable {
     @Override
     public void run() {
        // try {
-            /*SolverProperty property = toParse.getSolvProperty();
-            if(property.getSolverPropertyType().equals(SolverPropertyType.Parameter)){
+            /*Property property = toParse.getSolvProperty();
+            if(property.getPropertySource().equals(SolverPropertyType.Parameter)){
             processParameter();
             }else {
             try {
-            switch(property.getSolverPropertyType()){
+            switch(property.getPropertySource()){
             case LauncherOutput:
             parse(ExperimentResultDAO.getLauncherOutputFile(toParse.getExpResult()));
             break;
@@ -70,12 +70,12 @@ class PropertyComputationUnit implements Runnable {
     /*    } catch (InterruptedException ex) {
             Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
         }
-        /*SolverProperty property = toParse.getSolvProperty();
-        if(property.getSolverPropertyType().equals(SolverPropertyType.Parameter)){
+        /*Property property = toParse.getSolvProperty();
+        if(property.getPropertySource().equals(SolverPropertyType.Parameter)){
             processParameter();
         }else {
             try {
-                switch(property.getSolverPropertyType()){
+                switch(property.getPropertySource()){
                     case LauncherOutput:
                         parse(ExperimentResultDAO.getLauncherOutputFile(toParse.getExpResult()));
                         break;
@@ -99,7 +99,9 @@ class PropertyComputationUnit implements Runnable {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
             }
         }*/
+        System.out.println("arbeit, arbeit!");
         callback.callback();
+        
     }
 
 
@@ -119,7 +121,7 @@ class PropertyComputationUnit implements Runnable {
                         res.add(token);
                         found = false;
                     }
-                    else if(token.equals(toParse.getSolvProperty().getPrefix()))
+                    else if(token.equals(toParse.getSolvProperty().getRegularExpression()))
                         found = true;
 
                 }
@@ -135,14 +137,14 @@ class PropertyComputationUnit implements Runnable {
                         res.add(token);
                         break;
                     }
-                    else if(token.equals(toParse.getSolvProperty().getPrefix()))
+                    else if(token.equals(toParse.getSolvProperty().getRegularExpression()))
                         found = true;
 
                 }
             }
         }
         toParse.setValue(res);
-        ExperimentResultHasSolverPropertyDAO.save(toParse);
+        ExperimentResultHasPropertyDAO.save(toParse);
     }
 
     private void processParameter() {

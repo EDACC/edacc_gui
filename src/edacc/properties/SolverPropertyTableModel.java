@@ -5,7 +5,7 @@
 
 package edacc.properties;
 
-import edacc.model.SolverProperty;
+import edacc.model.Property;
 import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 
@@ -15,7 +15,7 @@ import javax.swing.table.AbstractTableModel;
  */
 public class SolverPropertyTableModel extends AbstractTableModel {
     private String[] columns = {"Name", "Prefix", "Value type", "Property type", "Multiple"};
-    private Vector<SolverProperty> rows = new Vector<SolverProperty>();
+    private Vector<Property> rows = new Vector<Property>();
 
     /**
      *
@@ -52,7 +52,7 @@ public class SolverPropertyTableModel extends AbstractTableModel {
             case 3:
                 return PropertyValueTypeSelectionModel.class;
             case 4:
-                return SolverPropertyType.class;
+                return PropertySource.class;
             case 5:
                 return Boolean.class;
             default:
@@ -61,10 +61,10 @@ public class SolverPropertyTableModel extends AbstractTableModel {
     }
 
     /**
-     * Returns the value of the requested cell. ColumnIndex of 0 returns a String representing the name of the SolverProperty.
-     * ColumnIndex of 1 returns a String representing the prefix of the SolverProperty. ColumnIndex 2 returns
-     * the PropertyValueType object of the SolverProperty. ColumnIndex of 3 returns the SolverPropertyType.
-     * ColumnIndex of 4 returns the multiple status and a ColumnIndex of 5 returns the SolverProperty object.
+     * Returns the value of the requested cell. ColumnIndex of 0 returns a String representing the name of the Property.
+     * ColumnIndex of 1 returns a String representing the prefix of the Property. ColumnIndex 2 returns
+     * the PropertyValueType object of the Property. ColumnIndex of 3 returns the PropertySource.
+     * ColumnIndex of 4 returns the multiple status and a ColumnIndex of 5 returns the Property object.
      *
      * @param rowIndex
      * @param columnIndex
@@ -76,11 +76,11 @@ public class SolverPropertyTableModel extends AbstractTableModel {
             case 0:
                 return rows.get(rowIndex).getName();
             case 1:
-                return rows.get(rowIndex).getPrefix();
+                return rows.get(rowIndex).getRegularExpression();
             case 2:
                 return rows.get(rowIndex).getPropertyValueType();
             case 3:
-                return rows.get(rowIndex).getSolverPropertyType();
+                return rows.get(rowIndex).getPropertySource();
             case 4:
                 return rows.get(rowIndex).isMultiple();
             case 5:
@@ -91,18 +91,18 @@ public class SolverPropertyTableModel extends AbstractTableModel {
     }
 
     /**
-     * Adds the given SolverProperty object.
-     * @param resProperty SolverProperty object to add
+     * Adds the given Property object.
+     * @param resProperty Property object to add
      */
-    private void addResultProperty(SolverProperty resProperty){
+    private void addResultProperty(Property resProperty){
         rows.add(resProperty);
     }
 
     /**
-     * Adds all given SolverProperty objects.
-     * @param resProperties the SolverProperty objects to add
+     * Adds all given Property objects.
+     * @param resProperties the Property objects to add
      */
-    public void addResultProperties(Vector<SolverProperty> resProperties){
+    public void addResultProperties(Vector<Property> resProperties){
         for(int i = 0; i < resProperties.size(); i++){
             addResultProperty(resProperties.get(i));
         }
@@ -110,8 +110,8 @@ public class SolverPropertyTableModel extends AbstractTableModel {
     }
 
     /**
-     * Removes the SolverProperty at the given position of the table.
-     * @param rowIndex of the SolverProperty to remove
+     * Removes the Property at the given position of the table.
+     * @param rowIndex of the Property to remove
      */
     public void removeResultProperty(int rowIndex){
         rows.remove(rowIndex);
@@ -119,7 +119,7 @@ public class SolverPropertyTableModel extends AbstractTableModel {
     }
 
     /**
-     * Removes all SolverProperty objects from the table.
+     * Removes all Property objects from the table.
      */
     public void clear(){
         this.rows.clear();
@@ -127,10 +127,10 @@ public class SolverPropertyTableModel extends AbstractTableModel {
     }
 
     /**
-     * Removes the given SolverProperty object from the table
-     * @param toRemove the SolverProperty object to remove
+     * Removes the given Property object from the table
+     * @param toRemove the Property object to remove
      */
-    public void removeSolverProperty(SolverProperty toRemove){
+    public void removeSolverProperty(Property toRemove){
         rows.remove(toRemove);
         this.fireTableDataChanged();
     }

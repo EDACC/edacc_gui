@@ -6,7 +6,7 @@ package edacc.experiment;
 
 import edacc.model.ExperimentHasInstance;
 import edacc.model.Instance;
-import edacc.model.InstanceHasInstanceProperty;
+import edacc.model.InstanceHasProperty;
 import edacc.model.InstanceProperty;
 import edacc.model.NoConnectionToDBException;
 import edacc.satinstances.ConvertException;
@@ -222,7 +222,7 @@ public class InstanceTableModel extends AbstractTableModel {
                 if (properties.size() <= propertyIdx || instances.get(rowIndex).getPropertyValues() == null) {
                     return null;
                 }
-                InstanceHasInstanceProperty ip = instances.get(rowIndex).getPropertyValues().get(properties.get(propertyIdx).getName());
+                InstanceHasProperty ip = instances.get(rowIndex).getPropertyValues().get(properties.get(propertyIdx).getName());
                 try {
                     return properties.get(propertyIdx).getPropertyValueType().getJavaTypeRepresentation(ip.getValue());
                 } catch (ConvertException ex) {

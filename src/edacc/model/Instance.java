@@ -72,11 +72,11 @@ public class Instance extends BaseModel implements IntegerPKModel {
         this.instanceClass = instanceClass;
     }
 
-    public HashMap<String, InstanceHasInstanceProperty> getPropertyValues() {
+    public HashMap<String, InstanceHasProperty> getPropertyValues() {
         return propertyValues;
     }
 
-    public void setPropertyValues(HashMap<String, InstanceHasInstanceProperty> instancePropertyValues) {
+    public void setPropertyValues(HashMap<String, InstanceHasProperty> instancePropertyValues) {
         this.propertyValues = instancePropertyValues;
     }
 
@@ -97,5 +97,5 @@ public class Instance extends BaseModel implements IntegerPKModel {
      */
     private InstanceClass instanceClass;
 
-    private HashMap<String, InstanceHasInstanceProperty> propertyValues;
+    private HashMap<String, InstanceHasProperty> propertyValues;
 }

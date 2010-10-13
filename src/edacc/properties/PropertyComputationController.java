@@ -11,11 +11,11 @@ import edacc.model.Experiment;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.ExperimentResultHasSolverProperty;
-import edacc.model.ExperimentResultHasSolverPropertyDAO;
+import edacc.model.ExperimentResultHasPropertyDAO;
 import edacc.model.ExperimentResultNotInDBException;
 import edacc.model.NoConnectionToDBException;
-import edacc.model.SolverProperty;
-import edacc.model.SolverPropertyNotInDBException;
+import edacc.model.Property;
+import edacc.model.PropertyNotInDBException;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,15 +32,15 @@ import java.util.logging.Logger;
  */
 public class PropertyComputationController implements Runnable{
     final Lock lock = new ReentrantLock(); 
-    private int availableProcessors ;
+    private int availableProcessors = 10 ;
     Experiment exp;
-    Vector<SolverProperty> toParse;
-    Vector<SolverProperty> parameterResProp;
+    Vector<Property> toParse;
+    Vector<Property> parameterResProp;
     Vector<ExperimentResultHasSolverProperty> queue;
     boolean recompute;
 
-    public PropertyComputationController(Experiment exp, Vector<SolverProperty> givenProperties, boolean recompute) throws NoConnectionToDBException, SQLException{
-        availableProcessors = Runtime.getRuntime().availableProcessors();
+    public PropertyComputationController(Experiment exp, Vector<Property> givenProperties, boolean recompute) throws NoConnectionToDBException, SQLException{
+        //availableProcessors = Runtime.getRuntime().availableProcessors();
         /*this.exp = exp;
         this.toParse = givenProperties;
         this.recompute = recompute;    
@@ -56,7 +56,7 @@ public class PropertyComputationController implements Runnable{
         }
     }
 
-    private void createParserJobs() throws NoConnectionToDBException, SQLException, SolverPropertyTypeNotExistException, IOException, SolverPropertyNotInDBException {
+    private void createParserJobs() throws NoConnectionToDBException, SQLException, SolverPropertyTypeNotExistException, IOException, PropertyNotInDBException {
         queue = new Vector<ExperimentResultHasSolverProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idJob FROM " +
                 "ExperimentResults WHERE Experiment_idExperiment=?;");
@@ -69,15 +69,15 @@ public class PropertyComputationController implements Runnable{
                 try {
                     ExperimentResult res = ExperimentResultDAO.getById( rs.getInt(1));
                     try {
-                        ExperimentResultHasSolverProperty tmp = ExperimentResultHasSolverPropertyDAO.getByExperimentResultAndResultProperty(res, toParse.get(i));
+                        ExperimentResultHasSolverProperty tmp = ExperimentResultHasPropertyDAO.getByExperimentResultAndResultProperty(res, toParse.get(i));
                         queue.add(tmp);
                         if(recompute){
                             tmp.setValue(new Vector<String>());
-                            ExperimentResultHasSolverPropertyDAO.save(tmp);
+                            ExperimentResultHasPropertyDAO.save(tmp);
                         }
                     } catch (ExpResultHasSolvPropertyNotInDBException ex) {
-                        queue.add(ExperimentResultHasSolverPropertyDAO.createExperimentResultHasResultPropertyDAO(res, toParse.get(i)));
-                    } catch (SolverPropertyNotInDBException ex) {
+                        queue.add(ExperimentResultHasPropertyDAO.createExperimentResultHasResultPropertyDAO(res, toParse.get(i)));
+                    } catch (PropertyNotInDBException ex) {
                         Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (SolverPropertyTypeNotExistException ex) {
                         Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);

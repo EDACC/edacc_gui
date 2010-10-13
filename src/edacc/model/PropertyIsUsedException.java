@@ -9,9 +9,9 @@ package edacc.model;
  *
  * @author rretz
  */
-public class SolverPropertyHasParameterNotInDBException extends Exception{
+public class PropertyIsUsedException extends Exception{
 
-    public SolverPropertyHasParameterNotInDBException() {
+    public PropertyIsUsedException() {
         super();
     }
 

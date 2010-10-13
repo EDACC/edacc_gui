@@ -13,6 +13,6 @@ package edacc.properties;
  * 2 for Paramter
  * @author rretz
  */
-public enum SolverPropertyType {
+public enum PropertySource {
     LauncherOutput, Parameter, SolverOutput, VerifierOutput, WatcherOutput;
 }

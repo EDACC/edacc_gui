@@ -4,14 +4,14 @@ import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.ExperimentResultHasSolverProperty;
-import edacc.model.ExperimentResultHasSolverPropertyDAO;
+import edacc.model.ExperimentResultHasPropertyDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
-import edacc.model.InstanceHasInstanceProperty;
-import edacc.model.InstanceHasInstancePropertyDAO;
+import edacc.model.InstanceHasProperty;
+import edacc.model.InstanceHasPropertyDAO;
 import edacc.model.InstanceProperty;
-import edacc.model.SolverProperty;
-import edacc.model.SolverPropertyDAO;
+import edacc.model.Property;
+import edacc.model.PropertyDAO;
 import edacc.satinstances.ConvertException;
 import edacc.satinstances.InstancePropertyManager;
 import edacc.satinstances.PropertyValueType;
@@ -35,7 +35,7 @@ public abstract class Plot {
     public static int MEDIAN = -1;
     protected ExperimentController expController;
     // "constants" for solver properties
-    public static SolverProperty PROP_CPUTIME;
+    public static Property PROP_CPUTIME;
     private HashMap<ResultIdentifier, ExperimentResult> resultMap;
     private HashMap<Integer, Instance> instanceMap;
 
@@ -66,14 +66,14 @@ public abstract class Plot {
         }
     }
 
-    public static ArrayList<SolverProperty> getSolverProperties() throws Exception {
-        ArrayList<SolverProperty> res = new ArrayList<SolverProperty>();
+    public static ArrayList<Property> getSolverProperties() throws Exception {
+        ArrayList<Property> res = new ArrayList<Property>();
         if (PROP_CPUTIME == null) {
-            PROP_CPUTIME = new SolverProperty();
+            PROP_CPUTIME = new Property();
             PROP_CPUTIME.setName("CPU-Time");
         }
         res.add(PROP_CPUTIME);
-        res.addAll(SolverPropertyDAO.getAll());
+        res.addAll(PropertyDAO.getAll());
         return res;
     }
 
@@ -132,7 +132,7 @@ public abstract class Plot {
             return res;
     }
 
-    public Double getValue(ExperimentResult result, SolverProperty property) {
+    public Double getValue(ExperimentResult result, Property property) {
         if (property == PROP_CPUTIME) {
             return Double.valueOf(result.getResultTime());
         } else {
@@ -145,7 +145,7 @@ public abstract class Plot {
     }
 
     public Double getValue(Instance instance, InstanceProperty property) {
-        InstanceHasInstanceProperty ihip = instance.getPropertyValues().get(property.getName());
+        InstanceHasProperty ihip = instance.getPropertyValues().get(property.getName());
         if (ihip == null) {
             return null;
         }
@@ -158,7 +158,7 @@ public abstract class Plot {
      * @param property
      * @return
      */
-    public Double getAverage(ArrayList<ExperimentResult> results, SolverProperty property) {
+    public Double getAverage(ArrayList<ExperimentResult> results, Property property) {
         if (results.isEmpty()) {
             return null;
         }
@@ -185,7 +185,7 @@ public abstract class Plot {
      * @param property
      * @return
      */
-    public Double getMedian(ArrayList<ExperimentResult> results, SolverProperty property) {
+    public Double getMedian(ArrayList<ExperimentResult> results, Property property) {
         if (results.isEmpty()) {
             return null;
         }

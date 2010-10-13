@@ -7,9 +7,9 @@ package edacc.properties;
 
 import edacc.EDACCComputeResultProperties;
 import edacc.model.NoConnectionToDBException;
-import edacc.model.SolverProperty;
-import edacc.model.SolverPropertyDAO;
-import edacc.model.SolverPropertyNotInDBException;
+import edacc.model.Property;
+import edacc.model.PropertyDAO;
+import edacc.model.PropertyNotInDBException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Vector;
@@ -32,12 +32,12 @@ public class ComputeResultPropertiesController {
 
     public void loadResultProperties() {
         try {
-            ((ResultPropertySelectionTableModel) tableResultProperty.getModel()).addResultProperties(SolverPropertyDAO.getAll());
+            ((ResultPropertySelectionTableModel) tableResultProperty.getModel()).addResultProperties(PropertyDAO.getAll());
         } catch (NoConnectionToDBException ex) {
             Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SolverPropertyNotInDBException ex) {
+        } catch (PropertyNotInDBException ex) {
             Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SolverPropertyTypeNotExistException ex) {
             Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
@@ -46,7 +46,7 @@ public class ComputeResultPropertiesController {
         }
     }
 
-    public void computeResultProperties(Vector<SolverProperty> toCalculate, boolean recompute) {
+    public void computeResultProperties(Vector<Property> toCalculate, boolean recompute) {
         try {
             Thread compute = new Thread(new PropertyComputationController(null, null, true));
             compute.start();

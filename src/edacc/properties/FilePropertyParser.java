@@ -8,7 +8,7 @@ package edacc.properties;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.NoConnectionToDBException;
-import edacc.model.SolverProperty;
+import edacc.model.Property;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -33,16 +33,16 @@ public class FilePropertyParser {
      *
      * @param solvProp to parse for
      * @param expResult on which the parser works (result file oder client output file)
-     * @return values of all occurences of given SolverProperty in the given ExperimentResult.
+     * @return values of all occurences of given Property in the given ExperimentResult.
      * @throws FileNotFoundException
      * @throws IOException
      * @throws NoAllowedSolverPropertyTypeException
      */
-    public Vector<String> parse(SolverProperty solvProp, ExperimentResult expResult) throws FileNotFoundException, IOException, NoAllowedSolverPropertyTypeException, NoConnectionToDBException, SQLException{
+    public Vector<String> parse(Property solvProp, ExperimentResult expResult) throws FileNotFoundException, IOException, NoAllowedSolverPropertyTypeException, NoConnectionToDBException, SQLException{
         File file = null;
-/*        if(solvProp.getSolverPropertyType() == SolverPropertyType.ResultFile)
+/*        if(solvProp.getPropertySource() == SolverPropertyType.ResultFile)
             file = ExperimentResultDAO.getSolverOutputFile(expResult);
-        else if(solvProp.getSolverPropertyType() == SolverPropertyType.ClientOutput)
+        else if(solvProp.getPropertySource() == SolverPropertyType.ClientOutput)
             file = ExperimentResultDAO.getLauncherOutputFile(expResult);
         else
             throw new NoAllowedSolverPropertyTypeException();
@@ -62,7 +62,7 @@ public class FilePropertyParser {
                         res.add(token);
                         found = false;
                     }
-                    else if(token.equals(solvProp.getPrefix()))
+                    else if(token.equals(solvProp.getRegularExpression()))
                         found = true;
 
                 }
@@ -78,7 +78,7 @@ public class FilePropertyParser {
                         res.add(token);
                         break;
                     }
-                    else if(token.equals(solvProp.getPrefix()))
+                    else if(token.equals(solvProp.getRegularExpression()))
                         found = true;
                     
                 }

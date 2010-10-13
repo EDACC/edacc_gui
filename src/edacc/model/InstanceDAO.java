@@ -54,9 +54,9 @@ public class InstanceDAO {
         i.setName(rs.getString("name"));
         Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
         i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
-        i.setPropertyValues(new HashMap<String, InstanceHasInstanceProperty>());
+        i.setPropertyValues(new HashMap<String, InstanceHasProperty>());
         for (int prop = 0; prop < props.size(); prop++) {
-            i.getPropertyValues().put(props.get(prop).getName(), new InstanceHasInstanceProperty(i, props.get(prop), rs.getString("tbl_" + prop + ".value")));
+            i.getPropertyValues().put(props.get(prop).getName(), new InstanceHasProperty(i, props.get(prop), rs.getString("tbl_" + prop + ".value")));
         }
         return i;
     }
@@ -213,7 +213,7 @@ public class InstanceDAO {
 
             ArrayList<Instance> tmp = new ArrayList<Instance>();
             tmp.add(c);
-            InstanceHasInstancePropertyDAO.assign(tmp);
+            InstanceHasPropertyDAO.assign(tmp);
 
             i.setSaved();
             cache.cache(i);
@@ -352,7 +352,7 @@ public class InstanceDAO {
                 instanceHasPropertyAssignList.add(i);
             }
             rs.close();
-            InstanceHasInstancePropertyDAO.assign(instanceHasPropertyAssignList);
+            InstanceHasPropertyDAO.assign(instanceHasPropertyAssignList);
             return res;
         }
 
