@@ -7,7 +7,7 @@ import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.InstanceProperty;
 import edacc.model.SolverConfiguration;
-import edacc.model.SolverProperty;
+import edacc.model.Property;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.JComboBox;
@@ -25,7 +25,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
     private String infos, plotTitle;
     private SolverConfiguration solverConfig;
     private ArrayList<Instance> instances;
-    private SolverProperty solverProperty;
+    private Property solverProperty;
     private InstanceProperty instanceProperty;
     private Integer run;
     private Boolean xlog, ylog;
@@ -77,7 +77,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
         for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
             comboRun.addItem(i);
         }
-        for (SolverProperty sProp : getSolverProperties()) {
+        for (Property sProp : getSolverProperties()) {
             comboSolverProperty.addItem(sProp);
         }
         for (InstanceProperty iProp : getInstanceProperties()) {
@@ -93,7 +93,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
     public void plot(final Rengine re, ArrayList<PointInformation> pointInformations) throws Exception {
 
         if (run == null || solverConfig == null || instanceProperty == null || solverProperty == null || instances == null || xlog == null || ylog == null) {
-            if (!(comboSolverProperty.getSelectedItem() instanceof SolverProperty)) {
+            if (!(comboSolverProperty.getSelectedItem() instanceof Property)) {
                 throw new DependencyException("You have to select a solver property.");
             }
             if (!(comboInstanceProperty.getSelectedItem() instanceof InstanceProperty)) {
@@ -122,7 +122,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
 
             solverConfig = (SolverConfiguration) comboSolver.getSelectedItem();
             instanceProperty = (InstanceProperty) comboInstanceProperty.getSelectedItem();
-            solverProperty = (SolverProperty) comboSolverProperty.getSelectedItem();
+            solverProperty = (Property) comboSolverProperty.getSelectedItem();
             xlog = scaleSelector.isXScaleLog();
             ylog = scaleSelector.isYScaleLog();
         }

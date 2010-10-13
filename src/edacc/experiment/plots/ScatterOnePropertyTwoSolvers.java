@@ -6,7 +6,7 @@ import edacc.model.ExperimentResult;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
-import edacc.model.SolverProperty;
+import edacc.model.Property;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
     private String infos, plotTitle;
     private ArrayList<Instance> instances;
     private SolverConfiguration xSolverConfig, ySolverConfig;
-    private SolverProperty property;
+    private Property property;
     private Integer run;
     private Boolean xlog, ylog;
 
@@ -78,7 +78,7 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
         for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
             comboRun.addItem(i);
         }
-        for (SolverProperty sp : getSolverProperties()) {
+        for (Property sp : getSolverProperties()) {
             comboProperty.addItem(sp);
         }
         ArrayList<Instance> instances = new ArrayList<Instance>();
@@ -91,7 +91,7 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
     public void plot(final Rengine re, ArrayList<PointInformation> pointInformations) throws Exception {
 
         if (run == null || xSolverConfig == null || ySolverConfig == null || property == null || instances == null || xlog == null || ylog == null) {
-            if (!(comboProperty.getSelectedItem() instanceof SolverProperty)) {
+            if (!(comboProperty.getSelectedItem() instanceof Property)) {
                 throw new DependencyException("You have to select a property.");
             }
 
@@ -118,7 +118,7 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
 
             xSolverConfig = (SolverConfiguration) combo1.getSelectedItem();
             ySolverConfig = (SolverConfiguration) combo2.getSelectedItem();
-            property = (SolverProperty) comboProperty.getSelectedItem();
+            property = (Property) comboProperty.getSelectedItem();
             xlog = scaleSelector.isXScaleLog();
             ylog = scaleSelector.isYScaleLog();
         }

@@ -9,9 +9,9 @@ package edacc.model;
  *
  * @author rretz
  */
-public class SolverPropertyIsUsedException extends Exception{
+public class PropertyTypeDoesNotExistException extends Exception {
 
-    public SolverPropertyIsUsedException() {
+    public PropertyTypeDoesNotExistException() {
         super();
     }
 

@@ -13,14 +13,14 @@ import java.sql.SQLException;
  *
  * @author dgall
  */
-public class InstanceHasInstanceProperty extends BaseModel implements IntegerPKModel {
+public class InstanceHasProperty extends BaseModel implements IntegerPKModel {
 
     private int id;
     private Instance instance;
     private InstanceProperty instanceProperty;
     private String value;
 
-    protected InstanceHasInstanceProperty(Instance instance, InstanceProperty instanceProperty, String value) {
+    protected InstanceHasProperty(Instance instance, InstanceProperty instanceProperty, String value) {
         this.instance = instance;
         this.instanceProperty = instanceProperty;
         this.value = value;

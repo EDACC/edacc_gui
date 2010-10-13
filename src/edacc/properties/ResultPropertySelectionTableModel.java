@@ -5,7 +5,7 @@
 
 package edacc.properties;
 
-import edacc.model.SolverProperty;
+import edacc.model.Property;
 import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 
@@ -14,7 +14,7 @@ import javax.swing.table.AbstractTableModel;
  * @author rretz
  */
 public class ResultPropertySelectionTableModel extends AbstractTableModel{
-    private Vector<SolverProperty> rows = new Vector<SolverProperty>();
+    private Vector<Property> rows = new Vector<Property>();
     private Vector<Boolean> selected = new Vector<Boolean>();
     private String[] columns = {"Result property", "Selected"};
 
@@ -53,7 +53,7 @@ public class ResultPropertySelectionTableModel extends AbstractTableModel{
             return Boolean.class;
     }
 
-    public SolverProperty getResultProperty(int rowIndex){
+    public Property getResultProperty(int rowIndex){
         return rows.get(rowIndex);
     }
 
@@ -71,12 +71,12 @@ public class ResultPropertySelectionTableModel extends AbstractTableModel{
 
     }
 
-    public void addResultProperty(SolverProperty toAdd){
+    public void addResultProperty(Property toAdd){
         this.rows.add(toAdd);
         this.selected.add(false);
     }
 
-    public void addResultProperties(Vector<SolverProperty> toAdd){
+    public void addResultProperties(Vector<Property> toAdd){
         for(int i = 0; i < toAdd.size(); i++){
             addResultProperty(toAdd.get(i));
         }
@@ -88,8 +88,8 @@ public class ResultPropertySelectionTableModel extends AbstractTableModel{
         return false;
     }
 
-    public Vector<SolverProperty> getAllChoosen(){
-        Vector<SolverProperty> choosen = new Vector<SolverProperty>();
+    public Vector<Property> getAllChoosen(){
+        Vector<Property> choosen = new Vector<Property>();
         for(int i = 0; i < selected.size(); i++){
             if(selected.get(i))
                 choosen.add(rows.get(i));
