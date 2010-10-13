@@ -7,9 +7,9 @@ import edacc.model.ExperimentResult;
 import edacc.model.Instance;
 import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.InstanceDAO;
+import edacc.model.Property;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
-import edacc.model.SolverProperty;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -40,8 +40,8 @@ public class ProbabilisticDomination extends Plot {
     private static ProbabilisticDomination probDom;
     private static SolverConfiguration _solver1, _solver2;
     private static ArrayList<Instance> _instances;
-    private static SolverProperty _property;
-    private SolverProperty property;
+    private static Property _property;
+    private Property property;
     private SolverConfiguration solver1, solver2;
     private Instance instance;
     private String infos, title;
@@ -116,7 +116,7 @@ public class ProbabilisticDomination extends Plot {
             comboSolver1.addItem(sc);
             comboSolver2.addItem(sc);
         }
-        for (SolverProperty p : getSolverProperties()) {
+        for (Property p : getSolverProperties()) {
             comboProperty.addItem(p);
         }
         ArrayList<Instance> i = new ArrayList<Instance>();
@@ -129,7 +129,7 @@ public class ProbabilisticDomination extends Plot {
         _solver1 = (SolverConfiguration) comboSolver1.getSelectedItem();
         _solver2 = (SolverConfiguration) comboSolver2.getSelectedItem();
         _instances = instanceSelector.getSelectedInstances();
-        _property = (SolverProperty) comboProperty.getSelectedItem();
+        _property = (Property) comboProperty.getSelectedItem();
         pnlFirstDominates.removeAll();
         pnlSecondDominates.removeAll();
         pnlCrossovers.removeAll();
@@ -190,7 +190,7 @@ public class ProbabilisticDomination extends Plot {
         pnlProbabilisticDomination.revalidate();
     }
 
-    public int probabilisticDominates(Instance instance, SolverConfiguration sc1, SolverConfiguration sc2, SolverProperty prop) throws REngineInitializationException {
+    public int probabilisticDominates(Instance instance, SolverConfiguration sc1, SolverConfiguration sc2, Property prop) throws REngineInitializationException {
         ArrayList<ExperimentResult> results1 = getResults(sc1.getId(), instance.getId());
         ArrayList<ExperimentResult> results2 = getResults(sc2.getId(), instance.getId());
         ArrayList<Double> resultsDouble1 = new ArrayList<Double>();

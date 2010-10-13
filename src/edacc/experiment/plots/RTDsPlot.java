@@ -6,7 +6,7 @@ import edacc.model.ExperimentResult;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
-import edacc.model.SolverProperty;
+import edacc.model.Property;
 import java.util.ArrayList;
 import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
@@ -21,7 +21,7 @@ public class RTDsPlot extends Plot {
     private static JComboBox comboInstance, comboProperty;
     private ArrayList<SolverConfiguration> scs;
     private Instance instance;
-    private SolverProperty property;
+    private Property property;
     private String title;
 
     public RTDsPlot(ExperimentController expController) {
@@ -51,7 +51,7 @@ public class RTDsPlot extends Plot {
         for (Instance i : InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId())) {
             comboInstance.addItem(i);
         }
-        for (SolverProperty p : getSolverProperties()) {
+        for (Property p : getSolverProperties()) {
             comboProperty.addItem(p);
         }
     }
@@ -67,12 +67,12 @@ public class RTDsPlot extends Plot {
             if (!(comboInstance.getSelectedItem() instanceof Instance)) {
                 throw new DependencyException("You have to select an instance.");
             }
-            if (!(comboProperty.getSelectedItem() instanceof SolverProperty)) {
+            if (!(comboProperty.getSelectedItem() instanceof Property)) {
                 throw new DependencyException("You have to select a property.");
             }
             scs = solverSelector.getSelectedSolverConfigurations();
             instance = (Instance) comboInstance.getSelectedItem();
-            property = (SolverProperty) comboProperty.getSelectedItem();
+            property = (Property) comboProperty.getSelectedItem();
         }
         initializeResults();
         title = "Property distribution on " + instance + " (" + expController.getActiveExperiment().getName() + ")";

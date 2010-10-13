@@ -6,7 +6,7 @@ import edacc.model.ExperimentResult;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
-import edacc.model.SolverProperty;
+import edacc.model.Property;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.JComboBox;
@@ -21,7 +21,7 @@ public class RTDPlot extends Plot {
     private static JComboBox combo1, combo2, comboProperty, comboInstance;
     public SolverConfiguration sc1, sc2;
     public Instance instance;
-    public SolverProperty property;
+    public Property property;
     private String infos, title;
 
     public RTDPlot(ExperimentController expController) {
@@ -61,7 +61,7 @@ public class RTDPlot extends Plot {
         for (Instance i : InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId())) {
             comboInstance.addItem(i);
         }
-        for (SolverProperty p : getSolverProperties()) {
+        for (Property p : getSolverProperties()) {
             comboProperty.addItem(p);
         }
     }
@@ -75,13 +75,13 @@ public class RTDPlot extends Plot {
             if (!(comboInstance.getSelectedItem() instanceof Instance)) {
                 throw new DependencyException("You have to select an instance.");
             }
-            if (!(comboProperty.getSelectedItem() instanceof SolverProperty)) {
+            if (!(comboProperty.getSelectedItem() instanceof Property)) {
                 throw new DependencyException("You have to select a property.");
             }
             sc1 = (SolverConfiguration) combo1.getSelectedItem();
             sc2 = (SolverConfiguration) combo2.getSelectedItem();
             instance = (Instance) comboInstance.getSelectedItem();
-            property = (SolverProperty) comboProperty.getSelectedItem();
+            property = (Property) comboProperty.getSelectedItem();
         }
         initializeResults();
         title = "Property distribution comparison on " + instance + " (" + expController.getActiveExperiment().getName() + ")";
