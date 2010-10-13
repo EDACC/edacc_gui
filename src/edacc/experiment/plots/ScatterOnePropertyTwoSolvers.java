@@ -23,7 +23,7 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
     private static JComboBox combo1, combo2, comboRun, comboProperty;
     private static InstanceSelector instanceSelector;
     private static ScaleSelector scaleSelector;
-    private String warning, plotTitle;
+    private String infos, plotTitle;
     private ArrayList<Instance> instances;
     private SolverConfiguration xSolverConfig, ySolverConfig;
     private SolverProperty property;
@@ -124,7 +124,7 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
         }
 
         initializeResults();
-        warning = null;
+        infos = null;
         double maxValue = 0.;
         plotTitle = xSolverConfig.getName() + " vs. " + ySolverConfig.getName() + " (" + expController.getActiveExperiment().getName() + ")";
         ArrayList<Double> xsVec = new ArrayList<Double>();
@@ -328,22 +328,40 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
             re.eval("plot(limits, limits, type='l', col='black', lty=2, xlim=limits, ylim=limits, xaxs='i', yaxs='i',xaxt='n',yaxt='n', xlab='', ylab='')");
         }
 
+        double[] spearman = Statistics.spearmanCorrelation(re, "xs", "ys");
+        infos = htmlHeader;
+        if (spearman != null) {
+            infos += "<h2>Spearman Rank correlation coefficient</h2>"
+                    + "Correlation Coefficient: " + spearman[1] + "<br>"
+                    + "p-value: " + spearman[0] + "<br>";
+        } else {
+        }
+        double[] pearson = Statistics.pearsonCorrelation(re, "xs", "ys");
+        if (pearson != null) {
+            infos += "<h2>Pearson product-moment correlation coefficient</h2>"
+                    + "Correlation Coefficient: " + pearson[1] + "<br>"
+                    + "p-value: " + pearson[0] + "<br>";
+        } else {
+        }
         if (xNoResult > 0 || yNoResult > 0 || xNoProp > 0 || yNoProp > 0) {
-            warning = "<html>Some points could not be calculated or might be inaccurate (for median or average):<br>";
+            infos += "<h2>Warning</h2>";
+            infos += "Some points could not be calculated or might be inaccurate (for median or average):<br>";
             if (xNoResult > 0) {
-                warning += xSolverConfig.getName() + " was not successfully verified on " + xNoResult + " runs.<br>";
+                infos += xSolverConfig.getName() + " was not successfully verified on " + xNoResult + " runs.<br>";
             }
             if (xNoProp > 0) {
-                warning += "" + xNoProp + " properties are not calculated for " + xSolverConfig.getName() + "<br>";
+                infos += "" + xNoProp + " properties are not calculated for " + xSolverConfig.getName() + "<br>";
             }
             if (yNoResult > 0) {
-                warning += ySolverConfig.getName() + " was not successfully verified on " + yNoResult + " runs.<br>";
+                infos += ySolverConfig.getName() + " was not successfully verified on " + yNoResult + " runs.<br>";
             }
             if (yNoProp > 0) {
-                warning += "" + yNoProp + " properties are not calculated for " + ySolverConfig.getName() + "<br>";
+                infos += "" + yNoProp + " properties are not calculated for " + ySolverConfig.getName() + "<br>";
             }
-            warning += "</html>";
         }
+
+        infos += htmlFooter;
+
 
         ArrayList<double[]> points = getPoints(re, xs, ys);
         int k = 0;
@@ -364,7 +382,7 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
     }
 
     @Override
-    public String getWarning() {
-        return warning;
+    public String getAdditionalInformations() {
+        return infos;
     }
 }

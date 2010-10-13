@@ -108,16 +108,18 @@ public class BoxPlot extends Plot {
         engine.eval("boxplot(main = 'Boxplot', " + data + ", names = names, horizontal = TRUE)");
         engine.eval("mtext('CPU Time (s)', side=1,line=3, cex=1.2)");
         if (warnings.size() > 0) {
-            warning = "<html>Some solvers got the penalty of " + expController.getActiveExperiment().getCPUTimeLimit() + "s for not solving some instances:<br>";
+            warning = htmlHeader +
+                    "<h2>Warning</h2>";
+            warning += "Some solvers got the penalty of " + expController.getActiveExperiment().getCPUTimeLimit() + "s for not solving some instances:<br>";
             for (String w : warnings) {
                 warning += w + "<br>";
             }
-            warning += "</html>";
+            warning += htmlFooter;
         }
     }
 
     @Override
-    public String getWarning() {
+    public String getAdditionalInformations() {
         return warning;
     }
 }

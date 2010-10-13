@@ -26,7 +26,7 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
     private static JComboBox combo1, combo2, comboSolver, comboRun;
     private static ScaleSelector scaleSelector;
     private static InstanceSelector instanceSelector;
-    private String warning, plotTitle;
+    private String infos, plotTitle;
     private SolverConfiguration solverConfig;
     private ArrayList<Instance> instances;
     private SolverProperty xprop, yprop;
@@ -128,7 +128,7 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
         }
 
         initializeResults();
-        warning = null;
+        infos = null;
         double ymax = 0.;
         double xmax = 0.;
         plotTitle = solverConfig.getName() + ": " + xprop + " vs. " + yprop + " (" + expController.getActiveExperiment().getName() + ")";
@@ -288,6 +288,21 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
         re.eval("mtext('" + title + "', side=3, line=4, cex=1.7)");
         re.eval("par(new=1)");
 
+        double[] spearman = Statistics.spearmanCorrelation(re, "xs", "ys");
+        infos = htmlHeader;
+        if (spearman != null) {
+            infos += "<h2>Spearman Rank correlation coefficient</h2>"
+                    + "Correlation Coefficient: " + spearman[1] + "<br>"
+                    + "p-value: " + spearman[0] + "<br>";
+        } else {
+        }
+        double[] pearson = Statistics.pearsonCorrelation(re, "xs", "ys");
+        if (pearson != null) {
+            infos += "<h2>Pearson product-moment correlation coefficient</h2>"
+                    + "Correlation Coefficient: " + pearson[1] + "<br>"
+                    + "p-value: " + pearson[0] + "<br>";
+        } else {
+        }
         ArrayList<double[]> points = getPoints(re, xs, ys);
         int k = 0;
         for (double[] point : points) {
@@ -304,5 +319,10 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
 
     public static String getTitle() {
         return "Scatter plot - Two result properties of a solver";
+    }
+
+    @Override
+    public String getAdditionalInformations() {
+        return infos;
     }
 }

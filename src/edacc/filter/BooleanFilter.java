@@ -18,6 +18,7 @@ public class BooleanFilter extends javax.swing.JPanel implements FilterInterface
     public BooleanFilter(String name) {
         initComponents();
         btnGroup = new ButtonGroup();
+        lblName.setText(name);
         btnGroup.add(radioTrue);
         btnGroup.add(radioFalse);
         radioTrue.setSelected(true);
@@ -34,7 +35,7 @@ public class BooleanFilter extends javax.swing.JPanel implements FilterInterface
 
         radioTrue = new javax.swing.JRadioButton();
         radioFalse = new javax.swing.JRadioButton();
-        chkActivate = new javax.swing.JCheckBox();
+        lblName = new javax.swing.JLabel();
 
         setName("Form"); // NOI18N
 
@@ -45,43 +46,39 @@ public class BooleanFilter extends javax.swing.JPanel implements FilterInterface
         radioFalse.setText(resourceMap.getString("radioFalse.text")); // NOI18N
         radioFalse.setName("radioFalse"); // NOI18N
 
-        chkActivate.setText(resourceMap.getString("chkActivate.text")); // NOI18N
-        chkActivate.setName("chkActivate"); // NOI18N
+        lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
+        lblName.setName("lblName"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addComponent(lblName)
+                .addGap(66, 66, 66)
                 .addComponent(radioTrue)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(radioFalse)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 409, Short.MAX_VALUE)
-                .addComponent(chkActivate))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(radioFalse))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(chkActivate)
+                .addComponent(radioFalse)
                 .addComponent(radioTrue)
-                .addComponent(radioFalse))
+                .addComponent(lblName))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox chkActivate;
+    private javax.swing.JLabel lblName;
     private javax.swing.JRadioButton radioFalse;
     private javax.swing.JRadioButton radioTrue;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public boolean include(Object value) {
-        if (!chkActivate.isSelected()) {
-            return true;
-        }
         if (value instanceof Boolean) {
-
             return radioTrue.isSelected() && (Boolean) value || radioFalse.isSelected() && (Boolean) value;
         }
         return true;
@@ -90,10 +87,4 @@ public class BooleanFilter extends javax.swing.JPanel implements FilterInterface
     public static boolean accept(Class<?> clazz) {
         return clazz == Boolean.class;
     }
-
-    @Override
-    public boolean hasFiltersApplied() {
-        return chkActivate.isSelected();
-    }
-
 }

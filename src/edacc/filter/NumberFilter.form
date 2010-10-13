@@ -19,51 +19,49 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="1" attributes="0">
-              <Component id="txtLower" min="-2" pref="58" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+          <Group type="102" alignment="0" attributes="0">
               <Component id="lblName" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="txtUpper" min="-2" pref="60" max="-2" attributes="0"/>
-              <EmptySpace pref="242" max="32767" attributes="0"/>
-              <Component id="chkActivate" min="-2" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="comboOperator" min="-2" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="txtValue" min="-2" pref="58" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="103" groupAlignment="3" attributes="0">
-              <Component id="chkActivate" alignment="3" min="-2" max="-2" attributes="0"/>
-              <Component id="txtLower" alignment="3" min="-2" max="-2" attributes="0"/>
               <Component id="lblName" alignment="3" min="-2" max="-2" attributes="0"/>
-              <Component id="txtUpper" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="comboOperator" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="txtValue" alignment="3" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JCheckBox" name="chkActivate">
+    <Component class="javax.swing.JTextField" name="txtValue">
       <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="chkActivate.text"/>
-        <Property name="name" type="java.lang.String" value="chkActivate" noResource="true"/>
+        <Property name="text" type="java.lang.String" resourceKey="txtValue.text"/>
+        <Property name="name" type="java.lang.String" value="txtValue" noResource="true"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="txtLower">
+    <Component class="javax.swing.JComboBox" name="comboOperator">
       <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="txtLower.text"/>
-        <Property name="name" type="java.lang.String" value="txtLower" noResource="true"/>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="4">
+            <StringItem index="0" value="Item 1"/>
+            <StringItem index="1" value="Item 2"/>
+            <StringItem index="2" value="Item 3"/>
+            <StringItem index="3" value="Item 4"/>
+          </StringArray>
+        </Property>
+        <Property name="name" type="java.lang.String" value="comboOperator" noResource="true"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblName">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="lblName.text"/>
         <Property name="name" type="java.lang.String" value="lblName" noResource="true"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="txtUpper">
-      <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="txtUpper.text"/>
-        <Property name="name" type="java.lang.String" value="txtUpper" noResource="true"/>
       </Properties>
     </Component>
   </SubComponents>

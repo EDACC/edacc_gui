@@ -1,20 +1,23 @@
 package edacc.experiment.plots;
 
+import edacc.EDACCApp;
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.ExperimentResultHasSolverProperty;
-import edacc.model.ExperimentResultHasSolverPropertyDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasInstanceProperty;
-import edacc.model.InstanceHasInstancePropertyDAO;
 import edacc.model.InstanceProperty;
 import edacc.model.SolverProperty;
 import edacc.model.SolverPropertyDAO;
 import edacc.satinstances.ConvertException;
 import edacc.satinstances.InstancePropertyManager;
 import edacc.satinstances.PropertyValueType;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +32,12 @@ import org.rosuda.JRI.Rengine;
  */
 public abstract class Plot {
 
+    public String htmlHeader = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\">\n"
+            + "<html>\n"
+            + "<head>\n"
+            + "<style type=\"text/css\">\n";
+    public final String htmlFooter = "</body>\n"
+            + "</html>";
     public static final String[] colors = {"red", "green", "blue", "darkgoldenrod1", "darkolivegreen", "darkorchid", "deeppink", "darkgreen", "blue4"};
     public static int ALLRUNS = -3;
     public static int AVERAGE = -2;
@@ -40,6 +49,19 @@ public abstract class Plot {
     private HashMap<Integer, Instance> instanceMap;
 
     protected Plot(ExperimentController expController) {
+        try {
+            InputStream is = this.getClass().getResourceAsStream("/edacc/experiment/resources/stylesheet.css");
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            String line;
+            while ((line = br.readLine()) != null) {
+                htmlHeader += line + '\n';
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        htmlHeader += htmlHeader + "</style>\n"
+                + "</head>\n"
+                + "<body>";
         this.expController = expController;
     }
 
@@ -110,32 +132,39 @@ public abstract class Plot {
     public ExperimentResult getResult(int solverConfigId, int instanceId, int run) {
         ExperimentResult res = resultMap.get(new ResultIdentifier(solverConfigId, instanceId, run));
         // if the result is not in our map or it is not a verified result then return null
-        if (res == null || !String.valueOf(res.getResultCode().getValue()).startsWith("1")) {
+        // TODO: überdenken
+        // if (res == null || !String.valueOf(res.getResultCode().getValue()).startsWith("1")) {
+        //     return null;
+        // }
+        return res;
+    }
+
+    private Double transformPropertyValueTypeToDouble(PropertyValueType type, String value) {
+        Double res = null;
+        try {
+            if (type.getJavaType() == Integer.class) {
+                res = new Double((Integer) type.getJavaTypeRepresentation(value));
+            } else if (type.getJavaType() == Float.class) {
+                res = new Double((Float) type.getJavaTypeRepresentation(value));
+            } else if (type.getJavaType() == Double.class) {
+                res = (Double) type.getJavaTypeRepresentation(value);
+            }
+        } catch (ConvertException ex) {
             return null;
         }
         return res;
     }
 
-    private Double transformPropertyValueTypeToDouble(PropertyValueType type, String value) {
-            Double res = null;
-            try {
-                if (type.getJavaType() == Integer.class) {
-                    res = new Double((Integer) type.getJavaTypeRepresentation(value));
-                } else if (type.getJavaType() == Float.class) {
-                    res = new Double((Float) type.getJavaTypeRepresentation(value));
-                } else if (type.getJavaType() == Double.class) {
-                    res = (Double) type.getJavaTypeRepresentation(value);
-                }
-            } catch (ConvertException ex) {
-                return null;
-            }
-            return res;
-    }
-
     public Double getValue(ExperimentResult result, SolverProperty property) {
         if (property == PROP_CPUTIME) {
+            if (!String.valueOf(result.getResultCode().getValue()).startsWith("1")) {
+                return new Double(expController.getActiveExperiment().getCPUTimeLimit());
+            }
             return Double.valueOf(result.getResultTime());
         } else {
+            if (!String.valueOf(result.getResultCode().getValue()).startsWith("1")) {
+                return null;
+            }
             ExperimentResultHasSolverProperty erhsp = result.getPropertyValues().get(property.getId());
             if (erhsp == null || erhsp.getValue().isEmpty()) {
                 return null;
@@ -266,7 +295,7 @@ public abstract class Plot {
      * Some warnings while generating the plot.
      * @return null for no warning, any String otherwise
      */
-    public String getWarning() {
+    public String getAdditionalInformations() {
         return null;
     }
 }

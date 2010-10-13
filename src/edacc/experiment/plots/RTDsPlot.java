@@ -6,7 +6,7 @@ import edacc.model.ExperimentResult;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
-import java.sql.SQLException;
+import edacc.model.SolverProperty;
 import java.util.ArrayList;
 import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
@@ -18,9 +18,11 @@ import org.rosuda.JRI.Rengine;
 public class RTDsPlot extends Plot {
 
     private static SolverConfigurationSelector solverSelector;
-    private static JComboBox comboInstance;
+    private static JComboBox comboInstance, comboProperty;
     private ArrayList<SolverConfiguration> scs;
     private Instance instance;
+    private SolverProperty property;
+    private String title;
 
     public RTDsPlot(ExperimentController expController) {
         super(expController);
@@ -30,11 +32,15 @@ public class RTDsPlot extends Plot {
         if (solverSelector == null) {
             solverSelector = new SolverConfigurationSelector();
         }
+        if (comboProperty == null) {
+            comboProperty = new JComboBox();
+        }
         if (comboInstance == null) {
             comboInstance = new JComboBox();
         }
         return new Dependency[]{
                     new Dependency("Solvers", solverSelector),
+                    new Dependency("Property", comboProperty),
                     new Dependency("Instance", comboInstance)
                 };
     }
@@ -45,12 +51,15 @@ public class RTDsPlot extends Plot {
         for (Instance i : InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId())) {
             comboInstance.addItem(i);
         }
+        for (SolverProperty p : getSolverProperties()) {
+            comboProperty.addItem(p);
+        }
     }
 
     @Override
     public void plot(Rengine engine, ArrayList<PointInformation> pointInformations) throws Exception {
 
-        if (scs == null || instance == null) {
+        if (scs == null || instance == null || property == null) {
             if (solverSelector.getSelectedSolverConfigurations().isEmpty()) {
                 throw new DependencyException("You have to select solvers in order to plot.");
             }
@@ -58,11 +67,15 @@ public class RTDsPlot extends Plot {
             if (!(comboInstance.getSelectedItem() instanceof Instance)) {
                 throw new DependencyException("You have to select an instance.");
             }
-
+            if (!(comboProperty.getSelectedItem() instanceof SolverProperty)) {
+                throw new DependencyException("You have to select a property.");
+            }
             scs = solverSelector.getSelectedSolverConfigurations();
             instance = (Instance) comboInstance.getSelectedItem();
+            property = (SolverProperty) comboProperty.getSelectedItem();
         }
         initializeResults();
+        title = "Property distribution on " + instance + " (" + expController.getActiveExperiment().getName() + ")";
         double max_x = 0.;
 
         ArrayList<double[]> results = new ArrayList<double[]>();
@@ -71,14 +84,23 @@ public class RTDsPlot extends Plot {
         int k = 0;
         for (SolverConfiguration sc : scs) {
             ArrayList<ExperimentResult> res = getResults(sc.getId(), instance.getId());
-            double[] tmp = new double[res.size()];
+            ArrayList<Double> tmp = new ArrayList<Double>();
             for (int i = 0; i < res.size(); i++) {
-                tmp[i] = res.get(i).getResultTime();
-                if (tmp[i] > max_x) {
-                    max_x = tmp[i];
+                Double value = getValue(res.get(i), property);
+                if (value == null) {
+                    // TODO: warning!
+                    continue;
+                }
+                tmp.add(value);
+                if (value > max_x) {
+                    max_x = value;
                 }
             }
-            results.add(tmp);
+            double[] tmpArray = new double[tmp.size()];
+            for (int i = 0; i < tmpArray.length; i++) {
+                tmpArray[i] = tmp.get(i);
+            }
+            results.add(tmpArray);
             legendNames[k] = sc.getName();
             legendColors[k] = colors[k % colors.length];
             k++;
@@ -98,7 +120,7 @@ public class RTDsPlot extends Plot {
             engine.eval("par(new=1)");
         }
         // plot labels and axes
-        engine.eval("mtext('CPU Time (s)', side=1, line=3, cex=1.2)");                      // bottom axis label
+        engine.eval("mtext('"+property.getName()+"', side=1, line=3, cex=1.2)");                      // bottom axis label
         engine.eval("mtext('P(solve within x seconds)', side=2, padj=0, line=3, cex=1.2)"); // left axis label
         engine.eval("mtext('Runtime Distributions', padj=1, side=3, line=3, cex=1.7)");     // plot title
 
@@ -113,10 +135,10 @@ public class RTDsPlot extends Plot {
 
     @Override
     public String getPlotTitle() {
-        return "RTDs (" + expController.getActiveExperiment().getName() + ")";
+        return title;
     }
 
     public static String getTitle() {
-        return "Plot of the runtime distributions of solvers on an instance";
+        return "Property distributions of solvers on an instance";
     }
 }

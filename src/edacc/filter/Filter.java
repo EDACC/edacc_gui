@@ -1,16 +1,21 @@
 /*
- * EDACCFilter.java
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/*
+ * Filter2.java
  *
- * Created on 12.10.2010, 00:44:27
+ * Created on 13.10.2010, 11:29:39
  */
 package edacc.filter;
 
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowFilter.Entry;
@@ -27,7 +32,10 @@ public class Filter extends javax.swing.JDialog {
     private JTable table;
     private TableRowSorter<? extends TableModel> rowSorter;
     private RowFilter<Object, Object> rowFilter;
-    private HashMap<Integer, FilterInterface> colFilter;
+    private HashMap<Integer, FilterType> colFilter;
+    private GridBagLayout argumentLayout;
+    private GridBagConstraints gridBagConstraints;
+    private Parser parser;
 
     /** Creates new form EDACCFilter */
     public Filter(java.awt.Frame parent, boolean modal, JTable table) {
@@ -46,94 +54,67 @@ public class Filter extends javax.swing.JDialog {
             }
         };
         rowSorter.setRowFilter(rowFilter);
-        colFilter = new HashMap<Integer, FilterInterface>();
+        colFilter = new HashMap<Integer, FilterType>();
+        argumentLayout = new GridBagLayout();
+        pnlArguments.setLayout(argumentLayout);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.weightx = 1000;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        //gridBagConstraints.ipadx = 6;
+        //gridBagConstraints.ipady = 6;
+        gridBagConstraints.insets = new Insets(6, 6, 6, 6);
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        parser = new Parser();
     }
 
     public boolean include(Entry<? extends Object, ? extends Object> entry) {
-        for (int i = 0; i < table.getModel().getColumnCount(); i++) {
-            if (colFilter.containsKey(i)) {
-                if (!colFilter.get(i).include(table.getModel().getValueAt((Integer) entry.getIdentifier(), i))) {
-                    return false;
-                }
+        HashMap<Integer, Boolean> arguments = new HashMap<Integer, Boolean>();
+        for (int i = 0; i < pnlArguments.getComponentCount(); i++) {
+            if (pnlArguments.getComponent(i) instanceof ArgumentPanel) {
+                ArgumentPanel panel = (ArgumentPanel) pnlArguments.getComponent(i);
+                FilterInterface filter = panel.getFilterInterface();
+                arguments.put(panel.getArgNum(), filter.include(table.getModel().getValueAt((Integer) entry.getIdentifier(), panel.getColumn())));
             }
         }
-        return true;
+
+        try {
+            return parser.eval(txtExpression.getText(), arguments);
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     public void clearFilters() {
     }
 
     public boolean hasFiltersApplied() {
-        boolean res = false;
-        for (FilterInterface filter : colFilter.values()) {
-            res |= filter.hasFiltersApplied();
+        try {
+            return parser != null && !parser.eval(txtExpression.getText(), new HashMap<Integer, Boolean>());
+        } catch (Exception ex) {
+            return true;
         }
-        return res;
     }
 
-    protected void updateLayout() {
-        GridBagConstraints c = new GridBagConstraints();
-        pnlFilter.removeAll();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.anchor = GridBagConstraints.WEST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.ipadx = 2;
-        c.ipady = 2;
+    protected void updateFilterTypes() {
         for (int i = 0; i < table.getModel().getColumnCount(); i++) {
-            //int k = table.convertColumnIndexToModel(i);
-             c.gridx = 0;
             if (colFilter.containsKey(i)) {
-                c.weightx = .1;
-                pnlFilter.add(new JLabel(table.getModel().getColumnName(i) + ": "), c);
-                c.gridx = 1;
-                c.weightx = 1000;
-                pnlFilter.add((JPanel) colFilter.get(i), c);
-                c.gridy++;
                 continue;
-            }
-           
-            if (BooleanFilter.accept(table.getModel().getColumnClass(i))) {
-                c.weightx = .1;
-                pnlFilter.add(new JLabel(table.getModel().getColumnName(i) + ": "), c);
-                c.gridx = 1;
-                c.weightx = 1000;
-                BooleanFilter filter = new BooleanFilter(table.getModel().getColumnName(i));
-                pnlFilter.add(filter, c);
-                c.gridy++;
-                colFilter.put(i, filter);
-            }
-
-            if (NumberFilter.accept(table.getModel().getColumnClass(i))) {
-                c.weightx = .1;
-                pnlFilter.add(new JLabel(table.getModel().getColumnName(i) + ": "), c);
-                c.gridx = 1;
-                c.weightx = 1000;
-                NumberFilter filter = new NumberFilter(table.getModel().getColumnName(i));
-                pnlFilter.add(filter, c);
-                c.gridy++;
-                colFilter.put(i, filter);
-            }
-
-
-            if (StringFilter.accept(table.getModel().getColumnClass(i))) {
-                c.weightx = .1;
-                pnlFilter.add(new JLabel(table.getModel().getColumnName(i) + ": "), c);
-                c.gridx = 1;
-                c.weightx = 1000;
-                StringFilter filter = new StringFilter(table.getModel().getColumnName(i));
-                pnlFilter.add(filter, c);
-                c.gridy++;
-                colFilter.put(i, filter);
+            } else {
+                colFilter.put(i, new FilterType(i, table.getModel().getColumnName(i), table.getModel().getColumnClass(i)));
             }
         }
+        comboFilterTypes.removeAllItems();
+        for (FilterType f : colFilter.values()) {
+            comboFilterTypes.addItem(f);
+        }
+
         this.pack();
     }
 
     @Override
     public void setVisible(boolean visible) {
         if (visible) {
-            updateLayout();
+            updateFilterTypes();
         }
         super.setVisible(visible);
     }
@@ -147,49 +128,215 @@ public class Filter extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        pnlFilter = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        pnlArguments = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        btnAdd = new javax.swing.JButton();
+        comboFilterTypes = new javax.swing.JComboBox();
+        jPanel2 = new javax.swing.JPanel();
+        txtExpression = new javax.swing.JTextField();
         btnApply = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setName("Form"); // NOI18N
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(Filter.class);
-        pnlFilter.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("pnlFilter.border.title"))); // NOI18N
-        pnlFilter.setName("pnlFilter"); // NOI18N
-        pnlFilter.setLayout(new java.awt.GridBagLayout());
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel1.border.title"))); // NOI18N
+        jPanel1.setName("jPanel1"); // NOI18N
+
+        jScrollPane1.setName("jScrollPane1"); // NOI18N
+
+        pnlArguments.setName("pnlArguments"); // NOI18N
+        pnlArguments.setLayout(new java.awt.GridBagLayout());
+        jScrollPane1.setViewportView(pnlArguments);
+
+        jPanel4.setName("jPanel4"); // NOI18N
 
         javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(Filter.class, this);
+        btnAdd.setAction(actionMap.get("btnAdd")); // NOI18N
+        btnAdd.setText(resourceMap.getString("btnAdd.text")); // NOI18N
+        btnAdd.setName("btnAdd"); // NOI18N
+
+        comboFilterTypes.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboFilterTypes.setName("comboFilterTypes"); // NOI18N
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(comboFilterTypes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnAdd)
+                .addContainerGap(402, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(comboFilterTypes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAdd))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 515, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 181, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel2.border.title"))); // NOI18N
+        jPanel2.setName("jPanel2"); // NOI18N
+
+        txtExpression.setText(resourceMap.getString("txtExpression.text")); // NOI18N
+        txtExpression.setName("txtExpression"); // NOI18N
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(txtExpression, javax.swing.GroupLayout.DEFAULT_SIZE, 515, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(txtExpression, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+
         btnApply.setAction(actionMap.get("btnApply")); // NOI18N
         btnApply.setText(resourceMap.getString("btnApply.text")); // NOI18N
         btnApply.setName("btnApply"); // NOI18N
+
+        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
+        jLabel1.setName("jLabel1"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(331, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 207, Short.MAX_VALUE)
                 .addComponent(btnApply)
                 .addContainerGap())
+            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(pnlFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnApply)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnApply)
+                    .addComponent(jLabel1))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAdd;
+    private javax.swing.JButton btnApply;
+    private javax.swing.JComboBox comboFilterTypes;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel pnlArguments;
+    private javax.swing.JTextField txtExpression;
+    // End of variables declaration//GEN-END:variables
+
+    class FilterType {
+
+        int column;
+        String name;
+        Class<?> clazz;
+
+        public FilterType(int column, String name, Class<?> clazz) {
+            this.column = column;
+            this.name = name;
+            this.clazz = clazz;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    @Action
+    public void btnAdd() {
+        int argNum = 0;
+        for (int i = 0; i < pnlArguments.getComponentCount(); i++) {
+            if (pnlArguments.getComponent(i) instanceof ArgumentPanel) {
+                int tmp = ((ArgumentPanel) pnlArguments.getComponent(i)).getArgNum();
+                if (argNum < tmp) {
+                    argNum = tmp;
+                }
+            }
+        }
+        argNum++;
+        if (comboFilterTypes.getSelectedItem() instanceof FilterType) {
+            FilterType filterType = (FilterType) comboFilterTypes.getSelectedItem();
+            if (filterType.clazz == Integer.class || filterType.clazz == Float.class || filterType.clazz == Double.class) {
+                pnlArguments.add(new ArgumentPanel(this, new NumberFilter(filterType.name), argNum, filterType.column));
+            } else if (filterType.clazz == String.class) {
+                pnlArguments.add(new ArgumentPanel(this, new StringFilter(filterType.name), argNum, filterType.column));
+            } else if (filterType.clazz == Boolean.class) {
+                pnlArguments.add(new ArgumentPanel(this, new BooleanFilter(filterType.name), argNum, filterType.column));
+            }
+            try {
+                if (parser.eval(txtExpression.getText(), new HashMap<Integer, Boolean>())) {
+                    // expression is valid and will always evaluate to true (no arguments needed)
+                    txtExpression.setText("$" + argNum);
+                }
+            } catch (Exception ex) {
+                try {
+                    parser.eval(txtExpression.getText(), new HashMap<Integer, Boolean>(), true);
+                    // expression is valid but arguments are needed
+                    txtExpression.setText(txtExpression.getText() + " && $" + argNum);
+                } catch (Exception ex1) {
+                }
+
+            }
+            setGridBagConstraints();
+        }
+    }
+
+    private void setGridBagConstraints() {
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weighty = 1;
+        for (int i = 0; i < pnlArguments.getComponentCount(); i++) {
+            gridBagConstraints.gridy++;
+            gridBagConstraints.weighty *= 1000;
+            argumentLayout.setConstraints(pnlArguments.getComponent(i), gridBagConstraints);
+        }
+        pnlArguments.repaint();
+        pnlArguments.revalidate();
+    }
 
     @Action
     public void btnApply() {
-        this.setVisible(false);
+        setVisible(false);
     }
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnApply;
-    private javax.swing.JPanel pnlFilter;
-    // End of variables declaration//GEN-END:variables
+
+    public void remove(ArgumentPanel pnl) {
+        pnlArguments.remove(pnl);
+        setGridBagConstraints();
+    }
 }

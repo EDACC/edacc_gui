@@ -23,7 +23,15 @@ public class AnalysisController {
     }
     
     public static Rengine getREngine(PlotPanel plotPanel) throws REngineInitializationException {
+        getRengine();
+        lastPlotPanel = plotPanel;
+        re.eval("JavaGD()");
+        plotPanel.setDeviceNumber(getCurrentDeviceNumber());
+        plotPanels.put(plotPanel.getDeviceNumber(), plotPanel);
+        return re;
+    }
 
+    public static Rengine getRengine() throws REngineInitializationException {
         try {
             if (re == null || !re.isAlive()) {
                 if (!Rengine.versionCheck()) {
@@ -40,18 +48,10 @@ public class AnalysisController {
                     throw new REngineInitializationException("Did not find JavaGD.");
                 }
                 re.eval("Sys.putenv('JAVAGD_CLASS_NAME'='edacc/model/RPlotDevice')");
-            }            
+            }
         } catch (Exception ex) {
             throw new REngineInitializationException(ex.getMessage());
         }
-        lastPlotPanel = plotPanel;
-        re.eval("JavaGD()");
-        plotPanel.setDeviceNumber(getCurrentDeviceNumber());
-        plotPanels.put(plotPanel.getDeviceNumber(), plotPanel);
-        return re;
-    }
-
-    public static Rengine getRengine() {
         return re;
     }
 

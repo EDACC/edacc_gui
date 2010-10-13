@@ -22,7 +22,7 @@ public class JobsFilter extends Filter {
     }
 
     @Override
-    protected void updateLayout() {
+    protected void updateFilterTypes() {
         // make all columns visible, this will let the filter recognize every column
         boolean[] old = model.getColumnVisibility();
         if (visibility.length != old.length) {
@@ -32,7 +32,7 @@ public class JobsFilter extends Filter {
             }
         }
         model.setColumnVisibility(visibility, false);
-        super.updateLayout();
+        super.updateFilterTypes();
         // revert
         model.setColumnVisibility(old, false);
     }
