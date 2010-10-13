@@ -9,9 +9,9 @@ package edacc.model;
  * This exception is thrown if the requested SolverProperty object does not exist in the database
  * @author rretz
  */
-public class SolverPropertyNotInDBException extends Exception{
+public class PropertyNotInDBException extends Exception{
 
-    public SolverPropertyNotInDBException() {
+    public PropertyNotInDBException() {
         super("Requested SolverProperty object does not exist in the database!");
     }
 

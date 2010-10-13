@@ -15,7 +15,7 @@ public class ExperimentResultHasSolverProperty extends BaseModel implements Inte
 
     private int id;
     private ExperimentResult expResult;
-    private SolverProperty solvProperty;
+    private Property solvProperty;
     private Vector<String> value;
 
     public ExperimentResult getExpResult() {
@@ -28,11 +28,11 @@ public class ExperimentResultHasSolverProperty extends BaseModel implements Inte
             this.setModified();
     }
 
-    public SolverProperty getSolvProperty() {
+    public Property getSolvProperty() {
         return solvProperty;
     }
 
-    public void setSolvProperty(SolverProperty solvProperty) {
+    public void setSolvProperty(Property solvProperty) {
         this.solvProperty = solvProperty;
         if (this.isSaved())
             this.setModified();

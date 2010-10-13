@@ -11,7 +11,7 @@
 
 package edacc;
 
-import edacc.model.SolverProperty;
+import edacc.model.Property;
 import edacc.properties.ComputeResultPropertiesController;
 import edacc.properties.ResultPropertySelectionTableModel;
 import java.awt.Component;
@@ -154,7 +154,7 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog {
     }//GEN-LAST:event_buttonCancelActionPerformed
 
     private void buttonComputeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonComputeActionPerformed
-        Vector<SolverProperty> toCalculate = tableModel.getAllChoosen();
+        Vector<Property> toCalculate = tableModel.getAllChoosen();
         if(toCalculate.isEmpty()){
             JOptionPane.showMessageDialog(this,
                 "No result property selected.",

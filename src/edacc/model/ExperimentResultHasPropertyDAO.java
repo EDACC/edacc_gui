@@ -17,7 +17,7 @@ import java.util.Vector;
  * Implements the data access object of the ExperimentResultHasSolverProperty class
  * @author rretz
  */
-public class ExperimentResultHasSolverPropertyDAO {
+public class ExperimentResultHasPropertyDAO {
 
     protected static final String table = "ExperimentResult_has_SolverProperty";
     protected static final String valueTable = "SolverPropertyValue";
@@ -31,12 +31,12 @@ public class ExperimentResultHasSolverPropertyDAO {
     /**
      * Creates a new  ExperimentResultHasSolverProperty object, saves it into the database and cache, and returns it.
      * @param expResult related ExperimentResult object
-     * @param solvProperty related SolverProperty object
+     * @param solvProperty related Property object
      * @return new ExperimentResultHasSolverProperty which is also deposited in the database.
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    public static ExperimentResultHasSolverProperty createExperimentResultHasResultPropertyDAO(ExperimentResult expResult, SolverProperty solvProperty)
+    public static ExperimentResultHasSolverProperty createExperimentResultHasResultPropertyDAO(ExperimentResult expResult, Property solvProperty)
             throws NoConnectionToDBException, SQLException {
         ExperimentResultHasSolverProperty e = new ExperimentResultHasSolverProperty();
         e.setExpResult(expResult);
@@ -122,10 +122,10 @@ public class ExperimentResultHasSolverPropertyDAO {
      * @throws SQLException
      * @throws ExpResultHassolvPropertyNotInDBException
      * @throws ExperimentResultNotInDBException
-     * @throws SolverPropertyNotInDBException
+     * @throws PropertyNotInDBException
      */
     public static Vector<ExperimentResultHasSolverProperty> getAllByExperimentResult(ExperimentResult expResult)
-            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
+            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
         Vector<ExperimentResultHasSolverProperty> res = new Vector<ExperimentResultHasSolverProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idER_h_RP "
@@ -142,17 +142,17 @@ public class ExperimentResultHasSolverPropertyDAO {
     }
 
     /**
-     * Returns and caches (if necessary) all ExperimentResultHasSolverProperty related to the given SolverProperty object
-     * @param solvProperty SolverProperty object to search for
+     * Returns and caches (if necessary) all ExperimentResultHasSolverProperty related to the given Property object
+     * @param solvProperty Property object to search for
      * @return Vector of all ExperimentResultHasSolverProperty related to the given Result Property object
      * @throws NoConnectionToDBException
      * @throws SQLException
      * @throws ExpResultHassolvPropertyNotInDBException
      * @throws ExperimentResultNotInDBException
-     * @throws SolverPropertyNotInDBException
+     * @throws PropertyNotInDBException
      */
-    public static Vector<ExperimentResultHasSolverProperty> getAllByResultProperty(SolverProperty solvProperty)
-            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
+    public static Vector<ExperimentResultHasSolverProperty> getAllByResultProperty(Property solvProperty)
+            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
         Vector<ExperimentResultHasSolverProperty> res = new Vector<ExperimentResultHasSolverProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idER_h_RP "
@@ -168,7 +168,7 @@ public class ExperimentResultHasSolverPropertyDAO {
         return res;
     }
 
-    public static ExperimentResultHasSolverProperty getByExperimentResultAndResultProperty(ExperimentResult expResult, SolverProperty property) throws SQLException, NoConnectionToDBException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
+    public static ExperimentResultHasSolverProperty getByExperimentResultAndResultProperty(ExperimentResult expResult, Property property) throws SQLException, NoConnectionToDBException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
         ExperimentResultHasSolverProperty res = null;
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idER_h_SP "
@@ -192,14 +192,14 @@ public class ExperimentResultHasSolverPropertyDAO {
      * @throws SQLException
      * @throws Exception
      */
-    public static void assign(ArrayList<ExperimentResult> expResults, int experimentId) throws SQLException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
+    public static void assign(ArrayList<ExperimentResult> expResults, int experimentId) throws SQLException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
         HashMap<Integer, ExperimentResult> experimentResults = new HashMap<Integer, ExperimentResult>();
         for (ExperimentResult er : expResults) {
             er.setPropertyValues(new HashMap<Integer, ExperimentResultHasSolverProperty>());
             experimentResults.put(er.getId(), er);
         }
-        HashMap<Integer, SolverProperty> solverProperties = new HashMap<Integer, SolverProperty>();
-        for (SolverProperty sp : SolverPropertyDAO.getAll()) {
+        HashMap<Integer, Property> solverProperties = new HashMap<Integer, Property>();
+        for (Property sp : PropertyDAO.getAll()) {
             solverProperties.put(sp.getId(), sp);
         }
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
@@ -241,10 +241,10 @@ public class ExperimentResultHasSolverPropertyDAO {
      * @throws SQLException
      * @throws ExpResultHassolvPropertyNotInDBException
      * @throws ExperimentResultNotInDBException
-     * @throws SolverPropertyNotInDBException
+     * @throws PropertyNotInDBException
      */
     public static ExperimentResultHasSolverProperty getById(int id)
-            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
+            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
         ExperimentResultHasSolverProperty res = cache.getCached(id);
         if (res != null) {
             return res;
@@ -260,7 +260,7 @@ public class ExperimentResultHasSolverPropertyDAO {
             res = new ExperimentResultHasSolverProperty();
             res.setId(id);
             res.setExpResult(ExperimentResultDAO.getById(rs.getInt(1)));
-            res.setSolvProperty(SolverPropertyDAO.getById(rs.getInt(2)));
+            res.setSolvProperty(PropertyDAO.getById(rs.getInt(2)));
 
             // Get the values for the value Vector of the ExperimentResultHasSolverProperty object from the SolverPropertyValue table from the database
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(
@@ -279,5 +279,9 @@ public class ExperimentResultHasSolverPropertyDAO {
             cache.cache(res);
             return res;
         }
+    }
+
+    static void removeAllOfProperty(Property r) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

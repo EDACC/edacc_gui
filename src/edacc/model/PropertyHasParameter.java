@@ -9,9 +9,9 @@ package edacc.model;
  *
  * @author rretz
  */
-public class SolverPropertyHasParameter extends BaseModel implements IntegerPKModel{
+public class PropertyHasParameter extends BaseModel implements IntegerPKModel{
     private int id;
-    private SolverProperty solvProperty;
+    private Property property;
     private String parameter;
 
     @Override
@@ -35,12 +35,12 @@ public class SolverPropertyHasParameter extends BaseModel implements IntegerPKMo
             this.setModified();
     }
 
-    public SolverProperty getSolvProperty() {
-        return solvProperty;
+    public Property getProperty() {
+        return property;
     }
 
-    public void setSolvProperty(SolverProperty solvProperty) {
-        this.solvProperty = solvProperty;
+    public void setProperty(Property property) {
+        this.property = property;
         if (this.isSaved())
             this.setModified();
     }

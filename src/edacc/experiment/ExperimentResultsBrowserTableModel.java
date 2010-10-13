@@ -21,8 +21,8 @@ import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
-import edacc.model.SolverProperty;
-import edacc.model.SolverPropertyDAO;
+import edacc.model.Property;
+import edacc.model.PropertyDAO;
 import edacc.properties.FilePropertyParser;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     private String[] CONST_COLUMNS = {"ID", "Compute Queue", "Solver", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
     private boolean[] CONST_VISIBLE = {false, true, true, true, true, true, true, true, true, true, false, false, false, false};
     private String[] columns;
-    private ArrayList<SolverProperty> solverProperties;
+    private ArrayList<Property> solverProperties;
     private ExperimentResultHasSolverProperty[][] propertyValues;
     private boolean[] visible;
     private HashMap<Integer, ArrayList<ParameterInstance>> parameterInstances;
@@ -74,9 +74,9 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     }
 
     public void updateSolverProperties() {
-        solverProperties = new ArrayList<SolverProperty>();
+        solverProperties = new ArrayList<Property>();
         try {
-            solverProperties.addAll(SolverPropertyDAO.getAll());
+            solverProperties.addAll(PropertyDAO.getAll());
         } catch (Exception e) {
         }
         for (int i = solverProperties.size() - 1; i >= 0; i--) {
@@ -464,8 +464,8 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 } else {
                     return null;
                 }
-            /*if (solverProperties.get(property).getSolverPropertyType() == SolverPropertyType.ClientOutput
-            || solverProperties.get(property).getSolverPropertyType() == SolverPropertyType.ResultFile) {
+            /*if (solverProperties.get(property).getPropertySource() == SolverPropertyType.ClientOutput
+            || solverProperties.get(property).getPropertySource() == SolverPropertyType.ResultFile) {
             // calculate property value, very inefficent because it is called too often .. mir egal :-)
             ArrayList<String> result = new ArrayList<String>();
             try {

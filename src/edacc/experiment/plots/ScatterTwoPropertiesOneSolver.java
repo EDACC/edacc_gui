@@ -6,8 +6,8 @@ import edacc.model.ExperimentResult;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
-import edacc.model.SolverProperty;
-import edacc.model.SolverPropertyDAO;
+import edacc.model.Property;
+import edacc.model.PropertyDAO;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -29,7 +29,7 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
     private String warning, plotTitle;
     private SolverConfiguration solverConfig;
     private ArrayList<Instance> instances;
-    private SolverProperty xprop, yprop;
+    private Property xprop, yprop;
     private Integer run;
     private Boolean xlog, ylog;
 
@@ -81,7 +81,7 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
             comboRun.addItem(i);
         }
 
-        for (SolverProperty property : getSolverProperties()) {
+        for (Property property : getSolverProperties()) {
             combo1.addItem(property);
             combo2.addItem(property);
         }
@@ -99,7 +99,7 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
                 throw new DependencyException("You have to select a solver.");
             }
 
-            if (!(combo1.getSelectedItem() instanceof SolverProperty) || !(combo2.getSelectedItem() instanceof SolverProperty)) {
+            if (!(combo1.getSelectedItem() instanceof Property) || !(combo2.getSelectedItem() instanceof Property)) {
                 throw new DependencyException("You have to select two solver properties.");
             }
             run = -4;
@@ -120,8 +120,8 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
                 throw new DependencyException("You have to select instances in order to plot.");
             }
 
-            xprop = (SolverProperty) combo1.getSelectedItem();
-            yprop = (SolverProperty) combo2.getSelectedItem();
+            xprop = (Property) combo1.getSelectedItem();
+            yprop = (Property) combo2.getSelectedItem();
             solverConfig = (SolverConfiguration) comboSolver.getSelectedItem();
             xlog = scaleSelector.isXScaleLog();
             ylog = scaleSelector.isYScaleLog();

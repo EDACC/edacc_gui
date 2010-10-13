@@ -26,7 +26,7 @@ import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
-import edacc.model.SolverPropertyNotInDBException;
+import edacc.model.PropertyNotInDBException;
 import edacc.model.TaskCancelledException;
 import edacc.model.Tasks;
 import edacc.properties.SolverPropertyTypeNotExistException;
@@ -211,7 +211,7 @@ public class ExperimentController {
      * config panel.
      * @throws SQLException
      */
-    public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
+    public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
 
         task.setStatus("Checking jobs..");
         ArrayList<SolverConfiguration> deletedSolverConfigurations = SolverConfigurationDAO.getAllDeleted();
@@ -297,7 +297,7 @@ public class ExperimentController {
      * saves the instances selection of the currently loaded experiment
      * @throws SQLException
      */
-    public void saveExperimentHasInstances(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, SolverPropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
+    public void saveExperimentHasInstances(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
         task.setStatus("Checking jobs..");
         ArrayList<ExperimentHasInstance> deletedInstances = main.insTableModel.getDeletedExperimentHasInstances();
         if (deletedInstances.size() > 0) {
@@ -361,7 +361,7 @@ public class ExperimentController {
      * @return number of jobs added to the experiment results table
      * @throws SQLException
      */
-    public int generateJobs(int numRuns, final Tasks task) throws SQLException, TaskCancelledException, IOException, SolverPropertyTypeNotExistException, SolverPropertyNotInDBException {
+    public int generateJobs(int numRuns, final Tasks task) throws SQLException, TaskCancelledException, IOException, SolverPropertyTypeNotExistException, PropertyNotInDBException {
         PropertyChangeListener cancelExperimentResultDAOStatementListener = new PropertyChangeListener() {
 
             @Override

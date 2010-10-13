@@ -12,14 +12,14 @@
 package edacc;
 
 import edacc.model.NoConnectionToDBException;
-import edacc.model.SolverProperty;
-import edacc.model.SolverPropertyHasParameter;
-import edacc.model.SolverPropertyIsUsedException;
-import edacc.model.SolverPropertyNotInDBException;
+import edacc.model.Property;
+import edacc.model.PropertyHasParameter;
+import edacc.model.PropertyIsUsedException;
+import edacc.model.PropertyNotInDBException;
 import edacc.properties.SolverPropertiesController;
 import edacc.properties.SolverPropertyTableModel;
 import edacc.properties.SolverPropertyTableSelectionListener;
-import edacc.properties.SolverPropertyType;
+import edacc.properties.PropertySource;
 import edacc.properties.SolverPropertyTypeNotExistException;
 import java.awt.Component;
 import java.io.IOException;
@@ -40,7 +40,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     private SolverPropertiesController controller;
     private SolverPropertyTableModel solPropertyTableModel;
-    private SolverPropertyType[] comboBoxSolPropType = {SolverPropertyType.LauncherOutput, SolverPropertyType.Parameter, SolverPropertyType.SolverOutput, SolverPropertyType.VerifierOutput, SolverPropertyType.WatcherOutput};
+    private PropertySource[] comboBoxSolPropType = {PropertySource.LauncherOutput, PropertySource.Parameter, PropertySource.SolverOutput, PropertySource.VerifierOutput, PropertySource.WatcherOutput};
     private EDACCManagePropertyValueTypesDialog PropertyValueTypesDialog;
     private boolean editing = false;
 
@@ -518,7 +518,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SolverPropertyIsUsedException ex) {
+            } catch (PropertyIsUsedException ex) {
                 JOptionPane.showMessageDialog(this,
                 "Cannot delete the solver property, because it's already in use.",
                 "Error",
@@ -543,25 +543,25 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 "You must select a solver property type for the solver property.",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-        }else if(!comboBoxPropertySource.getSelectedItem().equals(SolverPropertyType.Parameter) && comboBoxPropertyValuetype.getSelectedIndex() == -1){
+        }else if(!comboBoxPropertySource.getSelectedItem().equals(PropertySource.Parameter) && comboBoxPropertyValuetype.getSelectedIndex() == -1){
             JOptionPane.showMessageDialog(this,
                 "You must select a  property value type for the solver property.",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-        }else if(comboBoxPropertySource.getSelectedItem().equals(SolverPropertyType.Parameter) && comboBoxParameter.getSelectedIndex() == -1){
+        }else if(comboBoxPropertySource.getSelectedItem().equals(PropertySource.Parameter) && comboBoxParameter.getSelectedIndex() == -1){
             JOptionPane.showMessageDialog(this,
                 "You must select a  parameter for the solver property.",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
         }else{
             try {
-                if(!comboBoxPropertySource.getSelectedItem().equals(SolverPropertyType.Parameter)){
+                if(!comboBoxPropertySource.getSelectedItem().equals(PropertySource.Parameter)){
                      controller.saveSolverProperty(textSolverPropertyFieldName.getText(), textSolvertPropertyFieldPrefix.getText(), textAreaResultPropertyDescription.getText(),
-                    (SolverPropertyType) comboBoxPropertySource.getSelectedItem(), (String) comboBoxPropertyValuetype.getSelectedItem(),
+                    (PropertySource) comboBoxPropertySource.getSelectedItem(), (String) comboBoxPropertyValuetype.getSelectedItem(),
                     checkBoxMultipleOccurrences.isSelected());
                 } else{
                      controller.saveSolverProperty(textSolverPropertyFieldName.getText(), textSolvertPropertyFieldPrefix.getText(), textAreaResultPropertyDescription.getText(),
-                    (SolverPropertyType) comboBoxPropertySource.getSelectedItem(), (String) comboBoxParameter.getSelectedItem());
+                    (PropertySource) comboBoxPropertySource.getSelectedItem(), (String) comboBoxParameter.getSelectedItem());
                 }
 
             } catch (NoConnectionToDBException ex) {
@@ -571,13 +571,13 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                     "A database error occurred. " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
-            } catch (SolverPropertyNotInDBException ex) {
+            } catch (PropertyNotInDBException ex) {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SolverPropertyTypeNotExistException ex) {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SolverPropertyIsUsedException ex) {
+            } catch (PropertyIsUsedException ex) {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -665,14 +665,14 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     }
 
     public void SolverPropertyTypeChanged() {
-        if(!this.comboBoxPropertySource.getSelectedItem().equals(SolverPropertyType.Parameter) &&
+        if(!this.comboBoxPropertySource.getSelectedItem().equals(PropertySource.Parameter) &&
                 this.comboBoxPropertySource.isEnabled() && !editing){
             this.comboBoxPropertyValuetype.setEnabled(true);
             this.buttonPropertyAddValueType.setEnabled(true);
             this.checkBoxMultipleOccurrences.setEnabled(true);
             this.buttonSaveSolverProperty.setEnabled(true);
             this.comboBoxParameter.setEnabled(false);
-        }else if(this.comboBoxPropertySource.getSelectedItem().equals(SolverPropertyType.Parameter) &&
+        }else if(this.comboBoxPropertySource.getSelectedItem().equals(PropertySource.Parameter) &&
                 this.comboBoxPropertySource.isEnabled() && !editing){
            this.comboBoxPropertyValuetype.setEnabled(false);
            this.buttonPropertyAddValueType.setEnabled(false);
@@ -693,7 +693,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SolverPropertyNotInDBException ex) {
+        } catch (PropertyNotInDBException ex) {
             Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SolverPropertyTypeNotExistException ex) {
             Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
@@ -714,28 +714,28 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     }
 
     /**
-     * Fills the input fields with the parameters of the given SolverProperty object and activates the input fields.
-     * @param toShow the SolverProperty object to show.
+     * Fills the input fields with the parameters of the given Property object and activates the input fields.
+     * @param toShow the Property object to show.
      */
-    public void showSolverProperty(SolverProperty toShow){
+    public void showSolverProperty(Property toShow){
         this.editing = true;
         this.textSolverPropertyFieldName.setText(toShow.getName());
-        this.textSolvertPropertyFieldPrefix.setText(toShow.getPrefix());
+        this.textSolvertPropertyFieldPrefix.setText(toShow.getRegularExpression());
         this.textAreaResultPropertyDescription.setText(toShow.getDescription());
-        this.comboBoxPropertySource.setSelectedItem(toShow.getSolverPropertyType());
-        if(!toShow.getSolverPropertyType().equals(SolverPropertyType.Parameter)){
+        this.comboBoxPropertySource.setSelectedItem(toShow.getPropertySource());
+        if(!toShow.getPropertySource().equals(PropertySource.Parameter)){
             this.comboBoxPropertyValuetype.setSelectedItem(toShow.getPropertyValueType());
             this.checkBoxMultipleOccurrences.setSelected(toShow.isMultiple());
         }
         this.enableEditing();
     }
 
-    public void showSolverProperty(SolverProperty toShow, SolverPropertyHasParameter solverPropertyType) {
+    public void showSolverProperty(Property toShow, PropertyHasParameter solverPropertyType) {
         this.editing = true;
         this.textSolverPropertyFieldName.setText(toShow.getName());
-        this.textSolvertPropertyFieldPrefix.setText(toShow.getPrefix());
+        this.textSolvertPropertyFieldPrefix.setText(toShow.getRegularExpression());
         this.textAreaResultPropertyDescription.setText(toShow.getDescription());
-        this.comboBoxPropertySource.setSelectedItem(toShow.getSolverPropertyType());
+        this.comboBoxPropertySource.setSelectedItem(toShow.getPropertySource());
         this.comboBoxParameter.setSelectedItem(solverPropertyType.getParameter());
         this.enableEditing();
     }
