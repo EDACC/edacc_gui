@@ -14,6 +14,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.sql.SQLException;
+
 import javax.swing.border.TitledBorder;
 
 /**
@@ -35,8 +36,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.weightx = 0.5;
-        //gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
-        //gridBagConstraints.weighty = 0.5;
+        gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
 
         this.parent = null;
         layout = new GridBagLayout();
@@ -178,8 +178,10 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
 
     private void setGridBagConstraints() {
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.weighty = 1;
         for (int i = 0; i < this.getComponentCount(); i++) {
             gridBagConstraints.gridy++;
+            gridBagConstraints.weighty *= 1000;
             layout.setConstraints(this.getComponent(i), gridBagConstraints);
         }
     }

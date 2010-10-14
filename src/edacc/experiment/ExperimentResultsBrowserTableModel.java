@@ -62,7 +62,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     private ExperimentResultHasProperty[][] propertyValues;
     private boolean[] visible;
     private HashMap<Integer, ArrayList<ParameterInstance>> parameterInstances;
-    private String[] gridQueues;
+    private HashMap<Integer, GridQueue> gridQueues;
 
     public ExperimentResultsBrowserTableModel() {
         columns = new String[CONST_COLUMNS.length];
@@ -272,16 +272,11 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                         }
                     }
                     parameterInstances = new HashMap<Integer, ArrayList<ParameterInstance>>();
-                    gridQueues = new String[jobs.size()];
+                    gridQueues = new HashMap<Integer, GridQueue>();
                     try {
                         ArrayList<GridQueue> queues = GridQueueDAO.getAll();
-                        HashMap<Integer, GridQueue> queueMap = new HashMap<Integer, GridQueue>();
                         for (GridQueue q : queues) {
-                            queueMap.put(q.getId(), q);
-                        }
-                        for (int i = 0; i < jobs.size(); i++) {
-                            GridQueue q = queueMap.get(jobs.get(i).getComputeQueue());
-                            gridQueues[i] = q != null ? q.getName() : "none";
+                            gridQueues.put(q.getId(), q);
                         }
                     } catch (Exception e) {
                     }
@@ -415,7 +410,8 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             case 0:
                 return j.getId();
             case 1:
-                return gridQueues[rowIndex];
+                GridQueue q = gridQueues.get(j.getComputeQueue());
+                return q == null?"none":q.getName();
             case 2:
                 Solver solver = getSolver(rowIndex);
                 return solver == null ? "" : solver.getName();

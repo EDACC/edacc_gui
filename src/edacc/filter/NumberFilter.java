@@ -10,11 +10,16 @@ package edacc.filter;
  * @author simon
  */
 public class NumberFilter extends javax.swing.JPanel implements FilterInterface {
-
     /** Creates new form NumberFilter */
     public NumberFilter(String name) {
         initComponents();
-        lblName.setText("<= " + name + " <= ");
+        lblName.setText(name);
+        comboOperator.removeAllItems();
+        comboOperator.addItem("<");
+        comboOperator.addItem("<=");
+        comboOperator.addItem("==");
+        comboOperator.addItem(">=");
+        comboOperator.addItem(">");
     }
 
     /** This method is called from within the constructor to
@@ -26,88 +31,82 @@ public class NumberFilter extends javax.swing.JPanel implements FilterInterface 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        chkActivate = new javax.swing.JCheckBox();
-        txtLower = new javax.swing.JTextField();
+        txtValue = new javax.swing.JTextField();
+        comboOperator = new javax.swing.JComboBox();
         lblName = new javax.swing.JLabel();
-        txtUpper = new javax.swing.JTextField();
 
         setName("Form"); // NOI18N
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(NumberFilter.class);
-        chkActivate.setText(resourceMap.getString("chkActivate.text")); // NOI18N
-        chkActivate.setName("chkActivate"); // NOI18N
+        txtValue.setText(resourceMap.getString("txtValue.text")); // NOI18N
+        txtValue.setName("txtValue"); // NOI18N
 
-        txtLower.setText(resourceMap.getString("txtLower.text")); // NOI18N
-        txtLower.setName("txtLower"); // NOI18N
+        comboOperator.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboOperator.setName("comboOperator"); // NOI18N
 
         lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
         lblName.setName("lblName"); // NOI18N
-
-        txtUpper.setText(resourceMap.getString("txtUpper.text")); // NOI18N
-        txtUpper.setName("txtUpper"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(txtLower, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createSequentialGroup()
                 .addComponent(lblName)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtUpper, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 242, Short.MAX_VALUE)
-                .addComponent(chkActivate))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(comboOperator, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtValue, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(chkActivate)
-                .addComponent(txtLower, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(lblName)
-                .addComponent(txtUpper, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(comboOperator, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     @Override
     public boolean include(Object value) {
-        if (!chkActivate.isSelected()) {
-            return true;
-        }
-        double hi, lo;
         try {
-            lo = Double.parseDouble(txtLower.getText());
-            hi = Double.parseDouble(txtUpper.getText());
+            int comp;
+            if (value instanceof Integer) {
+                Integer val = (Integer) value;
+                comp = val.compareTo(Integer.parseInt(txtValue.getText()));
+            } else if (value instanceof Double) {
+                Double val = (Double) value;
+                comp = val.compareTo(Double.parseDouble(txtValue.getText()));
+            } else if (value instanceof Float) {
+                Float val = (Float) value;
+                comp = val.compareTo(Float.parseFloat(txtValue.getText()));
+            } else {
+                return false;
+            }
+            if ("<".equals(comboOperator.getSelectedItem())) {
+                return comp < 0;
+            } else if ("<=".equals(comboOperator.getSelectedItem())) {
+                return comp <= 0;
+            } else if ("==".equals(comboOperator.getSelectedItem())) {
+                return comp == 0;
+            } else if (">=".equals(comboOperator.getSelectedItem())) {
+                return comp >= 0;
+            } else if (">".equals(comboOperator.getSelectedItem())) {
+                return comp > 0;
+            }
         } catch (NumberFormatException e) {
             return false;
         }
-        if (value instanceof Integer) {
-            int val = (Integer) value;
-            return lo <= val && val <= hi;
-        }
-        if (value instanceof Double) {
-            double val = (Double) value;
-            return lo <= val && val <= hi;
-        }
-        if (value instanceof Float) {
-            float val = (Float) value;
-            return lo <= val && val <= hi;
-        }
-        return true;
+        return false;
     }
 
     public static boolean accept(Class<?> clazz) {
         return clazz == Integer.class || clazz == Double.class || clazz == Float.class;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox chkActivate;
+    private javax.swing.JComboBox comboOperator;
     private javax.swing.JLabel lblName;
-    private javax.swing.JTextField txtLower;
-    private javax.swing.JTextField txtUpper;
+    private javax.swing.JTextField txtValue;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public boolean hasFiltersApplied() {
-        return chkActivate.isSelected();
-    }
 }

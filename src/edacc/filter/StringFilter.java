@@ -10,17 +10,15 @@
  */
 package edacc.filter;
 
-import java.util.regex.Matcher;
-
 /**
  *
  * @author simon
  */
 public class StringFilter extends javax.swing.JPanel implements FilterInterface {
-
     /** Creates new form StringFilter */
     public StringFilter(String name) {
         initComponents();
+        lblName.setText(name + " (RegExp)");
     }
 
     /** This method is called from within the constructor to
@@ -32,18 +30,14 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        chkActivate = new javax.swing.JCheckBox();
-        lblContains = new javax.swing.JLabel();
+        lblName = new javax.swing.JLabel();
         txtRegexp = new javax.swing.JTextField();
 
         setName("Form"); // NOI18N
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(StringFilter.class);
-        chkActivate.setText(resourceMap.getString("chkActivate.text")); // NOI18N
-        chkActivate.setName("chkActivate"); // NOI18N
-
-        lblContains.setText(resourceMap.getString("lblContains.text")); // NOI18N
-        lblContains.setName("lblContains"); // NOI18N
+        lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
+        lblName.setName("lblName"); // NOI18N
 
         txtRegexp.setText(resourceMap.getString("txtRegexp.text")); // NOI18N
         txtRegexp.setName("txtRegexp"); // NOI18N
@@ -52,27 +46,21 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(lblContains)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtRegexp, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkActivate))
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(lblName)
+                .addGap(14, 14, 14)
+                .addComponent(txtRegexp, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(chkActivate)
-                .addComponent(lblContains)
-                .addComponent(txtRegexp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(txtRegexp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblName))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     @Override
     public boolean include(Object value) {
-        if (!chkActivate.isSelected()) {
-            return true;
-        }
         if (value instanceof String) {
             String val = (String) value;
             try {
@@ -88,13 +76,8 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
         return clazz == String.class;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox chkActivate;
-    private javax.swing.JLabel lblContains;
+    private javax.swing.JLabel lblName;
     private javax.swing.JTextField txtRegexp;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public boolean hasFiltersApplied() {
-        return chkActivate.isSelected();
-    }
 }

@@ -29,7 +29,8 @@ public class AnalysisPanel extends javax.swing.JPanel {
                 BoxPlot.class, ScatterOnePropertyTwoSolvers.class,
                 ScatterTwoPropertiesOneSolver.class, ScatterInstancePropertySolverProperty.class,
                 CactusPlot.class, KernelDensityPlot.class,
-                RTDPlot.class, RTDsPlot.class
+                RTDPlot.class, RTDsPlot.class,
+                ProbabilisticDomination.class
             };
 
     /** Creates new form AnalysisPanel */

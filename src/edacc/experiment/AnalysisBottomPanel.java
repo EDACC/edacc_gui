@@ -159,6 +159,7 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
             } else if (e instanceof SQLException) {
                 javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Database error", javax.swing.JOptionPane.ERROR_MESSAGE);
             } else {
+                e.printStackTrace();
                 javax.swing.JOptionPane.showMessageDialog(null, e, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
         }

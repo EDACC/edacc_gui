@@ -73,7 +73,7 @@ public class PropertyDAO {
      * @throws SQLException
      * @throws PropertyNotInDBException
      */
-    public static Property getById(int id) throws NoConnectionToDBException, SQLException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
+    public static Property getById(int id) throws NoConnectionToDBException, SQLException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
         Property res = cache.getCached(id);
         if(res != null){
             return res;
@@ -189,7 +189,7 @@ public class PropertyDAO {
      * @throws SolverPropertyTypeNotExistException
      * @throws IOException
      */
-    public static Vector<Property> getAll() throws NoConnectionToDBException, SQLException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException{
+    public static Vector<Property> getAll() throws NoConnectionToDBException, SQLException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException{
         Vector<Property> res = new Vector<Property>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
             "SELECT idSolverProperty "
@@ -225,7 +225,7 @@ public class PropertyDAO {
      * @throws IOException
      */
     public static Vector<Property> getAllInstanceProperties() throws NoConnectionToDBException, SQLException, PropertyNotInDBException,
-            SolverPropertyTypeNotExistException, IOException{
+            SolverPropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException{
         Vector<Property> res = new Vector<Property>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
             "SELECT idProperty FROM " + table + " WHERE PropertyType=0;");
@@ -247,7 +247,7 @@ public class PropertyDAO {
      * @throws IOException
      */
     public static Vector<Property> getAllResultProperties() throws NoConnectionToDBException, SQLException, PropertyNotInDBException,
-            SolverPropertyTypeNotExistException, SolverPropertyTypeNotExistException, IOException{
+            SolverPropertyTypeNotExistException, SolverPropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException{
         Vector<Property> res = new Vector<Property>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
             "SELECT idProperty FROM " + table + " WHERE PropertyType=1;");
@@ -270,7 +270,7 @@ public class PropertyDAO {
      * @throws IOException
      */
     public static Property getByName(String name) throws NoConnectionToDBException, SQLException, PropertyNotInDBException,
-            PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
+            PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
          PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
             "SELECT idSolverProperty FROM " + table + " WHERE name=?;");
          ps.setString(1, name);

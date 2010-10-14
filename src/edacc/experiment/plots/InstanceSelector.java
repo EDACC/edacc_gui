@@ -34,7 +34,6 @@ public class InstanceSelector extends JPanel {
     private JTable table;
     private InstanceTableModel tableModel;
     private JButton btnFilter, btnSelectAll, btnDeselectAll, btnInvert;
-    private EDACCInstanceFilter dialogFilter;
     private InstanceFilter rowFilter;
     private TableRowSorter<InstanceTableModel> sorter;
     private JLabel lblFilter;
@@ -168,6 +167,7 @@ public class InstanceSelector extends JPanel {
         try {
             tableModel.setInstances(instances);
         } catch (Exception e) {
+            // TODO: ..
         }
     }
 
