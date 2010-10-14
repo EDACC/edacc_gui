@@ -15,9 +15,9 @@ import javax.swing.event.ListSelectionListener;
  */
 public class SolverPropertyTableSelectionListener implements ListSelectionListener{
     JTable table;
-    SolverPropertiesController controller;
+    PropertyController controller;
 
-    public SolverPropertyTableSelectionListener(JTable table, SolverPropertiesController controller) {
+    public SolverPropertyTableSelectionListener(JTable table, PropertyController controller) {
         this.table = table;
         this.controller = controller;
     }

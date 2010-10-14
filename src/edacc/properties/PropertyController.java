@@ -6,13 +6,11 @@
 package edacc.properties;
 
 import edacc.EDACCManagePropertyDialog;
+import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.NoConnectionToDBException;
-import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
-import edacc.model.PropertyHasParameterDAO;
-import edacc.model.PropertyHasParameterNotInDBException;
 import edacc.model.PropertyIsUsedException;
 import edacc.model.PropertyNotInDBException;
 import edacc.model.PropertyTypeDoesNotExistException;
@@ -30,19 +28,19 @@ import javax.swing.JTable;
  * Controller class of the EDACCManageSolverDialog
  * @author rretz
  */
-public class SolverPropertiesController {
+public class PropertyController {
     private EDACCManagePropertyDialog main;
     private JPanel panel;
     private JTable tableSolverProperty;
     private int editId;
 
     /**
-     * Constructor of the SolverPropertiesController
+     * Constructor of the PropertyController
      * @param manage the EDACCManagePropertyDialog to controll
      * @param panelManageResultProperty main panel of the EDACCManagerSolverPropertyDialog
      * @param tableResultProperty the table which contains the Overview over all Property objects.
      */
-    public SolverPropertiesController(EDACCManagePropertyDialog manage, JPanel panelManageResultProperty, JTable tableResultProperty) {
+    public PropertyController(EDACCManagePropertyDialog manage, JPanel panelManageResultProperty, JTable tableResultProperty) {
         this.main = manage;
         this.panel = panelManageResultProperty;
         this.tableSolverProperty = tableResultProperty;
@@ -91,7 +89,7 @@ public class SolverPropertiesController {
      */
     public void loadSolverProperties() 
             throws NoConnectionToDBException, SQLException, SQLException, PropertyNotInDBException,
-        SolverPropertyTypeNotExistException, IOException {
+        SolverPropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
         ((SolverPropertyTableModel)this.tableSolverProperty.getModel()).clear();
         ((SolverPropertyTableModel)this.tableSolverProperty.getModel()).addResultProperties(new Vector<Property>(PropertyDAO.getAll()));
     }
@@ -106,7 +104,7 @@ public class SolverPropertiesController {
     }
 
     public void removeSolverProperty(int convertRowIndexToModel) throws NoConnectionToDBException, SQLException, PropertyIsUsedException,
-            PropertyTypeDoesNotExistException, IOException, PropertyHasParameterNotInDBException, PropertyNotInDBException, SolverPropertyTypeNotExistException {
+            PropertyTypeDoesNotExistException, IOException, PropertyNotInDBException, SolverPropertyTypeNotExistException {
         Property toRemove = (Property)((SolverPropertyTableModel)tableSolverProperty.getModel()).getValueAt(convertRowIndexToModel, 5);
         PropertyDAO.remove(toRemove);
         ((SolverPropertyTableModel)tableSolverProperty.getModel()).removeSolverProperty(toRemove);
@@ -123,17 +121,17 @@ public class SolverPropertiesController {
                 }
                 this.editId = toShow.getId();
             } catch (NoConnectionToDBException ex) {
-                Logger.getLogger(SolverPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(PropertyController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
-                Logger.getLogger(SolverPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(PropertyController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (PropertyHasParameterNotInDBException ex) {
-                Logger.getLogger(SolverPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(PropertyController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (PropertyNotInDBException ex) {
-                Logger.getLogger(SolverPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(PropertyController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SolverPropertyTypeNotExistException ex) {
-                Logger.getLogger(SolverPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(PropertyController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                Logger.getLogger(SolverPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(PropertyController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }else 
             this.editId = -1;

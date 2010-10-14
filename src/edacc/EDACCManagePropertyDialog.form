@@ -5,6 +5,7 @@
     <Property name="defaultCloseOperation" type="int" value="2"/>
     <Property name="title" type="java.lang.String" resourceKey="Form.title"/>
     <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
+    <Property name="undecorated" type="boolean" value="true"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -24,10 +25,10 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="1" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="panelManageSolverProperty" alignment="1" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="panelManageSolverProperty" max="32767" attributes="0"/>
                   <Component id="buttonDone" alignment="1" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -37,8 +38,9 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Component id="panelManageSolverProperty" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="panelManageSolverProperty" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="buttonDone" min="-2" pref="23" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -63,7 +65,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jSplitPane1" max="32767" attributes="0"/>
+                  <Component id="jSplitPane1" pref="833" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -71,9 +73,8 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jSplitPane1" pref="683" max="32767" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace pref="16" max="32767" attributes="0"/>
+                  <Component id="jSplitPane1" min="-2" pref="653" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -235,7 +236,7 @@
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="panelManageSolverPropertyEditInput" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace pref="8" max="32767" attributes="0"/>
                           <Component id="buttonSaveSolverProperty" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -243,16 +244,6 @@
                 </DimensionLayout>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JButton" name="buttonSaveSolverProperty">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="buttonSaveSolverProperty.text"/>
-                    <Property name="enabled" type="boolean" value="false"/>
-                    <Property name="name" type="java.lang.String" value="buttonSaveSolverProperty" noResource="true"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonSaveSolverPropertyActionPerformed"/>
-                  </Events>
-                </Component>
                 <Container class="javax.swing.JPanel" name="panelManageSolverPropertyEditInput">
                   <Properties>
                     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -269,46 +260,37 @@
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="labelPropertyType" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="labelSolverPropertyname" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="labelSolverPropertyDescription" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="radioBtnRegExpression" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="radioBtnComputationMethod" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="labelPropertySource" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="labelParameter" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="labelPropertyValueType" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <Component id="comboBoxPropertyValuetype" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace type="separate" max="-2" attributes="0"/>
-                                              <Component id="buttonPropertyAddValueType" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <Component id="comboBoxParameter" min="-2" max="-2" attributes="0"/>
-                                          <Component id="comboBoxPropertySource" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <Component id="comboBoxComputationMethod" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace type="separate" max="-2" attributes="0"/>
-                                              <Component id="buttonNewComputationMethod" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace type="separate" max="-2" attributes="0"/>
-                                              <Component id="labelComputationMethodParameters" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                              <Component id="textFieldComputationmethodParameter" pref="449" max="32767" attributes="0"/>
-                                          </Group>
-                                          <Component id="comboBoxPropertyType" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="textSolverPropertyFieldName" alignment="0" pref="635" max="32767" attributes="1"/>
-                                          <Component id="jScrollPane1" alignment="0" pref="635" max="32767" attributes="1"/>
-                                          <Component id="textSolvertPropertyFieldPrefix" alignment="0" pref="635" max="32767" attributes="1"/>
-                                      </Group>
-                                  </Group>
+                                  <Component id="labelPropertyType" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="labelSolverPropertyname" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="labelSolverPropertyDescription" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="radioBtnRegExpression" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="radioBtnComputationMethod" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="labelPropertySource" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="labelPropertyValueType" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="labeMultipleOccurrences" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="checkBoxMultipleOccurrences" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="labeMultipleOccurrences" min="-2" max="-2" attributes="0"/>
+                                      <Component id="comboBoxPropertyValuetype" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                                      <Component id="checkBoxMultipleOccurrences" min="-2" max="-2" attributes="0"/>
+                                      <Component id="buttonPropertyAddValueType" min="-2" max="-2" attributes="0"/>
                                   </Group>
+                                  <Component id="comboBoxPropertySource" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="comboBoxComputationMethod" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                                      <Component id="buttonNewComputationMethod" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                                      <Component id="labelComputationMethodParameters" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="textFieldComputationmethodParameter" pref="449" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Component id="comboBoxPropertyType" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="textSolverPropertyFieldName" alignment="0" pref="635" max="32767" attributes="1"/>
+                                  <Component id="jScrollPane1" alignment="0" pref="635" max="32767" attributes="1"/>
+                                  <Component id="textSolvertPropertyFieldPrefix" alignment="0" pref="635" max="32767" attributes="1"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -350,30 +332,18 @@
                                   <Component id="labelPropertySource" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="comboBoxPropertySource" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <EmptySpace min="-2" pref="49" max="-2" attributes="0"/>
-                                      <Component id="labelPropertyValueType" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="3" attributes="0">
-                                          <Component id="comboBoxParameter" alignment="3" min="-2" max="-2" attributes="0"/>
-                                          <Component id="labelParameter" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="3" attributes="0">
-                                          <Component id="comboBoxPropertyValuetype" alignment="3" min="-2" max="-2" attributes="0"/>
-                                          <Component id="buttonPropertyAddValueType" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                  </Group>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="labelPropertyValueType" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="comboBoxPropertyValuetype" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="buttonPropertyAddValueType" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="1" attributes="0">
                                   <Component id="labeMultipleOccurrences" min="-2" max="-2" attributes="0"/>
                                   <Component id="checkBoxMultipleOccurrences" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="16" max="32767" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -481,24 +451,6 @@
                         <Property name="name" type="java.lang.String" value="checkBoxMultipleOccurrences" noResource="true"/>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JLabel" name="labelParameter">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="labelParameter.text"/>
-                        <Property name="name" type="java.lang.String" value="labelParameter" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JComboBox" name="comboBoxParameter">
-                      <Properties>
-                        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                          <StringArray count="0"/>
-                        </Property>
-                        <Property name="enabled" type="boolean" value="false"/>
-                        <Property name="name" type="java.lang.String" value="comboBoxParameter" noResource="true"/>
-                      </Properties>
-                      <Events>
-                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="comboBoxParameterActionPerformed"/>
-                      </Events>
-                    </Component>
                     <Component class="javax.swing.JComboBox" name="comboBoxPropertyType">
                       <Properties>
                         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
@@ -553,6 +505,16 @@
                     </Component>
                   </SubComponents>
                 </Container>
+                <Component class="javax.swing.JButton" name="buttonSaveSolverProperty">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="buttonSaveSolverProperty.text"/>
+                    <Property name="enabled" type="boolean" value="false"/>
+                    <Property name="name" type="java.lang.String" value="buttonSaveSolverProperty" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonSaveSolverPropertyActionPerformed"/>
+                  </Events>
+                </Component>
               </SubComponents>
             </Container>
           </SubComponents>
