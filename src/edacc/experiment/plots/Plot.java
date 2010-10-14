@@ -37,9 +37,12 @@ public abstract class Plot {
     public final String htmlFooter = "</body>\n"
             + "</html>";
     public static final String[] colors = {"red", "green", "blue", "darkgoldenrod1", "darkolivegreen", "darkorchid", "deeppink", "darkgreen", "blue4"};
-    public static int ALLRUNS = -3;
-    public static int AVERAGE = -2;
-    public static int MEDIAN = -1;
+    public static final int ALLRUNS = -3;
+    public static final int AVERAGE = -2;
+    public static final int MEDIAN = -1;
+    public static final String ALLRUNS_TEXT = "all runs";
+    public static final String AVERAGE_TEXT = "all runs - average";
+    public static final String MEDIAN_TEXT = "all runs - median";
     protected ExperimentController expController;
     // "constants" for solver properties
     public static Property PROP_CPUTIME;
@@ -243,7 +246,7 @@ public abstract class Plot {
             return res;
         }
         for (int i = 0; i < xs.length; i++) {
-            res.add(new Point2D.Double(xs[i],ys[i]));
+            res.add(new Point2D.Double(xs[i], ys[i]));
         }
         return res;
     }
@@ -294,7 +297,6 @@ public abstract class Plot {
      * current plot instance.
      */
     public abstract void updateDependencies();
-    
 }
 
 class ResultIdentifier {

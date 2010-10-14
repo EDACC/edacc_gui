@@ -323,6 +323,23 @@ public class ScatterInstancePropertySolverProperty extends Plot {
 
     @Override
     public void updateDependencies() {
-        // TODO: implement
+        if (solverConfig == null || instances == null || solverProperty == null || instanceProperty == null || run == null || xlog == null || ylog == null) {
+            return;
+        }
+        if (run == AVERAGE) {
+            comboRun.setSelectedItem(AVERAGE_TEXT);
+        } else if (run == MEDIAN) {
+            comboRun.setSelectedItem(MEDIAN_TEXT);
+        } else if (run == ALLRUNS) {
+            comboRun.setSelectedItem(ALLRUNS);
+        } else {
+            comboRun.setSelectedItem(run);
+        }
+        comboSolver.setSelectedItem(solverConfig);
+        instanceSelector.setSelectedInstances(instances);
+        comboSolverProperty.setSelectedItem(solverProperty);
+        comboInstanceProperty.setSelectedItem(instanceProperty);
+        scaleSelector.setXScaleLog(xlog);
+        scaleSelector.setYScaleLog(ylog);
     }
 }

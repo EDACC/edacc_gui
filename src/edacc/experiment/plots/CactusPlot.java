@@ -2,14 +2,12 @@ package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentResult;
-import edacc.model.ExperimentResultStatus;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import edacc.model.Property;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -65,9 +63,9 @@ public class CactusPlot extends Plot {
 
     public static void loadDefaultValues(ExperimentController expController) throws Exception {
         comboRun.removeAllItems();
-        comboRun.addItem("all runs - average");
-        comboRun.addItem("all runs - median");
-        comboRun.addItem("all runs");
+        comboRun.addItem(AVERAGE_TEXT);
+        comboRun.addItem(MEDIAN_TEXT);
+        comboRun.addItem(ALLRUNS);
         for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
             comboRun.addItem(i);
         }
@@ -87,11 +85,11 @@ public class CactusPlot extends Plot {
     public void plot(Rengine engine, ArrayList<PointInformation> pointInformations) throws Exception {
         if (run == null || property == null || instances == null || solverConfigs == null || selectedInstanceIds == null) {
             run = -4;
-            if ("all runs - average".equals(comboRun.getSelectedItem())) {
+            if (AVERAGE_TEXT.equals(comboRun.getSelectedItem())) {
                 run = AVERAGE;
-            } else if ("all runs - median".equals(comboRun.getSelectedItem())) {
+            } else if (MEDIAN_TEXT.equals(comboRun.getSelectedItem())) {
                 run = MEDIAN;
-            } else if ("all runs".equals(comboRun.getSelectedItem())) {
+            } else if (ALLRUNS_TEXT.equals(comboRun.getSelectedItem())) {
                 run = ALLRUNS;
             } else if (comboRun.getSelectedItem() instanceof Integer) {
                 run = (Integer) comboRun.getSelectedItem();
@@ -233,6 +231,20 @@ public class CactusPlot extends Plot {
 
     @Override
     public void updateDependencies() {
-        // TODO: implement
+        if (run == null || property == null || instances == null || solverConfigs == null) {
+            return;
+        }
+        if (run == AVERAGE) {
+        comboRun.setSelectedItem(AVERAGE_TEXT);
+        } else if (run == MEDIAN) {
+            comboRun.setSelectedItem(MEDIAN_TEXT);
+        } else if (run == ALLRUNS) {
+            comboRun.setSelectedItem(ALLRUNS);
+        } else {
+            comboRun.setSelectedItem(run);
+        }
+        comboProperty.setSelectedItem(property);
+        instanceSelector.setSelectedInstances(instances);
+        solverConfigurationSelector.setSelectedSolverConfigurations(solverConfigs);
     }
 }

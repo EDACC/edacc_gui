@@ -6,7 +6,6 @@ import edacc.model.ExperimentResult;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
@@ -95,6 +94,10 @@ public class KernelDensityPlot extends Plot {
 
     @Override
     public void updateDependencies() {
-        // TODO: implement
+        if (sc == null || instance == null) {
+            return;
+        }
+        comboSolver.setSelectedItem(sc);
+        comboInstance.setSelectedItem(instance);
     }
 }

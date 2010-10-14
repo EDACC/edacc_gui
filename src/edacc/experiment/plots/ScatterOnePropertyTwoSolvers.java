@@ -386,6 +386,23 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
 
     @Override
     public void updateDependencies() {
-        // TODO: implement
+        if (xSolverConfig == null || ySolverConfig == null || instances == null || property == null || run == null || xlog == null || ylog == null) {
+            return;
+        }
+        if (run == AVERAGE) {
+            comboRun.setSelectedItem(AVERAGE_TEXT);
+        } else if (run == MEDIAN) {
+            comboRun.setSelectedItem(MEDIAN_TEXT);
+        } else if (run == ALLRUNS) {
+            comboRun.setSelectedItem(ALLRUNS);
+        } else {
+            comboRun.setSelectedItem(run);
+        }
+        combo1.setSelectedItem(xSolverConfig);
+        combo2.setSelectedItem(ySolverConfig);
+        instanceSelector.setSelectedInstances(instances);
+        comboProperty.setSelectedItem(property);
+        scaleSelector.setXScaleLog(xlog);
+        scaleSelector.setYScaleLog(ylog);
     }
 }

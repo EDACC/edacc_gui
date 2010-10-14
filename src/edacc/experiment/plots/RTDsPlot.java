@@ -144,6 +144,11 @@ public class RTDsPlot extends Plot {
 
     @Override
     public void updateDependencies() {
-        // TODO: implement
+        if (scs == null ||instance == null || property == null) {
+            return;
+        }
+        solverSelector.setSolverConfigurations(scs);
+        comboInstance.setSelectedItem(instance);
+        comboProperty.setSelectedItem(property);
     }
 }

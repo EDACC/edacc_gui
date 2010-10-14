@@ -7,15 +7,10 @@ import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import edacc.model.Property;
-import edacc.model.PropertyDAO;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Vector;
 import javax.swing.JComboBox;
-import javax.swing.JTextField;
 import org.rosuda.JRI.Rengine;
 
 /**
@@ -327,6 +322,23 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
 
     @Override
     public void updateDependencies() {
-        // TODO: implement
+        if (solverConfig == null || instances == null || xprop == null || yprop == null || run == null || xlog == null || ylog == null) {
+            return;
+        }
+        if (run == AVERAGE) {
+            comboRun.setSelectedItem(AVERAGE_TEXT);
+        } else if (run == MEDIAN) {
+            comboRun.setSelectedItem(MEDIAN_TEXT);
+        } else if (run == ALLRUNS) {
+            comboRun.setSelectedItem(ALLRUNS);
+        } else {
+            comboRun.setSelectedItem(run);
+        }
+        comboSolver.setSelectedItem(solverConfig);
+        instanceSelector.setSelectedInstances(instances);
+        combo1.setSelectedItem(xprop);
+        combo2.setSelectedItem(yprop);
+        scaleSelector.setXScaleLog(xlog);
+        scaleSelector.setYScaleLog(ylog);
     }
 }
