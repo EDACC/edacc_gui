@@ -124,7 +124,7 @@ public class ManageDBInstances implements Observer{
         Vector<Instance> toRemove = new Vector<Instance>();
         
         for (int i = 0; i < rows.length; i++) {
-            toRemove.add((Instance )main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(rows[i]), 1));
+            toRemove.add((Instance )main.instanceTableModel.getInstance(tableInstances.convertRowIndexToModel(rows[i])));
         }
         InstanceTableModel tableModel = new InstanceTableModel();
         tableModel.addInstances(toRemove);
@@ -228,7 +228,7 @@ public class ManageDBInstances implements Observer{
         Instance temp;
         Vector<Instance> md5Error = new Vector<Instance>();
         for(int i = 0; i < rows.length; i++){
-           temp =    (Instance) main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(rows[i]), 1);
+           temp =    (Instance) main.instanceTableModel.getInstance(tableInstances.convertRowIndexToModel(rows[i]));
            
            File f = new File(path + System.getProperty("file.separator") + temp.getName());
            if(!f.exists())
@@ -505,7 +505,7 @@ public class ManageDBInstances implements Observer{
                 InstanceClass input = addInstanceToClass.getInput();
                 Vector<Instance> toChange = new Vector<Instance>();
                 for(int i = 0; i < selectedRows.length; i++){
-                    toChange.add((Instance) main.instanceTableModel.getValueAt(selectedRows[i], 1));
+                    toChange.add((Instance) main.instanceTableModel.getInstance(selectedRows[i]));
                 }
                 if (input != null) {
                     if (input.isSource()) {
@@ -564,7 +564,7 @@ public class ManageDBInstances implements Observer{
             try {
                 Vector<Instance> toRemove = new Vector<Instance>();
                 for(int i = 0; i < selectedRowsInstance.length; i++){
-                    toRemove.add((Instance) main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(selectedRowsInstance[i]), 1));
+                    toRemove.add((Instance) main.instanceTableModel.getInstance(tableInstances.convertRowIndexToModel(selectedRowsInstance[i])));
                 }
                 // check if the user really want to remove the instances from the instace classes
                 InstanceTableModel tableModel = new InstanceTableModel();

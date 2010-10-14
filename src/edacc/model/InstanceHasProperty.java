@@ -17,10 +17,10 @@ public class InstanceHasProperty extends BaseModel implements IntegerPKModel {
 
     private int id;
     private Instance instance;
-    private InstanceProperty instanceProperty;
+    private Property instanceProperty;
     private String value;
 
-    protected InstanceHasProperty(Instance instance, InstanceProperty instanceProperty, String value) {
+    protected InstanceHasProperty(Instance instance, Property instanceProperty, String value) {
         this.instance = instance;
         this.instanceProperty = instanceProperty;
         this.value = value;
@@ -34,7 +34,7 @@ public class InstanceHasProperty extends BaseModel implements IntegerPKModel {
         return instance;
     }
 
-    public InstanceProperty getInstanceProperty() {
+    public Property getInstanceProperty() {
         return instanceProperty;
     }
 

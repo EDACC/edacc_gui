@@ -26,6 +26,7 @@ public class Property extends BaseModel implements IntegerPKModel{
    private boolean multiple;
    private ComputationMethod computationMethod;
    private String computationMethodParameters;
+   private Boolean isDefault;
 
     public ComputationMethod getComputationMethod() {
         return computationMethod;
@@ -182,6 +183,8 @@ public class Property extends BaseModel implements IntegerPKModel{
                 throw new SolverPropertyTypeNotExistException();
 
         }
+        if (this.isSaved())
+            this.setModified();
     }
 
     public PropertySource getPropertySource(){
@@ -212,6 +215,18 @@ public class Property extends BaseModel implements IntegerPKModel{
     public String toString() {
         return name;
     }
+
+    public Boolean IsDefault() {
+        return isDefault;
+    }
+
+    public void setIsDefault(Boolean isDefault) {
+        this.isDefault = isDefault;
+        if (this.isSaved())
+            this.setModified();
+    }
+
+
 
 
 }

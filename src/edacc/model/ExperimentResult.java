@@ -30,7 +30,7 @@ public class ExperimentResult extends BaseModel {
 
     private int computeQueue;
 
-    private HashMap<Integer, ExperimentResultHasSolverProperty> propertyValues;
+    private HashMap<Integer, ExperimentResultHasProperty> propertyValues;
     
     protected ExperimentResult() {
     }
@@ -250,11 +250,11 @@ public class ExperimentResult extends BaseModel {
         this.resultCode = ExperimentResultResultCode.getExperimentResultResultCode(resultCode);
     }
 
-    public HashMap<Integer, ExperimentResultHasSolverProperty> getPropertyValues() {
+    public HashMap<Integer, ExperimentResultHasProperty> getPropertyValues() {
         return propertyValues;
     }
 
-    public void setPropertyValues(HashMap<Integer, ExperimentResultHasSolverProperty> propertyValues) {
+    public void setPropertyValues(HashMap<Integer, ExperimentResultHasProperty> propertyValues) {
         this.propertyValues = propertyValues;
     }
 }

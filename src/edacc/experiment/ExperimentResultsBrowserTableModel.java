@@ -7,7 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 import edacc.model.ExperimentResult;
-import edacc.model.ExperimentResultHasSolverProperty;
+import edacc.model.ExperimentResultHasProperty;
 import edacc.model.ExperimentResultStatus;
 import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
@@ -59,7 +59,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     private boolean[] CONST_VISIBLE = {false, true, true, true, true, true, true, true, true, true, false, false, false, false};
     private String[] columns;
     private ArrayList<Property> solverProperties;
-    private ExperimentResultHasSolverProperty[][] propertyValues;
+    private ExperimentResultHasProperty[][] propertyValues;
     private boolean[] visible;
     private HashMap<Integer, ArrayList<ParameterInstance>> parameterInstances;
     private HashMap<Integer, GridQueue> gridQueues;
@@ -263,9 +263,9 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 ExperimentResultsBrowserTableModel.this.jobs = jobs;
                 if (jobs != null) {
                     if (solverProperties.size() > 0) {
-                        propertyValues = new ExperimentResultHasSolverProperty[jobs.size()][];
+                        propertyValues = new ExperimentResultHasProperty[jobs.size()][];
                         for (int i = 0; i < jobs.size(); i++) {
-                            propertyValues[i] = new ExperimentResultHasSolverProperty[solverProperties.size()];
+                            propertyValues[i] = new ExperimentResultHasProperty[solverProperties.size()];
                             for (int j = 0; j < solverProperties.size(); j++) {
                                 propertyValues[i][j] = jobs.get(i).getPropertyValues().get(solverProperties.get(j).getId());
                             }
@@ -447,7 +447,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 if (solverProperties.size() <= propertyIdx) {
                     return null;
                 }
-                ExperimentResultHasSolverProperty erp = propertyValues[rowIndex][propertyIdx];
+                ExperimentResultHasProperty erp = propertyValues[rowIndex][propertyIdx];
                 if (erp != null && !erp.getValue().isEmpty()) {
                     try {
                         if (solverProperties.get(propertyIdx).getPropertyValueType() == null) {

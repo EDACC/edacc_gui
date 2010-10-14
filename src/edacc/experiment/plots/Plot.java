@@ -4,7 +4,7 @@ import edacc.EDACCApp;
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
-import edacc.model.ExperimentResultHasSolverProperty;
+import edacc.model.ExperimentResultHasProperty;
 import edacc.model.ExperimentResultHasPropertyDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
@@ -164,10 +164,8 @@ public abstract class Plot {
             }
             return Double.valueOf(result.getResultTime());
         } else {
-            if (!String.valueOf(result.getResultCode().getValue()).startsWith("1")) {
-                return null;
-            }
-            ExperimentResultHasSolverProperty erhsp = result.getPropertyValues().get(property.getId());
+            ExperimentResultHasProperty erhsp = result.getPropertyValues().get(property.getId());
+
             if (erhsp == null || erhsp.getValue().isEmpty()) {
                 return null;
             }

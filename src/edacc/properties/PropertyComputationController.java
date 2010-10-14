@@ -10,7 +10,7 @@ import edacc.model.ExpResultHasSolvPropertyNotInDBException;
 import edacc.model.Experiment;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
-import edacc.model.ExperimentResultHasSolverProperty;
+import edacc.model.ExperimentResultHasProperty;
 import edacc.model.ExperimentResultHasPropertyDAO;
 import edacc.model.ExperimentResultNotInDBException;
 import edacc.model.NoConnectionToDBException;
@@ -36,7 +36,7 @@ public class PropertyComputationController implements Runnable{
     Experiment exp;
     Vector<Property> toParse;
     Vector<Property> parameterResProp;
-    Vector<ExperimentResultHasSolverProperty> queue;
+    Vector<ExperimentResultHasProperty> queue;
     boolean recompute;
 
     public PropertyComputationController(Experiment exp, Vector<Property> givenProperties, boolean recompute) throws NoConnectionToDBException, SQLException{
@@ -57,7 +57,7 @@ public class PropertyComputationController implements Runnable{
     }
 
     private void createParserJobs() throws NoConnectionToDBException, SQLException, SolverPropertyTypeNotExistException, IOException, PropertyNotInDBException {
-        queue = new Vector<ExperimentResultHasSolverProperty>();
+        queue = new Vector<ExperimentResultHasProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idJob FROM " +
                 "ExperimentResults WHERE Experiment_idExperiment=?;");
         ps.setInt(exp.getId(), 1);
@@ -69,7 +69,7 @@ public class PropertyComputationController implements Runnable{
                 try {
                     ExperimentResult res = ExperimentResultDAO.getById( rs.getInt(1));
                     try {
-                        ExperimentResultHasSolverProperty tmp = ExperimentResultHasPropertyDAO.getByExperimentResultAndResultProperty(res, toParse.get(i));
+                        ExperimentResultHasProperty tmp = ExperimentResultHasPropertyDAO.getByExperimentResultAndResultProperty(res, toParse.get(i));
                         queue.add(tmp);
                         if(recompute){
                             tmp.setValue(new Vector<String>());

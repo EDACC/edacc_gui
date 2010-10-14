@@ -9,9 +9,9 @@ package edacc.model;
  *
  * @author rretz
  */
-public class PropertyHasParameterNotInDBException extends Exception{
+public class NoComputationMethodBinarySpecifiedException extends Exception{
 
-    public PropertyHasParameterNotInDBException() {
+    public NoComputationMethodBinarySpecifiedException() {
         super();
     }
 

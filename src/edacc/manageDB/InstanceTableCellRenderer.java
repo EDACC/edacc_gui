@@ -26,7 +26,7 @@ public class InstanceTableCellRenderer extends DefaultTableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
          Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
          
-         Instance instance = (Instance) ((InstanceTableModel)table.getModel()).getValueAt(row, 5);
+         Instance instance = (Instance) ((InstanceTableModel)table.getModel()).getInstance(row);
        // try {
             if(isSelected)cell.setBackground(Color.blue);
             /*else if (InstanceDAO.IsInAnyExperiment(instance.getId())) {

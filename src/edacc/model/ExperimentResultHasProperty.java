@@ -11,7 +11,7 @@ import java.util.Vector;
  *
  * @author rretz
  */
-public class ExperimentResultHasSolverProperty extends BaseModel implements IntegerPKModel {
+public class ExperimentResultHasProperty extends BaseModel implements IntegerPKModel {
 
     private int id;
     private ExperimentResult expResult;
