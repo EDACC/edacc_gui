@@ -230,4 +230,9 @@ public class CactusPlot extends Plot {
     public String getPlotTitle() {
         return "Cactus Plot (" + expController.getActiveExperiment().getName() + ")";
     }
+
+    @Override
+    public void updateDependencies() {
+        // TODO: implement
+    }
 }

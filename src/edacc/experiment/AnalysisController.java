@@ -1,5 +1,6 @@
 package edacc.experiment;
 
+import edacc.experiment.plots.Plot;
 import edacc.experiment.plots.PlotPanel;
 import java.util.HashMap;
 import org.rosuda.JRI.REXP;
@@ -11,6 +12,7 @@ import org.rosuda.JRI.Rengine;
  */
 public class AnalysisController {
     public static PlotPanel lastPlotPanel; // for the RPlotDevice .. see edacc.model.RPlotDevice.java
+    public static AnalysisPanel analysisPanel;
     private static Rengine re;
     private static HashMap<Integer, PlotPanel> plotPanels = new HashMap<Integer, PlotPanel>();
 
@@ -125,5 +127,14 @@ public class AnalysisController {
         setCurrentDeviceNumber(pnl.getDeviceNumber());
         filename = filename.replace("\\", "\\\\");
         re.eval("dev.print(device = pdf, file = '" + filename + "')");
+    }
+
+    /**
+     * Tries to set the class of the plot as the current plot type.
+     * @param plot
+     * @return false, iff setting the plot type failed.
+     */
+    public static boolean setSelectedPlotType(Plot plot) {
+        return analysisPanel==null?false:analysisPanel.setSelectedPlot(plot);
     }
 }

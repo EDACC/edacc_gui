@@ -298,4 +298,9 @@ public class ProbabilisticDomination extends Plot {
     public String getAdditionalInformations() {
         return infos;
     }
+
+    @Override
+    public void updateDependencies() {
+        // not needed, because we use the result property distribution plot for plots
+    }
 }

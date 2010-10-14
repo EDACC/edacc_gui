@@ -325,4 +325,9 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
     public String getAdditionalInformations() {
         return infos;
     }
+
+    @Override
+    public void updateDependencies() {
+        // TODO: implement
+    }
 }

@@ -52,7 +52,7 @@ public class KernelDensityPlot extends Plot {
 
     @Override
     public void plot(Rengine engine, ArrayList<PointInformation> pointInformations) throws Exception {
-        
+
         if (sc == null || instance == null) {
             if (!(comboSolver.getSelectedItem() instanceof SolverConfiguration)) {
                 throw new DependencyException("You have to select a solver.");
@@ -91,5 +91,10 @@ public class KernelDensityPlot extends Plot {
     @Override
     public String getPlotTitle() {
         return title;
+    }
+
+    @Override
+    public void updateDependencies() {
+        // TODO: implement
     }
 }

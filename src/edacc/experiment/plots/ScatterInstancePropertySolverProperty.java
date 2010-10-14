@@ -321,4 +321,9 @@ public class ScatterInstancePropertySolverProperty extends Plot {
     public String getAdditionalInformations() {
         return infos;
     }
+
+    @Override
+    public void updateDependencies() {
+        // TODO: implement
+    }
 }

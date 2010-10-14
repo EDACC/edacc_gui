@@ -14,6 +14,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashSet;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -173,5 +174,19 @@ public class InstanceSelector extends JPanel {
 
     public ArrayList<Instance> getSelectedInstances() {
         return tableModel.getSelectedInstances();
+    }
+
+    public void setSelectedInstances(ArrayList<Instance> selectedInstances) {
+        HashSet<Integer> ids = new HashSet<Integer>();
+        for (Instance i : selectedInstances) {
+            ids.add(i.getId());
+        }
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            if (ids.contains(tableModel.getInstance(i).getId())) {
+                tableModel.setValueAt(Boolean.TRUE, i, InstanceTableModel.COL_SELECTED);
+            } else {
+                tableModel.setValueAt(Boolean.FALSE, i, InstanceTableModel.COL_SELECTED);
+            }
+        }
     }
 }

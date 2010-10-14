@@ -300,6 +300,13 @@ public abstract class Plot {
     public String getAdditionalInformations() {
         return null;
     }
+
+    /**
+     * Updates the `static` dependencies of the static plot type to the data for the
+     * current plot instance.
+     */
+    public abstract void updateDependencies();
+    
 }
 
 class ResultIdentifier {

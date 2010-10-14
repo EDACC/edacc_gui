@@ -11,13 +11,10 @@ import edacc.model.InstanceProperty;
 import edacc.model.NoConnectionToDBException;
 import edacc.satinstances.ConvertException;
 import edacc.satinstances.InstancePropertyManager;
-import edacc.satinstances.PropertyValueTypeManager;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 import java.util.Vector;
 

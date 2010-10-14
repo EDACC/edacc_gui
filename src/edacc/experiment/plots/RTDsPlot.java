@@ -141,4 +141,9 @@ public class RTDsPlot extends Plot {
     public static String getTitle() {
         return "Property distributions of solvers on an instance";
     }
+
+    @Override
+    public void updateDependencies() {
+        // TODO: implement
+    }
 }

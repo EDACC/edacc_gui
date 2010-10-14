@@ -24,14 +24,14 @@ import org.rosuda.JRI.Rengine;
  */
 public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.events.PlotTabEvents, TaskEvents {
 
-    private AnalysisPanel analysePanel;
+    private AnalysisPanel analysisPanel;
     private PlotPanel panel;
     private Plot plot;
 
     /** Creates new form AnalysisBottomPanel */
-    public AnalysisBottomPanel(AnalysisPanel analysePanel) {
+    public AnalysisBottomPanel(AnalysisPanel analysisPanel) {
         initComponents();
-        this.analysePanel = analysePanel;
+        this.analysisPanel = analysisPanel;
         EDACCPlotTabView.addListener(this);
         tabViewCountChanged(EDACCPlotTabView.getTabViewCount());
     }
@@ -85,9 +85,12 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
 
     @Action
     public void btnGeneratePlot() {
-        plot = analysePanel.getSelectedPlot();
+        plot = analysisPanel.getSelectedPlot();
         if (plot == null) {
             return;
+        }
+        if (AnalysisController.analysisPanel == null) {
+            AnalysisController.analysisPanel = analysisPanel;
         }
 
         try {

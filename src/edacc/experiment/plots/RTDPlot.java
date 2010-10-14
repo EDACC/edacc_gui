@@ -189,4 +189,9 @@ public class RTDPlot extends Plot {
     public static String getTitle() {
         return "Property distribution comparison of two solvers on an instance";
     }
+
+    @Override
+    public void updateDependencies() {
+        // TODO: implement
+    }
 }
