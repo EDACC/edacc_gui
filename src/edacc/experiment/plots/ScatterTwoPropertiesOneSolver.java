@@ -10,6 +10,7 @@ import edacc.model.Property;
 import edacc.model.PropertyDAO;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -161,7 +162,7 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
                     // add the values and set the point information; the right point coordinates will be set later
                     xsVec.add(xsValue);
                     ysVec.add(ysValue);
-                    pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>"
+                    pointInformations.add(new PointInformation(new Point2D.Double(), "<html>"
                             + xprop + ": " + (double) Math.round(xsValue * 100) / 100 + "<br>"
                             + yprop + ": " + (double) Math.round(ysValue * 100) / 100 + "<br>"
                             + "Run: " + res.getRun() + "<br>"
@@ -192,7 +193,7 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
                 // add the values and specify the point information
                 xsVec.add(xsValue);
                 ysVec.add(ysValue);
-                pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>"
+                pointInformations.add(new PointInformation(new Point2D.Double(), "<html>"
                         + xprop + ": " + (double) Math.round(xsValue * 100) / 100 + "<br>"
                         + yprop + ": " + (double) Math.round(ysValue * 100) / 100 + "<br>"
                         + "Instance: " + instance.getName()
@@ -226,7 +227,7 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
                 // add the values and specify the point information
                 xsVec.add(xsValue);
                 ysVec.add(ysValue);
-                pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>"
+                pointInformations.add(new PointInformation(new Point2D.Double(), "<html>"
                         + xprop + ": " + (double) Math.round(xsValue * 100) / 100 + "<br>"
                         + yprop + ": " + (double) Math.round(ysValue * 100) / 100 + "<br>"
                         + "Instance: " + instance.getName()
@@ -303,12 +304,10 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
                     + "p-value: " + pearson[0] + "<br>";
         } else {
         }
-        ArrayList<double[]> points = getPoints(re, xs, ys);
+        ArrayList<Point2D> points = getPoints(re, xs, ys);
         int k = 0;
-        for (double[] point : points) {
-            pointInformations.get(k).getPoint()[0] = point[0];
-            pointInformations.get(k).getPoint()[1] = point[1];
-            k++;
+        for (Point2D point : points) {
+            pointInformations.get(k++).getPoint().setLocation(point);
         }
     }
 

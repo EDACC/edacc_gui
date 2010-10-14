@@ -2,6 +2,7 @@ package edacc.experiment;
 
 import edacc.experiment.plots.Plot;
 import edacc.experiment.plots.PlotPanel;
+import java.awt.geom.Point2D;
 import java.util.HashMap;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.Rengine;
@@ -71,14 +72,11 @@ public class AnalysisController {
         re.eval("dev.set(which = " + plotDevice + ")");
     }
 
-    public static double[] convertPoint(int dev, double[] point) {
+    public static Point2D convertPoint(int dev, Point2D point) {
         setCurrentDeviceNumber(dev);
-        double[] res = new double[2];
-        REXP xcoord = re.eval("grconvertX(" + point[0] + ", from = \"user\", to = \"device\")");
-        REXP ycoord = re.eval("grconvertY(" + point[1] + ", from = \"user\", to = \"device\")");
-        res[0] = xcoord.asDouble();
-        res[1] = ycoord.asDouble();
-        return res;
+        REXP xcoord = re.eval("grconvertX(" + point.getX() + ", from = \"user\", to = \"device\")");
+        REXP ycoord = re.eval("grconvertY(" + point.getY() + ", from = \"user\", to = \"device\")");
+        return new Point2D.Double(xcoord.asDouble(), ycoord.asDouble());
     }
 
     private static void moveDevice(int from, int to) {

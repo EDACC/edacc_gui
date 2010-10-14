@@ -1,21 +1,19 @@
 package edacc.experiment.plots;
 
-import edacc.EDACCApp;
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.ExperimentResultHasProperty;
-import edacc.model.ExperimentResultHasPropertyDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasProperty;
-import edacc.model.InstanceHasPropertyDAO;
 import edacc.model.InstanceProperty;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
 import edacc.satinstances.ConvertException;
 import edacc.satinstances.InstancePropertyManager;
 import edacc.satinstances.PropertyValueType;
+import java.awt.geom.Point2D;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +22,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.rosuda.JRI.Rengine;
 
 /**
@@ -59,6 +55,7 @@ public abstract class Plot {
                 htmlHeader += line + '\n';
             }
         } catch (IOException ex) {
+            // TODO: ...
             ex.printStackTrace();
         }
         htmlHeader += htmlHeader + "</style>\n"
@@ -240,21 +237,14 @@ public abstract class Plot {
 
     }
 
-    public ArrayList<double[]> getPoints(Rengine re, double[] xs, double[] ys) {
-
-        ArrayList<double[]> res = new ArrayList<double[]>();
+    public ArrayList<Point2D> getPoints(Rengine re, double[] xs, double[] ys) {
+        ArrayList<Point2D> res = new ArrayList<Point2D>();
         if (xs.length != ys.length) {
             return res;
         }
-
-        for (int i = 0; i
-                < xs.length; i++) {
-            double[] tmp = new double[2];
-            tmp[0] = xs[i];
-            tmp[1] = ys[i];
-            res.add(tmp);
+        for (int i = 0; i < xs.length; i++) {
+            res.add(new Point2D.Double(xs[i],ys[i]));
         }
-
         return res;
     }
 
