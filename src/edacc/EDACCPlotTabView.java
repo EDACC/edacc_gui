@@ -394,6 +394,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
             fc.setFileFilter(new ExtensionFileFilter(suffix.toUpperCase() + " (*." + suffix + ")", suffix));
         }
         fc.setFileFilter(new ExtensionFileFilter("PDF (*.pdf)", "pdf"));
+        fc.setFileFilter(new ExtensionFileFilter("eps (*.eps)", "eps"));
         fc.setAcceptAllFileFilterUsed(true);
         fc.setMultiSelectionEnabled(false);
         if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
@@ -409,9 +410,11 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                         break;
                     }
                 }
-                // add pdf
+                // add pdf & eps
                 if (fileName.endsWith(".pdf")) {
                     imgType = "pdf";
+                } else if (fileName.endsWith(".eps")) {
+                    imgType = "eps";
                 }
             } else {
                 imgType = ((ExtensionFileFilter) fc.getFileFilter()).extensions[0];
@@ -434,7 +437,8 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
             //  TabComponent tc = (TabComponent) tabbedPanePlots.getTabComponentAt(tabbedPanePlots.getSelectedIndex());
             if ("pdf".equals(imgType)) {
                 AnalysisController.saveToPdf(plotPanel, fileName);
-                //     tc.setTitle(name);
+            } else if ("eps".equals(imgType)) {
+                AnalysisController.saveToEps(plotPanel, fileName);
             } else {
                 try {
                     // Get a buffered Image with the right dimension

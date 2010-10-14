@@ -129,6 +129,12 @@ public class AnalysisController {
         re.eval("dev.print(device = pdf, file = '" + filename + "')");
     }
 
+    public static void saveToEps(PlotPanel pnl, String filename) {
+        setCurrentDeviceNumber(pnl.getDeviceNumber());
+        filename = filename.replace("\\", "\\\\");
+        re.eval("dev.print(device = eps, file = '" + filename + "')");
+    }
+
     /**
      * Tries to set the class of the plot as the current plot type.
      * @param plot
