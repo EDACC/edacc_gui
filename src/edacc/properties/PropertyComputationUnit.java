@@ -6,7 +6,7 @@
 package edacc.properties;
 
 import edacc.model.ExperimentResultDAO;
-import edacc.model.ExperimentResultHasSolverProperty;
+import edacc.model.ExperimentResultHasProperty;
 import edacc.model.ExperimentResultHasPropertyDAO;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
@@ -26,10 +26,10 @@ import java.util.logging.Logger;
  * @author rretz
  */
 class PropertyComputationUnit implements Runnable {
-    ExperimentResultHasSolverProperty toParse;
+    ExperimentResultHasProperty toParse;
     PropertyComputationController callback;
 
-    PropertyComputationUnit(ExperimentResultHasSolverProperty toParse, PropertyComputationController callback) {
+    PropertyComputationUnit(ExperimentResultHasProperty toParse, PropertyComputationController callback) {
         this.toParse = toParse;
         this.callback = callback;
     }

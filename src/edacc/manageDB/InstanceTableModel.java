@@ -14,7 +14,7 @@ import javax.swing.table.AbstractTableModel;
  * @author rretz
  */
 public class InstanceTableModel extends AbstractTableModel{
-    private String[] columns = {"Name"};
+    private String[] columns = {"Name", "MD5"};
     protected Vector<Instance> instances;
 
     public InstanceTableModel(){
@@ -77,7 +77,7 @@ public class InstanceTableModel extends AbstractTableModel{
     /**
      *
      * @param rowIndex
-     * @param columnIndex For columnIndex = 1 the instance at rowIndex is returned
+     * @param columnIndex 
      * @return the Object from the choosen cell; return == "" when columnIndex is out of columnRange
      */
     public Object getValueAt(int rowIndex, int columnIndex) {
@@ -85,9 +85,13 @@ public class InstanceTableModel extends AbstractTableModel{
             case 0:
                 return instances.get(rowIndex).getName();
             case 1:
-                return instances.get(rowIndex);
+                return instances.get(rowIndex).getMd5();
             default:
                 return "";
         }
+    }
+
+    public Instance getInstance(int rowIndex){
+        return instances.elementAt(rowIndex);
     }
 }

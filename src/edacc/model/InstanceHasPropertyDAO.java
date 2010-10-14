@@ -107,7 +107,7 @@ public class InstanceHasPropertyDAO {
 
     private static InstanceHasProperty getInstanceHasInstancePropertyFromResultSet(ResultSet rs) throws SQLException, IOException {
         Instance i = InstanceDAO.getById(rs.getInt("idInstance"));
-        InstanceProperty p = InstancePropertyManager.getInstance().getByName(rs.getString("idInstanceProperty"));
+        Property p = PropertyDAO.getByName(rs.getString("idProperty"));
         String value = rs.getString("value");
         return new InstanceHasProperty(i, p, value);
     }
@@ -138,19 +138,19 @@ public class InstanceHasPropertyDAO {
             instances.put(i.getId(), i);
         }
 
-        HashMap<String, InstanceProperty> instanceProperties = new HashMap<String, InstanceProperty>();
+        HashMap<String, Property> instanceProperties = new HashMap<String, Property>();
         try {
-            for (InstanceProperty ip : InstancePropertyManager.getInstance().getAll()) {
-                instanceProperties.put(ip.getName(), ip);
+            for (Property p : PropertyDAO.getAllInstanceProperties()) {
+                instanceProperties.put(p.getName(), p);
             }
         } catch (Exception e) {
             throw new SQLException(e.getMessage());
         }
 
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT ihip.id, ihip.idInstance, ihip.idInstanceProperty, ihip.value "
-                + "FROM Instance_has_InstanceProperty AS ihip "
-                + "LEFT JOIN Instances AS i ON (ihip.idInstance = i.idInstance)");
+                "SELECT ihp.id, ihp.idInstance, ihp.idInstanceProperty, ihp.value "
+                + "FROM Instance_has_Property AS ihp "
+                + "LEFT JOIN Instances AS i ON (ihp.idInstance = i.idInstance)");
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
             int id = rs.getInt(1);
@@ -161,7 +161,7 @@ public class InstanceHasPropertyDAO {
             if (instance != null) {
                 InstanceHasProperty ihip = cache.getCached(id);
                 if (ihip == null) {
-                    InstanceProperty ip = instanceProperties.get(idInstanceProperty);
+                    Property ip = instanceProperties.get(idInstanceProperty);
                     if (ip == null) {
                         continue;
                     }

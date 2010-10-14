@@ -14,8 +14,10 @@ package edacc;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import edacc.model.PropertyHasParameter;
+import edacc.model.PropertyHasParameterNotInDBException;
 import edacc.model.PropertyIsUsedException;
 import edacc.model.PropertyNotInDBException;
+import edacc.model.PropertyTypeDoesNotExistException;
 import edacc.properties.SolverPropertiesController;
 import edacc.properties.SolverPropertyTableModel;
 import edacc.properties.SolverPropertyTableSelectionListener;
@@ -513,7 +515,19 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 JOptionPane.ERROR_MESSAGE);
             }else{
             try {
-                controller.removeSolverProperty(tableSolverProperty.convertRowIndexToModel(tableSolverProperty.getSelectedRow()));
+                try {
+                    controller.removeSolverProperty(tableSolverProperty.convertRowIndexToModel(tableSolverProperty.getSelectedRow()));
+                } catch (PropertyTypeDoesNotExistException ex) {
+                    Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (PropertyHasParameterNotInDBException ex) {
+                    Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (PropertyNotInDBException ex) {
+                    Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SolverPropertyTypeNotExistException ex) {
+                    Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                }
             } catch (NoConnectionToDBException ex) {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
@@ -560,8 +574,13 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                     (PropertySource) comboBoxPropertySource.getSelectedItem(), (String) comboBoxPropertyValuetype.getSelectedItem(),
                     checkBoxMultipleOccurrences.isSelected());
                 } else{
-                     controller.saveSolverProperty(textSolverPropertyFieldName.getText(), textSolvertPropertyFieldPrefix.getText(), textAreaResultPropertyDescription.getText(),
-                    (PropertySource) comboBoxPropertySource.getSelectedItem(), (String) comboBoxParameter.getSelectedItem());
+                    try {
+                        controller.saveSolverProperty(textSolverPropertyFieldName.getText(), textSolvertPropertyFieldPrefix.getText(), textAreaResultPropertyDescription.getText(), (PropertySource) comboBoxPropertySource.getSelectedItem(), (String) comboBoxParameter.getSelectedItem());
+                    } catch (PropertyTypeDoesNotExistException ex) {
+                        Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (PropertyHasParameterNotInDBException ex) {
+                        Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
 
             } catch (NoConnectionToDBException ex) {

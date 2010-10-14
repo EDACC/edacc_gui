@@ -14,31 +14,31 @@ import java.util.HashMap;
 import java.util.Vector;
 
 /**
- * Implements the data access object of the ExperimentResultHasSolverProperty class
+ * Implements the data access object of the ExperimentResultHasProperty class
  * @author rretz
  */
 public class ExperimentResultHasPropertyDAO {
 
-    protected static final String table = "ExperimentResult_has_SolverProperty";
-    protected static final String valueTable = "SolverPropertyValue";
-    private static final ObjectCache<ExperimentResultHasSolverProperty> cache = new ObjectCache<ExperimentResultHasSolverProperty>();
-    private static final String deleteQuery = "DELETE FROM " + table + " WHERE idER_h_SP=?";
-    private static String updateQuery = "UPDATE " + table + " SET ExperimentResults_idJob=?, SolverProperty_idSolverProperty=? WHERE idER_h_SP=?";
-    private static String insertQuery = "INSERT INTO " + table + " (ExperimentResults_idJob, SolverProperty_idSolverProperty) VALUES (?, ?)";
-    private static final String deleteValueQuery = "DELETE FROM " + valueTable + " WHERE ExperimentResult_has_SolverProperty_idER_h_SP=?";
+    protected static final String table = "ExperimentResult_has_Property";
+    protected static final String valueTable = "ExperimentResult_has_PropertyValue";
+    private static final ObjectCache<ExperimentResultHasProperty> cache = new ObjectCache<ExperimentResultHasProperty>();
+    private static final String deleteQuery = "DELETE FROM " + table + " WHERE idExperimentResult_has_Property=?";
+    private static String updateQuery = "UPDATE " + table + " SET idExperimentResults=?, idProperty=? WHERE idExperimentResult_has_Property=?";
+    private static String insertQuery = "INSERT INTO " + table + " (idExperimentResults, idProperty) VALUES (?, ?)";
+    private static final String deleteValueQuery = "DELETE FROM " + valueTable + " WHERE id=?";
     private static String insertValueQuery = "INSERT INTO " + valueTable + " (ExperimentResult_has_SolverProperty_idER_h_SP, value, order) VALUES (?, ?, ?)";
 
     /**
-     * Creates a new  ExperimentResultHasSolverProperty object, saves it into the database and cache, and returns it.
+     * Creates a new  ExperimentResultHasProperty object, saves it into the database and cache, and returns it.
      * @param expResult related ExperimentResult object
      * @param solvProperty related Property object
-     * @return new ExperimentResultHasSolverProperty which is also deposited in the database.
+     * @return new ExperimentResultHasProperty which is also deposited in the database.
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    public static ExperimentResultHasSolverProperty createExperimentResultHasResultPropertyDAO(ExperimentResult expResult, Property solvProperty)
+    public static ExperimentResultHasProperty createExperimentResultHasResultPropertyDAO(ExperimentResult expResult, Property solvProperty)
             throws NoConnectionToDBException, SQLException {
-        ExperimentResultHasSolverProperty e = new ExperimentResultHasSolverProperty();
+        ExperimentResultHasProperty e = new ExperimentResultHasProperty();
         e.setExpResult(expResult);
         e.setSolvProperty(solvProperty);
         e.setValue(null);
@@ -48,13 +48,13 @@ public class ExperimentResultHasPropertyDAO {
     }
 
     /**
-     * Saves the given ExperimentResultHasSolverProperty into the database. Dependend on the PersistanteState of
+     * Saves the given ExperimentResultHasProperty into the database. Dependend on the PersistanteState of
      * the given object a new entry is created , deleted  or updated in the database.
      * @param e the ExperimentResultHasResultPorperty object which has to be saved into the db
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    public static void save(ExperimentResultHasSolverProperty e) throws NoConnectionToDBException, SQLException {
+    public static void save(ExperimentResultHasProperty e) throws NoConnectionToDBException, SQLException {
         if (e.isDeleted()) {
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteValueQuery);
             ps.setInt(1, e.getId());
@@ -102,31 +102,31 @@ public class ExperimentResultHasPropertyDAO {
     }
 
     /**
-     * Deletes the given ExperimentResultHasSolverProperty from the database and cache.
-     * @param e ExperimentResultHasSolverProperty to delete
+     * Deletes the given ExperimentResultHasProperty from the database and cache.
+     * @param e ExperimentResultHasProperty to delete
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    public static void delete(ExperimentResultHasSolverProperty e) throws NoConnectionToDBException, SQLException {
+    public static void delete(ExperimentResultHasProperty e) throws NoConnectionToDBException, SQLException {
         e.setDeleted();
         save(e);
     }
 
     //
     /**
-     * Returns an caches (if necessary) all ExperimentResultHasSolverProperty objects which are related to the given
+     * Returns an caches (if necessary) all ExperimentResultHasProperty objects which are related to the given
      * ExperimentResult object.
      * @param expResult ExperimentResult object to search for
-     * @return a Vector of all ExperimentResultHasSolverProperty objects related to the given ExperimentResult object
+     * @return a Vector of all ExperimentResultHasProperty objects related to the given ExperimentResult object
      * @throws NoConnectionToDBException
      * @throws SQLException
      * @throws ExpResultHassolvPropertyNotInDBException
      * @throws ExperimentResultNotInDBException
      * @throws PropertyNotInDBException
      */
-    public static Vector<ExperimentResultHasSolverProperty> getAllByExperimentResult(ExperimentResult expResult)
+    public static Vector<ExperimentResultHasProperty> getAllByExperimentResult(ExperimentResult expResult)
             throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
-        Vector<ExperimentResultHasSolverProperty> res = new Vector<ExperimentResultHasSolverProperty>();
+        Vector<ExperimentResultHasProperty> res = new Vector<ExperimentResultHasProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idER_h_RP "
                 + "FROM " + table + " "
@@ -142,18 +142,18 @@ public class ExperimentResultHasPropertyDAO {
     }
 
     /**
-     * Returns and caches (if necessary) all ExperimentResultHasSolverProperty related to the given Property object
+     * Returns and caches (if necessary) all ExperimentResultHasProperty related to the given Property object
      * @param solvProperty Property object to search for
-     * @return Vector of all ExperimentResultHasSolverProperty related to the given Result Property object
+     * @return Vector of all ExperimentResultHasProperty related to the given Result Property object
      * @throws NoConnectionToDBException
      * @throws SQLException
      * @throws ExpResultHassolvPropertyNotInDBException
      * @throws ExperimentResultNotInDBException
      * @throws PropertyNotInDBException
      */
-    public static Vector<ExperimentResultHasSolverProperty> getAllByResultProperty(Property solvProperty)
+    public static Vector<ExperimentResultHasProperty> getAllByResultProperty(Property solvProperty)
             throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
-        Vector<ExperimentResultHasSolverProperty> res = new Vector<ExperimentResultHasSolverProperty>();
+        Vector<ExperimentResultHasProperty> res = new Vector<ExperimentResultHasProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idER_h_RP "
                 + "FROM " + table + " "
@@ -168,8 +168,8 @@ public class ExperimentResultHasPropertyDAO {
         return res;
     }
 
-    public static ExperimentResultHasSolverProperty getByExperimentResultAndResultProperty(ExperimentResult expResult, Property property) throws SQLException, NoConnectionToDBException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
-        ExperimentResultHasSolverProperty res = null;
+    public static ExperimentResultHasProperty getByExperimentResultAndResultProperty(ExperimentResult expResult, Property property) throws SQLException, NoConnectionToDBException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
+        ExperimentResultHasProperty res = null;
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idER_h_SP "
                 + "FROM " + table + " "
@@ -186,7 +186,7 @@ public class ExperimentResultHasPropertyDAO {
     }
 
     /**
-     * Assigns the ExperimentResultHasSolverProperty objects to the experiment results.
+     * Assigns the ExperimentResultHasProperty objects to the experiment results.
      * @param expResults
      * @param experimentId
      * @throws SQLException
@@ -195,7 +195,7 @@ public class ExperimentResultHasPropertyDAO {
     public static void assign(ArrayList<ExperimentResult> expResults, int experimentId) throws SQLException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
         HashMap<Integer, ExperimentResult> experimentResults = new HashMap<Integer, ExperimentResult>();
         for (ExperimentResult er : expResults) {
-            er.setPropertyValues(new HashMap<Integer, ExperimentResultHasSolverProperty>());
+            er.setPropertyValues(new HashMap<Integer, ExperimentResultHasProperty>());
             experimentResults.put(er.getId(), er);
         }
         HashMap<Integer, Property> solverProperties = new HashMap<Integer, Property>();
@@ -218,9 +218,9 @@ public class ExperimentResultHasPropertyDAO {
             int idSolverProperty = rs.getInt(3);
             ExperimentResult job = experimentResults.get(idJob);
             if (job != null) {
-                ExperimentResultHasSolverProperty erhsp = job.getPropertyValues().get(rs.getInt(idSolverProperty));
+                ExperimentResultHasProperty erhsp = job.getPropertyValues().get(rs.getInt(idSolverProperty));
                 if (erhsp == null) {
-                    erhsp = new ExperimentResultHasSolverProperty();
+                    erhsp = new ExperimentResultHasProperty();
                     erhsp.setId(rs.getInt(1));
                     erhsp.setExpResult(experimentResults.get(idJob));
                     erhsp.setSolvProperty(solverProperties.get(idSolverProperty));
@@ -234,18 +234,18 @@ public class ExperimentResultHasPropertyDAO {
     }
 
     /**
-     * Returns and caches (if necessary) the ExperimentResultHasSolverProperty object with the given id. The  values are kept in their order.
-     * @param id <Integer> of the requested ExperimentResultHasSolverProperty
-     * @return the ExperimentResultHasSolverProperty object with the given id
+     * Returns and caches (if necessary) the ExperimentResultHasProperty object with the given id. The  values are kept in their order.
+     * @param id <Integer> of the requested ExperimentResultHasProperty
+     * @return the ExperimentResultHasProperty object with the given id
      * @throws NoConnectionToDBException
      * @throws SQLException
      * @throws ExpResultHassolvPropertyNotInDBException
      * @throws ExperimentResultNotInDBException
      * @throws PropertyNotInDBException
      */
-    public static ExperimentResultHasSolverProperty getById(int id)
+    public static ExperimentResultHasProperty getById(int id)
             throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
-        ExperimentResultHasSolverProperty res = cache.getCached(id);
+        ExperimentResultHasProperty res = cache.getCached(id);
         if (res != null) {
             return res;
         } else {
@@ -257,12 +257,12 @@ public class ExperimentResultHasPropertyDAO {
             if (!rs.next()) {
                 throw new ExpResultHasSolvPropertyNotInDBException();
             }
-            res = new ExperimentResultHasSolverProperty();
+            res = new ExperimentResultHasProperty();
             res.setId(id);
             res.setExpResult(ExperimentResultDAO.getById(rs.getInt(1)));
             res.setSolvProperty(PropertyDAO.getById(rs.getInt(2)));
 
-            // Get the values for the value Vector of the ExperimentResultHasSolverProperty object from the SolverPropertyValue table from the database
+            // Get the values for the value Vector of the ExperimentResultHasProperty object from the SolverPropertyValue table from the database
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                     "SELECT value "
                     + "FROM " + valueTable + " WHERE ExperimentResult_has_SolverProperty_idER_h_SP=? "
