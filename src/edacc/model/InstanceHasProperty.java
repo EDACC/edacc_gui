@@ -25,7 +25,7 @@ public class InstanceHasProperty extends BaseModel implements IntegerPKModel {
         this.instanceProperty = instanceProperty;
         this.value = value;
     }
-
+    
     public String getValue() {
         return value;
     }

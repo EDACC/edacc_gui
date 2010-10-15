@@ -5,6 +5,7 @@
 
 package edacc.properties;
 
+import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
 import edacc.model.ExpResultHasSolvPropertyNotInDBException;
 import edacc.model.Experiment;
@@ -56,7 +57,7 @@ public class PropertyComputationController implements Runnable{
         }
     }
 
-    private void createParserJobs() throws NoConnectionToDBException, SQLException, SolverPropertyTypeNotExistException, IOException, PropertyNotInDBException {
+    private void createParserJobs() throws NoConnectionToDBException, SQLException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException {
         queue = new Vector<ExperimentResultHasProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idJob FROM " +
                 "ExperimentResults WHERE Experiment_idExperiment=?;");
@@ -76,10 +77,10 @@ public class PropertyComputationController implements Runnable{
                             ExperimentResultHasPropertyDAO.save(tmp);
                         }
                     } catch (ExpResultHasSolvPropertyNotInDBException ex) {
-                        queue.add(ExperimentResultHasPropertyDAO.createExperimentResultHasResultPropertyDAO(res, toParse.get(i)));
+                        queue.add(ExperimentResultHasPropertyDAO.createExperimentResultHasPropertyDAO(res, toParse.get(i)));
                     } catch (PropertyNotInDBException ex) {
                         Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (SolverPropertyTypeNotExistException ex) {
+                    } catch (PropertyTypeNotExistException ex) {
                         Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (IOException ex) {
                         Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);

@@ -4,6 +4,7 @@ import edacc.EDACCApp;
 import edacc.EDACCExperimentMode;
 import edacc.EDACCSolverConfigEntry;
 import edacc.EDACCSolverConfigPanel;
+import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
@@ -29,7 +30,7 @@ import edacc.model.SolverDAO;
 import edacc.model.PropertyNotInDBException;
 import edacc.model.TaskCancelledException;
 import edacc.model.Tasks;
-import edacc.properties.SolverPropertyTypeNotExistException;
+import edacc.properties.PropertyTypeNotExistException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
@@ -211,7 +212,7 @@ public class ExperimentController {
      * config panel.
      * @throws SQLException
      */
-    public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
+    public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
 
         task.setStatus("Checking jobs..");
         ArrayList<SolverConfiguration> deletedSolverConfigurations = SolverConfigurationDAO.getAllDeleted();
@@ -297,7 +298,7 @@ public class ExperimentController {
      * saves the instances selection of the currently loaded experiment
      * @throws SQLException
      */
-    public void saveExperimentHasInstances(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException {
+    public void saveExperimentHasInstances(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
         task.setStatus("Checking jobs..");
         ArrayList<ExperimentHasInstance> deletedInstances = main.insTableModel.getDeletedExperimentHasInstances();
         if (deletedInstances.size() > 0) {
@@ -361,7 +362,7 @@ public class ExperimentController {
      * @return number of jobs added to the experiment results table
      * @throws SQLException
      */
-    public int generateJobs(int numRuns, final Tasks task) throws SQLException, TaskCancelledException, IOException, SolverPropertyTypeNotExistException, PropertyNotInDBException {
+    public int generateJobs(int numRuns, final Tasks task) throws SQLException, TaskCancelledException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
         PropertyChangeListener cancelExperimentResultDAOStatementListener = new PropertyChangeListener() {
 
             @Override

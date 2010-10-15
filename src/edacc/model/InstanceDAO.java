@@ -47,7 +47,7 @@ public class InstanceDAO {
         return from;
     }
 
-    private static Instance getInstance(ResultSet rs, Vector<InstanceProperty> props) throws IOException, NoConnectionToDBException, SQLException {
+    private static Instance getInstance(ResultSet rs, Vector<Property> props) throws IOException, NoConnectionToDBException, SQLException {
         Instance i = new Instance();
         i.setId(rs.getInt("idInstance"));
         i.setMd5(rs.getString("md5"));

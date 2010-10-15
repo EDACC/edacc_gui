@@ -14,7 +14,7 @@ import javax.swing.event.ListDataListener;
  *
  * @author rretz
  */
-public class SolverPropertyValueComboBoxModel implements ComboBoxModel{
+public class PropertyValueComboBoxModel implements ComboBoxModel{
     private Vector<PropertyValueType> list;
     private int selected = -1;
 

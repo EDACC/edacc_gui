@@ -9,9 +9,9 @@ package edacc.properties;
  * This exception is thrown if the requested SolverPropertyType does not exists.
  * @author rretz
  */
-public class SolverPropertyTypeNotExistException extends Exception{
+public class PropertyTypeNotExistException extends Exception{
 
-    public SolverPropertyTypeNotExistException() {
+    public PropertyTypeNotExistException() {
         super("Used SolverPropertyType not exist.");
     }
 

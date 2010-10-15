@@ -6,6 +6,7 @@
 package edacc.properties;
 
 import edacc.EDACCComputeResultProperties;
+import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
@@ -32,14 +33,18 @@ public class ComputeResultPropertiesController {
 
     public void loadResultProperties() {
         try {
-            ((ResultPropertySelectionTableModel) tableResultProperty.getModel()).addResultProperties(PropertyDAO.getAll());
+            try {
+                ((PropertySelectionTableModel) tableResultProperty.getModel()).addProperties(PropertyDAO.getAll());
+            } catch (ComputationMethodDoesNotExistException ex) {
+                Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } catch (NoConnectionToDBException ex) {
             Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (PropertyNotInDBException ex) {
             Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SolverPropertyTypeNotExistException ex) {
+        } catch (PropertyTypeNotExistException ex) {
             Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
