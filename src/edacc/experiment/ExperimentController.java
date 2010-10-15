@@ -108,6 +108,9 @@ public class ExperimentController {
         try {
             main.insTableModel.setInstances(instances);
         } catch (IOException e) {
+            if (edacc.ErrorLogger.DEBUG) {
+                e.printStackTrace();
+            }
             throw new SQLException(e.getMessage());
         }
 
