@@ -1,16 +1,16 @@
 package edacc.experiment.plots;
 
-import java.awt.Point;
+import java.awt.geom.Point2D;
 
 /**
  *
  * @author simon
  */
 public class PointInformation {
-    private double[] point;
+    private Point2D point;
     private String description;
 
-    public PointInformation(double[] point, String description) {
+    public PointInformation(Point2D point, String description) {
         this.point = point;
         this.description = description;
     }
@@ -23,7 +23,7 @@ public class PointInformation {
         this.description = description;
     }
 
-    public double[] getPoint() {
+    public Point2D getPoint() {
         return point;
     }
 

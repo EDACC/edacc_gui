@@ -10,6 +10,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashSet;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -130,5 +131,19 @@ public class SolverConfigurationSelector extends JPanel {
 
     public ArrayList<SolverConfiguration> getSelectedSolverConfigurations() {
         return tableModel.getSelectedSolverConfigurations();
+    }
+
+    public void setSelectedSolverConfigurations(ArrayList<SolverConfiguration> selectedSolverConfigs) {
+        HashSet<Integer> ids = new HashSet<Integer>();
+        for (SolverConfiguration sc : selectedSolverConfigs) {
+            ids.add(sc.getId());
+        }
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            if (ids.contains(tableModel.getSolverConfigurationAt(i).getId())) {
+                tableModel.setValueAt(Boolean.TRUE, i, SolverConfigurationTableModel.COL_SEL);
+            } else {
+                tableModel.setValueAt(Boolean.FALSE, i, SolverConfigurationTableModel.COL_SEL);
+            }
+        }
     }
 }

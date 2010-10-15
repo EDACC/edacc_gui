@@ -5,8 +5,12 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Point;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -15,7 +19,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.MouseInputAdapter;
 import org.rosuda.javaGD.GDCanvas;
-
 
 /**
  *
@@ -55,15 +58,23 @@ public class PlotPanel extends JPanel {
         return plot;
     }
 }
-class PointScanner extends MouseInputAdapter {
 
+class PointScanner extends MouseInputAdapter {
     PlotPanel graphicComponent;
     JWindow toolTip;
     JLabel label;
+    public LinkedList<Point2D> points;
 
     public PointScanner(PlotPanel gtt) {
         graphicComponent = gtt;
         initToolTip();
+        gtt.addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                points = null;
+            }
+        });
     }
 
     private void initToolTip() {
@@ -78,17 +89,23 @@ class PointScanner extends MouseInputAdapter {
 
     @Override
     public void mouseMoved(MouseEvent e) {
+        if (points == null) {
+            points = new LinkedList<Point2D>();
+            for (int i = 0; i < graphicComponent.pointInformations.size(); i++) {
+                points.add(AnalysisController.convertPoint(graphicComponent.getDeviceNumber(), graphicComponent.pointInformations.get(i).getPoint()));
+            }
+        }
         Point p = e.getPoint();
         if (graphicComponent.pointInformations == null) {
             return;
         }
         String str = null;
+        int index = 0;
         double dist = 65535.; // infinity
         for (PointInformation info : graphicComponent.pointInformations) {
-            double[] point = AnalysisController.convertPoint(graphicComponent.getDeviceNumber(), info.getPoint());
-            Point p2 = new Point((int)point[0], (int)point[1]);
-            double tmpdist = p.distance(p2);
-            if (p.distance(p2) < 5.) {
+            Point2D point = points.get(index++);
+            double tmpdist = points.get(index++).distance(p.x, p.y);
+            if (tmpdist < 5.) {
                 if (tmpdist < dist) {
                     dist = tmpdist;
                     str = info.getDescription();

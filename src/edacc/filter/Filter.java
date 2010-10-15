@@ -1,10 +1,5 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * Filter2.java
+ * Filter.java
  *
  * Created on 13.10.2010, 11:29:39
  */
@@ -14,8 +9,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowFilter.Entry;
@@ -85,6 +78,7 @@ public class Filter extends javax.swing.JDialog {
     }
 
     public void clearFilters() {
+        pnlArguments.removeAll();
     }
 
     public boolean hasFiltersApplied() {

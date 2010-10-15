@@ -62,7 +62,7 @@ public class AnalysisPanel extends javax.swing.JPanel {
                     ComboTypeEntry cte = (ComboTypeEntry) comboType.getSelectedItem();
                     try {
                         initialize();
-                        cte.plotClass.getMethod("loadDefaultValues", new Class[] {ExperimentController.class}).invoke(null, expController);
+                        cte.plotClass.getMethod("loadDefaultValues", new Class[]{ExperimentController.class}).invoke(null, expController);
                         initializePlotType(dependencies[comboType.getSelectedIndex()]);
 
                     } catch (Exception ex) {
@@ -122,13 +122,32 @@ public class AnalysisPanel extends javax.swing.JPanel {
 
     public Plot getSelectedPlot() {
         try {
-        if (comboType.getSelectedItem() instanceof ComboTypeEntry) {
-            ComboTypeEntry cte = (ComboTypeEntry) comboType.getSelectedItem();
-            return (Plot) cte.plotClass.getConstructor(ExperimentController.class).newInstance(expController);
-        }
+            if (comboType.getSelectedItem() instanceof ComboTypeEntry) {
+                ComboTypeEntry cte = (ComboTypeEntry) comboType.getSelectedItem();
+                return (Plot) cte.plotClass.getConstructor(ExperimentController.class).newInstance(expController);
+            }
         } catch (Exception e) {
+            // TODO: error!
         }
         return null;
+    }
+
+    /**
+     * Tries to set the class of the plot as the current plot type.
+     * @param plot
+     * @return false, iff setting the plot type failed (plot didn't exist)
+     */
+    public boolean setSelectedPlot(Plot plot) {
+        for (int i = 0; i < comboType.getItemCount(); i++) {
+            if (comboType.getItemAt(i) instanceof ComboTypeEntry) {
+                ComboTypeEntry cte = (ComboTypeEntry) comboType.getItemAt(i);
+                if (cte.plotClass == plot.getClass()) {
+                    comboType.setSelectedIndex(i);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /** This method is called from within the constructor to

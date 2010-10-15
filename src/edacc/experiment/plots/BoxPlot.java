@@ -6,7 +6,6 @@ import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import org.rosuda.JRI.Rengine;
 
@@ -108,8 +107,8 @@ public class BoxPlot extends Plot {
         engine.eval("boxplot(main = 'Boxplot', " + data + ", names = names, horizontal = TRUE)");
         engine.eval("mtext('CPU Time (s)', side=1,line=3, cex=1.2)");
         if (warnings.size() > 0) {
-            warning = htmlHeader +
-                    "<h2>Warning</h2>";
+            warning = htmlHeader
+                    + "<h2>Warning</h2>";
             warning += "Some solvers got the penalty of " + expController.getActiveExperiment().getCPUTimeLimit() + "s for not solving some instances:<br>";
             for (String w : warnings) {
                 warning += w + "<br>";
@@ -121,5 +120,14 @@ public class BoxPlot extends Plot {
     @Override
     public String getAdditionalInformations() {
         return warning;
+    }
+
+    @Override
+    public void updateDependencies() {
+        if (instances == null || solverConfigs == null) {
+            return;
+        }
+        instanceSelector.setSelectedInstances(instances);
+        solverConfigurationSelector.setSelectedSolverConfigurations(solverConfigs);
     }
 }

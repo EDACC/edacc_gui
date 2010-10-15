@@ -14,6 +14,9 @@ import javax.swing.table.AbstractTableModel;
  * @author simon
  */
 public class SolverConfigurationTableModel extends AbstractTableModel {
+    public static final int COL_SEL = 0;
+    public static final int COL_NAME = 1;
+    public static final int COL_PARAMETERS = 2;
     private String[] columns = {"Selected", "Solvername", "Parameters"};
     public boolean[] selected;
     private ArrayList<SolverConfiguration> solverConfigurations;
@@ -46,6 +49,10 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public SolverConfiguration getSolverConfigurationAt(int row) {
+        return solverConfigurations.get(row);
     }
 
     /**
@@ -85,11 +92,11 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
 
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
-            case 0:
+            case COL_SEL:
                 return selected[rowIndex];
-            case 1:
+            case COL_NAME:
                 return solverConfigurations.get(rowIndex).getName();
-            case 2:
+            case COL_PARAMETERS:
                 return getParameterString(rowIndex);
         }
         return "";

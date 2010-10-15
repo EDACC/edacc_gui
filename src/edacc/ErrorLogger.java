@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ErrorLogger extends EventQueue implements Thread.UncaughtExceptionHandler {
-    private static boolean DEBUG = true; // DEBUG = true => log exceptions to file and to stdout
+    public static boolean DEBUG = true; // DEBUG = true => log exceptions to file and to stdout
     File log = null;
     Writer writer = null;
 

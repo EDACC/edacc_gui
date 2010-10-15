@@ -6,7 +6,6 @@ import edacc.model.ExperimentResult;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
@@ -52,7 +51,7 @@ public class KernelDensityPlot extends Plot {
 
     @Override
     public void plot(Rengine engine, ArrayList<PointInformation> pointInformations) throws Exception {
-        
+
         if (sc == null || instance == null) {
             if (!(comboSolver.getSelectedItem() instanceof SolverConfiguration)) {
                 throw new DependencyException("You have to select a solver.");
@@ -91,5 +90,14 @@ public class KernelDensityPlot extends Plot {
     @Override
     public String getPlotTitle() {
         return title;
+    }
+
+    @Override
+    public void updateDependencies() {
+        if (sc == null || instance == null) {
+            return;
+        }
+        comboSolver.setSelectedItem(sc);
+        comboInstance.setSelectedItem(instance);
     }
 }

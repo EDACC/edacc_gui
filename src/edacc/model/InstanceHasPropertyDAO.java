@@ -5,6 +5,7 @@
 package edacc.model;
 
 import edacc.model.InstanceProperty;
+import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.ConvertException;
 import edacc.satinstances.InstancePropertyManager;
 import edacc.satinstances.InvalidVariableException;
@@ -35,9 +36,10 @@ public class InstanceHasPropertyDAO {
      * persisted in the db.
      * @return new InstanceHasProperty object with the calculated value.
      */
-    public static InstanceHasProperty createInstanceHasInstanceProperty(Instance instance, InstanceProperty instanceProperty) throws SQLException, ConvertException, IOException, InvalidVariableException, InstanceNotInDBException {
+    public static InstanceHasProperty createInstanceHasInstanceProperty(Instance instance, Property instanceProperty) throws SQLException, ConvertException, IOException, InvalidVariableException, InstanceNotInDBException {
         PropertyValueType type = instanceProperty.getPropertyValueType();
-        String value = type.getStringRepresentation(instanceProperty.computeProperty(InstanceDAO.getSATFormulaOfInstance(instance)));
+        // TODO: fix!
+        String value = null; //type.getStringRepresentation(instanceProperty.computeProperty(InstanceDAO.getSATFormulaOfInstance(instance)));
         InstanceHasProperty i = new InstanceHasProperty(instance, instanceProperty, value);
         i.setNew();
         save(i);
@@ -86,7 +88,7 @@ public class InstanceHasPropertyDAO {
         save(i);
     }
 
-    private static Vector<InstanceHasProperty> getInstanceHasInstanceClassByInstancePropertyName(String propertyName) throws SQLException, InstanceClassMustBeSourceException, IOException {
+    private static Vector<InstanceHasProperty> getInstanceHasInstanceClassByInstancePropertyName(String propertyName) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         Vector<InstanceHasProperty> res = new Vector<InstanceHasProperty>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idInstanceProperty=?");
         st.setString(1, propertyName);
@@ -105,14 +107,14 @@ public class InstanceHasPropertyDAO {
         return res;
     }
 
-    private static InstanceHasProperty getInstanceHasInstancePropertyFromResultSet(ResultSet rs) throws SQLException, IOException {
+    private static InstanceHasProperty getInstanceHasInstancePropertyFromResultSet(ResultSet rs) throws SQLException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         Instance i = InstanceDAO.getById(rs.getInt("idInstance"));
         Property p = PropertyDAO.getByName(rs.getString("idProperty"));
         String value = rs.getString("value");
         return new InstanceHasProperty(i, p, value);
     }
 
-    private static Vector<InstanceHasProperty> getInstanceHasInstancePropertyByInstanceId(int id) throws SQLException, InstanceClassMustBeSourceException, IOException {
+    private static Vector<InstanceHasProperty> getInstanceHasInstancePropertyByInstanceId(int id) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         Vector<InstanceHasProperty> res = new Vector<InstanceHasProperty>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idInstance=?");
         st.setInt(1, id);
@@ -173,7 +175,7 @@ public class InstanceHasPropertyDAO {
         }
     }
 
-    public static void removeAllOfProperty(Property r) throws NoConnectionToDBException, SQLException, IOException {
+    public static void removeAllOfProperty(Property r) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
          PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT id FROM " + table + "WHERE idProperty=?;");
          ps.setInt(1, r.getId());
@@ -183,7 +185,7 @@ public class InstanceHasPropertyDAO {
          }
     }
 
-    public static InstanceHasProperty getById(int id) throws NoConnectionToDBException, SQLException, IOException{
+    public static InstanceHasProperty getById(int id) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException{
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idInstance, idProperty, value FROM " + table + "WHERE idProperty=?;");
         ps.setInt(1, id);

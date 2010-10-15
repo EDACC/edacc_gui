@@ -42,7 +42,7 @@ public class PropertyDAO {
     public static Property createProperty(String name, String regularExpression, String description, PropertyType type, PropertyValueType valueType,
             PropertySource source, boolean multiple, ComputationMethod computationMethod, String computationMethodParameters, String parameter, Boolean isDefault)
             throws NoConnectionToDBException, SQLException, PropertyIsUsedException, PropertyTypeDoesNotExistException, IOException,
-            PropertyNotInDBException, PropertyTypeNotExistException{
+            PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException{
         Property r = new Property();
         r.setName(name);
         r.setDescription(description);
@@ -118,7 +118,7 @@ public class PropertyDAO {
      * @throws SQLException
      */
     public static void save(Property r) throws NoConnectionToDBException, SQLException, PropertyIsUsedException, PropertyTypeDoesNotExistException, 
-            IOException, PropertyNotInDBException, PropertyTypeNotExistException {
+            IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         if(r.isDeleted()){
             if(r.getType().equals(PropertyType.InstanceProperty))
                 InstanceHasPropertyDAO.removeAllOfProperty(r);
@@ -209,7 +209,7 @@ public class PropertyDAO {
      * @throws PropertyTypeDoesNotExistException
      */
     public static void remove(Property toRemove) throws NoConnectionToDBException, SQLException, PropertyIsUsedException, PropertyTypeDoesNotExistException, 
-            IOException, PropertyNotInDBException, PropertyTypeNotExistException {
+            IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         toRemove.setDeleted();
         save(toRemove);
     }

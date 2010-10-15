@@ -12,6 +12,7 @@ import javax.swing.JRadioButton;
  * @author simon
  */
 public class ScaleSelector extends JPanel {
+
     private ButtonGroup xButtons, yButtons;
     private JRadioButton xLog, xLin, yLog, yLin;
 
@@ -29,9 +30,9 @@ public class ScaleSelector extends JPanel {
         xButtons.add(xLin);
         yButtons.add(yLog);
         yButtons.add(yLin);
-        
+
         c.anchor = GridBagConstraints.NORTHEAST;
-        
+
         c.gridx = 0;
         c.gridy = 0;
         c.gridheight = 2;
@@ -61,7 +62,7 @@ public class ScaleSelector extends JPanel {
         c.gridheight = 1;
         c.gridx = 1;
         add(yLin, c);
-        
+
         c.gridy = 3;
         add(yLog, c);
 
@@ -75,5 +76,21 @@ public class ScaleSelector extends JPanel {
 
     public boolean isYScaleLog() {
         return yLog.isSelected();
+    }
+
+    public void setXScaleLog(Boolean xlog) {
+        if (xlog) {
+            xLog.setSelected(true);
+        } else {
+            xLin.setSelected(true);
+        }
+    }
+
+    public void setYScaleLog(Boolean ylog) {
+        if (ylog) {
+            yLog.setSelected(true);
+        } else {
+            yLin.setSelected(true);
+        }
     }
 }

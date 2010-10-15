@@ -8,6 +8,7 @@ import edacc.model.InstanceDAO;
 import edacc.model.InstanceProperty;
 import edacc.model.SolverConfiguration;
 import edacc.model.Property;
+import java.awt.geom.Point2D;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.JComboBox;
@@ -160,7 +161,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
                     // add the values and set the point information; the right point coordinates will be set later
                     xsVec.add(xsValue);
                     ysVec.add(ysValue);
-                    pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>"
+                    pointInformations.add(new PointInformation(new Point2D.Double(), "<html>"
                             + instance.getName() + " (" + instanceProperty + "): " + (double) Math.round(xsValue * 100) / 100 + "<br>"
                             + solverConfig.toString() + " (" + solverProperty + "): " + (double) Math.round(ysValue * 100) / 100 + "<br>"
                             + "Run: " + yres.getRun() + "<br>"
@@ -189,7 +190,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
                 // add the values and specify the point information
                 xsVec.add(xsValue);
                 ysVec.add(ysValue);
-                pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>"
+                pointInformations.add(new PointInformation(new Point2D.Double(), "<html>"
                         + instance.getName() + " (" + instanceProperty + "): " + (double) Math.round(xsValue * 100) / 100 + "<br>"
                         + solverConfig.toString() + " (" + solverProperty + "): " + (double) Math.round(ysValue * 100) / 100 + "<br>"
                         + "Instance: " + instance.getName()
@@ -223,7 +224,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
                 // add the values and specify the point information
                 xsVec.add(xsValue);
                 ysVec.add(ysValue);
-                pointInformations.add(new PointInformation(new double[]{0, 0}, "<html>"
+                pointInformations.add(new PointInformation(new Point2D.Double(), "<html>"
                         + instance.getName() + " (" + instanceProperty + "): " + (double) Math.round(xsValue * 100) / 100 + "<br>"
                         + solverConfig.toString() + " (" + solverProperty + "): " + (double) Math.round(ysValue * 100) / 100 + "<br>"
                         + "Instance: " + instance.getName()
@@ -299,12 +300,10 @@ public class ScatterInstancePropertySolverProperty extends Plot {
                     + "p-value: " + pearson[0] + "<br>";
         } else {
         }
-        ArrayList<double[]> points = getPoints(re, xs, ys);
+        ArrayList<Point2D> points = getPoints(re, xs, ys);
         int k = 0;
-        for (double[] point : points) {
-            pointInformations.get(k).getPoint()[0] = point[0];
-            pointInformations.get(k).getPoint()[1] = point[1];
-            k++;
+        for (Point2D point : points) {
+            pointInformations.get(k++).getPoint().setLocation(point);
         }
     }
 
@@ -320,5 +319,27 @@ public class ScatterInstancePropertySolverProperty extends Plot {
     @Override
     public String getAdditionalInformations() {
         return infos;
+    }
+
+    @Override
+    public void updateDependencies() {
+        if (solverConfig == null || instances == null || solverProperty == null || instanceProperty == null || run == null || xlog == null || ylog == null) {
+            return;
+        }
+        if (run == AVERAGE) {
+            comboRun.setSelectedItem(AVERAGE_TEXT);
+        } else if (run == MEDIAN) {
+            comboRun.setSelectedItem(MEDIAN_TEXT);
+        } else if (run == ALLRUNS) {
+            comboRun.setSelectedItem(ALLRUNS);
+        } else {
+            comboRun.setSelectedItem(run);
+        }
+        comboSolver.setSelectedItem(solverConfig);
+        instanceSelector.setSelectedInstances(instances);
+        comboSolverProperty.setSelectedItem(solverProperty);
+        comboInstanceProperty.setSelectedItem(instanceProperty);
+        scaleSelector.setXScaleLog(xlog);
+        scaleSelector.setYScaleLog(ylog);
     }
 }

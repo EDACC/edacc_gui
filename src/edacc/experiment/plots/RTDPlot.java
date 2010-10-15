@@ -7,7 +7,6 @@ import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import edacc.model.Property;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
@@ -188,5 +187,16 @@ public class RTDPlot extends Plot {
 
     public static String getTitle() {
         return "Property distribution comparison of two solvers on an instance";
+    }
+
+    @Override
+    public void updateDependencies() {
+        if (sc1 == null || sc2 == null || instance == null || property == null) {
+            return;
+        }
+        combo1.setSelectedItem(sc1);
+        combo2.setSelectedItem(sc2);
+        comboInstance.setSelectedItem(instance);
+        comboProperty.setSelectedItem(property);
     }
 }

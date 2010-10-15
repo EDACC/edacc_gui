@@ -7,6 +7,7 @@ package edacc;
 
 import edacc.events.PlotTabEvents;
 import edacc.experiment.AnalysisController;
+import edacc.experiment.REngineInitializationException;
 import edacc.experiment.plots.PlotPanel;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -31,6 +32,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -123,7 +126,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         pnlAdditionalInformations.setVisible(false);
         splitPane.setDividerSize(0);
         splitPane.setDividerLocation(.9);
-        
+
     }
 
     private void addPanel(TabComponent tabComp, PlotPanel pnl) {
@@ -391,6 +394,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
             fc.setFileFilter(new ExtensionFileFilter(suffix.toUpperCase() + " (*." + suffix + ")", suffix));
         }
         fc.setFileFilter(new ExtensionFileFilter("PDF (*.pdf)", "pdf"));
+        fc.setFileFilter(new ExtensionFileFilter("eps (*.eps)", "eps"));
         fc.setAcceptAllFileFilterUsed(true);
         fc.setMultiSelectionEnabled(false);
         if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
@@ -406,9 +410,11 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                         break;
                     }
                 }
-                // add pdf
+                // add pdf & eps
                 if (fileName.endsWith(".pdf")) {
                     imgType = "pdf";
+                } else if (fileName.endsWith(".eps")) {
+                    imgType = "eps";
                 }
             } else {
                 imgType = ((ExtensionFileFilter) fc.getFileFilter()).extensions[0];
@@ -431,7 +437,8 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
             //  TabComponent tc = (TabComponent) tabbedPanePlots.getTabComponentAt(tabbedPanePlots.getSelectedIndex());
             if ("pdf".equals(imgType)) {
                 AnalysisController.saveToPdf(plotPanel, fileName);
-                //     tc.setTitle(name);
+            } else if ("eps".equals(imgType)) {
+                AnalysisController.saveToEps(plotPanel, fileName);
             } else {
                 try {
                     // Get a buffered Image with the right dimension
@@ -466,6 +473,8 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
 
         jPanel2 = new javax.swing.JPanel();
         btnSave = new javax.swing.JButton();
+        btnRefresh = new javax.swing.JButton();
+        btnSettings = new javax.swing.JButton();
         splitPane = new javax.swing.JSplitPane();
         tabbedPanePlots = new javax.swing.JTabbedPane();
         pnlAdditionalInformations = new javax.swing.JPanel();
@@ -484,6 +493,14 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         btnSave.setText(resourceMap.getString("btnSave.text")); // NOI18N
         btnSave.setName("btnSave"); // NOI18N
 
+        btnRefresh.setAction(actionMap.get("btnRefresh")); // NOI18N
+        btnRefresh.setText(resourceMap.getString("btnRefresh.text")); // NOI18N
+        btnRefresh.setName("btnRefresh"); // NOI18N
+
+        btnSettings.setAction(actionMap.get("btnSettings")); // NOI18N
+        btnSettings.setText(resourceMap.getString("btnSettings.text")); // NOI18N
+        btnSettings.setName("btnSettings"); // NOI18N
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -491,11 +508,18 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnSave)
-                .addContainerGap(516, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnRefresh)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnSettings)
+                .addContainerGap(362, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(btnSave)
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(btnSave)
+                .addComponent(btnRefresh)
+                .addComponent(btnSettings))
         );
 
         splitPane.setDividerLocation(200);
@@ -564,7 +588,9 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_tabbedPanePlotsStateChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnSave;
+    private javax.swing.JButton btnSettings;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPanel pnlAdditionalInformations;
@@ -832,6 +858,41 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                 }
             }
             return false;
+        }
+    }
+
+    @Action
+    public void btnSettings() {
+                if (!(tabbedPanePlots.getSelectedComponent() instanceof PlotPanel)) {
+            return;
+        }
+        PlotPanel panel = (PlotPanel) tabbedPanePlots.getSelectedComponent();
+
+        if (AnalysisController.setSelectedPlotType(panel.getPlot())) {
+            // set the dependencies
+            panel.getPlot().updateDependencies();
+            // repaint the analysis panel and set the main form to the foreground.
+            AnalysisController.analysisPanel.revalidate();
+            AnalysisController.analysisPanel.repaint();
+            AnalysisController.analysisPanel.requestFocus();
+        } else {
+            // TODO: message: failed!
+        }
+    }
+
+    @Action
+    public void btnRefresh() {
+        if (!(tabbedPanePlots.getSelectedComponent() instanceof PlotPanel)) {
+            return;
+        }
+        PlotPanel panel = (PlotPanel) tabbedPanePlots.getSelectedComponent();
+        AnalysisController.setCurrentDeviceNumber(panel.getDeviceNumber());
+        try {
+            panel.getPlot().plot(AnalysisController.getRengine(), panel.pointInformations);
+        } catch (REngineInitializationException ex) {
+            // TODO: error
+        } catch (Exception ex) {
+            // TODO: error
         }
     }
 }

@@ -29,19 +29,19 @@ public class InstanceDAO {
     protected static final String table = "Instances";
     private static final ObjectCache<Instance> cache = new ObjectCache<Instance>();
 
-    private static String getPropertySelect(Vector<InstanceProperty> props) {
+    private static String getPropertySelect(Vector<Property> props) {
         String select = " ";
         int tbl = 0;
-        for (InstanceProperty p : props) {
+        for (Property p : props) {
             select += ", tbl_" + tbl++ + ".value";
         }
         return select + " ";
     }
 
-    private static String getPropertyFrom(Vector<InstanceProperty> props) throws IOException, NoConnectionToDBException, SQLException {
+    private static String getPropertyFrom(Vector<Property> props) throws IOException, NoConnectionToDBException, SQLException {
         String from = " ";
         int tbl = 0;
-        for (InstanceProperty p : props) {
+        for (Property p : props) {
             from += "JOIN (SELECT idInstance, value FROM Instance_has_InstanceProperty WHERE idInstanceProperty = \"" + p.getName() + "\") AS tbl_" + tbl++ + " USING (idInstance) ";
         }
         return from;
@@ -231,7 +231,8 @@ public class InstanceDAO {
      */
     public static LinkedList<Instance> getAll() throws SQLException, InstanceClassMustBeSourceException, IOException {
         // return linked list with all instances
-        Vector<InstanceProperty> props = InstancePropertyManager.getInstance().getAll();
+        // TODO: fix!
+        Vector<Property> props = new Vector<Property>();//InstancePropertyManager.getInstance().getAll();
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
         ResultSet rs = st.executeQuery("SELECT i.idInstance, i.md5, i.name, i.instanceClass_idinstanceClass" + getPropertySelect(props)
                 + "FROM " + table + " AS i " + getPropertyFrom(props));
@@ -252,7 +253,8 @@ public class InstanceDAO {
     }
 
     public static LinkedList<Instance> getAllByExperimentId(int id) throws SQLException, InstanceClassMustBeSourceException, IOException {
-        Vector<InstanceProperty> props = InstancePropertyManager.getInstance().getAll();
+        // TODO: fix!
+        Vector<Property> props = new Vector<Property>();//InstancePropertyManager.getInstance().getAll();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT DISTINCT i.idInstance, i.md5, i.name, i.instanceClass_idinstanceClass" + getPropertySelect(props)
                 + "FROM " + table + " as i JOIN Experiment_has_Instances as ei ON "
