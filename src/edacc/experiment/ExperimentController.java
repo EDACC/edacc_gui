@@ -590,10 +590,9 @@ public class ExperimentController {
                             ExperimentResult er = map.get(results.get(i).getId());
                             if (er != null) {
                                 results.set(i, er);
-                                // main.jobsTableModel.fireTableRowsUpdated(i, i); // doesn't work with sorted columns :-\
+                                 main.jobsTableModel.fireTableRowsUpdated(i, i); 
                             }
                         }
-                        main.jobsTableModel.fireTableDataChanged();
                     }
                 }
             }
