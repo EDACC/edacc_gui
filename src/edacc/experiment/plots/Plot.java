@@ -164,6 +164,9 @@ public abstract class Plot {
             }
             return Double.valueOf(result.getResultTime());
         } else {
+            if (!String.valueOf(result.getResultCode().getValue()).startsWith("1")) {
+                return new Double(expController.getActiveExperiment().getCPUTimeLimit());
+            }
             ExperimentResultHasProperty erhsp = result.getPropertyValues().get(property.getId());
 
             if (erhsp == null || erhsp.getValue().isEmpty()) {
