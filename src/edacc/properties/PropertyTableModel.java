@@ -6,6 +6,7 @@
 package edacc.properties;
 
 import edacc.model.Property;
+import edacc.model.PropertyType;
 import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 
@@ -13,8 +14,8 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author rretz
  */
-public class SolverPropertyTableModel extends AbstractTableModel {
-    private String[] columns = {"Name", "Prefix", "Value type", "Property type", "Multiple"};
+public class PropertyTableModel extends AbstractTableModel {
+    private String[] columns = {"Name", "Property type"};
     private Vector<Property> rows = new Vector<Property>();
 
     /**
@@ -46,15 +47,7 @@ public class SolverPropertyTableModel extends AbstractTableModel {
             case 0:
                 return String.class;
             case 1:
-                return String.class;
-            case 2:
-                return String.class;
-            case 3:
-                return PropertyValueTypeSelectionModel.class;
-            case 4:
-                return PropertySource.class;
-            case 5:
-                return Boolean.class;
+                return PropertyType.class;
             default:
                 return null;
         }
@@ -64,7 +57,7 @@ public class SolverPropertyTableModel extends AbstractTableModel {
      * Returns the value of the requested cell. ColumnIndex of 0 returns a String representing the name of the Property.
      * ColumnIndex of 1 returns a String representing the prefix of the Property. ColumnIndex 2 returns
      * the PropertyValueType object of the Property. ColumnIndex of 3 returns the PropertySource.
-     * ColumnIndex of 4 returns the multiple status and a ColumnIndex of 5 returns the Property object.
+     * ColumnIndex of 4 returns the multiple status.
      *
      * @param rowIndex
      * @param columnIndex
@@ -76,20 +69,20 @@ public class SolverPropertyTableModel extends AbstractTableModel {
             case 0:
                 return rows.get(rowIndex).getName();
             case 1:
-                return rows.get(rowIndex).getRegularExpression();
-            case 2:
-                return rows.get(rowIndex).getPropertyValueType();
-            case 3:
-                return rows.get(rowIndex).getPropertySource();
-            case 4:
-                return rows.get(rowIndex).isMultiple();
-            case 5:
-                return rows.get(rowIndex);
+                return rows.get(rowIndex).getType();
             default:
                 return "";
         }
     }
 
+    /**
+     *
+     * @param rowIndex the row of the requested Property in the TableModel
+     * @return the requested Property at the given rowIndex of the TableModel
+     */
+    public Property getProperty(int rowIndex){
+        return rows.get(rowIndex);
+    }
     /**
      * Adds the given Property object.
      * @param resProperty Property object to add
@@ -130,7 +123,7 @@ public class SolverPropertyTableModel extends AbstractTableModel {
      * Removes the given Property object from the table
      * @param toRemove the Property object to remove
      */
-    public void removeSolverProperty(Property toRemove){
+    public void removeProperty(Property toRemove){
         rows.remove(toRemove);
         this.fireTableDataChanged();
     }

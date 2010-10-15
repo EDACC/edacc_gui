@@ -39,7 +39,7 @@ public class ComputeResultPropertiesController {
             Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (PropertyNotInDBException ex) {
             Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SolverPropertyTypeNotExistException ex) {
+        } catch (PropertyTypeNotExistException ex) {
             Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);

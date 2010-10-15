@@ -5,7 +5,7 @@
 
 package edacc.model;
 
-import edacc.properties.SolverPropertyTypeNotExistException;
+import edacc.properties.PropertyTypeNotExistException;
 import edacc.properties.PropertySource;
 import edacc.satinstances.PropertyValueType;
 import java.io.File;
@@ -162,7 +162,7 @@ public class Property extends BaseModel implements IntegerPKModel{
      *
      * @param typeId the DB representation of the PropertySource
      */
-    public void setPropertySource(int sourceId) throws SolverPropertyTypeNotExistException{
+    public void setPropertySource(int sourceId) throws PropertyTypeNotExistException{
         switch(sourceId){
             case 0:
                 this.source = PropertySource.LauncherOutput;
@@ -180,7 +180,7 @@ public class Property extends BaseModel implements IntegerPKModel{
                 this.source = PropertySource.WatcherOutput;
                 break;
             default:
-                throw new SolverPropertyTypeNotExistException();
+                throw new PropertyTypeNotExistException();
 
         }
         if (this.isSaved())

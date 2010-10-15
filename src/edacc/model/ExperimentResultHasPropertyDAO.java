@@ -4,7 +4,7 @@
  */
 package edacc.model;
 
-import edacc.properties.SolverPropertyTypeNotExistException;
+import edacc.properties.PropertyTypeNotExistException;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -126,7 +126,7 @@ public class ExperimentResultHasPropertyDAO {
      */
     public static Vector<ExperimentResultHasProperty> getAllByExperimentResult(ExperimentResult expResult)
             throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, 
-            PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
+            PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
         Vector<ExperimentResultHasProperty> res = new Vector<ExperimentResultHasProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idExperimentResult_has_Property "
@@ -154,7 +154,7 @@ public class ExperimentResultHasPropertyDAO {
      */
     public static Vector<ExperimentResultHasProperty> getAllByProperty(Property Property)
             throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, 
-            PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
+            PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
         Vector<ExperimentResultHasProperty> res = new Vector<ExperimentResultHasProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idExperimentResult_has_Property "
@@ -172,7 +172,7 @@ public class ExperimentResultHasPropertyDAO {
 
     public static ExperimentResultHasProperty getByExperimentResultAndResultProperty(ExperimentResult expResult, Property property)
             throws SQLException, NoConnectionToDBException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException,
-            PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
+            PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
         ExperimentResultHasProperty res = null;
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idER_h_SP "
@@ -197,7 +197,7 @@ public class ExperimentResultHasPropertyDAO {
      * @throws Exception
      */
     public static void assign(ArrayList<ExperimentResult> expResults, int experimentId) throws SQLException, PropertyNotInDBException,
-            SolverPropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
+            PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
         HashMap<Integer, ExperimentResult> experimentResults = new HashMap<Integer, ExperimentResult>();
         for (ExperimentResult er : expResults) {
             er.setPropertyValues(new HashMap<Integer, ExperimentResultHasProperty>());
@@ -259,7 +259,7 @@ public class ExperimentResultHasPropertyDAO {
      */
     public static ExperimentResultHasProperty getById(int id)
             throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, 
-            PropertyNotInDBException, SolverPropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
+            PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
         ExperimentResultHasProperty res = cache.getCached(id);
         if (res != null) {
             return res;
