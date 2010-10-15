@@ -6,12 +6,14 @@
 package edacc.properties;
 
 import edacc.EDACCManagePropertyDialog;
+import edacc.model.ComputationMethod;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
 import edacc.model.PropertyIsUsedException;
 import edacc.model.PropertyNotInDBException;
+import edacc.model.PropertyType;
 import edacc.model.PropertyTypeDoesNotExistException;
 import edacc.satinstances.PropertyValueType;
 import edacc.satinstances.PropertyValueTypeManager;
@@ -108,40 +110,6 @@ public class ManagePropertyController {
             this.editId = -1;
     }
 
-    public void saveSolverProperty(String name, String prefix, String description, PropertySource propType, String parameter)
-            throws NoConnectionToDBException, SQLException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, 
-            PropertyIsUsedException, PropertyTypeDoesNotExistException, ComputationMethodDoesNotExistException{
-
-        if(editId != -1){
-            Property toEdit = PropertyDAO.getById(editId);
-            toEdit.setName(name);
-            toEdit.setRegularExpression(prefix);
-            toEdit.setDescription(description);
-            PropertyDAO.save(toEdit);
-        }else {
-        //   PropertyDAO.createProperty(name, prefix, description, propType, parameter);
-        }
-        loadProperties();
-        main.clearSolverPropertyEditField();
-    }
-
-     public void saveSolverProperty(String name, String prefix, String description, PropertySource propType, String valueType, boolean isMultiple)
-            throws NoConnectionToDBException, SQLException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, 
-            PropertyIsUsedException, ComputationMethodDoesNotExistException{
-
-        if(editId != -1){
-            Property toEdit = PropertyDAO.getById(editId);
-            toEdit.setName(name);
-            toEdit.setRegularExpression(prefix);
-            toEdit.setDescription(description);
-       //     PropertyDAO.save(toEdit);
-        }else {
-          //  PropertyDAO.createResultProperty(name, prefix, description, PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(valueType), propType, isMultiple);
-        }
-        loadProperties();
-        main.clearSolverPropertyEditField();
-    }
-
     public void showPropertyTypeSelection() {
         main.showPropertyTypeSelection();
     }
@@ -150,9 +118,24 @@ public class ManagePropertyController {
         main.propertyTypeChanged();
     }
 
-    void disablePropertyEditFields() {
+    public void disablePropertyEditFields() {
         main.disablePropertyEditFields();
     }
-      
 
+    public void saveProperty(String name, String description, PropertyType type, String regExp, ComputationMethod computationMethod,
+            String computationMethodParameters, PropertySource source, PropertyValueType<?> valueType, boolean isMultipe)
+            throws NoConnectionToDBException, SQLException, PropertyIsUsedException, PropertyTypeDoesNotExistException, IOException,
+            PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException{
+
+        if(editId != -1){
+            Property toEdit = PropertyDAO.getById(editId);
+            toEdit.setName(name);
+            toEdit.setDescription(description);
+            PropertyDAO.save(toEdit);
+        }else
+            PropertyDAO.createProperty(name, regExp, description, type, valueType, source, isMultipe, computationMethod,
+                computationMethodParameters, name, isMultipe);
+        loadProperties();
+        main.clearSolverPropertyEditField();
+    }
 }
