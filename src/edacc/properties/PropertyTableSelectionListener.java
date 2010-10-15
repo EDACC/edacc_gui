@@ -13,11 +13,11 @@ import javax.swing.event.ListSelectionListener;
  *
  * @author rretz
  */
-public class SolverPropertyTableSelectionListener implements ListSelectionListener{
+public class PropertyTableSelectionListener implements ListSelectionListener{
     JTable table;
     ManagePropertyController controller;
 
-    public SolverPropertyTableSelectionListener(JTable table, ManagePropertyController controller) {
+    public PropertyTableSelectionListener(JTable table, ManagePropertyController controller) {
         this.table = table;
         this.controller = controller;
     }
@@ -27,7 +27,7 @@ public class SolverPropertyTableSelectionListener implements ListSelectionListen
             if (table.getSelectedRow() != -1) {
                 controller.showProperty(table.convertRowIndexToModel(table.getSelectedRow()));
             } else
-                controller.showSolverPropertyEditField(false);
+               controller.disablePropertyEditFields();
             }
     }
 

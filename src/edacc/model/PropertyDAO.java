@@ -191,7 +191,7 @@ public class PropertyDAO {
     public static Vector<Property> getAll() throws NoConnectionToDBException, SQLException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException{
         Vector<Property> res = new Vector<Property>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-            "SELECT idSolverProperty "
+            "SELECT idProperty "
             + "FROM " + table);
         ResultSet rs = ps.executeQuery();
         while(rs.next()){

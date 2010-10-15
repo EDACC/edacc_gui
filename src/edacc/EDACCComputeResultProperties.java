@@ -13,7 +13,7 @@ package edacc;
 
 import edacc.model.Property;
 import edacc.properties.ComputeResultPropertiesController;
-import edacc.properties.ResultPropertySelectionTableModel;
+import edacc.properties.PropertySelectionTableModel;
 import java.awt.Component;
 import java.util.Vector;
 import javax.swing.JLabel;
@@ -27,7 +27,7 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class EDACCComputeResultProperties extends javax.swing.JDialog {
     ComputeResultPropertiesController controller;
-    ResultPropertySelectionTableModel tableModel;
+    PropertySelectionTableModel tableModel;
     /** Creates new form EDACCComputeResultProperties */
     public EDACCComputeResultProperties(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -36,7 +36,7 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog {
         controller = new ComputeResultPropertiesController(this, tableSelectResultProperties);
 
         // initate the result property table
-        tableModel = new ResultPropertySelectionTableModel();
+        tableModel = new PropertySelectionTableModel();
         tableSelectResultProperties.setModel(tableModel);
        
        initalize();

@@ -20,7 +20,7 @@ import edacc.model.PropertyType;
 import edacc.model.PropertyTypeDoesNotExistException;
 import edacc.properties.ManagePropertyController;
 import edacc.properties.PropertyTableModel;
-import edacc.properties.SolverPropertyTableSelectionListener;
+import edacc.properties.PropertyTableSelectionListener;
 import edacc.properties.PropertySource;
 import edacc.properties.PropertyTypeNotExistException;
 import java.awt.Component;
@@ -56,7 +56,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         // initialize tableSolverProperty
         propertyTableModel = new PropertyTableModel();
         tableProperty.setModel(propertyTableModel);
-        tableProperty.getSelectionModel().addListSelectionListener(new SolverPropertyTableSelectionListener(tableProperty, controller));
+        tableProperty.getSelectionModel().addListSelectionListener(new PropertyTableSelectionListener(tableProperty, controller));
            
         // Adding new ColumnModel for the suitable representation of boolen values in the table.
         tableProperty.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
@@ -117,8 +117,10 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCManagePropertyDialog.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
+        setBackground(resourceMap.getColor("Form.background")); // NOI18N
+        setFont(resourceMap.getFont("Form.font")); // NOI18N
+        setIconImage(null);
         setName("Form"); // NOI18N
-        setUndecorated(true);
 
         panelManageProperty.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("panelManageProperty.border.title"))); // NOI18N
         panelManageProperty.setName("panelManageProperty"); // NOI18N
@@ -426,7 +428,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         panelManagePropertyLayout.setVerticalGroup(
             panelManagePropertyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelManagePropertyLayout.createSequentialGroup()
-                .addContainerGap(16, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 653, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -443,11 +445,11 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(panelManageProperty, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(buttonDone, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addComponent(buttonDone))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -455,7 +457,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(panelManageProperty, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(32, 32, 32)
                 .addComponent(buttonDone, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -677,6 +679,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     public void initialize(){
         try {
             // Initialize the comboBoxPropertyType
+            comboBoxPropertyType.removeAllItems();
             for(int i = 0; i < propertyTypes.length; i++){
                 this.comboBoxPropertyType.addItem(propertyTypes[i]);
             }
@@ -738,12 +741,14 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     }
 
     public void loadResultPropertySources(){
+        comboBoxPropertySource.removeAllItems();
         for(int i = 0; i < ResultPropertySources.length; i++){
             comboBoxPropertySource.addItem(ResultPropertySources[i]);
         }
     }
 
     public void loadInstancePropertySources(){
+        comboBoxPropertySource.removeAllItems();
         for(int i = 0; i < InstancePropertySources.length; i++){
             comboBoxPropertySource.addItem(InstancePropertySources[i]);
         }
@@ -779,6 +784,12 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     private void enableEditing() {
         this.textPropertyFieldName.setEnabled(true);
         this.textAreaPropertyDescription.setEnabled(true);
+        this.buttonSaveProperty.setEnabled(true);
+    }
+
+    public void disablePropertyEditFields() {
+        this.textPropertyFieldName.setEnabled(false);
+        this.textAreaPropertyDescription.setEnabled(false);
     }
 
 }

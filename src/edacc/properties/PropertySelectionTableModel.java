@@ -13,7 +13,7 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author rretz
  */
-public class ResultPropertySelectionTableModel extends AbstractTableModel{
+public class PropertySelectionTableModel extends AbstractTableModel{
     private Vector<Property> rows = new Vector<Property>();
     private Vector<Boolean> selected = new Vector<Boolean>();
     private String[] columns = {"Result property", "Selected"};
@@ -53,7 +53,7 @@ public class ResultPropertySelectionTableModel extends AbstractTableModel{
             return Boolean.class;
     }
 
-    public Property getResultProperty(int rowIndex){
+    public Property getProperty(int rowIndex){
         return rows.get(rowIndex);
     }
 
@@ -71,14 +71,14 @@ public class ResultPropertySelectionTableModel extends AbstractTableModel{
 
     }
 
-    public void addResultProperty(Property toAdd){
+    public void addProperty(Property toAdd){
         this.rows.add(toAdd);
         this.selected.add(false);
     }
 
-    public void addResultProperties(Vector<Property> toAdd){
+    public void addProperties(Vector<Property> toAdd){
         for(int i = 0; i < toAdd.size(); i++){
-            addResultProperty(toAdd.get(i));
+            addProperty(toAdd.get(i));
         }
         this.fireTableDataChanged();
     }

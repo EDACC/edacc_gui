@@ -149,6 +149,10 @@ public class ManagePropertyController {
     public void propertyTypeChanged() {
         main.propertyTypeChanged();
     }
+
+    void disablePropertyEditFields() {
+        main.disablePropertyEditFields();
+    }
       
 
 }

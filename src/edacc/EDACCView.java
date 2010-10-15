@@ -356,6 +356,13 @@ public class EDACCView extends FrameView implements Observer {
     }//GEN-LAST:event_helpMenuItemActionPerformed
 
     private void ManagePropertyMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ManagePropertyMenuItemActionPerformed
+        if (manageSolverProperties == null) {
+            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+            manageSolverProperties = new EDACCManagePropertyDialog(mainFrame, true);
+            manageSolverProperties.setLocationRelativeTo(mainFrame);
+        }
+        manageSolverProperties.initialize();
+        manageSolverProperties.setVisible(true);
     }//GEN-LAST:event_ManagePropertyMenuItemActionPerformed
 
     @Action
@@ -524,14 +531,8 @@ public class EDACCView extends FrameView implements Observer {
     }
 
     @Action
-    public void btnSolverProperties() {
-        if (manageSolverProperties == null) {
-            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            manageSolverProperties = new EDACCManagePropertyDialog(mainFrame, true);
-            manageSolverProperties.setLocationRelativeTo(mainFrame);
-        }
-        manageSolverProperties.initialize();
-        manageSolverProperties.setVisible(true);
+    public void btnProperties() {
+        
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem ManagePropertyMenuItem;
