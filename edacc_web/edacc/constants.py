@@ -7,6 +7,10 @@
     application.
 """
 
+# enum of possible property value types (propertyValue column in the Property table)
+INSTANCE_PROPERTY_TYPE = 0
+RESULT_PROPERTY_TYPE = 1
+
 # tuples since there are 3 codes that mean 'finished'
 JOB_ERROR = (-2,)
 JOB_WAITING = (-1,)
@@ -23,6 +27,7 @@ JOB_STATUS = {
     0:  'running',
     1:  'finished',
     2:  'terminated by ulimit',
+    21: 'terminated by ulimit',
 }
 
 JOB_RESULT_CODE = {
@@ -58,4 +63,5 @@ JOB_STATUS_COLOR = {
     0:  'orange',
     1:  '#00CC33',
     2:  '#FF6600',
+    21: '#FF6600',
 }
