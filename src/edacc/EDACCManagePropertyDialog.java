@@ -11,6 +11,8 @@
 
 package edacc;
 
+import edacc.properties.ManagePropertyDialogSourceListener;
+import edacc.properties.ManagePropertyDialogTypeListener;
 import edacc.model.ComputationMethod;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.NoConnectionToDBException;
@@ -50,6 +52,9 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     private PropertyType[] propertyTypes = {PropertyType.InstanceProperty, PropertyType.ResultProperty};
     private EDACCManagePropertyValueTypesDialog PropertyValueTypesDialog;
     private boolean editing = false;
+    private EDACCManageComputationMethodDialog computationMethodDialog;
+    private ManagePropertyDialogSourceListener sourceListener;
+    private ManagePropertyDialogTypeListener typeListener;
 
     /** Creates new form EDACCManagePropertyDialog */
     public EDACCManagePropertyDialog(java.awt.Frame parent, boolean modal) {
@@ -76,6 +81,10 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 return lbl;
             }
         });
+
+        sourceListener = new ManagePropertyDialogSourceListener(controller);
+        typeListener = new ManagePropertyDialogTypeListener(controller, comboBoxPropertyType);
+        
     }
 
     /** This method is called from within the constructor to
@@ -282,11 +291,6 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
 
         comboBoxPropertyType.setEnabled(false);
         comboBoxPropertyType.setName("comboBoxPropertyType"); // NOI18N
-        comboBoxPropertyType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                comboBoxPropertyTypeActionPerformed(evt);
-            }
-        });
 
         labelPropertyType.setText(resourceMap.getString("labelPropertyType.text")); // NOI18N
         labelPropertyType.setName("labelPropertyType"); // NOI18N
@@ -488,7 +492,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_buttonDoneActionPerformed
 
     private void comboBoxPropertySourceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxPropertySourceActionPerformed
-        controller.propertySourceChanged();
+
     }//GEN-LAST:event_comboBoxPropertySourceActionPerformed
 
     private void buttonPropertyAddValueTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPropertyAddValueTypeActionPerformed
@@ -509,8 +513,9 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 JOptionPane.ERROR_MESSAGE);
             }else{
             try {
-                try {
+                try {                 
                     controller.removeProperty(tableProperty.convertRowIndexToModel(tableProperty.getSelectedRow()));
+
                 } catch (PropertyTypeDoesNotExistException ex) {
                     Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
@@ -518,6 +523,8 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 } catch (PropertyNotInDBException ex) {
                     Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (PropertyTypeNotExistException ex) {
+                    Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ComputationMethodDoesNotExistException ex) {
                     Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } catch (NoConnectionToDBException ex) {
@@ -562,11 +569,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 JOptionPane.ERROR_MESSAGE);
         }else{
             try {
-                controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), 
-                        textFieldPropertyRegularExpression.getText(), (ComputationMethod) comboBoxComputationMethod.getSelectedItem(),
-                        textFieldComputationmethodParameter.getText(), (PropertySource) comboBoxPropertySource.getSelectedItem(),
-                        (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String)comboBoxPropertyValuetype.getSelectedItem()),
-                        checkBoxMultipleOccurrences.isSelected());
+                controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), textFieldPropertyRegularExpression.getText(), (ComputationMethod) comboBoxComputationMethod.getSelectedItem(), textFieldComputationmethodParameter.getText(), (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String)comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
             } catch (IOException ex) {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (NoConnectionToDBException ex) {
@@ -581,16 +584,19 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (PropertyTypeNotExistException ex) {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ComputationMethodDoesNotExistException ex) {
+                Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }//GEN-LAST:event_buttonSavePropertyActionPerformed
 
-    private void comboBoxPropertyTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxPropertyTypeActionPerformed
-        controller.propertyTypeChanged();
-    }//GEN-LAST:event_comboBoxPropertyTypeActionPerformed
-
     private void buttonNewComputationMethodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonNewComputationMethodActionPerformed
-        // TODO add your handling code here:
+        if(computationMethodDialog == null){
+            computationMethodDialog = new EDACCManageComputationMethodDialog(EDACCApp.getApplication().getMainFrame(), editing);
+            computationMethodDialog.setLocationRelativeTo(this);
+            computationMethodDialog.setVisible(true);
+        }
+        computationMethodDialog.initialize();
     }//GEN-LAST:event_buttonNewComputationMethodActionPerformed
 
     /**
@@ -666,12 +672,15 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     }
 
     public void propertySourceChanged() {
-        if(!this.comboBoxPropertyType.getSelectedItem().equals(PropertyType.InstanceProperty) && this.comboBoxPropertySource.isEnabled()
+        if(this.comboBoxPropertyType.getSelectedItem().equals(PropertyType.InstanceProperty) && this.comboBoxPropertySource.isEnabled()
                 && !editing){
             if(this.comboBoxPropertySource.getSelectedItem().equals(PropertySource.InstanceName)){
                 this.radioBtnRegExpression.setEnabled(editing);
                 this.radioBtnRegExpression.setSelected(true);
                 this.textFieldPropertyRegularExpression.setEnabled(true);
+                radioBtnComputationMethod.setEnabled(false);
+                buttonNewComputationMethod.setEnabled(false);
+                textFieldComputationmethodParameter.setEnabled(false);
             }else if(this.comboBoxPropertySource.getSelectedItem().equals(PropertySource.Instance)){
                 this.radioBtnComputationMethod.setEnabled(true);
                 this.radioBtnRegExpression.setEnabled(true);
@@ -701,6 +710,8 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             }
             controller.loadProperties();
             controller.loadPropertyValueTypes();
+            comboBoxPropertyType.addItemListener(typeListener);
+            
         } catch (SQLException ex) {
             Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ComputationMethodDoesNotExistException ex) {
@@ -731,7 +742,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     }
 
     public void propertyTypeChanged() {
-         if(!this.comboBoxPropertyType.getSelectedItem().equals(PropertyType.InstanceProperty) && this.comboBoxPropertyType.isEnabled()
+         if(this.comboBoxPropertyType.getSelectedItem().equals(PropertyType.InstanceProperty) && this.comboBoxPropertyType.isEnabled()
                  && !editing){
              this.comboBoxPropertySource.setEnabled(true);
              this.comboBoxComputationMethod.setEnabled(true);
@@ -741,7 +752,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
              this.checkBoxMultipleOccurrences.setEnabled(true);
              this.buttonPropertyAddValueType.setEnabled(true);
              loadInstancePropertySources();
-        }else if(this.comboBoxPropertyType.getSelectedItem().equals(PropertyType.ResultProperty) && this.comboBoxPropertySource.isEnabled()
+        }else if(this.comboBoxPropertyType.getSelectedItem().equals(PropertyType.ResultProperty) && this.comboBoxPropertyType.isEnabled()
                  && !editing){
             this.comboBoxPropertySource.setEnabled(true);
             this.comboBoxComputationMethod.setEnabled(true);
@@ -757,17 +768,23 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     }
 
     public void loadResultPropertySources(){
+        if(comboBoxPropertySource.getItemCount() != 0)
+            comboBoxPropertySource.removeItemListener(sourceListener);
         comboBoxPropertySource.removeAllItems();
         for(int i = 0; i < ResultPropertySources.length; i++){
             comboBoxPropertySource.addItem(ResultPropertySources[i]);
         }
+        comboBoxPropertySource.addItemListener(sourceListener);
     }
 
     public void loadInstancePropertySources(){
+        if(comboBoxPropertySource.getItemCount() != 0)
+            comboBoxPropertySource.removeItemListener(sourceListener);
         comboBoxPropertySource.removeAllItems();
         for(int i = 0; i < InstancePropertySources.length; i++){
             comboBoxPropertySource.addItem(InstancePropertySources[i]);
         }
+        comboBoxPropertySource.addItemListener(sourceListener);
     }
 
     /**

@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Vector;
 
 /**
  *
@@ -64,7 +65,7 @@ public class ComputationMethodDAO {
      * @throws NoComputationMethodBinarySpecifiedException
      * @throws FileNotFoundException
      */
-    private static void save(ComputationMethod cm) throws NoConnectionToDBException, NoConnectionToDBException, NoConnectionToDBException, SQLException, ComputationMethodAlreadyExistsException, NoComputationMethodBinarySpecifiedException, FileNotFoundException {
+    public static void save(ComputationMethod cm) throws NoConnectionToDBException, NoConnectionToDBException, NoConnectionToDBException, SQLException, ComputationMethodAlreadyExistsException, NoComputationMethodBinarySpecifiedException, FileNotFoundException {
         if(cm.isDeleted()){
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
             ps.setInt(1, cm.getId());
@@ -179,5 +180,23 @@ public class ComputationMethodDAO {
         out.close();
         in.close();
     }
+
+    /**
+     * Returns and caches all ComputationMethod objects form the database
+     * @return all ComputationMethod objects from the database.
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws ComputationMethodDoesNotExistException
+     */
+    public static Vector<ComputationMethod> getAll() throws NoConnectionToDBException, SQLException, ComputationMethodDoesNotExistException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+            "SELECT idComputationMethod FROM " + table + ";");
+        ResultSet rs = ps.executeQuery();
+        Vector<ComputationMethod> all = new Vector<ComputationMethod>();
+        while(rs.next()){
+            all.add(getById(rs.getInt("idComputationMethod")));
+        }
+        return all;
+     }
 
 }

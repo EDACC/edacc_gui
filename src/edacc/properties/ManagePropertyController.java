@@ -82,7 +82,7 @@ public class ManagePropertyController {
             throws NoConnectionToDBException, SQLException, SQLException, PropertyNotInDBException,
         PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
         ((PropertyTableModel)this.tableSolverProperty.getModel()).clear();
-        ((PropertyTableModel)this.tableSolverProperty.getModel()).addResultProperties(new Vector<Property>(PropertyDAO.getAll()));
+        ((PropertyTableModel)this.tableSolverProperty.getModel()).addProperties(new Vector<Property>(PropertyDAO.getAll()));
     }
 
     public void loadPropertyValueTypes() throws IOException, NoConnectionToDBException, SQLException{
@@ -95,7 +95,8 @@ public class ManagePropertyController {
     }
 
     public void removeProperty(int convertRowIndexToModel) throws NoConnectionToDBException, SQLException, PropertyIsUsedException,
-            PropertyTypeDoesNotExistException, IOException, PropertyNotInDBException, PropertyTypeNotExistException {
+            PropertyTypeDoesNotExistException, IOException, PropertyNotInDBException, PropertyTypeNotExistException,
+            ComputationMethodDoesNotExistException {
         Property toRemove = (Property)((PropertyTableModel)tableSolverProperty.getModel()).getValueAt(convertRowIndexToModel, 5);
         PropertyDAO.remove(toRemove);
         ((PropertyTableModel)tableSolverProperty.getModel()).removeProperty(toRemove);

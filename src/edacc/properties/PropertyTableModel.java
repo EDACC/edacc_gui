@@ -55,10 +55,7 @@ public class PropertyTableModel extends AbstractTableModel {
 
     /**
      * Returns the value of the requested cell. ColumnIndex of 0 returns a String representing the name of the Property.
-     * ColumnIndex of 1 returns a String representing the prefix of the Property. ColumnIndex 2 returns
-     * the PropertyValueType object of the Property. ColumnIndex of 3 returns the PropertySource.
-     * ColumnIndex of 4 returns the multiple status.
-     *
+     * ColumnIndex of 1 returns a String representing the type of the Property.
      * @param rowIndex
      * @param columnIndex
      * @return value of the requested cell or "" if the requested cell is invalid.
@@ -85,19 +82,19 @@ public class PropertyTableModel extends AbstractTableModel {
     }
     /**
      * Adds the given Property object.
-     * @param resProperty Property object to add
+     * @param property Property object to add
      */
-    private void addResultProperty(Property resProperty){
-        rows.add(resProperty);
+    private void addProperty(Property property){
+        rows.add(property);
     }
 
     /**
      * Adds all given Property objects.
-     * @param resProperties the Property objects to add
+     * @param properties the Property objects to add
      */
-    public void addResultProperties(Vector<Property> resProperties){
-        for(int i = 0; i < resProperties.size(); i++){
-            addResultProperty(resProperties.get(i));
+    public void addProperties(Vector<Property> properties){
+        for(int i = 0; i < properties.size(); i++){
+            addProperty(properties.get(i));
         }
         this.fireTableDataChanged();
     }
@@ -106,7 +103,7 @@ public class PropertyTableModel extends AbstractTableModel {
      * Removes the Property at the given position of the table.
      * @param rowIndex of the Property to remove
      */
-    public void removeResultProperty(int rowIndex){
+    public void removeProperty(int rowIndex){
         rows.remove(rowIndex);
         this.fireTableDataChanged();
     }
