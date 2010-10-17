@@ -15,8 +15,8 @@ public class InstanceFilter extends Filter {
     private boolean filterInstanceClasses;
     private InstanceTableModel model;
 
-    public InstanceFilter(java.awt.Frame parent, boolean modal, JTable table) {
-        super(parent, modal, table);
+    public InstanceFilter(java.awt.Frame parent, boolean modal, JTable table, boolean autoUpdateFilterTypes) {
+        super(parent, modal, table, autoUpdateFilterTypes);
         if (!(table.getModel() instanceof InstanceTableModel)) {
             throw new IllegalArgumentException("Expected instance table model.");
         }

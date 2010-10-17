@@ -123,7 +123,7 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
             ylog = scaleSelector.isYScaleLog();
         }
 
-        initializeResults();
+        initialize();
         infos = null;
         double ymax = 0.;
         double xmax = 0.;
@@ -299,11 +299,13 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
                     + "p-value: " + pearson[0] + "<br>";
         } else {
         }
+        infos += htmlFooter;
         ArrayList<Point2D> points = getPoints(re, xs, ys);
         int k = 0;
         for (Point2D point : points) {
             pointInformations.get(k++).getPoint().setLocation(point);
         }
+        deinitialize();
     }
 
     @Override

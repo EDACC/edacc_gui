@@ -38,13 +38,16 @@ public class BooleanFilter extends javax.swing.JPanel implements FilterInterface
         lblName = new javax.swing.JLabel();
 
         setName("Form"); // NOI18N
+        setPreferredSize(new java.awt.Dimension(198, 20));
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(BooleanFilter.class);
         radioTrue.setText(resourceMap.getString("radioTrue.text")); // NOI18N
         radioTrue.setName("radioTrue"); // NOI18N
+        radioTrue.setPreferredSize(new java.awt.Dimension(47, 20));
 
         radioFalse.setText(resourceMap.getString("radioFalse.text")); // NOI18N
         radioFalse.setName("radioFalse"); // NOI18N
+        radioFalse.setPreferredSize(new java.awt.Dimension(51, 20));
 
         lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
         lblName.setName("lblName"); // NOI18N
@@ -56,15 +59,15 @@ public class BooleanFilter extends javax.swing.JPanel implements FilterInterface
             .addGroup(layout.createSequentialGroup()
                 .addComponent(lblName)
                 .addGap(66, 66, 66)
-                .addComponent(radioTrue)
+                .addComponent(radioTrue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(radioFalse))
+                .addComponent(radioFalse, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(radioFalse)
-                .addComponent(radioTrue)
+                .addComponent(radioFalse, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(radioTrue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(lblName))
         );
     }// </editor-fold>//GEN-END:initComponents

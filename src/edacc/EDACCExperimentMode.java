@@ -11,12 +11,9 @@ import edacc.experiment.AnalysisPanel;
 import edacc.experiment.ExperimentInstanceClassTableModel;
 import edacc.experiment.ExperimentController;
 import edacc.experiment.ExperimentResultsBrowserTableModel;
-import edacc.experiment.ExperimentResultsBrowserTableModelRowFilter;
 import edacc.experiment.ExperimentTableModel;
 import edacc.experiment.InstanceTableModel;
-import edacc.experiment.InstanceTableModelRowFilter;
 import edacc.experiment.SolverTableModel;
-import edacc.filter.Filter;
 import edacc.filter.InstanceFilter;
 import edacc.filter.JobsFilter;
 import edacc.gridqueues.GridQueuesController;
@@ -27,8 +24,8 @@ import edacc.model.ExperimentResultStatus;
 import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.Solver;
 import edacc.model.TaskCancelledException;
+import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
-import edacc.properties.ComputeResultPropertiesController;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -154,7 +151,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
             @Override
             public void run() {
-                instanceFilter = new InstanceFilter(EDACCApp.getApplication().getMainFrame(), true, tableInstances);
+                instanceFilter = new InstanceFilter(EDACCApp.getApplication().getMainFrame(), true, tableInstances, true);
                 instanceClassModel = new ExperimentInstanceClassTableModel(insTableModel, instanceFilter, expController);
                 tableInstanceClasses.setModel(instanceClassModel);
             }
@@ -186,7 +183,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
             @Override
             public void run() {
-                resultBrowserRowFilter = new JobsFilter(EDACCApp.getApplication().getMainFrame(), true, tableJobs);
+                resultBrowserRowFilter = new JobsFilter(EDACCApp.getApplication().getMainFrame(), true, tableJobs, false);
             }
         });
 
@@ -1532,15 +1529,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 btnGeneratePackage.setEnabled(false);
             }
         } else if (manageExperimentPane.getSelectedIndex() == 4) {
+            // job browser tab
+            resultBrowserETA = null;
+            lblETA.setText("");
             try {
-                // job browser tab
-                resultBrowserETA = null;
-                lblETA.setText("");
-                jobsTableModel.updateSolverProperties();
                 jobsTableModel.setJobs(null);
             } catch (SQLException ex) {
-                createDatabaseErrorMessage(ex);
             }
+            jobsTableModel.updateSolverProperties();
+
             // first draw the results browser, then load the jobs (SwingUtilites)
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -1550,17 +1547,31 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
             });
         } else if (manageExperimentPane.getSelectedIndex() == 5) {
-            // Analyse tab
+            // Analysis tab
             try {
                 AnalysisController.checkForR();
             } catch (Exception e) {
                 javax.swing.JOptionPane.showMessageDialog(null, "Error while initializing R: " + e.getMessage(), "Analyse", javax.swing.JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            analysePanel.initialize();
-            if (analysePanel.comboType.getItemCount() > 0) {
-                analysePanel.comboType.setSelectedIndex(0);
-            }
+            analysePanel.removeAll();
+            Tasks.startTask(new TaskRunnable() {
+
+                @Override
+                public void run(Tasks task) {
+                    analysePanel.initialize();
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            if (analysePanel.comboType.getItemCount() > 0) {
+                                analysePanel.comboType.setSelectedIndex(0);
+                            }
+                        }
+                    });
+
+                }
+            }, false);
         }
 
         if (manageExperimentPane.getSelectedIndex() != 4) {
@@ -1807,15 +1818,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     @Action
     public void btnLoadExperiment() {
         if (tableExperiments.getSelectedRow() != -1) {
-            if (expController.getActiveExperiment() != null && hasUnsavedChanges()) {
-                if (JOptionPane.showConfirmDialog(this,
-                        "Loading an experiment will make you lose all unsaved changes of the current experiment. Continue loading the experiment?",
-                        "Warning!",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-                    Experiment selectedExperiment = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
-                    Tasks.startTask("loadExperiment", new Class[]{Experiment.class, edacc.model.Tasks.class}, new Object[]{selectedExperiment, null}, expController, this);
-                }
-            } else {
+            if (expController.getActiveExperiment() == null || !hasUnsavedChanges() || JOptionPane.showConfirmDialog(this,
+                    "Loading an experiment will make you lose all unsaved changes of the current experiment. Continue loading the experiment?",
+                    "Warning!",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                 Experiment selectedExperiment = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
                 Tasks.startTask("loadExperiment", new Class[]{Experiment.class, edacc.model.Tasks.class}, new Object[]{selectedExperiment, null}, expController, this);
             }
@@ -2001,7 +2007,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     @Action
     public void btnRefreshJobs() {
         resultBrowserETA = null;
-        Tasks.startTask("loadJobs", expController, this);
+        Tasks.startTask("loadJobs", expController, this, false);
     }
 
     @Action

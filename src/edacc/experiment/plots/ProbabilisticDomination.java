@@ -136,7 +136,7 @@ public class ProbabilisticDomination extends Plot {
         ArrayList<Instance> firstDominates = new ArrayList<Instance>();
         ArrayList<Instance> secondDominates = new ArrayList<Instance>();
         ArrayList<Instance> crossovers = new ArrayList<Instance>();
-        probDom.initializeResults();
+        probDom.initialize();
         for (Instance i : _instances) {
             int dom;
             try {
@@ -188,6 +188,7 @@ public class ProbabilisticDomination extends Plot {
             c.gridy++;
         }
         pnlProbabilisticDomination.revalidate();
+        probDom.deinitialize();
     }
 
     public int probabilisticDominates(Instance instance, SolverConfiguration sc1, SolverConfiguration sc2, Property prop) throws REngineInitializationException {
@@ -220,6 +221,7 @@ public class ProbabilisticDomination extends Plot {
         for (int i = 0; i < resultsDouble2.size(); i++) {
             resultsDoubleArray2[i] = resultsDouble2.get(i);
         }
+
         engine.assign("values1", resultsDoubleArray1);
         engine.assign("values2", resultsDoubleArray2);
         engine.eval("ecdf1 <- ecdf(values1)");

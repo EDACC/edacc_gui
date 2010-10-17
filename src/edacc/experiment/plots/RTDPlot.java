@@ -82,7 +82,7 @@ public class RTDPlot extends Plot {
             instance = (Instance) comboInstance.getSelectedItem();
             property = (Property) comboProperty.getSelectedItem();
         }
-        initializeResults();
+        initialize();
         title = "Property distribution comparison on " + instance + " (" + expController.getActiveExperiment().getName() + ")";
         infos = null;
         ArrayList<ExperimentResult> results1 = getResults(sc1.getId(), instance.getId());
@@ -173,6 +173,7 @@ public class RTDPlot extends Plot {
         }
         // TODO: warnings
         infos += htmlFooter;
+        deinitialize();
     }
 
     @Override

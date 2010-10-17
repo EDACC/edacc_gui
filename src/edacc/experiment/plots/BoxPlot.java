@@ -70,7 +70,7 @@ public class BoxPlot extends Plot {
                 throw new DependencyException("You have to select solvers in order to plot.");
             }
         }
-        initializeResults();
+        initialize();
         int k = 0;
         ArrayList<String> warnings = new ArrayList<String>();
         String[] names = new String[solverConfigs.size()];
@@ -115,6 +115,7 @@ public class BoxPlot extends Plot {
             }
             warning += htmlFooter;
         }
+        deinitialize();
     }
 
     @Override
