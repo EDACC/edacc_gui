@@ -62,6 +62,8 @@ public class QuadTree<T> {
                 for (BucketObject p : points) {
                     insert(p.point, (T) p.obj);
                 }
+                points.clear();
+                points = null;
             }
         }
     }
