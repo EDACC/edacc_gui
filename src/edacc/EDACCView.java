@@ -23,6 +23,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import edacc.manageDB.Util;
+import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
 import java.io.IOException;
 import java.net.URL;
@@ -504,22 +505,29 @@ public class EDACCView extends FrameView implements Observer {
             }
 
         }
-        try {
-            experimentMode.initialize();
-            mainPanelLayout.replace(mode, experimentMode);
-            mode = experimentMode;
-            manageExperimentModeMenuItem.setSelected(true);
-            manageDBModeMenuItem.setSelected(false);
-        } catch (NoConnectionToDBException ex) {
-            JOptionPane.showMessageDialog(this.getComponent(), "You have to connect to the database before switching modes", "No database connection", JOptionPane.ERROR_MESSAGE);
-            noMode();
-        } catch (SQLException ex) {
-            createDatabaseErrorMessage(ex);
-            noMode();
-        } catch (Exception e) {
-            javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-        }
-        statusMessageLabel.setText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+        Tasks.startTask(new TaskRunnable() {
+
+            @Override
+            public void run(Tasks task) {
+                try {
+                    experimentMode.initialize();
+                    mainPanelLayout.replace(mode, experimentMode);
+                    mode = experimentMode;
+                    manageExperimentModeMenuItem.setSelected(true);
+                    manageDBModeMenuItem.setSelected(false);
+                } catch (NoConnectionToDBException ex) {
+                    JOptionPane.showMessageDialog(EDACCView.this.getComponent(), "You have to connect to the database before switching modes", "No database connection", JOptionPane.ERROR_MESSAGE);
+                    noMode();
+                } catch (SQLException ex) {
+                    createDatabaseErrorMessage(ex);
+                    noMode();
+                } catch (Exception e) {
+                    javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                }
+                statusMessageLabel.setText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+            }
+        }, true);
+
     }
 
     @Action
@@ -532,7 +540,6 @@ public class EDACCView extends FrameView implements Observer {
 
     @Action
     public void btnProperties() {
-        
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem ManagePropertyMenuItem;

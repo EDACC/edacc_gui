@@ -3,6 +3,7 @@ package edacc.model;
 import edacc.EDACCApp;
 import edacc.events.TaskEvents;
 import edacc.EDACCTaskView;
+import java.util.LinkedList;
 import javax.swing.SwingUtilities;
 import org.jdesktop.application.Task;
 import org.jdesktop.application.Application;
@@ -19,6 +20,8 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
     private Class[] signature;
     private Object[] parameters;
     private Object target;
+    private TaskRunnable runnable;
+    private static final Object syncTasks = new Object();
     private static Task task;
     private static EDACCTaskView taskView;
 
@@ -83,6 +86,37 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
         startTask(methodName, new Class[]{}, new Object[]{}, target, view, withTaskView);
     }
 
+    public static void startTask(TaskRunnable runnable, boolean withTaskView) {
+        taskView = null;
+        task = new Tasks(runnable);
+        if (withTaskView) {
+            taskView = new EDACCTaskView(EDACCApp.getApplication().getMainFrame(), true, (Tasks) task);
+            taskView.setResizable(false);
+            taskView.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+            taskView.setTitle("Running..");
+            taskView.setOperationName("Running..");
+            taskView.setMessage("");
+            taskView.setProgress(0.);
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        if (taskView.isDisplayable()) {
+                            taskView.setVisible(true);
+                        }
+                    } catch (Exception _) {
+                        // happens if the task view is already disposed, i.e. the task is finished.
+                    }
+                }
+            });
+        }
+        ApplicationContext appC = Application.getInstance().getContext();
+        appC.getTaskService().execute(task);
+        appC.getTaskMonitor().setForegroundTask(task);
+
+    }
+
     private Tasks(EDACCApp app, String methodName, Class[] signature, Object[] parameters, Object target, TaskEvents view) {
         super(app);
         this.methodName = methodName;
@@ -92,43 +126,69 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
         this.view = view;
     }
 
+    private Tasks(TaskRunnable runnable) {
+        super(EDACCApp.getApplication());
+        this.runnable = runnable;
+    }
+
     @Override
     protected Void doInBackground() {
-        try {
-            for (int i = 0; i < signature.length; i++) {
-                if (signature[i] == edacc.model.Tasks.class) {
-                    parameters[i] = this;
+        synchronized (syncTasks) {
+            if (runnable != null) {
+
+                runnable.run(this);
+                if (taskView != null) {
+                    taskView.dispose();
                 }
+                task = null;
+                return null;
+            } else {
+                try {
+                    for (int i = 0; i < signature.length; i++) {
+                        if (signature[i] == edacc.model.Tasks.class) {
+                            parameters[i] = this;
+                        }
+                    }
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            view.onTaskStart(methodName);
+                        }
+                    });
+                    final Object res = target.getClass().getDeclaredMethod(methodName, signature).invoke(target, parameters);
+                    if (taskView != null) {
+                        taskView.dispose();
+                    }
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            view.onTaskSuccessful(methodName, res);
+                        }
+                    });
+
+                } catch (final java.lang.reflect.InvocationTargetException e) {
+                    if (taskView != null) {
+                        taskView.dispose();
+                    }
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            view.onTaskFailed(methodName, e.getTargetException());
+                        }
+                    });
+
+                } catch (Exception e) {
+                    System.out.println("This should not happen. Called a method which should not be called. Be sure that your method is declared as public. Exception as follows: " + e);
+                    EDACCApp.getLogger().logException(e);
+                }
+                task = null;
+                return null;
             }
-            try {
-                view.onTaskStart(methodName);
-            } catch (Exception e) {
-                EDACCApp.getLogger().logException(e);
-            }
-            Object res = target.getClass().getDeclaredMethod(methodName, signature).invoke(target, parameters);
-            if (taskView != null) {
-                taskView.dispose();
-            }
-            try {
-                view.onTaskSuccessful(methodName, res);
-            } catch (Exception ex) {
-                EDACCApp.getLogger().logException(ex);
-            }
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            if (taskView != null) {
-                taskView.dispose();
-            }
-            try {
-                view.onTaskFailed(methodName, e.getTargetException());
-            } catch (Exception ex) {
-                EDACCApp.getLogger().logException(ex);
-            }
-        } catch (Exception e) {
-            System.out.println("This should not happen. Called a method which should not be called. Be sure that your method is declared as public. Exception as follows: " + e);
-            EDACCApp.getLogger().logException(e);
+
         }
-        task = null;
-        return null;
     }
 
     /**

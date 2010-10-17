@@ -127,7 +127,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
             xlog = scaleSelector.isXScaleLog();
             ylog = scaleSelector.isYScaleLog();
         }
-        initializeResults();
+        initialize();
         infos = null;
         double ymax = 0.;
         double xmax = 0.;
@@ -305,6 +305,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
         for (Point2D point : points) {
             pointInformations.get(k++).getPoint().setLocation(point);
         }
+        deinitialize();
     }
 
     @Override

@@ -51,7 +51,7 @@ public class InstanceSelector extends JPanel {
 
             @Override
             public void run() {
-                rowFilter = new InstanceFilter(EDACCApp.getApplication().getMainFrame(), true, table);
+                rowFilter = new InstanceFilter(EDACCApp.getApplication().getMainFrame(), true, table, true);
                 rowFilter.setFilterInstanceClasses(false);
             }
         });

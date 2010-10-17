@@ -13,8 +13,8 @@ public class JobsFilter extends Filter {
     private ExperimentResultsBrowserTableModel model;
     private boolean[] visibility = new boolean[0];
 
-    public JobsFilter(java.awt.Frame parent, boolean modal, JTable table) {
-        super(parent, modal, table);
+    public JobsFilter(java.awt.Frame parent, boolean modal, JTable table, boolean autoUpdateFilterTypes) {
+        super(parent, modal, table, autoUpdateFilterTypes);
         if (!(table.getModel() instanceof ExperimentResultsBrowserTableModel)) {
             throw new IllegalArgumentException("Expected ExperimentResultBrowserTableModel.");
         }
@@ -22,7 +22,7 @@ public class JobsFilter extends Filter {
     }
 
     @Override
-    protected void updateFilterTypes() {
+    public void updateFilterTypes() {
         // make all columns visible, this will let the filter recognize every column
         boolean[] old = model.getColumnVisibility();
         if (visibility.length != old.length) {

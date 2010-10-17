@@ -886,7 +886,9 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
             return;
         }
         PlotPanel panel = (PlotPanel) tabbedPanePlots.getSelectedComponent();
-        AnalysisController.setCurrentDeviceNumber(panel.getDeviceNumber());
+        if (!AnalysisController.setCurrentDeviceNumber(panel.getDeviceNumber())) {
+            return ;
+        }
         try {
             panel.getPlot().plot(AnalysisController.getRengine(), panel.pointInformations);
         } catch (REngineInitializationException ex) {

@@ -29,9 +29,9 @@ public class Filter extends javax.swing.JDialog {
     private GridBagLayout argumentLayout;
     private GridBagConstraints gridBagConstraints;
     private Parser parser;
-
+    private boolean updateFilterTypes;
     /** Creates new form EDACCFilter */
-    public Filter(java.awt.Frame parent, boolean modal, JTable table) {
+    public Filter(java.awt.Frame parent, boolean modal, JTable table, boolean autoUpdateFilterTypes) {
         super(parent, modal);
         initComponents();
         if (!(table.getRowSorter() instanceof TableRowSorter)) {
@@ -58,6 +58,7 @@ public class Filter extends javax.swing.JDialog {
         gridBagConstraints.insets = new Insets(6, 6, 6, 6);
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         parser = new Parser();
+        this.updateFilterTypes = autoUpdateFilterTypes;
     }
 
     public boolean include(Entry<? extends Object, ? extends Object> entry) {
@@ -79,6 +80,7 @@ public class Filter extends javax.swing.JDialog {
 
     public void clearFilters() {
         pnlArguments.removeAll();
+        txtExpression.setText("");
     }
 
     public boolean hasFiltersApplied() {
@@ -89,13 +91,25 @@ public class Filter extends javax.swing.JDialog {
         }
     }
 
-    protected void updateFilterTypes() {
+    public void updateFilterTypes() {
         for (int i = 0; i < table.getModel().getColumnCount(); i++) {
             if (colFilter.containsKey(i)) {
-                continue;
-            } else {
-                colFilter.put(i, new FilterType(i, table.getModel().getColumnName(i), table.getModel().getColumnClass(i)));
+                if (colFilter.get(i).clazz != table.getModel().getColumnClass(i)) {
+                    System.out.println("GOT CLASS: " + colFilter.get(i).clazz + " EXPECTED " + table.getModel().getColumnClass(i));
+                    colFilter.remove(i);
+                    for (int k = pnlArguments.getComponentCount()-1; k >= 0; k--) {
+                        if (pnlArguments.getComponent(k) instanceof ArgumentPanel) {
+                            ArgumentPanel panel = (ArgumentPanel) pnlArguments.getComponent(k);
+                            if (panel.getColumn() == i) {
+                                pnlArguments.remove(k);
+                            }
+                        }
+                    }
+                } else {
+                    continue;
+                }
             }
+            colFilter.put(i, new FilterType(i, table.getModel().getColumnName(i), table.getModel().getColumnClass(i)));
         }
         comboFilterTypes.removeAllItems();
         for (FilterType f : colFilter.values()) {
@@ -107,7 +121,7 @@ public class Filter extends javax.swing.JDialog {
 
     @Override
     public void setVisible(boolean visible) {
-        if (visible) {
+        if (updateFilterTypes) {
             updateFilterTypes();
         }
         super.setVisible(visible);

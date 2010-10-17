@@ -67,7 +67,12 @@ public abstract class Plot {
         this.expController = expController;
     }
 
-    protected void initializeResults() throws SQLException, Exception {
+    /**
+     * This method has to be called to use the higher level methods of this class
+     * @throws SQLException
+     * @throws Exception
+     */
+    protected void initialize() throws SQLException, Exception {
         if (resultMap == null) {
             resultMap = new HashMap<ResultIdentifier, ExperimentResult>();
         } else {
@@ -88,6 +93,17 @@ public abstract class Plot {
         for (Instance i : instances) {
             instanceMap.put(i.getId(), i);
         }
+    }
+
+    /**
+     * This method has to be called to clean up all data structures created by the initialize method.
+     * This will save RAM.
+     */
+    protected void deinitialize() {
+        resultMap.clear();
+        instanceMap.clear();
+        resultMap = null;
+        instanceMap = null;
     }
 
     public static ArrayList<Property> getSolverProperties() throws Exception {

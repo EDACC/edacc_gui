@@ -156,6 +156,7 @@ public class ExperimentController {
         }
         main.insTableModel.setExperimentHasInstances(ehi);
         main.solverConfigPanel.endUpdate();
+        task.setStatus("Finalizing");
         main.afterExperimentLoaded();
     }
 
@@ -583,6 +584,7 @@ public class ExperimentController {
                 ArrayList<ExperimentResult> results = main.jobsTableModel.getJobs();
                 if (results == null) {
                     main.jobsTableModel.setJobs(ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId()));
+                    main.resultBrowserRowFilter.updateFilterTypes();
                 } else {
                     ArrayList<ExperimentResult> modified = ExperimentResultDAO.getAllModifiedByExperimentId(activeExperiment.getId(), main.jobsTableModel.lastUpdated);
                     if (modified.size() > 0) {

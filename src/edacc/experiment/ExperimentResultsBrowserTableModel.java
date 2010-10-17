@@ -249,7 +249,6 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                         }
                     } catch (Exception e) {
                     }
-
                 }
                 ExperimentResultsBrowserTableModel.this.fireTableDataChanged();
             }
