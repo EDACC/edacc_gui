@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 /**
@@ -37,21 +38,26 @@ public class EDACCManageComputationMethodDialog extends javax.swing.JDialog {
     private ManageComputationMethodController controller;
     private ComputationMethodTableModel tableModel;
     private File selectedFile;
+    private EDACCManagePropertyDialog main;
 
     /** Creates new form EDACCManageComputationMethodDialog */
-    public EDACCManageComputationMethodDialog(java.awt.Frame parent, boolean modal) {
+    public EDACCManageComputationMethodDialog(java.awt.Frame parent, boolean modal, EDACCManagePropertyDialog main) {
         super(parent, modal);
         initComponents();
 
-        controller = new ManageComputationMethodController(this, panelMain, tableModel);
-
+        this.main = main;
         // initialize the tableComputationMethod
         tableModel = new ComputationMethodTableModel();
+        controller = new ManageComputationMethodController(this, panelMain, tableModel);
         tableComputationMethod.setModel(tableModel);
         tableComputationMethod.getSelectionModel().addListSelectionListener(new ComputationMethodTableSelectionListener(tableComputationMethod, controller));
 
     }
 
+    private EDACCManageComputationMethodDialog(JFrame jFrame, boolean b) {
+        super(jFrame, b);
+        initComponents();
+    }
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -339,6 +345,7 @@ public class EDACCManageComputationMethodDialog extends javax.swing.JDialog {
 
     private void buttonDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDoneActionPerformed
         this.setVisible(false);
+        main.loadComputationMethods();
     }//GEN-LAST:event_buttonDoneActionPerformed
 
     private void buttonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemoveActionPerformed
@@ -476,4 +483,5 @@ public class EDACCManageComputationMethodDialog extends javax.swing.JDialog {
         textAreaDescription.setEnabled(b);
         buttonSave.setEnabled(b);
     }
+
 }

@@ -14,6 +14,7 @@ package edacc;
 import edacc.properties.ManagePropertyDialogSourceListener;
 import edacc.properties.ManagePropertyDialogTypeListener;
 import edacc.model.ComputationMethod;
+import edacc.model.ComputationMethodDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
@@ -498,7 +499,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     private void buttonPropertyAddValueTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPropertyAddValueTypeActionPerformed
       if(PropertyValueTypesDialog == null){
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            PropertyValueTypesDialog = new EDACCManagePropertyValueTypesDialog(mainFrame, true);
+            PropertyValueTypesDialog = new EDACCManagePropertyValueTypesDialog(mainFrame, true, this);
             PropertyValueTypesDialog.setLocationRelativeTo(mainFrame);
             PropertyValueTypesDialog.initialize();
       }
@@ -569,7 +570,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 JOptionPane.ERROR_MESSAGE);
         }else{
             try {
-                controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), textFieldPropertyRegularExpression.getText(), (ComputationMethod) comboBoxComputationMethod.getSelectedItem(), textFieldComputationmethodParameter.getText(), (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String)comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
+                controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), textFieldPropertyRegularExpression.getText(), (ComputationMethod) ComputationMethodDAO.getByName((String)comboBoxComputationMethod.getSelectedItem()), textFieldComputationmethodParameter.getText(), (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String)comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
             } catch (IOException ex) {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (NoConnectionToDBException ex) {
@@ -592,11 +593,11 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
 
     private void buttonNewComputationMethodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonNewComputationMethodActionPerformed
         if(computationMethodDialog == null){
-            computationMethodDialog = new EDACCManageComputationMethodDialog(EDACCApp.getApplication().getMainFrame(), editing);
-            computationMethodDialog.setLocationRelativeTo(this);
-            computationMethodDialog.setVisible(true);
+            computationMethodDialog = new EDACCManageComputationMethodDialog(EDACCApp.getApplication().getMainFrame(), true, this);
+            computationMethodDialog.setLocationRelativeTo(this);           
         }
         computationMethodDialog.initialize();
+        computationMethodDialog.setVisible(true);
     }//GEN-LAST:event_buttonNewComputationMethodActionPerformed
 
     /**
@@ -710,6 +711,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             }
             controller.loadProperties();
             controller.loadPropertyValueTypes();
+            loadComputationMethods();
             comboBoxPropertyType.addItemListener(typeListener);
             
         } catch (SQLException ex) {
@@ -819,11 +821,50 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         this.textPropertyFieldName.setEnabled(true);
         this.textAreaPropertyDescription.setEnabled(true);
         this.buttonSaveProperty.setEnabled(true);
+        this.comboBoxComputationMethod.setEnabled(false);
+        this.checkBoxMultipleOccurrences.setEnabled(false);
+        this.comboBoxPropertySource.setEnabled(false);
+        this.comboBoxPropertyType.setEnabled(false);
+        this.comboBoxPropertyValuetype.setEnabled(false);
+        this.textFieldPropertyRegularExpression.setEnabled(false);
+        this.textFieldComputationmethodParameter.setEnabled(false);
+        this.buttonNewComputationMethod.setEnabled(false);
+        this.buttonPropertyAddValueType.setEnabled(false);
+        this.radioBtnComputationMethod.setEnabled(false);
+        this.radioBtnRegExpression.setEnabled(false);
     }
 
     public void disablePropertyEditFields() {
         this.textPropertyFieldName.setEnabled(false);
         this.textAreaPropertyDescription.setEnabled(false);
+    }
+
+    void loadComputationMethods() {
+        try {
+            comboBoxComputationMethod.removeAllItems();
+            Vector<ComputationMethod> items = controller.loadAllComputationMethods();
+            for (int i = 0; i < items.size(); i++) {
+                comboBoxComputationMethod.addItem(items.get(i).getName());
+            }
+        } catch (NoConnectionToDBException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ComputationMethodDoesNotExistException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    void loadPropertyValues() {
+        try {
+            controller.loadPropertyValueTypes();
+        } catch (IOException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoConnectionToDBException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 

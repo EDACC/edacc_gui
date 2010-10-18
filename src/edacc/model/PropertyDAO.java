@@ -24,10 +24,10 @@ public class PropertyDAO {
     protected static final String table = "Property";
     private static final ObjectCache<Property> cache = new ObjectCache<Property>();
     private static String deleteQuery = "DELETE FROM " + table + " WHERE idProperty=?;";
-    private static String updateQuery = "UPDATE " + table + " SET name=?, regExp=?, description=?, propertyType=?, propertySource=? ," +
-            "propertyValueType=?, multiple=?, idComputationMethod=?, computationMethodParameters=?  WHERE idProperty=?;";
-    private static String insertQuery = "INSERT INTO " + table + " (name, regExp, description, propertyType, propertySource ," +
-            "propertyValueType, multiple, idComputationMethod, computationMethodParameters, isDefault) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    private static String updateQuery = "UPDATE " + table + " SET name=?, regExpression=?, description=?, propertyType=?, propertySource=? ," +
+            "propertyValueType=?, multipleOccourence=?, idComputationMethod=?, computationMethodParameters=?  WHERE idProperty=?;";
+    private static String insertQuery = "INSERT INTO " + table + " (name, regExpression, description, propertyType, propertySource ," +
+            "propertyValueType, multipleOccourence, idComputationMethod, computationMethodParameters, isDefault) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
     /**
      * Creates a new  Property object, saves it into the database and cache, and returns it.
@@ -80,8 +80,8 @@ public class PropertyDAO {
         }else{
             res = new Property();
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                    "SELECT name, description, regExp, propertyType, propertySource ,propertyValueType, multiple, idComputationMethod, " +
-                    "computationMethodParameters FROM " + table + " WHERE idProperty=?");
+                    "SELECT name, description, regExpression, propertyType, propertySource ,propertyValueType, multipleOccourence, idComputationMethod, " +
+                    "computationMethodParameters, isDefault FROM " + table + " WHERE idProperty=?");
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if(!rs.next())
@@ -104,6 +104,7 @@ public class PropertyDAO {
                 res.setComputationMethod(null);
                 res.setComputationMethodParameters("");
             }
+            res.setIsDefault(rs.getBoolean(10));
             res.setSaved();
             cache.cache(res);
             return res;
@@ -161,8 +162,8 @@ public class PropertyDAO {
                ps.setNull(6, java.sql.Types.NULL);
                ps.setNull(7, java.sql.Types.NULL);
             }else {
-                ps.setString(5, r.getPropertyValueType().getName());
-                ps.setBoolean(6, r.isMultiple());
+                ps.setString(6, r.getPropertyValueType().getName());
+                ps.setBoolean(7, r.isMultiple());
             }
             ps.setInt(8, r.getComputationMethod().getId());
             ps.setString(9, r.getComputationMethodParameters());

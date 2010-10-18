@@ -7,6 +7,7 @@ package edacc.properties;
 
 import edacc.EDACCManagePropertyDialog;
 import edacc.model.ComputationMethod;
+import edacc.model.ComputationMethodDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
@@ -138,5 +139,9 @@ public class ManagePropertyController {
                 computationMethodParameters, name, isMultipe);
         loadProperties();
         main.clearSolverPropertyEditField();
+    }
+
+    public Vector<ComputationMethod> loadAllComputationMethods() throws NoConnectionToDBException, SQLException, ComputationMethodDoesNotExistException {
+        return ComputationMethodDAO.getAll();
     }
 }

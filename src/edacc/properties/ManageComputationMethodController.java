@@ -77,7 +77,7 @@ public class ManageComputationMethodController {
     public void saveComputationMethod(String name, String description, File selectedFile) throws NoConnectionToDBException, SQLException,
             ComputationMethodDoesNotExistException, ComputationMethodAlreadyExistsException, NoComputationMethodBinarySpecifiedException,
             FileNotFoundException, IOException, NoSuchAlgorithmException {
-        if(editId == -1){
+        if(editId != -1){
             ComputationMethod toSave = ComputationMethodDAO.getById(editId);
             toSave.setName(name);
             toSave.setDescription(description);

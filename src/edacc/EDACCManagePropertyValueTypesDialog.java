@@ -37,11 +37,13 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
     private PropertyValueTypesController controller;
     private PropertyValueTypeTableModel propValueTypeTableModel;
     private EDACCSelectPropertyValueTypeClassDialog selectValueType;
+    private EDACCManagePropertyDialog main;
+
     /** Creates new form EDACCManagePropertyValueTypesDialog */
-    public EDACCManagePropertyValueTypesDialog(java.awt.Frame parent, boolean modal) {
+    public EDACCManagePropertyValueTypesDialog(java.awt.Frame parent, boolean modal, EDACCManagePropertyDialog main) {
         super(parent, modal);
         initComponents();
-
+        this.main = main;
         // initialize tablePropertyValueTypes
         propValueTypeTableModel = new PropertyValueTypeTableModel();
         tablePropertyValueTypes.setModel(propValueTypeTableModel);
@@ -57,6 +59,11 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
             }
         });
         controller = new PropertyValueTypesController(this, tablePropertyValueTypes);
+    }
+
+    private EDACCManagePropertyValueTypesDialog(JFrame jFrame, boolean b) {
+        super(jFrame, b);
+        initComponents();
     }
 
      /**
@@ -198,6 +205,7 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
 
     private void buttonDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDoneActionPerformed
         this.setVisible(false);
+        main.loadPropertyValues();
     }//GEN-LAST:event_buttonDoneActionPerformed
 
     private void buttonChooseClassFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonChooseClassFileActionPerformed

@@ -23,9 +23,9 @@ import java.util.Vector;
 public class ComputationMethodDAO {
     private static ObjectCache<ComputationMethod> cache = new ObjectCache<ComputationMethod>();
     private static String table = "ComputationMethod";
-    private static String deleteQuery = "DELETE FROM " + table + "WHERE idComputationMethod=?;";
+    private static String deleteQuery = "DELETE FROM " + table + " WHERE idComputationMethod=?;";
     private static String updateQuery = "UPDATE " + table + " SET name=?, description=? WHERE idComputationMethod=?;";
-    private static String insertQuery = "INSERT INTO " + table + "(name, description, md5, binaryName, binary) " +
+    private static String insertQuery = "INSERT INTO " + table +  " (name, description, md5, binaryName, binaryFile) " +
             "VALUES (?, ?, ?, ?, ?);";
 
     /**
@@ -85,7 +85,9 @@ public class ComputationMethodDAO {
                 throw new NoComputationMethodBinarySpecifiedException();
 
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                    "SELECT idComputationMethod FROM " + table + "WHERE name=? OR md5=?;");
+                    "SELECT idComputationMethod FROM " + table + " WHERE name=? OR md5=?;");
+            ps.setString(1, cm.getName());
+            ps.setString(2, cm.getMd5());
             ResultSet rs = ps.executeQuery();
             if(rs.next())
                 throw new ComputationMethodAlreadyExistsException();
@@ -96,6 +98,11 @@ public class ComputationMethodDAO {
             ps.setString(4, cm.getBinaryName());
             ps.setBinaryStream(5, new FileInputStream(cm.getBinary()));
             ps.executeUpdate();
+            ResultSet generatedKeys = ps.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                cm.setId(generatedKeys.getInt(1));
+            }
+            generatedKeys.close();
             ps.close();
             cm.setSaved();
             cache.cache(cm);
@@ -116,7 +123,7 @@ public class ComputationMethodDAO {
             return res;
         res = new ComputationMethod();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                    "SELECT name, description, md5, binaryName FROM " + table + "WHERE idComputationMethod=?;");
+                    "SELECT name, description, md5, binaryName FROM " + table + " WHERE idComputationMethod=?;");
          ps.setInt(1, id);
          ResultSet rs = ps.executeQuery();
          if(!rs.next())
@@ -165,7 +172,7 @@ public class ComputationMethodDAO {
     public static void getBinaryOfComputationMethod(File f, ComputationMethod cm) throws NoConnectionToDBException, SQLException,
             ComputationMethodDoesNotExistException, FileNotFoundException, IOException{
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                    "SELECT binary FROM " + table + "WHERE idComputationMethod=?;");
+                    "SELECT binaryFile FROM " + table + "WHERE idComputationMethod=?;");
         ps.setInt(1, cm.getId());
         ResultSet rs = ps.executeQuery();
         if(!rs.next())
@@ -198,5 +205,14 @@ public class ComputationMethodDAO {
         }
         return all;
      }
+
+    public static ComputationMethod getByName(String name) throws NoConnectionToDBException, SQLException, ComputationMethodDoesNotExistException{
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+            "SELECT idComputationMethod FROM " + table + " WHERE name=?;");
+        ps.setString(1, name);
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        return getById(rs.getInt(1));
+    }
 
 }
