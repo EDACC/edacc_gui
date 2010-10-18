@@ -582,10 +582,7 @@ public class ExperimentController {
                     main.jobsTableModel.fireTableDataChanged();
                 } else {
                     ArrayList<ExperimentResult> modified = ExperimentResultDAO.getAllModifiedByExperimentId(activeExperiment.getId(), main.jobsTableModel.lastUpdated);
-                    System.out.println("MODIFIED: " + modified.size());
-
                     if (modified.size() > 0) {
-                        System.out.println(((ExperimentResultHasProperty)modified.get(0).getPropertyValues().values().toArray()[0]).getValue().get(0));
                         HashMap<Integer, ExperimentResult> map = new HashMap<Integer, ExperimentResult>();
                         for (ExperimentResult er : modified) {
                             map.put(er.getId(), er);
@@ -598,7 +595,6 @@ public class ExperimentController {
                             }
                         }
                     }
-                    //main.jobsTableModel.fireTableDataChanged();
                 }
             }
             main.jobsTableModel.lastUpdated = timestamp;
