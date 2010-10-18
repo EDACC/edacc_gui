@@ -67,7 +67,7 @@ public class ExperimentResultHasPropertyDAO {
         } else if (e.isModified()) {
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
             ps.setInt(1, e.getExpResult().getId());
-            ps.setInt(2, e.getSolvProperty().getId());
+            ps.setInt(2, e.getProperty().getId());
             ps.setInt(3, e.getId());
             ps.executeUpdate();
 
@@ -88,7 +88,7 @@ public class ExperimentResultHasPropertyDAO {
         } else if (e.isNew()) {
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
             ps.setInt(1, e.getExpResult().getId());
-            ps.setInt(2, e.getSolvProperty().getId());
+            ps.setInt(2, e.getProperty().getId());
             ps.executeUpdate();
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
