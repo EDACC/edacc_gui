@@ -1,10 +1,14 @@
 package edacc.experiment;
 
+import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.ExperimentHasInstance;
 import edacc.model.Instance;
 import edacc.model.InstanceHasProperty;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
+import edacc.model.PropertyDAO;
+import edacc.model.PropertyNotInDBException;
+import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.ConvertException;
 import edacc.satinstances.InstancePropertyManager;
 import java.io.IOException;
@@ -30,26 +34,31 @@ public class InstanceTableModel extends AbstractTableModel {
     protected HashMap<Integer, ExperimentHasInstance> selectedInstances;
     protected Vector<ExperimentHasInstance> savedExperimentInstances;
 
-    public void setInstances(ArrayList<Instance> instances) throws IOException, NoConnectionToDBException, SQLException {
+    public void setInstances(ArrayList<Instance> instances) {
         updateProperties();
         this.instances = instances;
         experimentHasInstances = new Vector<ExperimentHasInstance>();
         experimentHasInstances.setSize(instances.size());
-        try {
-            this.fireTableStructureChanged();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.fireTableStructureChanged();
     }
 
-    private void updateProperties() throws IOException, NoConnectionToDBException, SQLException {
+    private void updateProperties() {
         properties = new ArrayList<Property>();
         // TODO: fix!
-       // properties.addAll(InstancePropertyManager.getInstance().getAll());
-        columns = java.util.Arrays.copyOf(columns, COL_PROP + properties.size());
-        for (int i = COL_PROP; i < columns.length; i++) {
-            columns[i] = properties.get(i - COL_PROP).getName();
+        try {
+            //properties.addAll(PropertyDAO.getAllInstanceProperties());
+            if (properties.size() > 0) {
+                columns = java.util.Arrays.copyOf(columns, COL_PROP + properties.size());
+                for (int i = COL_PROP; i < columns.length; i++) {
+                    columns[i] = properties.get(i - COL_PROP).getName();
+                }
+            }
+        } catch (Exception e) {
+            if (edacc.ErrorLogger.DEBUG) {
+                e.printStackTrace();
+            }
         }
+
     }
 
     /**

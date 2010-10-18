@@ -184,6 +184,16 @@ public class ExperimentResultDAO {
         return count;
     }
 
+    public static Timestamp getLastModifiedByExperimentId(int id) throws NoConnectionToDBException, SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT MAX(date_modified) FROM " + table + " WHERE Experiment_idExperiment=?");
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        rs.next(); // there will always be a timestamp
+        Timestamp res = rs.getTimestamp(1);
+        rs.close();
+        return res;
+    }
+
     /**
      * checks the database if a job with the given parameters already exists
      * @param run

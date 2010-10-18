@@ -3,8 +3,6 @@ package edacc.experiment;
 import edacc.satinstances.ConvertException;
 import java.sql.SQLException;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultHasProperty;
@@ -59,7 +57,6 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     private boolean[] CONST_VISIBLE = {false, true, true, true, true, true, true, true, true, true, false, false, false, false};
     private String[] columns;
     private ArrayList<Property> solverProperties;
-    private ExperimentResultHasProperty[][] propertyValues;
     private boolean[] visible;
     private HashMap<Integer, ArrayList<ParameterInstance>> parameterInstances;
     private HashMap<Integer, GridQueue> gridQueues;
@@ -76,7 +73,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public void updateSolverProperties() {
         solverProperties = new ArrayList<Property>();
         try {
-            solverProperties.addAll(PropertyDAO.getAll());
+            solverProperties.addAll(PropertyDAO.getAllResultProperties());
         } catch (Exception e) {
             if (edacc.ErrorLogger.DEBUG) {
                 e.printStackTrace();
@@ -231,15 +228,6 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             public void run() {
                 ExperimentResultsBrowserTableModel.this.jobs = jobs;
                 if (jobs != null) {
-                    if (solverProperties.size() > 0) {
-                        propertyValues = new ExperimentResultHasProperty[jobs.size()][];
-                        for (int i = 0; i < jobs.size(); i++) {
-                            propertyValues[i] = new ExperimentResultHasProperty[solverProperties.size()];
-                            for (int j = 0; j < solverProperties.size(); j++) {
-                                propertyValues[i][j] = jobs.get(i).getPropertyValues().get(solverProperties.get(j).getId());
-                            }
-                        }
-                    }
                     parameterInstances = new HashMap<Integer, ArrayList<ParameterInstance>>();
                     gridQueues = new HashMap<Integer, GridQueue>();
                     try {
@@ -308,11 +296,15 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int col) {
+        return getRealColumnClass(getIndexForColumn(col));
+    }
+
+    public Class getRealColumnClass(int col) {
         if (getRowCount() == 0) {
             return String.class;
         } else {
-            if (getIndexForColumn(col) >= COL_PROPERTY) {
-                int propertyIdx = getIndexForColumn(col) - COL_PROPERTY;
+            if (col >= COL_PROPERTY) {
+                int propertyIdx = col - COL_PROPERTY;
                 if (propertyIdx >= solverProperties.size()) {
                     return String.class;
                 }
@@ -321,7 +313,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 }
                 return solverProperties.get(propertyIdx).getPropertyValueType().getJavaType();
             } else {
-                return getValueAt(0, col).getClass();
+                return getRealValueAt(0, col).getClass();
             }
         }
     }
@@ -348,22 +340,17 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         return visible;
     }
 
-    @Override
-    public Object getValueAt(int rowIndex, int columnIndex) {
+    public Object getRealValueAt(int rowIndex, int columnIndex) {
         if (rowIndex < 0 || rowIndex >= getRowCount()) {
             return null;
         }
         ExperimentResult j = jobs.get(rowIndex);
-
-        if (columnIndex != -1) {
-            columnIndex = getIndexForColumn(columnIndex);
-        }
         switch (columnIndex) {
             case 0:
                 return j.getId();
             case 1:
                 GridQueue q = gridQueues.get(j.getComputeQueue());
-                return q == null?"none":q.getName();
+                return q == null ? "none" : q.getName();
             case 2:
                 Solver solver = getSolver(rowIndex);
                 return solver == null ? "" : solver.getName();
@@ -399,7 +386,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 if (solverProperties.size() <= propertyIdx) {
                     return null;
                 }
-                ExperimentResultHasProperty erp = propertyValues[rowIndex][propertyIdx];
+                ExperimentResultHasProperty erp = j.getPropertyValues().get(solverProperties.get(propertyIdx).getId());
                 if (erp != null && !erp.getValue().isEmpty()) {
                     try {
                         if (solverProperties.get(propertyIdx).getPropertyValueType() == null) {
@@ -412,24 +399,20 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 } else {
                     return null;
                 }
-            /*if (solverProperties.get(property).getPropertySource() == SolverPropertyType.ClientOutput
-            || solverProperties.get(property).getPropertySource() == SolverPropertyType.ResultFile) {
-            // calculate property value, very inefficent because it is called too often .. mir egal :-)
-            ArrayList<String> result = new ArrayList<String>();
-            try {
-            java.util.Vector<String> res = parser.parse(solverProperties.get(property), jobs.get(rowIndex));
-            result.addAll(res);
-            } catch (Exception e) {
-            return "";
-            }
-            if (result.size() > 0) {
-            return result.get(0);
-            } else {
-            return "";
-            }
-            } else {
-            }*/
         }
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        if (rowIndex < 0 || rowIndex >= getRowCount()) {
+            return null;
+        }
+        ExperimentResult j = jobs.get(rowIndex);
+
+        if (columnIndex != -1) {
+            columnIndex = getIndexForColumn(columnIndex);
+        }
+        return getRealValueAt(rowIndex, columnIndex);
     }
 
     /**
@@ -494,10 +477,13 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     }
 
     public int getJobsCount() {
-        return jobs.size();
+        return jobs == null ? 0 : jobs.size();
     }
 
     public int getJobsCount(ExperimentResultStatus status) {
+        if (jobs == null) {
+            return 0;
+        }
         int res = 0;
         for (ExperimentResult j : jobs) {
             if (j.getStatus().equals(status)) {
