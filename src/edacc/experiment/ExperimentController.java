@@ -14,6 +14,7 @@ import edacc.model.ExperimentHasInstance;
 import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
+import edacc.model.ExperimentResultHasProperty;
 import edacc.model.ExperimentResultStatus;
 import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
@@ -572,7 +573,7 @@ public class ExperimentController {
     public void loadJobs() {
         try {
             final ExperimentResultsBrowserTableModel sync = main.jobsTableModel;
-            Timestamp timestamp = ExperimentResultDAO.getCurrentTimestamp();
+            Timestamp timestamp = ExperimentResultDAO.getLastModifiedByExperimentId(activeExperiment.getId());
             synchronized (sync) {
                 ArrayList<ExperimentResult> results = main.jobsTableModel.getJobs();
                 if (results == null) {
@@ -581,7 +582,10 @@ public class ExperimentController {
                     main.jobsTableModel.fireTableDataChanged();
                 } else {
                     ArrayList<ExperimentResult> modified = ExperimentResultDAO.getAllModifiedByExperimentId(activeExperiment.getId(), main.jobsTableModel.lastUpdated);
+                    System.out.println("MODIFIED: " + modified.size());
+
                     if (modified.size() > 0) {
+                        System.out.println(((ExperimentResultHasProperty)modified.get(0).getPropertyValues().values().toArray()[0]).getValue().get(0));
                         HashMap<Integer, ExperimentResult> map = new HashMap<Integer, ExperimentResult>();
                         for (ExperimentResult er : modified) {
                             map.put(er.getId(), er);

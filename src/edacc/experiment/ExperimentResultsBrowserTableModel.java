@@ -231,15 +231,6 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             public void run() {
                 ExperimentResultsBrowserTableModel.this.jobs = jobs;
                 if (jobs != null) {
-                    if (solverProperties.size() > 0) {
-                        propertyValues = new ExperimentResultHasProperty[jobs.size()][];
-                        for (int i = 0; i < jobs.size(); i++) {
-                            propertyValues[i] = new ExperimentResultHasProperty[solverProperties.size()];
-                            for (int j = 0; j < solverProperties.size(); j++) {
-                                propertyValues[i][j] = jobs.get(i).getPropertyValues().get(solverProperties.get(j).getId());
-                            }
-                        }
-                    }
                     parameterInstances = new HashMap<Integer, ArrayList<ParameterInstance>>();
                     gridQueues = new HashMap<Integer, GridQueue>();
                     try {
@@ -398,7 +389,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 if (solverProperties.size() <= propertyIdx) {
                     return null;
                 }
-                ExperimentResultHasProperty erp = propertyValues[rowIndex][propertyIdx];
+                ExperimentResultHasProperty erp = j.getPropertyValues().get(solverProperties.get(propertyIdx).getId());
                 if (erp != null && !erp.getValue().isEmpty()) {
                     try {
                         if (solverProperties.get(propertyIdx).getPropertyValueType() == null) {
