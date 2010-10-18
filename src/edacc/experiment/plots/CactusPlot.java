@@ -114,7 +114,7 @@ public class CactusPlot extends Plot {
                 selectedInstanceIds.add(i.getId());
             }
         }
-        initialize();
+        initialize(expController);
         SolverInfos[] solver = new SolverInfos[solverConfigs.size()];
         double max_y = 0;
         int max_x = 0;
@@ -218,7 +218,6 @@ public class CactusPlot extends Plot {
         engine.assign("pchs", pchs);
         engine.assign("ltys", lty);
         engine.eval("legend(1, " + (max_y - (max_y * .3)) + ", legend=lnames, col=colors, pch=pchs, lty=ltys)");
-        deinitialize();
     }
 
     public static String getTitle() {

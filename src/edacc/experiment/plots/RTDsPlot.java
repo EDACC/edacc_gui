@@ -74,7 +74,7 @@ public class RTDsPlot extends Plot {
             instance = (Instance) comboInstance.getSelectedItem();
             property = (Property) comboProperty.getSelectedItem();
         }
-        initialize();
+        initialize(expController);
         title = "Property distribution on " + instance + " (" + expController.getActiveExperiment().getName() + ")";
         double max_x = 0.;
 
@@ -131,7 +131,6 @@ public class RTDsPlot extends Plot {
                 + "legend=legendNames,"
                 + "col=legendColors,"
                 + "pch=c(0," + scs.size() + "), lty=1)");
-        deinitialize();
     }
 
     @Override

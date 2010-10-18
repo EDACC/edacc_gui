@@ -15,10 +15,12 @@ package edacc.filter;
  * @author simon
  */
 public class StringFilter extends javax.swing.JPanel implements FilterInterface {
+    private String regExp;
     /** Creates new form StringFilter */
     public StringFilter(String name) {
         initComponents();
         lblName.setText(name + " (RegExp)");
+        regExp = "";
     }
 
     /** This method is called from within the constructor to
@@ -64,7 +66,7 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
         if (value instanceof String) {
             String val = (String) value;
             try {
-                return val.matches(txtRegexp.getText());
+                return val.matches(regExp);
             } catch (Exception e) {
                 return false;
             }
@@ -79,5 +81,15 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
     private javax.swing.JLabel lblName;
     private javax.swing.JTextField txtRegexp;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void apply() {
+        regExp = txtRegexp.getText();
+    }
+
+    @Override
+    public void undo() {
+        txtRegexp.setText(regExp);
+    }
 
 }

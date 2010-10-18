@@ -90,7 +90,7 @@ public class ExperimentController {
         ArrayList<Experiment> v = new ArrayList<Experiment>();
         v.addAll(ExperimentDAO.getAll());
         experiments = v;
-       /* VirtualExperiment test = new VirtualExperiment();
+        /* VirtualExperiment test = new VirtualExperiment();
         test.setSaved();
         test.setName("test virtexp");
         test.setDescription("Test descr");
@@ -101,18 +101,11 @@ public class ExperimentController {
         main.expTableModel.setExperiments(experiments);
         Vector<InstanceClass> vic = new Vector<InstanceClass>();
         vic.addAll(InstanceClassDAO.getAll());
-        
+
         main.instanceClassModel.setClasses(vic);
         ArrayList<Instance> instances = new ArrayList<Instance>();
         instances.addAll(InstanceDAO.getAll());
-        try {
-            main.insTableModel.setInstances(instances);
-        } catch (IOException e) {
-            if (edacc.ErrorLogger.DEBUG) {
-                e.printStackTrace();
-            }
-            throw new SQLException(e.getMessage());
-        }
+        main.insTableModel.setInstances(instances);
 
     }
 
@@ -132,24 +125,24 @@ public class ExperimentController {
         task.setStatus("Loading solvers..");
         vs.addAll(SolverDAO.getAll());
         task.setTaskProgress(.33f);
-     /*   if (exp instanceof VirtualExperiment) {
-            VirtualExperiment vexp = (VirtualExperiment) exp;
-            task.setStatus("Loading solver configurations..");
-            for (Experiment e : vexp.getExperiments()) {
-                vss.addAll(SolverConfigurationDAO.getSolverConfigurationByExperimentId(e.getId()));
-            }
-            task.setTaskProgress(.66f);
-            task.setStatus("Loading instances..");
-            // select instances for the experiment
-            ehi.addAll(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
+        /*   if (exp instanceof VirtualExperiment) {
+        VirtualExperiment vexp = (VirtualExperiment) exp;
+        task.setStatus("Loading solver configurations..");
+        for (Experiment e : vexp.getExperiments()) {
+        vss.addAll(SolverConfigurationDAO.getSolverConfigurationByExperimentId(e.getId()));
+        }
+        task.setTaskProgress(.66f);
+        task.setStatus("Loading instances..");
+        // select instances for the experiment
+        ehi.addAll(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
         } else {*/
-            task.setStatus("Loading solver configurations..");
-            vss.addAll(SolverConfigurationDAO.getSolverConfigurationByExperimentId(exp.getId()));
-            task.setTaskProgress(.66f);
-            task.setStatus("Loading instances..");
-            // select instances for the experiment
-            ehi.addAll(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
-       // }
+        task.setStatus("Loading solver configurations..");
+        vss.addAll(SolverConfigurationDAO.getSolverConfigurationByExperimentId(exp.getId()));
+        task.setTaskProgress(.66f);
+        task.setStatus("Loading instances..");
+        // select instances for the experiment
+        ehi.addAll(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
+        // }
         main.solTableModel.setSolvers(vs);
         for (int i = 0; i < vss.size(); i++) {
             main.solverConfigPanel.addSolverConfiguration(vss.get(i));
@@ -201,7 +194,7 @@ public class ExperimentController {
      * @throws SQLException
      * @throws Exception
      */
-    public void createExperiment(String name, String description) throws SQLException, Exception {
+    public void createExperiment(String name, String description) throws SQLException, InstanceClassMustBeSourceException, IOException {
         java.util.Date d = new java.util.Date();
         ExperimentDAO.createExperiment(name, new Date(d.getTime()), description);
         initialize();
@@ -585,6 +578,7 @@ public class ExperimentController {
                 if (results == null) {
                     main.jobsTableModel.setJobs(ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId()));
                     main.resultBrowserRowFilter.updateFilterTypes();
+                    main.jobsTableModel.fireTableDataChanged();
                 } else {
                     ArrayList<ExperimentResult> modified = ExperimentResultDAO.getAllModifiedByExperimentId(activeExperiment.getId(), main.jobsTableModel.lastUpdated);
                     if (modified.size() > 0) {
@@ -596,10 +590,11 @@ public class ExperimentController {
                             ExperimentResult er = map.get(results.get(i).getId());
                             if (er != null) {
                                 results.set(i, er);
-                                 main.jobsTableModel.fireTableRowsUpdated(i, i); 
+                                main.jobsTableModel.fireTableRowsUpdated(i, i);
                             }
                         }
                     }
+                    //main.jobsTableModel.fireTableDataChanged();
                 }
             }
             main.jobsTableModel.lastUpdated = timestamp;

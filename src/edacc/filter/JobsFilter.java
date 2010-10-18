@@ -11,7 +11,6 @@ import javax.swing.RowFilter.Entry;
 public class JobsFilter extends Filter {
 
     private ExperimentResultsBrowserTableModel model;
-    private boolean[] visibility = new boolean[0];
 
     public JobsFilter(java.awt.Frame parent, boolean modal, JTable table, boolean autoUpdateFilterTypes) {
         super(parent, modal, table, autoUpdateFilterTypes);
@@ -22,35 +21,18 @@ public class JobsFilter extends Filter {
     }
 
     @Override
-    public void updateFilterTypes() {
-        // make all columns visible, this will let the filter recognize every column
-        boolean[] old = model.getColumnVisibility();
-        if (visibility.length != old.length) {
-            visibility = new boolean[old.length];
-            for (int i = 0; i < visibility.length; i++) {
-                visibility[i] = true;
-            }
-        }
-        model.setColumnVisibility(visibility, false);
-        super.updateFilterTypes();
-        // revert
-        model.setColumnVisibility(old, false);
+    public Object getValueAt(int row, int col) {
+        return model.getRealValueAt(row, col);
     }
 
+
     @Override
-    public boolean include(Entry<? extends Object, ? extends Object> entry) {
-        // make all columns visible, this will let the filter recognize every column
-        boolean[] old = model.getColumnVisibility();
-        if (visibility.length != old.length) {
-            visibility = new boolean[old.length];
-            for (int i = 0; i < visibility.length; i++) {
-                visibility[i] = true;
-            }
+    public void updateFilterTypes() {
+        String[] columnNames = model.getAllColumnNames();
+        Class<?>[] columnClasses = new Class<?>[columnNames.length];
+        for (int i = 0; i < columnClasses.length; i++) {
+            columnClasses[i] = model.getRealColumnClass(i);
         }
-        model.setColumnVisibility(visibility, false);
-        boolean res = super.include(entry);
-        // revert
-        model.setColumnVisibility(old, false);
-        return res;
+        super.updateFilterTypes(columnClasses, columnNames);
     }
 }

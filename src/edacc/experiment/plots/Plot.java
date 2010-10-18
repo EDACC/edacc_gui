@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,8 +47,9 @@ public abstract class Plot {
     protected ExperimentController expController;
     // "constants" for solver properties
     public static Property PROP_CPUTIME;
-    private HashMap<ResultIdentifier, ExperimentResult> resultMap;
-    private HashMap<Integer, Instance> instanceMap;
+    private static HashMap<ResultIdentifier, ExperimentResult> resultMap;
+    private static Timestamp lastUpdated;
+    private static int expId;
 
     protected Plot(ExperimentController expController) {
         try {
@@ -72,38 +74,22 @@ public abstract class Plot {
      * @throws SQLException
      * @throws Exception
      */
-    protected void initialize() throws SQLException, Exception {
-        if (resultMap == null) {
-            resultMap = new HashMap<ResultIdentifier, ExperimentResult>();
-        } else {
-            resultMap.clear();
+    protected static void initialize(ExperimentController expController) throws SQLException, Exception {
+        int count = ExperimentResultDAO.getCountByExperimentId(expController.getActiveExperiment().getId());
+        Timestamp ts = ExperimentResultDAO.getLastModifiedByExperimentId(expController.getActiveExperiment().getId());
+        if (resultMap == null || count != resultMap.size() || !ts.equals(lastUpdated) || expId != expController.getActiveExperiment().getId()) {
+            if (resultMap == null) {
+                resultMap = new HashMap<ResultIdentifier, ExperimentResult>();
+            } else {
+                resultMap.clear();
+            }
+            ArrayList<ExperimentResult> results = ExperimentResultDAO.getAllByExperimentId(expController.getActiveExperiment().getId());
+            for (ExperimentResult result : results) {
+                resultMap.put(new ResultIdentifier(result.getSolverConfigId(), result.getInstanceId(), result.getRun()), result);
+            }
+            lastUpdated = ts;
+            expId = expController.getActiveExperiment().getId();
         }
-        if (instanceMap == null) {
-            instanceMap = new HashMap<Integer, Instance>();
-        } else {
-            instanceMap.clear();
-        }
-        ArrayList<ExperimentResult> results = ExperimentResultDAO.getAllByExperimentId(expController.getActiveExperiment().getId());
-        for (ExperimentResult result : results) {
-            resultMap.put(new ResultIdentifier(result.getSolverConfigId(), result.getInstanceId(), result.getRun()), result);
-        }
-
-        ArrayList<Instance> instances = new ArrayList<Instance>();
-        instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
-        for (Instance i : instances) {
-            instanceMap.put(i.getId(), i);
-        }
-    }
-
-    /**
-     * This method has to be called to clean up all data structures created by the initialize method.
-     * This will save RAM.
-     */
-    protected void deinitialize() {
-        resultMap.clear();
-        instanceMap.clear();
-        resultMap = null;
-        instanceMap = null;
     }
 
     public static ArrayList<Property> getSolverProperties() throws Exception {

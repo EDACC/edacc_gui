@@ -21,9 +21,9 @@ public class ExperimentDAO {
      * so it can be referenced by related objects
      * @return new Experiment object
      */
-    public static Experiment createExperiment(String name, Date date, String description) throws SQLException, Exception {
+    public static Experiment createExperiment(String name, Date date, String description) throws SQLException {
         if (getExperimentByName(name) != null) {
-            throw new Exception("There exists already an experiment with the same name.");
+            throw new SQLException("There exists already an experiment with the same name.");
         }
         Experiment i = new Experiment();
         i.setName(name);

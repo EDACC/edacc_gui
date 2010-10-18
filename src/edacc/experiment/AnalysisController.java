@@ -162,7 +162,9 @@ public class AnalysisController {
         synchronized (syncR) {
             setCurrentDeviceNumber(pnl.getDeviceNumber());
             filename = filename.replace("\\", "\\\\");
-            re.eval("dev.print(device = eps, file = '" + filename + "')");
+            re.eval("setEPS()");
+            re.eval("dev.print(device = postscript, file = '"+filename+"')");
+            // TODO: revert setEPS()
         }
     }
 

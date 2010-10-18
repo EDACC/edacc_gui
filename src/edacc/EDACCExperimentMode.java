@@ -17,15 +17,19 @@ import edacc.experiment.SolverTableModel;
 import edacc.filter.InstanceFilter;
 import edacc.filter.JobsFilter;
 import edacc.gridqueues.GridQueuesController;
+import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultStatus;
 import edacc.model.InstanceClassMustBeSourceException;
+import edacc.model.NoConnectionToDBException;
+import edacc.model.PropertyNotInDBException;
 import edacc.model.Solver;
 import edacc.model.TaskCancelledException;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
+import edacc.properties.PropertyTypeNotExistException;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -326,7 +330,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         } catch (SQLException ex) {
         }
         resultBrowserRowFilter.clearFilters();
-
         jobsTableModel.resetColumnVisibility();
         setJobsFilterStatus("");
         jobsTimerWasActive = false;
@@ -2018,6 +2021,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }
 
     public void updateRuntimeEstimation() {
+        if (jobsTableModel.getJobs() == null) {
+            lblETA.setText("");
+            return;
+        }
         int jobsCount = jobsTableModel.getJobsCount();
         int jobsSuccessful = jobsTableModel.getJobsCount(ExperimentResultStatus.SUCCESSFUL);
         int jobsWaiting = jobsTableModel.getJobsCount(ExperimentResultStatus.NOTSTARTED);

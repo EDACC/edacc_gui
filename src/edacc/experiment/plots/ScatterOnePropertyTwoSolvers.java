@@ -123,7 +123,7 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
             ylog = scaleSelector.isYScaleLog();
         }
 
-        initialize();
+        initialize(expController);
         infos = null;
         double maxValue = 0.;
         plotTitle = xSolverConfig.getName() + " vs. " + ySolverConfig.getName() + " (" + expController.getActiveExperiment().getName() + ")";
@@ -368,7 +368,6 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
         for (Point2D point : points) {
             pointInformations.get(k++).getPoint().setLocation(point);
         }
-        deinitialize();
     }
 
     @Override

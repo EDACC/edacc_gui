@@ -13,7 +13,9 @@ import javax.swing.ButtonGroup;
  * @author simon
  */
 public class BooleanFilter extends javax.swing.JPanel implements FilterInterface {
-    ButtonGroup btnGroup;
+    private ButtonGroup btnGroup;
+    private boolean valTrue;
+    private boolean valFalse;
     /** Creates new form BooleanFilter */
     public BooleanFilter(String name) {
         initComponents();
@@ -22,6 +24,8 @@ public class BooleanFilter extends javax.swing.JPanel implements FilterInterface
         btnGroup.add(radioTrue);
         btnGroup.add(radioFalse);
         radioTrue.setSelected(true);
+        valTrue = true;
+        valFalse = true;
     }
 
     /** This method is called from within the constructor to
@@ -82,12 +86,25 @@ public class BooleanFilter extends javax.swing.JPanel implements FilterInterface
     @Override
     public boolean include(Object value) {
         if (value instanceof Boolean) {
-            return radioTrue.isSelected() && (Boolean) value || radioFalse.isSelected() && (Boolean) value;
+            return valTrue && (Boolean) value || valFalse && (Boolean) value;
         }
         return true;
     }
 
+
     public static boolean accept(Class<?> clazz) {
         return clazz == Boolean.class;
+    }
+
+    @Override
+    public void apply() {
+        valTrue = radioTrue.isSelected();
+        valFalse = radioFalse.isSelected();
+    }
+
+    @Override
+    public void undo() {
+        radioTrue.setSelected(valTrue);
+        radioFalse.setSelected(valFalse);
     }
 }

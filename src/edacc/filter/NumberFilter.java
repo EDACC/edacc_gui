@@ -10,6 +10,13 @@ package edacc.filter;
  * @author simon
  */
 public class NumberFilter extends javax.swing.JPanel implements FilterInterface {
+
+    private Integer valInt;
+    private Float valFloat;
+    private Double valDouble;
+    boolean isInt, isFloat, isDouble;
+    private String compStr;
+
     /** Creates new form NumberFilter */
     public NumberFilter(String name) {
         initComponents();
@@ -20,6 +27,10 @@ public class NumberFilter extends javax.swing.JPanel implements FilterInterface 
         comboOperator.addItem("==");
         comboOperator.addItem(">=");
         comboOperator.addItem(">");
+        valInt = 0;
+        valFloat = 0.f;
+        valDouble = 0.;
+        compStr = "<";
     }
 
     /** This method is called from within the constructor to
@@ -69,33 +80,29 @@ public class NumberFilter extends javax.swing.JPanel implements FilterInterface 
 
     @Override
     public boolean include(Object value) {
-        try {
-            int comp;
-            if (value instanceof Integer) {
-                Integer val = (Integer) value;
-                comp = val.compareTo(Integer.parseInt(txtValue.getText()));
-            } else if (value instanceof Double) {
-                Double val = (Double) value;
-                comp = val.compareTo(Double.parseDouble(txtValue.getText()));
-            } else if (value instanceof Float) {
-                Float val = (Float) value;
-                comp = val.compareTo(Float.parseFloat(txtValue.getText()));
-            } else {
-                return false;
-            }
-            if ("<".equals(comboOperator.getSelectedItem())) {
-                return comp < 0;
-            } else if ("<=".equals(comboOperator.getSelectedItem())) {
-                return comp <= 0;
-            } else if ("==".equals(comboOperator.getSelectedItem())) {
-                return comp == 0;
-            } else if (">=".equals(comboOperator.getSelectedItem())) {
-                return comp >= 0;
-            } else if (">".equals(comboOperator.getSelectedItem())) {
-                return comp > 0;
-            }
-        } catch (NumberFormatException e) {
+        int comp;
+        if (value instanceof Integer) {
+            Integer val = (Integer) value;
+            comp = val.compareTo(valInt);
+        } else if (value instanceof Double) {
+            Double val = (Double) value;
+            comp = val.compareTo(valDouble);
+        } else if (value instanceof Float) {
+            Float val = (Float) value;
+            comp = val.compareTo(valFloat);
+        } else {
             return false;
+        }
+        if ("<".equals(compStr)) {
+            return comp < 0;
+        } else if ("<=".equals(compStr)) {
+            return comp <= 0;
+        } else if ("==".equals(compStr)) {
+            return comp == 0;
+        } else if (">=".equals(compStr)) {
+            return comp >= 0;
+        } else if (">".equals(compStr)) {
+            return comp > 0;
         }
         return false;
     }
@@ -109,4 +116,45 @@ public class NumberFilter extends javax.swing.JPanel implements FilterInterface 
     private javax.swing.JTextField txtValue;
     // End of variables declaration//GEN-END:variables
 
+    @Override
+    public void apply() {
+        isInt = false;
+        isFloat = false;
+        isDouble = false;
+        try {
+            valDouble = Double.parseDouble(txtValue.getText());
+            isDouble = true;
+        } catch (Exception e) {
+            valDouble = 0.;
+        }
+        try {
+            valFloat = Float.parseFloat(txtValue.getText());
+            isFloat = true;
+        } catch (Exception e) {
+            valFloat = 0.f;
+        }
+        try {
+            valInt = Integer.parseInt(txtValue.getText());
+            isInt = true;
+        } catch (Exception e) {
+            valInt = 0;
+        }
+        if (comboOperator.getSelectedItem() instanceof String) {
+            compStr = (String) comboOperator.getSelectedItem();
+        } else {
+            compStr = "<";
+        }
+    }
+
+    @Override
+    public void undo() {
+        comboOperator.setSelectedItem(compStr);
+        if (isInt) {
+            txtValue.setText(valInt.toString());
+        } else if (isFloat) {
+            txtValue.setText(valFloat.toString());
+        } else {
+            txtValue.setText(valDouble.toString());
+        }
+    }
 }

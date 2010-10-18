@@ -67,7 +67,7 @@ public class KernelDensityPlot extends Plot {
             sc = (SolverConfiguration) comboSolver.getSelectedItem();
             instance = (Instance) comboInstance.getSelectedItem();
         }
-        initialize();
+        initialize(expController);
         title = "Kernel density estimation for " + sc.getName() + " on " + instance.getName() + " (" + expController.getActiveExperiment().getName() + ")";
 
         ArrayList<ExperimentResult> expResults = getResults(sc.getId(), instance.getId());
@@ -76,11 +76,11 @@ public class KernelDensityPlot extends Plot {
             results[i] = expResults.get(i).getResultTime();
         }
         engine.assign("results", results);
+        // TODO: CONSTANT!!
         engine.eval("plot(npudens(results),main='', xaxt='n', yaxt='n',xlab='', ylab='', xaxs='i', yaxs='i', las=1)");
 
         // plot labels and axes
         engine.eval("mtext('Nonparametric kernel density estimation',padj=1, side=3, line=3, cex=1.7)"); // plot title
-        deinitialize();
     }
 
     public static String getTitle() {
