@@ -91,9 +91,7 @@ public class PropertyComputationUnit implements Runnable {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        System.out.println("arbeit, arbeit!");
-        callback.callback();
-        
+        callback.callback();  
     }
 
     private void calculate(File f) {
@@ -103,4 +101,6 @@ public class PropertyComputationUnit implements Runnable {
     private void parse(String toParse) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
+
+
 }
