@@ -11,6 +11,7 @@ import edacc.EDACCExtendedWarning;
 import edacc.EDACCManageDBInstanceFilter;
 import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
+import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
 import edacc.model.InstanceNotInDBException;
 import edacc.model.Instance;
@@ -28,8 +29,10 @@ import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.MD5CheckFailedException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
+import edacc.model.PropertyNotInDBException;
 import edacc.model.Tasks;
 import edacc.properties.PropertyComputationController;
+import edacc.properties.PropertyTypeNotExistException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -74,7 +77,7 @@ public class ManageDBInstances implements Observer{
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    public void loadInstances() throws NoConnectionToDBException, SQLException, InstanceClassMustBeSourceException, IOException {
+    public void loadInstances() throws NoConnectionToDBException, SQLException, InstanceClassMustBeSourceException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         main.instanceTableModel.instances.clear();
         main.instanceTableModel.addInstances(new Vector<Instance>(InstanceDAO.getAll()));
         main.instanceTableModel.fireTableDataChanged();

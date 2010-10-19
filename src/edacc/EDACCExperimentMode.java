@@ -17,15 +17,19 @@ import edacc.experiment.SolverTableModel;
 import edacc.filter.InstanceFilter;
 import edacc.filter.JobsFilter;
 import edacc.gridqueues.GridQueuesController;
+import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultStatus;
 import edacc.model.InstanceClassMustBeSourceException;
+import edacc.model.NoConnectionToDBException;
+import edacc.model.PropertyNotInDBException;
 import edacc.model.Solver;
 import edacc.model.TaskCancelledException;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
+import edacc.properties.PropertyTypeNotExistException;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -332,7 +336,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         /* end of job browser tab */
     }
 
-    public void initialize() throws SQLException, InstanceClassMustBeSourceException, IOException {
+    public void initialize() throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         btnRemoveExperiment.setEnabled(false);
         btnEditExperiment.setEnabled(false);
         btnLoadExperiment.setEnabled(false);
