@@ -31,6 +31,7 @@ public class SolverConfigurationSelector extends JPanel {
     private JButton btnSelectAll, btnDeselectAll, btnInvert;
     private TableRowSorter<SolverConfigurationTableModel> sorter;
     private JLabel lblFilter;
+    private boolean updateTableColumnWidth;
 
     public SolverConfigurationSelector() {
         super(new GridBagLayout());
@@ -39,11 +40,6 @@ public class SolverConfigurationSelector extends JPanel {
         table = new JTable(tableModel);
         sorter = new TableRowSorter<SolverConfigurationTableModel>(tableModel);
         table.setRowSorter(sorter);
-
-        TableColumnModel colModel = table.getColumnModel();
-        colModel.getColumn(0).setPreferredWidth(15);
-        colModel.getColumn(1).setPreferredWidth(400);
-        colModel.getColumn(2).setPreferredWidth(400);
         scrollPane = new JScrollPane(table);
         lblFilter = new JLabel("");
         lblFilter.setForeground(Color.red);
@@ -102,6 +98,7 @@ public class SolverConfigurationSelector extends JPanel {
                 btnInvert();
             }
         });
+        updateTableColumnWidth = true;
     }
 
     public void btnSelectAll() {
@@ -127,6 +124,7 @@ public class SolverConfigurationSelector extends JPanel {
 
     public void setSolverConfigurations(ArrayList<SolverConfiguration> solverConfigurations) {
         tableModel.setSolverConfigurations(solverConfigurations);
+        updateTableColumnWidth = true;
     }
 
     public ArrayList<SolverConfiguration> getSelectedSolverConfigurations() {
@@ -144,6 +142,15 @@ public class SolverConfigurationSelector extends JPanel {
             } else {
                 tableModel.setValueAt(Boolean.FALSE, i, SolverConfigurationTableModel.COL_SEL);
             }
+        }
+    }
+
+    @Override
+    public void paint(java.awt.Graphics g) {
+        super.paint(g);
+        if (updateTableColumnWidth) {
+            edacc.experiment.Util.updateTableColumnWidth(table);
+            updateTableColumnWidth = false;
         }
     }
 }

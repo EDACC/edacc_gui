@@ -1,13 +1,12 @@
 package edacc.experiment.plots;
 
 import edacc.EDACCApp;
-import edacc.EDACCInstanceFilter;
 import edacc.experiment.InstanceTableModel;
-import edacc.experiment.InstanceTableModelRowFilter;
 import edacc.filter.InstanceFilter;
 import edacc.model.Instance;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -16,7 +15,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -38,6 +36,7 @@ public class InstanceSelector extends JPanel {
     private InstanceFilter rowFilter;
     private TableRowSorter<InstanceTableModel> sorter;
     private JLabel lblFilter;
+    private boolean updateTableColumnWidth;
 
     public InstanceSelector() {
         super(new GridBagLayout());
@@ -134,6 +133,7 @@ public class InstanceSelector extends JPanel {
                 btnInvert();
             }
         });
+        updateTableColumnWidth = true;
     }
 
     public void btnFilter() {
@@ -166,6 +166,7 @@ public class InstanceSelector extends JPanel {
 
     public void setInstances(ArrayList<Instance> instances) {
         tableModel.setInstances(instances);
+        updateTableColumnWidth = true;
     }
 
     public ArrayList<Instance> getSelectedInstances() {
@@ -183,6 +184,15 @@ public class InstanceSelector extends JPanel {
             } else {
                 tableModel.setValueAt(Boolean.FALSE, i, InstanceTableModel.COL_SELECTED);
             }
+        }
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        if (updateTableColumnWidth) {
+            edacc.experiment.Util.updateTableColumnWidth(table);
+            updateTableColumnWidth = false;
         }
     }
 }

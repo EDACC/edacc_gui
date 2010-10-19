@@ -510,8 +510,8 @@ public class EDACCView extends FrameView implements Observer {
             @Override
             public void run(Tasks task) {
                 try {
-                    experimentMode.initialize();
                     mainPanelLayout.replace(mode, experimentMode);
+                    experimentMode.initialize();
                     mode = experimentMode;
                     manageExperimentModeMenuItem.setSelected(true);
                     manageDBModeMenuItem.setSelected(false);

@@ -15,6 +15,7 @@ import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import java.awt.Component;
+import java.awt.Graphics;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.JLabel;
@@ -38,6 +39,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     private SolverConfiguration solverConfiguration;
     private Solver solver;
     private EDACCSolverConfigPanel parent;
+    private boolean updateTableColumnWidth;
 
     /**
      * Creates a new form EDACCSolverConfigEntry. Uses a solver configuration
@@ -90,9 +92,22 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                 return comp;
             }
         };
+       
         parameterTable.setDefaultRenderer(String.class, renderer);
         parameterTable.setDefaultRenderer(Integer.class, renderer);
+        updateTableColumnWidth = true;
     }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        if (updateTableColumnWidth) {
+        edacc.experiment.Util.updateTableColumnWidth(parameterTable);
+        updateTableColumnWidth = false;
+        }
+    }
+
+
 
     /**
      * Sets the number in the title.
@@ -116,7 +131,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             solverConfigEntryTableModel.setValueAt(entry.solverConfigEntryTableModel.getValueAt(i, 3), i, 3);
             solverConfigEntryTableModel.setValueAt(entry.solverConfigEntryTableModel.getValueAt(i, 0), i, 0);
         }
-
+        updateTableColumnWidth = true;
     }
 
     public int getSolverId() {
