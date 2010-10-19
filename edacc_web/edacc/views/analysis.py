@@ -18,6 +18,7 @@ from flask import abort, request
 
 from edacc import models, forms, ranking, statistics
 from edacc.views.helpers import require_phase, require_login
+from edacc.constants import RANKING, ANALYSIS1, ANALYSIS2
 from edacc.views import plot
 from edacc.forms import EmptyQuery
 
@@ -31,7 +32,7 @@ def render(*args, **kwargs):
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/ranking/')
-@require_phase(phases=(6, 7))
+@require_phase(phases=RANKING)
 @require_login
 def solver_ranking(database, experiment_id):
     """ Display a page with the ranking of the solvers of
@@ -40,14 +41,27 @@ def solver_ranking(database, experiment_id):
     db = models.get_database(database) or abort(404)
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
-    num_runs_per_solver = experiment.get_num_runs(db) * len(experiment.instances)
+    num_runs = experiment.get_num_runs(db)
+    num_runs_per_solver = num_runs * len(experiment.instances)
+
+    vbs_num_solved = 0
+    vbs_cumulated_cpu = 0
+    for i in experiment.instances:
+        best_solver_run = db.session.query(db.ExperimentResult).filter_by(experiment=experiment)\
+                                    .filter(db.ExperimentResult.resultCode.like('1%')) \
+                                    .filter_by(instance=i).order_by(db.ExperimentResult.resultTime) \
+                                    .first()
+        if best_solver_run:
+            vbs_num_solved += num_runs
+            vbs_cumulated_cpu += best_solver_run.resultTime * num_runs
 
     ranked_solvers = ranking.number_of_solved_instances_ranking(experiment)
-    data = [('Virtual Best Solver (VBS)',   # name of the solver
-             len(experiment.instances) * experiment.get_num_runs(db),     # number of successful runs
-             1.0,                           # % of all runs
-             0,                             # cumulated CPU time
-             0,                             # average CPU time per successful run
+    data = [('Virtual Best Solver (VBS)',           # name of the solver
+             vbs_num_solved,                        # number of successful runs
+             vbs_num_solved / float(num_runs_per_solver),  # % of all runs
+             1.0,                                   # % of vbs runs
+             vbs_cumulated_cpu,                     # cumulated CPU time
+             (0.0 if vbs_num_solved == 0 else vbs_cumulated_cpu / vbs_num_solved),    # average CPU time per successful run
              )]
     for solver in ranked_solvers:
         successful_runs = db.session.query(db.ExperimentResult).filter(db.ExperimentResult.resultCode.like('1%')) \
@@ -56,9 +70,10 @@ def solver_ranking(database, experiment_id):
         data.append((
             solver.get_name(),
             num_successful_runs,
-            num_successful_runs / float(num_runs_per_solver),
+            0 if num_runs_per_solver == 0 else num_successful_runs / float(num_runs_per_solver),
+            0 if vbs_num_solved == 0 else num_successful_runs / float(vbs_num_solved),
             sum(j.get_time() for j in successful_runs),
-            numpy.average([j.get_time() for j in successful_runs])
+            numpy.average([j.get_time() for j in successful_runs] or 0)
         ))
 
     return render('/analysis/ranking.html', database=database, db=db,
@@ -67,7 +82,7 @@ def solver_ranking(database, experiment_id):
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/cactus/')
-@require_phase(phases=(6, 7))
+@require_phase(phases=ANALYSIS1)
 @require_login
 def cactus_plot(database, experiment_id):
     """ Displays a page where the user can select a set of instances and a
@@ -93,7 +108,7 @@ def cactus_plot(database, experiment_id):
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/rtd-comparison/')
-@require_phase(phases=(6, 7))
+@require_phase(phases=ANALYSIS2)
 @require_login
 def result_property_comparison(database, experiment_id):
     """
@@ -165,7 +180,7 @@ def result_property_comparison(database, experiment_id):
               experiment=experiment, db=db, form=form, GET_data=GET_data,
               ks_statistic=ks_statistic, ks_p_value=ks_p_value,
               wx_statistic=wx_statistic, wx_p_value=wx_p_value,
-              wx_error=wx_error, ks_error=ks_error)
+              wx_error=wx_error, ks_error=ks_error, median1=median1, median2=median2)
 
 
     return render('/analysis/result_property_comparison.html', database=database,
@@ -173,7 +188,7 @@ def result_property_comparison(database, experiment_id):
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/rtds/')
-@require_phase(phases=(6, 7))
+@require_phase(phases=ANALYSIS2)
 @require_login
 def rtds(database, experiment_id):
     """
@@ -195,7 +210,7 @@ def rtds(database, experiment_id):
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/scatter-two-solvers/')
-@require_phase(phases=(6, 7))
+@require_phase(phases=ANALYSIS2)
 @require_login
 def scatter_2solver_1property(database, experiment_id):
     """
@@ -228,10 +243,11 @@ def scatter_2solver_1property(database, experiment_id):
                         form.solver_config1.data, form.solver_config2.data,
                         form.instances.data, form.solver_property.data, form.run.data)
 
+        # log transform data if axis scaling is enabled, only affects pearson's coeff.
         if form.xscale.data == 'log':
-            points = map(lambda p: (math.log(p[0]), p[1]), points)
+            points = map(lambda p: (math.log(p[0]) if p[0] != 0 else 0, p[1]), points)
         if form.yscale.data == 'log':
-            points = map(lambda p: (p[0], math.log(p[1])), points)
+            points = map(lambda p: (p[0], math.log(p[1]) if p[1] != 0 else 0), points)
 
         spearman_r, spearman_p_value = statistics.spearman_correlation([p[0] for p in points], [p[1] for p in points])
         pearson_r, pearson_p_value = statistics.pearson_correlation([p[0] for p in points], [p[1] for p in points])
@@ -243,7 +259,7 @@ def scatter_2solver_1property(database, experiment_id):
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/scatter-instance-vs-result/')
-@require_phase(phases=(6, 7))
+@require_phase(phases=ANALYSIS2)
 @require_login
 def scatter_1solver_instance_vs_result_property(database, experiment_id):
     """
@@ -281,10 +297,11 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
                         form.instance_property.data, form.solver_property.data,
                         form.run.data)
 
+        # log transform data if axis scaling is enabled, only affects pearson's coeff.
         if form.xscale.data == 'log':
-            points = map(lambda p: (math.log(p[0]), p[1]), points)
+            points = map(lambda p: (math.log(p[0]) if p[0] != 0 else 0, p[1]), points)
         if form.yscale.data == 'log':
-            points = map(lambda p: (p[0], math.log(p[1])), points)
+            points = map(lambda p: (p[0], math.log(p[1]) if p[1] != 0 else 0), points)
 
         spearman_r, spearman_p_value = statistics.spearman_correlation([p[0] for p in points], [p[1] for p in points])
         pearson_r, pearson_p_value = statistics.pearson_correlation([p[0] for p in points], [p[1] for p in points])
@@ -296,7 +313,7 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/scatter-result-vs-result/')
-@require_phase(phases=(6, 7))
+@require_phase(phases=ANALYSIS2)
 @require_login
 def scatter_1solver_result_vs_result_property(database, experiment_id):
     """
@@ -330,10 +347,11 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
                     form.solver_config.data, form.instances.data,
                     form.solver_property1.data, form.solver_property2.data, form.run.data)
 
+        # log transform data if axis scaling is enabled, only affects pearson's coeff.
         if form.xscale.data == 'log':
-            points = map(lambda p: (math.log(p[0]), p[1]), points)
+            points = map(lambda p: (math.log(p[0]) if p[0] != 0 else 0, p[1]), points)
         if form.yscale.data == 'log':
-            points = map(lambda p: (p[0], math.log(p[1])), points)
+            points = map(lambda p: (p[0], math.log(p[1]) if p[1] != 0 else 0), points)
 
         spearman_r, spearman_p_value = statistics.spearman_correlation([p[0] for p in points], [p[1] for p in points])
         pearson_r, pearson_p_value = statistics.pearson_correlation([p[0] for p in points], [p[1] for p in points])
@@ -345,7 +363,7 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/rtd/')
-@require_phase(phases=(6, 7))
+@require_phase(phases=ANALYSIS2)
 @require_login
 def rtd(database, experiment_id):
     """
@@ -365,7 +383,7 @@ def rtd(database, experiment_id):
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/probabilistic-domination/')
-@require_phase(phases=(6, 7))
+@require_phase(phases=ANALYSIS2)
 @require_login
 def probabilistic_domination(database, experiment_id):
     """
@@ -411,7 +429,7 @@ def probabilistic_domination(database, experiment_id):
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/box-plots/')
-@require_phase(phases=(6, 7))
+@require_phase(phases=ANALYSIS2)
 @require_login
 def box_plots(database, experiment_id):
     """ Displays a page allowing the user to plot box plots with the results of all runs
