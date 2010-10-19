@@ -92,20 +92,20 @@ public abstract class Plot {
         }
     }
 
-    public static ArrayList<Property> getSolverProperties() throws Exception {
+    public static ArrayList<Property> getResultProperties() throws Exception {
         ArrayList<Property> res = new ArrayList<Property>();
         if (PROP_CPUTIME == null) {
             PROP_CPUTIME = new Property();
             PROP_CPUTIME.setName("CPU-Time");
         }
         res.add(PROP_CPUTIME);
-        res.addAll(PropertyDAO.getAll());
+        res.addAll(PropertyDAO.getAllResultProperties());
         return res;
     }
 
-    public static ArrayList<InstanceProperty> getInstanceProperties() throws Exception {
-        ArrayList<InstanceProperty> res = new ArrayList<InstanceProperty>();
-        res.addAll(InstancePropertyManager.getInstance().getAll());
+    public static ArrayList<Property> getInstanceProperties() throws Exception {
+        ArrayList<Property> res = new ArrayList<Property>();
+        res.addAll(PropertyDAO.getAllInstanceProperties());
         return res;
     }
 
@@ -178,8 +178,8 @@ public abstract class Plot {
         }
     }
 
-    public Double getValue(Instance instance, InstanceProperty property) {
-        InstanceHasProperty ihip = instance.getPropertyValues().get(property.getName());
+    public Double getValue(Instance instance, Property property) {
+        InstanceHasProperty ihip = instance.getPropertyValues().get(property.getId());
         if (ihip == null) {
             return null;
         }

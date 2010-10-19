@@ -27,7 +27,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
     private SolverConfiguration solverConfig;
     private ArrayList<Instance> instances;
     private Property solverProperty;
-    private InstanceProperty instanceProperty;
+    private Property instanceProperty;
     private Integer run;
     private Boolean xlog, ylog;
 
@@ -78,10 +78,10 @@ public class ScatterInstancePropertySolverProperty extends Plot {
         for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
             comboRun.addItem(i);
         }
-        for (Property sProp : getSolverProperties()) {
+        for (Property sProp : getResultProperties()) {
             comboSolverProperty.addItem(sProp);
         }
-        for (InstanceProperty iProp : getInstanceProperties()) {
+        for (Property iProp : getInstanceProperties()) {
             comboInstanceProperty.addItem(iProp);
         }
         ArrayList<Instance> instances = new ArrayList<Instance>();
@@ -97,7 +97,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
             if (!(comboSolverProperty.getSelectedItem() instanceof Property)) {
                 throw new DependencyException("You have to select a solver property.");
             }
-            if (!(comboInstanceProperty.getSelectedItem() instanceof InstanceProperty)) {
+            if (!(comboInstanceProperty.getSelectedItem() instanceof Property)) {
                 throw new DependencyException("You have to select an instance property.");
             }
             if (!(comboSolver.getSelectedItem() instanceof SolverConfiguration)) {
@@ -122,7 +122,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
             }
 
             solverConfig = (SolverConfiguration) comboSolver.getSelectedItem();
-            instanceProperty = (InstanceProperty) comboInstanceProperty.getSelectedItem();
+            instanceProperty = (Property) comboInstanceProperty.getSelectedItem();
             solverProperty = (Property) comboSolverProperty.getSelectedItem();
             xlog = scaleSelector.isXScaleLog();
             ylog = scaleSelector.isYScaleLog();

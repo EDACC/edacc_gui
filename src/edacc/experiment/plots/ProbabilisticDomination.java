@@ -116,7 +116,7 @@ public class ProbabilisticDomination extends Plot {
             comboSolver1.addItem(sc);
             comboSolver2.addItem(sc);
         }
-        for (Property p : getSolverProperties()) {
+        for (Property p : getResultProperties()) {
             comboProperty.addItem(p);
         }
         ArrayList<Instance> i = new ArrayList<Instance>();

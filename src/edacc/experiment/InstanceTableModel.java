@@ -25,10 +25,9 @@ import java.util.Vector;
 public class InstanceTableModel extends AbstractTableModel {
 
     public static int COL_NAME = 0;
-    public static int COL_MD5 = 1;
-    public static int COL_SELECTED = 2;
-    public static int COL_PROP = 3;
-    private String[] columns = {"Name", "md5", "selected"};
+    public static int COL_SELECTED = 1;
+    public static int COL_PROP = 2;
+    private String[] columns = {"Name", "selected"};
     ArrayList<Property> properties;
     protected ArrayList<Instance> instances;
     protected Vector<ExperimentHasInstance> experimentHasInstances;
@@ -187,16 +186,12 @@ public class InstanceTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int col) {
-        if (col == 1) {
-            return true;
-        } else {
-            return false;
-        }
+        return col == COL_SELECTED;
     }
 
     @Override
     public void setValueAt(Object value, int row, int col) {
-        if (col == 1) {
+        if (col == COL_SELECTED) {
             if ((Boolean) value) {
                 selectedInstances.put(instances.get(row).getId(), experimentHasInstances.get(row));
             } else {
@@ -220,8 +215,6 @@ public class InstanceTableModel extends AbstractTableModel {
             case 0:
                 return instances.get(rowIndex).getName();
             case 1:
-                return instances.get(rowIndex).getMd5();
-            case 2:
                 return selectedInstances.containsKey(instances.get(rowIndex).getId()); //selected.get(rowIndex);
             default:
                 int propertyIdx = columnIndex - COL_PROP;
