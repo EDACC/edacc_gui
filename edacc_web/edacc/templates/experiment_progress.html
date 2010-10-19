@@ -3,24 +3,13 @@
 {% block head %}
     {{ super() }}
     <link rel="stylesheet" href="/static/css/datatable.css" type="text/css" />
+    <link rel="stylesheet" href="/static/css/ColVis.css" type="text/css" />
     <script src="/static/js/jquery.dataTables.min.js" type="text/javascript"></script>
     <script src="/static/js/jquery.timers-1.2.js" type="text/javascript"></script>
     <script src="/static/js/jquery.dataTables.ajaxReloadPlugin.js" type="text/javascript"></script>
+    <script src="/static/js/ColVis.min.js" type="text/javascript"></script>
     <script type="text/javascript">
         /* <![CDATA[ */
-        $.fn.dataTableExt.afnSortData['job-status'] = function  ( oSettings, iColumn )
-        {
-            var aData = [];
-            $('td:eq('+iColumn+')', oSettings.oApi._fnGetTrNodes(oSettings)).each(function() {
-                var v = $(this).html()
-                if (v == 'error') aData.push("Aerror");
-                else if (v == 'not started') aData.push("Bnot started");
-                else if (v == 'running') aData.push("Crunning");
-                else if (v == 'finished') aData.push("Dfinished");
-                else if (v == 'terminated by ulimit') aData.push("Eterminated by ulimit");
-            });
-            return aData;
-        }
         $(document).ready(function() {
             var JOB_STATUS_COLOR = { {% autoescape false %}{{JS_colors|safe}}{% endautoescape %} };
 
@@ -34,10 +23,11 @@
                 "iDisplayLength": 50,
                 "aLengthMenu": [10, 25, 50, 100, 500, 1000, 5000, 10000],
                 "bStateSave": true,
+                "sDom": '<"clear">Clfrtip',
                 "bProcessing": true,
                 "sAjaxSource": "{{url_for('experiment_progress_ajax', database=database, experiment_id=experiment.idExperiment)}}",
 		"fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                    $('td:eq(0)', nRow).html('<a style="color: black;" href="/{{database}}/experiment/{{experiment.idExperiment}}/result/'+aData[0]+'">'+aData[0]+'</a>');
+                    $('td:eq(0)', nRow).html('<a style="color: black;" href="/{{database}}/experiment/{{experiment.idExperiment}}/result/'+aData[0]+'">'+$('td:eq(0)', nRow).html()+'</a>');
                     $(nRow).attr("bgcolor", JOB_STATUS_COLOR[aData[8]]);
                     return nRow;
 		},
@@ -54,6 +44,67 @@
 
             $('#refresh').click(function() {
                 oTable.fnReloadAjax();
+                return false;
+            });
+
+            getDataTableVars = function(oSettings){
+                var iColumns = oSettings.aoColumns.length;
+                var aoData = [];
+                var i;
+
+                /* Paging and general */
+                oSettings.iServerDraw++;
+                aoData.push( { "name": "sEcho",          "value": oSettings.iServerDraw } );
+                aoData.push( { "name": "iColumns",       "value": iColumns } );
+                aoData.push( { "name": "sColumns",       "value": oTable.oApi._fnColumnOrdering(oSettings) } );
+                aoData.push( { "name": "iDisplayStart",  "value": oSettings._iDisplayStart } );
+                aoData.push( { "name": "iDisplayLength", "value": oSettings.oFeatures.bPaginate !== false ?
+                        oSettings._iDisplayLength : -1 } );
+
+                /* Filtering */
+                if ( oSettings.oFeatures.bFilter !== false )
+                {
+                        aoData.push( { "name": "sSearch",        "value": oSettings.oPreviousSearch.sSearch } );
+                        aoData.push( { "name": "bEscapeRegex",   "value": oSettings.oPreviousSearch.bEscapeRegex } );
+                        for ( i=0 ; i<iColumns ; i++ )
+                        {
+                                aoData.push( { "name": "sSearch_"+i,      "value": oSettings.aoPreSearchCols[i].sSearch } );
+                                aoData.push( { "name": "bEscapeRegex_"+i, "value": oSettings.aoPreSearchCols[i].bEscapeRegex } );
+                                aoData.push( { "name": "bSearchable_"+i,  "value": oSettings.aoColumns[i].bSearchable } );
+                        }
+                }
+
+                /* Sorting */
+                if ( oSettings.oFeatures.bSort !== false )
+                {
+                        var iFixed = oSettings.aaSortingFixed !== null ? oSettings.aaSortingFixed.length : 0;
+                        var iUser = oSettings.aaSorting.length;
+                        aoData.push( { "name": "iSortingCols",   "value": iFixed+iUser } );
+                        for ( i=0 ; i<iFixed ; i++ )
+                        {
+                                aoData.push( { "name": "iSortCol_"+i,  "value": oSettings.aaSortingFixed[i][0] } );
+                                aoData.push( { "name": "sSortDir_"+i,  "value": oSettings.aaSortingFixed[i][1] } );
+                        }
+
+                        for ( i=0 ; i<iUser ; i++ )
+                        {
+                                aoData.push( { "name": "iSortCol_"+(i+iFixed),  "value": oSettings.aaSorting[i][0] } );
+                                aoData.push( { "name": "sSortDir_"+(i+iFixed),  "value": oSettings.aaSorting[i][1] } );
+                        }
+
+                        for ( i=0 ; i<iColumns ; i++ )
+                        {
+                                aoData.push( { "name": "bSortable_"+i,  "value": oSettings.aoColumns[i].bSortable } );
+                        }
+                }
+
+                return aoData;
+            }
+
+            $('#get_csv').click(function() {
+                var aoData = getDataTableVars(oTable.fnSettings());
+                var varStr = jQuery.param(aoData);
+                document.location.href = '{{url_for('experiment_progress_ajax', database=database, experiment_id=experiment.idExperiment)}}?'+varStr+'&csv';
                 return false;
             });
 
@@ -103,8 +154,8 @@
     </div>
     -->
 
-    <a id="refresh" href="#">Refresh Data</a> <strong>Refresh Interval:</strong>
-    <select id="refresh_interval"><option value="-" selected="selected">-</option><option value="2">2s</option><option value="5">5s</option><option value="10">10s</option><option value="30">30s</option></select>
+    <a id="get_csv" href="#">Download as CSV</a> | <a id="refresh" href="#">Refresh Data</a> <strong>Refresh Interval:</strong>
+    <select id="refresh_interval"><option value="-" selected="selected">-</option><option value="2">2s</option><option value="5">5s</option><option value="10">10s</option><option value="30">30s</option></select><br/>
     <div style="max-width: 98%">
     <table id="table_jobs" class="display">
         <thead>

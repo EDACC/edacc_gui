@@ -86,11 +86,12 @@ class EDACCDatabase(object):
             def get_property_value(self, property, db):
                 """ Returns the value of the property with the given name. """
                 try:
-                    property = db.session.query(db.Property).get(property)
+                    property = db.session.query(db.Property).get(int(property))
                     pv = db.session.query(db.InstanceProperties).filter_by(property=property, instance=self).first()
                     return pv.get_value()
                 except:
                     return None
+
 
             def get_instance(self):
                 """ Decompresses the instance blob and returns it as string """
@@ -165,10 +166,9 @@ class EDACCDatabase(object):
                 else:
                     try:
                         property = db.session.query(db.Property).get(int(property))
-                        pv = db.session.query(db.ExperimentResultResultProperty).filter_by(property=property, experiment_result=self).first()
+                        pv = db.session.query(db.ExperimentResultProperty).filter_by(property=property, experiment_result=self).first()
                         return pv.get_value()
                     except:
-                        # if the property or property value doesn't exist return None
                         return None
 
         class InstanceClass(object):
@@ -195,10 +195,10 @@ class EDACCDatabase(object):
 
         class Property(object):
             def is_result_property(self):
-                return self.propertyType == config.RESULT_PROPERTY_TYPE
+                return self.propertyType == constants.RESULT_PROPERTY_TYPE
 
             def is_instance_property(self):
-                return self.propertyType == config.INSTANCE_PROPERTY_TYPE
+                return self.propertyType == constants.INSTANCE_PROPERTY_TYPE
 
             def is_simple(self):
                 """ Returns whether the property is a simple property which is
@@ -232,7 +232,7 @@ class EDACCDatabase(object):
 
         class InstanceProperties(object):
             def get_value(self):
-                valueType = self.property.valueType.lower()
+                valueType = self.property.propertyValueType.lower()
                 try:
                     if valueType in ('float', 'double',):
                         return float(self.value)
@@ -349,7 +349,7 @@ class EDACCDatabase(object):
         mapper(ExperimentResultProperty, metadata.tables['ExperimentResult_has_Property'],
             properties = {
                 'property': relationship(Property, backref='experiment_results'),
-                'values': relation(ResultPropertyValue)
+                'values': relation(ResultPropertyValue, backref='experiment_result_property')
             }
         )
         mapper(ResultPropertyValue, metadata.tables['ExperimentResult_has_PropertyValue'])
