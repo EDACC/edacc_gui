@@ -28,7 +28,7 @@ public class ExperimentResultHasProperty extends BaseModel implements IntegerPKM
             this.setModified();
     }
 
-    public Property getSolvProperty() {
+    public Property getProperty() {
         return solvProperty;
     }
 

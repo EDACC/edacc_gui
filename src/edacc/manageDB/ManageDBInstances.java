@@ -27,7 +27,9 @@ import edacc.model.InstanceIsInExperimentException;
 import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.MD5CheckFailedException;
 import edacc.model.NoConnectionToDBException;
+import edacc.model.Property;
 import edacc.model.Tasks;
+import edacc.properties.PropertyComputationController;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -733,6 +735,10 @@ public class ManageDBInstances implements Observer{
         } catch (SQLException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void computeProperties(Vector<Instance> instances, Vector<Property> properties) {
+        PropertyComputationController p = new PropertyComputationController(instances, properties);
     }
 }
 

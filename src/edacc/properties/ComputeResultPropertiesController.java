@@ -55,6 +55,14 @@ public class ComputeResultPropertiesController {
         try {
             Thread compute = new Thread(new PropertyComputationController(null, null, true));
             compute.start();
+        } catch (PropertyTypeNotExistException ex) {
+            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (PropertyNotInDBException ex) {
+            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ComputationMethodDoesNotExistException ex) {
+            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoConnectionToDBException ex) {
             Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {

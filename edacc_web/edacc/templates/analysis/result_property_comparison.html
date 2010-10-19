@@ -14,7 +14,7 @@
             instances[{{loop.index0}}]["name"] = "{{instance.name}}";
             {% set outer_loop = loop %}
                 {% for prop in db.get_instance_properties() %}
-                    instances[{{outer_loop.index0}}]["{{prop.name}}"] = {{instance.get_property_value(prop.name, db) or "''"}};
+                    instances[{{outer_loop.index0}}]["{{prop.name}}"] = {{instance.get_property_value(prop.idProperty, db) or "''"}};
                 {% endfor %}
             {% endfor %}
             {% endautoescape %}
@@ -92,8 +92,7 @@
                 <tr>
                     <td style="vertical-align: middle;">Filter instances</td>
                     <td>{{form.instance_filter}}<img id="instance_filter_apply" src="/static/img/search.png"/><img id="instance_filter_clear" src="/static/img/clear.png"/><br/>
-                        JS expression filter. Valid variables are name, numAtoms,<br/> numClauses, ratio and maxClauseLength.<br/>
-                            Example: (numAtoms >= 6000 && numAtoms <= 8000)
+                        JS expression filter. Valid variables are {% for prop in db.get_instance_properties() %}{{prop.name}}, {% endfor %} <br/>
                     </td>
                 </tr>
                 <tr><td colspan="2"><input type="submit" value="Show" /></td></tr>
@@ -119,6 +118,8 @@
                 H0: RTD1 = RTD2<br/>
                 H1: RTD1 != RTD2<br/>
                 Statistic: {{wx_statistic|round(2)}}<br/>
+                Median {{form.solver_config1.data}}: {{median1}}<br/>
+                Median {{form.solver_config2.data}}: {{median2}}<br/>
                 <i>p</i>-value: {{(wx_p_value)}} (two-sided)<br/>
                 {% if wx_p_value <= 0.05 %}
                 The Null-Hypothesis should be <strong>rejected</strong> at significance level 0.05.
@@ -135,7 +136,7 @@
         <div style="text-align: center; margin-left: 20px; margin-bottom: 20px; float: left;">
             {% autoescape false %}
             <img alt="graph" src="{{url_for('plot.result_property_comparison_plot', database=database, experiment_id=experiment.idExperiment)}}?{{GET_data}}" /><br/>
-            Download as <a href="{{url_for('plot.result_property_comparison_plot', database=database, experiment_id=experiment.idExperiment)}}?{{GET_data}}&pdf">PDF</a> | <a href="{{url_for('plot.result_property_comparison_plot', database=database, experiment_id=experiment.idExperiment)}}?{{GET_data}}&csv">Raw Data (CSV)</a>
+            Download as <a href="{{url_for('plot.result_property_comparison_plot', database=database, experiment_id=experiment.idExperiment)}}?{{GET_data}}&pdf">PDF</a> | <a href="{{url_for('plot.result_property_comparison_plot', database=database, experiment_id=experiment.idExperiment)}}?{{GET_data}}&eps">EPS</a> | <a href="{{url_for('plot.result_property_comparison_plot', database=database, experiment_id=experiment.idExperiment)}}?{{GET_data}}&csv">Raw Data (CSV)</a>
             {% endautoescape %}
         </div>
     {% endif %}

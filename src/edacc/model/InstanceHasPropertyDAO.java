@@ -66,7 +66,7 @@ public class InstanceHasPropertyDAO {
             return;
         }
         st.setInt(1, i.getInstance().getId());
-        st.setString(2, i.getInstanceProperty().getName());
+        st.setString(2, i.getProperty().getName());
         st.executeUpdate();
 
         // set id if necessary
@@ -150,7 +150,7 @@ public class InstanceHasPropertyDAO {
         }
 
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT ihp.id, ihp.idInstance, ihp.idInstanceProperty, ihp.value "
+                "SELECT ihp.id, ihp.idInstance, ihp.idProperty, ihp.value "
                 + "FROM Instance_has_Property AS ihp "
                 + "LEFT JOIN Instances AS i ON (ihp.idInstance = i.idInstance)");
         ResultSet rs = ps.executeQuery();
@@ -187,8 +187,21 @@ public class InstanceHasPropertyDAO {
 
     public static InstanceHasProperty getById(int id) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException{
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idInstance, idProperty, value FROM " + table + "WHERE idProperty=?;");
+                "SELECT idInstance, idProperty, value FROM " + table + " WHERE id=?;");
         ps.setInt(1, id);
         return getInstanceHasInstancePropertyFromResultSet(ps.executeQuery());
+    }
+
+    public static InstanceHasProperty getByInstanceAndProperty(Instance instance, Property property) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, InstanceHasPropertyNotInDBException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT id, value FROM " + table + " WHERE idInstance=? AND idProperty=?;");
+        ps.setInt(1, instance.getId());
+        ps.setInt(2, property.getId());
+        ResultSet rs = ps.executeQuery();
+        if(!rs.next())
+            throw new InstanceHasPropertyNotInDBException();
+        InstanceHasProperty res = new InstanceHasProperty(instance, property, rs.getString(2));
+        res.setId(rs.getInt(1));
+        return res;
     }
 }

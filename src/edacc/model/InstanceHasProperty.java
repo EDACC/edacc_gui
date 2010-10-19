@@ -34,7 +34,7 @@ public class InstanceHasProperty extends BaseModel implements IntegerPKModel {
         return instance;
     }
 
-    public Property getInstanceProperty() {
+    public Property getProperty() {
         return instanceProperty;
     }
 
