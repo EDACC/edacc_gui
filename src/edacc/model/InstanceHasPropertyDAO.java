@@ -136,14 +136,14 @@ public class InstanceHasPropertyDAO {
     public static void assign(ArrayList<Instance> inst) throws SQLException {
         HashMap<Integer, Instance> instances = new HashMap<Integer, Instance>();
         for (Instance i : inst) {
-            i.setPropertyValues(new HashMap<String, InstanceHasProperty>());
+            i.setPropertyValues(new HashMap<Integer, InstanceHasProperty>());
             instances.put(i.getId(), i);
         }
 
-        HashMap<String, Property> instanceProperties = new HashMap<String, Property>();
+        HashMap<Integer, Property> instanceProperties = new HashMap<Integer, Property>();
         try {
             for (Property p : PropertyDAO.getAllInstanceProperties()) {
-                instanceProperties.put(p.getName(), p);
+                instanceProperties.put(p.getId(), p);
             }
         } catch (Exception e) {
             throw new SQLException(e.getMessage());
@@ -157,7 +157,7 @@ public class InstanceHasPropertyDAO {
         while (rs.next()) {
             int id = rs.getInt(1);
             int idInstance = rs.getInt(2);
-            String idInstanceProperty = rs.getString(3);
+            int idInstanceProperty = rs.getInt(3);
             String value = rs.getString(4);
             Instance instance = instances.get(idInstance);
             if (instance != null) {

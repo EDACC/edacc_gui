@@ -3,6 +3,7 @@ package edacc.model;
 import SevenZip.Compression.LZMA.Decoder;
 import SevenZip.Compression.LZMA.Encoder;
 import edacc.manageDB.InstanceParser.InstanceParser;
+import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.InstancePropertyManager;
 import edacc.satinstances.InvalidVariableException;
 import edacc.satinstances.SATInstance;
@@ -42,7 +43,7 @@ public class InstanceDAO {
         String from = " ";
         int tbl = 0;
         for (Property p : props) {
-            from += "JOIN (SELECT idInstance, value FROM Instance_has_InstanceProperty WHERE idInstanceProperty = \"" + p.getName() + "\") AS tbl_" + tbl++ + " USING (idInstance) ";
+            from += "JOIN (SELECT idInstance, value FROM Instance_has_Property WHERE idProperty = \"" + p.getId() + "\") AS tbl_" + tbl++ + " USING (idInstance) ";
         }
         return from;
     }
@@ -54,9 +55,9 @@ public class InstanceDAO {
         i.setName(rs.getString("name"));
         Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
         i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
-        i.setPropertyValues(new HashMap<String, InstanceHasProperty>());
+        i.setPropertyValues(new HashMap<Integer, InstanceHasProperty>());
         for (int prop = 0; prop < props.size(); prop++) {
-            i.getPropertyValues().put(props.get(prop).getName(), new InstanceHasProperty(i, props.get(prop), rs.getString("tbl_" + prop + ".value")));
+            i.getPropertyValues().put(props.get(prop).getId(), new InstanceHasProperty(i, props.get(prop), rs.getString("tbl_" + prop + ".value")));
         }
         return i;
     }
@@ -229,10 +230,10 @@ public class InstanceDAO {
      * @return all instances in a List
      * @throws SQLException
      */
-    public static LinkedList<Instance> getAll() throws SQLException, InstanceClassMustBeSourceException, IOException {
+    public static LinkedList<Instance> getAll() throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         // return linked list with all instances
         // TODO: fix!
-        Vector<Property> props = new Vector<Property>();//InstancePropertyManager.getInstance().getAll();
+        Vector<Property> props = PropertyDAO.getAllInstanceProperties();
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
         ResultSet rs = st.executeQuery("SELECT i.idInstance, i.md5, i.name, i.instanceClass_idinstanceClass" + getPropertySelect(props)
                 + "FROM " + table + " AS i " + getPropertyFrom(props));

@@ -25,9 +25,10 @@ import java.util.Vector;
 public class InstanceTableModel extends AbstractTableModel {
 
     public static int COL_NAME = 0;
-    public static int COL_SELECTED = 1;
-    public static int COL_PROP = 2;
-    private String[] columns = {"Name", "selected"};
+    public static int COL_MD5 = 1;
+    public static int COL_SELECTED = 2;
+    public static int COL_PROP = 3;
+    private String[] columns = {"Name", "md5", "selected"};
     ArrayList<Property> properties;
     protected ArrayList<Instance> instances;
     protected Vector<ExperimentHasInstance> experimentHasInstances;
@@ -46,7 +47,7 @@ public class InstanceTableModel extends AbstractTableModel {
         properties = new ArrayList<Property>();
         // TODO: fix!
         try {
-            //properties.addAll(PropertyDAO.getAllInstanceProperties());
+            properties.addAll(PropertyDAO.getAllInstanceProperties());
             if (properties.size() > 0) {
                 columns = java.util.Arrays.copyOf(columns, COL_PROP + properties.size());
                 for (int i = COL_PROP; i < columns.length; i++) {
@@ -219,13 +220,18 @@ public class InstanceTableModel extends AbstractTableModel {
             case 0:
                 return instances.get(rowIndex).getName();
             case 1:
+                return instances.get(rowIndex).getMd5();
+            case 2:
                 return selectedInstances.containsKey(instances.get(rowIndex).getId()); //selected.get(rowIndex);
             default:
                 int propertyIdx = columnIndex - COL_PROP;
                 if (properties.size() <= propertyIdx || instances.get(rowIndex).getPropertyValues() == null) {
                     return null;
                 }
-                InstanceHasProperty ip = instances.get(rowIndex).getPropertyValues().get(properties.get(propertyIdx).getName());
+                InstanceHasProperty ip = instances.get(rowIndex).getPropertyValues().get(properties.get(propertyIdx).getId());
+                if (ip == null) {
+                    return null;
+                }
                 try {
                     return properties.get(propertyIdx).getPropertyValueType().getJavaTypeRepresentation(ip.getValue());
                 } catch (ConvertException ex) {

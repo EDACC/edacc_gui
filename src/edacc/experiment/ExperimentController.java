@@ -87,7 +87,7 @@ public class ExperimentController {
      * Initializes the experiment controller. Loads the experiments and the instances classes.
      * @throws SQLException
      */
-    public void initialize() throws SQLException, InstanceClassMustBeSourceException, IOException {
+    public void initialize() throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         ArrayList<Experiment> v = new ArrayList<Experiment>();
         v.addAll(ExperimentDAO.getAll());
         experiments = v;
@@ -160,7 +160,7 @@ public class ExperimentController {
      * @return
      * @throws SQLException
      */
-    public void removeExperiment(int id) throws SQLException, InstanceClassMustBeSourceException, IOException {
+    public void removeExperiment(int id) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         Experiment e = ExperimentDAO.getById(id);
         if (e.equals(activeExperiment)) {
             unloadExperiment();
@@ -195,7 +195,7 @@ public class ExperimentController {
      * @throws SQLException
      * @throws Exception
      */
-    public void createExperiment(String name, String description) throws SQLException, InstanceClassMustBeSourceException, IOException {
+    public void createExperiment(String name, String description) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         java.util.Date d = new java.util.Date();
         ExperimentDAO.createExperiment(name, new Date(d.getTime()), description);
         initialize();
@@ -537,7 +537,7 @@ public class ExperimentController {
         return experiments_added;
     }
 
-    public void saveExperimentParameters(Integer CPUTimeLimit, Integer wallClockTimeLimit, Integer memoryLimit, Integer stackSizeLimit, Integer outputSizeLimit, Integer maxSeed, boolean generateSeeds, boolean linkSeeds) throws SQLException, InstanceClassMustBeSourceException, IOException {
+    public void saveExperimentParameters(Integer CPUTimeLimit, Integer wallClockTimeLimit, Integer memoryLimit, Integer stackSizeLimit, Integer outputSizeLimit, Integer maxSeed, boolean generateSeeds, boolean linkSeeds) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         activeExperiment.setCPUTimeLimit(CPUTimeLimit);
         activeExperiment.setWallClockTimeLimit(wallClockTimeLimit);
         activeExperiment.setMemoryLimit(memoryLimit);
