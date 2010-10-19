@@ -150,7 +150,7 @@ public class InstanceHasPropertyDAO {
         }
 
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT ihp.id, ihp.idInstance, ihp.idInstanceProperty, ihp.value "
+                "SELECT ihp.id, ihp.idInstance, ihp.idProperty, ihp.value "
                 + "FROM Instance_has_Property AS ihp "
                 + "LEFT JOIN Instances AS i ON (ihp.idInstance = i.idInstance)");
         ResultSet rs = ps.executeQuery();
