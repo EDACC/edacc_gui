@@ -43,6 +43,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.TableRowSorter;
 import org.jdesktop.application.Action;
+import org.jdesktop.application.Application;
 
 /**
  *
@@ -1664,11 +1665,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             this.manageDBInstances.showInstanceInfoDialog(this.tableInstances.getSelectedRows());
     }//GEN-LAST:event_btnAddInstances1ActionPerformed
 
+    private EDACCComputeInstancePropertyDialog computeInstancePropertyDlg;
     private void bComputePropertyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bComputePropertyActionPerformed
         Vector<Instance> instances = new Vector<Instance>();
         for (int i : tableInstances.getSelectedRows())
             instances.add(instanceTableModel.getInstance(i));
-        
+        computeInstancePropertyDlg = new EDACCComputeInstancePropertyDialog(EDACCApp.getApplication().getMainFrame(), manageDBInstances, instances);
+        computeInstancePropertyDlg.setLocationRelativeTo(this);
+        computeInstancePropertyDlg.setVisible(true);
     }//GEN-LAST:event_bComputePropertyActionPerformed
 
     private void parameterChanged() {
