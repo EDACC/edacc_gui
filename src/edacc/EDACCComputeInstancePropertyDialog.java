@@ -12,23 +12,13 @@
 package edacc;
 
 import edacc.manageDB.ManageDBInstances;
-import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.Instance;
-import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
-import edacc.model.PropertyNotInDBException;
-import edacc.properties.PropertyTypeNotExistException;
-import java.awt.GraphicsConfiguration;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractListModel;
 import javax.swing.JOptionPane;
-import javax.swing.ListModel;
 
 /**
  *
