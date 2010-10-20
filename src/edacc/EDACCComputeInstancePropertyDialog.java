@@ -11,7 +11,9 @@
 
 package edacc;
 
+import edacc.manageDB.ManageDBInstances;
 import edacc.model.Instance;
+import edacc.model.Property;
 import java.util.Vector;
 
 /**
@@ -21,12 +23,14 @@ import java.util.Vector;
 public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog {
 
     private Vector<Instance> instances;
+    private ManageDBInstances manageDBInstances;
 
     /** Creates new form EDACCComputeInstancePropertyDialog */
-    public EDACCComputeInstancePropertyDialog(java.awt.Frame parent, Vector<Instance> instances) {
+    public EDACCComputeInstancePropertyDialog(java.awt.Frame parent, ManageDBInstances manageDBInstances, Vector<Instance> instances) {
         super(parent, true);
         initComponents();
         this.instances = instances;
+        this.manageDBInstances = manageDBInstances;
     }
 
     /** This method is called from within the constructor to
@@ -60,6 +64,11 @@ public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog {
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCComputeInstancePropertyDialog.class);
         bCompute.setText(resourceMap.getString("bCompute.text")); // NOI18N
         bCompute.setName("bCompute"); // NOI18N
+        bCompute.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bComputeActionPerformed(evt);
+            }
+        });
 
         bCancel.setText(resourceMap.getString("bCancel.text")); // NOI18N
         bCancel.setName("bCancel"); // NOI18N
@@ -98,6 +107,11 @@ public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void bComputeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bComputeActionPerformed
+        Vector<Property> properties = new Vector<Property>();
+        manageDBInstances.computeProperties(instances, properties);
+    }//GEN-LAST:event_bComputeActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bCancel;
