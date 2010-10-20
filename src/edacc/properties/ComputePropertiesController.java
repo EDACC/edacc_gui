@@ -7,6 +7,7 @@ package edacc.properties;
 
 import edacc.EDACCComputeResultProperties;
 import edacc.model.ComputationMethodDoesNotExistException;
+import edacc.model.Experiment;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
@@ -51,9 +52,9 @@ public class ComputePropertiesController {
         }
     }
 
-    public void computeResultProperties(Vector<Property> toCalculate, boolean recompute) {
+    public void computProperties(Vector<Property> toCalculate, boolean recompute, Experiment exp) {
         try {
-            Thread compute = new Thread(new PropertyComputationController(null, null, true));
+            Thread compute = new Thread(new PropertyComputationController(exp, toCalculate, recompute));
             compute.start();
         } catch (PropertyTypeNotExistException ex) {
             Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);

@@ -11,6 +11,7 @@
 
 package edacc;
 
+import edacc.model.Experiment;
 import edacc.model.Property;
 import edacc.properties.ComputePropertiesController;
 import edacc.properties.PropertySelectionTableModel;
@@ -28,11 +29,12 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class EDACCComputeResultProperties extends javax.swing.JDialog {
     ComputePropertiesController controller;
     PropertySelectionTableModel tableModel;
+    Experiment exp;
     /** Creates new form EDACCComputeResultProperties */
-    public EDACCComputeResultProperties(java.awt.Frame parent, boolean modal) {
+    public EDACCComputeResultProperties(java.awt.Frame parent, boolean modal, Experiment exp) {
         super(parent, modal);
         initComponents();
-
+        this.exp = exp;
         controller = new ComputePropertiesController(this, tableSelectResultProperties);
 
         // initate the result property table
@@ -40,6 +42,11 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog {
         tableSelectResultProperties.setModel(tableModel);
        
        initalize();
+    }
+
+    public EDACCComputeResultProperties(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
+        initComponents();
     }
 
     /** This method is called from within the constructor to
@@ -161,7 +168,7 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog {
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
         }else {
-            controller.computeResultProperties(toCalculate, this.checkBoxReCompute.isSelected());
+            controller.computProperties(toCalculate, this.checkBoxReCompute.isSelected(), exp);
         }
     }//GEN-LAST:event_buttonComputeActionPerformed
 
