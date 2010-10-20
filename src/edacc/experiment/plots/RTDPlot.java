@@ -82,11 +82,11 @@ public class RTDPlot extends Plot {
             instance = (Instance) comboInstance.getSelectedItem();
             property = (Property) comboProperty.getSelectedItem();
         }
-        initialize(expController);
+        expController.updateExperimentResults();
         title = "Property distribution comparison on " + instance + " (" + expController.getActiveExperiment().getName() + ")";
         infos = null;
-        ArrayList<ExperimentResult> results1 = getResults(sc1.getId(), instance.getId());
-        ArrayList<ExperimentResult> results2 = getResults(sc2.getId(), instance.getId());
+        ArrayList<ExperimentResult> results1 = expController.getResults(sc1.getId(), instance.getId());
+        ArrayList<ExperimentResult> results2 = expController.getResults(sc2.getId(), instance.getId());
 
         double max_x = 0;
         ArrayList<Double> resultsDouble1 = new ArrayList<Double>();
@@ -95,7 +95,7 @@ public class RTDPlot extends Plot {
         int secondNoResult = 0;
         // TODO: continue fix!
         for (int i = 0; i < results1.size(); i++) {
-            Double tmp = getValue(results1.get(i), property);
+            Double tmp = expController.getValue(results1.get(i), property);
             if (tmp == null) {
                 firstNoResult++;
                 continue;
@@ -106,7 +106,7 @@ public class RTDPlot extends Plot {
             }
         }
         for (int i = 0; i < results2.size(); i++) {
-            Double tmp = getValue(results2.get(i), property);
+            Double tmp = expController.getValue(results2.get(i), property);
             if (tmp == null) {
                 secondNoResult++;
                 continue;

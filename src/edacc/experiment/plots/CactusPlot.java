@@ -114,7 +114,7 @@ public class CactusPlot extends Plot {
                 selectedInstanceIds.add(i.getId());
             }
         }
-        initialize(expController);
+        expController.updateExperimentResults();
         SolverInfos[] solver = new SolverInfos[solverConfigs.size()];
         double max_y = 0;
         int max_x = 0;
@@ -124,15 +124,15 @@ public class CactusPlot extends Plot {
             int k = 0;
             for (Integer instanceId : selectedInstanceIds) {
                 if (run == ALLRUNS) {
-                    ArrayList<ExperimentResult> tmp = getResults(sc.getId(), instanceId);
+                    ArrayList<ExperimentResult> tmp = expController.getResults(sc.getId(), instanceId);
                     for (ExperimentResult er : tmp) {
-                        Double value = getValue(er, property);
+                        Double value = expController.getValue(er, property);
                         if (value != null) {
                             resultValues.add(value);
                         }
                     }
                 } else if (run == MEDIAN || run == AVERAGE) {
-                    ArrayList<ExperimentResult> results = getResults(sc.getId(), instanceId);
+                    ArrayList<ExperimentResult> results = expController.getResults(sc.getId(), instanceId);
                     Double value;
                     if (run == MEDIAN) {
                         value = getMedian(results, property);
@@ -146,11 +146,11 @@ public class CactusPlot extends Plot {
                         // TODO: warning
                     }
                 } else {
-                    ExperimentResult res = getResult(sc.getId(), instanceId, run);
+                    ExperimentResult res = expController.getResult(sc.getId(), instanceId, run);
                     if (res == null) {
                         continue;
                     }
-                    Double value = getValue(res, property);
+                    Double value = expController.getValue(res, property);
                     if (value == null) {
                         continue;
                     }

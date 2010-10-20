@@ -4,9 +4,11 @@ import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentResult;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
+import edacc.model.Property;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import java.util.ArrayList;
+import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
 
 /**
@@ -17,9 +19,11 @@ public class BoxPlot extends Plot {
 
     private static InstanceSelector instanceSelector;
     private static SolverConfigurationSelector solverConfigurationSelector;
+    private static JComboBox comboProperty;
     private String warning = null;
     private ArrayList<Instance> instances;
     private ArrayList<SolverConfiguration> solverConfigs;
+    private Property property;
 
     public BoxPlot(ExperimentController expController) {
         super(expController);
@@ -33,7 +37,11 @@ public class BoxPlot extends Plot {
         if (solverConfigurationSelector == null) {
             solverConfigurationSelector = new SolverConfigurationSelector();
         }
+        if (comboProperty == null) {
+            comboProperty = new JComboBox();
+        }
         return new Dependency[]{
+                    new Dependency("Property", comboProperty),
                     new Dependency("Solvers", solverConfigurationSelector),
                     new Dependency("Instances", instanceSelector)
                 };
@@ -46,6 +54,10 @@ public class BoxPlot extends Plot {
         instanceSelector.btnSelectAll();
         solverConfigurationSelector.setSolverConfigurations(SolverConfigurationDAO.getSolverConfigurationByExperimentId(expController.getActiveExperiment().getId()));
         solverConfigurationSelector.btnSelectAll();
+        comboProperty.removeAllItems();
+        for (Property p : getResultProperties()) {
+            comboProperty.addItem(p);
+        }
     }
 
     public static String getTitle() {
@@ -60,7 +72,11 @@ public class BoxPlot extends Plot {
     @Override
     public void plot(Rengine engine, ArrayList<PointInformation> pointInformations) throws Exception {
         warning = null;
-        if (instances == null || solverConfigs == null) {
+        if (instances == null || solverConfigs == null || property == null) {
+            if (!(comboProperty.getSelectedItem() instanceof Property)) {
+                throw new DependencyException("You have to select a property.");
+            }
+            property = (Property) comboProperty.getSelectedItem();
             instances = instanceSelector.getSelectedInstances();
             if (instances == null || instances.isEmpty()) {
                 throw new DependencyException("You have to select instances in order to plot.");
@@ -69,31 +85,41 @@ public class BoxPlot extends Plot {
             if (solverConfigs.isEmpty()) {
                 throw new DependencyException("You have to select solvers in order to plot.");
             }
+
         }
-        initialize(expController);
+        expController.updateExperimentResults();
         int k = 0;
         ArrayList<String> warnings = new ArrayList<String>();
         String[] names = new String[solverConfigs.size()];
         for (SolverConfiguration sc : solverConfigs) {
-            int penalties = 0;
+          //  int penalties = 0;
             ArrayList<ExperimentResult> results = new ArrayList<ExperimentResult>();
             for (Instance i : instances) {
-                results.addAll(getResults(sc.getId(), i.getId()));
+                results.addAll(expController.getResults(sc.getId(), i.getId()));
             }
-            double[] times = new double[expController.getActiveExperiment().getNumRuns() * instances.size()];
-            for (int i = 0; i < results.size(); i++) {
-                times[i] = results.get(i).getResultTime();
+            ArrayList<Double> values = new ArrayList<Double>();
+            for (ExperimentResult er : results) {
+                Double value = expController.getValue(er, property);
+                if (value == null) {
+                    // TODO!
+                } else {
+                    values.add(value);
+                }
+            }
+            double[] times = new double[values.size()];
+            for (int i = 0; i < values.size(); i++) {
+                times[i] = values.get(i);
             }
             // penalty for not solving the instance.
-            for (int i = results.size(); i < expController.getActiveExperiment().getNumRuns() * instances.size(); i++) {
+            /*for (int i = results.size(); i < expController.getActiveExperiment().getNumRuns() * instances.size(); i++) {
                 penalties++;
                 times[i] = expController.getActiveExperiment().getCPUTimeLimit();
-            }
+            }*/
             names[k] = sc.getName();
             engine.assign("res_" + (k++), times);
-            if (penalties > 0) {
+           /* if (penalties > 0) {
                 warnings.add("Solver " + sc.getName() + " got " + penalties + " penalties.");
-            }
+            }*/
         }
 
         String data = "";
@@ -105,7 +131,7 @@ public class BoxPlot extends Plot {
         }
         engine.assign("names", names);
         engine.eval("boxplot(main = 'Boxplot', " + data + ", names = names, horizontal = TRUE)");
-        engine.eval("mtext('CPU Time (s)', side=1,line=3, cex=1.2)");
+        engine.eval("mtext('"+property.getName() +"', side=1,line=3, cex=1.2)");
         if (warnings.size() > 0) {
             warning = htmlHeader
                     + "<h2>Warning</h2>";
@@ -124,10 +150,11 @@ public class BoxPlot extends Plot {
 
     @Override
     public void updateDependencies() {
-        if (instances == null || solverConfigs == null) {
+        if (instances == null || solverConfigs == null || property == null) {
             return;
         }
         instanceSelector.setSelectedInstances(instances);
         solverConfigurationSelector.setSelectedSolverConfigurations(solverConfigs);
+        comboProperty.setSelectedItem(property);
     }
 }

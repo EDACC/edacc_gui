@@ -50,8 +50,6 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public static int COL_WATCHER_OUTPUT = 12;
     public static int COL_VERIFIER_OUTPUT = 13;
     public static int COL_PROPERTY = 14;
-    public Timestamp lastUpdated;
-    private static final FilePropertyParser parser = new FilePropertyParser(); // just for now
     private ArrayList<ExperimentResult> jobs;
     private String[] CONST_COLUMNS = {"ID", "Compute Queue", "Solver", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
     private boolean[] CONST_VISIBLE = {false, true, true, true, true, true, true, true, true, true, false, false, false, false};

@@ -1,6 +1,7 @@
 package edacc.model;
 
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.HashMap;
 
 public class ExperimentResult extends BaseModel {
@@ -31,7 +32,7 @@ public class ExperimentResult extends BaseModel {
     private int computeQueue;
 
     private HashMap<Integer, ExperimentResultHasProperty> propertyValues;
-    
+    private Timestamp datemodified;
     protected ExperimentResult() {
     }
 
@@ -256,5 +257,13 @@ public class ExperimentResult extends BaseModel {
 
     public void setPropertyValues(HashMap<Integer, ExperimentResultHasProperty> propertyValues) {
         this.propertyValues = propertyValues;
+    }
+
+    public Timestamp getDatemodified() {
+        return datemodified;
+    }
+
+    public void setDatemodified(Timestamp datemodified) {
+        this.datemodified = datemodified;
     }
 }

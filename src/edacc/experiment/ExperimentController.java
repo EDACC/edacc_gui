@@ -23,7 +23,9 @@ import edacc.model.InstanceClass;
 import edacc.model.InstanceClassDAO;
 import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.InstanceDAO;
+import edacc.model.InstanceHasProperty;
 import edacc.model.NoConnectionToDBException;
+import edacc.model.Property;
 import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
@@ -32,6 +34,8 @@ import edacc.model.PropertyNotInDBException;
 import edacc.model.TaskCancelledException;
 import edacc.model.Tasks;
 import edacc.properties.PropertyTypeNotExistException;
+import edacc.satinstances.ConvertException;
+import edacc.satinstances.PropertyValueType;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
@@ -72,6 +76,12 @@ public class ExperimentController {
     private Experiment activeExperiment;
     private ArrayList<Experiment> experiments;
     private static RandomNumberGenerator rnd = new JavaRandom();
+    // caching experiment results
+    private HashMap<ResultIdentifier, ExperimentResult> resultMap;
+    private Timestamp lastUpdated;
+    private Experiment experiment;
+    // end of caching experiment results
+    public static Property PROP_CPUTIME;
 
     /**
      * Creates a new experiment Controller
@@ -81,6 +91,9 @@ public class ExperimentController {
     public ExperimentController(EDACCExperimentMode experimentMode, EDACCSolverConfigPanel solverConfigPanel) {
         this.main = experimentMode;
         this.solverConfigPanel = solverConfigPanel;
+        PROP_CPUTIME = new Property();
+        PROP_CPUTIME.setName("CPU-Time");
+
     }
 
     /**
@@ -572,33 +585,38 @@ public class ExperimentController {
 
     public void loadJobs() {
         try {
+            updateExperimentResults();
             final ExperimentResultsBrowserTableModel sync = main.jobsTableModel;
-            Timestamp timestamp = ExperimentResultDAO.getLastModifiedByExperimentId(activeExperiment.getId());
             synchronized (sync) {
                 ArrayList<ExperimentResult> results = main.jobsTableModel.getJobs();
-                if (results == null) {
-                    main.jobsTableModel.setJobs(ExperimentResultDAO.getAllByExperimentId(activeExperiment.getId()));
-                    main.resultBrowserRowFilter.updateFilterTypes();
-                    main.jobsTableModel.fireTableDataChanged();
-                } else {
-                    ArrayList<ExperimentResult> modified = ExperimentResultDAO.getAllModifiedByExperimentId(activeExperiment.getId(), main.jobsTableModel.lastUpdated);
-                    if (modified.size() > 0) {
-                        HashMap<Integer, ExperimentResult> map = new HashMap<Integer, ExperimentResult>();
-                        for (ExperimentResult er : modified) {
-                            map.put(er.getId(), er);
-                        }
+                if (results != null) {
+                    if (results.size() != resultMap.size()) {
+                        results = null;
+                    } else {
                         for (int i = 0; i < results.size(); i++) {
-                            ExperimentResult er = map.get(results.get(i).getId());
-                            if (er != null) {
-                                results.set(i, er);
+                            ExperimentResult er = results.get(i);
+                            ExperimentResult tmp = resultMap.get(new ResultIdentifier(er.getSolverConfigId(), er.getInstanceId(), er.getRun()));
+                            if (tmp == null) {
+                                results = null;
+                                break;
+                            } else if (!er.getDatemodified().equals(tmp.getDatemodified())) {
+                                results.set(i, tmp);
                                 main.jobsTableModel.fireTableRowsUpdated(i, i);
                             }
                         }
+                        if (results != null && results.size() != resultMap.size()) {
+                            results = null;
+                        }
                     }
                 }
+                if (results == null) {
+                    results = new ArrayList<ExperimentResult>();
+                    results.addAll(resultMap.values());
+                    main.jobsTableModel.setJobs(results);
+                    main.resultBrowserRowFilter.updateFilterTypes();
+                    main.jobsTableModel.fireTableDataChanged();
+                }
             }
-            main.jobsTableModel.lastUpdated = timestamp;
-            System.gc();
         } catch (Exception e) {
             //   e.printStackTrace();
             // TODO: shouldn't happen but show message if it does
@@ -1053,5 +1071,162 @@ public class ExperimentController {
 
     public String getExperimentResultOutput(int type, ExperimentResult er) throws SQLException, NoConnectionToDBException, IOException {
         return ExperimentResultDAO.getOutputText(type, er);
+    }
+
+    public void updateExperimentResults() throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
+        if (activeExperiment == null) {
+            experiment = null;
+            resultMap = null;
+            return;
+        }
+        if (experiment != activeExperiment) {
+            resultMap = null;
+            lastUpdated = new Timestamp(0);
+        }
+        Timestamp ts = ExperimentResultDAO.getLastModifiedByExperimentId(getActiveExperiment().getId());
+        ArrayList<ExperimentResult> modified = ExperimentResultDAO.getAllModifiedByExperimentId(activeExperiment.getId(), lastUpdated);
+        if (resultMap == null) {
+            resultMap = new HashMap<ResultIdentifier, ExperimentResult>();
+        }
+        for (ExperimentResult result : modified) {
+            ResultIdentifier key = new ResultIdentifier(result.getSolverConfigId(), result.getInstanceId(), result.getRun());
+            if (resultMap.containsKey(key)) {
+                resultMap.remove(key);
+            }
+            resultMap.put(key, result);
+        }
+        int count = ExperimentResultDAO.getCountByExperimentId(getActiveExperiment().getId());
+        if (count != resultMap.size()) {
+            // full update
+            resultMap.clear();
+            ArrayList<ExperimentResult> experimentResults = ExperimentResultDAO.getAllByExperimentId(getActiveExperiment().getId());
+            for (ExperimentResult result : experimentResults) {
+                resultMap.put(new ResultIdentifier(result.getSolverConfigId(), result.getInstanceId(), result.getRun()), result);
+            }
+        }
+        lastUpdated = ts;
+        experiment = activeExperiment;
+    }
+
+    /**
+     * Returns a Vector of all ExperimentResults in the current experiment with the solverConfig id and instance id specified
+     * @param solverConfigId the solverConfig id of the ExperimentResults
+     * @param instanceId the instance id of the ExperimentResults
+     * @return returns an empty vector if there are no such ExperimentResults
+     */
+    public ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId) {
+        ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
+        for (int i = 0; i < experiment.getNumRuns(); i++) {
+            ExperimentResult result = getResult(solverConfigId, instanceId, i);
+            if (result != null) {
+                res.add(result);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Returns an ExperimentResult identified by solverConfig id, instance id and run for the current experiment.
+     * @param solverConfigId the solverConfig id for the ExperimentResult
+     * @param instanceId the instance id for the ExperimentResult
+     * @param run the run
+     * @return returns null if there is no such ExperimentResult
+     */
+    public ExperimentResult getResult(int solverConfigId, int instanceId, int run) {
+        ExperimentResult res = resultMap.get(new ResultIdentifier(solverConfigId, instanceId, run));
+        // if the result is not in our map or it is not a verified result then return null
+        // TODO: überdenken
+        // if (res == null || !String.valueOf(res.getResultCode().getValue()).startsWith("1")) {
+        //     return null;
+        // }
+        return res;
+    }
+
+    private Double transformPropertyValueTypeToDouble(PropertyValueType type, String value) {
+        Double res = null;
+        try {
+            if (type.getJavaType() == Integer.class) {
+                res = new Double((Integer) type.getJavaTypeRepresentation(value));
+            } else if (type.getJavaType() == Float.class) {
+                res = new Double((Float) type.getJavaTypeRepresentation(value));
+            } else if (type.getJavaType() == Double.class) {
+                res = (Double) type.getJavaTypeRepresentation(value);
+            }
+        } catch (ConvertException ex) {
+            return null;
+        }
+        return res;
+    }
+
+    public Double getValue(ExperimentResult result, Property property) {
+        if (result.getStatus() != ExperimentResultStatus.SUCCESSFUL) {
+            return null;
+        }
+        if (property == PROP_CPUTIME) {
+            if (!String.valueOf(result.getResultCode().getValue()).startsWith("1")) {
+                return new Double(experiment.getCPUTimeLimit());
+            }
+            return Double.valueOf(result.getResultTime());
+        } else {
+            if (!String.valueOf(result.getResultCode().getValue()).startsWith("1")) {
+                return null;
+            }
+            ExperimentResultHasProperty erhsp = result.getPropertyValues().get(property.getId());
+            if (erhsp == null || erhsp.getValue().isEmpty()) {
+                return null;
+            }
+            return transformPropertyValueTypeToDouble(property.getPropertyValueType(), erhsp.getValue().get(0));
+        }
+    }
+
+    public Double getValue(Instance instance, Property property) {
+        InstanceHasProperty ihip = instance.getPropertyValues().get(property.getId());
+        if (ihip == null) {
+            return null;
+        }
+        return transformPropertyValueTypeToDouble(property.getPropertyValueType(), ihip.getValue());
+    }
+
+    class ResultIdentifier {
+
+        int solverConfigId;
+        int instanceId;
+        int run;
+
+        public ResultIdentifier(int solverConfigId, int instanceId, int run) {
+            this.solverConfigId = solverConfigId;
+            this.instanceId = instanceId;
+            this.run = run;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final ResultIdentifier other = (ResultIdentifier) obj;
+            if (this.solverConfigId != other.solverConfigId) {
+                return false;
+            }
+            if (this.instanceId != other.instanceId) {
+                return false;
+            }
+            if (this.run != other.run) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 53 * hash + this.solverConfigId;
+            hash = 53 * hash + this.instanceId;
+            hash = 53 * hash + this.run;
+            return hash;
+        }
     }
 }

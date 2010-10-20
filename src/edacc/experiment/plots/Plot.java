@@ -5,6 +5,7 @@ import edacc.model.Experiment;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.ExperimentResultHasProperty;
+import edacc.model.ExperimentResultStatus;
 import edacc.model.Instance;
 import edacc.model.InstanceHasProperty;
 import edacc.model.Property;
@@ -43,10 +44,7 @@ public abstract class Plot {
     public static final String AVERAGE_TEXT = "all runs - average";
     public static final String MEDIAN_TEXT = "all runs - median";
     protected ExperimentController expController;
-    public static Property PROP_CPUTIME;
-    private static HashMap<ResultIdentifier, ExperimentResult> resultMap;
-    private static Timestamp lastUpdated;
-    private static Experiment experiment;
+    
 
     protected Plot(ExperimentController expController) {
         try {
@@ -66,36 +64,9 @@ public abstract class Plot {
         this.expController = expController;
     }
 
-    /**
-     * This method has to be called to use the higher level methods of this class
-     * @throws SQLException
-     * @throws Exception
-     */
-    protected static void initialize(ExperimentController expController) throws SQLException, Exception {
-        int count = ExperimentResultDAO.getCountByExperimentId(expController.getActiveExperiment().getId());
-        Timestamp ts = ExperimentResultDAO.getLastModifiedByExperimentId(expController.getActiveExperiment().getId());
-        if (resultMap == null || count != resultMap.size() || !ts.equals(lastUpdated) || experiment != expController.getActiveExperiment()) {
-            if (resultMap == null) {
-                resultMap = new HashMap<ResultIdentifier, ExperimentResult>();
-            } else {
-                resultMap.clear();
-            }
-            ArrayList<ExperimentResult> results = ExperimentResultDAO.getAllByExperimentId(expController.getActiveExperiment().getId());
-            for (ExperimentResult result : results) {
-                resultMap.put(new ResultIdentifier(result.getSolverConfigId(), result.getInstanceId(), result.getRun()), result);
-            }
-            lastUpdated = ts;
-            experiment = expController.getActiveExperiment();
-        }
-    }
-
     public static ArrayList<Property> getResultProperties() throws Exception {
         ArrayList<Property> res = new ArrayList<Property>();
-        if (PROP_CPUTIME == null) {
-            PROP_CPUTIME = new Property();
-            PROP_CPUTIME.setName("CPU-Time");
-        }
-        res.add(PROP_CPUTIME);
+        res.add(ExperimentController.PROP_CPUTIME);
         res.addAll(PropertyDAO.getAllResultProperties());
         return res;
     }
@@ -107,89 +78,12 @@ public abstract class Plot {
     }
 
     /**
-     * Returns a Vector of all ExperimentResults in the current experiment with the solverConfig id and instance id specified
-     * @param solverConfigId the solverConfig id of the ExperimentResults
-     * @param instanceId the instance id of the ExperimentResults
-     * @return returns an empty vector if there are no such ExperimentResults
-     */
-    public static ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId) {
-        ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
-        for (int i = 0; i < experiment.getNumRuns(); i++) {
-            ExperimentResult result = getResult(solverConfigId, instanceId, i);
-            if (result != null) {
-                res.add(result);
-            }
-        }
-        return res;
-    }
-
-    /**
-     * Returns an ExperimentResult identified by solverConfig id, instance id and run for the current experiment.
-     * @param solverConfigId the solverConfig id for the ExperimentResult
-     * @param instanceId the instance id for the ExperimentResult
-     * @param run the run
-     * @return returns null if there is no such ExperimentResult
-     */
-    public static ExperimentResult getResult(int solverConfigId, int instanceId, int run) {
-        ExperimentResult res = resultMap.get(new ResultIdentifier(solverConfigId, instanceId, run));
-        // if the result is not in our map or it is not a verified result then return null
-        // TODO: überdenken
-        // if (res == null || !String.valueOf(res.getResultCode().getValue()).startsWith("1")) {
-        //     return null;
-        // }
-        return res;
-    }
-
-    private static Double transformPropertyValueTypeToDouble(PropertyValueType type, String value) {
-        Double res = null;
-        try {
-            if (type.getJavaType() == Integer.class) {
-                res = new Double((Integer) type.getJavaTypeRepresentation(value));
-            } else if (type.getJavaType() == Float.class) {
-                res = new Double((Float) type.getJavaTypeRepresentation(value));
-            } else if (type.getJavaType() == Double.class) {
-                res = (Double) type.getJavaTypeRepresentation(value);
-            }
-        } catch (ConvertException ex) {
-            return null;
-        }
-        return res;
-    }
-
-    public static Double getValue(ExperimentResult result, Property property) {
-        if (property == PROP_CPUTIME) {
-            if (!String.valueOf(result.getResultCode().getValue()).startsWith("1")) {
-                return new Double(experiment.getCPUTimeLimit());
-            }
-            return Double.valueOf(result.getResultTime());
-        } else {
-            if (!String.valueOf(result.getResultCode().getValue()).startsWith("1")) {
-                return null;
-            }
-            ExperimentResultHasProperty erhsp = result.getPropertyValues().get(property.getId());
-
-            if (erhsp == null || erhsp.getValue().isEmpty()) {
-                return null;
-            }
-            return transformPropertyValueTypeToDouble(property.getPropertyValueType(), erhsp.getValue().get(0));
-        }
-    }
-
-    public static Double getValue(Instance instance, Property property) {
-        InstanceHasProperty ihip = instance.getPropertyValues().get(property.getId());
-        if (ihip == null) {
-            return null;
-        }
-        return transformPropertyValueTypeToDouble(property.getPropertyValueType(), ihip.getValue());
-    }
-
-    /**
      * Calculates the average property value for the given ExperimentResults, i.e. the sum of the property values divided by the count
      * @param results
      * @param property
      * @return
      */
-    public static Double getAverage(ArrayList<ExperimentResult> results, Property property) {
+    public Double getAverage(ArrayList<ExperimentResult> results, Property property) {
         if (results.isEmpty()) {
             return null;
         }
@@ -197,7 +91,7 @@ public abstract class Plot {
         double res = 0.;
         int count = 0;
         for (ExperimentResult result : results) {
-            Double value = getValue(result, property);
+            Double value = expController.getValue(result, property);
             if (value != null) {
                 count++;
                 res += value;
@@ -216,14 +110,14 @@ public abstract class Plot {
      * @param property
      * @return
      */
-    public static Double getMedian(ArrayList<ExperimentResult> results, Property property) {
+    public Double getMedian(ArrayList<ExperimentResult> results, Property property) {
         if (results.isEmpty()) {
             return null;
         }
 
         ArrayList<Double> values = new ArrayList<Double>();
         for (ExperimentResult res : results) {
-            Double value = getValue(res, property);
+            Double value = expController.getValue(res, property);
             if (value != null) {
                 values.add(value);
             }
@@ -297,45 +191,3 @@ public abstract class Plot {
     public abstract void updateDependencies();
 }
 
-class ResultIdentifier {
-
-    int solverConfigId;
-    int instanceId;
-    int run;
-
-    public ResultIdentifier(int solverConfigId, int instanceId, int run) {
-        this.solverConfigId = solverConfigId;
-        this.instanceId = instanceId;
-        this.run = run;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ResultIdentifier other = (ResultIdentifier) obj;
-        if (this.solverConfigId != other.solverConfigId) {
-            return false;
-        }
-        if (this.instanceId != other.instanceId) {
-            return false;
-        }
-        if (this.run != other.run) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 53 * hash + this.solverConfigId;
-        hash = 53 * hash + this.instanceId;
-        hash = 53 * hash + this.run;
-        return hash;
-    }
-}

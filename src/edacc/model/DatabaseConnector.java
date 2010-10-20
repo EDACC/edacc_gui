@@ -54,7 +54,7 @@ public class DatabaseConnector extends Observable {
             this.password = password;
             this.database = database;
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?user=" + username + "&password=" + password);
+            conn = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?user=" + username + "&password=" + password + "&rewriteBatchedStatements=true");
         } catch (ClassNotFoundException e) {
             throw e;
         } catch (SQLException e) {

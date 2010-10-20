@@ -9,6 +9,8 @@ import edacc.events.PlotTabEvents;
 import edacc.experiment.AnalysisController;
 import edacc.experiment.REngineInitializationException;
 import edacc.experiment.plots.PlotPanel;
+import edacc.model.TaskRunnable;
+import edacc.model.Tasks;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -32,8 +34,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -222,19 +222,18 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         }
     }
 
-    public void updateTitle(String title) {
+    public void updateTitle(String _title) {
         String tmp = "";
         if (tabViews.size() == 0 || tabViews.get(0) == this) {
             tmp = mainWindowTitle;
         } else {
             tmp = title;
         }
-        if ("".equals(title)) {
-            title = tmp;
+        if ("".equals(_title)) {
+            setTitle(tmp);
         } else {
-            title = tmp + " - " + title;
+            setTitle(tmp + " - " + _title);
         }
-        setTitle(title);
     }
 
     public void updateAdditionalInformations(PlotPanel plotPanel) {
@@ -382,6 +381,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         tabComp.setParent(tabView);
         tabView.addPanel(tabComp, pnl);
         tabView.updateAdditionalInformations(pnl);
+        tabView.updateTitle(pnl.getPlot().getPlotTitle());
         tabViewCountChanged();
     }
 
@@ -797,18 +797,20 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                     if (!dropView.dropBegin) {
                         dropView.dropIdx++;
                     }
-
+                    PlotPanel pnl = (PlotPanel) tabbedPanePlots.getSelectedComponent();
                     TabComponent tabComponent = (TabComponent) tabbedPanePlots.getTabComponentAt(tabbedPanePlots.getSelectedIndex());
                     dropView.tabbedPanePlots.add(tabbedPanePlots.getSelectedComponent(), dropView.dropIdx);
                     if (dropView == EDACCPlotTabView.this && sel < dropView.dropIdx) {
                         dropView.dropIdx--;
                     }
                     tabComponent.setParent(dropView);
+
                     dropView.tabbedPanePlots.setTabComponentAt(dropView.dropIdx, tabComponent);
                     dropView.tabbedPanePlots.setSelectedIndex(dropView.dropIdx);
                     if (dropView != EDACCPlotTabView.this) {
                         EDACCPlotTabView.this.closeTab(tabComponent, false);
                     }
+                    dropView.updateTitle(pnl.getPlot().getPlotTitle());
                 }
             }
         }
@@ -863,7 +865,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
 
     @Action
     public void btnSettings() {
-                if (!(tabbedPanePlots.getSelectedComponent() instanceof PlotPanel)) {
+        if (!(tabbedPanePlots.getSelectedComponent() instanceof PlotPanel)) {
             return;
         }
         PlotPanel panel = (PlotPanel) tabbedPanePlots.getSelectedComponent();
@@ -882,19 +884,29 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
 
     @Action
     public void btnRefresh() {
+        // TODO: selbes experiment?!!
         if (!(tabbedPanePlots.getSelectedComponent() instanceof PlotPanel)) {
             return;
         }
-        PlotPanel panel = (PlotPanel) tabbedPanePlots.getSelectedComponent();
-        if (!AnalysisController.setCurrentDeviceNumber(panel.getDeviceNumber())) {
-            return ;
-        }
-        try {
-            panel.getPlot().plot(AnalysisController.getRengine(), panel.pointInformations);
-        } catch (REngineInitializationException ex) {
-            // TODO: error
-        } catch (Exception ex) {
-            // TODO: error
+        synchronized (AnalysisController.syncR) {
+            final PlotPanel panel = (PlotPanel) tabbedPanePlots.getSelectedComponent();
+            if (!AnalysisController.setCurrentDeviceNumber(panel.getDeviceNumber())) {
+                return;
+            }
+            Tasks.startTask(new TaskRunnable() {
+
+                @Override
+                public void run(Tasks task) {
+                    try {
+                        panel.getPlot().plot(AnalysisController.getRengine(), panel.pointInformations);
+                    } catch (REngineInitializationException ex) {
+                        // TODO: error
+                    } catch (Exception ex) {
+                        // TODO: error
+                    }
+                }
+            }, true);
+
         }
     }
 }
