@@ -10,13 +10,9 @@ import edacc.events.TaskEvents;
 import edacc.experiment.plots.DependencyException;
 import edacc.experiment.plots.Plot;
 import edacc.experiment.plots.PlotPanel;
-import edacc.experiment.plots.PointInformation;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.jdesktop.application.Action;
 import org.rosuda.JRI.Rengine;
@@ -114,7 +110,6 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
                     }
                 }
             }, true);
-            // Tasks.startTask("plot", new Class[]{Rengine.class, new ArrayList<PointInformation>().getClass()}, new Object[]{re, panel.pointInformations}, plot, AnalysisBottomPanel.this);
         } catch (REngineInitializationException ex) {
             javax.swing.JOptionPane.showMessageDialog(null, "Error while initializing R: " + ex.getMessage(), "Initialization Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }

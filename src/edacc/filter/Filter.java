@@ -10,6 +10,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowFilter.Entry;
@@ -18,7 +20,8 @@ import javax.swing.table.TableRowSorter;
 import org.jdesktop.application.Action;
 
 /**
- *
+ * This class represents a filter. It can be used with any AbstractTableModel.
+ * Currently supported are: BooleanFilter, NumberFilter & StringFilter.
  * @author simon
  */
 public class Filter extends javax.swing.JDialog {
@@ -34,7 +37,13 @@ public class Filter extends javax.swing.JDialog {
     private LinkedList<ArgumentPanel> filterArguments;
     private boolean updateFilterTypes;
 
-    /** Creates new form EDACCFilter */
+    /**
+     * Creates new form EDACCFilter. If the table has no instance of TableRowSorter a IllegalArgumentException is thrown.
+     * @param parent The parent for this dialog
+     * @param modal
+     * @param table the table to be used for this filter
+     * @param autoUpdateFilterTypes if this is set to true, the filter will updated the classes of the columns on each setVisible(true)
+     */
     public Filter(java.awt.Frame parent, boolean modal, JTable table, boolean autoUpdateFilterTypes) {
         super(parent, modal);
         initComponents();
@@ -57,8 +66,6 @@ public class Filter extends javax.swing.JDialog {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.weightx = 1000;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        //gridBagConstraints.ipadx = 6;
-        //gridBagConstraints.ipady = 6;
         gridBagConstraints.insets = new Insets(6, 6, 6, 6);
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         parser = new Parser();
@@ -67,10 +74,21 @@ public class Filter extends javax.swing.JDialog {
         filterArguments = new LinkedList<ArgumentPanel>();
     }
 
+    /**
+     * Gets the value of the underlying table, i.e. it calls the getValue method of the table model.
+     * @param row
+     * @param col
+     * @return
+     */
     public Object getValueAt(int row, int col) {
         return table.getModel().getValueAt(row, col);
     }
 
+    /**
+     * Returns true iff the given entry matches the filter parameters.
+     * @param entry
+     * @return
+     */
     public synchronized boolean include(Entry<? extends Object, ? extends Object> entry) {
         HashMap<Integer, Boolean> arguments = new HashMap<Integer, Boolean>();
         for (ArgumentPanel panel : filterArguments) {
@@ -83,11 +101,18 @@ public class Filter extends javax.swing.JDialog {
         }
     }
 
+    /**
+     * Removes all filters and clears the expression.
+     */
     public void clearFilters() {
         pnlArguments.removeAll();
         txtExpression.setText("");
     }
 
+    /**
+     * Returns true iff there is the chance that some rows might not be visible in the table.
+     * @return
+     */
     public synchronized boolean hasFiltersApplied() {
         try {
             return parser != null && !parser.eval(expression, new HashMap<Integer, Boolean>());
@@ -96,7 +121,11 @@ public class Filter extends javax.swing.JDialog {
         }
     }
 
+    /**
+     * Updates the classes of the columns to generate the filters. Can be overwritten but should then call updateFilterTypes(Class<?>[], String[]).
+     */
     public void updateFilterTypes() {
+        // create to arrays with the column classes and the column names
         Class<?>[] classes = new Class<?>[table.getModel().getColumnCount()];
         String[] columnNames = new String[table.getModel().getColumnCount()];
 
@@ -104,6 +133,7 @@ public class Filter extends javax.swing.JDialog {
             classes[i] = table.getModel().getColumnClass(i);
             columnNames[i] = table.getModel().getColumnName(i);
         }
+        // update the filter types with that data
         updateFilterTypes(classes, columnNames);
     }
 
@@ -111,7 +141,10 @@ public class Filter extends javax.swing.JDialog {
         for (int i = 0; i < classes.length; i++) {
             if (colFilter.containsKey(i)) {
                 if (colFilter.get(i).clazz != classes[i]) {
+                    // the generated filter for this column has a wrong class, i.e. the class of the column has been changed.
+                    // remove this filter (will be added later with the right class)
                     colFilter.remove(i);
+                    // and remove all panels in the argument referring this column
                     for (int k = pnlArguments.getComponentCount() - 1; k >= 0; k--) {
                         if (pnlArguments.getComponent(k) instanceof ArgumentPanel) {
                             ArgumentPanel panel = (ArgumentPanel) pnlArguments.getComponent(k);
@@ -124,8 +157,10 @@ public class Filter extends javax.swing.JDialog {
                     continue;
                 }
             }
+            // add the filter class
             colFilter.put(i, new FilterType(i, columnNames[i], classes[i]));
         }
+        // update the filter combo box
         comboFilterTypes.removeAllItems();
         for (FilterType f : colFilter.values()) {
             comboFilterTypes.addItem(f);
@@ -304,7 +339,6 @@ public class Filter extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
 
     class FilterType {
-
         int column;
         String name;
         Class<?> clazz;
@@ -323,6 +357,7 @@ public class Filter extends javax.swing.JDialog {
 
     @Action
     public void btnAdd() {
+        // find out, what is the highest argument number
         int argNum = 0;
         for (int i = 0; i < pnlArguments.getComponentCount(); i++) {
             if (pnlArguments.getComponent(i) instanceof ArgumentPanel) {
@@ -332,8 +367,10 @@ public class Filter extends javax.swing.JDialog {
                 }
             }
         }
+        // increment, i.e. this number is free to use
         argNum++;
         if (comboFilterTypes.getSelectedItem() instanceof FilterType) {
+            // find out which filter to use, construct it and add it to the panel.
             FilterType filterType = (FilterType) comboFilterTypes.getSelectedItem();
             if (filterType.clazz == Integer.class || filterType.clazz == Float.class || filterType.clazz == Double.class) {
                 pnlArguments.add(new ArgumentPanel(this, new NumberFilter(filterType.name), argNum, filterType.column));
@@ -342,6 +379,8 @@ public class Filter extends javax.swing.JDialog {
             } else if (filterType.clazz == Boolean.class) {
                 pnlArguments.add(new ArgumentPanel(this, new BooleanFilter(filterType.name), argNum, filterType.column));
             }
+            // replace the expression by `$argNum` iff the current expression will always validate to true
+            // add `&& $argNum` to the expression iff there is currently a valid expression and this expression will not always validate to true
             try {
                 if (parser.eval(txtExpression.getText(), new HashMap<Integer, Boolean>())) {
                     // expression is valid and will always evaluate to true (no arguments needed)
@@ -361,6 +400,8 @@ public class Filter extends javax.swing.JDialog {
     }
 
     private void setGridBagConstraints() {
+        // update the grid bag constraints
+        // set weight to maximum
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weighty = 1;
         for (int i = 0; i < pnlArguments.getComponentCount(); i++) {
@@ -374,6 +415,7 @@ public class Filter extends javax.swing.JDialog {
 
     @Action
     public synchronized void btnApply() {
+        // save the expression and filter arguments to be used in the include part
         expression = txtExpression.getText();
         filterArguments.clear();
         for (int i = 0; i < pnlArguments.getComponentCount(); i++) {
@@ -385,13 +427,29 @@ public class Filter extends javax.swing.JDialog {
         setVisible(false);
     }
 
+    /**
+     * Removes the panel from this view. It also replaces all occurrences of `$argNum` by `true`
+     * @param pnl the panel to be removed
+     */
     public void remove(ArgumentPanel pnl) {
+        // first remove the panel
         pnlArguments.remove(pnl);
+        // then replace all occurrences of `$argNum` by true
+        String arg = String.valueOf(pnl.getArgNum());
+        String expr = txtExpression.getText();
+        Matcher matcher = Pattern.compile("\\$" + arg + "([^0-9]|\n)").matcher(expr + "\n");
+        while (matcher.find()) {
+            expr = expr.substring(0, matcher.start()) + "true" + expr.substring(matcher.start()+arg.length()+1, expr.length());
+            matcher = Pattern.compile("\\$" + arg + "([^0-9]|\n)").matcher(expr + "\n");
+        }
+        txtExpression.setText(expr);
+        // finally update grid bag constraints
         setGridBagConstraints();
     }
 
     @Action
     public synchronized void btnDismiss() {
+        // revert every operation, i.e. load the saved values
         txtExpression.setText(expression);
         pnlArguments.removeAll();
         for (ArgumentPanel panel : filterArguments) {

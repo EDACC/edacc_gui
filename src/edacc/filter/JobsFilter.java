@@ -5,13 +5,20 @@ import javax.swing.JTable;
 import javax.swing.RowFilter.Entry;
 
 /**
- *
+ * This filter can be used for the ExperimentResultsBrowserTableModel. It supports invisible columns.
  * @author simon
  */
 public class JobsFilter extends Filter {
 
     private ExperimentResultsBrowserTableModel model;
 
+    /**
+     * Throws an IllegalArgumentException if the model of the table is not an instance of ExperimentResultsBrowserTableModel.
+     * @param parent
+     * @param modal
+     * @param table
+     * @param autoUpdateFilterTypes
+     */
     public JobsFilter(java.awt.Frame parent, boolean modal, JTable table, boolean autoUpdateFilterTypes) {
         super(parent, modal, table, autoUpdateFilterTypes);
         if (!(table.getModel() instanceof ExperimentResultsBrowserTableModel)) {

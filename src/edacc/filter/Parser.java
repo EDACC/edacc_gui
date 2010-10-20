@@ -1,14 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edacc.filter;
 
 import java.util.HashMap;
-import java.util.StringTokenizer;
 
 /**
- *
+ * This is a simple boolean evaluator.
  * @author simon
  */
 public class Parser {
@@ -26,17 +21,15 @@ public class Parser {
     }
 
     public boolean eval(String expression, HashMap<Integer, Boolean> arguments, boolean test) throws Exception {
-        //System.out.println("EXPRESSION = " + expression);
         expression = expression.replaceAll(" ", "");
         boolean res = true;
         boolean not = false;
         int op = 0;
         int i = 0;
         while (i < expression.length()) {
-            //System.out.println("Trying to parse " + expression.substring(i, expression.length()));
             if (expression.charAt(i) == '(') {
                 if (op == -1) {
-                    throw new Exception("DBG( Syntax error at Position " + i);
+                    throw new Exception("");
                 }
                 int num = 1;
                 int cur = i;
@@ -50,7 +43,7 @@ public class Parser {
                     i++;
                 }
                 if (num != 0) {
-                    throw new Exception("DBG (2 Syntax error at Position " + i);
+                    throw new Exception("");
                 }
                 boolean tmp = eval(expression.substring(cur + 1, i - 1), arguments, test);
                 if (not) {
@@ -61,19 +54,19 @@ public class Parser {
                 op = -1;
             } else if (expression.charAt(i) == '&') {
                 if (i + 1 >= expression.length() || expression.charAt(i + 1) != '&') {
-                    throw new Exception("DBG& Syntax error at Position " + i);
+                    throw new Exception();
                 }
                 i += 2;
                 op = 0;
             } else if (expression.charAt(i) == '|') {
                 if (i + 1 >= expression.length() || expression.charAt(i) != '|') {
-                    throw new Exception("DBG| Syntax error at Position " + i);
+                    throw new Exception();
                 }
                 i += 2;
                 op = 1;
             } else if (expression.charAt(i) == '$') {
                 if (op == -1) {
-                    throw new Exception("DBGa Syntax error at Position " + i);
+                    throw new Exception();
                 }
                 String numText = "";
                 i++;
@@ -82,7 +75,7 @@ public class Parser {
                     i++;
                 }
                 if ("".equals(numText)) {
-                    throw new Exception("DBGa2 Syntax error at Position " + i);
+                    throw new Exception();
                 }
                 int argNum = Integer.parseInt(numText);
                 Boolean tmp = arguments.get(argNum);
@@ -90,7 +83,7 @@ public class Parser {
                     tmp = true;
                 }
                 if (tmp == null) {
-                    throw new Exception("Invalid argument " + argNum);
+                    throw new Exception();
                 }
                 if (not) {
                     tmp = !tmp;
@@ -126,7 +119,7 @@ public class Parser {
                 not = true;
                 i++;
             } else {
-                throw new Exception("DBG!! Syntex error at Position " + i);
+                throw new Exception();
             }
         }
         return res;
