@@ -213,7 +213,7 @@ public class InstanceDAO {
             i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
 
             ArrayList<Instance> tmp = new ArrayList<Instance>();
-            tmp.add(c);
+            tmp.add(i);
             InstanceHasPropertyDAO.assign(tmp);
 
             i.setSaved();
@@ -306,7 +306,7 @@ public class InstanceDAO {
     public static Blob getBinary(int id) throws NoConnectionToDBException, SQLException, InstanceNotInDBException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
 
-        ResultSet rs = st.executeQuery("SELECT i.instance FROM instances AS i WHERE i.idInstance = " + id);
+        ResultSet rs = st.executeQuery("SELECT i.instance FROM " + table + " AS i WHERE i.idInstance = " + id);
         if (rs.next()) {
             return rs.getBlob("instance");
         } else {

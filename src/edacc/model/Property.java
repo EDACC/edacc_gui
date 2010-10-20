@@ -179,6 +179,9 @@ public class Property extends BaseModel implements IntegerPKModel{
             case 4:
                 this.source = PropertySource.WatcherOutput;
                 break;
+            case -1: 
+                this.source = PropertySource.WatcherOutput;
+                break; // TODO vernuenftige Absprache
             default:
                 throw new PropertyTypeNotExistException();
 

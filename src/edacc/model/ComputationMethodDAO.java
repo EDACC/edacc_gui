@@ -172,7 +172,7 @@ public class ComputationMethodDAO {
     public static void getBinaryOfComputationMethod(File f, ComputationMethod cm) throws NoConnectionToDBException, SQLException,
             ComputationMethodDoesNotExistException, FileNotFoundException, IOException{
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                    "SELECT binaryFile FROM " + table + "WHERE idComputationMethod=?;");
+                    "SELECT binaryFile FROM " + table + " WHERE idComputationMethod=?;");
         ps.setInt(1, cm.getId());
         ResultSet rs = ps.executeQuery();
         if(!rs.next())

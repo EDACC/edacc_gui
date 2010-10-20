@@ -26,8 +26,8 @@ import java.util.Vector;
 public class InstanceHasPropertyDAO {
 
     protected static final String table = "Instance_has_Property";
-    protected static final String insertQuery = "INSERT INTO " + table + " (idInstance, idInstanceProperty, value) VALUES (?, ?, ?)";
-    protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idInstance=? AND idInstanceProperty=?";
+    protected static final String insertQuery = "INSERT INTO " + table + " (idInstance, idProperty, value) VALUES (?, ?, ?)";
+    protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idInstance=? AND idProperty=?";
     private static final ObjectCache<InstanceHasProperty> cache = new ObjectCache<InstanceHasProperty>();
 
     /**
@@ -66,7 +66,8 @@ public class InstanceHasPropertyDAO {
             return;
         }
         st.setInt(1, i.getInstance().getId());
-        st.setString(2, i.getProperty().getName());
+        st.setInt(2, i.getProperty().getId());
+        st.setString(3, i.getValue());
         st.executeUpdate();
 
         // set id if necessary
@@ -146,7 +147,7 @@ public class InstanceHasPropertyDAO {
                 instanceProperties.put(p.getId(), p);
             }
         } catch (Exception e) {
-            throw new SQLException(e.getMessage());
+            throw new SQLException(e.getMessage() + e.getClass());
         }
 
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
