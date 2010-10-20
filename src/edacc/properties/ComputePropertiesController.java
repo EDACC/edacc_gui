@@ -22,11 +22,11 @@ import javax.swing.JTable;
  *
  * @author rretz
  */
-public class ComputeResultPropertiesController {
+public class ComputePropertiesController {
     EDACCComputeResultProperties main;
     JTable tableResultProperty;
 
-    public ComputeResultPropertiesController(EDACCComputeResultProperties main, JTable tableResultProperty){
+    public ComputePropertiesController(EDACCComputeResultProperties main, JTable tableResultProperty){
         this.main = main;
         this.tableResultProperty = tableResultProperty;
     }
@@ -36,18 +36,18 @@ public class ComputeResultPropertiesController {
             try {
                 ((PropertySelectionTableModel) tableResultProperty.getModel()).addProperties(PropertyDAO.getAll());
             } catch (ComputationMethodDoesNotExistException ex) {
-                Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (NoConnectionToDBException ex) {
-            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (PropertyNotInDBException ex) {
-            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (PropertyTypeNotExistException ex) {
-            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -56,17 +56,17 @@ public class ComputeResultPropertiesController {
             Thread compute = new Thread(new PropertyComputationController(null, null, true));
             compute.start();
         } catch (PropertyTypeNotExistException ex) {
-            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (PropertyNotInDBException ex) {
-            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ComputationMethodDoesNotExistException ex) {
-            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoConnectionToDBException ex) {
-            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(ComputeResultPropertiesController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

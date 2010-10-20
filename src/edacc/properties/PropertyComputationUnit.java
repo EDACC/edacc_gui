@@ -10,6 +10,7 @@ import edacc.model.ExperimentResultHasProperty;
 import edacc.model.ExperimentResultHasPropertyDAO;
 import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasProperty;
+import edacc.model.InstanceHasPropertyDAO;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import java.io.BufferedReader;
@@ -31,15 +32,18 @@ public class PropertyComputationUnit implements Runnable {
     ExperimentResultHasProperty erhp;
     InstanceHasProperty ihp;
     PropertyComputationController callback;
+    Property property;
 
     PropertyComputationUnit(ExperimentResultHasProperty erhp, PropertyComputationController callback) {
         this.erhp = erhp;
         this.callback = callback;
+        this.property = erhp.getProperty();
     }
 
     PropertyComputationUnit(InstanceHasProperty ihp, PropertyComputationController callback) {
         this.ihp = ihp;
         this.callback = callback;
+        this.property = ihp.getProperty();
     }
 
     @Override
@@ -49,16 +53,16 @@ public class PropertyComputationUnit implements Runnable {
                 Property property = erhp.getProperty();
                 switch (property.getPropertySource()) {
                     case LauncherOutput:
-                        calculate(ExperimentResultDAO.getLauncherOutputFile(erhp.getExpResult()));
+                        compute(ExperimentResultDAO.getLauncherOutputFile(erhp.getExpResult()));
                         break;
                     case SolverOutput:
-                        calculate(ExperimentResultDAO.getSolverOutputFile(erhp.getExpResult()));
+                        compute(ExperimentResultDAO.getSolverOutputFile(erhp.getExpResult()));
                         break;
                     case VerifierOutput:
-                        calculate(ExperimentResultDAO.getVerifierOutputFile(erhp.getExpResult()));
+                        compute(ExperimentResultDAO.getVerifierOutputFile(erhp.getExpResult()));
                         break;
                     case WatcherOutput:
-                        calculate(ExperimentResultDAO.getWatcherOutputFile(erhp.getExpResult()));
+                        compute(ExperimentResultDAO.getWatcherOutputFile(erhp.getExpResult()));
                         break;
                 }
             } catch (NoConnectionToDBException ex) {
@@ -72,13 +76,12 @@ public class PropertyComputationUnit implements Runnable {
             }
         }else if(ihp != null){
             try {
-                Property property = ihp.getProperty();
                 switch (property.getPropertySource()) {
                     case Instance:
-                        calculate(InstanceDAO.getBinaryFileOfInstance(ihp.getInstance()));
+                        compute(InstanceDAO.getBinaryFileOfInstance(ihp.getInstance()));
                         break;
                     case InstanceName:
-                        parse(ihp.getInstance().getName());
+                        parseInstanceName();
                         break;
                 }
             } catch (NoConnectionToDBException ex) {
@@ -91,16 +94,42 @@ public class PropertyComputationUnit implements Runnable {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        System.out.println("arbeit, arbeit!");
-        callback.callback();
-        
+        callback.callback();  
     }
 
-    private void calculate(File f) {
+    private void compute(File f) throws FileNotFoundException, IOException, SQLException {
+        if(property.getComputationMethod() != null){
+            // TODO compute the paroperty with the computation binary on the given file
+        }else if(!property.getRegularExpression().equals("") || property.getRegularExpression() != null){
+            Vector<String> res = new Vector<String>();
+            BufferedReader buf = new BufferedReader(new FileReader(f));
+            String tmp;
+            while((tmp = buf.readLine()) != null){
+                if((tmp = parse(tmp)) != null){
+                    res.add(tmp);
+                    if(!property.isMultiple() || ihp != null)
+                        break;
+                }
+
+            }
+            if(ihp  != null){
+                ihp.setValue(res.firstElement());
+                InstanceHasPropertyDAO.save(ihp);
+            }
+            else if(erhp != null){
+                erhp.setValue(res);
+                ExperimentResultHasPropertyDAO.save(erhp);
+            }
+        }
+    }
+
+    private String parse(String toParse) {
+        return null;
+    }
+
+    private void parseInstanceName() {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    private void parse(String toParse) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+
 }

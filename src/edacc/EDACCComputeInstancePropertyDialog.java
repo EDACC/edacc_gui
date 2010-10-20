@@ -11,8 +11,14 @@
 
 package edacc;
 
+import edacc.manageDB.ManageDBInstances;
 import edacc.model.Instance;
+import edacc.model.Property;
+import edacc.model.PropertyDAO;
+import java.util.List;
 import java.util.Vector;
+import javax.swing.AbstractListModel;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -21,12 +27,15 @@ import java.util.Vector;
 public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog {
 
     private Vector<Instance> instances;
+    private ManageDBInstances manageDBInstances;
 
     /** Creates new form EDACCComputeInstancePropertyDialog */
-    public EDACCComputeInstancePropertyDialog(java.awt.Frame parent, Vector<Instance> instances) {
-        super(parent, true);
+    public EDACCComputeInstancePropertyDialog(java.awt.Frame parent, ManageDBInstances manageDBInstances, Vector<Instance> instances) {
+        super(parent, "Compute property for the selected instances", true);
         initComponents();
         this.instances = instances;
+        this.manageDBInstances = manageDBInstances;
+        showProperties();
     }
 
     /** This method is called from within the constructor to
@@ -39,7 +48,7 @@ public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList();
+        listProperties = new javax.swing.JList();
         bCompute = new javax.swing.JButton();
         bCancel = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -49,20 +58,30 @@ public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog {
 
         jScrollPane1.setName("jScrollPane1"); // NOI18N
 
-        jList1.setModel(new javax.swing.AbstractListModel() {
+        listProperties.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
-        jList1.setName("jList1"); // NOI18N
-        jScrollPane1.setViewportView(jList1);
+        listProperties.setName("listProperties"); // NOI18N
+        jScrollPane1.setViewportView(listProperties);
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCComputeInstancePropertyDialog.class);
         bCompute.setText(resourceMap.getString("bCompute.text")); // NOI18N
         bCompute.setName("bCompute"); // NOI18N
+        bCompute.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bComputeActionPerformed(evt);
+            }
+        });
 
         bCancel.setText(resourceMap.getString("bCancel.text")); // NOI18N
         bCancel.setName("bCancel"); // NOI18N
+        bCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bCancelActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
         jLabel1.setName("jLabel1"); // NOI18N
@@ -99,12 +118,49 @@ public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void bComputeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bComputeActionPerformed
+        Vector<Property> properties = new Vector<Property>();
+        manageDBInstances.computeProperties(instances, properties);
+    }//GEN-LAST:event_bComputeActionPerformed
+
+    private void bCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bCancelActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_bCancelActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bCancel;
     private javax.swing.JButton bCompute;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JList jList1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JList listProperties;
     // End of variables declaration//GEN-END:variables
+
+    private void showProperties() {
+        try {
+            Vector<Property> props = PropertyDAO.getAllInstanceProperties();
+            listProperties.setModel(new PropertyListModel(props));
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "An error occured while trying to load the properties from the DB: \n" + e.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private class PropertyListModel extends AbstractListModel {
+
+        private Vector<Property> properties;
+
+        public PropertyListModel(List<Property> properties) {
+            this.properties = new Vector<Property>(properties);
+        }
+
+        @Override
+        public int getSize() {
+            return properties.size();
+        }
+
+        @Override
+        public Object getElementAt(int index) {
+            return properties.get(index);
+        }
+    }
 
 }

@@ -46,4 +46,10 @@ public class InstanceHasProperty extends BaseModel implements IntegerPKModel {
     protected void setId(int id) {
         this.id = id;
     }
+
+    public void setValue(String value) {
+        this.value = value;
+        if (this.isSaved())
+            this.setModified();
+    }
 }

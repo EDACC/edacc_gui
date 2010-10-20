@@ -52,7 +52,7 @@ public class InstanceHasPropertyDAO {
      * @param i
      * @throws SQLException
      */
-    private static void save(InstanceHasProperty i) throws SQLException {
+    public static void save(InstanceHasProperty i) throws SQLException {
         PreparedStatement st;
         if (i.isDeleted()) {
             st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);

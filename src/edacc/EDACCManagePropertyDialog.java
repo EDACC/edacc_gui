@@ -744,7 +744,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     }
 
     public void propertyTypeChanged() {
-         if(this.comboBoxPropertyType.getSelectedItem().equals(PropertyType.InstanceProperty) && this.comboBoxPropertyType.isEnabled()
+         if(this.comboBoxPropertyType.isEnabled() && this.comboBoxPropertyType.getSelectedItem().equals(PropertyType.InstanceProperty)
                  && !editing){
              this.comboBoxPropertySource.setEnabled(true);
              this.comboBoxComputationMethod.setEnabled(true);
@@ -754,7 +754,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
              this.checkBoxMultipleOccurrences.setEnabled(true);
              this.buttonPropertyAddValueType.setEnabled(true);
              loadInstancePropertySources();
-        }else if(this.comboBoxPropertyType.getSelectedItem().equals(PropertyType.ResultProperty) && this.comboBoxPropertyType.isEnabled()
+        }else if(this.comboBoxPropertyType.isEnabled() && this.comboBoxPropertyType.getSelectedItem().equals(PropertyType.ResultProperty)
                  && !editing){
             this.comboBoxPropertySource.setEnabled(true);
             this.comboBoxComputationMethod.setEnabled(true);
