@@ -168,11 +168,42 @@
 		<title>Solver</title>
 		<para>
 			DB-Model <sbr/> <!-- das ist ein Zeilenumbruch -->
-			<mediaobject>
-			<imageobject>
-				<imagedata fileref="resource/Solver.png" format="PNG"/>
-			</imageobject>
-		</mediaobject>
+			
+			<table><title>Solver</title>
+			<tgroup cols='2' align='left' colsep='1' rowsep='1'>
+			<tbody>
+			<row>
+			  <entry>SolverID</entry>
+			  <entry>This is an ID to manage the solvers in the DB.</entry>
+			</row>
+			<row>
+			  <entry>Name</entry>
+			  <entry>The name wich is shown in the GUI.</entry>
+			</row>
+			<row>
+			  <entry>Binary</entry>
+			  <entry>Is the compiled (executable) code of the solver.</entry>
+			</row>
+			<row>
+			  <entry>Description</entry>
+			  <entry>Save the description from the GUI in the DB.</entry>
+			</row>
+			<row>
+			  <entry>md5</entry>
+			  <entry>is the md5-checksum from the solverbinary.</entry>
+			</row>
+			<row>
+			  <entry>Code</entry>
+			  <entry>save the uncompiled sourcecode of your solver.</entry>
+			</row>
+			<row>
+			  <entry>Version</entry>
+			  <entry>is the version of the solver.</entry>
+			</row>
+			</tbody>
+			</tgroup>
+			</table>
+			
 		</para>
 		
 		<para> 
@@ -189,12 +220,46 @@
 		<title>Parameter</title>
 		<para>
 			DB-Model <sbr/> 
-			
+
+			<table><title>Parameter</title>
+			<tgroup cols='2' align='left' colsep='1' rowsep='1'>
+			<tbody>
+			<row>
+			  <entry>ParameterID</entry>
+			  <entry>This is an ID to manage the Parameters in the DB.</entry>
+			</row>
+			<row>
+			  <entry>Name</entry>
+			  <entry>Is a significant name wich is shown in the GUI.</entry>
+			</row>
+			<row>
+			  <entry>Prefix</entry>
+			  <entry>Is the prefix to start the solver (like "-s").</entry>
+			</row>
+			<row>
+			  <entry>Has Value</entry>
+			  <entry>Is a boolean flag. It's true if the parameter need a value (like "-seed 234").</entry>
+			</row>
+			<row>
+			  <entry>SolverID</entry>
+			  <entry>Is the ID of the appendent Solver.</entry>
+			</row>
+			<row>
+			  <entry>Order</entry>
+			  <entry>Is the order of the parameters when the solver is started.</entry>
+			</row>
+			</tbody>
+			</tgroup>
+			</table>
+
 		</para>
 		
 		<para> 
 			Boundary Conditions <sbr/>
-			
+			<itemizedlist>
+				<listitem><para>Every Parameter appendent solver. A parameter can not exist without solver.</para></listitem>
+				<listitem><para>The Value of the parameter is set in the "Experiment Mode".</para></listitem>
+			</itemizedlist>
 		</para>
 		
 	</section>
@@ -203,21 +268,134 @@
 		<para>
 			DB-Model <sbr/> 
 			
+			<table><title>Instance class</title>
+			<tgroup cols='2' align='left' colsep='1' rowsep='1'>
+			<tbody>
+			<row>
+			  <entry>ClassID</entry>
+			  <entry>This is the ID to manage the instanceclasses in the DB.</entry>
+			</row>
+			<row>
+			  <entry>Name</entry>
+			  <entry>Is the class name wich is shown in the GUI.</entry>
+			</row>
+			<row>
+			  <entry>Description</entry>
+			  <entry>Is the description of the class and is shown in the GUI.</entry>
+			</row>
+			<row>
+			  <entry>Source</entry>
+			  <entry>Is an boolean flag. It's true, if the class is a source class.</entry>
+			</row>
+			</tbody>
+			</tgroup>
+			</table>
+			
+			<table><title>Instance</title>
+			<tgroup cols='2' align='left' colsep='1' rowsep='1'>
+			<tbody>
+			<row>
+			  <entry>InstanceID</entry>
+			  <entry>This is an ID to mange the instances in the DB.</entry>
+			</row>
+			<row>
+			  <entry>Name</entry>
+			  <entry>Is the name of the instance wich is shown in the GUI.</entry>
+			</row>
+			<row>
+			  <entry>Instance</entry>
+			  <entry>Is the instancefile (e.g. the textfile).</entry>
+			</row>
+			<row>
+			  <entry>md5</entry>
+			  <entry>Is the calculated md5-checksum of the saved file.</entry>
+			</row>
+			<row>
+			  <entry>Atoms</entry>
+			  <entry>Is the number of variables in the instance.</entry>
+			</row>
+			<row>
+			  <entry>Clauses</entry>
+			  <entry>Is the number of clauses in the instance.</entry>
+			</row>
+			<row>
+			  <entry>Ratio</entry>
+			  <entry>Is the value of atoms / clauses</entry>
+			</row>
+			<row>
+			  <entry>Clause Length</entry>
+			  <entry>Is the maximal length of a clause in the instance.</entry>
+			</row>
+			<row>
+			  <entry>ClassID</entry>
+			  <entry>Is the ID of the appendent class.</entry>
+			</row>
+			</tbody>
+			</tgroup>
+			</table>
+			
 		</para>
 		
 		<para> 
 			Boundary Conditions <sbr/>
-			
+			<itemizedlist>
+				<listitem><para>Every instance belong to exact one source class.</para></listitem>
+				<listitem><para>It's not possible to save a instance twice because the md5-checksum is unique.</para></listitem>
+				<listitem><para>The value of the atoms, clauses and ratio will be set automaticly if you add the instace (a parser calculate them).</para></listitem>
+				<listitem><para>An Instance can belong to many userclasses.</para></listitem>
+			</itemizedlist>
 		</para>
 		
 	</section>
 </chapter>
   
+<chapter>
+	<title>Experiment-Modus</title>
+	<para>
+		An experiment is a cartesian product of a set of solver configurations, a set of instances, a set of computing systems and some computational limits.
+		<sbr/>(Experiment = {Solver configuration} X {Instance} X {Computing system} X {Runtime propertie} = {Job})<sbr/>
+	</para>
+	
+	<section>
+		<title>Experiment dates</title>
+		<para>
+
+		</para>
+	</section>
+</chapter>
   
+ <chapter>
+	<title>(Compute-) Client</title>
+	<para>
+		The client consists of three sub components, the luncher, the watcher and the verifier. <!--Adrian fragen wie der client gestartet wird? -->
+	</para>
+	
+	<section>
+		<title>Luncher</title>
+		<para>
+			The luncher create the DB-connection and is responsible for fetching not computed jobs and downloading all necessary files which were not in the package.
+		</para>
+	</section>
+	<section>
+		<title>Watcher</title>
+		<para>
+			The watcher starts the solver with the choosen configuration. It also monitor the consuming resources and if a solver exceed a limit the watcher stop the solver. 
+		</para>
+	</section>
+	<section>
+		<title>Verifier</title>
+		<para>
+			The verifier is a problemspecific component and has to be provided by the user. For SAT-problems it check if the calculated solution is correct.
+		</para>
+	</section>
+</chapter>
   
-  
-  
-  
+<chapter>
+	<title>Web (Frontend)</title>
+	<para>
+	
+	</para>
+</chapter>
   
  
 
