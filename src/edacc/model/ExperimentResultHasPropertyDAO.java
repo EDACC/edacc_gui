@@ -204,7 +204,7 @@ public class ExperimentResultHasPropertyDAO {
             experimentResults.put(er.getId(), er);
         }
         HashMap<Integer, Property> solverProperties = new HashMap<Integer, Property>();
-        for (Property sp : PropertyDAO.getAll()) {
+        for (Property sp : PropertyDAO.getAllResultProperties()) {
             solverProperties.put(sp.getId(), sp);
         }
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(

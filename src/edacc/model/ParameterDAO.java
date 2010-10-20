@@ -82,7 +82,7 @@ public class ParameterDAO {
      */
     public static Vector<Parameter> getParameterFromSolverId(int id) throws SQLException {
         Vector<Parameter> res = new Vector<Parameter>();
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Solver_idSolver=?");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Solver_idSolver=? ORDER BY `order`");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {

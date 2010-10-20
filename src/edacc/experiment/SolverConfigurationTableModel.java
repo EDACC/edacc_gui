@@ -55,36 +55,6 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
         return solverConfigurations.get(row);
     }
 
-    /**
-     * Transforms the parameters obtained by getParameters to a string
-     * @param row
-     * @return
-     */
-    public String getParameterString(int row) {
-        try {
-            ArrayList<ParameterInstance> params = getParameters(row);
-            if (params == null) {
-                return "";
-            }
-            String paramString = "";
-
-            for (ParameterInstance param : params) {
-                Parameter solverParameter = ParameterDAO.getById(param.getParameter_id());
-                if (solverParameter.getHasValue())
-                    paramString += solverParameter.getPrefix() + " " + param.getValue();
-                else
-                    paramString += solverParameter.getPrefix()+ " ";
-
-                if (params.get(params.size()-1) != param) {
-                    paramString += " ";
-                }
-            }
-            return paramString;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     @Override
     public String getColumnName(int column) {
         return columns[column];
@@ -97,7 +67,7 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
             case COL_NAME:
                 return solverConfigurations.get(rowIndex).getName();
             case COL_PARAMETERS:
-                return getParameterString(rowIndex);
+                return Util.getParameterString(getParameters(rowIndex));
         }
         return "";
     }
