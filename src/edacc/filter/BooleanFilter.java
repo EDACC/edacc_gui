@@ -9,7 +9,7 @@ package edacc.filter;
 import javax.swing.ButtonGroup;
 
 /**
- *
+ * This class implements a boolean filter.
  * @author simon
  */
 public class BooleanFilter extends javax.swing.JPanel implements FilterInterface {

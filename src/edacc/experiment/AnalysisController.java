@@ -8,7 +8,7 @@ import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.Rengine;
 
 /**
- *
+ * This class implements some functions for the connection between java and r.
  * @author simon
  */
 public class AnalysisController {
@@ -19,6 +19,10 @@ public class AnalysisController {
     private static Rengine re;
     private static HashMap<Integer, PlotPanel> plotPanels = new HashMap<Integer, PlotPanel>();
 
+    /**
+     * Basically this looks if the jri-library can be loaded.
+     * @throws REngineInitializationException if the library could not be loaded.
+     */
     public static void checkForR() throws REngineInitializationException {
         try {
             System.loadLibrary("jri");
@@ -27,6 +31,12 @@ public class AnalysisController {
         }
     }
 
+    /**
+     * Creates a new device and sets the device number of the plot.
+     * @param plotPanel the plot panel for which we need a device
+     * @return the r engine
+     * @throws REngineInitializationException if creating a new r engine failed
+     */
     public static Rengine getREngine(PlotPanel plotPanel) throws REngineInitializationException {
         synchronized (syncR) {
             getRengine();
@@ -38,6 +48,11 @@ public class AnalysisController {
         return re;
     }
 
+    /**
+     * Returns a r engine. If there is no living r engine, it will try to create a new one.
+     * @return the r engine
+     * @throws REngineInitializationException if creating a new r engine failed.
+     */
     public static Rengine getRengine() throws REngineInitializationException {
         try {
             if (re == null || !re.isAlive()) {
@@ -62,6 +77,10 @@ public class AnalysisController {
         return re;
     }
 
+    /**
+     * Returns the current device of the r engine.
+     * @return the device id
+     */
     public static int getCurrentDeviceNumber() {
         if (re == null || !re.isAlive()) {
             throw new IllegalArgumentException("No rengine.");
@@ -74,7 +93,7 @@ public class AnalysisController {
     /**
      * Tries to set the device number plotDevice. If it fails it returns false.
      * @param plotDevice
-     * @return
+     * @return false, if there is no r engine, true otherwise
      */
     public static boolean setCurrentDeviceNumber(int plotDevice) {
         if (re == null || !re.isAlive()) {
@@ -85,6 +104,12 @@ public class AnalysisController {
         }
     }
 
+    /**
+     * Converts the given point from user coordinates to device coordinates on the specified device.
+     * @param dev the device
+     * @param point the point
+     * @return a new point with the converted coordinates
+     */
     public static Point2D convertPoint(int dev, Point2D point) {
         REXP xcoord;
         REXP ycoord;
@@ -114,8 +139,13 @@ public class AnalysisController {
         }
     }
 
+    /**
+     * Closes the R device with that id.
+     * @param dev
+     */
     public static void closeDevice(int dev) {
         synchronized (syncR) {
+            // close the device and remove the panel from the hashmap
             setCurrentDeviceNumber(dev);
             re.eval("dev.off()");
             plotPanels.remove(dev);
@@ -139,6 +169,12 @@ public class AnalysisController {
         }
     }
 
+    /**
+     * Returns the number of devices in the R engine.
+     * It calls `dev.list()` and returns the length.
+     * Throws an exception if there is no living R engine.
+     * @return
+     */
     public static int getDeviceCount() {
         if (re == null || !re.isAlive()) {
             throw new IllegalArgumentException("No rengine.");
@@ -150,6 +186,11 @@ public class AnalysisController {
         return res == null ? 0 : res.length;
     }
 
+    /**
+     * Saves the image of the panel to a filename in the pdf format using R.
+     * @param pnl the panel
+     * @param filename the filename
+     */
     public static void saveToPdf(PlotPanel pnl, String filename) {
         synchronized (syncR) {
             setCurrentDeviceNumber(pnl.getDeviceNumber());
@@ -158,6 +199,11 @@ public class AnalysisController {
         }
     }
 
+    /**
+     * Saves the image of the panel to a filename in the eps format using R.
+     * @param pnl the panel
+     * @param filename the filename
+     */
     public static void saveToEps(PlotPanel pnl, String filename) {
         synchronized (syncR) {
             setCurrentDeviceNumber(pnl.getDeviceNumber());

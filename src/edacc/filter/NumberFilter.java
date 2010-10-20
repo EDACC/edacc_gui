@@ -6,7 +6,7 @@
 package edacc.filter;
 
 /**
- *
+ * This class implements a filter for numbers (Integer, Float, Double).
  * @author simon
  */
 public class NumberFilter extends javax.swing.JPanel implements FilterInterface {

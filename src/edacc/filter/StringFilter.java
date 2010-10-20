@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * StringFilter.java
  *
  * Created on 12.10.2010, 09:56:58
@@ -11,7 +6,7 @@
 package edacc.filter;
 
 /**
- *
+ * This class implements a filter for strings by using regular expressions.
  * @author simon
  */
 public class StringFilter extends javax.swing.JPanel implements FilterInterface {

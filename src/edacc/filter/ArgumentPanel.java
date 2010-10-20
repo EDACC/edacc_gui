@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import org.jdesktop.application.Action;
 
 /**
- *
+ * This is a container for an FilterInterface.
  * @author simon
  */
 public class ArgumentPanel extends javax.swing.JPanel {
@@ -56,20 +56,15 @@ public class ArgumentPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         lblArgNum = new javax.swing.JLabel();
-        btnRemove = new javax.swing.JButton();
         pnlArgument = new javax.swing.JPanel();
+        btnRemove = new javax.swing.JButton();
 
         setName("Form"); // NOI18N
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(ArgumentPanel.class);
         lblArgNum.setText(resourceMap.getString("lblArgNum.text")); // NOI18N
         lblArgNum.setName("lblArgNum"); // NOI18N
-
-        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(ArgumentPanel.class, this);
-        btnRemove.setAction(actionMap.get("btnRemove")); // NOI18N
-        btnRemove.setText(resourceMap.getString("btnRemove.text")); // NOI18N
-        btnRemove.setName("btnRemove"); // NOI18N
-        btnRemove.setPreferredSize(new java.awt.Dimension(71, 20));
+        lblArgNum.setPreferredSize(new java.awt.Dimension(34, 19));
 
         pnlArgument.setName("pnlArgument"); // NOI18N
 
@@ -77,30 +72,37 @@ public class ArgumentPanel extends javax.swing.JPanel {
         pnlArgument.setLayout(pnlArgumentLayout);
         pnlArgumentLayout.setHorizontalGroup(
             pnlArgumentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 8, Short.MAX_VALUE)
+            .addGap(0, 75, Short.MAX_VALUE)
         );
         pnlArgumentLayout.setVerticalGroup(
             pnlArgumentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 20, Short.MAX_VALUE)
         );
 
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(ArgumentPanel.class, this);
+        btnRemove.setAction(actionMap.get("btnRemove")); // NOI18N
+        btnRemove.setText(resourceMap.getString("btnRemove.text")); // NOI18N
+        btnRemove.setName("btnRemove"); // NOI18N
+        btnRemove.setPreferredSize(new java.awt.Dimension(71, 20));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(lblArgNum)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblArgNum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlArgument, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlArgument, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnRemove, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(btnRemove, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(btnRemove, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(lblArgNum))
-            .addComponent(pnlArgument, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(pnlArgument, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(lblArgNum, javax.swing.GroupLayout.DEFAULT_SIZE, 20, Short.MAX_VALUE)
+            .addComponent(btnRemove, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
     }// </editor-fold>//GEN-END:initComponents
 

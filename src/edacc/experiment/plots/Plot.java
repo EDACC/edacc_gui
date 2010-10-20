@@ -1,17 +1,15 @@
 package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
+import edacc.model.Experiment;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.ExperimentResultHasProperty;
 import edacc.model.Instance;
-import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasProperty;
-import edacc.model.InstanceProperty;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
 import edacc.satinstances.ConvertException;
-import edacc.satinstances.InstancePropertyManager;
 import edacc.satinstances.PropertyValueType;
 import java.awt.geom.Point2D;
 import java.io.BufferedReader;
@@ -45,11 +43,10 @@ public abstract class Plot {
     public static final String AVERAGE_TEXT = "all runs - average";
     public static final String MEDIAN_TEXT = "all runs - median";
     protected ExperimentController expController;
-    // "constants" for solver properties
     public static Property PROP_CPUTIME;
     private static HashMap<ResultIdentifier, ExperimentResult> resultMap;
     private static Timestamp lastUpdated;
-    private static int expId;
+    private static Experiment experiment;
 
     protected Plot(ExperimentController expController) {
         try {
@@ -77,7 +74,7 @@ public abstract class Plot {
     protected static void initialize(ExperimentController expController) throws SQLException, Exception {
         int count = ExperimentResultDAO.getCountByExperimentId(expController.getActiveExperiment().getId());
         Timestamp ts = ExperimentResultDAO.getLastModifiedByExperimentId(expController.getActiveExperiment().getId());
-        if (resultMap == null || count != resultMap.size() || !ts.equals(lastUpdated) || expId != expController.getActiveExperiment().getId()) {
+        if (resultMap == null || count != resultMap.size() || !ts.equals(lastUpdated) || experiment != expController.getActiveExperiment()) {
             if (resultMap == null) {
                 resultMap = new HashMap<ResultIdentifier, ExperimentResult>();
             } else {
@@ -88,7 +85,7 @@ public abstract class Plot {
                 resultMap.put(new ResultIdentifier(result.getSolverConfigId(), result.getInstanceId(), result.getRun()), result);
             }
             lastUpdated = ts;
-            expId = expController.getActiveExperiment().getId();
+            experiment = expController.getActiveExperiment();
         }
     }
 
@@ -115,9 +112,9 @@ public abstract class Plot {
      * @param instanceId the instance id of the ExperimentResults
      * @return returns an empty vector if there are no such ExperimentResults
      */
-    public ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId) {
+    public static ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId) {
         ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
-        for (int i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
+        for (int i = 0; i < experiment.getNumRuns(); i++) {
             ExperimentResult result = getResult(solverConfigId, instanceId, i);
             if (result != null) {
                 res.add(result);
@@ -133,7 +130,7 @@ public abstract class Plot {
      * @param run the run
      * @return returns null if there is no such ExperimentResult
      */
-    public ExperimentResult getResult(int solverConfigId, int instanceId, int run) {
+    public static ExperimentResult getResult(int solverConfigId, int instanceId, int run) {
         ExperimentResult res = resultMap.get(new ResultIdentifier(solverConfigId, instanceId, run));
         // if the result is not in our map or it is not a verified result then return null
         // TODO: überdenken
@@ -143,7 +140,7 @@ public abstract class Plot {
         return res;
     }
 
-    private Double transformPropertyValueTypeToDouble(PropertyValueType type, String value) {
+    private static Double transformPropertyValueTypeToDouble(PropertyValueType type, String value) {
         Double res = null;
         try {
             if (type.getJavaType() == Integer.class) {
@@ -159,15 +156,15 @@ public abstract class Plot {
         return res;
     }
 
-    public Double getValue(ExperimentResult result, Property property) {
+    public static Double getValue(ExperimentResult result, Property property) {
         if (property == PROP_CPUTIME) {
             if (!String.valueOf(result.getResultCode().getValue()).startsWith("1")) {
-                return new Double(expController.getActiveExperiment().getCPUTimeLimit());
+                return new Double(experiment.getCPUTimeLimit());
             }
             return Double.valueOf(result.getResultTime());
         } else {
             if (!String.valueOf(result.getResultCode().getValue()).startsWith("1")) {
-                return new Double(expController.getActiveExperiment().getCPUTimeLimit());
+                return null;
             }
             ExperimentResultHasProperty erhsp = result.getPropertyValues().get(property.getId());
 
@@ -178,7 +175,7 @@ public abstract class Plot {
         }
     }
 
-    public Double getValue(Instance instance, Property property) {
+    public static Double getValue(Instance instance, Property property) {
         InstanceHasProperty ihip = instance.getPropertyValues().get(property.getId());
         if (ihip == null) {
             return null;
@@ -192,7 +189,7 @@ public abstract class Plot {
      * @param property
      * @return
      */
-    public Double getAverage(ArrayList<ExperimentResult> results, Property property) {
+    public static Double getAverage(ArrayList<ExperimentResult> results, Property property) {
         if (results.isEmpty()) {
             return null;
         }
@@ -219,7 +216,7 @@ public abstract class Plot {
      * @param property
      * @return
      */
-    public Double getMedian(ArrayList<ExperimentResult> results, Property property) {
+    public static Double getMedian(ArrayList<ExperimentResult> results, Property property) {
         if (results.isEmpty()) {
             return null;
         }
@@ -245,7 +242,7 @@ public abstract class Plot {
 
     }
 
-    public ArrayList<Point2D> getPoints(Rengine re, double[] xs, double[] ys) {
+    public static ArrayList<Point2D> getPoints(Rengine re, double[] xs, double[] ys) {
         ArrayList<Point2D> res = new ArrayList<Point2D>();
         if (xs.length != ys.length) {
             return res;
@@ -263,8 +260,6 @@ public abstract class Plot {
     public static void loadDefaultValues(ExperimentController expController) throws Exception {
     }
 
-    ;
-
     /**
      * Returns the dependencies for that plot.
      * @return the dependencies
@@ -278,8 +273,6 @@ public abstract class Plot {
     public static String getTitle() {
         return "";
     }
-
-    ;
 
     /**
      * Plots the plot to the R-engine

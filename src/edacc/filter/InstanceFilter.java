@@ -6,7 +6,7 @@ import javax.swing.JTable;
 import javax.swing.RowFilter.Entry;
 
 /**
- *
+ * This is a Filter with the extension of using instance classes to filter also.
  * @author simon
  */
 public class InstanceFilter extends Filter {
@@ -15,6 +15,13 @@ public class InstanceFilter extends Filter {
     private boolean filterInstanceClasses;
     private InstanceTableModel model;
 
+    /**
+     * Throws IllegalArgumentException if the Table Model of the table is not an instance of InstanceTableModel.
+     * @param parent
+     * @param modal
+     * @param table
+     * @param autoUpdateFilterTypes
+     */
     public InstanceFilter(java.awt.Frame parent, boolean modal, JTable table, boolean autoUpdateFilterTypes) {
         super(parent, modal, table, autoUpdateFilterTypes);
         if (!(table.getModel() instanceof InstanceTableModel)) {
@@ -40,18 +47,33 @@ public class InstanceFilter extends Filter {
         instanceClassIds.clear();
     }
 
+    /**
+     * Add an instance class id to be included to the fillter.
+     * @param id
+     */
     public void addInstanceClassId(int id) {
         instanceClassIds.add(id);
     }
 
+    /**
+     * Remove an instance class id to be excluded from the filter.
+     * @param id
+     */
     public void removeInstanceClassId(int id) {
         instanceClassIds.remove(id);
     }
 
+    /**
+     * Remove all instance class ids.
+     */
     public void clearInstanceClassIds() {
         instanceClassIds.clear();
     }
 
+    /**
+     * If this is set to true class ids will also be filtered.
+     * @param filterInstanceClasses
+     */
     public void setFilterInstanceClasses(boolean filterInstanceClasses) {
         this.filterInstanceClasses = filterInstanceClasses;
     }
