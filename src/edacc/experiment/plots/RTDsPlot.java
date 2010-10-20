@@ -51,7 +51,7 @@ public class RTDsPlot extends Plot {
         for (Instance i : InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId())) {
             comboInstance.addItem(i);
         }
-        for (Property p : getSolverProperties()) {
+        for (Property p : getResultProperties()) {
             comboProperty.addItem(p);
         }
     }

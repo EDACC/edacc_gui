@@ -31,15 +31,18 @@ public class PropertyComputationUnit implements Runnable {
     ExperimentResultHasProperty erhp;
     InstanceHasProperty ihp;
     PropertyComputationController callback;
+    Property property;
 
     PropertyComputationUnit(ExperimentResultHasProperty erhp, PropertyComputationController callback) {
         this.erhp = erhp;
         this.callback = callback;
+        this.property = erhp.getProperty();
     }
 
     PropertyComputationUnit(InstanceHasProperty ihp, PropertyComputationController callback) {
         this.ihp = ihp;
         this.callback = callback;
+        this.property = ihp.getProperty();
     }
 
     @Override
@@ -72,7 +75,6 @@ public class PropertyComputationUnit implements Runnable {
             }
         }else if(ihp != null){
             try {
-                Property property = ihp.getProperty();
                 switch (property.getPropertySource()) {
                     case Instance:
                         calculate(InstanceDAO.getBinaryFileOfInstance(ihp.getInstance()));
@@ -91,16 +93,20 @@ public class PropertyComputationUnit implements Runnable {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        System.out.println("arbeit, arbeit!");
-        callback.callback();
-        
+        callback.callback();  
     }
 
     private void calculate(File f) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        if(property.getComputationMethod() != null){
+            // TODO compute the paroperty with the computation binary on the given file
+        }else if(!property.getRegularExpression().equals("") || property.getRegularExpression() != null){
+            // TODO compute the paroperty with the regular expression on the given file
+        }
     }
 
     private void parse(String toParse) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
+
+
 }

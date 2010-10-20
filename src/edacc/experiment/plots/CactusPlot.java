@@ -70,7 +70,7 @@ public class CactusPlot extends Plot {
             comboRun.addItem(i);
         }
         comboProperty.removeAllItems();
-        for (Property sp : getSolverProperties()) {
+        for (Property sp : getResultProperties()) {
             comboProperty.addItem(sp);
         }
         ArrayList<Instance> instances = new ArrayList<Instance>();

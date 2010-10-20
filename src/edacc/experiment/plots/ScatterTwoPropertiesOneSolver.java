@@ -77,7 +77,7 @@ public class ScatterTwoPropertiesOneSolver extends Plot {
             comboRun.addItem(i);
         }
 
-        for (Property property : getSolverProperties()) {
+        for (Property property : getResultProperties()) {
             combo1.addItem(property);
             combo2.addItem(property);
         }
