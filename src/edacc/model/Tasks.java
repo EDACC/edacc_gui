@@ -3,6 +3,7 @@ package edacc.model;
 import edacc.EDACCApp;
 import edacc.events.TaskEvents;
 import edacc.EDACCTaskView;
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import org.jdesktop.application.Task;
 import org.jdesktop.application.Application;
@@ -83,14 +84,22 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
         startTask(methodName, new Class[]{}, new Object[]{}, target, view, withTaskView);
     }
 
+    public static void startTask(TaskRunnable runnable) {
+        startTask(runnable, true);
+    }
+    
     public static void startTask(TaskRunnable runnable, boolean withTaskView) {
+        startTask(runnable, true, EDACCApp.getApplication().getMainFrame());
+    }
+
+    public static void startTask(TaskRunnable runnable, boolean withTaskView, JFrame parent) {
         synchronized (syncTasks) {
             taskView = null;
             Tasks task = new Tasks(runnable);
             if (withTaskView) {
-                taskView = new EDACCTaskView(EDACCApp.getApplication().getMainFrame(), true, (Tasks) task);
+                taskView = new EDACCTaskView(parent, true, (Tasks) task);
                 taskView.setResizable(false);
-                taskView.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+                taskView.setLocationRelativeTo(parent);
                 taskView.setTitle("Running..");
                 taskView.setOperationName("Running..");
                 taskView.setMessage("");
@@ -134,8 +143,10 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
     protected Void doInBackground() {
         synchronized (syncTasks) {
             if (runnable != null) {
-
-                runnable.run(this);
+                try {
+                    runnable.run(this);
+                } catch (Exception e) {
+                }
                 if (taskView != null) {
                     taskView.dispose();
                 }

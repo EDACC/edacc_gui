@@ -387,6 +387,9 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
 
     @Action
     public void btnSave() {
+        if (!(tabbedPanePlots.getSelectedComponent() instanceof PlotPanel)) {
+            return;
+        }
         JFileChooser fc = new JFileChooser();
 
         // Set the platform dependent image types
@@ -888,15 +891,15 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         if (!(tabbedPanePlots.getSelectedComponent() instanceof PlotPanel)) {
             return;
         }
-        synchronized (AnalysisController.syncR) {
-            final PlotPanel panel = (PlotPanel) tabbedPanePlots.getSelectedComponent();
-            if (!AnalysisController.setCurrentDeviceNumber(panel.getDeviceNumber())) {
-                return;
-            }
-            Tasks.startTask(new TaskRunnable() {
+        Tasks.startTask(new TaskRunnable() {
 
-                @Override
-                public void run(Tasks task) {
+            @Override
+            public void run(Tasks task) {
+                synchronized (AnalysisController.syncR) {
+                    final PlotPanel panel = (PlotPanel) tabbedPanePlots.getSelectedComponent();
+                    if (!AnalysisController.setCurrentDeviceNumber(panel.getDeviceNumber())) {
+                        return;
+                    }
                     try {
                         panel.getPlot().plot(AnalysisController.getRengine(), panel.pointInformations);
                     } catch (REngineInitializationException ex) {
@@ -905,8 +908,9 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                         // TODO: error
                     }
                 }
-            }, true);
+            }
+        }, true, this);
 
-        }
+
     }
 }

@@ -102,14 +102,22 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
                 public void run(Tasks task) {
                     synchronized (AnalysisController.syncR) {
                         try {
+                            EDACCPlotTabView.setTabViewsVisible(true);
                             plot.plot(re, panel.pointInformations);
                             AnalysisBottomPanel.this.onTaskSuccessful("plot", null);
-                        } catch (Throwable ex) {
-                            AnalysisBottomPanel.this.onTaskFailed("plot", ex);
+                        } catch (final Throwable ex) {
+                            SwingUtilities.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    AnalysisBottomPanel.this.onTaskFailed("plot", ex);
+                                }
+
+                            });
                         }
                     }
                 }
-            }, true);
+            }, true, EDACCPlotTabView.getMainTabView());
         } catch (REngineInitializationException ex) {
             javax.swing.JOptionPane.showMessageDialog(null, "Error while initializing R: " + ex.getMessage(), "Initialization Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
@@ -155,7 +163,6 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
                 @Override
                 public void run() {
                     EDACCPlotTabView.addPanelInMainTabView(plot.getPlotTitle(), panel);
-                    EDACCPlotTabView.setTabViewsVisible(true);
                 }
             });
 
@@ -170,14 +177,14 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
     public void onTaskFailed(String methodName, Throwable e) {
         if ("plot".equals(methodName)) {
             if (e instanceof DependencyException) {
-                javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Invalid input", javax.swing.JOptionPane.ERROR_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(EDACCPlotTabView.getMainTabView(), e.getMessage(), "Invalid input", javax.swing.JOptionPane.ERROR_MESSAGE);
             } else if (e instanceof SQLException) {
-                javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Database error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(EDACCPlotTabView.getMainTabView(), e.getMessage(), "Database error", javax.swing.JOptionPane.ERROR_MESSAGE);
             } else {
                 if (edacc.ErrorLogger.DEBUG) {
                     e.printStackTrace();
                 }
-                javax.swing.JOptionPane.showMessageDialog(null, e, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(EDACCPlotTabView.getMainTabView(), e, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
         }
     }
