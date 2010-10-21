@@ -3,13 +3,19 @@ package edacc.experiment.plots;
 import edacc.experiment.AnalysisController;
 import edacc.experiment.ExperimentController;
 import edacc.experiment.REngineInitializationException;
+import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.ExperimentResult;
 import edacc.model.Instance;
 import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.InstanceDAO;
+import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
+import edacc.model.PropertyNotInDBException;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
+import edacc.model.TaskRunnable;
+import edacc.model.Tasks;
+import edacc.properties.PropertyTypeNotExistException;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -17,6 +23,8 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -85,14 +93,7 @@ public class ProbabilisticDomination extends Plot {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    updateProbabilisticDomination();
-                } catch (SQLException ex) {
-                    // TODO ...
-                } catch (Exception ex) {
-                    // TODO ...
-                    ex.printStackTrace();
-                }
+                updateProbabilisticDomination();
             }
         });
         return new Dependency[]{
@@ -125,78 +126,93 @@ public class ProbabilisticDomination extends Plot {
         instanceSelector.btnSelectAll();
     }
 
-    public static void updateProbabilisticDomination() throws SQLException, Exception {
-        _solver1 = (SolverConfiguration) comboSolver1.getSelectedItem();
-        _solver2 = (SolverConfiguration) comboSolver2.getSelectedItem();
-        _instances = instanceSelector.getSelectedInstances();
-        _property = (Property) comboProperty.getSelectedItem();
-        pnlFirstDominates.removeAll();
-        pnlSecondDominates.removeAll();
-        pnlCrossovers.removeAll();
-        ArrayList<Instance> firstDominates = new ArrayList<Instance>();
-        ArrayList<Instance> secondDominates = new ArrayList<Instance>();
-        ArrayList<Instance> crossovers = new ArrayList<Instance>();
-        ProbabilisticDomination.initialize(probDom.expController);
-        for (Instance i : _instances) {
-            int dom;
-            try {
-                dom = probDom.probabilisticDominates(i, _solver1, _solver2, _property);
-            } catch (Exception e) {
-                continue;
-            }
+    public static void updateProbabilisticDomination() {
+        Tasks.startTask(new TaskRunnable() {
 
-            if (dom == 1) {
-                firstDominates.add(i);
-            } else if (dom == -1) {
-                secondDominates.add(i);
-            } else {
-                crossovers.add(i);
+            @Override
+            public void run(Tasks task) {
+                task.setOperationName("Updating probabilistic domination");
+                _solver1 = (SolverConfiguration) comboSolver1.getSelectedItem();
+                _solver2 = (SolverConfiguration) comboSolver2.getSelectedItem();
+                _instances = instanceSelector.getSelectedInstances();
+                _property = (Property) comboProperty.getSelectedItem();
+                pnlFirstDominates.removeAll();
+                pnlSecondDominates.removeAll();
+                pnlCrossovers.removeAll();
+                ArrayList<Instance> firstDominates = new ArrayList<Instance>();
+                ArrayList<Instance> secondDominates = new ArrayList<Instance>();
+                ArrayList<Instance> crossovers = new ArrayList<Instance>();
+                task.setStatus("Loading data from database");
+                try {
+                    probDom.expController.updateExperimentResults();
+                } catch (Exception e) {
+                    // TODO: error
+                    return;
+                }
+                task.setStatus("Calculating probabilistic domination");
+                for (Instance i : _instances) {
+                    int dom;
+                    try {
+                        dom = probDom.probabilisticDominates(i, _solver1, _solver2, _property);
+                    } catch (Exception e) {
+                        continue;
+                    }
+
+                    if (dom == 1) {
+                        firstDominates.add(i);
+                    } else if (dom == -1) {
+                        secondDominates.add(i);
+                    } else {
+                        crossovers.add(i);
+                    }
+                }
+                pnlFirstDominates.setBorder(new TitledBorder("Instances where " + _solver1 + " prob. dominates " + _solver2 + " (" + firstDominates.size() + ")"));
+                pnlSecondDominates.setBorder(new TitledBorder("Instances where " + _solver2 + " prob. dominates " + _solver1 + " (" + secondDominates.size() + ")"));
+                pnlCrossovers.setBorder(new TitledBorder("Instances with crossovers (" + crossovers.size() + ")"));
+                ButtonGroup buttonGroup = new ButtonGroup();
+                radioButtons = new JRadioButton[firstDominates.size() + secondDominates.size() + crossovers.size()];
+                int buttonIdx = 0;
+                JRadioButton radioButton;
+                GridBagConstraints c = new GridBagConstraints();
+                c.gridy = 0;
+                c.weightx = 10000;
+                c.fill = GridBagConstraints.HORIZONTAL;
+                for (Instance i : firstDominates) {
+                    radioButton = new JRadioButton(i.getName());
+                    radioButtons[buttonIdx++] = radioButton;
+                    buttonGroup.add(radioButton);
+                    pnlFirstDominates.add(radioButton, c);
+                    c.gridy++;
+                }
+                c.gridy = 0;
+                for (Instance i : secondDominates) {
+                    radioButton = new JRadioButton(i.getName());
+                    radioButtons[buttonIdx++] = radioButton;
+                    buttonGroup.add(radioButton);
+                    pnlSecondDominates.add(radioButton, c);
+                    c.gridy++;
+                }
+                c.gridy = 0;
+                for (Instance i : crossovers) {
+                    radioButton = new JRadioButton(i.getName());
+                    radioButtons[buttonIdx++] = radioButton;
+                    buttonGroup.add(radioButton);
+                    pnlCrossovers.add(radioButton, c);
+                    c.gridy++;
+                }
+                pnlProbabilisticDomination.revalidate();
             }
-        }
-        pnlFirstDominates.setBorder(new TitledBorder("Instances where " + _solver1 + " prob. dominates " + _solver2 + " (" + firstDominates.size() + ")"));
-        pnlSecondDominates.setBorder(new TitledBorder("Instances where " + _solver2 + " prob. dominates " + _solver1 + " (" + secondDominates.size() + ")"));
-        pnlCrossovers.setBorder(new TitledBorder("Instances with crossovers (" + crossovers.size() + ")"));
-        ButtonGroup buttonGroup = new ButtonGroup();
-        radioButtons = new JRadioButton[firstDominates.size() + secondDominates.size() + crossovers.size()];
-        int buttonIdx = 0;
-        JRadioButton radioButton;
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridy = 0;
-        c.weightx = 10000;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        for (Instance i : firstDominates) {
-            radioButton = new JRadioButton(i.getName());
-            radioButtons[buttonIdx++] = radioButton;
-            buttonGroup.add(radioButton);
-            pnlFirstDominates.add(radioButton, c);
-            c.gridy++;
-        }
-        c.gridy = 0;
-        for (Instance i : secondDominates) {
-            radioButton = new JRadioButton(i.getName());
-            radioButtons[buttonIdx++] = radioButton;
-            buttonGroup.add(radioButton);
-            pnlSecondDominates.add(radioButton, c);
-            c.gridy++;
-        }
-        c.gridy = 0;
-        for (Instance i : crossovers) {
-            radioButton = new JRadioButton(i.getName());
-            radioButtons[buttonIdx++] = radioButton;
-            buttonGroup.add(radioButton);
-            pnlCrossovers.add(radioButton, c);
-            c.gridy++;
-        }
-        pnlProbabilisticDomination.revalidate();
+        }, true);
+
     }
 
     public int probabilisticDominates(Instance instance, SolverConfiguration sc1, SolverConfiguration sc2, Property prop) throws REngineInitializationException {
-        ArrayList<ExperimentResult> results1 = getResults(sc1.getId(), instance.getId());
-        ArrayList<ExperimentResult> results2 = getResults(sc2.getId(), instance.getId());
+        ArrayList<ExperimentResult> results1 = expController.getResults(sc1.getId(), instance.getId());
+        ArrayList<ExperimentResult> results2 = expController.getResults(sc2.getId(), instance.getId());
         ArrayList<Double> resultsDouble1 = new ArrayList<Double>();
         ArrayList<Double> resultsDouble2 = new ArrayList<Double>();
         for (ExperimentResult res : results1) {
-            Double value = getValue(res, prop);
+            Double value = expController.getValue(res, prop);
             if (value == null) {
                 // TODO: ...
                 continue;
@@ -204,7 +220,7 @@ public class ProbabilisticDomination extends Plot {
             resultsDouble1.add(value);
         }
         for (ExperimentResult res : results2) {
-            Double value = getValue(res, prop);
+            Double value = expController.getValue(res, prop);
             if (value == null) {
                 // TODO: ...
                 continue;

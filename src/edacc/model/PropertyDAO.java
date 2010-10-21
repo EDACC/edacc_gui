@@ -101,7 +101,10 @@ public class PropertyDAO {
                 res.setRegularExpression(rs.getString(3));
                 res.setValueType(PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(rs.getString(6)));
                 res.setMultiple(rs.getBoolean(7));
-                res.setComputationMethod(ComputationMethodDAO.getById(rs.getInt(8)));
+                if(res.getRegularExpression() == null)
+                    res.setComputationMethod(ComputationMethodDAO.getById(rs.getInt(8)));
+                else
+                    res.setComputationMethod(null);
                 res.setComputationMethodParameters(rs.getString(9));
             }else{
                 res.setRegularExpression("");
@@ -151,7 +154,10 @@ public class PropertyDAO {
                 ps.setString(6, r.getPropertyValueType().getName());
                 ps.setBoolean(7, r.isMultiple());
             }
-            ps.setInt(8, r.getComputationMethod().getId());
+            if(r.getComputationMethod() != null)
+                ps.setInt(8, r.getComputationMethod().getId());
+            else
+                ps.setNull(8, java.sql.Types.NULL);
             ps.setString(9, r.getComputationMethodParameters());
             ps.setInt(10, r.getId());
             ps.executeUpdate();
@@ -171,7 +177,10 @@ public class PropertyDAO {
                 ps.setString(6, r.getPropertyValueType().getName());
                 ps.setBoolean(7, r.isMultiple());
             }
-            ps.setInt(8, r.getComputationMethod().getId());
+            if(r.getComputationMethod() != null)
+                ps.setInt(8, r.getComputationMethod().getId());
+            else
+                ps.setNull(8, java.sql.Types.NULL);
             ps.setString(9, r.getComputationMethodParameters());
             ps.setBoolean(10, r.IsDefault());
             ps.executeUpdate();

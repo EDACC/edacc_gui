@@ -1,18 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edacc.experiment;
 
 import edacc.filter.InstanceFilter;
-import edacc.model.Instance;
 import edacc.model.InstanceClass;
-import edacc.model.InstanceDAO;
 import java.util.Vector;
-import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableRowSorter;
 
 /**
  *

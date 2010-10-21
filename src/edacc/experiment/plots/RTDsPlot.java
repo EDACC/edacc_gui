@@ -74,7 +74,7 @@ public class RTDsPlot extends Plot {
             instance = (Instance) comboInstance.getSelectedItem();
             property = (Property) comboProperty.getSelectedItem();
         }
-        initialize(expController);
+        expController.updateExperimentResults();
         title = "Property distribution on " + instance + " (" + expController.getActiveExperiment().getName() + ")";
         double max_x = 0.;
 
@@ -83,10 +83,10 @@ public class RTDsPlot extends Plot {
         String[] legendColors = new String[scs.size()];
         int k = 0;
         for (SolverConfiguration sc : scs) {
-            ArrayList<ExperimentResult> res = getResults(sc.getId(), instance.getId());
+            ArrayList<ExperimentResult> res = expController.getResults(sc.getId(), instance.getId());
             ArrayList<Double> tmp = new ArrayList<Double>();
             for (int i = 0; i < res.size(); i++) {
-                Double value = getValue(res.get(i), property);
+                Double value = expController.getValue(res.get(i), property);
                 if (value == null) {
                     // TODO: warning!
                     continue;

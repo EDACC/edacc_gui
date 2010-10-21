@@ -123,7 +123,7 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
             ylog = scaleSelector.isYScaleLog();
         }
 
-        initialize(expController);
+        expController.updateExperimentResults();
         infos = null;
         double maxValue = 0.;
         plotTitle = xSolverConfig.getName() + " vs. " + ySolverConfig.getName() + " (" + expController.getActiveExperiment().getName() + ")";
@@ -135,13 +135,13 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
         for (Instance instance : instances) {
             if (run == ALLRUNS) {
                 // get all x results in a hashmap
-                ArrayList<ExperimentResult> xsTmp = getResults(xSolverConfig.getId(), instance.getId());
+                ArrayList<ExperimentResult> xsTmp = expController.getResults(xSolverConfig.getId(), instance.getId());
                 HashMap<Integer, ExperimentResult> xsResults = new HashMap<Integer, ExperimentResult>();
                 for (ExperimentResult xres : xsTmp) {
                     xsResults.put(xres.getRun(), xres);
                 }
                 // get the y results
-                ArrayList<ExperimentResult> ysResults = getResults(ySolverConfig.getId(), instance.getId());
+                ArrayList<ExperimentResult> ysResults = expController.getResults(ySolverConfig.getId(), instance.getId());
 
 
                 for (ExperimentResult yres : ysResults) {
@@ -155,8 +155,8 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
                         continue;
                     }
                     // get the values; if the properties are currently not calculated this will result in null
-                    Double xsValue = getValue(xres, property);
-                    Double ysValue = getValue(yres, property);
+                    Double xsValue = expController.getValue(xres, property);
+                    Double ysValue = expController.getValue(yres, property);
                     if (xsValue == null || ysValue == null) {
                         if (xsValue == null) {
                             xNoProp++;
@@ -186,8 +186,8 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
                 yNoResult += xsResults.size();
             } else if (run == MEDIAN || run == AVERAGE) {
                 // get the x/y results and calculate the count of the not verified jobs
-                ArrayList<ExperimentResult> xsResults = getResults(xSolverConfig.getId(), instance.getId());
-                ArrayList<ExperimentResult> ysResults = getResults(ySolverConfig.getId(), instance.getId());
+                ArrayList<ExperimentResult> xsResults = expController.getResults(xSolverConfig.getId(), instance.getId());
+                ArrayList<ExperimentResult> ysResults = expController.getResults(ySolverConfig.getId(), instance.getId());
 
                 HashSet<Integer> tmp = new HashSet<Integer>();
                 for (ExperimentResult res : xsResults) {
@@ -232,8 +232,8 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
                         + "</html>"));
             } else {
                 // get the x/y results, this is for a particular run
-                ExperimentResult xsResult = getResult(xSolverConfig.getId(), instance.getId(), run);
-                ExperimentResult ysResult = getResult(ySolverConfig.getId(), instance.getId(), run);
+                ExperimentResult xsResult = expController.getResult(xSolverConfig.getId(), instance.getId(), run);
+                ExperimentResult ysResult = expController.getResult(ySolverConfig.getId(), instance.getId(), run);
 
                 if (xsResult == null || ysResult == null) {
                     if (xsResult == null) {
@@ -245,8 +245,8 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
                     continue;
                 }
 
-                Double xsValue = getValue(xsResult, property);
-                Double ysValue = getValue(ysResult, property);
+                Double xsValue = expController.getValue(xsResult, property);
+                Double ysValue = expController.getValue(ysResult, property);
                 if (xsValue == null || ysValue == null) {
                     if (xsValue == null) {
                         xNoProp++;

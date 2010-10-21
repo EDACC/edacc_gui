@@ -3,7 +3,7 @@ package edacc.model;
 import edacc.EDACCApp;
 import edacc.events.TaskEvents;
 import edacc.EDACCTaskView;
-import java.util.LinkedList;
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import org.jdesktop.application.Task;
 import org.jdesktop.application.Application;
@@ -22,7 +22,6 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
     private Object target;
     private TaskRunnable runnable;
     private static final Object syncTasks = new Object();
-    private static Task task;
     private static EDACCTaskView taskView;
 
     /**
@@ -35,36 +34,35 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
      * @param view The corresponding view which implements EDACCTaskEvents to have control over this task.
      */
     public static void startTask(String methodName, Class[] signature, Object[] parameters, Object target, TaskEvents view, boolean withTaskView) {
-        if (task != null) {
-            return;
-        }
-        taskView = null;
-        task = new Tasks(org.jdesktop.application.Application.getInstance(EDACCApp.class), methodName, signature, parameters, target, view);
-        if (withTaskView) {
-            taskView = new EDACCTaskView(EDACCApp.getApplication().getMainFrame(), true, (Tasks) task);
-            taskView.setResizable(false);
-            taskView.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
-            taskView.setTitle("Running..");
-            taskView.setOperationName("Running..");
-            taskView.setMessage("");
-            taskView.setProgress(0.);
-            SwingUtilities.invokeLater(new Runnable() {
+        synchronized (syncTasks) {
+            taskView = null;
+            Tasks task = new Tasks(org.jdesktop.application.Application.getInstance(EDACCApp.class), methodName, signature, parameters, target, view);
+            if (withTaskView) {
+                taskView = new EDACCTaskView(EDACCApp.getApplication().getMainFrame(), true, (Tasks) task);
+                taskView.setResizable(false);
+                taskView.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+                taskView.setTitle("Running..");
+                taskView.setOperationName("Running..");
+                taskView.setMessage("");
+                taskView.setProgress(0.);
+                SwingUtilities.invokeLater(new Runnable() {
 
-                @Override
-                public void run() {
-                    try {
-                        if (taskView.isDisplayable()) {
-                            taskView.setVisible(true);
+                    @Override
+                    public void run() {
+                        try {
+                            if (taskView.isDisplayable()) {
+                                taskView.setVisible(true);
+                            }
+                        } catch (Exception _) {
+                            // happens if the task view is already disposed, i.e. the task is finished.
                         }
-                    } catch (Exception _) {
-                        // happens if the task view is already disposed, i.e. the task is finished.
                     }
-                }
-            });
+                });
+            }
+            ApplicationContext appC = Application.getInstance().getContext();
+            appC.getTaskService().execute(task);
+            appC.getTaskMonitor().setForegroundTask(task);
         }
-        ApplicationContext appC = Application.getInstance().getContext();
-        appC.getTaskService().execute(task);
-        appC.getTaskMonitor().setForegroundTask(task);
     }
 
     public static void startTask(String methodName, Class[] signature, Object[] parameters, Object target, TaskEvents view) {
@@ -86,34 +84,44 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
         startTask(methodName, new Class[]{}, new Object[]{}, target, view, withTaskView);
     }
 
+    public static void startTask(TaskRunnable runnable) {
+        startTask(runnable, true);
+    }
+    
     public static void startTask(TaskRunnable runnable, boolean withTaskView) {
-        taskView = null;
-        task = new Tasks(runnable);
-        if (withTaskView) {
-            taskView = new EDACCTaskView(EDACCApp.getApplication().getMainFrame(), true, (Tasks) task);
-            taskView.setResizable(false);
-            taskView.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
-            taskView.setTitle("Running..");
-            taskView.setOperationName("Running..");
-            taskView.setMessage("");
-            taskView.setProgress(0.);
-            SwingUtilities.invokeLater(new Runnable() {
+        startTask(runnable, true, EDACCApp.getApplication().getMainFrame());
+    }
 
-                @Override
-                public void run() {
-                    try {
-                        if (taskView.isDisplayable()) {
-                            taskView.setVisible(true);
+    public static void startTask(TaskRunnable runnable, boolean withTaskView, JFrame parent) {
+        synchronized (syncTasks) {
+            taskView = null;
+            Tasks task = new Tasks(runnable);
+            if (withTaskView) {
+                taskView = new EDACCTaskView(parent, true, (Tasks) task);
+                taskView.setResizable(false);
+                taskView.setLocationRelativeTo(parent);
+                taskView.setTitle("Running..");
+                taskView.setOperationName("Running..");
+                taskView.setMessage("");
+                taskView.setProgress(0.);
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            if (taskView.isDisplayable()) {
+                                taskView.setVisible(true);
+                            }
+                        } catch (Exception _) {
+                            // happens if the task view is already disposed, i.e. the task is finished.
                         }
-                    } catch (Exception _) {
-                        // happens if the task view is already disposed, i.e. the task is finished.
                     }
-                }
-            });
+                });
+            }
+            ApplicationContext appC = Application.getInstance().getContext();
+            appC.getTaskService().execute(task);
+            appC.getTaskMonitor().setForegroundTask(task);
         }
-        ApplicationContext appC = Application.getInstance().getContext();
-        appC.getTaskService().execute(task);
-        appC.getTaskMonitor().setForegroundTask(task);
 
     }
 
@@ -135,12 +143,13 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
     protected Void doInBackground() {
         synchronized (syncTasks) {
             if (runnable != null) {
-
-                runnable.run(this);
+                try {
+                    runnable.run(this);
+                } catch (Exception e) {
+                }
                 if (taskView != null) {
                     taskView.dispose();
                 }
-                task = null;
                 return null;
             } else {
                 try {
@@ -184,10 +193,8 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
                     System.out.println("This should not happen. Called a method which should not be called. Be sure that your method is declared as public. Exception as follows: " + e);
                     EDACCApp.getLogger().logException(e);
                 }
-                task = null;
                 return null;
             }
-
         }
     }
 

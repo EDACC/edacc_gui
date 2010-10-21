@@ -36,6 +36,8 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -147,13 +149,13 @@ public class PropertyComputationUnit implements Runnable {
             Vector<String> res = new Vector<String>();
             BufferedReader buf = new BufferedReader(new FileReader(f));
             String tmp;
+            Vector<String> toAdd = new Vector<String>();
             while((tmp = buf.readLine()) != null){
-                if((tmp = parse(tmp)) != null){
-                    res.add(tmp);
+                if(!(toAdd = parse(tmp)).isEmpty()){
+                    res.addAll(res);
                     if(!property.isMultiple() || ihp != null)
                         break;
                 }
-
             }
             if(ihp  != null){
                 ihp.setValue(res.firstElement());
@@ -166,8 +168,16 @@ public class PropertyComputationUnit implements Runnable {
         }
     }
 
-    private String parse(String toParse) {
-        return null;
+    private Vector<String> parse(String toParse) {
+        Vector<String> res = new Vector<String>();
+        Pattern pat = Pattern.compile(property.getRegularExpression());
+        Matcher m = pat.matcher(toParse);
+        while (m.find()) {
+            res.add(m.group(1));
+            if(!property.isMultiple())
+                break;
+        }
+        return res;
     }
 
     private void parseInstanceName() {

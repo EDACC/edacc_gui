@@ -118,6 +118,8 @@ public class AnalysisPanel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 1.;
         gridBagConstraints.gridwidth = 2;
         add(bottom, gridBagConstraints);
+        this.invalidate();
+        this.repaint();
     }
 
     public Plot getSelectedPlot() {

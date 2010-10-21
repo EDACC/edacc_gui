@@ -24,7 +24,7 @@ public class ExperimentResultDAO {
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idJob=?";
     protected static final String selectQuery = "SELECT SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance, " +
             "idJob, run, seed, status, resultTime, resultCode, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN, " +
-            "solverExitCode, watcherExitCode, verifierExitCode, computeQueue, TIMEDIFF(NOW(), startTime) AS runningTime " +
+            "solverExitCode, watcherExitCode, verifierExitCode, computeQueue, TIMEDIFF(NOW(), startTime) AS runningTime, date_modified " +
             "FROM " + table + " ";
 
     public static ExperimentResult createExperimentResult(int run, int status, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId) throws SQLException {
@@ -56,6 +56,7 @@ public class ExperimentResultDAO {
                 st.setString(9, r.getWatcherOutputFilename());
                 st.setString(10, r.getVerifierOutputFilename());
                 st.addBatch();
+
                 r.setSaved();
             }
             st.executeBatch();
@@ -156,6 +157,7 @@ public class ExperimentResultDAO {
         r.setVerifierExitCode(rs.getInt("verifierExitCode"));
         r.setComputeQueue(rs.getInt("computeQueue"));
 
+        r.setDatemodified(rs.getTimestamp("date_modified"));
         if (r.getStatus() == ExperimentResultStatus.RUNNING) {
             try {
                 r.setRunningTime(rs.getTime("runningTime"));

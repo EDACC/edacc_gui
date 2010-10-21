@@ -50,8 +50,6 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public static int COL_WATCHER_OUTPUT = 12;
     public static int COL_VERIFIER_OUTPUT = 13;
     public static int COL_PROPERTY = 14;
-    public Timestamp lastUpdated;
-    private static final FilePropertyParser parser = new FilePropertyParser(); // just for now
     private ArrayList<ExperimentResult> jobs;
     private String[] CONST_COLUMNS = {"ID", "Compute Queue", "Solver", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
     private boolean[] CONST_VISIBLE = {false, true, true, true, true, true, true, true, true, true, false, false, false, false};
@@ -60,6 +58,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     private boolean[] visible;
     private HashMap<Integer, ArrayList<ParameterInstance>> parameterInstances;
     private HashMap<Integer, GridQueue> gridQueues;
+    private HashMap<Integer, String> parameters;
 
     public ExperimentResultsBrowserTableModel() {
         columns = new String[CONST_COLUMNS.length];
@@ -180,37 +179,6 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         }
     }
 
-    /**
-     * Transforms the parameters obtained by getParameters to a string
-     * @param row
-     * @return
-     */
-    public String getParameterString(int row) {
-        try {
-            ArrayList<ParameterInstance> params = getParameters(row);
-            if (params == null) {
-                return "";
-            }
-            String paramString = "";
-
-            for (ParameterInstance param : params) {
-                Parameter solverParameter = ParameterDAO.getById(param.getParameter_id());
-                if (solverParameter.getHasValue()) {
-                    paramString += solverParameter.getPrefix() + " " + param.getValue();
-                } else {
-                    paramString += solverParameter.getPrefix() + " ";
-                }
-
-                if (params.get(params.size() - 1) != param) {
-                    paramString += " ";
-                }
-            }
-            return paramString;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     public ExperimentResult getExperimentResult(int row) {
         return jobs.get(row);
     }
@@ -227,6 +195,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             @Override
             public void run() {
                 ExperimentResultsBrowserTableModel.this.jobs = jobs;
+                parameters = new HashMap<Integer, String>();
                 if (jobs != null) {
                     parameterInstances = new HashMap<Integer, ArrayList<ParameterInstance>>();
                     gridQueues = new HashMap<Integer, GridQueue>();
@@ -355,7 +324,12 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 Solver solver = getSolver(rowIndex);
                 return solver == null ? "" : solver.getName();
             case 3:
-                return getParameterString(rowIndex);
+                String params = parameters.get(j.getSolverConfigId());
+                if (params == null) {
+                    params = Util.getParameterString(getParameters(rowIndex));
+                    parameters.put(j.getSolverConfigId(), params);
+                }
+                return params;
             case 4:
                 Instance instance = getInstance(rowIndex);
                 return instance == null ? "" : instance.getName();

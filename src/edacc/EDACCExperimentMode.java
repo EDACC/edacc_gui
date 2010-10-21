@@ -92,6 +92,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private Timer jobsTimer = null;
     private Integer resultBrowserETA;
     private boolean jobsTimerWasActive = false;
+    private boolean updateJobsTableColumnWidth = false;
 
     /** Creates new form EDACCExperimentMode */
     public EDACCExperimentMode() {
@@ -1708,7 +1709,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }//GEN-LAST:event_tableJobsMouseClicked
 
     private void btnComputeResultPropertiesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnComputeResultPropertiesActionPerformed
-        EDACCComputeResultProperties compute = new EDACCComputeResultProperties(EDACCApp.getApplication().getMainFrame(), true);
+        EDACCComputeResultProperties compute = new EDACCComputeResultProperties(EDACCApp.getApplication().getMainFrame(), true, expController.getActiveExperiment());
         compute.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         compute.setVisible(true);
     }//GEN-LAST:event_btnComputeResultPropertiesActionPerformed
@@ -1836,6 +1837,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     "Warning!",
                     JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                 Experiment selectedExperiment = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
+                updateJobsTableColumnWidth = true;
                 Tasks.startTask("loadExperiment", new Class[]{Experiment.class, edacc.model.Tasks.class}, new Object[]{selectedExperiment, null}, expController, this);
             }
         }
@@ -2192,7 +2194,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 jobsTimerWasActive = false;
             }
             updateRuntimeEstimation();
-            edacc.experiment.Util.updateTableColumnWidth(tableJobs);
+            if (updateJobsTableColumnWidth) {
+                updateJobsTableColumnWidth = false;
+                edacc.experiment.Util.updateTableColumnWidth(tableJobs);
+            }
         }
     }
 
