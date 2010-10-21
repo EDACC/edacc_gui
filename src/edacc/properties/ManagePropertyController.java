@@ -60,7 +60,7 @@ public class ManagePropertyController {
      * Clears the input fields of the gui.
      */
     private void clearPropertyEditField() {
-       main.clearSolverPropertyEditField();
+       main.clearPropertyEditField();
     }
 
     /**
@@ -144,7 +144,7 @@ public class ManagePropertyController {
                 computationMethodParameters, name, isMultipe);
         }
         loadProperties();
-        main.clearSolverPropertyEditField();
+        main.clearPropertyEditField();
     }
 
     public Vector<ComputationMethod> loadAllComputationMethods() throws NoConnectionToDBException, SQLException, ComputationMethodDoesNotExistException {
