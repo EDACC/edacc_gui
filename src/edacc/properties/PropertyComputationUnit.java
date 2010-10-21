@@ -122,8 +122,7 @@ public class PropertyComputationUnit implements Runnable {
                 bin.setExecutable(true);
                 Process p = Runtime.getRuntime().exec(bin.getAbsolutePath());
                 Blob instance = InstanceDAO.getBinary(ihp.getInstance().getId());
-                long instanceFileSize = instance.length();
-                //FileReader instanceReader = new FileReader(new InputStreamReader(instanceStream));
+                BufferedReader instanceReader = new BufferedReader(new InputStreamReader(instance.getBinaryStream()));
                 // The std input stream of the external program. We pipe the content of the instance file into that stream
                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
                 // The std output stream of the external program (-> output of the program). We read the calculated value from this stream.
@@ -131,9 +130,9 @@ public class PropertyComputationUnit implements Runnable {
 
                 // pipe the content of the instance file to the input of the external program
                 try {
-                    for (int i = 1; i < instance.length(); i += 1000) {
-                        p.getOutputStream().write(instance.getBytes(1, 1000));
-                    }
+                    int i;
+                    while ((i = instanceReader.read()) != -1)
+                        out.write(i);
                 } catch (IOException e) {
                     if (!e.getMessage().contains("Broken pipe")) {
                         throw e;
@@ -142,6 +141,7 @@ public class PropertyComputationUnit implements Runnable {
                 // Read first line of program output
                 String value = in.readLine();
                 ihp.setValue(value);
+                System.out.println(value);
             }
         }else if(!property.getRegularExpression().equals("") || property.getRegularExpression() != null){
             Vector<String> res = new Vector<String>();
