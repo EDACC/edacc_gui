@@ -8,7 +8,7 @@ package edacc.model;
 import edacc.properties.PropertyTypeNotExistException;
 import edacc.properties.PropertySource;
 import edacc.satinstances.PropertyValueType;
-import java.io.File;
+import java.util.Vector;
 
 /**
  *
@@ -19,7 +19,7 @@ public class Property extends BaseModel implements IntegerPKModel{
    private int id;
    private String name;
    private String description;
-   private String RegularExpression;
+   private Vector<String> RegularExpression;
    private PropertyType type;
    private PropertyValueType valueType;
    private PropertySource source;
@@ -122,11 +122,11 @@ public class Property extends BaseModel implements IntegerPKModel{
      *
      * @return the RegularExpression of the Property
      */
-    public String getRegularExpression() {
+    public Vector<String> getRegularExpression() {
         return RegularExpression;
     }
 
-    public void setRegularExpression(String RegularExpression) {
+    public void setRegularExpression(Vector<String> RegularExpression) {
         this.RegularExpression = RegularExpression;
         if (this.isSaved())
             this.setModified();

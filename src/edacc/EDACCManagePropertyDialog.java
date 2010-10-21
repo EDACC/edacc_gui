@@ -110,7 +110,6 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         panelManagePropertyEditInput = new javax.swing.JPanel();
         textPropertyFieldName = new javax.swing.JTextField();
         labelPropertyname = new javax.swing.JLabel();
-        textFieldPropertyRegularExpression = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         textAreaPropertyDescription = new javax.swing.JTextArea();
         labelPropertyDescription = new javax.swing.JLabel();
@@ -129,6 +128,8 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         radioBtnComputationMethod = new javax.swing.JRadioButton();
         labelComputationMethodParameters = new javax.swing.JLabel();
         textFieldComputationmethodParameter = new javax.swing.JTextField();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        textAreaRegularExpressions = new javax.swing.JTextArea();
         buttonSaveProperty = new javax.swing.JButton();
         buttonDone = new javax.swing.JButton();
 
@@ -241,9 +242,6 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         labelPropertyname.setText(resourceMap.getString("labelPropertyname.text")); // NOI18N
         labelPropertyname.setName("labelPropertyname"); // NOI18N
 
-        textFieldPropertyRegularExpression.setEnabled(false);
-        textFieldPropertyRegularExpression.setName("textFieldPropertyRegularExpression"); // NOI18N
-
         jScrollPane1.setEnabled(false);
         jScrollPane1.setName("jScrollPane1"); // NOI18N
 
@@ -323,6 +321,13 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         textFieldComputationmethodParameter.setEnabled(false);
         textFieldComputationmethodParameter.setName("textFieldComputationmethodParameter"); // NOI18N
 
+        jScrollPane2.setName("jScrollPane2"); // NOI18N
+
+        textAreaRegularExpressions.setColumns(20);
+        textAreaRegularExpressions.setRows(5);
+        textAreaRegularExpressions.setName("textAreaRegularExpressions"); // NOI18N
+        jScrollPane2.setViewportView(textAreaRegularExpressions);
+
         javax.swing.GroupLayout panelManagePropertyEditInputLayout = new javax.swing.GroupLayout(panelManagePropertyEditInput);
         panelManagePropertyEditInput.setLayout(panelManagePropertyEditInputLayout);
         panelManagePropertyEditInputLayout.setHorizontalGroup(
@@ -340,24 +345,24 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                     .addComponent(labeMultipleOccurrences))
                 .addGap(27, 27, 27)
                 .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE)
                     .addComponent(checkBoxMultipleOccurrences)
                     .addGroup(panelManagePropertyEditInputLayout.createSequentialGroup()
                         .addComponent(comboBoxPropertyValuetype, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(buttonPropertyAddValueType))
-                    .addComponent(comboBoxPropertySource, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(comboBoxPropertyType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(textPropertyFieldName, javax.swing.GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE)
                     .addGroup(panelManagePropertyEditInputLayout.createSequentialGroup()
                         .addComponent(comboBoxComputationMethod, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(buttonNewComputationMethod)
                         .addGap(18, 18, 18)
                         .addComponent(labelComputationMethodParameters)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(textFieldComputationmethodParameter, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE))
-                    .addComponent(comboBoxPropertyType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textPropertyFieldName, javax.swing.GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE)
-                    .addComponent(textFieldPropertyRegularExpression, javax.swing.GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(textFieldComputationmethodParameter, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE))
+                    .addComponent(comboBoxPropertySource, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         panelManagePropertyEditInputLayout.setVerticalGroup(
@@ -375,11 +380,14 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(labelPropertyDescription)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(17, 17, 17)
-                .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(textFieldPropertyRegularExpression, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(radioBtnRegExpression))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelManagePropertyEditInputLayout.createSequentialGroup()
+                        .addGap(17, 17, 17)
+                        .addComponent(radioBtnRegExpression))
+                    .addGroup(panelManagePropertyEditInputLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(radioBtnComputationMethod)
                     .addComponent(comboBoxComputationMethod, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -390,7 +398,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(labelPropertySource)
                     .addComponent(comboBoxPropertySource, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(labelPropertyValueType)
                     .addComponent(comboBoxPropertyValuetype, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -427,7 +435,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManagerPropertyEditLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(panelManagePropertyEditInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(buttonSaveProperty)
                 .addContainerGap())
         );
@@ -553,7 +561,10 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 "You must specify a name for the property.",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-        }else if(textFieldPropertyRegularExpression.getText().equals("") && comboBoxComputationMethod.getSelectedIndex() == -1){
+        }else if((textAreaRegularExpressions.getText().equals("") && comboBoxComputationMethod.getSelectedIndex() == -1)
+                || (radioBtnComputationMethod.isSelected() && comboBoxComputationMethod.getSelectedIndex() == -1)
+                || (radioBtnRegExpression.isSelected() && textAreaRegularExpressions.getText().equals(""))
+                || (!radioBtnComputationMethod.isSelected() && !radioBtnRegExpression.isSelected())){
             JOptionPane.showMessageDialog(this,
                 "You must specify a regular expression or choose a computation method for the property.",
                 "Error",
@@ -570,7 +581,10 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 JOptionPane.ERROR_MESSAGE);
         }else{
             try {
-                controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), textFieldPropertyRegularExpression.getText(), (ComputationMethod) ComputationMethodDAO.getByName((String)comboBoxComputationMethod.getSelectedItem()), textFieldComputationmethodParameter.getText(), (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String)comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
+                if(radioBtnRegExpression.isSelected()){
+                    controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), textAreaRegularExpressions.getText(), null, "", (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String)comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
+                }else if(radioBtnComputationMethod.isSelected())
+                    controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), "", (ComputationMethod) ComputationMethodDAO.getByName((String)comboBoxComputationMethod.getSelectedItem()), textFieldComputationmethodParameter.getText(), (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String)comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
             } catch (IOException ex) {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (NoConnectionToDBException ex) {
@@ -631,6 +645,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     private javax.swing.JComboBox comboBoxPropertyType;
     private javax.swing.JComboBox comboBoxPropertyValuetype;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JLabel labeMultipleOccurrences;
     private javax.swing.JLabel labelComputationMethodParameters;
@@ -649,8 +664,8 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     private javax.swing.JRadioButton radioBtnRegExpression;
     private javax.swing.JTable tableProperty;
     private javax.swing.JTextArea textAreaPropertyDescription;
+    private javax.swing.JTextArea textAreaRegularExpressions;
     private javax.swing.JTextField textFieldComputationmethodParameter;
-    private javax.swing.JTextField textFieldPropertyRegularExpression;
     private javax.swing.JTextField textPropertyFieldName;
     // End of variables declaration//GEN-END:variables
 
@@ -666,34 +681,34 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         this.comboBoxPropertySource.removeAllItems();
         this.textAreaPropertyDescription.setText("");
         this.textFieldComputationmethodParameter.setText("");
-        this.textFieldPropertyRegularExpression.setText("");
+        this.textAreaRegularExpressions.setText("");
         this.textPropertyFieldName.setText("");
         this.radioBtnComputationMethod.setSelected(false);
         this.radioBtnRegExpression.setSelected(false);
     }
 
     public void propertySourceChanged() {
-        if(this.comboBoxPropertyType.getSelectedItem().equals(PropertyType.InstanceProperty) && this.comboBoxPropertySource.isEnabled()
+        if(this.comboBoxPropertySource.isEnabled() && this.comboBoxPropertyType.getSelectedItem().equals(PropertyType.InstanceProperty)
                 && !editing){
             if(this.comboBoxPropertySource.getSelectedItem().equals(PropertySource.InstanceName)){
                 this.radioBtnRegExpression.setEnabled(editing);
                 this.radioBtnRegExpression.setSelected(true);
-                this.textFieldPropertyRegularExpression.setEnabled(true);
+                this.textAreaRegularExpressions.setEnabled(true);
                 radioBtnComputationMethod.setEnabled(false);
                 buttonNewComputationMethod.setEnabled(false);
                 textFieldComputationmethodParameter.setEnabled(false);
             }else if(this.comboBoxPropertySource.getSelectedItem().equals(PropertySource.Instance)){
                 this.radioBtnComputationMethod.setEnabled(true);
                 this.radioBtnRegExpression.setEnabled(true);
-                this.textFieldPropertyRegularExpression.setEnabled(true);
+                this.textAreaRegularExpressions.setEnabled(true);
                 this.textFieldComputationmethodParameter.setEnabled(true);
                 this.buttonNewComputationMethod.setEnabled(true);
             }
-        }else if(this.comboBoxPropertyType.getSelectedItem().equals(PropertyType.ResultProperty) && this.comboBoxPropertySource.isEnabled()
+        }else if(this.comboBoxPropertySource.isEnabled() && this.comboBoxPropertyType.getSelectedItem().equals(PropertyType.ResultProperty) 
                 && !editing){
             this.radioBtnComputationMethod.setEnabled(true);
             this.radioBtnRegExpression.setEnabled(true);
-            this.textFieldPropertyRegularExpression.setEnabled(true);
+            this.textAreaRegularExpressions.setEnabled(true);
             this.textFieldComputationmethodParameter.setEnabled(true);
             this.buttonNewComputationMethod.setEnabled(true);
         }
@@ -810,7 +825,11 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             this.textFieldComputationmethodParameter.setText(toShow.getComputationMethodParameters());
         }else if(!toShow.getRegularExpression().equals("")){
             this.radioBtnRegExpression.setSelected(true);
-            this.textFieldPropertyRegularExpression.setText(toShow.getRegularExpression());
+            String toAdd = "";
+            for(int i = 0; i < toShow.getRegularExpression().size(); i++){
+                toAdd += toShow.getRegularExpression().get(i) + "\n";
+            }
+            this.textAreaRegularExpressions.setText(toAdd);
         }
         this.comboBoxPropertySource.setSelectedItem(toShow.getPropertySource());
         this.comboBoxPropertyValuetype.setSelectedItem(toShow.getPropertyValueType().getName());
@@ -826,7 +845,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         this.comboBoxPropertySource.setEnabled(false);
         this.comboBoxPropertyType.setEnabled(false);
         this.comboBoxPropertyValuetype.setEnabled(false);
-        this.textFieldPropertyRegularExpression.setEnabled(false);
+        this.textAreaRegularExpressions.setEnabled(false);
         this.textFieldComputationmethodParameter.setEnabled(false);
         this.buttonNewComputationMethod.setEnabled(false);
         this.buttonPropertyAddValueType.setEnabled(false);

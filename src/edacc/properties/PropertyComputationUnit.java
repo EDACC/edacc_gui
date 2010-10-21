@@ -14,7 +14,6 @@ import edacc.model.ExperimentResultHasPropertyDAO;
 import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasProperty;
 import edacc.model.InstanceHasPropertyDAO;
-import edacc.model.InstanceHasPropertyNotInDBException;
 import edacc.model.InstanceNotInDBException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
@@ -26,13 +25,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.Blob;
 import java.sql.SQLException;
-import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -170,12 +166,14 @@ public class PropertyComputationUnit implements Runnable {
 
     private Vector<String> parse(String toParse) {
         Vector<String> res = new Vector<String>();
-        Pattern pat = Pattern.compile(property.getRegularExpression());
-        Matcher m = pat.matcher(toParse);
-        while (m.find()) {
-            res.add(m.group(1));
-            if(!property.isMultiple())
-                break;
+        for(int i = 0; i < property.getRegularExpression().size(); i++){
+            Pattern pat = Pattern.compile(property.getRegularExpression().get(i));
+            Matcher m = pat.matcher(toParse);
+            while (m.find()) {
+                res.add(m.group(1));
+                if(!property.isMultiple() || ihp != null)
+                    return res;
+            }    
         }
         return res;
     }

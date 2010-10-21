@@ -124,19 +124,25 @@ public class ManagePropertyController {
         main.disablePropertyEditFields();
     }
 
-    public void saveProperty(String name, String description, PropertyType type, String regExp, ComputationMethod computationMethod,
+    public void saveProperty(String name, String description, PropertyType type, String regExpression, ComputationMethod computationMethod,
             String computationMethodParameters, PropertySource source, PropertyValueType<?> valueType, boolean isMultipe)
             throws NoConnectionToDBException, SQLException, PropertyIsUsedException, PropertyTypeDoesNotExistException, IOException,
             PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException{
-
+            Vector<String> regExpressions = new Vector<String>();
         if(editId != -1){
             Property toEdit = PropertyDAO.getById(editId);
             toEdit.setName(name);
             toEdit.setDescription(description);
             PropertyDAO.save(toEdit);
-        }else
-            PropertyDAO.createProperty(name, regExp, description, type, valueType, source, isMultipe, computationMethod,
+        }else{
+            // extract the single reg expressions from the regExp String
+            String[] getRegExp = regExpression.split("\n");
+            for(int i = 0; i < getRegExp.length; i++){
+                regExpressions.add(getRegExp[i]);
+            }
+             PropertyDAO.createProperty(name, regExpressions, description, type, valueType, source, isMultipe, computationMethod,
                 computationMethodParameters, name, isMultipe);
+        }
         loadProperties();
         main.clearSolverPropertyEditField();
     }

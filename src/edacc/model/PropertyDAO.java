@@ -9,17 +9,11 @@ import edacc.properties.PropertySource;
 import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.PropertyValueType;
 import edacc.satinstances.PropertyValueTypeManager;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -30,10 +24,10 @@ public class PropertyDAO {
     protected static final String table = "Property";
     private static final ObjectCache<Property> cache = new ObjectCache<Property>();
     private static String deleteQuery = "DELETE FROM " + table + " WHERE idProperty=?;";
-    private static String updateQuery = "UPDATE " + table + " SET name=?, regExpression=?, description=?, propertyType=?, propertySource=? ," +
+    private static String updateQuery = "UPDATE " + table + " SET name=?,  description=?, propertyType=?, propertySource=? ," +
             "propertyValueType=?, multipleOccourence=?, idComputationMethod=?, computationMethodParameters=?  WHERE idProperty=?;";
-    private static String insertQuery = "INSERT INTO " + table + " (name, regExpression, description, propertyType, propertySource ," +
-            "propertyValueType, multipleOccourence, idComputationMethod, computationMethodParameters, isDefault) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    private static String insertQuery = "INSERT INTO " + table + " (name, description, propertyType, propertySource ," +
+            "propertyValueType, multipleOccourence, idComputationMethod, computationMethodParameters, isDefault) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
     /**
      * Creates a new  Property object, saves it into the database and cache, and returns it.
@@ -45,7 +39,7 @@ public class PropertyDAO {
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    public static Property createProperty(String name, String regularExpression, String description, PropertyType type, PropertyValueType valueType,
+    public static Property createProperty(String name, Vector<String> regularExpression, String description, PropertyType type, PropertyValueType valueType,
             PropertySource source, boolean multiple, ComputationMethod computationMethod, String computationMethodParameters, String parameter, Boolean isDefault)
             throws NoConnectionToDBException, SQLException, PropertyIsUsedException, PropertyTypeDoesNotExistException, IOException,
             PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException{
@@ -58,7 +52,7 @@ public class PropertyDAO {
         r.setMultiple(multiple);
         r.setIsDefault(isDefault);
         if(!source.equals(PropertySource.Parameter)){
-            if(regularExpression.equals("")){
+            if(computationMethod != null){
                 r.setComputationMethod(computationMethod);
                 r.setComputationMethodParameters(computationMethodParameters);
             }else
@@ -86,7 +80,7 @@ public class PropertyDAO {
         }else{
             res = new Property();
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                    "SELECT name, description, regExpression, propertyType, propertySource ,propertyValueType, multipleOccourence, idComputationMethod, " +
+                    "SELECT name, description, propertyType, propertySource ,propertyValueType, multipleOccourence, idComputationMethod, " +
                     "computationMethodParameters, isDefault FROM " + table + " WHERE idProperty=?");
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
@@ -95,25 +89,25 @@ public class PropertyDAO {
             res.setId(id);
             res.setName(rs.getString(1));
             res.setDescription(rs.getString(2));            
-            res.setType(rs.getInt(4));
-            res.setPropertySource(rs.getInt(5));
+            res.setType(rs.getInt(3));
+            res.setPropertySource(rs.getInt(4));
             if(!res.getPropertySource().equals(PropertySource.Parameter)){
-                res.setRegularExpression(rs.getString(3));
-                res.setValueType(PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(rs.getString(6)));
-                res.setMultiple(rs.getBoolean(7));
-                if(res.getRegularExpression() == null)
-                    res.setComputationMethod(ComputationMethodDAO.getById(rs.getInt(8)));
+                res.setRegularExpression(getRegularExpressions(id));
+                res.setValueType(PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(rs.getString(5)));
+                res.setMultiple(rs.getBoolean(6));
+                if(res.getRegularExpression().isEmpty())
+                    res.setComputationMethod(ComputationMethodDAO.getById(rs.getInt(7)));
                 else
                     res.setComputationMethod(null);
-                res.setComputationMethodParameters(rs.getString(9));
+                res.setComputationMethodParameters(rs.getString(8));
             }else{
-                res.setRegularExpression("");
+                res.setRegularExpression(new Vector<String>());
                 res.setValueType(null);
                 res.setMultiple(false);
                 res.setComputationMethod(null);
                 res.setComputationMethodParameters("");
             }
-            res.setIsDefault(rs.getBoolean(10));
+            res.setIsDefault(rs.getBoolean(9));
             res.setSaved();
             cache.cache(res);
             return res;
@@ -143,46 +137,45 @@ public class PropertyDAO {
         }else if( r.isModified()){            
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
             ps.setString(1, r.getName());
-            ps.setString(2, r.getRegularExpression());
-            ps.setString(3, r.getDescription());
-            ps.setInt(4, r.getPropertyTypeDBRepresentation());
-            ps.setInt(5, r.getPropertySourceDBRepresentation());
+            setRegularExpressions(r.getRegularExpression(), r.getId());
+            ps.setString(2, r.getDescription());
+            ps.setInt(3, r.getPropertyTypeDBRepresentation());
+            ps.setInt(4, r.getPropertySourceDBRepresentation());
             if(r.getPropertySource().equals(PropertySource.Parameter)){
+               ps.setNull(5, java.sql.Types.NULL);
                ps.setNull(6, java.sql.Types.NULL);
-               ps.setNull(7, java.sql.Types.NULL);
             }else {
-                ps.setString(6, r.getPropertyValueType().getName());
-                ps.setBoolean(7, r.isMultiple());
+                ps.setString(5, r.getPropertyValueType().getName());
+                ps.setBoolean(6, r.isMultiple());
             }
             if(r.getComputationMethod() != null)
-                ps.setInt(8, r.getComputationMethod().getId());
+                ps.setInt(7, r.getComputationMethod().getId());
             else
-                ps.setNull(8, java.sql.Types.NULL);
-            ps.setString(9, r.getComputationMethodParameters());
-            ps.setInt(10, r.getId());
+                ps.setNull(7, java.sql.Types.NULL);
+            ps.setString(8, r.getComputationMethodParameters());
+            ps.setInt(9, r.getId());
             ps.executeUpdate();
             ps.close();
             r.setSaved();
         }else if(r.isNew()){
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setString(1, r.getName());
-            ps.setString(2, r.getRegularExpression());
-            ps.setString(3, r.getDescription());
-            ps.setInt(4, r.getPropertyTypeDBRepresentation());
-            ps.setInt(5, r.getPropertySourceDBRepresentation());
+            ps.setString(2, r.getDescription());
+            ps.setInt(3, r.getPropertyTypeDBRepresentation());
+            ps.setInt(4, r.getPropertySourceDBRepresentation());
             if(r.getPropertySource().equals(PropertySource.Parameter)){
+               ps.setNull(5, java.sql.Types.NULL);
                ps.setNull(6, java.sql.Types.NULL);
-               ps.setNull(7, java.sql.Types.NULL);
             }else {
-                ps.setString(6, r.getPropertyValueType().getName());
-                ps.setBoolean(7, r.isMultiple());
+                ps.setString(5, r.getPropertyValueType().getName());
+                ps.setBoolean(6, r.isMultiple());
             }
             if(r.getComputationMethod() != null)
-                ps.setInt(8, r.getComputationMethod().getId());
+                ps.setInt(7, r.getComputationMethod().getId());
             else
-                ps.setNull(8, java.sql.Types.NULL);
-            ps.setString(9, r.getComputationMethodParameters());
-            ps.setBoolean(10, r.IsDefault());
+                ps.setNull(7, java.sql.Types.NULL);
+            ps.setString(8, r.getComputationMethodParameters());
+            ps.setBoolean(9, r.IsDefault());
             ps.executeUpdate();
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -192,6 +185,7 @@ public class PropertyDAO {
             ps.close();
             r.setSaved();
             cache.cache(r);
+            setRegularExpressions(r.getRegularExpression(), r.getId());
         }
     }
 
@@ -292,6 +286,32 @@ public class PropertyDAO {
          ResultSet rs = ps.executeQuery();
          rs.next();
          return getById(rs.getInt("idSolverProperty"));
+    }
+
+    private static Vector<String> getRegularExpressions(int id) throws NoConnectionToDBException, SQLException{
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+            "SELECT regexpr FROM PropertyRegExp WHERE idProperty=?;");
+         ps.setInt(1, id);
+         ResultSet rs = ps.executeQuery();
+         Vector<String> res = new Vector<String>();
+         while(rs.next()){
+             res.add(rs.getString(1));
+         }
+         return res;
+    }
+
+    private static void setRegularExpressions(Vector<String> regularExpression, int id) throws NoConnectionToDBException, SQLException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+            "DELETE FROM PropertyRegExp WHERE idProperty=?;");
+        ps.setInt(1, id);
+        ps.executeUpdate();
+        ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+            "INSERT INTO PropertyRegExp (idProperty, regexpr) VALUES (?, ?);");
+        for(int i = 0; i < regularExpression.size(); i++){
+            ps.setInt(1, id);
+            ps.setString(2, regularExpression.get(i));
+            ps.executeUpdate();
+        }
     }
 
 }

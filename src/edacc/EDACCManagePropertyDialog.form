@@ -244,7 +244,7 @@
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="panelManagePropertyEditInput" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="17" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                           <Component id="buttonSaveProperty" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -279,26 +279,26 @@
                               </Group>
                               <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jScrollPane2" pref="635" max="32767" attributes="0"/>
                                   <Component id="checkBoxMultipleOccurrences" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="comboBoxPropertyValuetype" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
                                       <Component id="buttonPropertyAddValueType" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="comboBoxPropertySource" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Group type="102" alignment="0" attributes="0">
+                                  <Component id="comboBoxPropertyType" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="textPropertyFieldName" alignment="0" pref="635" max="32767" attributes="1"/>
+                                  <Component id="jScrollPane1" alignment="0" pref="635" max="32767" attributes="1"/>
+                                  <Group type="102" attributes="0">
                                       <Component id="comboBoxComputationMethod" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
                                       <Component id="buttonNewComputationMethod" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
                                       <Component id="labelComputationMethodParameters" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                      <Component id="textFieldComputationmethodParameter" pref="449" max="32767" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="textFieldComputationmethodParameter" pref="455" max="32767" attributes="0"/>
                                   </Group>
-                                  <Component id="comboBoxPropertyType" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="textPropertyFieldName" alignment="0" pref="635" max="32767" attributes="1"/>
-                                  <Component id="jScrollPane1" alignment="0" pref="635" max="32767" attributes="1"/>
-                                  <Component id="textFieldPropertyRegularExpression" alignment="0" pref="635" max="32767" attributes="1"/>
+                                  <Component id="comboBoxPropertySource" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -322,12 +322,17 @@
                                   <Component id="labelPropertyDescription" min="-2" max="-2" attributes="0"/>
                                   <Component id="jScrollPane1" min="-2" pref="61" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="textFieldPropertyRegularExpression" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
-                                  <Component id="radioBtnRegExpression" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
+                                      <Component id="radioBtnRegExpression" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="jScrollPane2" min="-2" pref="65" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="radioBtnComputationMethod" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="comboBoxComputationMethod" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -340,7 +345,7 @@
                                   <Component id="labelPropertySource" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="comboBoxPropertySource" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="labelPropertyValueType" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="comboBoxPropertyValuetype" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -367,12 +372,6 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" resourceKey="labelPropertyname.text"/>
                         <Property name="name" type="java.lang.String" value="labelPropertyname" noResource="true"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JTextField" name="textFieldPropertyRegularExpression">
-                      <Properties>
-                        <Property name="enabled" type="boolean" value="false"/>
-                        <Property name="name" type="java.lang.String" value="textFieldPropertyRegularExpression" noResource="true"/>
                       </Properties>
                     </Component>
                     <Container class="javax.swing.JScrollPane" name="jScrollPane1">
@@ -520,6 +519,25 @@
                         <Property name="name" type="java.lang.String" value="textFieldComputationmethodParameter" noResource="true"/>
                       </Properties>
                     </Component>
+                    <Container class="javax.swing.JScrollPane" name="jScrollPane2">
+                      <Properties>
+                        <Property name="name" type="java.lang.String" value="jScrollPane2" noResource="true"/>
+                      </Properties>
+                      <AuxValues>
+                        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+                      </AuxValues>
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+                      <SubComponents>
+                        <Component class="javax.swing.JTextArea" name="textAreaRegularExpressions">
+                          <Properties>
+                            <Property name="columns" type="int" value="20"/>
+                            <Property name="rows" type="int" value="5"/>
+                            <Property name="name" type="java.lang.String" value="textAreaRegularExpressions" noResource="true"/>
+                          </Properties>
+                        </Component>
+                      </SubComponents>
+                    </Container>
                   </SubComponents>
                 </Container>
                 <Component class="javax.swing.JButton" name="buttonSaveProperty">
