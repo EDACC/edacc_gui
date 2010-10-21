@@ -144,6 +144,9 @@ class PointScanner extends MouseInputAdapter {
         }
         PointInformation res;
         synchronized (sync) {
+            if (quadTree == null) {
+                return ;
+            }
             res = quadTree.query(new Point2D.Double(e.getX(), e.getY()), 5.);
         }
         if (res != null) {

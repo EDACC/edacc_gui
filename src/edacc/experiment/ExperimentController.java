@@ -115,13 +115,13 @@ public class ExperimentController {
         main.expTableModel.setExperiments(experiments);
         Vector<InstanceClass> vic = new Vector<InstanceClass>();
         try {
-        vic.addAll(InstanceClassDAO.getAll());
+            vic.addAll(InstanceClassDAO.getAll());
 
-        main.instanceClassModel.setClasses(vic);
-        ArrayList<Instance> instances = new ArrayList<Instance>();
-        instances.addAll(InstanceDAO.getAll());
-        main.insTableModel.setInstances(instances);
-        }catch (Exception e) {
+            main.instanceClassModel.setClasses(vic);
+            ArrayList<Instance> instances = new ArrayList<Instance>();
+            instances.addAll(InstanceDAO.getAll());
+            main.insTableModel.setInstances(instances);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -390,7 +390,7 @@ public class ExperimentController {
                 }
             }
         };
-        
+
         task.setOperationName("Generating jobs for experiment " + activeExperiment.getName());
         task.setStatus("Loading data from database");
         updateExperimentResults();
@@ -1080,6 +1080,7 @@ public class ExperimentController {
         }
         return res;
     }
+
     /**
      * Returns all disjunct runs in an array list.
      * This array list should contain all integers between 0 and numRuns-1 inclusive.
@@ -1147,21 +1148,29 @@ public class ExperimentController {
         experiment = activeExperiment;
     }
 
+    public ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId) {
+        return getResults(solverConfigId, instanceId, null);
+    }
+    
     /**
      * Returns a Vector of all ExperimentResults in the current experiment with the solverConfig id and instance id specified
      * @param solverConfigId the solverConfig id of the ExperimentResults
      * @param instanceId the instance id of the ExperimentResults
      * @return returns an empty vector if there are no such ExperimentResults
      */
-    public ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId) {
+    public ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId, ExperimentResultStatus[] status) {
         ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
         for (int i = 0; i < experiment.getNumRuns(); i++) {
-            ExperimentResult result = getResult(solverConfigId, instanceId, i);
+            ExperimentResult result = getResult(solverConfigId, instanceId, i, status);
             if (result != null) {
                 res.add(result);
             }
         }
         return res;
+    }
+
+    public ExperimentResult getResult(int solverConfigId, int instanceId, int run) {
+        return getResult(solverConfigId, instanceId, run, null);
     }
 
     /**
@@ -1171,13 +1180,20 @@ public class ExperimentController {
      * @param run the run
      * @return returns null if there is no such ExperimentResult
      */
-    public ExperimentResult getResult(int solverConfigId, int instanceId, int run) {
+    public ExperimentResult getResult(int solverConfigId, int instanceId, int run, ExperimentResultStatus[] status) {
         ExperimentResult res = resultMap.get(new ResultIdentifier(solverConfigId, instanceId, run));
-        // if the result is not in our map or it is not a verified result then return null
-        // TODO: überdenken
-        // if (res == null || !String.valueOf(res.getResultCode().getValue()).startsWith("1")) {
-        //     return null;
-        // }
+        if (status != null) {
+            boolean found = false;
+            for (ExperimentResultStatus s : status) {
+                if (res.getStatus().equals(s)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return null;
+            }
+        }
         return res;
     }
 
@@ -1198,7 +1214,12 @@ public class ExperimentController {
     }
 
     public Double getValue(ExperimentResult result, Property property) {
-        if (result.getStatus() != ExperimentResultStatus.SUCCESSFUL) {
+
+        if (result.getStatus() == ExperimentResultStatus.RUNNING
+                || result.getStatus() == ExperimentResultStatus.NOTSTARTED
+                || result.getStatus() == ExperimentResultStatus.LAUNCHERCRASH
+                || result.getStatus() == ExperimentResultStatus.VERIFIERCRASH
+                || result.getStatus() == ExperimentResultStatus.WATCHERCRASH) {
             return null;
         }
         if (property == PROP_CPUTIME) {

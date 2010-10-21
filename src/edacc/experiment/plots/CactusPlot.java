@@ -2,6 +2,7 @@ package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentResult;
+import edacc.model.ExperimentResultStatus;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
@@ -26,7 +27,7 @@ class SolverInfos {
  * @author simon
  */
 public class CactusPlot extends Plot {
-
+    private static final ExperimentResultStatus[] statusCodes = new ExperimentResultStatus[] { ExperimentResultStatus.SUCCESSFUL };
     private static JComboBox comboRun, comboProperty;
     private static InstanceSelector instanceSelector;
     private static SolverConfigurationSelector solverConfigurationSelector;
@@ -124,7 +125,7 @@ public class CactusPlot extends Plot {
             int k = 0;
             for (Integer instanceId : selectedInstanceIds) {
                 if (run == ALLRUNS) {
-                    ArrayList<ExperimentResult> tmp = expController.getResults(sc.getId(), instanceId);
+                    ArrayList<ExperimentResult> tmp = expController.getResults(sc.getId(), instanceId, statusCodes);
                     for (ExperimentResult er : tmp) {
                         Double value = expController.getValue(er, property);
                         if (value != null) {
@@ -132,7 +133,7 @@ public class CactusPlot extends Plot {
                         }
                     }
                 } else if (run == MEDIAN || run == AVERAGE) {
-                    ArrayList<ExperimentResult> results = expController.getResults(sc.getId(), instanceId);
+                    ArrayList<ExperimentResult> results = expController.getResults(sc.getId(), instanceId, statusCodes);
                     Double value;
                     if (run == MEDIAN) {
                         value = getMedian(results, property);

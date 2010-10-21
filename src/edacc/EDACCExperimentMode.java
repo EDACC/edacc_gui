@@ -2061,7 +2061,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         String ETA = null;
         if (count > 0 && jobsRunning > 0) {
             avgTime /= count;
-            int timeleft = (int) (Math.round(jobsWaiting * avgTime / jobsRunning) - curRunningTime / jobsRunning);
+            int timeleft = (int) (Math.round((jobsWaiting + jobsRunning) * avgTime / jobsRunning) - curRunningTime / jobsRunning);
 
             if (resultBrowserETA != null) {
                 int tmp = timeleft - resultBrowserETA;
