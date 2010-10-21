@@ -141,7 +141,7 @@ public class PropertyComputationUnit implements Runnable {
                 ihp.setValue(value);
                 System.out.println(value);
             }
-        }else if(!property.getRegularExpression().equals("") || property.getRegularExpression() != null){
+        }else if(property.getRegularExpression() != null){
             Vector<String> res = new Vector<String>();
             BufferedReader buf = new BufferedReader(new FileReader(f));
             String tmp;
@@ -179,7 +179,11 @@ public class PropertyComputationUnit implements Runnable {
     }
 
     private void parseInstanceName() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        if(ihp != null){
+            Vector<String> res = parse(ihp.getInstance().getName());
+            if(!res.isEmpty())
+                ihp.setValue(res.firstElement());
+        }
     }
 
     public static void main(String[] args) {
