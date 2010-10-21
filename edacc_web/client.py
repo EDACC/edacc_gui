@@ -20,14 +20,14 @@ TMP                 = '/tmp' # used for temporary files
 PACKAGE_DIR         = os.path.join(os.path.abspath(os.path.dirname(__file__)))
 
 DATABASE_DRIVER     = 'mysql'
-DATABASE_HOST       = 'localhost'
+DATABASE_HOST       = 'edacc.informatik.uni-ulm.de'
 DATABASE_PORT       = 3306
-DATABASE_NAME       = 'EDACC'
+DATABASE_NAME       = 'EDACC5'
 DATABASE_USER       = 'edacc'
 DATABASE_PASSWORD   = 'edaccteam'
 
 # Experiment this client should run, case-sensitive
-EXPERIMENT_NAME     = 'Hier könnte ihre Werbung stehen'
+EXPERIMENT_NAME     = 'echo `satisfiable` > /dev/null'
 
 class EDACCDatabase(object):
     """ Encapsulates a single EDACC database connection. """
