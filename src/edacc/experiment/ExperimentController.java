@@ -607,6 +607,7 @@ public class ExperimentController {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             //   e.printStackTrace();
             // TODO: shouldn't happen but show message if it does
         }

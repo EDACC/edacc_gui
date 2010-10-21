@@ -59,9 +59,10 @@ public class AnalysisController {
                 if (!Rengine.versionCheck()) {
                     throw new REngineInitializationException("** Version mismatch - Java files don't match library version.");
                 }
-                re = new Rengine(new String[]{}, false, null);
+                re = new Rengine(new String[]{"--vanilla"}, false, null);
 
                 if (!re.waitForR()) {
+                    re = null;
                     throw new REngineInitializationException("Cannot load R.");
                 }
                 if (re.eval("library(JavaGD)") == null) {
