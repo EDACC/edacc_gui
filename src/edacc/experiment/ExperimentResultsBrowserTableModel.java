@@ -70,28 +70,33 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     }
 
     public void updateSolverProperties() {
-        solverProperties = new ArrayList<Property>();
+        ArrayList<Property> tmp = new ArrayList<Property>();
         try {
-            solverProperties.addAll(PropertyDAO.getAllResultProperties());
+            tmp.addAll(PropertyDAO.getAllResultProperties());
         } catch (Exception e) {
             if (edacc.ErrorLogger.DEBUG) {
                 e.printStackTrace();
             }
         }
-        for (int i = solverProperties.size() - 1; i >= 0; i--) {
-            if (solverProperties.get(i).isMultiple()) {
-                solverProperties.remove(i);
+        if (!tmp.equals(solverProperties)) {
+            solverProperties = tmp;
+
+            for (int i = solverProperties.size() - 1; i >= 0; i--) {
+                if (solverProperties.get(i).isMultiple()) {
+                    solverProperties.remove(i);
+                }
             }
+            columns = java.util.Arrays.copyOf(columns, CONST_COLUMNS.length + solverProperties.size());
+            visible = java.util.Arrays.copyOf(visible, CONST_VISIBLE.length + solverProperties.size());
+            int j = 0;
+            for (int i = CONST_COLUMNS.length; i < columns.length; i++) {
+                columns[i] = solverProperties.get(j).getName();
+                visible[i] = true;
+                j++;
+            }
+            this.fireTableStructureChanged();
         }
-        columns = java.util.Arrays.copyOf(columns, CONST_COLUMNS.length + solverProperties.size());
-        visible = java.util.Arrays.copyOf(visible, CONST_VISIBLE.length + solverProperties.size());
-        int j = 0;
-        for (int i = CONST_COLUMNS.length; i < columns.length; i++) {
-            columns[i] = solverProperties.get(j).getName();
-            visible[i] = true;
-            j++;
-        }
-        this.fireTableStructureChanged();
+
     }
 
     /**
@@ -195,10 +200,10 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             @Override
             public void run() {
                 ExperimentResultsBrowserTableModel.this.jobs = jobs;
-                parameters = new HashMap<Integer, String>();
                 if (jobs != null) {
                     parameterInstances = new HashMap<Integer, ArrayList<ParameterInstance>>();
                     gridQueues = new HashMap<Integer, GridQueue>();
+                    parameters = new HashMap<Integer, String>();
                     try {
                         ArrayList<GridQueue> queues = GridQueueDAO.getAll();
                         for (GridQueue q : queues) {

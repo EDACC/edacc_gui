@@ -315,26 +315,32 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }
 
     public void reinitializeGUI() {
-
         expController.unloadExperiment();
-        /* experiment tab */
+        reinitializeExperiments();
+        reinitializeInstances();
+        reinitializeJobBrowser();
+    }
+
+    public void reinitializeExperiments() {
         expTableModel.setExperiments(null);
-        /* end of experiment tab */
-        /* instance tab */
+    }
+    
+    public void reinitializeInstances() {
         btnDeselectAllInstnaceClassesActionPerformed(null);
         instanceFilter.clearFilters();
         lblFilterStatus.setText("");
-        /* end of instance tab */
-        /* job browser tab */
+    }
+
+    public void reinitializeJobBrowser() {
         try {
             jobsTableModel.setJobs(null);
+            jobsTableModel.fireTableStructureChanged();
         } catch (SQLException ex) {
         }
         resultBrowserRowFilter.clearFilters();
         jobsTableModel.resetColumnVisibility();
         setJobsFilterStatus("");
         jobsTimerWasActive = false;
-        /* end of job browser tab */
     }
 
     public void initialize() throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
@@ -1544,6 +1550,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         } else if (manageExperimentPane.getSelectedIndex() == 4) {
             // job browser tab
+            final Rectangle rect = tableJobs.getVisibleRect();
+
             resultBrowserETA = null;
             lblETA.setText("");
             try {
@@ -1557,7 +1565,28 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
                 @Override
                 public void run() {
-                    Tasks.startTask("loadJobs", expController, EDACCExperimentMode.this);
+                    Tasks.startTask(new TaskRunnable() {
+
+                        @Override
+                        public void run(Tasks task) {
+                            try {
+                            expController.loadJobs();
+                            } catch (Throwable e) {
+                                EDACCExperimentMode.this.onTaskFailed("loadJobs", e);
+                            }
+                            tableJobs.scrollRectToVisible(rect);
+                            SwingUtilities.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
+                                }
+
+                            });
+
+                        }
+
+                    });
                 }
             });
         } else if (manageExperimentPane.getSelectedIndex() == 5) {
@@ -1792,6 +1821,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
      * Method to be called after an experiment is loaded.
      */
     public void afterExperimentLoaded() {
+        reinitializeInstances();
+        reinitializeJobBrowser();
         manageExperimentPane.setEnabledAt(1, true);
         manageExperimentPane.setEnabledAt(2, true);
         manageExperimentPane.setEnabledAt(3, true);

@@ -92,7 +92,7 @@ public class ExperimentController {
         this.main = experimentMode;
         this.solverConfigPanel = solverConfigPanel;
         PROP_CPUTIME = new Property();
-        PROP_CPUTIME.setName("CPU-Time");
+        PROP_CPUTIME.setName("CPU-Time (s)");
 
     }
 

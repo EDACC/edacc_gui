@@ -144,6 +144,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                 PlotPanel plotPanel = (PlotPanel) tabbedPanePlots.getComponentAt(i);
                 if (closeDevice) {
                     AnalysisController.closeDevice(plotPanel.getDeviceNumber());
+                    plotPanel.closeDisplay();
                 }
                 tabbedPanePlots.remove(i);
                 break;
@@ -450,6 +451,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                     Graphics g = bufferedImage.createGraphics();
                     g.setColor(Color.WHITE);
                     g.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
+                    g.setClip(0, 0, plotPanel.gdc.getWidth(), plotPanel.gdc.getHeight());
                     plotPanel.gdc.invalidate();
                     plotPanel.gdc.paintAll(g);
                     plotPanel.gdc.paint(g);
@@ -724,6 +726,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                 Graphics g = bufferedImage.createGraphics();
                 g.setColor(Color.WHITE);
                 g.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
+                g.setClip(0, 0, comp.gdc.getWidth(), comp.gdc.getHeight());
                 comp.gdc.invalidate();
                 comp.gdc.paintAll(g);
                 comp.gdc.paint(g);

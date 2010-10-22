@@ -60,7 +60,7 @@
                   <Component id="btnRefresh" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnSettings" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="362" max="32767" attributes="0"/>
+                  <EmptySpace pref="384" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -152,7 +152,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane2" alignment="0" pref="595" max="32767" attributes="0"/>
+                  <Component id="jScrollPane2" alignment="0" pref="597" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">

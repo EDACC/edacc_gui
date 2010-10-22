@@ -144,7 +144,7 @@ public class RTDPlot extends Plot {
 
         // plot labels and axes
         engine.eval("mtext('" + property.getName() + "', side=1, line=3, cex=1.2)");                      // bottom axis label
-        engine.eval("mtext('P(solve within x seconds)', side=2, padj=0, line=3, cex=1.2)"); // left axis label
+        engine.eval("mtext('P(solve within x "+property.getName()+ ")', side=2, padj=0, line=3, cex=1.2)"); // left axis label
         engine.eval("mtext('RTD Comparison', padj=1, side=3, line=3, cex=1.7)");            // plot title
 
         // plot legend
