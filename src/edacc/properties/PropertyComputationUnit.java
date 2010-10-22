@@ -113,7 +113,7 @@ public class PropertyComputationUnit implements Runnable {
     }
 
     private void compute(File f) throws FileNotFoundException, IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, ComputationMethodDoesNotExistException {
-        if(property.getComputationMethod() != null){
+        if (property.getComputationMethod() != null){
             // parse instance file (external program call)
             if (ihp != null) {
                 File bin = ComputationMethodDAO.getBinaryOfComputationMethod(property.getComputationMethod());
@@ -132,16 +132,30 @@ public class PropertyComputationUnit implements Runnable {
                     while ((i = instanceReader.read()) != -1)
                         out.write(i);
                 } catch (IOException e) {
+                    // if a program stops reading from the stream, stop writing to it but show no error. Otherwise show an error message
                     if (!e.getMessage().contains("Broken pipe")) {
                         throw e;
                     }
                 }
+                /**
+                 * Read the program output and save it as value of the property
+                 * for the given instance.
+                 * IMPORTANT!
+                 * The value will be saved as a String in the DB and no
+                 * conversion will be done!
+                 * When loading the value from the DB, the method
+                 * PropertyValueType.getJavaRepresentation(String) will be called
+                 * on that value for the PropertyValueType of the property (so
+                 * the String will be converted to the correct Java type).
+                 */
                 // Read first line of program output
                 String value = in.readLine();
+                // set the value and save it
                 ihp.setValue(value);
                 System.out.println(value);
+                InstanceHasPropertyDAO.save(ihp);
             }
-        }else if(property.getRegularExpression() != null){
+        } else if(property.getRegularExpression() != null){
             Vector<String> res = new Vector<String>();
             BufferedReader buf = new BufferedReader(new FileReader(f));
             String tmp;
