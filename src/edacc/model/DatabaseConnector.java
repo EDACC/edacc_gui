@@ -175,4 +175,19 @@ public class DatabaseConnector extends Observable {
     public String getUsername() {
         return username;
     }
+
+    /**
+     * Returns whether the database is a competition database
+     * @return
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     */
+    public boolean isCompetitionDB() throws NoConnectionToDBException, SQLException {
+        PreparedStatement ps = getConn().prepareStatement("SELECT competition FROM DBConfiguration");
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getBoolean("competition");
+        }
+        return false;
+    }
 }
