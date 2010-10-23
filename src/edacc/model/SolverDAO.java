@@ -18,6 +18,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import edacc.manageDB.Util;
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 /**
  *
@@ -331,5 +332,26 @@ public class SolverDAO {
 
     public static void clearCache() {
         cache.clear();
+    }
+
+    /**
+     * Returns the competition categories of the solver as list of strings.
+     * @param solver
+     * @return
+     */
+    public static ArrayList<String> getCompetitionCategories(Solver solver) throws NoConnectionToDBException, SQLException {
+        ArrayList<String> res = new ArrayList<String>();
+        String query = "SELECT CompetitionCategory.name as name FROM CompetitionCategory LEFT JOIN Solver_has_CompetitionCategory "
+                + "ON idCompetitionCategory = CompetitionCategory_idCompetitionCategory "
+                + "WHERE Solver_idSolver=?;";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, solver.getId());
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            res.add(rs.getString("name"));
+        }
+        rs.close();
+        ps.close();
+        return res;
     }
 }
