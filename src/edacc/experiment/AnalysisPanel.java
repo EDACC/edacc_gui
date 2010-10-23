@@ -27,7 +27,7 @@ public class AnalysisPanel extends javax.swing.JPanel {
     private Dependency[][] dependencies;
     private static Class<Plot>[] plotClasses = (Class<Plot>[]) new Class<?>[]{
                 BoxPlot.class, ScatterOnePropertyTwoSolvers.class,
-                ScatterTwoPropertiesOneSolver.class, ScatterInstancePropertySolverProperty.class,
+                ScatterTwoPropertiesOneSolver.class, ScatterInstancePropertySolverProperty.class, 
                 CactusPlot.class, KernelDensityPlot.class,
                 RTDPlot.class, RTDsPlot.class,
                 ProbabilisticDomination.class

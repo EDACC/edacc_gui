@@ -87,7 +87,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private EDACCOutputViewer outputViewer;
     private EDACCExperimentModeJobsCellRenderer tableJobsStringRenderer;
     private ResultsBrowserTableRowSorter resultsBrowserTableRowSorter;
-    private EDACCInstanceFilter dialogFilter;
     private AnalysisPanel analysePanel;
     private Timer jobsTimer = null;
     private Integer resultBrowserETA;
@@ -1940,10 +1939,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public void btnChooseSolvers() {
         solverConfigPanel.beginUpdate();
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
-            if ((Boolean) solTableModel.getValueAt(i, 4) && !solverConfigPanel.solverExists(((Solver) solTableModel.getValueAt(i, 5)).getId())) {
-                solverConfigPanel.addSolver(solTableModel.getValueAt(i, 5));
-            } else if (!(Boolean) solTableModel.getValueAt(i, 4)) {
-                solverConfigPanel.removeSolver(solTableModel.getValueAt(i, 5));
+            if (solTableModel.isSelected(i) && !solverConfigPanel.solverExists(solTableModel.getSolver(i).getId())) {
+                solverConfigPanel.addSolver(solTableModel.getSolver(i));
+            } else if (!solTableModel.isSelected(i)) {
+                solverConfigPanel.removeSolver(solTableModel.getSolver(i));
             }
         }
         solverConfigPanel.endUpdate();
@@ -1963,21 +1962,21 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     @Action
     public void btnSelectAllSolvers() {
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
-            solTableModel.setValueAt(true, i, 4);
+            solTableModel.setSelected(i, true);
         }
     }
 
     @Action
     public void btnDeselectAll() {
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
-            solTableModel.setValueAt(false, i, 4);
+            solTableModel.setSelected(i, false);
         }
     }
 
     @Action
     public void btnReverseSolverSelection() {
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
-            solTableModel.setValueAt(!((Boolean) solTableModel.getValueAt(i, 4)), i, 4);
+            solTableModel.setSelected(i, !solTableModel.isSelected(i));
         }
     }
 

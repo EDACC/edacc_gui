@@ -100,6 +100,7 @@ public class AnalysisController {
         if (re == null || !re.isAlive()) {
             return false;
         }
+        System.out.println("SET DEVICE NUM: " + plotDevice);
         synchronized (syncR) {
             return re.eval("dev.set(which = " + plotDevice + ")").asInt() == plotDevice;
         }
@@ -129,13 +130,15 @@ public class AnalysisController {
                 return;
             }
             PlotPanel pnl = plotPanels.get(from);
+            System.out.println("MOVE " + from + " (" + pnl.getDeviceNumber() + ") to " + to);
             plotPanels.put(to, pnl);
             plotPanels.remove(from);
-            setCurrentDeviceNumber(from);
-            re.eval("dev.copy(device = JavaGD, " + to + ")");
-            setCurrentDeviceNumber(from);
-            re.eval("dev.off()");
-            pnl.gdc.setDeviceNumber(to);
+            //setCurrentDeviceNumber(from);
+            System.out.println(re.eval("dev.copy(device = JavaGD, " + from + ", " + to + ")"));
+           // pnl.gdc.setDeviceNumber(to);
+            //setCurrentDeviceNumber(from);
+            re.eval("dev.off(" + from + ")");
+            pnl.setDeviceNumber(to);
             pnl.gdc.initRefresh();
         }
     }
@@ -146,27 +149,33 @@ public class AnalysisController {
      */
     public static void closeDevice(int dev) {
         synchronized (syncR) {
+            // TODO: fix this.
             // close the device and remove the panel from the hashmap
-            setCurrentDeviceNumber(dev);
-            re.eval("dev.off()");
+           // plotPanels.get(dev).gdi.executeDevOff();
+          //  plotPanels.get(dev).gdc.cleanup();
             plotPanels.remove(dev);
-
+            //int[] devlist = re.eval("dev.list()").asIntArray();
             // rename devices ... resulting dev list is 2, 3, 4, ...
             // this has to be done due to a bug in JavaGD(?)
-            int[] devlist = re.eval("dev.list()").asIntArray();
-            if (devlist == null || devlist.length == 0) {
+            //int[] devlist = re.eval("dev.list()").asIntArray();
+            // System.out.println("LIST HERE: " + java.util.Arrays.toString(devlist));
+         /*   if (devlist == null || devlist.length == 0) {
                 return;
             }
-            int cur = 2;
+            if (devlist[devlist.length - 1] - 2 >= devlist.length) {
+                moveDevice(devlist[devlist.length - 1], dev);
+            }*/
+
+            /*  int cur = 2;
             int idx = 0;
             while (idx < devlist.length) {
-                if (devlist[idx] != cur) {
-                    plotPanels.get(devlist[idx]).setDeviceNumber(cur);
-                    moveDevice(devlist[idx], cur);
-                }
-                cur++;
-                idx++;
+            if (devlist[idx] != cur) {
+            plotPanels.get(devlist[idx]).setDeviceNumber(cur);
+            moveDevice(devlist[idx], cur);
             }
+            cur++;
+            idx++;
+            }*/
         }
     }
 
@@ -184,6 +193,7 @@ public class AnalysisController {
         synchronized (syncR) {
             res = re.eval("dev.list()").asIntArray();
         }
+        System.out.println(java.util.Arrays.toString(res));
         return res == null ? 0 : res.length;
     }
 
@@ -210,7 +220,7 @@ public class AnalysisController {
             setCurrentDeviceNumber(pnl.getDeviceNumber());
             filename = filename.replace("\\", "\\\\");
             re.eval("setEPS()");
-            re.eval("dev.print(device = postscript, file = '"+filename+"')");
+            re.eval("dev.print(device = postscript, file = '" + filename + "')");
             // TODO: revert setEPS()
         }
     }

@@ -1,17 +1,14 @@
 package edacc.experiment;
 
-import edacc.model.ComputationMethodDoesNotExistException;
+import edacc.model.DatabaseConnector;
 import edacc.model.ExperimentHasInstance;
 import edacc.model.Instance;
+import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasProperty;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
-import edacc.model.PropertyNotInDBException;
-import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.ConvertException;
-import edacc.satinstances.InstancePropertyManager;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,20 +22,58 @@ import java.util.Vector;
 public class InstanceTableModel extends AbstractTableModel {
 
     public static int COL_NAME = 0;
+    public static int COL_BENCHTYPE = 1;
     public static int COL_SELECTED = 1;
     public static int COL_PROP = 2;
-    private String[] columns = {"Name", "selected"};
+    private static final String[] columns_competition = {"Name", "Benchmark Type", "selected"};
+    private static final String[] columns_noCompetition = {"Name", "selected"};
+    private String[] columns = columns_noCompetition;
     ArrayList<Property> properties;
     protected ArrayList<Instance> instances;
     protected Vector<ExperimentHasInstance> experimentHasInstances;
     protected HashMap<Integer, ExperimentHasInstance> selectedInstances;
     protected Vector<ExperimentHasInstance> savedExperimentInstances;
+    protected String[] benchmarkTypes;
 
     public void setInstances(ArrayList<Instance> instances) {
+        boolean isCompetition;
+
+        try {
+            isCompetition = DatabaseConnector.getInstance().isCompetitionDB();
+        } catch (Exception e) {
+            isCompetition = false;
+        }
+        if (isCompetition) {
+            columns = columns_competition;
+            COL_BENCHTYPE = 1;
+            COL_SELECTED = 2;
+            COL_PROP = 3;
+        } else {
+            columns = columns_noCompetition;
+            COL_BENCHTYPE = -1;
+            COL_SELECTED = 1;
+            COL_PROP = 2;
+        }
         updateProperties();
         this.instances = instances;
         experimentHasInstances = new Vector<ExperimentHasInstance>();
         experimentHasInstances.setSize(instances.size());
+        if (instances == null) {
+            benchmarkTypes = null;
+        } else if (isCompetition) {
+
+
+            benchmarkTypes = new String[instances.size()];
+            try {
+                HashMap<Integer, String> types = InstanceDAO.getBenchmarkTypes();
+                for (int i = 0; i < instances.size(); i++) {
+                    benchmarkTypes[i] = types.get(instances.get(i).getId());
+
+                }
+            } catch (Exception e) {
+            }
+
+        }
         this.fireTableStructureChanged();
     }
 
@@ -211,25 +246,26 @@ public class InstanceTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        switch (columnIndex) {
-            case 0:
-                return instances.get(rowIndex).getName();
-            case 1:
-                return selectedInstances.containsKey(instances.get(rowIndex).getId()); //selected.get(rowIndex);
-            default:
-                int propertyIdx = columnIndex - COL_PROP;
-                if (properties.size() <= propertyIdx || instances.get(rowIndex).getPropertyValues() == null) {
-                    return null;
-                }
-                InstanceHasProperty ip = instances.get(rowIndex).getPropertyValues().get(properties.get(propertyIdx).getId());
-                if (ip == null) {
-                    return null;
-                }
-                try {
-                    return properties.get(propertyIdx).getPropertyValueType().getJavaTypeRepresentation(ip.getValue());
-                } catch (ConvertException ex) {
-                    return null;
-                }
+        if (columnIndex == COL_NAME) {
+            return instances.get(rowIndex).getName();
+        } else if (columnIndex == COL_BENCHTYPE) {
+            return benchmarkTypes[rowIndex]==null?"":benchmarkTypes[rowIndex];
+        } else if (columnIndex == COL_SELECTED) {
+            return selectedInstances.containsKey(instances.get(rowIndex).getId());
+        } else {
+            int propertyIdx = columnIndex - COL_PROP;
+            if (properties.size() <= propertyIdx || instances.get(rowIndex).getPropertyValues() == null) {
+                return null;
+            }
+            InstanceHasProperty ip = instances.get(rowIndex).getPropertyValues().get(properties.get(propertyIdx).getId());
+            if (ip == null) {
+                return null;
+            }
+            try {
+                return properties.get(propertyIdx).getPropertyValueType().getJavaTypeRepresentation(ip.getValue());
+            } catch (ConvertException ex) {
+                return null;
+            }
         }
     }
 }
