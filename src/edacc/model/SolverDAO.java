@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import edacc.manageDB.Util;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -352,6 +353,27 @@ public class SolverDAO {
         }
         rs.close();
         ps.close();
+        return res;
+    }
+
+    public static HashMap<Integer, ArrayList<String>> getCompetitionCategories() throws NoConnectionToDBException, SQLException {
+        HashMap<Integer, ArrayList<String>> res = new HashMap<Integer, ArrayList<String>>();
+        String query = "SELECT Solver_idSolver, CompetitionCategory.name as name FROM CompetitionCategory LEFT JOIN Solver_has_CompetitionCategory "
+                + "ON idCompetitionCategory = CompetitionCategory_idCompetitionCategory";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            String name = rs.getString("name");
+            Integer id = new Integer(rs.getInt("Solver_idSolver"));
+            if (!res.containsKey(id)) {
+                ArrayList<String> lst = new ArrayList<String>();
+                lst.add(name);
+                res.put(id, lst);
+            } else {
+                res.get(id).add(name);
+            }
+
+        }
         return res;
     }
 }

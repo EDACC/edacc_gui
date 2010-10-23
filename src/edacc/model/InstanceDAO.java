@@ -476,4 +476,22 @@ public class InstanceDAO {
         }
         return null;
     }
+
+    /**
+     * Returns a HashMap mapping instance IDs to their benchmark type names.
+     * @return
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     */
+    public static HashMap<Integer, String> getBenchmarkTypes() throws NoConnectionToDBException, SQLException {
+        HashMap<Integer, String> res = new HashMap<Integer, String>();
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn()
+                .prepareStatement("SELECT idInstance, BenchmarkType.name as name "
+                + "FROM BenchmarkType JOIN Instances ON idBenchmarkType=BenchmarkType_idBenchmarkType");
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            res.put(new Integer(rs.getInt("idInstance")), rs.getString("name"));
+        }
+        return res;
+    }
 }
