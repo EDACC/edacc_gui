@@ -24,7 +24,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Component id="jPanel2" alignment="0" max="32767" attributes="0"/>
-          <Component id="splitPane" alignment="0" pref="609" max="32767" attributes="0"/>
+          <Component id="splitPane" alignment="0" pref="631" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -60,7 +60,9 @@
                   <Component id="btnRefresh" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnSettings" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="384" max="32767" attributes="0"/>
+                  <EmptySpace pref="340" max="32767" attributes="0"/>
+                  <Component id="lblCoordinates" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -70,6 +72,7 @@
                   <Component id="btnSave" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnRefresh" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnSettings" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblCoordinates" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -102,6 +105,12 @@
             <Property name="name" type="java.lang.String" value="btnSettings" noResource="true"/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JLabel" name="lblCoordinates">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="lblCoordinates.text"/>
+            <Property name="name" type="java.lang.String" value="lblCoordinates" noResource="true"/>
+          </Properties>
+        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JSplitPane" name="splitPane">
@@ -123,6 +132,7 @@
           </Properties>
           <Events>
             <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="tabbedPanePlotsStateChanged"/>
+            <EventHandler event="mouseMoved" listener="java.awt.event.MouseMotionListener" parameters="java.awt.event.MouseEvent" handler="tabbedPanePlotsMouseMoved"/>
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
@@ -152,7 +162,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane2" alignment="0" pref="597" max="32767" attributes="0"/>
+                  <Component id="jScrollPane2" alignment="0" pref="617" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">

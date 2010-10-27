@@ -132,6 +132,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
     private void addPanel(TabComponent tabComp, PlotPanel pnl) {
         // title: null, icon: null, panel: pnl, tooltip: title
         tabbedPanePlots.addTab(null, null, pnl, tabComp.getTitle());
+        pnl.setParent(this);
         // replace the tab component and select this new tab
         tabbedPanePlots.setTabComponentAt(tabbedPanePlots.getTabCount() - 1, tabComp);
         tabbedPanePlots.setSelectedIndex(tabbedPanePlots.getTabCount() - 1);
@@ -467,6 +468,10 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         }
     }
 
+    public void setCoordinates(String coordinates) {
+        lblCoordinates.setText(coordinates);
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -480,6 +485,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         btnSave = new javax.swing.JButton();
         btnRefresh = new javax.swing.JButton();
         btnSettings = new javax.swing.JButton();
+        lblCoordinates = new javax.swing.JLabel();
         splitPane = new javax.swing.JSplitPane();
         tabbedPanePlots = new javax.swing.JTabbedPane();
         pnlAdditionalInformations = new javax.swing.JPanel();
@@ -506,6 +512,9 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         btnSettings.setText(resourceMap.getString("btnSettings.text")); // NOI18N
         btnSettings.setName("btnSettings"); // NOI18N
 
+        lblCoordinates.setText(resourceMap.getString("lblCoordinates.text")); // NOI18N
+        lblCoordinates.setName("lblCoordinates"); // NOI18N
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -517,14 +526,17 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                 .addComponent(btnRefresh)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSettings)
-                .addContainerGap(362, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 340, Short.MAX_VALUE)
+                .addComponent(lblCoordinates)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                 .addComponent(btnSave)
                 .addComponent(btnRefresh)
-                .addComponent(btnSettings))
+                .addComponent(btnSettings)
+                .addComponent(lblCoordinates))
         );
 
         splitPane.setDividerLocation(200);
@@ -537,6 +549,11 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         tabbedPanePlots.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 tabbedPanePlotsStateChanged(evt);
+            }
+        });
+        tabbedPanePlots.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                tabbedPanePlotsMouseMoved(evt);
             }
         });
         splitPane.setTopComponent(tabbedPanePlots);
@@ -554,7 +571,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         pnlAdditionalInformations.setLayout(pnlAdditionalInformationsLayout);
         pnlAdditionalInformationsLayout.setHorizontalGroup(
             pnlAdditionalInformationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 595, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 617, Short.MAX_VALUE)
         );
         pnlAdditionalInformationsLayout.setVerticalGroup(
             pnlAdditionalInformationsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -568,7 +585,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(splitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 609, Short.MAX_VALUE)
+            .addComponent(splitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -582,6 +599,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void tabbedPanePlotsStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tabbedPanePlotsStateChanged
+        lblCoordinates.setText("");
         if (tabbedPanePlots.getSelectedIndex() >= 0) {
             TabComponent tabComponent = (TabComponent) tabbedPanePlots.getTabComponentAt(tabbedPanePlots.getSelectedIndex());
             if (tabComponent == null) {
@@ -592,12 +610,18 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
             this.updateTitle(tabComponent.getTitle());
         }
     }//GEN-LAST:event_tabbedPanePlotsStateChanged
+
+    private void tabbedPanePlotsMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabbedPanePlotsMouseMoved
+
+    }//GEN-LAST:event_tabbedPanePlotsMouseMoved
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnSettings;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblCoordinates;
     private javax.swing.JPanel pnlAdditionalInformations;
     private javax.swing.JSplitPane splitPane;
     private javax.swing.JTabbedPane tabbedPanePlots;

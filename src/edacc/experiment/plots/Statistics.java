@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edacc.experiment.plots;
 
 import org.rosuda.JRI.REXP;

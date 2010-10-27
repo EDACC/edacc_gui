@@ -23,7 +23,7 @@ public class ExperimentResultDAO {
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idJob=?";
     protected static final String selectQuery = "SELECT SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance, "
             + "idJob, run, seed, status, resultTime, resultCode, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN, "
-            + "solverExitCode, watcherExitCode, verifierExitCode, computeQueue, TIMEDIFF(NOW(), startTime) AS runningTime, IF(status = " + ExperimentResultStatus.RUNNING.getValue() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) AS date_modified2 "
+            + "solverExitCode, watcherExitCode, verifierExitCode, computeQueue, TIMESTAMPDIFF(SECOND, startTime, NOW()) AS runningTime, IF(status = " + ExperimentResultStatus.RUNNING.getValue() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) AS date_modified "
             + "FROM " + table + " ";
 
     public static ExperimentResult createExperimentResult(int run, int status, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId) throws SQLException {
@@ -156,20 +156,11 @@ public class ExperimentResultDAO {
         r.setVerifierExitCode(rs.getInt("verifierExitCode"));
         r.setComputeQueue(rs.getInt("computeQueue"));
 
-        r.setDatemodified(rs.getTimestamp("date_modified2"));
-        if (r.getDatemodified() == null) {
-            System.out.println(r.getWatcherOutputFilename());
-            System.out.println(r.getComputeQueue());
-            System.out.println("WAAAAAAAAAAAAAAAAARNING!!");
-        }
+        r.setDatemodified(rs.getTimestamp("date_modified"));
         if (r.getStatus() == ExperimentResultStatus.RUNNING) {
-            try {
-                r.setRunningTime(rs.getTime("runningTime"));
-            } catch (Exception e) {
-                r.setRunningTime(null);
-            }
+            r.setRunningTime(rs.getInt("runningTime"));
         } else {
-            r.setRunningTime(null);
+            r.setRunningTime(0);
         }
         return r;
     }
@@ -191,10 +182,12 @@ public class ExperimentResultDAO {
     }
 
     public static Timestamp getLastModifiedByExperimentId(int id) throws NoConnectionToDBException, SQLException {
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT IF(running > 110, TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP),ermodified) FROM (select MAX(date_modified) AS ermodified FROM " + table + " WHERE Experiment_idExperiment = ?) AS tbl1 JOIN (select COUNT(*) AS running FROM " + table + " WHERE Experiment_idExperiment = ? AND status = ?) AS tbl2");
+        /*PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT IF(running > 0, TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP),ermodified) FROM (select MAX(date_modified) AS ermodified FROM " + table + " WHERE Experiment_idExperiment = ?) AS tbl1 JOIN (select COUNT(*) AS running FROM " + table + " WHERE Experiment_idExperiment = ? AND status = ?) AS tbl2");
         st.setInt(1, id);
         st.setInt(2, id);
-        st.setInt(3, ExperimentResultStatus.RUNNING.getValue());
+        st.setInt(3, ExperimentResultStatus.RUNNING.getValue());*/
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("select MAX(date_modified) AS ermodified FROM " + table + " WHERE Experiment_idExperiment = ?");
+        st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         rs.next(); // there will always be a timestamp
         Timestamp res = rs.getTimestamp(1);
@@ -263,7 +256,7 @@ public class ExperimentResultDAO {
         ArrayList<ExperimentResult> v = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery
-                + "WHERE Experiment_idExperiment=? AND (date_modified > ? OR status = " + ExperimentResultStatus.RUNNING.getValue() + ");");
+                + "WHERE Experiment_idExperiment=? AND date_modified >= ?;");
         st.setInt(1, id);
         st.setTimestamp(2, modified);
         ResultSet rs = st.executeQuery();

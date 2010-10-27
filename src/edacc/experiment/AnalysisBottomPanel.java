@@ -106,6 +106,7 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
                             plot.plot(re, panel.pointInformations);
                             AnalysisBottomPanel.this.onTaskSuccessful("plot", null);
                         } catch (final Throwable ex) {
+                            ex.printStackTrace();
                             SwingUtilities.invokeLater(new Runnable() {
 
                                 @Override
@@ -120,7 +121,7 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
             }, true, EDACCPlotTabView.getMainTabView());
         } catch (REngineInitializationException ex) {
             javax.swing.JOptionPane.showMessageDialog(null, "Error while initializing R: " + ex.getMessage(), "Initialization Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-        }
+        } 
 
     }
 

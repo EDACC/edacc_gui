@@ -4,9 +4,7 @@ import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultStatus;
 import edacc.model.Instance;
-import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
-import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import edacc.model.Property;
 import java.util.ArrayList;
@@ -71,14 +69,12 @@ public class CactusPlot extends Plot {
             comboRun.addItem(i);
         }
         comboProperty.removeAllItems();
-        for (Property sp : getResultProperties()) {
+        for (Property sp : expController.getResultProperties()) {
             comboProperty.addItem(sp);
         }
-        ArrayList<Instance> instances = new ArrayList<Instance>();
-        instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
-        instanceSelector.setInstances(instances);
+        instanceSelector.setInstances(expController.getInstances());
         instanceSelector.btnSelectAll();
-        solverConfigurationSelector.setSolverConfigurations(SolverConfigurationDAO.getSolverConfigurationByExperimentId(expController.getActiveExperiment().getId()));
+        solverConfigurationSelector.setSolverConfigurations(expController.getSolverConfigurations());
         solverConfigurationSelector.btnSelectAll();
     }
 
@@ -142,9 +138,6 @@ public class CactusPlot extends Plot {
                     }
                     if (value != null) {
                         resultValues.add(value);
-                    }
-                    if (value == null || results.size() != expController.getActiveExperiment().getNumRuns()) {
-                        // TODO: warning
                     }
                 } else {
                     ExperimentResult res = expController.getResult(sc.getId(), instanceId, run);

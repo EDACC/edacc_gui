@@ -95,9 +95,9 @@ public class PropertyDAO {
                 res.setRegularExpression(getRegularExpressions(id));
                 res.setValueType(PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(rs.getString(5)));
                 res.setMultiple(rs.getBoolean(6));
-                if(res.getRegularExpression().isEmpty())
-                    res.setComputationMethod(ComputationMethodDAO.getById(rs.getInt(7)));
-                else
+             //   if(res.getRegularExpression().isEmpty())
+               //     res.setComputationMethod(ComputationMethodDAO.getById(rs.getInt(7)));
+              //  else
                     res.setComputationMethod(null);
                 res.setComputationMethodParameters(rs.getString(8));
             }else{

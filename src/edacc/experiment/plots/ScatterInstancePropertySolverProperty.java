@@ -1,11 +1,8 @@
 package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
-import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.Instance;
-import edacc.model.InstanceDAO;
-import edacc.model.InstanceProperty;
 import edacc.model.SolverConfiguration;
 import edacc.model.Property;
 import java.awt.geom.Point2D;
@@ -69,7 +66,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
         comboInstanceProperty.removeAllItems();
         comboSolverProperty.removeAllItems();
         comboSolver.removeAllItems();
-        for (SolverConfiguration solConfig : ExperimentDAO.getSolverConfigurationsInExperiment(expController.getActiveExperiment())) {
+        for (SolverConfiguration solConfig : expController.getSolverConfigurations()) {
             comboSolver.addItem(solConfig);
         }
         comboRun.addItem("all runs - average");
@@ -78,15 +75,13 @@ public class ScatterInstancePropertySolverProperty extends Plot {
         for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
             comboRun.addItem(i);
         }
-        for (Property sProp : getResultProperties()) {
+        for (Property sProp : expController.getResultProperties()) {
             comboSolverProperty.addItem(sProp);
         }
-        for (Property iProp : getInstanceProperties()) {
+        for (Property iProp : expController.getInstanceProperties()) {
             comboInstanceProperty.addItem(iProp);
         }
-        ArrayList<Instance> instances = new ArrayList<Instance>();
-        instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
-        instanceSelector.setInstances(instances);
+        instanceSelector.setInstances(expController.getInstances());
         instanceSelector.btnSelectAll();
     }
 
@@ -161,7 +156,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
                     // add the values and set the point information; the right point coordinates will be set later
                     xsVec.add(xsValue);
                     ysVec.add(ysValue);
-                    pointInformations.add(new PointInformation(new Point2D.Double(), "<html>"
+                    pointInformations.add(new PointInformation(new Point2D.Double(xsValue, ysValue), "<html>"
                             + instance.getName() + " (" + instanceProperty + "): " + (double) Math.round(xsValue * 100) / 100 + "<br>"
                             + solverConfig.toString() + " (" + solverProperty + "): " + (double) Math.round(ysValue * 100) / 100 + "<br>"
                             + "Run: " + yres.getRun() + "<br>"
@@ -190,7 +185,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
                 // add the values and specify the point information
                 xsVec.add(xsValue);
                 ysVec.add(ysValue);
-                pointInformations.add(new PointInformation(new Point2D.Double(), "<html>"
+                pointInformations.add(new PointInformation(new Point2D.Double(xsValue, ysValue), "<html>"
                         + instance.getName() + " (" + instanceProperty + "): " + (double) Math.round(xsValue * 100) / 100 + "<br>"
                         + solverConfig.toString() + " (" + solverProperty + "): " + (double) Math.round(ysValue * 100) / 100 + "<br>"
                         + "Instance: " + instance.getName()
@@ -224,7 +219,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
                 // add the values and specify the point information
                 xsVec.add(xsValue);
                 ysVec.add(ysValue);
-                pointInformations.add(new PointInformation(new Point2D.Double(), "<html>"
+                pointInformations.add(new PointInformation(new Point2D.Double(xsValue, ysValue), "<html>"
                         + instance.getName() + " (" + instanceProperty + "): " + (double) Math.round(xsValue * 100) / 100 + "<br>"
                         + solverConfig.toString() + " (" + solverProperty + "): " + (double) Math.round(ysValue * 100) / 100 + "<br>"
                         + "Instance: " + instance.getName()
@@ -299,11 +294,6 @@ public class ScatterInstancePropertySolverProperty extends Plot {
                     + "Correlation Coefficient: " + pearson[1] + "<br>"
                     + "p-value: " + pearson[0] + "<br>";
         } else {
-        }
-        ArrayList<Point2D> points = getPoints(re, xs, ys);
-        int k = 0;
-        for (Point2D point : points) {
-            pointInformations.get(k++).getPoint().setLocation(point);
         }
     }
 

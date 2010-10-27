@@ -1,10 +1,8 @@
 package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
-import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.Instance;
-import edacc.model.InstanceDAO;
 import edacc.model.Property;
 import edacc.model.SolverConfiguration;
 import java.util.ArrayList;
@@ -48,13 +46,13 @@ public class KernelDensityPlot extends Plot {
         comboSolver.removeAllItems();
         comboInstance.removeAllItems();
         comboProperty.removeAllItems();
-        for (SolverConfiguration sc : ExperimentDAO.getSolverConfigurationsInExperiment(expController.getActiveExperiment())) {
+        for (SolverConfiguration sc : expController.getSolverConfigurations()) {
             comboSolver.addItem(sc);
         }
-        for (Instance i : InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId())) {
+        for (Instance i : expController.getInstances()) {
             comboInstance.addItem(i);
         }
-        for (Property p : getResultProperties()) {
+        for (Property p : expController.getResultProperties()) {
             comboProperty.addItem(p);
         }
     }
@@ -100,8 +98,9 @@ public class KernelDensityPlot extends Plot {
         }
         engine.assign("results", results);
         // TODO: CONSTANT!!
-        engine.eval("plot(npudens(results),main='', xaxt='n', yaxt='n',xlab='', ylab='', xaxs='i', yaxs='i', las=1)");
-
+        engine.eval("d <- npudens(results)");
+        engine.eval("d$bws$xnames = '" + property.getName() + "'");
+        engine.eval("plot(d,main='', xaxt='n', yaxt='n', xaxs='i', yaxs='i', las=1)");
         // plot labels and axes
         engine.eval("mtext('Nonparametric kernel density estimation',padj=1, side=3, line=3, cex=1.7)"); // plot title
     }

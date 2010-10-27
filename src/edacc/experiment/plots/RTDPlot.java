@@ -1,10 +1,8 @@
 package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
-import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.Instance;
-import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import edacc.model.Property;
 import java.util.ArrayList;
@@ -52,15 +50,15 @@ public class RTDPlot extends Plot {
         combo1.removeAllItems();
         combo2.removeAllItems();
         comboInstance.removeAllItems();
-        for (SolverConfiguration solConfig : ExperimentDAO.getSolverConfigurationsInExperiment(expController.getActiveExperiment())) {
+        for (SolverConfiguration solConfig : expController.getSolverConfigurations()) {
             combo1.addItem(solConfig);
             combo2.addItem(solConfig);
         }
 
-        for (Instance i : InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId())) {
+        for (Instance i : expController.getInstances()) {
             comboInstance.addItem(i);
         }
-        for (Property p : getResultProperties()) {
+        for (Property p : expController.getResultProperties()) {
             comboProperty.addItem(p);
         }
     }
@@ -93,7 +91,6 @@ public class RTDPlot extends Plot {
         ArrayList<Double> resultsDouble2 = new ArrayList<Double>();
         int firstNoResult = 0;
         int secondNoResult = 0;
-        // TODO: continue fix!
         for (int i = 0; i < results1.size(); i++) {
             Double tmp = expController.getValue(results1.get(i), property);
             if (tmp == null) {
@@ -154,10 +151,10 @@ public class RTDPlot extends Plot {
                 + "pch=c(0,1), lty=1)");
         infos = htmlHeader;
         double[] kolmogorow = Statistics.kolmogorowSmirnow2sampleTest(engine, "results1", "results2");
-        infos += "<h2>Kolmogorow-Smirnow two-sample test</h2>";
         if (kolmogorow != null) {
-            infos += "H0: RTD1 = RTD2<br>"
-                    + "H1: RTD1 != RTD2<br>"
+            infos += "<h2>Kolmogorow-Smirnow two-sample test</h2>";
+            infos += "H0: RPD1 = RPD2<br>"
+                    + "H1: RPD1 != RPD2<br>"
                     + "Statistic: " + kolmogorow[0] + "<br>"
                     + "p-value: " + kolmogorow[1] + " (two-sided)<br>";
         } else {
@@ -165,13 +162,21 @@ public class RTDPlot extends Plot {
         double[] wilcox = Statistics.wilcoxTest(engine, "results1", "results2");
         if (wilcox != null) {
             infos += "<h2>Mann-Whitney-U Test (Wilcoxon rank sum test)</h2>"
-                    + "H0: RTD1 = RTD2<br>"
-                    + "H1: RTD1 != RTD2<br>"
+                    + "H0: RPD1 = RPD2<br>"
+                    + "H1: RPD1 != RPD2<br>"
                     + "Statistic: " + wilcox[0] + "<br>"
                     + "p-value: " + wilcox[1] + " (two-sided)<br>";
         } else {
         }
-        // TODO: warnings
+        if (firstNoResult > 0 || secondNoResult > 0) {
+            infos += "<h2>Warning</h2>";
+            if (firstNoResult > 0) {
+                infos += "Solver " + sc1.getName() + " has not solved or no result property calculated for " + firstNoResult + " runs.<br>";
+            }
+            if (secondNoResult > 0) {
+                infos += "Solver " + sc2.getName() + " has not solved or no result property calculated for " + secondNoResult + " runs.<br>";
+            }
+        }
         infos += htmlFooter;
     }
 

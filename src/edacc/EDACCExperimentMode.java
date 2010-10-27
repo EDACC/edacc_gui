@@ -14,8 +14,6 @@ import edacc.experiment.ExperimentResultsBrowserTableModel;
 import edacc.experiment.ExperimentTableModel;
 import edacc.experiment.InstanceTableModel;
 import edacc.experiment.SolverTableModel;
-import edacc.filter.InstanceFilter;
-import edacc.filter.JobsFilter;
 import edacc.gridqueues.GridQueuesController;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
@@ -25,7 +23,6 @@ import edacc.model.ExperimentResultStatus;
 import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.PropertyNotInDBException;
-import edacc.model.Solver;
 import edacc.model.TaskCancelledException;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
@@ -81,9 +78,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public ExperimentResultsBrowserTableModel jobsTableModel;
     public EDACCSolverConfigPanel solverConfigPanel;
     public TableRowSorter<InstanceTableModel> sorter;
-    public JobsFilter resultBrowserRowFilter;
+    public EDACCJobsFilter resultBrowserRowFilter;
     //  private EDACCExperimentModeVirtualExperimentSettings pnlVirtualExperimentSettings = new EDACCExperimentModeVirtualExperimentSettings();
-    private InstanceFilter instanceFilter;
+    private EDACCInstanceFilter instanceFilter;
     private EDACCOutputViewer outputViewer;
     private EDACCExperimentModeJobsCellRenderer tableJobsStringRenderer;
     private ResultsBrowserTableRowSorter resultsBrowserTableRowSorter;
@@ -155,7 +152,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
             @Override
             public void run() {
-                instanceFilter = new InstanceFilter(EDACCApp.getApplication().getMainFrame(), true, tableInstances, true);
+                instanceFilter = new EDACCInstanceFilter(EDACCApp.getApplication().getMainFrame(), true, tableInstances, true);
                 instanceClassModel = new ExperimentInstanceClassTableModel(insTableModel, instanceFilter, expController);
                 tableInstanceClasses.setModel(instanceClassModel);
             }
@@ -187,7 +184,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
             @Override
             public void run() {
-                resultBrowserRowFilter = new JobsFilter(EDACCApp.getApplication().getMainFrame(), true, tableJobs, false);
+                resultBrowserRowFilter = new EDACCJobsFilter(EDACCApp.getApplication().getMainFrame(), true, tableJobs, false);
             }
         });
 
@@ -323,7 +320,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public void reinitializeExperiments() {
         expTableModel.setExperiments(null);
     }
-    
+
     public void reinitializeInstances() {
         btnDeselectAllInstnaceClassesActionPerformed(null);
         instanceFilter.clearFilters();
@@ -1569,7 +1566,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                         @Override
                         public void run(Tasks task) {
                             try {
-                            expController.loadJobs();
+                                expController.loadJobs();
                             } catch (Throwable e) {
                                 EDACCExperimentMode.this.onTaskFailed("loadJobs", e);
                             }
@@ -1580,11 +1577,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                                 public void run() {
                                     EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
                                 }
-
                             });
 
                         }
-
                     });
                 }
             });
@@ -2082,10 +2077,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             if (er.getStatus().getValue() >= 1) {
                 count++;
                 avgTime += er.getResultTime();
-            } else if (er.getStatus().equals(ExperimentResultStatus.RUNNING) && er.getRunningTime() != null) {
-                curRunningTime += er.getRunningTime().getSeconds()
-                        + er.getRunningTime().getMinutes() * 60
-                        + er.getRunningTime().getHours() * 60 * 60;
+            } else if (er.getStatus().equals(ExperimentResultStatus.RUNNING)) {
+                curRunningTime += er.getRunningTime();
             }
         }
         String ETA = null;

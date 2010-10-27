@@ -5,11 +5,9 @@ import edacc.model.ExperimentHasInstance;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasProperty;
-import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
 import edacc.satinstances.ConvertException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
@@ -61,8 +59,6 @@ public class InstanceTableModel extends AbstractTableModel {
         if (instances == null) {
             benchmarkTypes = null;
         } else if (isCompetition) {
-
-
             benchmarkTypes = new String[instances.size()];
             try {
                 HashMap<Integer, String> types = InstanceDAO.getBenchmarkTypes();

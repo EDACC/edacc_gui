@@ -100,7 +100,6 @@ public class AnalysisController {
         if (re == null || !re.isAlive()) {
             return false;
         }
-        System.out.println("SET DEVICE NUM: " + plotDevice);
         synchronized (syncR) {
             return re.eval("dev.set(which = " + plotDevice + ")").asInt() == plotDevice;
         }
@@ -121,7 +120,17 @@ public class AnalysisController {
             ycoord = re.eval("grconvertY(" + point.getY() + ", from = \"user\", to = \"device\")");
         }
         return new Point2D.Double(xcoord.asDouble(), ycoord.asDouble());
+    }
 
+    public static Point2D convertPointToUserCoordinates(int dev, Point2D point) {
+        REXP xcoord;
+        REXP ycoord;
+        synchronized (syncR) {
+            setCurrentDeviceNumber(dev);
+            xcoord = re.eval("grconvertX(" + point.getX() + ", from = \"device\", to = \"user\")");
+            ycoord = re.eval("grconvertY(" + point.getY() + ", from = \"device\", to = \"user\")");
+        }
+        return new Point2D.Double(xcoord.asDouble(), ycoord.asDouble());
     }
 
     private static void moveDevice(int from, int to) {

@@ -3,10 +3,8 @@ package edacc.experiment.plots;
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentResult;
 import edacc.model.Instance;
-import edacc.model.InstanceDAO;
 import edacc.model.Property;
 import edacc.model.SolverConfiguration;
-import edacc.model.SolverConfigurationDAO;
 import java.util.ArrayList;
 import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
@@ -48,14 +46,12 @@ public class BoxPlot extends Plot {
     }
 
     public static void loadDefaultValues(ExperimentController expController) throws Exception {
-        ArrayList<Instance> _instances = new ArrayList<Instance>();
-        _instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
-        instanceSelector.setInstances(_instances);
+        instanceSelector.setInstances(expController.getInstances());
         instanceSelector.btnSelectAll();
-        solverConfigurationSelector.setSolverConfigurations(SolverConfigurationDAO.getSolverConfigurationByExperimentId(expController.getActiveExperiment().getId()));
+        solverConfigurationSelector.setSolverConfigurations(expController.getSolverConfigurations());
         solverConfigurationSelector.btnSelectAll();
         comboProperty.removeAllItems();
-        for (Property p : getResultProperties()) {
+        for (Property p : expController.getResultProperties()) {
             comboProperty.addItem(p);
         }
     }
@@ -92,7 +88,7 @@ public class BoxPlot extends Plot {
         ArrayList<String> warnings = new ArrayList<String>();
         String[] names = new String[solverConfigs.size()];
         for (SolverConfiguration sc : solverConfigs) {
-          //  int penalties = 0;
+            int noProp = 0;
             ArrayList<ExperimentResult> results = new ArrayList<ExperimentResult>();
             for (Instance i : instances) {
                 results.addAll(expController.getResults(sc.getId(), i.getId()));
@@ -101,7 +97,7 @@ public class BoxPlot extends Plot {
             for (ExperimentResult er : results) {
                 Double value = expController.getValue(er, property);
                 if (value == null) {
-                    // TODO!
+                    noProp++;
                 } else {
                     values.add(value);
                 }
@@ -110,16 +106,11 @@ public class BoxPlot extends Plot {
             for (int i = 0; i < values.size(); i++) {
                 times[i] = values.get(i);
             }
-            // penalty for not solving the instance.
-            /*for (int i = results.size(); i < expController.getActiveExperiment().getNumRuns() * instances.size(); i++) {
-                penalties++;
-                times[i] = expController.getActiveExperiment().getCPUTimeLimit();
-            }*/
             names[k] = sc.getName();
             engine.assign("res_" + (k++), times);
-           /* if (penalties > 0) {
-                warnings.add("Solver " + sc.getName() + " got " + penalties + " penalties.");
-            }*/
+            if (noProp > 0) {
+                warnings.add("Solver " + sc.getName() + " didn't solve or has no result property calculated for " + noProp + " runs.");
+            }
         }
 
         String data = "";
@@ -135,7 +126,6 @@ public class BoxPlot extends Plot {
         if (warnings.size() > 0) {
             warning = htmlHeader
                     + "<h2>Warning</h2>";
-            warning += "Some solvers got the penalty of " + expController.getActiveExperiment().getCPUTimeLimit() + "s for not solving some instances:<br>";
             for (String w : warnings) {
                 warning += w + "<br>";
             }

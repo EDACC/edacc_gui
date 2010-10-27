@@ -6,6 +6,8 @@
 package edacc;
 
 import edacc.model.DatabaseConnector;
+import edacc.model.TaskRunnable;
+import edacc.model.Tasks;
 import java.awt.event.KeyEvent;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
@@ -47,6 +49,8 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         txtUsername = new javax.swing.JTextField();
         txtPort = new javax.swing.JTextField();
         lblPassword = new javax.swing.JLabel();
+        chkUseSSL = new javax.swing.JCheckBox();
+        lblPassword1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCDatabaseSettingsView.class);
@@ -166,24 +170,34 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         lblPassword.setName("lblPassword"); // NOI18N
         lblPassword.setPreferredSize(new java.awt.Dimension(100, 17));
 
+        chkUseSSL.setText(resourceMap.getString("chkUseSSL.text")); // NOI18N
+        chkUseSSL.setName("chkUseSSL"); // NOI18N
+
+        lblPassword1.setLabelFor(txtPassword);
+        lblPassword1.setText(resourceMap.getString("lblPassword1.text")); // NOI18N
+        lblPassword1.setName("lblPassword1"); // NOI18N
+        lblPassword1.setPreferredSize(new java.awt.Dimension(100, 17));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblHostname, javax.swing.GroupLayout.PREFERRED_SIZE, 82, Short.MAX_VALUE)
                     .addComponent(lblDatabase, 0, 0, Short.MAX_VALUE)
                     .addComponent(lblUsername, 0, 0, Short.MAX_VALUE)
-                    .addComponent(lblPassword, 0, 0, Short.MAX_VALUE))
+                    .addComponent(lblPassword, 0, 0, Short.MAX_VALUE)
+                    .addComponent(lblPassword1, 0, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkUseSSL)
                     .addComponent(txtUsername, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
                     .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(txtHostname, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
                         .addComponent(lblPort, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtPort, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -211,6 +225,10 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(lblPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkUseSSL)
+                    .addComponent(lblPassword1, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -251,15 +269,21 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
-        try {
-            DatabaseConnector.getInstance().connect(txtHostname.getText(), Integer.parseInt(txtPort.getText()), txtUsername.getText(), txtDatabase.getText(), txtPassword.getText());
-            this.setVisible(false);
-        } catch (ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(this, "Couldn't find the MySQL jdbc driver Connector-J. Make sure it's in your Java class path", "Database driver not found", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Couldn't connect to the database: \n\n" + e.getMessage(), "Connection error", JOptionPane.ERROR_MESSAGE);
-        }
+        Tasks.startTask(new TaskRunnable() {
 
+            @Override
+            public void run(Tasks task) {
+                try {
+                    DatabaseConnector.getInstance().connect(txtHostname.getText(), Integer.parseInt(txtPort.getText()), txtUsername.getText(), txtDatabase.getText(), txtPassword.getText(), chkUseSSL.isSelected());
+                    EDACCDatabaseSettingsView.this.setVisible(false);
+                } catch (ClassNotFoundException e) {
+                    JOptionPane.showMessageDialog(EDACCDatabaseSettingsView.this, "Couldn't find the MySQL jdbc driver Connector-J. Make sure it's in your Java class path", "Database driver not found", JOptionPane.ERROR_MESSAGE);
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(EDACCDatabaseSettingsView.this, "Couldn't connect to the database: \n\n" + e.getMessage(), "Connection error", JOptionPane.ERROR_MESSAGE);
+                }
+
+            }
+        });
     }//GEN-LAST:event_btnConnectActionPerformed
 
     private void txtHostnameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtHostnameKeyPressed
@@ -268,8 +292,9 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
 //            txtPort.requestFocus();
 //            txtPort.selectAll();
 //        }
-         if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
         {
+            evt.consume();
             btnConnectActionPerformed(null);
         }
 
@@ -281,8 +306,9 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
 //            txtDatabase.requestFocus();
 //            txtDatabase.selectAll();
 //        }
-         if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
         {
+            evt.consume();
             btnConnectActionPerformed(null);
         }
     }//GEN-LAST:event_txtPortKeyPressed
@@ -293,8 +319,9 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
 //            txtUsername.requestFocus();
 //            txtUsername.selectAll();
 //        }
-         if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
         {
+            evt.consume();
             btnConnectActionPerformed(null);
         }
     }//GEN-LAST:event_txtDatabaseKeyPressed
@@ -305,8 +332,9 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
 //            txtPassword.requestFocus();
 //            txtPassword.selectAll();
 //        }
-         if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
         {
+            evt.consume();
             btnConnectActionPerformed(null);
         }
     }//GEN-LAST:event_txtUsernameKeyPressed
@@ -314,6 +342,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
     private void txtPasswordKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPasswordKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
         {
+            evt.consume();
             btnConnectActionPerformed(null);
         }
     }//GEN-LAST:event_txtPasswordKeyPressed
@@ -321,6 +350,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
     private void btnConnectKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnConnectKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
         {
+            evt.consume();
             btnConnectActionPerformed(null);
         }
     }//GEN-LAST:event_btnConnectKeyPressed
@@ -328,7 +358,8 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
     private void btnCancelKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnCancelKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB
         {
-        btnCancelActionPerformed(null);
+            evt.consume();
+            btnCancelActionPerformed(null);
         }
 
     }//GEN-LAST:event_btnCancelKeyPressed
@@ -336,14 +367,15 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
     private void txtDatabaseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDatabaseActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtDatabaseActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnConnect;
+    private javax.swing.JCheckBox chkUseSSL;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblDatabase;
     private javax.swing.JLabel lblHostname;
     private javax.swing.JLabel lblPassword;
+    private javax.swing.JLabel lblPassword1;
     private javax.swing.JLabel lblPort;
     private javax.swing.JLabel lblUsername;
     private javax.swing.JTextField txtDatabase;

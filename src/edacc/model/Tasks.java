@@ -34,6 +34,9 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
      * @param view The corresponding view which implements EDACCTaskEvents to have control over this task.
      */
     public static void startTask(String methodName, Class[] signature, Object[] parameters, Object target, TaskEvents view, boolean withTaskView) {
+        if (withTaskView && taskView != null) {
+            return;
+        }
         synchronized (syncTasks) {
             taskView = null;
             Tasks task = new Tasks(org.jdesktop.application.Application.getInstance(EDACCApp.class), methodName, signature, parameters, target, view);
@@ -87,12 +90,15 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
     public static void startTask(TaskRunnable runnable) {
         startTask(runnable, true);
     }
-    
+
     public static void startTask(TaskRunnable runnable, boolean withTaskView) {
         startTask(runnable, true, EDACCApp.getApplication().getMainFrame());
     }
 
     public static void startTask(TaskRunnable runnable, boolean withTaskView, JFrame parent) {
+        if (withTaskView && taskView != null) {
+            return;
+        }
         synchronized (syncTasks) {
             taskView = null;
             Tasks task = new Tasks(runnable);
@@ -118,6 +124,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
                     }
                 });
             }
+
             ApplicationContext appC = Application.getInstance().getContext();
             appC.getTaskService().execute(task);
             appC.getTaskMonitor().setForegroundTask(task);
@@ -146,9 +153,11 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
                 try {
                     runnable.run(this);
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
                 if (taskView != null) {
                     taskView.dispose();
+                    taskView = null;
                 }
                 return null;
             } else {
@@ -168,6 +177,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
                     final Object res = target.getClass().getDeclaredMethod(methodName, signature).invoke(target, parameters);
                     if (taskView != null) {
                         taskView.dispose();
+                        taskView = null;
                     }
                     SwingUtilities.invokeLater(new Runnable() {
 
@@ -180,6 +190,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
                 } catch (final java.lang.reflect.InvocationTargetException e) {
                     if (taskView != null) {
                         taskView.dispose();
+                        taskView = null;
                     }
                     SwingUtilities.invokeLater(new Runnable() {
 

@@ -2,7 +2,7 @@ package edacc.experiment.plots;
 
 import edacc.EDACCApp;
 import edacc.experiment.InstanceTableModel;
-import edacc.filter.InstanceFilter;
+import edacc.EDACCInstanceFilter;
 import edacc.model.Instance;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -33,7 +33,7 @@ public class InstanceSelector extends JPanel {
     private JTable table;
     private InstanceTableModel tableModel;
     private JButton btnFilter, btnSelectAll, btnDeselectAll, btnInvert;
-    private InstanceFilter rowFilter;
+    private EDACCInstanceFilter rowFilter;
     private TableRowSorter<InstanceTableModel> sorter;
     private JLabel lblFilter;
     private boolean updateTableColumnWidth;
@@ -50,7 +50,7 @@ public class InstanceSelector extends JPanel {
 
             @Override
             public void run() {
-                rowFilter = new InstanceFilter(EDACCApp.getApplication().getMainFrame(), true, table, true);
+                rowFilter = new EDACCInstanceFilter(EDACCApp.getApplication().getMainFrame(), true, table, true);
                 rowFilter.setFilterInstanceClasses(false);
             }
         });
