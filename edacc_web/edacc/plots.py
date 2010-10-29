@@ -8,39 +8,37 @@
     :copyright: (c) 2010 by Daniel Diepold.
     :license: MIT, see LICENSE for details.
 """
-
+from functools import wraps
 from rpy2 import robjects
 from rpy2.robjects.packages import importr
 
 grdevices = importr('grDevices') # plotting target devices
 np = importr('np') # non-parametric kernel smoothing methods
 stats = importr('stats') # statistical methods
+robjects.r("library('np')")
 
 robjects.r.setEPS() # set some default options for postscript in EPS format
 
 from threading import Lock
 global_lock = Lock()
 
-class synchronized(object):
-    """ Thread synchronization decorator using a global Lock object.
-        Allows only one thread to execute the decorated function at any point
-        in time.
+def synchronized(f):
+    """Thread synchronization decorator. Only allows exactly one thread
+    to enter the wrapped function at any given point in time.
     """
-    def __init__(self, *args):
-        self.lock = global_lock
-    def __call__(self, f):
-        def lockedfunc(*args, **kwargs):
+    @wraps(f)
+    def lockedfunc(*args, **kwargs):
+        try:
+            global_lock.acquire()
             try:
-                self.lock.acquire()
-                try:
-                    return f(*args, **kwargs)
-                except Exception, e:
-                    raise
-            finally:
-                self.lock.release()
-        return lockedfunc
+                return f(*args, **kwargs)
+            except Exception, e:
+                raise
+        finally:
+            global_lock.release()
+    return lockedfunc
 
-@synchronized()
+@synchronized
 def scatter(points, xlabel, ylabel, title, max_x, max_y, filename, format='png', xscale='', yscale='', diagonal_line=False, dim=700):
     """ Scatter plot of the points given in the list :points:
         Each element of points should be a tuple (x, y).
@@ -139,7 +137,7 @@ def scatter(points, xlabel, ylabel, title, max_x, max_y, filename, format='png',
     return pts
 
 
-@synchronized()
+@synchronized
 def cactus(solvers, max_x, max_y, ylabel, title, filename, format='png'):
     """ Cactus plot of the passed solvers configurations. `solvers` has to be
         a list of dictionaries with the keys `xs`, `ys` and `name`. For each
@@ -210,7 +208,7 @@ def cactus(solvers, max_x, max_y, ylabel, title, filename, format='png'):
     grdevices.dev_off()
 
 
-@synchronized()
+@synchronized
 def result_property_comparison(results1, results2, solver1, solver2, result_property_name, filename, format='png', dim=700):
     """Result property distribution comparison.
     Plots an cumulative empirical distribution function for the result vectors
@@ -223,6 +221,12 @@ def result_property_comparison(results1, results2, solver1, solver2, result_prop
         grdevices.bitmap(file=filename, type="pdfwrite")
     elif format == 'eps':
         grdevices.postscript(file=filename)
+
+    if len(results1) == len(results2) == 0:
+        robjects.r.frame()
+        robjects.r.mtext('not enough data', padj=5, side=3, line=3, cex=1.7)
+        grdevices.dev_off()
+        return
 
     max_x = max([max(results1), max(results2)])
 
@@ -262,8 +266,8 @@ def result_property_comparison(results1, results2, solver1, solver2, result_prop
     grdevices.dev_off()
 
 
-@synchronized()
-def rtds(results, filename, format='png'):
+@synchronized
+def property_distributions(results, filename, property_name, format='png'):
     """Runtime distribution plots for multiple result vectors.
     results is expected to be a list of tuples (sc, data)
     where data is the result vector of the solver configuration sc.
@@ -276,7 +280,7 @@ def rtds(results, filename, format='png'):
     elif format == 'eps':
         grdevices.postscript(file=filename)
 
-    max_x = max([max(r[1]) for r in results])
+    max_x = max([max(r[1] or [0]) for r in results] or [0])
 
     # plot without data to create the frame
     robjects.r.plot(robjects.FloatVector([]), robjects.FloatVector([]),
@@ -295,20 +299,21 @@ def rtds(results, filename, format='png'):
     # plot the distributions
     point_style = 0
     for res in results:
-        robjects.r.plot(robjects.r.ecdf(robjects.FloatVector(res[1])),
-                        main='', col=colors[point_style], pch=point_style,
-                        xlab='', ylab='', xaxs='i', yaxs='i', las=1,
-                        xaxt='n', yaxt='n',
-                        xlim=robjects.r.c(0.0,max_x), ylim=robjects.r.c(-0.05, 1.05))
-        robjects.r.par(new=1)
-        point_style += 1
+        if len(res[1]) > 0:
+            robjects.r.plot(robjects.r.ecdf(robjects.FloatVector(res[1])),
+                            main='', col=colors[point_style], pch=point_style,
+                            xlab='', ylab='', xaxs='i', yaxs='i', las=1,
+                            xaxt='n', yaxt='n',
+                            xlim=robjects.r.c(0.0,max_x), ylim=robjects.r.c(-0.05, 1.05))
+            robjects.r.par(new=1)
+            point_style += 1
 
     # plot labels and axes
-    robjects.r.mtext('CPU Time (s)', side=1,
+    robjects.r.mtext(property_name, side=1,
                      line=3, cex=1.2) # bottom axis label
-    robjects.r.mtext('P(solve within x seconds)', side=2, padj=0,
+    robjects.r.mtext('P(X <= x)', side=2, padj=0,
                      line=3, cex=1.2) # left axis label
-    robjects.r.mtext('Runtime Distributions',
+    robjects.r.mtext(property_name + ' distributions',
                      padj=1, side=3, line=3, cex=1.7) # plot title
 
     # plot legend
@@ -320,8 +325,8 @@ def rtds(results, filename, format='png'):
     grdevices.dev_off()
 
 
-@synchronized()
-def box_plot(data, filename, format='png'):
+@synchronized
+def box_plot(data, filename, property_label, format='png'):
     """Box plot for multiple result vectors.
 
     :param data: data dictionary with one entry for each result vector, the
@@ -335,20 +340,28 @@ def box_plot(data, filename, format='png'):
     elif format == 'eps':
         grdevices.postscript(file=filename)
 
+    any_data = False
     for key in data:
+        if len(data[key]) > 0:
+            any_data = True
         data[key] = robjects.FloatVector(data[key])
 
-    robjects.r.boxplot(robjects.DataFrame(data), main="", horizontal=True)
+    if any_data:
+        robjects.r.boxplot(robjects.Vector([data[k] for k in data]), main="",
+                           names=robjects.StrVector([key for key in data]), horizontal=True)
+        robjects.r.mtext(property_label, side=1,
+                         line=3, cex=1.2) # bottom axis label
+    else:
+        robjects.r.frame()
+        robjects.r.mtext('not enough data', padj=5, side=3, line=3, cex=1.7)
 
-    robjects.r.mtext('CPU Time (s)', side=1,
-                     line=3, cex=1.2) # bottom axis label
 
     grdevices.dev_off()
 
 
-@synchronized()
-def rtd(results, filename, format='png'):
-    """Plot of a single runtime distribution.
+@synchronized
+def property_distribution(results, filename, property_name, format='png'):
+    """Plot of a single property distribution.
 
     :param results: result vector
     """
@@ -370,24 +383,27 @@ def rtd(results, filename, format='png'):
                     xlab='',ylab='', **{'cex.main': 1.5})
     robjects.r.par(new=1)
 
-    robjects.r.plot(robjects.r.ecdf(robjects.FloatVector(results)),
-                    main='', xaxt='n', yaxt='n',
-                    xlab='', ylab='', xaxs='i', yaxs='i', las=1,
-                    xlim=robjects.r.c(0,max_x), ylim=robjects.r.c(-0.05, 1.05))
+    if len(results) > 0:
+        robjects.r.plot(robjects.r.ecdf(robjects.FloatVector(results or [0])),
+                        main='', xaxt='n', yaxt='n',
+                        xlab='', ylab='', xaxs='i', yaxs='i', las=1,
+                        xlim=robjects.r.c(0,max_x), ylim=robjects.r.c(-0.05, 1.05))
 
-    # plot labels and axes
-    robjects.r.mtext('CPU Time (s)', side=1,
-                     line=3, cex=1.2) # bottom axis label
-    robjects.r.mtext('P(solve within x seconds)', side=2, padj=0,
-                     line=3, cex=1.2) # left axis label
-    robjects.r.mtext('Runtime Distribution',
-                     padj=1, side=3, line=3, cex=1.7) # plot title
+        # plot labels and axes
+        robjects.r.mtext(property_name, side=1,
+                         line=3, cex=1.2) # bottom axis label
+        robjects.r.mtext('P(X <= x)', side=2, padj=0,
+                         line=3, cex=1.2) # left axis label
+        robjects.r.mtext(property_name + ' distribution',
+                         padj=1, side=3, line=3, cex=1.7) # plot title
+    else:
+        robjects.r.mtext('not enough data', padj=5, side=3, line=3, cex=1.7)
 
     grdevices.dev_off()
 
 
-@synchronized()
-def kerneldensity(data, filename, format='png'):
+@synchronized
+def kerneldensity(data, filename, property_name, format='png'):
     """Non-parametric kernel density estimation plot of a result vector.
 
     :param data: result vector
@@ -400,14 +416,17 @@ def kerneldensity(data, filename, format='png'):
     elif format == 'eps':
         grdevices.postscript(file=filename)
 
-    # add some pseudo value to data because R crashes when the data is constant
-    # and takes python with it ...
-    robjects.r.plot(np.npudens(robjects.FloatVector(data + [max(data) + 0.00001])),
-                    main='', xaxt='n', yaxt='n',
-                    xlab='', ylab='', xaxs='i', yaxs='i', las=1)
-
-    # plot labels and axes
-    robjects.r.mtext('Nonparametric kernel density estimation',
-                     padj=1, side=3, line=3, cex=1.7) # plot title
+    if len(data) > 0:
+        robjects.r('d <- npudens(c(' + ",".join(map(str, data + [max(data or [0]) + 0.00001])) + '))')
+        robjects.r("d$bws$xnames = '"+property_name+"'")
+        # add some pseudo value to data because R crashes when the data is constant
+        # and takes python down with it ...
+        robjects.r("plot(d, main='', xaxt='n', yaxt='n', xlab='', ylab='', xaxs='i', yaxs='i', las=1)")
+        # plot labels and axes
+        robjects.r.mtext('Nonparametric kernel density estimation',
+                         padj=1, side=3, line=3, cex=1.7) # plot title
+    else:
+        robjects.r.frame()
+        robjects.r.mtext('not enough data', padj=5, side=3, line=3, cex=1.7)
 
     grdevices.dev_off()

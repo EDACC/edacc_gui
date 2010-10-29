@@ -17,27 +17,19 @@ import numpy
 import datetime
 
 from flask import Module
-from flask import render_template
+from flask import render_template as render
 from flask import Response, abort, g, request
 from werkzeug import Headers, secure_filename
 
 from edacc import utils, models
 from sqlalchemy.orm import joinedload
-from edacc.constants import JOB_FINISHED, JOB_ERROR, JOB_RUNNING, JOB_STATUS, JOB_RESULT_CODE, JOB_STATUS_COLOR
-from edacc.constants import OWN_RESULTS, ALL_RESULTS, INSTANCE_DETAILS, ANALYSIS1, ANALYSIS2, RANKING
+from edacc.constants import *
 from edacc.views.helpers import require_phase, require_competition
 from edacc.views.helpers import require_login, is_admin
 from edacc import forms
 from edacc.forms import EmptyQuery
 
 frontend = Module(__name__)
-
-
-def render(*args, **kwargs):
-    from tidylib import tidy_document
-    res = render_template(*args, **kwargs)
-    doc, errs = tidy_document(res)
-    return doc
 
 
 @frontend.route('/')
@@ -52,7 +44,7 @@ def index():
 @frontend.route('/<database>/experiments/')
 @require_phase(phases=(1, 2, 3, 4, 5, 6, 7))
 def experiments_index(database):
-    """ Show a list of all experiments in the database """
+    """Show a list of all experiments in the database."""
     db = models.get_database(database) or abort(404)
 
     if db.is_competition() and db.competition_phase() not in (3, 4, 5, 6, 7):
@@ -68,12 +60,19 @@ def experiments_index(database):
 @frontend.route('/<database>/categories')
 @require_competition
 def categories(database):
-    return 'categories'
+    """Displays a static categories page."""
+    db = models.get_database(database) or abort(404)
+
+    try:
+        return render('/competitions/%s/categories.html' % (database,), db=db, database=database)
+    except:
+        abort(404)
 
 
 @frontend.route('/<database>/overview/')
 @require_competition
 def competition_overview(database):
+    """Displays a static overview page."""
     db = models.get_database(database) or abort(404)
 
     try:
@@ -85,6 +84,7 @@ def competition_overview(database):
 @frontend.route('/<database>/schedule/')
 @require_competition
 def competition_schedule(database):
+    """Displays a static schedule page."""
     db = models.get_database(database) or abort(404)
 
     try:
@@ -96,6 +96,7 @@ def competition_schedule(database):
 @frontend.route('/<database>/rules/')
 @require_competition
 def competition_rules(database):
+    """Displays a static rules page."""
     db = models.get_database(database) or abort(404)
 
     try:
@@ -146,7 +147,6 @@ def experiment_instances(database, experiment_id):
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
     instances = experiment.instances
-    instances.sort(key=lambda i: i.name)
 
     return render('experiment_instances.html', instances=instances,
                   experiment=experiment, database=database, db=db)
@@ -167,20 +167,20 @@ def experiment_results(database, experiment_id):
     if not is_admin() and db.is_competition() and db.competition_phase() in OWN_RESULTS:
         solver_configs = filter(lambda sc: sc.solver.user == g.User, solver_configs)
 
+    query = db.session.query(db.ExperimentResult).filter_by(experiment=experiment)
+
     results = []
     for instance in instances:
         row = []
         for solver_config in solver_configs:
-            query = db.session.query(db.ExperimentResult)
-            query.enable_eagerloads(True)
-            query.options(joinedload(db.ExperimentResult.instance,
-                                     db.ExperimentResult.solver_configuration))
-            jobs = query.filter_by(experiment=experiment) \
-                        .filter_by(solver_configuration=solver_config) \
+            jobs = query.filter_by(solver_configuration=solver_config) \
                         .filter_by(instance=instance) \
                         .all()
-            completed = len(filter(lambda j: j.status in JOB_FINISHED or j.status in JOB_ERROR, jobs))
+
+            completed = len(filter(lambda j: j.status not in STATUS_PROCESSING, jobs))
             runtimes = [j.get_time() for j in jobs]
+            runtimes = filter(lambda r: r is not None, runtimes)
+            runtimes = runtimes or [0]
             time_max = max(runtimes)
             time_min = min(runtimes)
             row.append({'time_avg': numpy.average(runtimes),
@@ -199,7 +199,6 @@ def experiment_results(database, experiment_id):
     return render('experiment_results.html', experiment=experiment,
                     instances=instances, solver_configs=solver_configs,
                     results=results, database=database, db=db)
-
 
 @frontend.route('/<database>/experiment/<int:experiment_id>/results-by-solver/')
 @require_phase(phases=OWN_RESULTS.union(ALL_RESULTS))
@@ -262,7 +261,7 @@ def experiment_results_by_instance(database, experiment_id):
         solver_configs = filter(lambda sc: sc.solver.user == g.User, solver_configs)
 
     form = forms.ResultByInstanceForm(request.args)
-    form.instance.query = instances
+    form.instance.query = instances or EmptyQuery()
 
     results = []
     if form.instance.data:
@@ -314,7 +313,7 @@ def experiment_progress(database, experiment_id):
 def experiment_progress_ajax(database, experiment_id):
     """ Returns JSON-serialized data of the experiment results.
         Used by the jQuery datatable as ajax data source with server side processing.
-        Parses the GET parameters and constructs an apropriate SQL query to fetch
+        Parses the GET parameters and constructs an appropriate SQL query to fetch
         the data.
     """
     db = models.get_database(database) or abort(404)
@@ -417,7 +416,7 @@ def experiment_progress_ajax(database, experiment_id):
     aaData = []
     for job in jobs:
         status = utils.job_status(job[6])
-        if job[6] in JOB_RUNNING:
+        if job[6] == STATUS_RUNNING:
             try:
                 seconds_running = int(job[8])
             except:
@@ -468,8 +467,8 @@ def solver_config_results(database, experiment_id, solver_configuration_id, inst
                     .filter_by(instance=instance) \
                     .all()
 
-    completed = len(filter(lambda j: j.status in JOB_FINISHED or j.status in JOB_ERROR, jobs))
-    correct = len(filter(lambda j: j.status in JOB_FINISHED and str(j.resultCode).startswith('1'), jobs))
+    completed = len(filter(lambda j: j.status not in STATUS_PROCESSING, jobs))
+    correct = len(filter(lambda j: j.status == STATUS_FINISHED and str(j.resultCode).startswith('1'), jobs))
 
     return render('solver_config_results.html', experiment=experiment,
                   solver_configuration=solver_configuration, instance=instance,
@@ -570,6 +569,24 @@ def experiment_result(database, experiment_id, result_id):
                   solver_config=result.solver_configuration, instance=result.instance, solverOutput_text=solverOutput_text,
                   launcherOutput_text=launcherOutput_text, watcherOutput_text=watcherOutput_text,
                   verifierOutput_text=verifierOutput_text, database=database, db=db)
+
+
+@frontend.route('/<database>/experiment/<int:experiment_id>/unsolved-instances/')
+@require_phase(phases=[5,6,7])
+@require_login
+def unsolved_instances(database, experiment_id):
+    db = models.get_database(database) or abort(404)
+    experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
+
+    unsolved_instances = []
+    for instance in experiment.instances:
+        if db.session.query(db.ExperimentResult).filter_by(experiment=experiment,
+                                                           instance=instance) \
+                        .filter(db.ExperimentResult.resultCode.like('1%')).count() == 0:
+            unsolved_instances.append(instance)
+
+    return render('unsolved_instances.html', database=database, db=db, experiment=experiment,
+                  unsolved_instances=unsolved_instances)
 
 
 @frontend.route('/<database>/experiment/<int:experiment_id>/result/<int:result_id>/download-solver-output')
