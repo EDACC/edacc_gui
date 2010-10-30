@@ -15,7 +15,6 @@ public class ParameterDAO {
     private static final ObjectCache<Parameter> cache = new ObjectCache<Parameter>();
 
     /**
-     * TODO Add caching for parameters??
      * Saves a parameter for a solver in the DB.
      * A parameter can't exist without a solver.
      * @param solver
@@ -23,7 +22,7 @@ public class ParameterDAO {
      */
     public static void saveParameterForSolver(Solver solver, Parameter parameter) throws NoConnectionToDBException, SQLException {
         if (!solver.isSaved())
-            return; // TODO do something if solver isn't in db
+            return; 
         if (parameter.isSaved()) return;
         if (parameter.isNew()) {
             final String insertQuery = "INSERT INTO Parameters (name, prefix, value, hasValue, Parameters.order, Solver_idSolver) VALUES (?, ?, ?, ?, ?, ?)";

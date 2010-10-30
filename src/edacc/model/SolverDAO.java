@@ -41,13 +41,10 @@ public class SolverDAO {
      * @param solver The Solver object to persist.
      */
     public static void save(Solver solver) throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, NoSolverNameSpecifiedException,  IOException {
-        //if (solver.isSaved()) {
-        //    return;
-        //}
-
         if (solver == null)
             return;
-
+         if (solver.isSaved())
+            return;
         // new solvers without binary aren't allowed
         if (solver.isNew() && solver.getName().isEmpty())
             throw new NoSolverNameSpecifiedException();
@@ -56,6 +53,7 @@ public class SolverDAO {
 
         PreparedStatement ps;
 
+        // check for duplicates by MD5 sum
         boolean alreadyInDB = solverAlreadyInDB(solver) != null;
 
         // insert  into db
