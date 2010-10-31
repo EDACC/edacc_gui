@@ -26,6 +26,7 @@ import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasProperty;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
+import edacc.model.PropertyDAO;
 import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
@@ -66,8 +67,13 @@ import javax.swing.SwingUtilities;
 
 /**
  * Experiment design more controller class, handles requests by the GUI
- * for creating, removing, loading, etc. experiments
- * @author daniel
+ * for creating, removing, loading, etc. experiments.
+ * Provides caching for experiment results. Use the higher level methods to get
+ * the experiment results. Those methods are synchronized and therefore can be
+ * used in threads.
+ * updateExperimentResults() will update the local cache for the current experiment
+ * and should be called first.
+ * @author daniel, simon
  */
 public class ExperimentController {
 
@@ -76,7 +82,8 @@ public class ExperimentController {
     private Experiment activeExperiment;
     private ArrayList<Experiment> experiments;
     private static RandomNumberGenerator rnd = new JavaRandom();
-    // caching experiment results
+    // caching experiments
+    // use of resultMap must be synchronized
     private HashMap<ResultIdentifier, ExperimentResult> resultMap;
     private Timestamp lastUpdated;
     private Experiment experiment;
@@ -92,7 +99,7 @@ public class ExperimentController {
         this.main = experimentMode;
         this.solverConfigPanel = solverConfigPanel;
         PROP_CPUTIME = new Property();
-        PROP_CPUTIME.setName("CPU-Time");
+        PROP_CPUTIME.setName("CPU-Time (s)");
 
     }
 
@@ -115,13 +122,13 @@ public class ExperimentController {
         main.expTableModel.setExperiments(experiments);
         Vector<InstanceClass> vic = new Vector<InstanceClass>();
         try {
-        vic.addAll(InstanceClassDAO.getAll());
+            vic.addAll(InstanceClassDAO.getAll());
 
-        main.instanceClassModel.setClasses(vic);
-        ArrayList<Instance> instances = new ArrayList<Instance>();
-        instances.addAll(InstanceDAO.getAll());
-        main.insTableModel.setInstances(instances);
-        }catch (Exception e) {
+            main.instanceClassModel.setClasses(vic);
+            ArrayList<Instance> instances = new ArrayList<Instance>();
+            instances.addAll(InstanceDAO.getAll());
+            main.insTableModel.setInstances(instances);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -377,7 +384,7 @@ public class ExperimentController {
      * @return number of jobs added to the experiment results table
      * @throws SQLException
      */
-    public int generateJobs(int numRuns, final Tasks task) throws SQLException, TaskCancelledException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
+    public synchronized int generateJobs(int numRuns, final Tasks task) throws SQLException, TaskCancelledException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
         PropertyChangeListener cancelExperimentResultDAOStatementListener = new PropertyChangeListener() {
 
             @Override
@@ -390,7 +397,7 @@ public class ExperimentController {
                 }
             }
         };
-        
+
         task.setOperationName("Generating jobs for experiment " + activeExperiment.getName());
         task.setStatus("Loading data from database");
         updateExperimentResults();
@@ -572,7 +579,7 @@ public class ExperimentController {
         return main.insTableModel.getRowCount();
     }
 
-    public void loadJobs() {
+    public synchronized void loadJobs() {
         try {
             updateExperimentResults();
             final ExperimentResultsBrowserTableModel sync = main.jobsTableModel;
@@ -604,11 +611,18 @@ public class ExperimentController {
                     main.jobsTableModel.setJobs(results);
                     main.resultBrowserRowFilter.updateFilterTypes();
                     main.jobsTableModel.fireTableDataChanged();
+                } else {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            main.tableJobs.updateUI();
+                        }
+
+                    });
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            //   e.printStackTrace();
             // TODO: shouldn't happen but show message if it does
         }
 
@@ -1069,7 +1083,7 @@ public class ExperimentController {
      * @param runs
      * @return
      */
-    public ArrayList<ExperimentResult> getAllByRun(ArrayList<Integer> runs) {
+    public synchronized ArrayList<ExperimentResult> getAllByRun(ArrayList<Integer> runs) {
         HashSet<Integer> set = new HashSet<Integer>();
         set.addAll(runs);
         ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
@@ -1080,6 +1094,7 @@ public class ExperimentController {
         }
         return res;
     }
+
     /**
      * Returns all disjunct runs in an array list.
      * This array list should contain all integers between 0 and numRuns-1 inclusive.
@@ -1092,7 +1107,7 @@ public class ExperimentController {
      * @throws PropertyNotInDBException
      * @throws ComputationMethodDoesNotExistException
      */
-    public ArrayList<Integer> getAllRuns() throws SQLException, IOException, PropertyTypeNotExistException, NoConnectionToDBException, PropertyNotInDBException, ComputationMethodDoesNotExistException {
+    public synchronized ArrayList<Integer> getAllRuns() throws SQLException, IOException, PropertyTypeNotExistException, NoConnectionToDBException, PropertyNotInDBException, ComputationMethodDoesNotExistException {
         // then look for all disjunct runs and return them in an array list
         HashSet<Integer> runs = new HashSet<Integer>();
         for (ExperimentResult er : resultMap.values()) {
@@ -1112,7 +1127,7 @@ public class ExperimentController {
      * @throws NoConnectionToDBException
      * @throws ComputationMethodDoesNotExistException
      */
-    public void updateExperimentResults() throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
+    public synchronized void updateExperimentResults() throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
         if (activeExperiment == null) {
             experiment = null;
             resultMap = null;
@@ -1147,21 +1162,29 @@ public class ExperimentController {
         experiment = activeExperiment;
     }
 
+    public ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId) {
+        return getResults(solverConfigId, instanceId, null);
+    }
+
     /**
      * Returns a Vector of all ExperimentResults in the current experiment with the solverConfig id and instance id specified
      * @param solverConfigId the solverConfig id of the ExperimentResults
      * @param instanceId the instance id of the ExperimentResults
      * @return returns an empty vector if there are no such ExperimentResults
      */
-    public ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId) {
+    public ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId, ExperimentResultStatus[] status) {
         ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
         for (int i = 0; i < experiment.getNumRuns(); i++) {
-            ExperimentResult result = getResult(solverConfigId, instanceId, i);
+            ExperimentResult result = getResult(solverConfigId, instanceId, i, status);
             if (result != null) {
                 res.add(result);
             }
         }
         return res;
+    }
+
+    public ExperimentResult getResult(int solverConfigId, int instanceId, int run) {
+        return getResult(solverConfigId, instanceId, run, null);
     }
 
     /**
@@ -1171,13 +1194,20 @@ public class ExperimentController {
      * @param run the run
      * @return returns null if there is no such ExperimentResult
      */
-    public ExperimentResult getResult(int solverConfigId, int instanceId, int run) {
+    public synchronized ExperimentResult getResult(int solverConfigId, int instanceId, int run, ExperimentResultStatus[] status) {
         ExperimentResult res = resultMap.get(new ResultIdentifier(solverConfigId, instanceId, run));
-        // if the result is not in our map or it is not a verified result then return null
-        // TODO: überdenken
-        // if (res == null || !String.valueOf(res.getResultCode().getValue()).startsWith("1")) {
-        //     return null;
-        // }
+        if (status != null) {
+            boolean found = false;
+            for (ExperimentResultStatus s : status) {
+                if (res.getStatus().equals(s)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return null;
+            }
+        }
         return res;
     }
 
@@ -1198,7 +1228,12 @@ public class ExperimentController {
     }
 
     public Double getValue(ExperimentResult result, Property property) {
-        if (result.getStatus() != ExperimentResultStatus.SUCCESSFUL) {
+
+        if (result.getStatus() == ExperimentResultStatus.RUNNING
+                || result.getStatus() == ExperimentResultStatus.NOTSTARTED
+                || result.getStatus() == ExperimentResultStatus.LAUNCHERCRASH
+                || result.getStatus() == ExperimentResultStatus.VERIFIERCRASH
+                || result.getStatus() == ExperimentResultStatus.WATCHERCRASH) {
             return null;
         }
         if (property == PROP_CPUTIME) {
@@ -1224,6 +1259,37 @@ public class ExperimentController {
             return null;
         }
         return transformPropertyValueTypeToDouble(property.getPropertyValueType(), ihip.getValue());
+    }
+
+    public ArrayList<Instance> getInstances() throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
+        // TODO: use cached data
+        if (activeExperiment == null) {
+            return null;
+        }
+        ArrayList<Instance> res = new ArrayList<Instance>();
+        res.addAll(InstanceDAO.getAllByExperimentId(activeExperiment.getId()));
+        return res;
+    }
+
+    public ArrayList<SolverConfiguration> getSolverConfigurations() throws SQLException {
+        // TODO: use cached data
+        if (activeExperiment == null) {
+            return null;
+        }
+        return SolverConfigurationDAO.getSolverConfigurationByExperimentId(activeExperiment.getId());
+    }
+
+    public ArrayList<Property> getResultProperties() throws Exception {
+        ArrayList<Property> res = new ArrayList<Property>();
+        res.add(ExperimentController.PROP_CPUTIME);
+        res.addAll(PropertyDAO.getAllResultProperties());
+        return res;
+    }
+
+    public ArrayList<Property> getInstanceProperties() throws Exception {
+        ArrayList<Property> res = new ArrayList<Property>();
+        res.addAll(PropertyDAO.getAllInstanceProperties());
+        return res;
     }
 
     class ResultIdentifier {

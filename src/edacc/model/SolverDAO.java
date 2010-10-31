@@ -18,6 +18,8 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import edacc.manageDB.Util;
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -331,5 +333,47 @@ public class SolverDAO {
 
     public static void clearCache() {
         cache.clear();
+    }
+
+    /**
+     * Returns the competition categories of the solver as list of strings.
+     * @param solver
+     * @return
+     */
+    public static ArrayList<String> getCompetitionCategories(Solver solver) throws NoConnectionToDBException, SQLException {
+        ArrayList<String> res = new ArrayList<String>();
+        String query = "SELECT CompetitionCategory.name as name FROM CompetitionCategory LEFT JOIN Solver_has_CompetitionCategory "
+                + "ON idCompetitionCategory = CompetitionCategory_idCompetitionCategory "
+                + "WHERE Solver_idSolver=?;";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, solver.getId());
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            res.add(rs.getString("name"));
+        }
+        rs.close();
+        ps.close();
+        return res;
+    }
+
+    public static HashMap<Integer, ArrayList<String>> getCompetitionCategories() throws NoConnectionToDBException, SQLException {
+        HashMap<Integer, ArrayList<String>> res = new HashMap<Integer, ArrayList<String>>();
+        String query = "SELECT Solver_idSolver, CompetitionCategory.name as name FROM CompetitionCategory LEFT JOIN Solver_has_CompetitionCategory "
+                + "ON idCompetitionCategory = CompetitionCategory_idCompetitionCategory";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            String name = rs.getString("name");
+            Integer id = new Integer(rs.getInt("Solver_idSolver"));
+            if (!res.containsKey(id)) {
+                ArrayList<String> lst = new ArrayList<String>();
+                lst.add(name);
+                res.put(id, lst);
+            } else {
+                res.get(id).add(name);
+            }
+
+        }
+        return res;
     }
 }

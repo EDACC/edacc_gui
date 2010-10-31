@@ -236,7 +236,25 @@ public class Property extends BaseModel implements IntegerPKModel{
             this.setModified();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Property other = (Property) obj;
+        if (this.id != other.id) {
+            return false;
+        }
+        return true;
+    }
 
-
-
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 47 * hash + this.id;
+        return hash;
+    }
 }

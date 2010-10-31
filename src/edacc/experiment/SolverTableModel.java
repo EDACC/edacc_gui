@@ -1,18 +1,26 @@
 package edacc.experiment;
 
+import edacc.model.DatabaseConnector;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import edacc.model.Solver;
+import edacc.model.SolverDAO;
+import java.util.HashMap;
 
 /**
  *
  * @author daniel
  */
 public class SolverTableModel extends AbstractTableModel {
-    private String[] columns = {"Name", "binary name", "md5", "description","Selected"};
+
+    private static final String[] columns_noCompetition = {"Name", "binary name", "md5", "description", "Selected"};
+    private static final String[] columns_competition = {"Name", "binary name", "md5", "description", "categories", "Selected"};
+    private String[] columns = columns_competition;
+    private String[] categories;
+    private boolean isCompetition;
     private ArrayList<Solver> solvers;
     private Boolean[] selected;
-    
+
     public SolverTableModel() {
         this.solvers = new ArrayList<Solver>();
     }
@@ -23,7 +31,38 @@ public class SolverTableModel extends AbstractTableModel {
         for (int i = 0; i < solvers.size(); i++) {
             selected[i] = false;
         }
-        this.fireTableDataChanged();
+        try {
+            isCompetition = DatabaseConnector.getInstance().isCompetitionDB();
+        } catch (Exception e) {
+            isCompetition = false;
+        }
+        categories = null;
+        if (isCompetition) {
+            columns = columns_competition;
+            if (solvers != null) {
+                categories = new String[solvers.size()];
+                try {
+                    HashMap<Integer, ArrayList<String>> cats = SolverDAO.getCompetitionCategories();
+                    for (int i = 0; i < solvers.size(); i++) {
+                        String tmp = "";
+                        ArrayList<String> catlist = cats.get(solvers.get(i).getId());
+                        if (catlist != null) {
+                            for (int k = 0; k < catlist.size(); k++) {
+                                tmp += catlist.get(k);
+                                if (k != catlist.size() - 1) {
+                                    tmp += ", ";
+                                }
+                            }
+                        }
+                        categories[i] = tmp;
+                    }
+                } catch (Exception e) {
+                }
+            }
+        } else {
+            columns = columns_noCompetition;
+        }
+        this.fireTableStructureChanged();
     }
 
     @Override
@@ -48,13 +87,23 @@ public class SolverTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int col) {
-        if (col == 4) return true;
+        if (isCompetition) {
+            col--;
+        }
+        if (col == 4) {
+            return true;
+        }
         return false;
     }
 
     @Override
     public void setValueAt(Object value, int row, int col) {
-        if (col == 4) selected[row] = (Boolean)value;
+        if (isCompetition) {
+            col--;
+        }
+        if (col == 4) {
+            selected[row] = (Boolean) value;
+        }
         fireTableCellUpdated(row, col);
     }
 
@@ -70,9 +119,13 @@ public class SolverTableModel extends AbstractTableModel {
             case 3:
                 return solvers.get(rowIndex).getDescription();
             case 4:
-                return selected[rowIndex];
+                if (isCompetition) {
+                    return categories[rowIndex] == null ? "" : categories[rowIndex];
+                } else {
+                    return selected[rowIndex];
+                }
             case 5:
-                return solvers.get(rowIndex);
+                return selected[rowIndex];
             default:
                 return "";
         }
@@ -90,5 +143,14 @@ public class SolverTableModel extends AbstractTableModel {
 
     public Solver getSolver(int row) {
         return solvers.get(row);
+    }
+
+    public boolean isSelected(int row) {
+        return selected[row];
+    }
+
+    public void setSelected(int row, boolean sel) {
+        selected[row] = sel;
+        fireTableRowsUpdated(row, row);
     }
 }

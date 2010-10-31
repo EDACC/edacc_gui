@@ -6,6 +6,7 @@
 
 package edacc.filter;
 
+import edacc.EDACCFilter;
 import javax.swing.JPanel;
 import org.jdesktop.application.Action;
 
@@ -14,11 +15,11 @@ import org.jdesktop.application.Action;
  * @author simon
  */
 public class ArgumentPanel extends javax.swing.JPanel {
-    private Filter filter;
+    private EDACCFilter filter;
     private FilterInterface filterInterface;
     private int argNum, column;
     /** Creates new form ArgumentPanel */
-    public ArgumentPanel(Filter filter, FilterInterface filterInterface, int argNum, int column) {
+    public ArgumentPanel(EDACCFilter filter, FilterInterface filterInterface, int argNum, int column) {
         initComponents();
         if (!(filterInterface instanceof JPanel)) {
             throw new IllegalArgumentException();

@@ -1,6 +1,5 @@
 package edacc.experiment;
 
-import edacc.model.Instance;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstance;
@@ -8,8 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JTable;
 
 /**
@@ -26,22 +23,24 @@ public class Util {
         int tableWidth = table.getWidth();
         int colsum = 0;
         int width[] = new int[table.getColumnCount()];
+        // iterate over all not filtered cells and get the length from each one.
+        // the maximum of the lengths of all cells within a column col will be in width[col]
         for (int col = 0; col < table.getColumnCount(); col++) {
+            // set the width to the columns title width
             width[col] = table.getFontMetrics(table.getFont()).stringWidth(table.getColumnName(col));
             for (int row = 0; row < table.getRowCount(); row++) {
-                if (table.getValueAt(row, col) == null) {
-                    continue;
-                }
-                String s = table.getValueAt(row, col).toString();
-                int len = table.getFontMetrics(table.getFont()).stringWidth(s);
+                // get the component which represents the value and determine its witdth
+                int len = table.getCellRenderer(row, col).getTableCellRendererComponent(table, table.getValueAt(row, col), false, true, table.convertRowIndexToModel(row), col).getPreferredSize().width;
                 if (len > width[col]) {
                     width[col] = len;
                 }
             }
             colsum += width[col];
         }
+        // get the weight for a pixel
         double proz = (double) tableWidth / (double) colsum;
         for (int col = 0; col < table.getColumnCount(); col++) {
+            // multiplicate the width of a column with the weight
             table.getColumnModel().getColumn(col).setPreferredWidth((int) (proz * width[col]));
         }
     }

@@ -111,16 +111,6 @@ class EDACCDatabase(object):
 
         class Experiment(object):
             """ Maps the Experiment table. """
-            def is_finished(self):
-                """ Returns whether this experiment is finished (true if there are any jobs and all of them are terminated) """
-                if len(self.experiment_results) == 0: return False
-                return all(j.status in constants.JOB_FINISHED or j.status in constants.JOB_ERROR
-                           for j in self.experiment_results)
-
-            def is_running(self):
-                """ Returns true if there are any running jobs """
-                return any(j.status in constants.JOB_RUNNING for j in self.experiment_results)
-
             def get_num_runs(self, db):
                 """ Returns the number of runs of the experiment """
                 num_results = db.session.query(db.ExperimentResult).filter_by(experiment=self).count()
@@ -397,12 +387,17 @@ class EDACCDatabase(object):
     def __str__(self):
         return self.label
 
-def parameter_string(solver_config):
+def parameter_string(solver_config, instance_filename, seed):
     """ Returns a string of the solver configuration parameters """
-    parameters = solver_config.parameter_instances
+    parameters = sorted(solver_config.parameter_instances, key=lambda p: p.parameter.order)
     args = []
     for p in parameters:
-        args.append(p.parameter.prefix)
+        if p.parameter.name == "instance":
+            p.value = instance_filename
+        elif p.parameter.name == "seed":
+            p.value = seed
+        if p.parameter.prefix != None:
+            args.append(p.parameter.prefix)
         if p.parameter.hasValue:
             if p.value == "": # if value not set, use default value from parameters table
                 args.append(p.parameter.value)
@@ -410,9 +405,9 @@ def parameter_string(solver_config):
                 args.append(p.value)
     return " ".join(args)
 
-def launch_command(solver_config):
+def launch_command(solver_config, instance_filename, seed):
     """ Returns a string of what the solver launch command looks like given the solver configuration """
-    return "./" + solver_config.solver.binaryName + " " + parameter_string(solver_config)
+    return "./" + solver_config.solver.binaryName + " " + parameter_string(solver_config, instance_filename, seed)
 
 def setlimits(cputime):
     resource.setrlimit(resource.RLIMIT_CPU, (cputime, cputime + 10))
@@ -468,8 +463,8 @@ class EDACCClient(threading.Thread):
                 db.session.commit()
 
                 client_line = '/usr/bin/time -f ";time=%U;mem=%M;" '
-                client_line += os.path.join(PACKAGE_DIR, 'solvers', launch_command(job.solver_configuration)[2:])
-                client_line += os.path.join(PACKAGE_DIR, 'instances', str(job.instance.idInstance) + '_' + job.instance.name) + ' ' + str(job.seed)
+                client_line += os.path.join(PACKAGE_DIR, 'solvers', launch_command(job.solver_configuration, os.path.join(PACKAGE_DIR, 'instances', str(job.instance.idInstance)+ '_' + job.instance.name), str(job.seed))[2:])
+
 
                 print "running job", job.idJob, client_line
                 stdout = open(os.path.join(TMP, str(job.idJob) + 'stdout~'), 'w')
@@ -505,9 +500,11 @@ class EDACCClient(threading.Thread):
                 print "  retcode", returncode
 
                 if returncode != 10 and returncode != 0: # CPU Time limit exceeded exit code guess
-                    job.status = 2
+                    job.status = 21
                 else:
                     job.status = 1
+                    if 's SATISFIABLE' in job.solverOutput:
+                        job.resultCode = 11
                 print "  CPU time:", runtime, "s", "Memory used:", memory, "kB"
                 job.computeQueue = self.experiment.grid_queue[0].idgridQueue
                 db.session.commit()

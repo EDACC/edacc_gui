@@ -3,8 +3,13 @@
  *
  * Created on 13.10.2010, 11:29:39
  */
-package edacc.filter;
+package edacc;
 
+import edacc.filter.ArgumentPanel;
+import edacc.filter.BooleanFilter;
+import edacc.filter.NumberFilter;
+import edacc.filter.Parser;
+import edacc.filter.StringFilter;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -24,7 +29,7 @@ import org.jdesktop.application.Action;
  * Currently supported are: BooleanFilter, NumberFilter & StringFilter.
  * @author simon
  */
-public class Filter extends javax.swing.JDialog {
+public class EDACCFilter extends javax.swing.JDialog {
 
     private JTable table;
     private TableRowSorter<? extends TableModel> rowSorter;
@@ -44,7 +49,7 @@ public class Filter extends javax.swing.JDialog {
      * @param table the table to be used for this filter
      * @param autoUpdateFilterTypes if this is set to true, the filter will updated the classes of the columns on each setVisible(true)
      */
-    public Filter(java.awt.Frame parent, boolean modal, JTable table, boolean autoUpdateFilterTypes) {
+    public EDACCFilter(java.awt.Frame parent, boolean modal, JTable table, boolean autoUpdateFilterTypes) {
         super(parent, modal);
         initComponents();
         if (!(table.getRowSorter() instanceof TableRowSorter)) {
@@ -56,7 +61,7 @@ public class Filter extends javax.swing.JDialog {
 
             @Override
             public boolean include(Entry<? extends Object, ? extends Object> entry) {
-                return Filter.this.include(entry);
+                return EDACCFilter.this.include(entry);
             }
         };
         rowSorter.setRowFilter(rowFilter);
@@ -203,7 +208,7 @@ public class Filter extends javax.swing.JDialog {
             }
         });
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(Filter.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCFilter.class);
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel1.border.title"))); // NOI18N
         jPanel1.setName("jPanel1"); // NOI18N
 
@@ -216,7 +221,7 @@ public class Filter extends javax.swing.JDialog {
 
         jPanel4.setName("jPanel4"); // NOI18N
 
-        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(Filter.class, this);
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCFilter.class, this);
         btnAdd.setAction(actionMap.get("btnAdd")); // NOI18N
         btnAdd.setText(resourceMap.getString("btnAdd.text")); // NOI18N
         btnAdd.setName("btnAdd"); // NOI18N

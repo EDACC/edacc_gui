@@ -1,13 +1,12 @@
 package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
-import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.Instance;
-import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import edacc.model.Property;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
 
@@ -23,6 +22,7 @@ public class RTDsPlot extends Plot {
     private Instance instance;
     private Property property;
     private String title;
+    private String warning;
 
     public RTDsPlot(ExperimentController expController) {
         super(expController);
@@ -46,12 +46,12 @@ public class RTDsPlot extends Plot {
     }
 
     public static void loadDefaultValues(ExperimentController expController) throws Exception {
-        solverSelector.setSolverConfigurations(ExperimentDAO.getSolverConfigurationsInExperiment(expController.getActiveExperiment()));
+        solverSelector.setSolverConfigurations(expController.getSolverConfigurations());
         solverSelector.btnSelectAll();
-        for (Instance i : InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId())) {
+        for (Instance i : expController.getInstances()) {
             comboInstance.addItem(i);
         }
-        for (Property p : getResultProperties()) {
+        for (Property p : expController.getResultProperties()) {
             comboProperty.addItem(p);
         }
     }
@@ -74,6 +74,7 @@ public class RTDsPlot extends Plot {
             instance = (Instance) comboInstance.getSelectedItem();
             property = (Property) comboProperty.getSelectedItem();
         }
+        warning = null;
         expController.updateExperimentResults();
         title = "Property distribution on " + instance + " (" + expController.getActiveExperiment().getName() + ")";
         double max_x = 0.;
@@ -82,19 +83,24 @@ public class RTDsPlot extends Plot {
         String[] legendNames = new String[scs.size()];
         String[] legendColors = new String[scs.size()];
         int k = 0;
+        LinkedList<String> warnings = new LinkedList<String>();
         for (SolverConfiguration sc : scs) {
             ArrayList<ExperimentResult> res = expController.getResults(sc.getId(), instance.getId());
             ArrayList<Double> tmp = new ArrayList<Double>();
+            int noResult = 0;
             for (int i = 0; i < res.size(); i++) {
                 Double value = expController.getValue(res.get(i), property);
                 if (value == null) {
-                    // TODO: warning!
+                    noResult++;
                     continue;
                 }
                 tmp.add(value);
                 if (value > max_x) {
                     max_x = value;
                 }
+            }
+            if (noResult > 0) {
+                warnings.add("Solver " + sc.getName() + " has not solved or has no result property calculated for " + noResult + " runs.");
             }
             double[] tmpArray = new double[tmp.size()];
             for (int i = 0; i < tmpArray.length; i++) {
@@ -121,7 +127,7 @@ public class RTDsPlot extends Plot {
         }
         // plot labels and axes
         engine.eval("mtext('"+property.getName()+"', side=1, line=3, cex=1.2)");                      // bottom axis label
-        engine.eval("mtext('P(solve within x seconds)', side=2, padj=0, line=3, cex=1.2)"); // left axis label
+        engine.eval("mtext('P(solve within x " + property.getName() + ")', side=2, padj=0, line=3, cex=1.2)"); // left axis label
         engine.eval("mtext('Runtime Distributions', padj=1, side=3, line=3, cex=1.7)");     // plot title
 
         // plot legend
@@ -131,6 +137,14 @@ public class RTDsPlot extends Plot {
                 + "legend=legendNames,"
                 + "col=legendColors,"
                 + "pch=c(0," + scs.size() + "), lty=1)");
+        if (warnings.size() > 0) {
+            warning = htmlHeader
+                    + "<h2>Warning</h2>";
+            for (String w: warnings) {
+                warning += w + "<br>";
+            }
+            warning += htmlFooter;
+        }
     }
 
     @Override
@@ -138,6 +152,11 @@ public class RTDsPlot extends Plot {
         return title;
     }
 
+    @Override
+    public String getAdditionalInformations() {
+        return warning;
+    }
+    
     public static String getTitle() {
         return "Property distributions of solvers on an instance";
     }

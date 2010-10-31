@@ -457,4 +457,41 @@ public class InstanceDAO {
     public static SATInstance getSATFormulaOfInstance(Instance i) throws IOException, InvalidVariableException, InstanceNotInDBException, SQLException {
         return edacc.satinstances.InstanceParser.getInstance().parseInstance(getBinary(i.getId()).getBinaryStream());
     }
+
+    /**
+     * Returns the name of the benchmark type of an instance or null if it doesn't have one
+     * @param i
+     * @return
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     */
+    public static String getBenchmarkType(Instance i) throws NoConnectionToDBException, SQLException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn()
+                .prepareStatement("SELECT BenchmarkType.name as name FROM BenchmarkType JOIN Instances ON idBenchmarkType=BenchmarkType_idBenchmarkType "
+                + "WHERE idInstance=?");
+        ps.setInt(1, i.getId());
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getString("name");
+        }
+        return null;
+    }
+
+    /**
+     * Returns a HashMap mapping instance IDs to their benchmark type names.
+     * @return
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     */
+    public static HashMap<Integer, String> getBenchmarkTypes() throws NoConnectionToDBException, SQLException {
+        HashMap<Integer, String> res = new HashMap<Integer, String>();
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn()
+                .prepareStatement("SELECT idInstance, BenchmarkType.name as name "
+                + "FROM BenchmarkType JOIN Instances ON idBenchmarkType=BenchmarkType_idBenchmarkType");
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            res.put(new Integer(rs.getInt("idInstance")), rs.getString("name"));
+        }
+        return res;
+    }
 }

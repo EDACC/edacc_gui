@@ -14,8 +14,6 @@ import edacc.experiment.ExperimentResultsBrowserTableModel;
 import edacc.experiment.ExperimentTableModel;
 import edacc.experiment.InstanceTableModel;
 import edacc.experiment.SolverTableModel;
-import edacc.filter.InstanceFilter;
-import edacc.filter.JobsFilter;
 import edacc.gridqueues.GridQueuesController;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
@@ -25,7 +23,6 @@ import edacc.model.ExperimentResultStatus;
 import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.PropertyNotInDBException;
-import edacc.model.Solver;
 import edacc.model.TaskCancelledException;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
@@ -81,13 +78,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public ExperimentResultsBrowserTableModel jobsTableModel;
     public EDACCSolverConfigPanel solverConfigPanel;
     public TableRowSorter<InstanceTableModel> sorter;
-    public JobsFilter resultBrowserRowFilter;
+    public EDACCJobsFilter resultBrowserRowFilter;
     //  private EDACCExperimentModeVirtualExperimentSettings pnlVirtualExperimentSettings = new EDACCExperimentModeVirtualExperimentSettings();
-    private InstanceFilter instanceFilter;
+    private EDACCInstanceFilter instanceFilter;
     private EDACCOutputViewer outputViewer;
     private EDACCExperimentModeJobsCellRenderer tableJobsStringRenderer;
     private ResultsBrowserTableRowSorter resultsBrowserTableRowSorter;
-    private EDACCInstanceFilter dialogFilter;
     private AnalysisPanel analysePanel;
     private Timer jobsTimer = null;
     private Integer resultBrowserETA;
@@ -156,7 +152,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
             @Override
             public void run() {
-                instanceFilter = new InstanceFilter(EDACCApp.getApplication().getMainFrame(), true, tableInstances, true);
+                instanceFilter = new EDACCInstanceFilter(EDACCApp.getApplication().getMainFrame(), true, tableInstances, true);
                 instanceClassModel = new ExperimentInstanceClassTableModel(insTableModel, instanceFilter, expController);
                 tableInstanceClasses.setModel(instanceClassModel);
             }
@@ -188,7 +184,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
             @Override
             public void run() {
-                resultBrowserRowFilter = new JobsFilter(EDACCApp.getApplication().getMainFrame(), true, tableJobs, false);
+                resultBrowserRowFilter = new EDACCJobsFilter(EDACCApp.getApplication().getMainFrame(), true, tableJobs, false);
             }
         });
 
@@ -315,26 +311,32 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }
 
     public void reinitializeGUI() {
-
         expController.unloadExperiment();
-        /* experiment tab */
+        reinitializeExperiments();
+        reinitializeInstances();
+        reinitializeJobBrowser();
+    }
+
+    public void reinitializeExperiments() {
         expTableModel.setExperiments(null);
-        /* end of experiment tab */
-        /* instance tab */
+    }
+
+    public void reinitializeInstances() {
         btnDeselectAllInstnaceClassesActionPerformed(null);
         instanceFilter.clearFilters();
         lblFilterStatus.setText("");
-        /* end of instance tab */
-        /* job browser tab */
+    }
+
+    public void reinitializeJobBrowser() {
         try {
             jobsTableModel.setJobs(null);
+            jobsTableModel.fireTableStructureChanged();
         } catch (SQLException ex) {
         }
         resultBrowserRowFilter.clearFilters();
         jobsTableModel.resetColumnVisibility();
         setJobsFilterStatus("");
         jobsTimerWasActive = false;
-        /* end of job browser tab */
     }
 
     public void initialize() throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
@@ -1544,6 +1546,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         } else if (manageExperimentPane.getSelectedIndex() == 4) {
             // job browser tab
+            final Rectangle rect = tableJobs.getVisibleRect();
+
             resultBrowserETA = null;
             lblETA.setText("");
             try {
@@ -1557,7 +1561,26 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
                 @Override
                 public void run() {
-                    Tasks.startTask("loadJobs", expController, EDACCExperimentMode.this);
+                    Tasks.startTask(new TaskRunnable() {
+
+                        @Override
+                        public void run(Tasks task) {
+                            try {
+                                expController.loadJobs();
+                            } catch (Throwable e) {
+                                EDACCExperimentMode.this.onTaskFailed("loadJobs", e);
+                            }
+                            tableJobs.scrollRectToVisible(rect);
+                            SwingUtilities.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
+                                }
+                            });
+
+                        }
+                    });
                 }
             });
         } else if (manageExperimentPane.getSelectedIndex() == 5) {
@@ -1792,6 +1815,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
      * Method to be called after an experiment is loaded.
      */
     public void afterExperimentLoaded() {
+        reinitializeInstances();
+        reinitializeJobBrowser();
         manageExperimentPane.setEnabledAt(1, true);
         manageExperimentPane.setEnabledAt(2, true);
         manageExperimentPane.setEnabledAt(3, true);
@@ -1909,10 +1934,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public void btnChooseSolvers() {
         solverConfigPanel.beginUpdate();
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
-            if ((Boolean) solTableModel.getValueAt(i, 4) && !solverConfigPanel.solverExists(((Solver) solTableModel.getValueAt(i, 5)).getId())) {
-                solverConfigPanel.addSolver(solTableModel.getValueAt(i, 5));
-            } else if (!(Boolean) solTableModel.getValueAt(i, 4)) {
-                solverConfigPanel.removeSolver(solTableModel.getValueAt(i, 5));
+            if (solTableModel.isSelected(i) && !solverConfigPanel.solverExists(solTableModel.getSolver(i).getId())) {
+                solverConfigPanel.addSolver(solTableModel.getSolver(i));
+            } else if (!solTableModel.isSelected(i)) {
+                solverConfigPanel.removeSolver(solTableModel.getSolver(i));
             }
         }
         solverConfigPanel.endUpdate();
@@ -1932,21 +1957,21 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     @Action
     public void btnSelectAllSolvers() {
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
-            solTableModel.setValueAt(true, i, 4);
+            solTableModel.setSelected(i, true);
         }
     }
 
     @Action
     public void btnDeselectAll() {
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
-            solTableModel.setValueAt(false, i, 4);
+            solTableModel.setSelected(i, false);
         }
     }
 
     @Action
     public void btnReverseSolverSelection() {
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
-            solTableModel.setValueAt(!((Boolean) solTableModel.getValueAt(i, 4)), i, 4);
+            solTableModel.setSelected(i, !solTableModel.isSelected(i));
         }
     }
 
@@ -2052,16 +2077,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             if (er.getStatus().getValue() >= 1) {
                 count++;
                 avgTime += er.getResultTime();
-            } else if (er.getStatus().equals(ExperimentResultStatus.RUNNING) && er.getRunningTime() != null) {
-                curRunningTime += er.getRunningTime().getSeconds()
-                        + er.getRunningTime().getMinutes() * 60
-                        + er.getRunningTime().getHours() * 60 * 60;
+            } else if (er.getStatus().equals(ExperimentResultStatus.RUNNING)) {
+                curRunningTime += er.getRunningTime();
             }
         }
         String ETA = null;
         if (count > 0 && jobsRunning > 0) {
             avgTime /= count;
-            int timeleft = (int) (Math.round(jobsWaiting * avgTime / jobsRunning) - curRunningTime / jobsRunning);
+            int timeleft = (int) (Math.round((jobsWaiting + jobsRunning) * avgTime / jobsRunning) - curRunningTime / jobsRunning);
 
             if (resultBrowserETA != null) {
                 int tmp = timeleft - resultBrowserETA;

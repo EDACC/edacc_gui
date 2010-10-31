@@ -43,7 +43,7 @@ public class DatabaseConnector extends Observable {
      * @throws ClassNotFoundException if the driver couldn't be found.
      * @throws SQLException if an error occurs while trying to establish the connection.
      */
-    public void connect(String hostname, int port, String username, String database, String password) throws ClassNotFoundException, SQLException {
+    public void connect(String hostname, int port, String username, String database, String password, boolean useSSL) throws ClassNotFoundException, SQLException {
         if (conn != null) {
             conn.close();
         }
@@ -53,8 +53,12 @@ public class DatabaseConnector extends Observable {
             this.username = username;
             this.password = password;
             this.database = database;
+            String properties = "?user=" + username + "&password=" + password + "&rewriteBatchedStatements=true";
+            if (useSSL) {
+                properties += "&useSSL=true&requireSSL=true";
+            }
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?user=" + username + "&password=" + password + "&rewriteBatchedStatements=true");
+            conn = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + properties);
         } catch (ClassNotFoundException e) {
             throw e;
         } catch (SQLException e) {
@@ -174,5 +178,20 @@ public class DatabaseConnector extends Observable {
 
     public String getUsername() {
         return username;
+    }
+
+    /**
+     * Returns whether the database is a competition database
+     * @return
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     */
+    public boolean isCompetitionDB() throws NoConnectionToDBException, SQLException {
+        PreparedStatement ps = getConn().prepareStatement("SELECT competition FROM DBConfiguration");
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getBoolean("competition");
+        }
+        return false;
     }
 }

@@ -3,19 +3,13 @@ package edacc.experiment.plots;
 import edacc.experiment.AnalysisController;
 import edacc.experiment.ExperimentController;
 import edacc.experiment.REngineInitializationException;
-import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.ExperimentResult;
 import edacc.model.Instance;
 import edacc.model.InstanceClassMustBeSourceException;
-import edacc.model.InstanceDAO;
-import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
-import edacc.model.PropertyNotInDBException;
 import edacc.model.SolverConfiguration;
-import edacc.model.SolverConfigurationDAO;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
-import edacc.properties.PropertyTypeNotExistException;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -23,8 +17,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -113,16 +105,14 @@ public class ProbabilisticDomination extends Plot {
         comboSolver1.removeAllItems();
         comboSolver2.removeAllItems();
         comboProperty.removeAllItems();
-        for (SolverConfiguration sc : SolverConfigurationDAO.getSolverConfigurationByExperimentId(expController.getActiveExperiment().getId())) {
+        for (SolverConfiguration sc : expController.getSolverConfigurations()) {
             comboSolver1.addItem(sc);
             comboSolver2.addItem(sc);
         }
-        for (Property p : getResultProperties()) {
+        for (Property p : expController.getResultProperties()) {
             comboProperty.addItem(p);
         }
-        ArrayList<Instance> i = new ArrayList<Instance>();
-        i.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
-        instanceSelector.setInstances(i);
+        instanceSelector.setInstances(expController.getInstances());
         instanceSelector.btnSelectAll();
     }
 

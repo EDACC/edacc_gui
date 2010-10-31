@@ -11,8 +11,6 @@ import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
-import edacc.model.Parameter;
-import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstance;
 import edacc.model.ParameterInstanceDAO;
 import edacc.model.Solver;
@@ -21,9 +19,8 @@ import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
-import edacc.properties.FilePropertyParser;
-import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import javax.swing.SwingUtilities;
@@ -70,28 +67,33 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     }
 
     public void updateSolverProperties() {
-        solverProperties = new ArrayList<Property>();
+        ArrayList<Property> tmp = new ArrayList<Property>();
         try {
-            solverProperties.addAll(PropertyDAO.getAllResultProperties());
+            tmp.addAll(PropertyDAO.getAllResultProperties());
         } catch (Exception e) {
             if (edacc.ErrorLogger.DEBUG) {
                 e.printStackTrace();
             }
         }
-        for (int i = solverProperties.size() - 1; i >= 0; i--) {
-            if (solverProperties.get(i).isMultiple()) {
-                solverProperties.remove(i);
+        if (!tmp.equals(solverProperties)) {
+            solverProperties = tmp;
+
+            for (int i = solverProperties.size() - 1; i >= 0; i--) {
+                if (solverProperties.get(i).isMultiple()) {
+                    solverProperties.remove(i);
+                }
             }
+            columns = java.util.Arrays.copyOf(columns, CONST_COLUMNS.length + solverProperties.size());
+            visible = java.util.Arrays.copyOf(visible, CONST_VISIBLE.length + solverProperties.size());
+            int j = 0;
+            for (int i = CONST_COLUMNS.length; i < columns.length; i++) {
+                columns[i] = solverProperties.get(j).getName();
+                visible[i] = true;
+                j++;
+            }
+            this.fireTableStructureChanged();
         }
-        columns = java.util.Arrays.copyOf(columns, CONST_COLUMNS.length + solverProperties.size());
-        visible = java.util.Arrays.copyOf(visible, CONST_VISIBLE.length + solverProperties.size());
-        int j = 0;
-        for (int i = CONST_COLUMNS.length; i < columns.length; i++) {
-            columns[i] = solverProperties.get(j).getName();
-            visible[i] = true;
-            j++;
-        }
-        this.fireTableStructureChanged();
+
     }
 
     /**
@@ -195,10 +197,10 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             @Override
             public void run() {
                 ExperimentResultsBrowserTableModel.this.jobs = jobs;
-                parameters = new HashMap<Integer, String>();
                 if (jobs != null) {
                     parameterInstances = new HashMap<Integer, ArrayList<ParameterInstance>>();
                     gridQueues = new HashMap<Integer, GridQueue>();
+                    parameters = new HashMap<Integer, String>();
                     try {
                         ArrayList<GridQueue> queues = GridQueueDAO.getAll();
                         for (GridQueue q : queues) {
@@ -341,8 +343,11 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 return j.getSeed();
             case 8:
                 String status = j.getStatus().toString();
-                if (j.getStatus() == ExperimentResultStatus.RUNNING && j.getRunningTime() != null) {
-                    status += " (" + j.getRunningTime() + ")";
+                if (j.getStatus() == ExperimentResultStatus.RUNNING) {
+                    int hours = j.getRunningTime() / 3600;
+                    int minutes = (j.getRunningTime() / 60) % 60;
+                    int seconds = j.getRunningTime() % 60;
+                    status += " (" + new Formatter().format("%02d:%02d:%02d", hours, minutes, seconds) + ")";
                 }
                 return status;
             case 9:

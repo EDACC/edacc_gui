@@ -1,6 +1,5 @@
 package edacc.model;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.HashMap;
 
@@ -18,7 +17,7 @@ public class ExperimentResult extends BaseModel {
     private int SolverConfigId;
     private int ExperimentId;
     private int InstanceId;
-    private Time runningTime;
+    private int runningTime;
 
     private String solverOutputFilename;
     private String launcherOutputFilename;
@@ -171,12 +170,12 @@ public class ExperimentResult extends BaseModel {
         }
     }
 
-    public Time getRunningTime() {
+    public int getRunningTime() {
         return runningTime;
     }
 
-    public void setRunningTime(Time maxTimeLeft) {
-        this.runningTime = maxTimeLeft;
+    public void setRunningTime(int runningTime) {
+        this.runningTime = runningTime;
     }
 
     public int getComputeQueue() {

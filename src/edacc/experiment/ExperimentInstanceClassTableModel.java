@@ -1,6 +1,6 @@
 package edacc.experiment;
 
-import edacc.filter.InstanceFilter;
+import edacc.EDACCInstanceFilter;
 import edacc.model.InstanceClass;
 import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
@@ -14,12 +14,12 @@ public class ExperimentInstanceClassTableModel extends AbstractTableModel {
     private String[] columns = {"Name", "Description", "Source", "Show"};
     protected Vector<InstanceClass> classes;
     protected Vector<Boolean> classSelect;
-    protected InstanceFilter filter;
+    protected EDACCInstanceFilter filter;
     protected InstanceTableModel model;
     protected ExperimentController expController;
     private boolean update;
 
-    public ExperimentInstanceClassTableModel(InstanceTableModel model, InstanceFilter filter, ExperimentController expController) {
+    public ExperimentInstanceClassTableModel(InstanceTableModel model, EDACCInstanceFilter filter, ExperimentController expController) {
         this.expController = expController;
         this.filter = filter;
         this.model = model;

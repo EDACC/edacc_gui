@@ -1,27 +1,17 @@
 package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
-import edacc.model.Experiment;
 import edacc.model.ExperimentResult;
-import edacc.model.ExperimentResultDAO;
-import edacc.model.ExperimentResultHasProperty;
-import edacc.model.ExperimentResultStatus;
-import edacc.model.Instance;
-import edacc.model.InstanceHasProperty;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
-import edacc.satinstances.ConvertException;
-import edacc.satinstances.PropertyValueType;
 import java.awt.geom.Point2D;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import org.rosuda.JRI.Rengine;
 
 /**
@@ -44,7 +34,6 @@ public abstract class Plot {
     public static final String AVERAGE_TEXT = "all runs - average";
     public static final String MEDIAN_TEXT = "all runs - median";
     protected ExperimentController expController;
-    
 
     protected Plot(ExperimentController expController) {
         try {
@@ -54,27 +43,13 @@ public abstract class Plot {
             while ((line = br.readLine()) != null) {
                 htmlHeader += line + '\n';
             }
+            htmlHeader += htmlHeader + "</style>\n"
+                    + "</head>\n"
+                    + "<body>";
         } catch (IOException ex) {
-            // TODO: ...
-            ex.printStackTrace();
+            htmlHeader = "<body>";
         }
-        htmlHeader += htmlHeader + "</style>\n"
-                + "</head>\n"
-                + "<body>";
         this.expController = expController;
-    }
-
-    public static ArrayList<Property> getResultProperties() throws Exception {
-        ArrayList<Property> res = new ArrayList<Property>();
-        res.add(ExperimentController.PROP_CPUTIME);
-        res.addAll(PropertyDAO.getAllResultProperties());
-        return res;
-    }
-
-    public static ArrayList<Property> getInstanceProperties() throws Exception {
-        ArrayList<Property> res = new ArrayList<Property>();
-        res.addAll(PropertyDAO.getAllInstanceProperties());
-        return res;
     }
 
     /**
@@ -136,17 +111,6 @@ public abstract class Plot {
 
     }
 
-    public static ArrayList<Point2D> getPoints(Rengine re, double[] xs, double[] ys) {
-        ArrayList<Point2D> res = new ArrayList<Point2D>();
-        if (xs.length != ys.length) {
-            return res;
-        }
-        for (int i = 0; i < xs.length; i++) {
-            res.add(new Point2D.Double(xs[i], ys[i]));
-        }
-        return res;
-    }
-
     /**
      * Will be called to reinitialize the dependency gui values.
      * @throws Exception can throw an exception
@@ -190,4 +154,3 @@ public abstract class Plot {
      */
     public abstract void updateDependencies();
 }
-
