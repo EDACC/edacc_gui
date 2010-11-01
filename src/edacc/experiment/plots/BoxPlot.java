@@ -121,6 +121,7 @@ public class BoxPlot extends Plot {
             }
         }
         engine.assign("names", names);
+        engine.eval("par(family=\"Helvetica\")");
         engine.eval("boxplot(main = 'Boxplot', " + data + ", names = names, horizontal = TRUE)");
         engine.eval("mtext('"+property.getName() +"', side=1,line=3, cex=1.2)");
         if (warnings.size() > 0) {

@@ -2,6 +2,7 @@ package edacc.experiment;
 
 import edacc.experiment.plots.Plot;
 import edacc.experiment.plots.PlotPanel;
+import java.awt.Toolkit;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import org.rosuda.JRI.REXP;
@@ -144,7 +145,7 @@ public class AnalysisController {
             plotPanels.remove(from);
             //setCurrentDeviceNumber(from);
             System.out.println(re.eval("dev.copy(device = JavaGD, " + from + ", " + to + ")"));
-           // pnl.gdc.setDeviceNumber(to);
+            // pnl.gdc.setDeviceNumber(to);
             //setCurrentDeviceNumber(from);
             re.eval("dev.off(" + from + ")");
             pnl.setDeviceNumber(to);
@@ -160,8 +161,8 @@ public class AnalysisController {
         synchronized (syncR) {
             // TODO: fix this.
             // close the device and remove the panel from the hashmap
-           // plotPanels.get(dev).gdi.executeDevOff();
-          //  plotPanels.get(dev).gdc.cleanup();
+            // plotPanels.get(dev).gdi.executeDevOff();
+            //  plotPanels.get(dev).gdc.cleanup();
             plotPanels.remove(dev);
             //int[] devlist = re.eval("dev.list()").asIntArray();
             // rename devices ... resulting dev list is 2, 3, 4, ...
@@ -169,10 +170,10 @@ public class AnalysisController {
             //int[] devlist = re.eval("dev.list()").asIntArray();
             // System.out.println("LIST HERE: " + java.util.Arrays.toString(devlist));
          /*   if (devlist == null || devlist.length == 0) {
-                return;
+            return;
             }
             if (devlist[devlist.length - 1] - 2 >= devlist.length) {
-                moveDevice(devlist[devlist.length - 1], dev);
+            moveDevice(devlist[devlist.length - 1], dev);
             }*/
 
             /*  int cur = 2;
@@ -211,11 +212,13 @@ public class AnalysisController {
      * @param pnl the panel
      * @param filename the filename
      */
-    public static void saveToPdf(PlotPanel pnl, String filename) {
+    public static void saveToPdf(PlotPanel pnl, String filename, double width, double height) throws ImageSaveFailedException {
         synchronized (syncR) {
             setCurrentDeviceNumber(pnl.getDeviceNumber());
             filename = filename.replace("\\", "\\\\");
-            re.eval("dev.print(device = pdf, file = '" + filename + "')");
+            if (re.eval("dev.print(device = pdf, file = '" + filename + "', width = " + width + ", height = " + height + ")") == null) {
+                throw new ImageSaveFailedException();
+            }
         }
     }
 
@@ -224,13 +227,55 @@ public class AnalysisController {
      * @param pnl the panel
      * @param filename the filename
      */
-    public static void saveToEps(PlotPanel pnl, String filename) {
+    public static void saveToEps(PlotPanel pnl, String filename, double width, double height) throws ImageSaveFailedException {
         synchronized (syncR) {
             setCurrentDeviceNumber(pnl.getDeviceNumber());
             filename = filename.replace("\\", "\\\\");
             re.eval("setEPS()");
-            re.eval("dev.print(device = postscript, file = '" + filename + "')");
+            if (re.eval("dev.print(device = postscript, file = '" + filename + "', width = " + width + ", height = " + height + ")") == null) {
+                throw new ImageSaveFailedException();
+            }
             // TODO: revert setEPS()
+        }
+    }
+
+    public static void saveToJpeg(PlotPanel pnl, String filename, double width, double height, int quality, int res, String units) throws ImageSaveFailedException {
+        synchronized (syncR) {
+            setCurrentDeviceNumber(pnl.getDeviceNumber());
+            filename = filename.replace("\\", "\\\\");
+            if (re.eval("dev.print(device = jpeg, file = '" + filename + "', width = " + width + ", height = " + height + ", quality = " + quality + ", res = " + res + ", units = '" + units + "')") == null) {
+                throw new ImageSaveFailedException();
+            }
+        }
+    }
+
+    public static void saveToTiff(PlotPanel pnl, String filename, double width, double height, int res, String units) throws ImageSaveFailedException {
+        synchronized (syncR) {
+            setCurrentDeviceNumber(pnl.getDeviceNumber());
+            filename = filename.replace("\\", "\\\\");
+            if (re.eval("dev.print(device = tiff, file = '" + filename + "', width = " + width + ", height = " + height + ", res = " + res + ", units = '" + units + "')") == null) {
+                throw new ImageSaveFailedException();
+            }
+        }
+    }
+
+    public static void saveToBmp(PlotPanel pnl, String filename, double width, double height, int res, String units) throws ImageSaveFailedException {
+        synchronized (syncR) {
+            setCurrentDeviceNumber(pnl.getDeviceNumber());
+            filename = filename.replace("\\", "\\\\");
+            if (re.eval("dev.print(device = bmp, file = '" + filename + "', width = " + width + ", height = " + height + ", res = " + res + ", units = '" + units + "')") == null) {
+                throw new ImageSaveFailedException();
+            }
+        }
+    }
+
+    public static void saveToPng(PlotPanel pnl, String filename, double width, double height, int res, String units) throws ImageSaveFailedException {
+        synchronized (syncR) {
+            setCurrentDeviceNumber(pnl.getDeviceNumber());
+            filename = filename.replace("\\", "\\\\");
+            if (re.eval("dev.print(device = png, file = '" + filename + "', width = " + width + ", height = " + height + ", res = " + res + ", units = '" + units + "')") == null) {
+                throw new ImageSaveFailedException();
+            }
         }
     }
 

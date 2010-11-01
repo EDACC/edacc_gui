@@ -3,8 +3,6 @@ package edacc.experiment.plots;
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentResult;
 import edacc.model.Property;
-import edacc.model.PropertyDAO;
-import java.awt.geom.Point2D;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

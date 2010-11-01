@@ -9,8 +9,6 @@ import edacc.events.TaskEvents;
 import edacc.experiment.ExperimentController;
 import edacc.model.Tasks;
 import java.io.File;
-import java.util.Calendar;
-import javax.swing.filechooser.FileFilter;
 
 /**
  *

@@ -7,6 +7,7 @@ package edacc;
 
 import edacc.events.PlotTabEvents;
 import edacc.experiment.AnalysisController;
+import edacc.experiment.ImageSaveFailedException;
 import edacc.experiment.REngineInitializationException;
 import edacc.experiment.plots.PlotPanel;
 import edacc.model.TaskRunnable;
@@ -19,7 +20,10 @@ import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -31,6 +35,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -38,11 +44,14 @@ import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.JWindow;
+import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicButtonUI;
 import org.jdesktop.application.Action;
@@ -392,45 +401,48 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         if (!(tabbedPanePlots.getSelectedComponent() instanceof PlotPanel)) {
             return;
         }
-        JFileChooser fc = new JFileChooser();
-
+        PlotPanel plotPanel = (PlotPanel) tabbedPanePlots.getSelectedComponent();
+        FileChooser fc = new FileChooser(plotPanel.gdc.getWidth(), plotPanel.gdc.getHeight());
         // Set the platform dependent image types
-        for (String suffix : ImageIO.getWriterFileSuffixes()) {
-            fc.setFileFilter(new ExtensionFileFilter(suffix.toUpperCase() + " (*." + suffix + ")", suffix));
-        }
-        fc.setFileFilter(new ExtensionFileFilter("PDF (*.pdf)", "pdf"));
-        fc.setFileFilter(new ExtensionFileFilter("eps (*.eps)", "eps"));
-        fc.setAcceptAllFileFilterUsed(true);
+       /* for (String suffix : ImageIO.getWriterFileSuffixes()) {
+        fc.setFileFilter(new ExtensionFileFilter(suffix.toUpperCase() + " (*." + suffix + ")", suffix));
+        }*/
+        fc.setFileFilter(new ExtensionFileFilter("PDF (*.pdf)", "pdf", ExtensionFileFilter.OP_UNIT_INCH));
+        fc.setFileFilter(new ExtensionFileFilter("EPS (*.eps)", "eps", ExtensionFileFilter.OP_UNIT_INCH));
+        fc.setFileFilter(new ExtensionFileFilter("JPEG (*.jpg)", "jpg", 1 | 2 | 4 | 8 | 16 | 32));
+        fc.setFileFilter(new ExtensionFileFilter("BMP (*.bmp)", "bmp", 1 | 2 | 4 | 8 | 32));
+        fc.setFileFilter(new ExtensionFileFilter("TIFF (*.tiff)", "tiff", 1 | 2 | 4 | 8 | 32));
+        fc.setFileFilter(new ExtensionFileFilter("PNG (*.png)", "png", 1 | 2 | 4 | 8 | 32));
+        fc.setAcceptAllFileFilterUsed(false);
         fc.setMultiSelectionEnabled(false);
         if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             String fileName = fc.getSelectedFile().getAbsolutePath();
-            String name = fc.getSelectedFile().getName();
             String imgType;
             // find out the image type to be used
-            if (fc.getFileFilter() == null || !(fc.getFileFilter() instanceof ExtensionFileFilter)) {
-                imgType = "";
-                for (String suffix : ImageIO.getWriterFileSuffixes()) {
-                    if (fileName.endsWith("." + suffix)) {
-                        imgType = suffix;
-                        break;
-                    }
-                }
-                // add pdf & eps
-                if (fileName.endsWith(".pdf")) {
-                    imgType = "pdf";
-                } else if (fileName.endsWith(".eps")) {
-                    imgType = "eps";
-                }
-            } else {
-                imgType = ((ExtensionFileFilter) fc.getFileFilter()).extensions[0];
-                if (!fileName.endsWith("." + imgType)) {
-                    fileName += "." + imgType;
-                }
+          /*  if (fc.getFileFilter() == null || !(fc.getFileFilter() instanceof ExtensionFileFilter)) {
+            imgType = "";
+            for (String suffix : ImageIO.getWriterFileSuffixes()) {
+            if (fileName.endsWith("." + suffix)) {
+            imgType = suffix;
+            break;
             }
-            if ("".equals(imgType)) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Unknown file extension.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-                return;
             }
+            // add pdf & eps
+            if (fileName.endsWith(".pdf")) {
+            imgType = "pdf";
+            } else if (fileName.endsWith(".eps")) {
+            imgType = "eps";
+            }
+            } else {*/
+            imgType = ((ExtensionFileFilter) fc.getFileFilter()).extensions[0];
+            if (!fileName.endsWith("." + imgType)) {
+                fileName += "." + imgType;
+            }
+            //}
+           /* if ("".equals(imgType)) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Unknown file extension.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+            }*/
             File f = new File(fileName);
             if (f.exists()) {
                 int userInput = javax.swing.JOptionPane.showConfirmDialog(this, "File exists. Overwrite?", "File exists", javax.swing.JOptionPane.YES_NO_OPTION);
@@ -438,31 +450,24 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
                     return;
                 }
             }
-            PlotPanel plotPanel = (PlotPanel) tabbedPanePlots.getSelectedComponent();
-            //  TabComponent tc = (TabComponent) tabbedPanePlots.getTabComponentAt(tabbedPanePlots.getSelectedIndex());
-            if ("pdf".equals(imgType)) {
-                AnalysisController.saveToPdf(plotPanel, fileName);
-            } else if ("eps".equals(imgType)) {
-                AnalysisController.saveToEps(plotPanel, fileName);
-            } else {
-                try {
-                    // Get a buffered Image with the right dimension
-                    BufferedImage bufferedImage = new BufferedImage(plotPanel.gdc.getWidth(), plotPanel.gdc.getHeight(), BufferedImage.TYPE_INT_RGB);
-                    // paint the image on the new buffered image
-                    Graphics g = bufferedImage.createGraphics();
-                    g.setColor(Color.WHITE);
-                    g.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
-                    g.setClip(0, 0, plotPanel.gdc.getWidth(), plotPanel.gdc.getHeight());
-                    plotPanel.gdc.invalidate();
-                    plotPanel.gdc.paintAll(g);
-                    plotPanel.gdc.paint(g);
-                    // save the image to disk
-                    ImageIO.write(bufferedImage, imgType, f);
-                    //  tc.setTitle(name);
-
-                } catch (IOException ex) {
-                    javax.swing.JOptionPane.showMessageDialog(this, "Error while writing file: " + ex.getMessage(), "Error while writing file", javax.swing.JOptionPane.ERROR_MESSAGE);
+            try {
+                if ("pdf".equals(imgType)) {
+                    AnalysisController.saveToPdf(plotPanel, fileName, fc.getImageWidth(), fc.getImageHeight());
+                } else if ("eps".equals(imgType)) {
+                    AnalysisController.saveToEps(plotPanel, fileName, fc.getImageWidth(), fc.getImageHeight());
+                } else if ("jpg".equals(imgType)) {
+                    AnalysisController.saveToJpeg(plotPanel, fileName, fc.getImageWidth(), fc.getImageHeight(), fc.getQuality(), fc.getResolution(), fc.getUnit());
+                } else if ("bmp".equals(imgType)) {
+                    AnalysisController.saveToBmp(plotPanel, fileName, fc.getImageWidth(), fc.getImageHeight(), fc.getResolution(), fc.getUnit());
+                } else if ("tiff".equals(imgType)) {
+                    AnalysisController.saveToTiff(plotPanel, fileName, fc.getImageWidth(), fc.getImageHeight(), fc.getResolution(), fc.getUnit());
+                } else if ("png".equals(imgType)) {
+                    AnalysisController.saveToPng(plotPanel, fileName, fc.getImageWidth(), fc.getImageHeight(), fc.getResolution(), fc.getUnit());
                 }
+            } catch (NumberFormatException e) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Invalid data.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            } catch (ImageSaveFailedException e) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Saving the image failed.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
 
         }
@@ -612,9 +617,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
     }//GEN-LAST:event_tabbedPanePlotsStateChanged
 
     private void tabbedPanePlotsMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabbedPanePlotsMouseMoved
-
     }//GEN-LAST:event_tabbedPanePlotsMouseMoved
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnSave;
@@ -848,20 +851,28 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
 
     class ExtensionFileFilter extends FileFilter {
 
+        public static final int OP_UNIT_INCH = 1;
+        public static final int OP_UNIT_CM = 2;
+        public static final int OP_UNIT_MM = 4;
+        public static final int OP_UNIT_PX = 8;
+        public static final int OP_QUALITY = 16;
+        public static final int OP_RESOLUTION = 32;
         String description;
         String extensions[];
+        int options;
 
-        public ExtensionFileFilter(String description, String extension) {
-            this(description, new String[]{extension});
+        public ExtensionFileFilter(String description, String extension, int options) {
+            this(description, new String[]{extension}, options);
         }
 
-        public ExtensionFileFilter(String description, String extensions[]) {
+        public ExtensionFileFilter(String description, String extensions[], int options) {
             if (description == null) {
                 this.description = extensions[0];
             } else {
                 this.description = description;
             }
             this.extensions = (String[]) extensions.clone();
+            this.options = options;
             toLower(this.extensions);
         }
 
@@ -939,5 +950,248 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
         }, true, this);
 
 
+    }
+
+    class FileChooser extends JFileChooser {
+
+        private JComboBox comboUnits;
+        private JTextField txtWidth, txtHeight, txtQuality, txtResolution;
+        private JPanel pnlOptions;
+        private Integer width, height;
+        private String cur;
+        public static final int DPI = 72;
+
+        public FileChooser(int width, int height) {
+            super();
+            this.width = width;
+            this.height = height;
+            this.addPropertyChangeListener("fileFilterChanged", new PropertyChangeListener() {
+
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if (evt.getOldValue() != evt.getNewValue()) {
+                        if (!(evt.getNewValue() instanceof ExtensionFileFilter)) {
+                            setAccessory(null);
+                        } else {
+                            updateOptionsPanel((ExtensionFileFilter) evt.getNewValue());
+                            setAccessory(pnlOptions);
+                        }
+                        FileChooser.this.revalidate();
+                    }
+                }
+            });
+        }
+
+        private void updateOptionsPanel(ExtensionFileFilter filter) {
+            txtHeight = new JTextField();
+            txtWidth = new JTextField();
+            txtQuality = new JTextField("75");
+            txtResolution = new JTextField(String.valueOf(DPI));
+            txtHeight.setPreferredSize(new Dimension(100, txtHeight.getPreferredSize().height));
+            txtWidth.setPreferredSize(new Dimension(100, txtWidth.getPreferredSize().height));
+            txtQuality.setPreferredSize(new Dimension(100, txtQuality.getPreferredSize().height));
+            txtResolution.setPreferredSize(new Dimension(100, txtResolution.getPreferredSize().height));
+            comboUnits = new JComboBox();
+            comboUnits.setPreferredSize(new Dimension(100, comboUnits.getPreferredSize().height));
+            cur = null;
+            comboUnits.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int w, h;
+                    int dpi;
+                    try {
+                        dpi = getResolution();
+                    } catch (NumberFormatException ex) {
+                        dpi = DPI;
+                    }
+                    if ("inch".equals(cur)) {
+                        try {
+                            double tmp = Double.parseDouble(txtWidth.getText());
+                            tmp *= dpi;
+                            w = (int) Math.round(tmp);
+                        } catch (NumberFormatException ex) {
+                            w = width;
+                        }
+                        try {
+                            double tmp = Double.parseDouble(txtHeight.getText());
+                            tmp *= dpi;
+                            h = (int) Math.round(tmp);
+                        } catch (NumberFormatException ex) {
+                            h = height;
+                        }
+                    } else if ("cm".equals(cur)) {
+                        try {
+                            double tmp = Double.parseDouble(txtWidth.getText());
+                            tmp *= dpi;
+                            tmp /= 2.54;
+                            w = (int) Math.round(tmp);
+                        } catch (NumberFormatException ex) {
+                            w = width;
+                        }
+                        try {
+                            double tmp = Double.parseDouble(txtHeight.getText());
+                            tmp *= dpi;
+                            tmp /= 2.54;
+                            h = (int) Math.round(tmp);
+                        } catch (NumberFormatException ex) {
+                            h = height;
+                        }
+                    } else if ("mm".equals(cur)) {
+                        try {
+                            double tmp = Double.parseDouble(txtWidth.getText());
+                            tmp *= dpi;
+                            tmp /= 2.54;
+                            tmp /= 10.;
+                            w = (int) Math.round(tmp);
+                        } catch (NumberFormatException ex) {
+                            w = width;
+                        }
+                        try {
+                            double tmp = Double.parseDouble(txtHeight.getText());
+                            tmp *= dpi;
+                            tmp /= 2.54;
+                            tmp /= 10.;
+                            h = (int) Math.round(tmp);
+                        } catch (NumberFormatException ex) {
+                            h = height;
+                        }
+                    } else if ("pixel".equals(cur)) {
+                        try {
+                            w = Integer.parseInt(txtWidth.getText());
+                        } catch (NumberFormatException ex) {
+                            w = width;
+                        }
+                        try {
+                            h = Integer.parseInt(txtHeight.getText());
+                        } catch (NumberFormatException ex) {
+                            h = height;
+                        }
+                    } else {
+                        w = width;
+                        h = height;
+                    }
+                    // w, h in pixels
+                    if ("inch".equals(comboUnits.getSelectedItem())) {
+                        Double i_width = (double) w / (double) dpi;
+                        Double i_height = (double) h / (double) dpi;
+                        i_width = (double) Math.round(i_width * 100) / (double) 100;
+                        i_height = (double) Math.round(i_height * 100) / (double) 100;
+                        txtHeight.setText(i_height.toString());
+                        txtWidth.setText(i_width.toString());
+                    } else if ("cm".equals(comboUnits.getSelectedItem())) {
+                        Double i_width = (double) w / (double) dpi * 2.54;
+                        Double i_height = (double) h / (double) dpi * 2.54;
+                        i_width = (double) Math.round(i_width * 100) / (double) 100;
+                        i_height = (double) Math.round(i_height * 100) / (double) 100;
+                        txtHeight.setText(i_height.toString());
+                        txtWidth.setText(i_width.toString());
+                    } else if ("mm".equals(comboUnits.getSelectedItem())) {
+                        Double i_width = (double) w / (double) dpi * 2.54 * 10.;
+                        Double i_height = (double) h / (double) dpi * 2.54 * 10.;
+                        i_width = (double) Math.round(i_width * 100) / (double) 100;
+                        i_height = (double) Math.round(i_height * 100) / (double) 100;
+                        txtHeight.setText(i_height.toString());
+                        txtWidth.setText(i_width.toString());
+                    } else if ("pixel".equals(comboUnits.getSelectedItem())) {
+                        txtHeight.setText(String.valueOf(h));
+                        txtWidth.setText(String.valueOf(w));
+                    } else {
+                    }
+                    if (comboUnits.getSelectedItem() instanceof String) {
+                        cur = (String) comboUnits.getSelectedItem();
+                    } else {
+                        cur = null;
+                    }
+                }
+            });
+            if ((filter.options & ExtensionFileFilter.OP_UNIT_INCH) > 0) {
+                comboUnits.addItem("inch");
+            }
+            if ((filter.options & ExtensionFileFilter.OP_UNIT_CM) > 0) {
+                comboUnits.addItem("cm");
+            }
+            if ((filter.options & ExtensionFileFilter.OP_UNIT_MM) > 0) {
+                comboUnits.addItem("mm");
+            }
+            if ((filter.options & ExtensionFileFilter.OP_UNIT_PX) > 0) {
+                comboUnits.addItem("pixel");
+            }
+            pnlOptions = new JPanel(new GridBagLayout());
+            GridBagConstraints c = new GridBagConstraints();
+            c.anchor = GridBagConstraints.PAGE_START;
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.weighty = 1;
+            c.gridx = 0;
+            c.gridy = 0;
+            c.insets = new Insets(3, 3, 3, 3);
+            pnlOptions.add(new JLabel("Units:"), c);
+            c.gridx = 1;
+            pnlOptions.add(comboUnits, c);
+            c.gridx = 0;
+            c.gridy = 1;
+            c.weighty *= 1000;
+            pnlOptions.add(new JLabel("Width:"), c);
+            c.gridx = 1;
+            pnlOptions.add(txtWidth, c);
+            c.gridx = 0;
+            c.gridy = 2;
+            c.weighty *= 1000;
+            pnlOptions.add(new JLabel("Height"), c);
+            c.gridx = 1;
+            pnlOptions.add(txtHeight, c);
+
+            if ((filter.options & ExtensionFileFilter.OP_RESOLUTION) > 0) {
+                c.gridx = 0;
+                c.gridy++;
+                c.weighty *= 1000;
+                pnlOptions.add(new JLabel("Resolution (DPI):"), c);
+                c.gridx = 1;
+                pnlOptions.add(txtResolution, c);
+            }
+            if ((filter.options & ExtensionFileFilter.OP_QUALITY) > 0) {
+                c.gridx = 0;
+                c.gridy++;
+                c.weighty *= 1000;
+                pnlOptions.add(new JLabel("Quality:"), c);
+                c.gridx = 1;
+                pnlOptions.add(txtQuality, c);
+            }
+            pnlOptions.setBorder(new TitledBorder("Options"));
+        }
+
+        public double getImageWidth() throws NumberFormatException {
+            return Double.parseDouble(txtWidth.getText());
+        }
+
+        public double getImageHeight() throws NumberFormatException {
+            return Double.parseDouble(txtHeight.getText());
+        }
+
+        public int getResolution() throws NumberFormatException {
+            return Integer.parseInt(txtResolution.getText());
+        }
+
+        public int getQuality() throws NumberFormatException {
+            return Integer.parseInt(txtQuality.getText());
+        }
+
+        /**
+         * Returns the selected unit as a string which R understands.
+         * @return
+         */
+        public String getUnit() {
+            String unit = (String) comboUnits.getSelectedItem();
+            if ("inch".equals(unit)) {
+                return "in";
+            } else if ("cm".equals(unit)) {
+                return "cm";
+            } else if ("mm".equals(unit)) {
+                return "mm";
+            } else if ("pixel".equals(unit)) {
+                return "px";
+            }
+            return "";
+        }
     }
 }
