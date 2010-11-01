@@ -38,12 +38,19 @@ import java.util.regex.Pattern;
 /**
  *
  * @author rretz
+ * @author dgall
  */
 public class PropertyComputationUnit implements Runnable {
-    ExperimentResultHasProperty erhp;
-    InstanceHasProperty ihp;
-    PropertyComputationController callback;
-    Property property;
+    private ExperimentResultHasProperty erhp;
+    private InstanceHasProperty ihp;
+    private PropertyComputationController callback;
+    private Property property;
+
+    /**
+     * Defines the maximum time the unit will wait for a value of an external program (in millis).
+     * default: 10 sec
+     */
+    private static final int MAX_WAIT_TIME = 10000;
 
     PropertyComputationUnit(ExperimentResultHasProperty erhp, PropertyComputationController callback) {
         this.erhp = erhp;
@@ -112,13 +119,14 @@ public class PropertyComputationUnit implements Runnable {
         callback.callback();  
     }
 
-    private void compute(Blob b) throws FileNotFoundException, IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, ComputationMethodDoesNotExistException {
+    private void compute(Blob b) throws FileNotFoundException, IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, ComputationMethodDoesNotExistException, ErrorInExternalProgramException {
         if(property.getComputationMethod() != null){
 
             // parse instance file (external program call)
             if (ihp != null) {
                 File bin = ComputationMethodDAO.getBinaryOfComputationMethod(property.getComputationMethod());
                 bin.setExecutable(true);
+                System.out.println(bin.getAbsolutePath());
                 Process p = Runtime.getRuntime().exec(bin.getAbsolutePath());
                 Blob instance = InstanceDAO.getBinary(ihp.getInstance().getId());
                 BufferedReader instanceReader = new BufferedReader(new InputStreamReader(instance.getBinaryStream()));
@@ -126,18 +134,39 @@ public class PropertyComputationUnit implements Runnable {
                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
                 // The std output stream of the external program (-> output of the program). We read the calculated value from this stream.
                 BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                // The error stream of the program
+                BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
                 // pipe the content of the instance file to the input of the external program
                 try {
-                    int i;
-                    while ((i = instanceReader.read()) != -1)
-                        out.write(i);
+                    String s;
+                    while ((s = instanceReader.readLine()) != null) {
+                        out.write(s);
+                        out.newLine();
+                    }
                 } catch (IOException e) {
                     // if a program stops reading from the stream, stop writing to it but show no error. Otherwise show an error message
                     if (!e.getMessage().contains("Broken pipe")) {
+                        e.printStackTrace();
                         throw e;
-                    }
+                    } 
                 }
+                // Close output stream, after whole instance file has been written to program input
+                out.close();
+
+                // check, if already an error occured
+                if (err.ready())
+                    throw new ErrorInExternalProgramException(err.readLine());
+                // check, if program already has terminated
+                try {
+                    int exit;
+                    if ((exit = p.exitValue()) != 0) {
+                        throw new ErrorInExternalProgramException("External program exited with errors! Exit value: " + exit);
+                }
+                } catch (IllegalThreadStateException e) {
+                    // do nothing if program is still running
+                }
+                                    
                 /**
                  * Read the program output and save it as value of the property
                  * for the given instance.
@@ -149,11 +178,20 @@ public class PropertyComputationUnit implements Runnable {
                  * on that value for the PropertyValueType of the property (so
                  * the String will be converted to the correct Java type).
                  */
+                // wait some time till program output is available (maybe external program needs some time to calculate the property)
+                long time = System.currentTimeMillis();
+                while (System.currentTimeMillis() - time < MAX_WAIT_TIME && !in.ready());
+                // if no value is available after waitng time, kill the program
+                if (!in.ready()) {
+                    p.destroy();
+                    throw new ErrorInExternalProgramException("Time limit of external calculation exceeded! The external program has been terminated!");
+                }
                 // Read first line of program output
                 String value = in.readLine();
                 // set the value and save it
                 ihp.setValue(value);
                 System.out.println(value);
+                //InstanceHasPropertyDAO.save(ihp);
             } else if (erhp != null){
                 File bin = ComputationMethodDAO.getBinaryOfComputationMethod(property.getComputationMethod());
                 bin.setExecutable(true);
