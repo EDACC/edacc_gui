@@ -41,6 +41,7 @@ public class PropertyComputationController implements Runnable{
     Vector<InstanceHasProperty> instancePropertyQueue;
     Vector<ExperimentResultHasProperty> resultPropertyQueue;
     boolean recompute;
+    private int jobs;
 
     public PropertyComputationController(Experiment exp, Vector<Property> givenProperties, boolean recompute) throws NoConnectionToDBException, SQLException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException{
         availableProcessors = Runtime.getRuntime().availableProcessors();
@@ -57,15 +58,20 @@ public class PropertyComputationController implements Runnable{
     public void run() {
         for(int i = 0; i < availableProcessors; i++){
             if(instancePropertyQueue != null){
-                if(instancePropertyQueue.isEmpty())
-                    break;
+                if(instancePropertyQueue.isEmpty()){
+                    jobs = i;
+                    return;
+                }
                  new Thread(new PropertyComputationUnit(instancePropertyQueue.get(i), this)).start();
             }else if(resultPropertyQueue != null){
-                if(resultPropertyQueue.isEmpty())
-                    break;
+                if(resultPropertyQueue.isEmpty()){
+                    jobs = i;
+                    return;
+                }
                 new Thread(new PropertyComputationUnit(resultPropertyQueue.get(i), this)).start();
             }           
         }
+        jobs = availableProcessors;
     }
 
     public void callback() {

@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
@@ -513,6 +514,58 @@ public class ExperimentResultDAO {
         f.getParentFile().mkdirs();
         getLauncherOutput(expRes.getId(), f);
         return f;
+    }
+
+    public static Blob getLauncherOutput(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, ExperimentResultNotInDBException {
+       PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT lancherOutput "
+                + "FROM " + table + " "
+                + "WHERE idJob=?;");
+        ps.setInt(1, expRes.getId());
+        ResultSet rs = ps.executeQuery();
+        if(rs.next())
+            return rs.getBlob(1);
+        else
+            throw new ExperimentResultNotInDBException();
+    }
+
+    public static Blob getSolverOutput(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, ExperimentResultNotInDBException {
+       PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT solverOutput "
+                + "FROM " + table + " "
+                + "WHERE idJob=?;");
+        ps.setInt(1, expRes.getId());
+        ResultSet rs = ps.executeQuery();
+        if(rs.next())
+            return rs.getBlob(1);
+        else
+            throw new ExperimentResultNotInDBException();
+    }
+
+    public static Blob getVerifierOutput(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, ExperimentResultNotInDBException {
+       PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT verifierOutput "
+                + "FROM " + table + " "
+                + "WHERE idJob=?;");
+        ps.setInt(1, expRes.getId());
+        ResultSet rs = ps.executeQuery();
+        if(rs.next())
+            return rs.getBlob(1);
+        else
+            throw new ExperimentResultNotInDBException();
+    }
+
+    public static Blob getWatcherOutput(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, ExperimentResultNotInDBException {
+       PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT watcherOutput "
+                + "FROM " + table + " "
+                + "WHERE idJob=?;");
+        ps.setInt(1, expRes.getId());
+        ResultSet rs = ps.executeQuery();
+        if(rs.next())
+            return rs.getBlob(1);
+        else
+            throw new ExperimentResultNotInDBException();
     }
 
     /**
