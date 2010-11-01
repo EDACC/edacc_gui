@@ -119,7 +119,7 @@ public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void bComputeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bComputeActionPerformed
-        Vector<Property> properties = new Vector<Property>();
+        Vector<Property> properties = ((PropertyListModel) listProperties.getModel()).getPropertyList();
         manageDBInstances.computeProperties(instances, properties);
     }//GEN-LAST:event_bComputeActionPerformed
 
@@ -160,6 +160,14 @@ public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog {
         @Override
         public Object getElementAt(int index) {
             return properties.get(index);
+        }
+
+        /**
+         *
+         * @return a new vector containing the properties in the JList.
+         */
+        public Vector<Property> getPropertyList() {
+            return (Vector<Property>) properties.clone();
         }
     }
 

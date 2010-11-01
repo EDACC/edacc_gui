@@ -4,10 +4,8 @@
  */
 package edacc.model;
 
-import edacc.model.InstanceProperty;
 import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.ConvertException;
-import edacc.satinstances.InstancePropertyManager;
 import edacc.satinstances.InvalidVariableException;
 import edacc.satinstances.PropertyValueType;
 import java.io.IOException;
@@ -16,7 +14,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Vector;
 
 /**
