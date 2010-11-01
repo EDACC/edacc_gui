@@ -20,7 +20,7 @@ import java.util.Vector;
  *
  * @author dgall
  */
-public class SATInstance extends PropertyInput {
+public class SATInstance {
 
     private Vector<Vector<Integer>> clauses;
     private Vector<Integer> variables;

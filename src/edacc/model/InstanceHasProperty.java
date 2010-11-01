@@ -5,10 +5,6 @@
 
 package edacc.model;
 
-import edacc.satinstances.InstancePropertyManager;
-import java.io.IOException;
-import java.sql.SQLException;
-
 /**
  *
  * @author dgall
