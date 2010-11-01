@@ -1,10 +1,6 @@
 package edacc.model;
 
-import SevenZip.Compression.LZMA.Decoder;
-import SevenZip.Compression.LZMA.Encoder;
-import edacc.manageDB.InstanceParser.InstanceParser;
 import edacc.properties.PropertyTypeNotExistException;
-import edacc.satinstances.InstancePropertyManager;
 import edacc.satinstances.InvalidVariableException;
 import edacc.satinstances.SATInstance;
 import java.io.File;
