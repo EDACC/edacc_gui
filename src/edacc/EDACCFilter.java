@@ -83,7 +83,7 @@ public class EDACCFilter extends javax.swing.JDialog {
      * Gets the value of the underlying table, i.e. it calls the getValue method of the table model.
      * @param row
      * @param col
-     * @return
+     * @return the value object
      */
     public Object getValueAt(int row, int col) {
         return table.getModel().getValueAt(row, col);
@@ -92,7 +92,7 @@ public class EDACCFilter extends javax.swing.JDialog {
     /**
      * Returns true iff the given entry matches the filter parameters.
      * @param entry
-     * @return
+     * @return boolean
      */
     public synchronized boolean include(Entry<? extends Object, ? extends Object> entry) {
         HashMap<Integer, Boolean> arguments = new HashMap<Integer, Boolean>();
@@ -116,7 +116,7 @@ public class EDACCFilter extends javax.swing.JDialog {
 
     /**
      * Returns true iff there is the chance that some rows might not be visible in the table.
-     * @return
+     * @return boolean
      */
     public synchronized boolean hasFiltersApplied() {
         try {

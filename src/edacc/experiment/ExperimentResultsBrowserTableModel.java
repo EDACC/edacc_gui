@@ -28,10 +28,11 @@ import javax.swing.SwingUtilities;
 /**
  * In this class rowIndexes are always the visible rowIndexes and columnIndexes
  * are always the visible column indexes.
- * @author daniel
+ * @author daniel, simon
  */
 public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
+    // constants for the columns
     public static int COL_ID = 0;
     public static int COL_COMPUTEQUEUE = 1;
     public static int COL_SOLVER = 2;
@@ -48,7 +49,9 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public static int COL_VERIFIER_OUTPUT = 13;
     public static int COL_PROPERTY = 14;
     private ArrayList<ExperimentResult> jobs;
+    // the constant columns
     private String[] CONST_COLUMNS = {"ID", "Compute Queue", "Solver", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
+    // the visibility of each column
     private boolean[] CONST_VISIBLE = {false, true, true, true, true, true, true, true, true, true, false, false, false, false};
     private String[] columns;
     private ArrayList<Property> solverProperties;
@@ -99,7 +102,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     /**
      * Returns the job id
      * @param row
-     * @return
+     * @return the id of the job
      */
     public Integer getId(int row) {
         return jobs.get(row).getId();
@@ -135,7 +138,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     /**
      * Returns the run
      * @param row
-     * @return
+     * @return the run
      */
     public Integer getRun(int row) {
         return jobs.get(row).getRun();
@@ -144,7 +147,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     /**
      * Returns the seed
      * @param row
-     * @return
+     * @return the seed
      */
     public Integer getSeed(int row) {
         return jobs.get(row).getSeed();
@@ -153,7 +156,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     /**
      * Returns the status
      * @param row
-     * @return
+     * @return the status
      */
     public ExperimentResultStatus getStatus(int row) {
         if (row < 0 || row >= getRowCount()) {
@@ -238,7 +241,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
     /**
      * Returns an array of all column names, not only the visible ones.
-     * @return
+     * @return array of string with all column names
      */
     public String[] getAllColumnNames() {
         return columns;
@@ -305,7 +308,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
     /**
      * Returns the visibility array
-     * @return
+     * @return array of boolean, where entry i says whether column i is visible or not
      */
     public boolean[] getColumnVisibility() {
         return visible;
@@ -396,7 +399,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
     /**
      * Returns all disjunct instance names which are currently in that model
-     * @return
+     * @return arraylist with the instance names
      */
     public ArrayList<String> getInstances() {
         ArrayList<String> res = new ArrayList<String>();

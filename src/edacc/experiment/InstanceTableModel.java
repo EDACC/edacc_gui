@@ -124,7 +124,7 @@ public class InstanceTableModel extends AbstractTableModel {
     /**
      * Returns a vector with all instance ids for which there is no
      * corresponding ExperimentHasInstance.
-     * @return
+     * @return Vector of the new instance ids
      */
     public Vector<Integer> getNewInstanceIds() {
         Vector<Integer> res = new Vector<Integer>();
@@ -144,7 +144,7 @@ public class InstanceTableModel extends AbstractTableModel {
     /**
      * Returns a vector with all deselected ExperimentHasInstance objects which
      * were specified by setExperimentHasInstances()
-     * @return
+     * @return arraylist of the ExperimentHasInstance objects
      */
     public ArrayList<ExperimentHasInstance> getDeletedExperimentHasInstances() {
         ArrayList<ExperimentHasInstance> res = new ArrayList<ExperimentHasInstance>();

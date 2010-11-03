@@ -15,7 +15,7 @@ public class Statistics {
      * @param re
      * @param xsName
      * @param ysName
-     * @return
+     * @return pvalue, cor
      */
     public static double[] spearmanCorrelation(Rengine re, String xsName, String ysName) {
         double[] res = null;
@@ -34,7 +34,7 @@ public class Statistics {
      * @param re
      * @param xsName
      * @param ysName
-     * @return
+     * @return pvalue, cor
      */
     public static double[] pearsonCorrelation(Rengine re, String xsName, String ysName) {
         double[] res = null;

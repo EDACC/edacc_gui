@@ -311,7 +311,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
 
     /**
      * Returns the main tab view.
-     * @return
+     * @return the main tab view
      */
     public static EDACCPlotTabView getMainTabView() {
         if (tabViews.size() == 0) {
@@ -325,7 +325,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
 
     /**
      * Returns the number of tab view windows
-     * @return
+     * @return the number of tab view windows
      */
     public static int getTabViewCount() {
         return tabViews.size();

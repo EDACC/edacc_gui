@@ -1781,7 +1781,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     /**
      * Returns the empty string or any string containing a non-negative number or -1.
      * @param text
-     * @return
+     * @return the number text
      */
     public String getNumberText(String text) {
         String res = "";

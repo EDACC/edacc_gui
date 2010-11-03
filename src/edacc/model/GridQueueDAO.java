@@ -235,7 +235,7 @@ public class GridQueueDAO {
     /**
      * Copies the PBS Script of the specified queue to a temporary location.
      * @param q
-     * @return
+     * @return the resulting file
      * @throws NoConnectionToDBException
      * @throws SQLException
      * @throws FileNotFoundException

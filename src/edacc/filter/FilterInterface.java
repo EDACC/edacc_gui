@@ -8,7 +8,7 @@ public interface FilterInterface {
     /**
      * Returns true iff the value matches the parameters of the filter.
      * @param value
-     * @return
+     * @return true iff the object should be included
      */
     public boolean include(Object value);
     /**

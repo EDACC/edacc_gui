@@ -3,11 +3,18 @@ package edacc.filter;
 import java.util.HashMap;
 
 /**
- * This is a simple boolean evaluator.
+ * This class implements a simple boolean evaluator.
  * @author simon
  */
 public class Parser {
 
+    /**
+     * evaluates the expression with the given arguments.
+     * @param expression the expression
+     * @param arguments the arguments
+     * @return the result of the evaluated expression
+     * @throws Exception if there are unknown arguments in the expression or there is a syntax error in the expression
+     */
     public boolean eval(String expression, HashMap<Integer, Boolean> arguments) throws Exception {
         return eval(expression, arguments, false);
     }
@@ -20,6 +27,14 @@ public class Parser {
         }
     }
 
+    /**
+     * evaluates the expression with the given arguments.
+     * @param expression the expression
+     * @param arguments the arguments
+     * @param test if this is set to true, every argument in the expression is replaced by `true`
+     * @return the result of the evaluated expression
+     * @throws Exception if there are unknown arguments in the expression or there is a syntax error in the expression
+     */
     public boolean eval(String expression, HashMap<Integer, Boolean> arguments, boolean test) throws Exception {
         expression = expression.replaceAll(" ", "");
         boolean res = true;
