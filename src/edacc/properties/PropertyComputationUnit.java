@@ -191,7 +191,7 @@ public class PropertyComputationUnit implements Runnable {
                 // set the value and save it
                 ihp.setValue(value);
                 System.out.println(value);
-                //InstanceHasPropertyDAO.save(ihp);
+                InstanceHasPropertyDAO.save(ihp);
             } else if (erhp != null){
                 File bin = ComputationMethodDAO.getBinaryOfComputationMethod(property.getComputationMethod());
                 bin.setExecutable(true);

@@ -29,6 +29,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,7 +39,7 @@ import java.util.logging.Logger;
  */
 public class PropertyComputationController implements Runnable{
     private int availableProcessors;
-    Vector<InstanceHasProperty> instancePropertyQueue;
+    LinkedBlockingQueue<InstanceHasProperty> instancePropertyQueue;
     Vector<ExperimentResultHasProperty> resultPropertyQueue;
     boolean recompute;
     private int jobs;
@@ -62,7 +63,11 @@ public class PropertyComputationController implements Runnable{
                     jobs = i;
                     return;
                 }
-                 new Thread(new PropertyComputationUnit(instancePropertyQueue.get(i), this)).start();
+                try {
+                    new Thread(new PropertyComputationUnit(instancePropertyQueue.take(), this)).start();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }else if(resultPropertyQueue != null){
                 if(resultPropertyQueue.isEmpty()){
                     jobs = i;
@@ -77,7 +82,11 @@ public class PropertyComputationController implements Runnable{
     public void callback() {
         if(instancePropertyQueue != null){
             if(!instancePropertyQueue.isEmpty())
-                new Thread(new PropertyComputationUnit(instancePropertyQueue.get(0), this)).start();
+                try {
+                new Thread(new PropertyComputationUnit(instancePropertyQueue.take(), this)).start();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }else if(resultPropertyQueue != null){
             if(!resultPropertyQueue.isEmpty())
                 new Thread(new PropertyComputationUnit(resultPropertyQueue.get(0), this)).start();
@@ -124,7 +133,7 @@ public class PropertyComputationController implements Runnable{
     }
 
     private void createJobQueue(Vector<Instance> instances, Vector<Property> givenProperties) {
-        instancePropertyQueue = new Vector<InstanceHasProperty>();
+        instancePropertyQueue = new LinkedBlockingQueue<InstanceHasProperty>();
         // create all InstanceHasProperty objects and adds them to the instancePropertyQueue
         for(int i = 0; i < instances.size(); i++){
             for(int j = 0; j < givenProperties.size(); j++){
