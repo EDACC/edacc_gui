@@ -53,9 +53,9 @@ public class PropertyComputationUnit implements Runnable {
     private static final int MAX_WAIT_TIME = 10000;
 
     PropertyComputationUnit(ExperimentResultHasProperty erhp, PropertyComputationController callback) {
-        this.erhp = erhp;
-        this.callback = callback;
         this.property = erhp.getProperty();
+        this.erhp = erhp;
+        this.callback = callback;      
     }
 
     PropertyComputationUnit(InstanceHasProperty ihp, PropertyComputationController callback) {
@@ -220,7 +220,7 @@ public class PropertyComputationUnit implements Runnable {
                 ExperimentResultHasPropertyDAO.save(erhp);
             }
         }else if(property.getRegularExpression() != null){
-            /*Vector<String> res = new Vector<String>();
+            Vector<String> res = new Vector<String>();
             BufferedReader buf = new BufferedReader(new InputStreamReader(b.getBinaryStream()));
             String tmp;
             Vector<String> toAdd = new Vector<String>();
@@ -238,7 +238,7 @@ public class PropertyComputationUnit implements Runnable {
             else if(erhp != null){
                 erhp.setValue(res);
                 ExperimentResultHasPropertyDAO.save(erhp);
-            }*/
+            }
         }
     }
 

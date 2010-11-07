@@ -73,13 +73,19 @@ public class PropertyComputationController implements Runnable{
                     jobs = i;
                     return;
                 }
-                new Thread(new PropertyComputationUnit(resultPropertyQueue.get(i), this)).start();
+                Property prop = resultPropertyQueue.get(i).getProperty();
+                new Thread(new PropertyComputationUnit(resultPropertyQueue.remove(i), this)).start();
             }           
         }
         jobs = availableProcessors;
     }
 
     public void callback() {
+        jobs--;
+        if(jobs == 0)
+            return;
+        // TODO: notify controller
+
         if(instancePropertyQueue != null){
             if(!instancePropertyQueue.isEmpty())
                 try {
@@ -97,7 +103,7 @@ public class PropertyComputationController implements Runnable{
         resultPropertyQueue = new Vector<ExperimentResultHasProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idJob FROM " +
                 "ExperimentResults WHERE Experiment_idExperiment=?;");
-        ps.setInt(exp.getId(), 1);
+        ps.setInt(1, exp.getId());
         ResultSet rs = ps.executeQuery();
         // create all experimentResultHasProperty objects and adds them into the resultPropertyQueue
         while(rs.next()){
