@@ -72,8 +72,7 @@ public class PropertyComputationController implements Runnable{
                 if(resultPropertyQueue.isEmpty()){
                     jobs = i;
                     return;
-                }
-                Property prop = resultPropertyQueue.get(i).getProperty();
+                }               
                 new Thread(new PropertyComputationUnit(resultPropertyQueue.remove(i), this)).start();
             }           
         }

@@ -562,8 +562,11 @@ public class ExperimentResultDAO {
                 + "WHERE idJob=?;");
         ps.setInt(1, expRes.getId());
         ResultSet rs = ps.executeQuery();
-        if(rs.next())
-            return rs.getBlob(1);
+        if(rs.next()){
+            Blob blob = rs.getBlob(1);
+             return blob;
+        }
+          
         else
             throw new ExperimentResultNotInDBException();
     }
