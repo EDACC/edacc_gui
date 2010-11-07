@@ -40,7 +40,7 @@ import java.util.logging.Logger;
 public class PropertyComputationController implements Runnable{
     private int availableProcessors;
     LinkedBlockingQueue<InstanceHasProperty> instancePropertyQueue;
-    Vector<ExperimentResultHasProperty> resultPropertyQueue;
+     LinkedBlockingQueue<ExperimentResultHasProperty> resultPropertyQueue;
     boolean recompute;
     private int jobs;
 
@@ -69,37 +69,48 @@ public class PropertyComputationController implements Runnable{
                     Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }else if(resultPropertyQueue != null){
-                if(resultPropertyQueue.isEmpty()){
-                    jobs = i;
-                    return;
-                }               
-                new Thread(new PropertyComputationUnit(resultPropertyQueue.remove(i), this)).start();
+                try {
+                    if (resultPropertyQueue.isEmpty()) {
+                        jobs = i;
+                        return;
+                    }
+                    new Thread(new PropertyComputationUnit(resultPropertyQueue.take(), this)).start();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }           
         }
         jobs = availableProcessors;
     }
 
     public void callback() {
-        jobs--;
-        if(jobs == 0)
-            return;
-        // TODO: notify controller
+        
 
         if(instancePropertyQueue != null){
             if(!instancePropertyQueue.isEmpty())
                 try {
                 new Thread(new PropertyComputationUnit(instancePropertyQueue.take(), this)).start();
+                jobs++;
             } catch (InterruptedException ex) {
                 Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }else if(resultPropertyQueue != null){
             if(!resultPropertyQueue.isEmpty())
-                new Thread(new PropertyComputationUnit(resultPropertyQueue.get(0), this)).start();
+                try {
+                new Thread(new PropertyComputationUnit(resultPropertyQueue.take(), this)).start();
+                jobs++;
+            } catch (InterruptedException ex) {
+                Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+        jobs--;
+        if(jobs == 0)
+            // TODO: notify controller
+            return;
     }
 
     private void createJobQueue(Experiment exp, Vector<Property> givenProperties) throws NoConnectionToDBException, SQLException {
-        resultPropertyQueue = new Vector<ExperimentResultHasProperty>();
+        resultPropertyQueue = new  LinkedBlockingQueue<ExperimentResultHasProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idJob FROM " +
                 "ExperimentResults WHERE Experiment_idExperiment=?;");
         ps.setInt(1, exp.getId());
