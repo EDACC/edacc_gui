@@ -120,6 +120,9 @@ public class PropertyComputationUnit implements Runnable {
     }
 
     private void compute(Blob b) throws FileNotFoundException, IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, ComputationMethodDoesNotExistException, ErrorInExternalProgramException {
+        if(b == null){
+            return;
+        }
         if(property.getComputationMethod() != null){
 
             // parse instance file (external program call)
@@ -226,7 +229,7 @@ public class PropertyComputationUnit implements Runnable {
             Vector<String> toAdd = new Vector<String>();
             while((tmp = buf.readLine()) != null){
                 if(!(toAdd = parse(tmp)).isEmpty()){
-                    res.addAll(res);
+                    res.addAll(toAdd);
                     if(!property.isMultiple() || ihp != null)
                         break;
                 }

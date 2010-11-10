@@ -26,7 +26,7 @@ public class ExperimentResultHasPropertyDAO {
     private static String updateQuery = "UPDATE " + table + " SET idExperimentResults=?, idProperty=? WHERE idExperimentResult_has_Property=?";
     private static String insertQuery = "INSERT INTO " + table + " (idExperimentResults, idProperty) VALUES (?, ?)";
     private static final String deleteValueQuery = "DELETE FROM " + valueTable + " WHERE id=?";
-    private static String insertValueQuery = "INSERT INTO " + valueTable + " (idExperimentResult_has_Property, value, order) VALUES (?, ?, ?)";
+    private static String insertValueQuery = "INSERT INTO " + valueTable + " (idExperimentResult_has_Property, value, EDACC5.ExperimentResult_has_PropertyValue.order) VALUES (?, ?, ?)";
 
     /**
      * Creates a new  ExperimentResultHasProperty object, saves it into the database and cache, and returns it.
