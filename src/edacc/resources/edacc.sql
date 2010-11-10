@@ -2,9 +2,6 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
-DROP SCHEMA IF EXISTS `EDACC` ;
-CREATE SCHEMA IF NOT EXISTS `EDACC` DEFAULT CHARACTER SET utf8 ;
-
 -- -----------------------------------------------------
 -- Table `User`
 -- -----------------------------------------------------
@@ -591,22 +588,31 @@ CREATE  TABLE IF NOT EXISTS `PropertyRegExp` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
-USE `EDACC`;
-
+-- -----------------------------------------------------
+-- Trigger `ExperimentResult_has_PropertyValueUpdateTrigger`
+-- -----------------------------------------------------
 DELIMITER $$
 
-USE `EDACC`$$
 DROP TRIGGER IF EXISTS `ExperimentResult_has_PropertyValueUpdateTrigger` $$
-USE `EDACC`$$
 CREATE TRIGGER ExperimentResult_has_PropertyValueUpdateTrigger AFTER INSERT ON ExperimentResult_has_PropertyValue
   FOR EACH ROW BEGIN
     UPDATE ExperimentResults SET date_modified = CURRENT_TIMESTAMP WHERE idJob = (SELECT idExperimentResults FROM ExperimentResult_has_Property WHERE idExperimentResult_has_Property = NEW.idExperimentResult_has_Property);
   END;
 $$
 
-
 DELIMITER ;
 
+-- -----------------------------------------------------
+-- Event `MONITOR_JOBS`
+-- -----------------------------------------------------
+DROP EVENT IF EXISTS MONITOR_JOBS;
+
+CREATE EVENT IF NOT EXISTS MONITOR_JOBS
+ON SCHEDULE EVERY '20' MINUTE
+DO
+UPDATE ExperimentResults SET status=-1 WHERE idJob IN (
+select idJob FROM Experiment JOIN (SELECT * FROM ExperimentResults WHERE status=0) AS ERtmp on Experiment.idExperiment = Experiment_idExperiment WHERE TIME_TO_SEC(TIMEDIFF(NOW(), startTime))>CPUTimeLimit*1.3
+);
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

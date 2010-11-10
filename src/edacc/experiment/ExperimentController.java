@@ -1061,7 +1061,10 @@ public class ExperimentController {
     public Experiment getExperiment(String name) throws SQLException {
         return ExperimentDAO.getExperimentByName(name);
     }
-
+    
+    public String getExperimentResultOutput(int type, ExperimentResult er) throws SQLException, NoConnectionToDBException, IOException {
+        return ExperimentResultDAO.getOutputText(type, er);
+    }
     /**
      * Checks if data in the experiment design tabs is modified.
      * @param numRuns
