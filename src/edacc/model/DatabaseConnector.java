@@ -23,6 +23,7 @@ public class DatabaseConnector extends Observable {
     private String database;
     private String username;
     private String password;
+
     private DatabaseConnector() {
     }
 
@@ -113,50 +114,56 @@ public class DatabaseConnector extends Observable {
      * Creates the correct DB schema for EDACC using an already established connection.
      */
     public void createDBSchema() throws NoConnectionToDBException, SQLException, IOException {
+
         InputStream in = EDACCApp.class.getClassLoader().getResourceAsStream("edacc/resources/edacc.sql");
-        if (in == null)
+        if (in == null) {
             throw new SQLQueryFileNotFoundException();
+        }
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         String line;
         String text = "";
         String l;
-        while ((line = br.readLine()) != null) 
-            if (!(l = line.replaceAll("\\s", "")).isEmpty() && !l.startsWith("--"))
+        while ((line = br.readLine()) != null) {
+            if (!(l = line.replaceAll("\\s", "")).isEmpty() && !l.startsWith("--")) {
                 text += line + " ";
+            }
+        }
         in.close();
         Vector<String> queries = new Vector<String>();
         String query = "";
         String delimiter = ";";
         int i = 0;
         while (i < text.length()) {
-            if (text.startsWith(delimiter,i)) {
-                queries.add(query);
-                i += delimiter.length();
-                query = "";
-            } else if (text.startsWith("delimiter",i)) {
+            if (text.toLowerCase().startsWith("delimiter", i)) {
                 i += 10;
                 delimiter = text.substring(i, text.indexOf(' ', i));
                 i = text.indexOf(' ', i);
+            } else if (text.startsWith(delimiter, i)) {
+                queries.add(query);
+                i += delimiter.length();
+                query = "";
             } else {
                 query += text.charAt(i);
                 i++;
             }
         }
-        if (!query.equals("")) {
+        if (!query.replaceAll(" ", "").equals("")) {
             queries.add(query);
         }
-
-        Statement st = getConn().createStatement();
-        for (String q : queries)
-            if (!q.replaceAll("\\s", "").isEmpty())
-                st.addBatch(q);
-        st.executeBatch();
-        st.close();
+        boolean autoCommit = getConn().getAutoCommit();
         try {
             getConn().setAutoCommit(false);
+            Statement st = getConn().createStatement();
+            for (String q : queries) {
+                st.execute(q);
+            }
+            st.close();
             getConn().commit();
+        } catch (SQLException e) {
+            getConn().rollback();
+            throw e;
         } finally {
-            getConn().setAutoCommit(true);
+            getConn().setAutoCommit(autoCommit);
         }
     }
 
