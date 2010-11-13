@@ -189,6 +189,25 @@ public class ExperimentResultHasPropertyDAO {
         return res;
     }
 
+        public static ExperimentResultHasProperty getByExperimentResultAndResultProperty(int jobId, int propId)
+            throws SQLException, NoConnectionToDBException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException,
+            PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT idExperimentResult_has_Property "
+                + "FROM " + table + " "
+                + "WHERE idProperty=? AND idExperimentResults=?;");
+        ps.setInt(1, propId);
+        ps.setInt(2, jobId);
+        ResultSet rs = ps.executeQuery();
+        if(!rs.next()){
+            throw new ExpResultHasSolvPropertyNotInDBException();
+        }
+       ExperimentResultHasProperty res = getById(rs.getInt(1));
+        rs.close();
+        ps.close();
+        return res;
+    }
+
     /**
      * Assigns the ExperimentResultHasProperty objects to the experiment results.
      * @param expResults
@@ -197,7 +216,7 @@ public class ExperimentResultHasPropertyDAO {
      * @throws Exception
      */
     public static void assign(ArrayList<ExperimentResult> expResults, int experimentId) throws SQLException, PropertyNotInDBException,
-            PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
+            PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
         HashMap<Integer, ExperimentResult> experimentResults = new HashMap<Integer, ExperimentResult>();
         for (ExperimentResult er : expResults) {
             er.setPropertyValues(new HashMap<Integer, ExperimentResultHasProperty>());
@@ -231,8 +250,8 @@ public class ExperimentResultHasPropertyDAO {
             int idJob = rs.getInt(2);
             int idSolverProperty = rs.getInt(3);
             ExperimentResult job = experimentResults.get(idJob);
-            if (job != null) {
-                ExperimentResultHasProperty erhp = job.getPropertyValues().get(rs.getInt(idSolverProperty));
+            if (job != null) {  
+                ExperimentResultHasProperty erhp = job.getPropertyValues().get(rs.getInt(3));
                 if (erhp == null) {
                     erhp = new ExperimentResultHasProperty();
                     erhp.setId(rs.getInt(1));

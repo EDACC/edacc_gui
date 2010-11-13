@@ -12,6 +12,7 @@ import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
 import edacc.model.PropertyNotInDBException;
+import edacc.model.Tasks;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Vector;
@@ -52,9 +53,9 @@ public class ComputePropertiesController {
         }
     }
 
-    public void computProperties(Vector<Property> toCalculate, boolean recompute, Experiment exp) {
+    public void computProperties(Vector<Property> toCalculate, boolean recompute, Experiment exp, Tasks task) {
         try {
-            Thread compute = new Thread(new PropertyComputationController(exp, toCalculate, recompute));
+            Thread compute = new Thread(new PropertyComputationController(exp, toCalculate, recompute, task));
             compute.start();
         } catch (PropertyTypeNotExistException ex) {
             Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);

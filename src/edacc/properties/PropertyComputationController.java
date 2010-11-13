@@ -22,6 +22,7 @@ import edacc.model.InstanceNotInDBException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import edacc.model.PropertyNotInDBException;
+import edacc.model.Tasks;
 import edacc.satinstances.ConvertException;
 import edacc.satinstances.InvalidVariableException;
 import java.io.IOException;
@@ -43,11 +44,22 @@ public class PropertyComputationController implements Runnable{
      LinkedBlockingQueue<ExperimentResultHasProperty> resultPropertyQueue;
     boolean recompute;
     private int jobs;
+    private Tasks task;
+    private int allJobs;
 
-    public PropertyComputationController(Experiment exp, Vector<Property> givenProperties, boolean recompute) throws NoConnectionToDBException, SQLException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException{
+    public PropertyComputationController(Experiment exp, Vector<Property> givenProperties, boolean recompute, Tasks task) throws NoConnectionToDBException, SQLException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException{
+        this.task = task;
         availableProcessors = Runtime.getRuntime().availableProcessors();
+        this.task.setOperationName("compute properties");
+        this.task.setStatus("initialize the computation");
         this.recompute = recompute;    
-        createJobQueue(exp, givenProperties);
+        try {
+            createJobQueue(exp, givenProperties);
+        } catch (ExpResultHasSolvPropertyNotInDBException ex) {
+            Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        allJobs = resultPropertyQueue.size();
+        this.task.setStatus("compute");
     }
 
     public PropertyComputationController(Vector<Instance> instances, Vector<Property> givenProperties){
@@ -57,6 +69,7 @@ public class PropertyComputationController implements Runnable{
 
     @Override
     public void run() {
+
         for(int i = 0; i < availableProcessors; i++){
             if(instancePropertyQueue != null){
                 if(instancePropertyQueue.isEmpty()){
@@ -85,7 +98,6 @@ public class PropertyComputationController implements Runnable{
 
     public void callback() {
         
-
         if(instancePropertyQueue != null){
             if(!instancePropertyQueue.isEmpty())
                 try {
@@ -104,12 +116,14 @@ public class PropertyComputationController implements Runnable{
             }
         }
         jobs--;
-        if(jobs == 0)
-            // TODO: notify controller
-            return;
+        if(jobs == 0){
+          task.cancel(true);
+          return;
+        }
+
     }
 
-    private void createJobQueue(Experiment exp, Vector<Property> givenProperties) throws NoConnectionToDBException, SQLException {
+    private void createJobQueue(Experiment exp, Vector<Property> givenProperties) throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException {
         resultPropertyQueue = new  LinkedBlockingQueue<ExperimentResultHasProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idJob FROM " +
                 "ExperimentResults WHERE Experiment_idExperiment=?;");

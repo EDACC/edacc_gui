@@ -11,8 +11,10 @@
 
 package edacc;
 
+import edacc.events.TaskEvents;
 import edacc.model.Experiment;
 import edacc.model.Property;
+import edacc.model.Tasks;
 import edacc.properties.ComputePropertiesController;
 import edacc.properties.PropertySelectionTableModel;
 import java.awt.Component;
@@ -26,7 +28,7 @@ import javax.swing.table.DefaultTableCellRenderer;
  *
  * @author rretz
  */
-public class EDACCComputeResultProperties extends javax.swing.JDialog {
+public class EDACCComputeResultProperties extends javax.swing.JDialog implements TaskEvents{
     ComputePropertiesController controller;
     PropertySelectionTableModel tableModel;
     Experiment exp;
@@ -168,7 +170,8 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog {
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
         }else {
-            controller.computProperties(toCalculate, this.checkBoxReCompute.isSelected(), exp);
+            Tasks.startTask("computProperties", new Class[]{Vector.class, boolean.class, edacc.model.Experiment.class, edacc.model.Tasks.class}, new Object[]{toCalculate, this.checkBoxReCompute.isSelected(), exp, null}, controller, EDACCComputeResultProperties.this);
+            //controller.computProperties(toCalculate, this.checkBoxReCompute.isSelected(), exp);
         }
     }//GEN-LAST:event_buttonComputeActionPerformed
 
@@ -201,5 +204,19 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog {
     private void initalize() {
         controller.loadResultProperties();
     }
+
+    @Override
+    public void onTaskSuccessful(String methodName, Object result) {
+    }
+
+    @Override
+    public void onTaskStart(String methodName) {
+    }
+
+    @Override
+    public void onTaskFailed(String methodName, Throwable e) {
+        e.printStackTrace();
+    }
+
 
 }
