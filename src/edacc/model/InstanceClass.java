@@ -78,5 +78,9 @@ public class InstanceClass extends BaseModel implements IntegerPKModel {
         }
     }
 
+    @Override
+    public String toString(){
+        return name;
+    }
     
 }

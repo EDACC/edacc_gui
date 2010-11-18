@@ -49,6 +49,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  *
@@ -84,9 +86,11 @@ public class ManageDBInstances implements Observer{
     }
 
     public void loadInstanceClasses() throws SQLException{
-        main.instanceClassTableModel.classes.clear();
+        main.instanceClassTreeModel = new DefaultTreeModel(new DefaultMutableTreeNode((DefaultMutableTreeNode)InstanceClassDAO.getAllAsTree()));
+
+       /* main.instanceClassTableModel.classes.clear();
         main.instanceClassTableModel.classSelect.clear();
-        main.instanceClassTableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAll()));
+        main.instanceClassTableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAll()));*/
     }
 
     /**

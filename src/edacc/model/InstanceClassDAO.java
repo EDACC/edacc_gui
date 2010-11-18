@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Vector;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  *
@@ -260,6 +261,13 @@ public class InstanceClassDAO {
 
     public static void clearCache() {
         cache.clear();
+    }
+
+    public static DefaultMutableTreeNode getAllAsTree(){
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE name=?");
+        st.setString(1, name);
+        ResultSet rs = st.executeQuery();
+        InstanceClass i = new InstanceClass();
     }
 
 }
