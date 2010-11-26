@@ -6,6 +6,7 @@ import edacc.EDACCSolverConfigEntry;
 import edacc.EDACCSolverConfigPanel;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
+import edacc.model.ExpResultHasSolvPropertyNotInDBException;
 import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentHasGridQueue;
@@ -15,6 +16,7 @@ import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.ExperimentResultHasProperty;
+import edacc.model.ExperimentResultNotInDBException;
 import edacc.model.ExperimentResultStatus;
 import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
@@ -111,14 +113,6 @@ public class ExperimentController {
         ArrayList<Experiment> v = new ArrayList<Experiment>();
         v.addAll(ExperimentDAO.getAll());
         experiments = v;
-        /* VirtualExperiment test = new VirtualExperiment();
-        test.setSaved();
-        test.setName("test virtexp");
-        test.setDescription("Test descr");
-        LinkedList<Experiment> testExp = new LinkedList<Experiment>();
-        testExp.add(experiments.get(0));
-        test.setExperiments(testExp);
-        experiments.add(test);*/
         main.expTableModel.setExperiments(experiments);
         Vector<InstanceClass> vic = new Vector<InstanceClass>();
         try {
@@ -136,7 +130,8 @@ public class ExperimentController {
 
     /**
      * Loads an experiment, the solvers and the solver configurations.
-     * @param id
+     * @param exp
+     * @param task
      * @throws SQLException
      */
     public void loadExperiment(Experiment exp, Tasks task) throws SQLException {
@@ -150,24 +145,12 @@ public class ExperimentController {
         task.setStatus("Loading solvers..");
         vs.addAll(SolverDAO.getAll());
         task.setTaskProgress(.33f);
-        /*   if (exp instanceof VirtualExperiment) {
-        VirtualExperiment vexp = (VirtualExperiment) exp;
-        task.setStatus("Loading solver configurations..");
-        for (Experiment e : vexp.getExperiments()) {
-        vss.addAll(SolverConfigurationDAO.getSolverConfigurationByExperimentId(e.getId()));
-        }
-        task.setTaskProgress(.66f);
-        task.setStatus("Loading instances..");
-        // select instances for the experiment
-        ehi.addAll(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
-        } else {*/
         task.setStatus("Loading solver configurations..");
         vss.addAll(SolverConfigurationDAO.getSolverConfigurationByExperimentId(exp.getId()));
         task.setTaskProgress(.66f);
         task.setStatus("Loading instances..");
         // select instances for the experiment
         ehi.addAll(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
-        // }
         main.solTableModel.setSolvers(vs);
         for (int i = 0; i < vss.size(); i++) {
             main.solverConfigPanel.addSolverConfiguration(vss.get(i));
@@ -181,7 +164,6 @@ public class ExperimentController {
     /**
      * Removes an experiment form the db.
      * @param id
-     * @return
      * @throws SQLException
      */
     public void removeExperiment(int id) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
@@ -214,10 +196,14 @@ public class ExperimentController {
      * invoked by the UI to create a new experiment, also calls initialize to load
      * instances and solvers
      * @param name
-     * @param date
      * @param description
      * @throws SQLException
-     * @throws Exception
+     * @throws InstanceClassMustBeSourceException
+     * @throws IOException
+     * @throws NoConnectionToDBException
+     * @throws PropertyNotInDBException
+     * @throws PropertyTypeNotExistException
+     * @throws ComputationMethodDoesNotExistException
      */
     public void createExperiment(String name, String description) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         java.util.Date d = new java.util.Date();
@@ -225,6 +211,11 @@ public class ExperimentController {
         initialize();
     }
 
+    /**
+     * This will save the settings for the given experiment.
+     * @param exp the experiment
+     * @throws SQLException
+     */
     public void saveExperiment(Experiment exp) throws SQLException {
         ExperimentDAO.save(exp);
     }
@@ -234,7 +225,7 @@ public class ExperimentController {
      * config panel.
      * @throws SQLException
      */
-    public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
+    public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
 
         task.setStatus("Checking jobs..");
         ArrayList<SolverConfiguration> deletedSolverConfigurations = SolverConfigurationDAO.getAllDeleted();
@@ -297,6 +288,11 @@ public class ExperimentController {
         }
     }
 
+    /**
+     * This will clean up all changed data for the solver configurations.
+     * @param task
+     * @throws SQLException
+     */
     public void undoSolverConfigurations(Tasks task) throws SQLException {
         main.solverConfigPanel.beginUpdate();
         main.solverConfigPanel.removeAll();
@@ -320,7 +316,7 @@ public class ExperimentController {
      * saves the instances selection of the currently loaded experiment
      * @throws SQLException
      */
-    public void saveExperimentHasInstances(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
+    public void saveExperimentHasInstances(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
         task.setStatus("Checking jobs..");
         ArrayList<ExperimentHasInstance> deletedInstances = main.insTableModel.getDeletedExperimentHasInstances();
         if (deletedInstances.size() > 0) {
@@ -378,13 +374,10 @@ public class ExperimentController {
      * Doesn't overwrite existing jobs
      * @throws SQLException
      * @param numRuns
-     * @param timeout
-     * @param generateSeeds
-     * @param maxSeed
      * @return number of jobs added to the experiment results table
      * @throws SQLException
      */
-    public synchronized int generateJobs(int numRuns, final Tasks task) throws SQLException, TaskCancelledException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
+    public synchronized int generateJobs(int numRuns, final Tasks task) throws SQLException, TaskCancelledException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
         PropertyChangeListener cancelExperimentResultDAOStatementListener = new PropertyChangeListener() {
 
             @Override
@@ -546,6 +539,24 @@ public class ExperimentController {
         return experiments_added;
     }
 
+    /**
+     * Updates the given parameters in the current experiment and saves the changes to the db.
+     * @param CPUTimeLimit
+     * @param wallClockTimeLimit
+     * @param memoryLimit
+     * @param stackSizeLimit
+     * @param outputSizeLimit
+     * @param maxSeed
+     * @param generateSeeds
+     * @param linkSeeds
+     * @throws SQLException
+     * @throws InstanceClassMustBeSourceException
+     * @throws IOException
+     * @throws NoConnectionToDBException
+     * @throws PropertyNotInDBException
+     * @throws PropertyTypeNotExistException
+     * @throws ComputationMethodDoesNotExistException
+     */
     public void saveExperimentParameters(Integer CPUTimeLimit, Integer wallClockTimeLimit, Integer memoryLimit, Integer stackSizeLimit, Integer outputSizeLimit, Integer maxSeed, boolean generateSeeds, boolean linkSeeds) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         activeExperiment.setCPUTimeLimit(CPUTimeLimit);
         activeExperiment.setWallClockTimeLimit(wallClockTimeLimit);
@@ -561,7 +572,7 @@ public class ExperimentController {
 
     /**
      * returns the number of jobs in the database for the given experiment
-     * @return
+     * @return the number of jobs in the db
      */
     public int getNumJobs() {
         try {
@@ -572,13 +583,8 @@ public class ExperimentController {
     }
 
     /**
-     * returns the number of instances shown in the instance selection tab
-     * @return
+     * Updates the job browser table
      */
-    public int getNumInstances() {
-        return main.insTableModel.getRowCount();
-    }
-
     public synchronized void loadJobs() {
         try {
             updateExperimentResults();
@@ -623,6 +629,7 @@ public class ExperimentController {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             // TODO: shouldn't happen but show message if it does
         }
 
@@ -1048,10 +1055,24 @@ public class ExperimentController {
         out.close();
     }
 
+    /**
+     * Returns the experiment with the given name.
+     * @param name
+     * @return the experiment
+     * @throws SQLException
+     */
     public Experiment getExperiment(String name) throws SQLException {
         return ExperimentDAO.getExperimentByName(name);
     }
-
+    
+    public String getExperimentResultOutput(int type, ExperimentResult er) throws SQLException, NoConnectionToDBException, IOException {
+        return ExperimentResultDAO.getOutputText(type, er);
+    }
+    /**
+     * Checks if data in the experiment design tabs is modified.
+     * @param numRuns
+     * @return true, iff some data is modified
+     */
     public boolean experimentResultsIsModified(int numRuns) {
         try {
             if (numRuns != activeExperiment.getNumRuns()) {
@@ -1073,15 +1094,11 @@ public class ExperimentController {
         return false;
     }
 
-    public String getExperimentResultOutput(int type, ExperimentResult er) throws SQLException, NoConnectionToDBException, IOException {
-        return ExperimentResultDAO.getOutputText(type, er);
-    }
-
     /**
      * Returns all experiment results with any run in the given list for the active experiment.
      * updateExperimentResults() should be called first.
      * @param runs
-     * @return
+     * @return arraylist of experiment results
      */
     public synchronized ArrayList<ExperimentResult> getAllByRun(ArrayList<Integer> runs) {
         HashSet<Integer> set = new HashSet<Integer>();
@@ -1127,7 +1144,7 @@ public class ExperimentController {
      * @throws NoConnectionToDBException
      * @throws ComputationMethodDoesNotExistException
      */
-    public synchronized void updateExperimentResults() throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
+    public synchronized void updateExperimentResults() throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
         if (activeExperiment == null) {
             experiment = null;
             resultMap = null;
@@ -1162,6 +1179,12 @@ public class ExperimentController {
         experiment = activeExperiment;
     }
 
+    /**
+     * Returns a Vector of all ExperimentResults in the current experiment with the solverConfig id and instance id specified
+     * @param solverConfigId the solverConfig id of the ExperimentResults
+     * @param instanceId the instance id of the ExperimentResults
+     * @return returns an empty vector if there are no such ExperimentResults
+     */
     public ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId) {
         return getResults(solverConfigId, instanceId, null);
     }
@@ -1183,6 +1206,13 @@ public class ExperimentController {
         return res;
     }
 
+    /**
+     * Returns an ExperimentResult identified by solverConfig id, instance id and run for the current experiment.
+     * @param solverConfigId the solverConfig id for the ExperimentResult
+     * @param instanceId the instance id for the ExperimentResult
+     * @param run the run
+     * @return returns null if there is no such ExperimentResult
+     */
     public ExperimentResult getResult(int solverConfigId, int instanceId, int run) {
         return getResult(solverConfigId, instanceId, run, null);
     }
@@ -1211,6 +1241,12 @@ public class ExperimentController {
         return res;
     }
 
+    /**
+     * Returns a double value for the given property value type and the string value
+     * @param type
+     * @param value
+     * @return null, iff the property value type doesn't represent Integer, Float or Double or an error occurred.
+     */
     private Double transformPropertyValueTypeToDouble(PropertyValueType type, String value) {
         Double res = null;
         try {
@@ -1227,6 +1263,12 @@ public class ExperimentController {
         return res;
     }
 
+    /**
+     * Returns the value for the given property and the given experiment result.
+     * @param result
+     * @param property
+     * @return null, iff the experiment result`s status is RUNNING, NOTSTARTED, LAUNCHERCRASH, VERIFIERCRASH, WATCHERCRASH or the property isn't calculated or the result isn't successfully verified. In case of the cpu-time property CPUTimeLmit can be returned.
+     */
     public Double getValue(ExperimentResult result, Property property) {
 
         if (result.getStatus() == ExperimentResultStatus.RUNNING
@@ -1253,6 +1295,12 @@ public class ExperimentController {
         }
     }
 
+    /**
+     * Returns the value of the property for this instance
+     * @param instance the instance
+     * @param property the property
+     * @return null, iff the property isn't calculated or some error occurred.
+     */
     public Double getValue(Instance instance, Property property) {
         InstanceHasProperty ihip = instance.getPropertyValues().get(property.getId());
         if (ihip == null) {
@@ -1261,8 +1309,18 @@ public class ExperimentController {
         return transformPropertyValueTypeToDouble(property.getPropertyValueType(), ihip.getValue());
     }
 
+    /**
+     * Returns all instances.
+     * @return arraylist of the instances
+     * @throws SQLException
+     * @throws InstanceClassMustBeSourceException
+     * @throws IOException
+     * @throws NoConnectionToDBException
+     * @throws PropertyNotInDBException
+     * @throws PropertyTypeNotExistException
+     * @throws ComputationMethodDoesNotExistException
+     */
     public ArrayList<Instance> getInstances() throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
-        // TODO: use cached data
         if (activeExperiment == null) {
             return null;
         }
@@ -1271,14 +1329,23 @@ public class ExperimentController {
         return res;
     }
 
+    /**
+     * Returns all solver configurations.
+     * @return arraylist of the solver configurations
+     * @throws SQLException
+     */
     public ArrayList<SolverConfiguration> getSolverConfigurations() throws SQLException {
-        // TODO: use cached data
         if (activeExperiment == null) {
             return null;
         }
         return SolverConfigurationDAO.getSolverConfigurationByExperimentId(activeExperiment.getId());
     }
 
+    /**
+     * Returns all result properties; adds CPUTime as result property.
+     * @return arraylist of the result properties
+     * @throws Exception
+     */
     public ArrayList<Property> getResultProperties() throws Exception {
         ArrayList<Property> res = new ArrayList<Property>();
         res.add(ExperimentController.PROP_CPUTIME);
@@ -1286,12 +1353,20 @@ public class ExperimentController {
         return res;
     }
 
+    /**
+     * Returns all instance properties.
+     * @return arraylist of the instance properties
+     * @throws Exception
+     */
     public ArrayList<Property> getInstanceProperties() throws Exception {
         ArrayList<Property> res = new ArrayList<Property>();
         res.addAll(PropertyDAO.getAllInstanceProperties());
         return res;
     }
 
+    /**
+     * Used to identify an experiment result in the local cache.
+     */
     class ResultIdentifier {
 
         int solverConfigId;

@@ -53,9 +53,9 @@ public class PropertyComputationUnit implements Runnable {
     private static final int MAX_WAIT_TIME = 10000;
 
     PropertyComputationUnit(ExperimentResultHasProperty erhp, PropertyComputationController callback) {
-        this.erhp = erhp;
-        this.callback = callback;
         this.property = erhp.getProperty();
+        this.erhp = erhp;
+        this.callback = callback;      
     }
 
     PropertyComputationUnit(InstanceHasProperty ihp, PropertyComputationController callback) {
@@ -120,6 +120,9 @@ public class PropertyComputationUnit implements Runnable {
     }
 
     private void compute(Blob b) throws FileNotFoundException, IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, ComputationMethodDoesNotExistException, ErrorInExternalProgramException {
+        if(b == null){
+            return;
+        }
         if(property.getComputationMethod() != null){
 
             // parse instance file (external program call)
@@ -191,7 +194,7 @@ public class PropertyComputationUnit implements Runnable {
                 // set the value and save it
                 ihp.setValue(value);
                 System.out.println(value);
-                //InstanceHasPropertyDAO.save(ihp);
+                InstanceHasPropertyDAO.save(ihp);
             } else if (erhp != null){
                 File bin = ComputationMethodDAO.getBinaryOfComputationMethod(property.getComputationMethod());
                 bin.setExecutable(true);
@@ -220,13 +223,13 @@ public class PropertyComputationUnit implements Runnable {
                 ExperimentResultHasPropertyDAO.save(erhp);
             }
         }else if(property.getRegularExpression() != null){
-            /*Vector<String> res = new Vector<String>();
+            Vector<String> res = new Vector<String>();
             BufferedReader buf = new BufferedReader(new InputStreamReader(b.getBinaryStream()));
             String tmp;
             Vector<String> toAdd = new Vector<String>();
             while((tmp = buf.readLine()) != null){
                 if(!(toAdd = parse(tmp)).isEmpty()){
-                    res.addAll(res);
+                    res.addAll(toAdd);
                     if(!property.isMultiple() || ihp != null)
                         break;
                 }
@@ -238,7 +241,7 @@ public class PropertyComputationUnit implements Runnable {
             else if(erhp != null){
                 erhp.setValue(res);
                 ExperimentResultHasPropertyDAO.save(erhp);
-            }*/
+            }
         }
     }
 

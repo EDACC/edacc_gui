@@ -234,7 +234,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
     /**
      * Returns true if a EDACCSolverConfigEntry exists with this solverId
      * @param solverId
-     * @return
+     * @return boolean
      */
     public boolean solverExists(int solverId) {
         for (int i = 0; i < this.getComponentCount(); i++) {

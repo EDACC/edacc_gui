@@ -38,15 +38,20 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.event.TreeSelectionEvent;
 import javax.swing.table.*;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JTree;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreeSelectionModel;
+import javax.swing.tree.TreeSelectionModel;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.Application;
 
@@ -86,7 +91,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         // initialize instance class table
         instanceClassTreeModel = new DefaultTreeModel(new DefaultMutableTreeNode(""));
         jTreeInstanceClass.setModel(instanceClassTreeModel);
-        jTreeInstanceClass.setRootVisible(false);
+        jTreeInstanceClass.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        //jTreeInstanceClass.setRootVisible(false);
        /* instanceClassTableModel = new InstanceClassTableModel(tableInstances);
         tableInstanceClass.setModel(instanceClassTableModel);
         tableInstanceClass.getSelectionModel().addListSelectionListener(new InstanceClassTableSelectionListener(tableInstanceClass, manageDBInstances));        
@@ -144,6 +150,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         manageDBParameters.loadParametersOfSolvers(solverTableModel.getSolvers());
         manageDBInstances.loadInstanceClasses();
 
+        jTreeInstanceClass.updateUI();
         unsavedChanges = false;
     }
 
@@ -1521,8 +1528,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     }//GEN-LAST:event_btnSolverRefreshActionPerformed
 
     private void btnNewInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewInstanceClassActionPerformed
-       /* manageDBInstances.addInstanceClasses();
-        tableInstanceClass.updateUI();
+        manageDBInstances.addInstanceClasses();
+        /*tableInstanceClass.updateUI();
         unsavedChanges = true;*/
     }//GEN-LAST:event_btnNewInstanceClassActionPerformed
     private void parameterChangedOnFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_parameterChangedOnFocusLost
@@ -1940,6 +1947,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         } else {
             tfParametersName.setBackground(Color.white);
         }
+    }
+
+    public JTree getInstanceClassTree(){
+        return jTreeInstanceClass;
     }
 }
 

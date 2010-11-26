@@ -22,6 +22,7 @@ import edacc.model.InstanceNotInDBException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import edacc.model.PropertyNotInDBException;
+import edacc.model.Tasks;
 import edacc.satinstances.ConvertException;
 import edacc.satinstances.InvalidVariableException;
 import java.io.IOException;
@@ -29,6 +30,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,15 +40,26 @@ import java.util.logging.Logger;
  */
 public class PropertyComputationController implements Runnable{
     private int availableProcessors;
-    Vector<InstanceHasProperty> instancePropertyQueue;
-    Vector<ExperimentResultHasProperty> resultPropertyQueue;
+    LinkedBlockingQueue<InstanceHasProperty> instancePropertyQueue;
+     LinkedBlockingQueue<ExperimentResultHasProperty> resultPropertyQueue;
     boolean recompute;
     private int jobs;
+    private Tasks task;
+    private int allJobs;
 
-    public PropertyComputationController(Experiment exp, Vector<Property> givenProperties, boolean recompute) throws NoConnectionToDBException, SQLException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException{
+    public PropertyComputationController(Experiment exp, Vector<Property> givenProperties, boolean recompute, Tasks task) throws NoConnectionToDBException, SQLException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException{
+        this.task = task;
         availableProcessors = Runtime.getRuntime().availableProcessors();
+        this.task.setOperationName("compute properties");
+        this.task.setStatus("initialize the computation");
         this.recompute = recompute;    
-        createJobQueue(exp, givenProperties);
+        try {
+            createJobQueue(exp, givenProperties);
+        } catch (ExpResultHasSolvPropertyNotInDBException ex) {
+            Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        allJobs = resultPropertyQueue.size();
+        this.task.setStatus("compute");
     }
 
     public PropertyComputationController(Vector<Instance> instances, Vector<Property> givenProperties){
@@ -56,39 +69,65 @@ public class PropertyComputationController implements Runnable{
 
     @Override
     public void run() {
+
         for(int i = 0; i < availableProcessors; i++){
             if(instancePropertyQueue != null){
                 if(instancePropertyQueue.isEmpty()){
                     jobs = i;
                     return;
                 }
-                 new Thread(new PropertyComputationUnit(instancePropertyQueue.get(i), this)).start();
-            }else if(resultPropertyQueue != null){
-                if(resultPropertyQueue.isEmpty()){
-                    jobs = i;
-                    return;
+                try {
+                    new Thread(new PropertyComputationUnit(instancePropertyQueue.take(), this)).start();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                new Thread(new PropertyComputationUnit(resultPropertyQueue.get(i), this)).start();
+            }else if(resultPropertyQueue != null){
+                try {
+                    if (resultPropertyQueue.isEmpty()) {
+                        jobs = i;
+                        return;
+                    }
+                    new Thread(new PropertyComputationUnit(resultPropertyQueue.take(), this)).start();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }           
         }
         jobs = availableProcessors;
     }
 
     public void callback() {
+        
         if(instancePropertyQueue != null){
             if(!instancePropertyQueue.isEmpty())
-                new Thread(new PropertyComputationUnit(instancePropertyQueue.get(0), this)).start();
+                try {
+                new Thread(new PropertyComputationUnit(instancePropertyQueue.take(), this)).start();
+                jobs++;
+            } catch (InterruptedException ex) {
+                Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }else if(resultPropertyQueue != null){
             if(!resultPropertyQueue.isEmpty())
-                new Thread(new PropertyComputationUnit(resultPropertyQueue.get(0), this)).start();
+                try {
+                new Thread(new PropertyComputationUnit(resultPropertyQueue.take(), this)).start();
+                jobs++;
+            } catch (InterruptedException ex) {
+                Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+        jobs--;
+        if(jobs == 0){
+          task.cancel(true);
+          return;
+        }
+
     }
 
-    private void createJobQueue(Experiment exp, Vector<Property> givenProperties) throws NoConnectionToDBException, SQLException {
-        resultPropertyQueue = new Vector<ExperimentResultHasProperty>();
+    private void createJobQueue(Experiment exp, Vector<Property> givenProperties) throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException {
+        resultPropertyQueue = new  LinkedBlockingQueue<ExperimentResultHasProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idJob FROM " +
                 "ExperimentResults WHERE Experiment_idExperiment=?;");
-        ps.setInt(exp.getId(), 1);
+        ps.setInt(1, exp.getId());
         ResultSet rs = ps.executeQuery();
         // create all experimentResultHasProperty objects and adds them into the resultPropertyQueue
         while(rs.next()){
@@ -124,7 +163,7 @@ public class PropertyComputationController implements Runnable{
     }
 
     private void createJobQueue(Vector<Instance> instances, Vector<Property> givenProperties) {
-        instancePropertyQueue = new Vector<InstanceHasProperty>();
+        instancePropertyQueue = new LinkedBlockingQueue<InstanceHasProperty>();
         // create all InstanceHasProperty objects and adds them to the instancePropertyQueue
         for(int i = 0; i < instances.size(); i++){
             for(int j = 0; j < givenProperties.size(); j++){

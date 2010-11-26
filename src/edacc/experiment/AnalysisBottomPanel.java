@@ -18,7 +18,9 @@ import org.jdesktop.application.Action;
 import org.rosuda.JRI.Rengine;
 
 /**
- *
+ * This class represents the bottom panel of the AnalysisPanel. It implements the functionality
+ * to generate, show and hide plots.
+ * @see edacc.experiment.AnalysisPanel
  * @author simon
  */
 public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.events.PlotTabEvents, TaskEvents {
@@ -82,8 +84,13 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * This will generate the plot for the current plot type in the AnalysisPanel.
+     * @see edacc.experiment.AnalysisPanel
+     */
     @Action
     public void btnGeneratePlot() {
+        // first get the current plot
         plot = analysisPanel.getSelectedPlot();
         if (plot == null) {
             return;
@@ -92,6 +99,8 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
             AnalysisController.analysisPanel = analysisPanel;
         }
 
+        // then generate a PlotPanel and add, plot the plot, and finally add it
+        // to the main tab view (onTaskSuccessful will do this)
         try {
             panel = new PlotPanel(plot);
             final Rengine re = AnalysisController.getREngine(panel);
@@ -106,14 +115,12 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
                             plot.plot(re, panel.pointInformations);
                             AnalysisBottomPanel.this.onTaskSuccessful("plot", null);
                         } catch (final Throwable ex) {
-                            ex.printStackTrace();
                             SwingUtilities.invokeLater(new Runnable() {
 
                                 @Override
                                 public void run() {
                                     AnalysisBottomPanel.this.onTaskFailed("plot", ex);
                                 }
-
                             });
                         }
                     }
@@ -121,7 +128,7 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
             }, true, EDACCPlotTabView.getMainTabView());
         } catch (REngineInitializationException ex) {
             javax.swing.JOptionPane.showMessageDialog(null, "Error while initializing R: " + ex.getMessage(), "Initialization Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-        } 
+        }
 
     }
 
@@ -140,6 +147,7 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
 
     @Override
     public final void tabViewCountChanged(int count) {
+        // if there are no plots, the show plots button should be disabled
         if (count == 0) {
             btnShowPlots.setEnabled(false);
         } else {
@@ -149,6 +157,7 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
 
     @Override
     public void tabViewVisibilityChanged(boolean visible) {
+        // set the title for the show plots button according to the state of the tab view visibility
         if (visible) {
             btnShowPlots.setText("Hide Plots");
         } else {
@@ -182,9 +191,6 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
             } else if (e instanceof SQLException) {
                 javax.swing.JOptionPane.showMessageDialog(EDACCPlotTabView.getMainTabView(), e.getMessage(), "Database error", javax.swing.JOptionPane.ERROR_MESSAGE);
             } else {
-                if (edacc.ErrorLogger.DEBUG) {
-                    e.printStackTrace();
-                }
                 javax.swing.JOptionPane.showMessageDialog(EDACCPlotTabView.getMainTabView(), e, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
         }

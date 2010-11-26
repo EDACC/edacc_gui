@@ -86,7 +86,10 @@ public class ManageDBInstances implements Observer{
     }
 
     public void loadInstanceClasses() throws SQLException{
-        main.instanceClassTreeModel = new DefaultTreeModel(new DefaultMutableTreeNode((DefaultMutableTreeNode)InstanceClassDAO.getAllAsTree()));
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
+        root.add(new DefaultMutableTreeNode((DefaultMutableTreeNode)InstanceClassDAO.getAllAsTree()));
+        main.instanceClassTreeModel = new DefaultTreeModel(root);
+        main.instanceClassTreeModel.reload();
 
        /* main.instanceClassTableModel.classes.clear();
         main.instanceClassTableModel.classSelect.clear();
@@ -268,7 +271,7 @@ public class ManageDBInstances implements Observer{
      * Sets all checkboxes of the instanceclass table true.
      */
     public void SelectAllInstanceClass(Tasks task) {
-        for(int i = 0; i < main.instanceClassTableModel.getRowCount(); i++){
+     /*   for(int i = 0; i < main.instanceClassTableModel.getRowCount(); i++){
            task.setStatus(i + " of " + main.instanceClassTableModel.getRowCount() + " instance classes are loaded.");
            task.setTaskProgress((float)i/(float)main.instanceClassTableModel.getRowCount());
             main.instanceClassTableModel.seSelected(i);
@@ -279,13 +282,13 @@ public class ManageDBInstances implements Observer{
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
     }
 
     public void DeselectAllInstanceClass(){
-        main.instanceClassTableModel.DeselectAll();
+       /* main.instanceClassTableModel.DeselectAll();
         main.instanceTableModel.clearTable();
-        main.instanceClassTableModel.fireTableDataChanged();
+        main.instanceClassTableModel.fireTableDataChanged();*/
     }
 
     /**
@@ -296,7 +299,7 @@ public class ManageDBInstances implements Observer{
      * @throws InstanceSourceClassHasInstance if one of the selected classes are a source class which has a refernce to an Instance.
      */
     public void RemoveInstanceClass(int[] choosen) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance {
-        Vector<InstanceClass> toRemove = new Vector<InstanceClass>();
+       /* Vector<InstanceClass> toRemove = new Vector<InstanceClass>();
         for(int i = 0; i < choosen.length; i++){
             toRemove.add((InstanceClass) main.instanceClassTableModel.getValueAt(choosen[i], 4));
         }
@@ -327,7 +330,7 @@ public class ManageDBInstances implements Observer{
                     "Check if all instances of the source classes are deleted or referenced to another class.",
                     new JTable(tableModel));
             }
-         }
+         }*/
     }
 
     /**
@@ -335,7 +338,7 @@ public class ManageDBInstances implements Observer{
      */
     public void addInstanceClasses() {
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        EDACCCreateEditInstanceClassDialog dialog = new EDACCCreateEditInstanceClassDialog(mainFrame, true, main.instanceClassTableModel, -1);
+        EDACCCreateEditInstanceClassDialog dialog = new EDACCCreateEditInstanceClassDialog(mainFrame, true, main.getInstanceClassTree());
         dialog.setLocationRelativeTo(mainFrame);
         EDACCApp.getApplication().show(dialog);
     }
@@ -421,11 +424,11 @@ public class ManageDBInstances implements Observer{
      * @throws SQLException
      */
     public Vector<Instance> buildInstancesAutogenerateClass(Vector<File> instanceFiles, File ret, Tasks task, int searchDepth) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException {
-        
+      
         Vector<Instance> instances = new Vector<Instance>();
         Vector<String> errorsDB = new Vector<String>();
         Vector<String> errorsAdd = new Vector<String>();
-        InstanceClass instanceClass;
+        /*InstanceClass instanceClass;
         task.setTaskProgress((float)0 / (float)instanceFiles.size());
         for (int i = 0; i < instanceFiles.size(); i++) {
             try {
@@ -477,7 +480,7 @@ public class ManageDBInstances implements Observer{
                      EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
                      "The following instances are already in the database. (Equal name or md5 hash)",
                      new JTable(tmp)); 
-        }
+        }*/
         return instances;
      
     }
@@ -499,7 +502,7 @@ public class ManageDBInstances implements Observer{
      * @param selectedRows The rows of the selected instances
      */
     public void addInstancesToClass(int[] selectedRows) throws IOException{
-         if(tableInstances.getSelectedRows().length == 0){
+        /* if(tableInstances.getSelectedRows().length == 0){
              JOptionPane.showMessageDialog(panelManageDBInstances,
                 "No instances selected.",
                 "Warning",
@@ -551,7 +554,7 @@ public class ManageDBInstances implements Observer{
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
-        }
+        }*/
     }
 
     /**
@@ -561,7 +564,7 @@ public class ManageDBInstances implements Observer{
      * @param selectedRowsInstanceClass rows of the InstanceClasses from which the selected instances have to be removed
      */
     public void RemoveInstanceFromInstanceClass(int[] selectedRowsInstance, int[] selectedRowsInstanceClass){
-       // check if a instance is selected, if not notify the user
+     /*  // check if a instance is selected, if not notify the user
         if(tableInstances.getSelectedRows().length == 0){
              JOptionPane.showMessageDialog(panelManageDBInstances,
                 "No instances selected.",
@@ -626,7 +629,7 @@ public class ManageDBInstances implements Observer{
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
            }
-        }
+        }*/
 
     }
 
@@ -680,15 +683,15 @@ public class ManageDBInstances implements Observer{
      * @param convertRowIndexToModel the row of the selected instance class
      */
     public void EditInstanceClass(InstanceClassTableModel instanceClassTableModel, int convertRowIndexToModel) {
-        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+     /*   JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
         EDACCCreateEditInstanceClassDialog dialog = new EDACCCreateEditInstanceClassDialog(mainFrame, true, instanceClassTableModel, convertRowIndexToModel);
         dialog.setLocationRelativeTo(mainFrame);
-        EDACCApp.getApplication().show(dialog);
+        EDACCApp.getApplication().show(dialog);*/
     }
 
     public void update(Observable o, Object arg) {
-        this.main.instanceTableModel.clearTable();
-        this.main.instanceClassTableModel.clearTable();
+       /* this.main.instanceTableModel.clearTable();
+        this.main.instanceClassTableModel.clearTable();*/
     }
 
     public void showInstanceClassButtons(boolean enable) {

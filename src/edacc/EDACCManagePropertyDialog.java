@@ -684,6 +684,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         if(this.comboBoxComputationMethod.getItemCount() != 0)
             this.comboBoxComputationMethod.setSelectedIndex(0);
         this.checkBoxMultipleOccurrences.setSelected(false);
+        comboBoxPropertySource.removeItemListener(sourceListener);
         this.comboBoxPropertySource.removeAllItems();
         this.textAreaPropertyDescription.setText("");
         this.textFieldComputationmethodParameter.setText("");
@@ -793,9 +794,11 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     }
 
     public void loadResultPropertySources(){
-        if(comboBoxPropertySource.getItemCount() != 0)
-            comboBoxPropertySource.removeItemListener(sourceListener);
-        comboBoxPropertySource.removeAllItems();
+        if(comboBoxPropertySource.getItemCount() != 0){
+             comboBoxPropertySource.removeItemListener(sourceListener);
+             comboBoxPropertySource.removeAllItems();
+        }
+           
         for(int i = 0; i < ResultPropertySources.length; i++){
             comboBoxPropertySource.addItem(ResultPropertySources[i]);
         }
@@ -805,9 +808,10 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     }
 
     public void loadInstancePropertySources(){
-        if(comboBoxPropertySource.getItemCount() != 0)
+        if(comboBoxPropertySource.getItemCount() != 0){
             comboBoxPropertySource.removeItemListener(sourceListener);
-        comboBoxPropertySource.removeAllItems();
+            comboBoxPropertySource.removeAllItems();
+        }           
         for(int i = 0; i < InstancePropertySources.length; i++){
             comboBoxPropertySource.addItem(InstancePropertySources[i]);
         }

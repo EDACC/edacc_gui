@@ -16,8 +16,7 @@ CREATE  TABLE IF NOT EXISTS `User` (
   `postal_address` VARCHAR(255) NULL ,
   `affiliation` VARCHAR(255) NULL ,
   PRIMARY KEY (`idUser`) )
-ENGINE = InnoDB
-COMMENT = 'Stores user infos in a competition database';
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -27,14 +26,14 @@ DROP TABLE IF EXISTS `Solver` ;
 
 CREATE  TABLE IF NOT EXISTS `Solver` (
   `idSolver` INT NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(255) NOT NULL COMMENT 'The name of the Solver' ,
-  `binaryName` VARCHAR(255) NOT NULL COMMENT 'The name of the binary.' ,
-  `binary` LONGBLOB NOT NULL COMMENT 'The binary itself.' ,
-  `description` TEXT NULL COMMENT 'Description of the solver.' ,
-  `md5` VARCHAR(60) NOT NULL COMMENT 'The md5 checksum of the binary of the solver. The md5 of the solvers within a DB have to be unique. ' ,
-  `code` LONGBLOB NULL COMMENT 'An archiv containing the code files of the solvers. ' ,
-  `version` VARCHAR(255) NULL COMMENT 'The version of the solver.' ,
-  `authors` VARCHAR(255) NULL COMMENT 'The author/s of the solver.' ,
+  `name` VARCHAR(255) NOT NULL ,
+  `binaryName` VARCHAR(255) NOT NULL ,
+  `binary` LONGBLOB NOT NULL ,
+  `description` TEXT NULL  ,
+  `md5` VARCHAR(60) NOT NULL  ,
+  `code` LONGBLOB NULL  ,
+  `version` VARCHAR(255) NULL  ,
+  `authors` VARCHAR(255) NULL  ,
   `User_idUser` INT NULL ,
   PRIMARY KEY (`idSolver`) ,
   UNIQUE INDEX `name` (`name` ASC, `version` ASC) ,
@@ -45,10 +44,7 @@ CREATE  TABLE IF NOT EXISTS `Solver` (
     REFERENCES `User` (`idUser` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1
-COLLATE = latin1_german1_ci
-COMMENT = 'All relevent information for a solver.';
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -58,22 +54,22 @@ DROP TABLE IF EXISTS `Parameters` ;
 
 CREATE  TABLE IF NOT EXISTS `Parameters` (
   `idParameter` INT NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(255) NOT NULL COMMENT 'User friendly description of the Parameter' ,
-  `prefix` VARCHAR(255) NULL COMMENT 'The prefix of the parmater as it is used in the command line of the binary.' ,
-  `hasValue` TINYINT(1)  NOT NULL COMMENT 'If the parameter has no value this column should be false. For example parameters like -h dont\'t need a value.' ,
-  `value` VARCHAR(255) NULL COMMENT 'A predifined value of a parameter.' ,
-  `order` INT NOT NULL COMMENT 'Specifies the order for the parameters, if there exists one. Parameters with the same order represent a sort of order-class and within this class there exists no order. ' ,
+  `name` VARCHAR(255) NOT NULL ,
+  `prefix` VARCHAR(255) NULL  ,
+  `hasValue` TINYINT(1)  NOT NULL  ,
+  `value` VARCHAR(255) NULL  ,
+  `order` INT NOT NULL  ,
   `Solver_idSolver` INT NOT NULL ,
   PRIMARY KEY (`idParameter`) ,
   INDEX `fk_Parameters_Solver` (`Solver_idSolver` ASC) ,
+  UNIQUE INDEX `uniqueprefix` (`Solver_idSolver` ASC, `prefix` ASC) ,
   UNIQUE INDEX `uniquename` (`name` ASC, `Solver_idSolver` ASC) ,
   CONSTRAINT `fk_Parameters_Solver`
     FOREIGN KEY (`Solver_idSolver` )
     REFERENCES `Solver` (`idSolver` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-COMMENT = 'Information abaout the parameters of a solver. ';
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -86,10 +82,36 @@ CREATE  TABLE IF NOT EXISTS `instanceClass` (
   `name` VARCHAR(255) NULL COMMENT 'The name of the class. (Unique)' ,
   `description` TEXT NULL COMMENT 'teh description should contain the source-url of the instances.\n' ,
   `source` TINYINT(1)  NOT NULL COMMENT 'tells if the class is a source class. ' ,
+  `User_idUser` INT NULL ,
   PRIMARY KEY (`idinstanceClass`) ,
-  UNIQUE INDEX `name` (`name` ASC) )
+  UNIQUE INDEX `name` (`name` ASC) ,
+  INDEX `fk_instanceClass_User1` (`User_idUser` ASC) ,
+  CONSTRAINT `fk_instanceClass_User1`
+    FOREIGN KEY (`User_idUser` )
+    REFERENCES `User` (`idUser` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 COMMENT = 'Enables to manage instances into classes.';
+
+
+-- -----------------------------------------------------
+-- Table `BenchmarkType`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `BenchmarkType` ;
+
+CREATE  TABLE IF NOT EXISTS `BenchmarkType` (
+  `idBenchmarkType` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(255) NOT NULL ,
+  `User_idUser` INT NOT NULL ,
+  PRIMARY KEY (`idBenchmarkType`) ,
+  INDEX `fk_BenchmarkType_User1` (`User_idUser` ASC) ,
+  CONSTRAINT `fk_BenchmarkType_User1`
+    FOREIGN KEY (`User_idUser` )
+    REFERENCES `User` (`idUser` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -102,17 +124,20 @@ CREATE  TABLE IF NOT EXISTS `Instances` (
   `name` VARCHAR(255) NOT NULL COMMENT 'Name of the file containing the instance.' ,
   `instance` LONGBLOB NOT NULL COMMENT 'The instance itself.' ,
   `md5` VARCHAR(60) NOT NULL COMMENT 'The MD5-cheksum of the file.' ,
-  `numAtoms` INT NULL COMMENT 'The number of variables.' ,
-  `numClauses` INT NULL COMMENT 'Number of clauses.' ,
-  `ratio` FLOAT NULL COMMENT 'Number of Variables / number of atoms.' ,
-  `maxClauseLength` INT NULL COMMENT 'Length of the longest clause.' ,
   `instanceClass_idinstanceClass` INT NOT NULL COMMENT 'The source class of the instance. ' ,
+  `BenchmarkType_idBenchmarkType` INT NULL ,
   PRIMARY KEY (`idInstance`, `instanceClass_idinstanceClass`) ,
   UNIQUE INDEX `name` (`name` ASC) ,
   INDEX `fk_Instances_instanceClass1` (`instanceClass_idinstanceClass` ASC) ,
+  INDEX `fk_Instances_BenchmarkType1` (`BenchmarkType_idBenchmarkType` ASC) ,
   CONSTRAINT `fk_Instances_instanceClass1`
     FOREIGN KEY (`instanceClass_idinstanceClass` )
     REFERENCES `instanceClass` (`idinstanceClass` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Instances_BenchmarkType1`
+    FOREIGN KEY (`BenchmarkType_idBenchmarkType` )
+    REFERENCES `BenchmarkType` (`idBenchmarkType` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
@@ -126,15 +151,17 @@ DROP TABLE IF EXISTS `Experiment` ;
 
 CREATE  TABLE IF NOT EXISTS `Experiment` (
   `idExperiment` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(255) NULL COMMENT 'Name of experiment.' ,
   `description` TEXT NULL COMMENT 'Description of the Experiment.' ,
   `date` DATE NOT NULL COMMENT 'The date when it was created.' ,
-  `numRuns` INT NOT NULL COMMENT 'Number of independent runs for the same solver and same instance. Usefull when testing stochastic solvers.' ,
-  `timeOut` INT NOT NULL COMMENT 'Maximum number of seconds a solver is allowed to run.\n' ,
-  `autoGeneratedSeeds` TINYINT(1)  NOT NULL COMMENT 'Specifies if seeds should be generated for the solvers. ' ,
-  `name` VARCHAR(255) NULL COMMENT 'Name of experiment.' ,
-  `memOut` INT NULL COMMENT 'maximum amount of memeory a solver is allowed to use' ,
   `maxSeed` BIGINT NULL COMMENT 'Maximum number for the seed generating process. ' ,
   `linkSeeds` TINYINT(1)  NULL ,
+  `autoGeneratedSeeds` TINYINT(1)  NOT NULL COMMENT 'Specifies if seeds should be generated for the solvers. ' ,
+  `CPUTimeLimit` INT NULL COMMENT 'Maximum number of seconds a solver is allowed to run.\n' ,
+  `wallClockTimeLimit` INT NULL ,
+  `memoryLimit` INT NULL COMMENT 'maximum amount of memeory a solver is allowed to use' ,
+  `stackSizeLimit` INT NULL ,
+  `outputSizeLimit` INT NULL ,
   PRIMARY KEY (`idExperiment`) )
 ENGINE = InnoDB
 COMMENT = 'Properties of an experiment.';
@@ -199,19 +226,29 @@ COMMENT = 'Parameter configuration of a solvers of an experiment.';
 DROP TABLE IF EXISTS `ExperimentResults` ;
 
 CREATE  TABLE IF NOT EXISTS `ExperimentResults` (
-  `idJob` INT NOT NULL AUTO_INCREMENT ,
-  `run` INT NOT NULL COMMENT 'The run of a (solver,instance) tupple.' ,
-  `status` INT NOT NULL COMMENT 'status of the job\n-2: an error occured\n-1: not started \n0: running\n1: finished normaly by solver\n2: terminated by ulimit maxtime\n3: terminated by ulimit maxmem' ,
-  `seed` INT NULL COMMENT 'The seed for the solver. ' ,
-  `resultFileName` VARCHAR(255) NOT NULL COMMENT 'the name of the result file of the solver =\n[solverName]_[instanceName]_[solverConfigID]_[run].solver' ,
-  `time` FLOAT NULL COMMENT 'The CPU-time the job needed to complete.' ,
-  `statusCode` INT NULL COMMENT 'the exit code of the solver' ,
   `SolverConfig_idSolverConfig` INT NOT NULL ,
   `Experiment_idExperiment` INT NOT NULL ,
   `Instances_idInstance` INT NOT NULL ,
-  `resultFile` LONGBLOB NULL COMMENT 'contains the stdout and stderr output of the solver. \nresultFileName.solver' ,
-  `clientOutput` LONGBLOB NULL COMMENT 'contains the stdout- and stderr-output of the client. Messages like: when and  which job was started can be displayed here.  \nresultFileName.client\n' ,
-  `startTime` TIME NULL COMMENT 'The start-time of the job.' ,
+  `idJob` INT NOT NULL AUTO_INCREMENT ,
+  `run` INT NOT NULL COMMENT 'The run of a (solver,instance) tupple.' ,
+  `seed` INT NULL COMMENT 'The seed for the solver. ' ,
+  `status` INT NOT NULL COMMENT 'status of the job\n-5: launcher crash\n-4: watcher crash\n-3: solver crash\n-2: verifier crash\n-1: not started \n0: running\n1: finished normaly by solver\n2x: terminated by limit x' ,
+  `startTime` DATETIME NULL COMMENT 'The start-time of the job.' ,
+  `resultTime` FLOAT NULL COMMENT 'The CPU-time the job needed to complete.' ,
+  `resultCode` INT NULL COMMENT '11: SAT\n10: UNSAT\n0: UNKNOWN\n-1: wrong answer\n-2: limit exceeded\n-21: cpu-time\n-22: wall clock-time\n-23: memory\n-24: stack-size\n-25: output-size\n-3xx: received signal:xx stands for the signal-code' ,
+  `solverOutput` LONGBLOB NULL COMMENT '[solverName]_[instanceName]_[solverConfigID]_[run].launcher.solver' ,
+  `launcherOutput` LONGBLOB NULL COMMENT '[solverName]_[instanceName]_[solverConfigID]_[run].launcher' ,
+  `watcherOutput` LONGBLOB NULL COMMENT '[solverName]_[instanceName]_[solverConfigID]_[run].watcher' ,
+  `verifierOutput` LONGBLOB NULL COMMENT '[solverName]_[instanceName]_[solverConfigID]_[run].verifier' ,
+  `solverOutputFN` TEXT NULL ,
+  `launcherOutputFN` TEXT NULL ,
+  `watcherOutputFN` TEXT NULL ,
+  `verifierOutputFN` TEXT NULL ,
+  `solverExitCode` INT NULL ,
+  `watcherExitCode` INT NULL ,
+  `verifierExitCode` INT NULL ,
+  `computeQueue` INT NULL COMMENT 'ID of the queue where the results where computed.' ,
+  `date_modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
   PRIMARY KEY (`idJob`) ,
   INDEX `fk_ExperimentResults_SolverConfig1` (`SolverConfig_idSolverConfig` ASC) ,
   INDEX `fk_ExperimentResults_Experiment1` (`Experiment_idExperiment` ASC) ,
@@ -339,40 +376,245 @@ DROP TABLE IF EXISTS `DBConfiguration` ;
 
 CREATE  TABLE IF NOT EXISTS `DBConfiguration` (
   `id` INT NOT NULL ,
-  `competition` TINYINT(1) NOT NULL ,
+  `competition` TINYINT(1)  NOT NULL ,
   `competitionPhase` INT NULL ,
   PRIMARY KEY (`id`) )
 ENGINE = InnoDB
 COMMENT = 'Should only contain 1 row with id 0';
 
--- -----------------------------------------------------
--- FUNCTION `absTime`
--- -----------------------------------------------------
-DROP FUNCTION IF EXISTS absTime;
-
-delimiter //
-CREATE FUNCTION absTime(time FLOAT) RETURNS INT
-BEGIN
-  WHILE time < 0 DO
-    SET time = time +24*60*60;
-  END WHILE;
-  RETURN time;
-END //
-delimiter ;
 
 -- -----------------------------------------------------
--- EVENT `MONITOR_JOBS`
+-- Table `PropertyValueType`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `PropertyValueType` ;
 
+CREATE  TABLE IF NOT EXISTS `PropertyValueType` (
+  `name` VARCHAR(255) NOT NULL ,
+  `typeClass` BLOB NULL ,
+  `isDefault` TINYINT(1)  NULL ,
+  `typeClassFileName` VARCHAR(255) NULL ,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) ,
+  PRIMARY KEY (`name`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ComputationMethod`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ComputationMethod` ;
+
+CREATE  TABLE IF NOT EXISTS `ComputationMethod` (
+  `idComputationMethod` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(255) NULL ,
+  `description` TEXT NULL ,
+  `md5` VARCHAR(60) NULL ,
+  `binaryName` VARCHAR(255) NULL ,
+  `binaryFile` BLOB NULL ,
+  PRIMARY KEY (`idComputationMethod`) ,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) ,
+  UNIQUE INDEX `md5_UNIQUE` (`md5` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Property`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Property` ;
+
+CREATE  TABLE IF NOT EXISTS `Property` (
+  `idProperty` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(255) NULL ,
+  `description` TEXT NULL ,
+  `propertyType` INT NULL ,
+  `propertySource` INT NULL ,
+  `idComputationMethod` INT NULL ,
+  `ComputationMethodParameters` VARCHAR(255) NULL ,
+  `propertyValueType` VARCHAR(255) NOT NULL ,
+  `isDefault` TINYINT(1)  NULL ,
+  `multipleOccourence` TINYINT(1)  NULL ,
+  PRIMARY KEY (`idProperty`) ,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) ,
+  INDEX `fk_Property_ComputationMethod1` (`idComputationMethod` ASC) ,
+  INDEX `fk_Property_PropertyValueType1` (`propertyValueType` ASC) ,
+  CONSTRAINT `fk_Property_ComputationMethod1`
+    FOREIGN KEY (`idComputationMethod` )
+    REFERENCES `ComputationMethod` (`idComputationMethod` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Property_PropertyValueType1`
+    FOREIGN KEY (`propertyValueType` )
+    REFERENCES `PropertyValueType` (`name` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ExperimentResult_has_Property`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ExperimentResult_has_Property` ;
+
+CREATE  TABLE IF NOT EXISTS `ExperimentResult_has_Property` (
+  `idExperimentResult_has_Property` INT NOT NULL AUTO_INCREMENT ,
+  `idProperty` INT NOT NULL ,
+  `idExperimentResults` INT NOT NULL ,
+  PRIMARY KEY (`idExperimentResult_has_Property`) ,
+  INDEX `fk_ExperimentResult_has_Property_Property1` (`idProperty` ASC) ,
+  INDEX `fk_ExperimentResult_has_Property_ExperimentResults1` (`idExperimentResults` ASC) ,
+  CONSTRAINT `fk_ExperimentResult_has_Property_Property1`
+    FOREIGN KEY (`idProperty` )
+    REFERENCES `Property` (`idProperty` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_ExperimentResult_has_Property_ExperimentResults1`
+    FOREIGN KEY (`idExperimentResults` )
+    REFERENCES `ExperimentResults` (`idJob` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ExperimentResult_has_PropertyValue`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ExperimentResult_has_PropertyValue` ;
+
+CREATE  TABLE IF NOT EXISTS `ExperimentResult_has_PropertyValue` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `idExperimentResult_has_Property` INT NOT NULL ,
+  `value` TEXT NULL ,
+  `order` INT NULL ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_ExperimentResult_has_PropertyValue_ExperimentResult_has_Pr1` (`idExperimentResult_has_Property` ASC) ,
+  CONSTRAINT `fk_ExperimentResult_has_PropertyValue_ExperimentResult_has_Pr1`
+    FOREIGN KEY (`idExperimentResult_has_Property` )
+    REFERENCES `ExperimentResult_has_Property` (`idExperimentResult_has_Property` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `CompetitionCategory`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `CompetitionCategory` ;
+
+CREATE  TABLE IF NOT EXISTS `CompetitionCategory` (
+  `idCompetitionCategory` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(255) NOT NULL ,
+  `description` TEXT NULL ,
+  PRIMARY KEY (`idCompetitionCategory`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Solver_has_CompetitionCategory`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Solver_has_CompetitionCategory` ;
+
+CREATE  TABLE IF NOT EXISTS `Solver_has_CompetitionCategory` (
+  `Solver_idSolver` INT NOT NULL ,
+  `CompetitionCategory_idCompetitionCategory` INT NOT NULL ,
+  PRIMARY KEY (`Solver_idSolver`, `CompetitionCategory_idCompetitionCategory`) ,
+  INDEX `fk_Solver_has_CompetitionCategory_CompetitionCategory1` (`CompetitionCategory_idCompetitionCategory` ASC) ,
+  CONSTRAINT `fk_Solver_has_CompetitionCategory_Solver1`
+    FOREIGN KEY (`Solver_idSolver` )
+    REFERENCES `Solver` (`idSolver` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Solver_has_CompetitionCategory_CompetitionCategory1`
+    FOREIGN KEY (`CompetitionCategory_idCompetitionCategory` )
+    REFERENCES `CompetitionCategory` (`idCompetitionCategory` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Instance_has_Property`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Instance_has_Property` ;
+
+CREATE  TABLE IF NOT EXISTS `Instance_has_Property` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `idInstance` INT NOT NULL ,
+  `idProperty` INT NOT NULL ,
+  `value` TEXT NULL ,
+  INDEX `fk_Instance_has_InstanceProperty_2` (`idInstance` ASC) ,
+  PRIMARY KEY (`id`) ,
+  INDEX `fk_Instance_has_Property_Property1` (`idProperty` ASC) ,
+  CONSTRAINT `fk_Instance_has_InstanceProperty_2`
+    FOREIGN KEY (`idInstance` )
+    REFERENCES `Instances` (`idInstance` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Instance_has_Property_Property1`
+    FOREIGN KEY (`idProperty` )
+    REFERENCES `Property` (`idProperty` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `VerifierCodes`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `VerifierCodes` ;
+
+CREATE  TABLE IF NOT EXISTS `VerifierCodes` (
+  `idVerifierCodes` INT NOT NULL ,
+  `code` INT NULL ,
+  `description` TEXT NULL ,
+  PRIMARY KEY (`idVerifierCodes`) )
+ENGINE = InnoDB
+COMMENT = 'The codes of the verifier together with a description.\n';
+
+
+-- -----------------------------------------------------
+-- Table `PropertyRegExp`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PropertyRegExp` ;
+
+CREATE  TABLE IF NOT EXISTS `PropertyRegExp` (
+  `idPropertyRegExp` INT NOT NULL AUTO_INCREMENT ,
+  `regexpr` VARCHAR(255) NULL ,
+  `idProperty` INT NULL ,
+  PRIMARY KEY (`idPropertyRegExp`) ,
+  INDEX `fk_PropertyRegExp_1` (`idProperty` ASC) ,
+  CONSTRAINT `fk_PropertyRegExp_1`
+    FOREIGN KEY (`idProperty` )
+    REFERENCES `Property` (`idProperty` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Trigger `ExperimentResult_has_PropertyValueUpdateTrigger`
+-- -----------------------------------------------------
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS `ExperimentResult_has_PropertyValueUpdateTrigger` $$
+CREATE TRIGGER ExperimentResult_has_PropertyValueUpdateTrigger AFTER INSERT ON ExperimentResult_has_PropertyValue
+  FOR EACH ROW BEGIN
+    UPDATE ExperimentResults SET date_modified = CURRENT_TIMESTAMP WHERE idJob = (SELECT idExperimentResults FROM ExperimentResult_has_Property WHERE idExperimentResult_has_Property = NEW.idExperimentResult_has_Property);
+  END;
+$$
+
+DELIMITER ;
+
+-- -----------------------------------------------------
+-- Event `MONITOR_JOBS`
+-- -----------------------------------------------------
 DROP EVENT IF EXISTS MONITOR_JOBS;
 
 CREATE EVENT IF NOT EXISTS MONITOR_JOBS
 ON SCHEDULE EVERY '20' MINUTE
 DO
 UPDATE ExperimentResults SET status=-1 WHERE idJob IN (
-select idJob FROM Experiment JOIN (SELECT * FROM ExperimentResults WHERE status=0) AS ERtmp on Experiment.idExperiment = Experiment_idExperiment WHERE absTime(TIME_TO_SEC(TIMEDIFF(curTime(), startTime)))>timeOut*1.5
+select idJob FROM Experiment JOIN (SELECT * FROM ExperimentResults WHERE status=0) AS ERtmp on Experiment.idExperiment = Experiment_idExperiment WHERE TIME_TO_SEC(TIMEDIFF(NOW(), startTime))>CPUTimeLimit*1.3
 );
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+

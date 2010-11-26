@@ -8,6 +8,8 @@ import edacc.model.NoConnectionToDBException;
 import java.awt.Component;
 import java.sql.SQLException;
 import java.util.Observable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
@@ -416,24 +418,43 @@ public class EDACCView extends FrameView implements Observer {
                 "This will destroy the EDACC tables of your DB an create new ones. Do you wish to continue?",
                 "Warning!",
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-            try {
-                // User clicked on "Yes"
-                DatabaseConnector.getInstance().createDBSchema();
-            } catch (NoConnectionToDBException ex) {
-                JOptionPane.showMessageDialog(mode,
-                        "Couldn't generate the EDACC tables: No connection to database. Please connect to a database first.",
-                        "Error!", JOptionPane.ERROR_MESSAGE);
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(mode,
-                        "An error occured while trying to generate the EDACC tables: " + ex.getMessage(),
-                        "Error!", JOptionPane.ERROR_MESSAGE);
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(mode,
-                        "An error occured while trying to generate the EDACC tables: " + ex.getMessage(),
-                        "Error!", JOptionPane.ERROR_MESSAGE);
-            } finally {
-                noMode();
-            }
+            noMode();
+            // User clicked on "Yes"
+            Tasks.startTask(new TaskRunnable() {
+
+                @Override
+                public void run(Tasks task) {
+                    try {
+                        task.setOperationName("Database");
+                        task.setStatus("Generating tables");
+                        DatabaseConnector.getInstance().createDBSchema();
+
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                manageDBMode();
+                            }
+                        });
+                    } catch (NoConnectionToDBException ex) {
+                        JOptionPane.showMessageDialog(mode,
+                                "Couldn't generate the EDACC tables: No connection to database. Please connect to a database first.",
+                                "Error!", JOptionPane.ERROR_MESSAGE);
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(mode,
+                                "An error occured while trying to generate the EDACC tables: " + ex.getMessage(),
+                                "Error!", JOptionPane.ERROR_MESSAGE);
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(mode,
+                                "An error occured while trying to generate the EDACC tables: " + ex.getMessage(),
+                                "Error!", JOptionPane.ERROR_MESSAGE);
+                    } finally {
+                        noMode();
+                    }
+                }
+            });
+
+
         }
     }
 
@@ -442,16 +463,16 @@ public class EDACCView extends FrameView implements Observer {
         manageDBModeMenuItem.setSelected(false);
         mainPanelLayout.replace(mode, noMode);
         mode = noMode;
-        statusMessageLabel.setText("No database connection established!");
+        if (!DatabaseConnector.getInstance().isConnected()) {
+            statusMessageLabel.setText("No database connection established!");
+        } else {
+            statusMessageLabel.setText("Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+        }
 
     }
 
     @Action
     public void manageDBMode() {
-        /*if (manageDBModeMenuItem.isSelected()) {
-        noMode();
-        return;
-        }*/
         if (manageExperimentModeMenuItem.isSelected()) {
             if (experimentMode.hasUnsavedChanges()) {
                 if (JOptionPane.showConfirmDialog(mode,
@@ -475,21 +496,23 @@ public class EDACCView extends FrameView implements Observer {
             manageDBModeMenuItem.setSelected(true);
             manageExperimentModeMenuItem.setSelected(false);
             statusMessageLabel.setText("MANAGE DB MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
-        } catch (NoConnectionToDBException ex) {
-            JOptionPane.showMessageDialog(this.getComponent(), "You have to connect to the database before switching modes", "No database connection", JOptionPane.ERROR_MESSAGE);
-            noMode();
-        } catch (SQLException ex) {
-            createDatabaseErrorMessage(ex);
-            noMode();
+        } catch (final Exception e) {
+            if (!SwingUtilities.isEventDispatchThread()) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        handleModeChangeError(e);
+                    }
+                });
+            } else {
+                handleModeChangeError(e);
+            }
         }
     }
 
     @Action
     public void manageExperimentMode() {
-        /*if (manageExperimentModeMenuItem.isSelected()) {
-        noMode();
-        return;
-        }*/
         if (manageDBModeMenuItem.isSelected()) {
             if (manageDBMode.unsavedChanges) {
                 if (JOptionPane.showConfirmDialog(mode,
@@ -510,23 +533,50 @@ public class EDACCView extends FrameView implements Observer {
             @Override
             public void run(Tasks task) {
                 try {
-                    mainPanelLayout.replace(mode, experimentMode);
                     experimentMode.initialize();
+                    mainPanelLayout.replace(mode, experimentMode);
                     mode = experimentMode;
                     manageExperimentModeMenuItem.setSelected(true);
                     manageDBModeMenuItem.setSelected(false);
-                } catch (NoConnectionToDBException ex) {
-                    JOptionPane.showMessageDialog(EDACCView.this.getComponent(), "You have to connect to the database before switching modes", "No database connection", JOptionPane.ERROR_MESSAGE);
-                    noMode();
-                } catch (SQLException ex) {
-                    createDatabaseErrorMessage(ex);
-                    noMode();
-                } catch (Exception e) {
-                    javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    statusMessageLabel.setText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+                } catch (final Exception e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            handleModeChangeError(e);
+                        }
+                    });
                 }
-                statusMessageLabel.setText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+
             }
         }, true);
+
+    }
+
+    public void handleModeChangeError(Throwable e) {
+        if (e instanceof NoConnectionToDBException) {
+            JOptionPane.showMessageDialog(EDACCView.this.getComponent(), "You have to connect to the database before switching modes", "No database connection", JOptionPane.ERROR_MESSAGE);
+            noMode();
+        } else if (e instanceof SQLException) {
+            if (((SQLException) e).getErrorCode() == 1146) {
+                // error code for mysql: table .. doesn't exist.
+                if (JOptionPane.showConfirmDialog(mode,
+                        "It seems that there are no tables in the database. Do you want to create them?",
+                        "Warning!",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+                    btnGenerateTables();
+                } else {
+                    noMode();
+                }
+            } else {
+                createDatabaseErrorMessage((SQLException) e);
+                noMode();
+            }
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+
+        }
 
     }
 

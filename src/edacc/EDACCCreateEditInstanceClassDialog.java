@@ -11,33 +11,36 @@
 
 package edacc;
 
-import edacc.manageDB.InstanceClassTableModel;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassAlreadyInDBException;
 import edacc.model.InstanceClassDAO;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  *
  * @author rretz
  */
 public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
-     InstanceClassTableModel tableModel;
+     JTree tree;
      InstanceClass instanceClass;
+     InstanceClass parent;
+     EDACCSelectParentInstanceClassDialog selectParent;
 
      /**
       * Creates new form EDACCCreateEditInstanceClassDialog
       * @param parent
       * @param modal
-      * @param tableModel
+      * @param treeModel
       * @param rowOfInstanceClass if its -1 the dialog is used as a create dialog, else as a edit dialog
       */
-    public EDACCCreateEditInstanceClassDialog(java.awt.Frame parent, boolean modal, InstanceClassTableModel tableModel,
-            int rowOfInstanceClass) {
+    public EDACCCreateEditInstanceClassDialog(java.awt.Frame parent, boolean modal, JTree tree) {
         super(parent, modal);
         initComponents();
-        if(rowOfInstanceClass == -1){
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+        if(node == null){
             this.jButtonEdit.setVisible(false);
             this.jButtonCreate.setEnabled(true);
             this.setTitle("Create a new instance class");
@@ -45,7 +48,7 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
             this.jButtonCreate.setVisible(false);
             this.jButtonEdit.setEnabled(true);
             this.jButtonEdit.setText("Save");
-            this.instanceClass = (InstanceClass)tableModel.getValueAt(rowOfInstanceClass, 4);
+            this.instanceClass = (InstanceClass)node.getUserObject();
             this.setTitle("Edit instance class: "+this.instanceClass.getName());
             this.jButtonEdit.setVisible(true);
             this.jTextFieldName.setText(instanceClass.getName());
@@ -60,7 +63,7 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
         }
             
 
-        this.tableModel = tableModel;
+        this.tree = tree;
     }
 
     /** This method is called from within the constructor to
@@ -85,6 +88,9 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
         jTextArea1 = new javax.swing.JTextArea();
         jRadioButtonSourceClass = new javax.swing.JRadioButton();
         jRadioButtonUserClass = new javax.swing.JRadioButton();
+        jButtonSelectParent = new javax.swing.JButton();
+        jLabelParent = new javax.swing.JLabel();
+        jLabelSelectedParent = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCCreateEditInstanceClassDialog.class);
@@ -104,7 +110,6 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
         });
 
         jButtonCreate.setText(resourceMap.getString("jButtonCreate.text")); // NOI18N
-        jButtonCreate.setEnabled(false);
         jButtonCreate.setName("jButtonCreate"); // NOI18N
         jButtonCreate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -113,16 +118,7 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
         });
 
         jButtonEdit.setText(resourceMap.getString("jButtonEdit.text")); // NOI18N
-        jButtonEdit.setEnabled(false);
-        jButtonEdit.setMaximumSize(new java.awt.Dimension(65, 23));
-        jButtonEdit.setMinimumSize(new java.awt.Dimension(65, 23));
         jButtonEdit.setName("jButtonEdit"); // NOI18N
-        jButtonEdit.setPreferredSize(new java.awt.Dimension(65, 23));
-        jButtonEdit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonEditActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -131,8 +127,8 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButtonCancel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 137, Short.MAX_VALUE)
-                .addComponent(jButtonEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 131, Short.MAX_VALUE)
+                .addComponent(jButtonEdit)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonCreate)
                 .addContainerGap())
@@ -143,11 +139,11 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(13, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonCancel)
                     .addComponent(jButtonCreate)
-                    .addComponent(jButtonEdit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jButtonCancel)
+                    .addComponent(jButtonEdit)))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -181,6 +177,20 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
         jRadioButtonUserClass.setText(resourceMap.getString("jRadioButtonUserClass.text")); // NOI18N
         jRadioButtonUserClass.setName("jRadioButtonUserClass"); // NOI18N
 
+        jButtonSelectParent.setText(resourceMap.getString("jButtonSelectParent.text")); // NOI18N
+        jButtonSelectParent.setName("jButtonSelectParent"); // NOI18N
+        jButtonSelectParent.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonSelectParentActionPerformed(evt);
+            }
+        });
+
+        jLabelParent.setText(resourceMap.getString("jLabelParent.text")); // NOI18N
+        jLabelParent.setName("jLabelParent"); // NOI18N
+
+        jLabelSelectedParent.setText(resourceMap.getString("jLabelSelectedParent.text")); // NOI18N
+        jLabelSelectedParent.setName("jLabelSelectedParent"); // NOI18N
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -189,13 +199,18 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabelName, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabelDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabelDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelParent))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
-                    .addComponent(jRadioButtonSourceClass, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jRadioButtonUserClass, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
-                    .addComponent(jTextFieldName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jButtonSelectParent)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabelSelectedParent))
+                    .addComponent(jRadioButtonUserClass, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
+                    .addComponent(jTextFieldName, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
+                    .addComponent(jRadioButtonSourceClass))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -208,12 +223,17 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabelDescription)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jRadioButtonSourceClass, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jRadioButtonUserClass)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonSelectParent)
+                    .addComponent(jLabelParent)
+                    .addComponent(jLabelSelectedParent))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -231,8 +251,8 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -265,9 +285,9 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
                     if(!jTextArea1.getText().isEmpty())
                         description = jTextArea1.getText();
                     if(jRadioButtonSourceClass.isSelected()){
-                        ret = InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), description, true);
-                     }else ret =  InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), description, false);
-                    tableModel.addClass(ret);
+                        ret = InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), description, parent, true);
+                     }else ret =  InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), description, parent, false);
+                   // tableModel.addClass(ret);
                     this.jTextArea1.setText("");
                     this.jTextFieldName.setText("");
                     this.dispose();
@@ -296,7 +316,7 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
             try {
                 instanceClass.setName(jTextFieldName.getText());
                 instanceClass.setDescription(jTextArea1.getText());
-                InstanceClassDAO.save(instanceClass);
+                InstanceClassDAO.save(instanceClass, null);
                 this.dispose();
             } catch (SQLException ex) {
                  JOptionPane.showMessageDialog(this,
@@ -307,14 +327,27 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jButtonEditActionPerformed
 
+    private void jButtonSelectParentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSelectParentActionPerformed
+        if(selectParent == null){
+            selectParent = new EDACCSelectParentInstanceClassDialog(EDACCApp.getApplication().getMainFrame(), true, this);
+            selectParent.setLocationRelativeTo(this);
+        }
+        selectParent.initialize();
+        selectParent.setVisible(true);
+        parent = selectParent.getInstanceClassParent();
+    }//GEN-LAST:event_jButtonSelectParentActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup SourceOrUserClass;
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonCreate;
     private javax.swing.JButton jButtonEdit;
+    private javax.swing.JButton jButtonSelectParent;
     private javax.swing.JLabel jLabelDescription;
     private javax.swing.JLabel jLabelName;
+    private javax.swing.JLabel jLabelParent;
+    private javax.swing.JLabel jLabelSelectedParent;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JRadioButton jRadioButtonSourceClass;

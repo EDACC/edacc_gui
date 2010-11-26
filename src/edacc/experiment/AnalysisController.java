@@ -2,7 +2,6 @@ package edacc.experiment;
 
 import edacc.experiment.plots.Plot;
 import edacc.experiment.plots.PlotPanel;
-import java.awt.Toolkit;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import org.rosuda.JRI.REXP;
@@ -123,6 +122,12 @@ public class AnalysisController {
         return new Point2D.Double(xcoord.asDouble(), ycoord.asDouble());
     }
 
+    /**
+     * Converts the given point from device coordinates to user coordinates on the specified device.
+     * @param dev the device
+     * @param point the point
+     * @return a new point with the converted coordinates
+     */
     public static Point2D convertPointToUserCoordinates(int dev, Point2D point) {
         REXP xcoord;
         REXP ycoord;
@@ -193,7 +198,7 @@ public class AnalysisController {
      * Returns the number of devices in the R engine.
      * It calls `dev.list()` and returns the length.
      * Throws an exception if there is no living R engine.
-     * @return
+     * @return the device count
      */
     public static int getDeviceCount() {
         if (re == null || !re.isAlive()) {
@@ -223,9 +228,12 @@ public class AnalysisController {
     }
 
     /**
-     * Saves the image of the panel to a filename in the eps format using R.
-     * @param pnl the panel
-     * @param filename the filename
+     * Saves the plot of the panel to a file in the eps format using R.
+     * @param pnl the panel which contains the plot
+     * @param filename the filename of the file
+     * @param width width in inch
+     * @param height height in inch
+     * @throws ImageSaveFailedException if the save operation failed
      */
     public static void saveToEps(PlotPanel pnl, String filename, double width, double height) throws ImageSaveFailedException {
         synchronized (syncR) {
@@ -239,6 +247,17 @@ public class AnalysisController {
         }
     }
 
+    /**
+     * Saves the plot of the panel to a file in the jpeg format using R.
+     * @param pnl the panel which contains the plot
+     * @param filename the filename of the file
+     * @param width unit is specified by units
+     * @param height unit is specified by units
+     * @param quality the image quality
+     * @param res the resolution in dpi
+     * @param units the units to be used for width and height
+     * @throws ImageSaveFailedException if the save operation failed
+     */
     public static void saveToJpeg(PlotPanel pnl, String filename, double width, double height, int quality, int res, String units) throws ImageSaveFailedException {
         synchronized (syncR) {
             setCurrentDeviceNumber(pnl.getDeviceNumber());
@@ -249,6 +268,16 @@ public class AnalysisController {
         }
     }
 
+    /**
+     * Saves the plot of the panel to a file in the tiff format using R.
+     * @param pnl the panel which contains the plot
+     * @param filename the filename of the file
+     * @param width unit is specified by units
+     * @param height unit is specified by units
+     * @param res the resolution in dpi
+     * @param units the units to be used for width and height
+     * @throws ImageSaveFailedException if the save operation failed
+     */
     public static void saveToTiff(PlotPanel pnl, String filename, double width, double height, int res, String units) throws ImageSaveFailedException {
         synchronized (syncR) {
             setCurrentDeviceNumber(pnl.getDeviceNumber());
@@ -259,6 +288,16 @@ public class AnalysisController {
         }
     }
 
+    /**
+     * Saves the plot of the panel to a file in the bmp format using R.
+     * @param pnl the panel which contains the plot
+     * @param filename the filename of the file
+     * @param width unit is specified by units
+     * @param height unit is specified by units
+     * @param res the resolution in dpi
+     * @param units the units to be used for width and height
+     * @throws ImageSaveFailedException if the save operation failed
+     */
     public static void saveToBmp(PlotPanel pnl, String filename, double width, double height, int res, String units) throws ImageSaveFailedException {
         synchronized (syncR) {
             setCurrentDeviceNumber(pnl.getDeviceNumber());
@@ -269,6 +308,16 @@ public class AnalysisController {
         }
     }
 
+    /**
+     * Saves the plot of the panel to a file in the png format using R.
+     * @param pnl the panel which contains the plot
+     * @param filename the filename of the file
+     * @param width unit is specified by units
+     * @param height unit is specified by units
+     * @param res the resolution in dpi
+     * @param units the units to be used for width and height
+     * @throws ImageSaveFailedException if the save operation failed
+     */
     public static void saveToPng(PlotPanel pnl, String filename, double width, double height, int res, String units) throws ImageSaveFailedException {
         synchronized (syncR) {
             setCurrentDeviceNumber(pnl.getDeviceNumber());

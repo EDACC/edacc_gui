@@ -54,7 +54,7 @@ public abstract class Plot {
      * Calculates the average property value for the given ExperimentResults, i.e. the sum of the property values divided by the count
      * @param results
      * @param property
-     * @return
+     * @return the average of the ExperimentResult values
      */
     public Double getAverage(ArrayList<ExperimentResult> results, Property property) {
         if (results.isEmpty()) {
@@ -81,7 +81,7 @@ public abstract class Plot {
      * Returns the median property value of the given ExperimentResults
      * @param results
      * @param property
-     * @return
+     * @return the median of the ExperimentResult values
      */
     public Double getMedian(ArrayList<ExperimentResult> results, Property property) {
         if (results.isEmpty()) {

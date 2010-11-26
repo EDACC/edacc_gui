@@ -98,7 +98,7 @@ public class ManagePropertyController {
     public void removeProperty(int convertRowIndexToModel) throws NoConnectionToDBException, SQLException, PropertyIsUsedException,
             PropertyTypeDoesNotExistException, IOException, PropertyNotInDBException, PropertyTypeNotExistException,
             ComputationMethodDoesNotExistException {
-        Property toRemove = (Property)((PropertyTableModel)tableSolverProperty.getModel()).getValueAt(convertRowIndexToModel, 5);
+        Property toRemove = (Property)((PropertyTableModel)tableSolverProperty.getModel()).getProperty(convertRowIndexToModel);
         PropertyDAO.remove(toRemove);
         ((PropertyTableModel)tableSolverProperty.getModel()).removeProperty(toRemove);
     }
