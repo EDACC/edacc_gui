@@ -27,7 +27,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -38,22 +37,16 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.event.TreeSelectionEvent;
 import javax.swing.table.*;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreeSelectionModel;
 import javax.swing.tree.TreeSelectionModel;
 import org.jdesktop.application.Action;
-import org.jdesktop.application.Application;
 
 /**
  *
@@ -89,9 +82,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         tableInstances.getSelectionModel().addListSelectionListener(new InstanceTableSelectionListener(tableInstances, manageDBInstances));
 
         // initialize instance class table
-        instanceClassTreeModel = new DefaultTreeModel(new DefaultMutableTreeNode(""));
+        instanceClassTreeModel = new DefaultTreeModel(new DefaultMutableTreeNode("test1"));
         jTreeInstanceClass.setModel(instanceClassTreeModel);
-        jTreeInstanceClass.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        jTreeInstanceClass.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        jTreeInstanceClass.addTreeSelectionListener(new InstanceClassTreeSelectionListener(manageDBInstances, jTreeInstanceClass));
+
         //jTreeInstanceClass.setRootVisible(false);
        /* instanceClassTableModel = new InstanceClassTableModel(tableInstances);
         tableInstanceClass.setModel(instanceClassTableModel);
@@ -1448,15 +1443,19 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     }//GEN-LAST:event_btnSelectAllInstanceClassesActionPerformed
 
     private void btnEditInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditInstanceClassActionPerformed
-            /*if(tableInstanceClass.getSelectedRow() == -1){
+            if(jTreeInstanceClass.getSelectionCount() == 0){
                     JOptionPane.showMessageDialog(panelManageDBInstances,
                     "Please select an instance class to edit!",
                     "Warning",
                     JOptionPane.WARNING_MESSAGE);
             }else {
-                manageDBInstances.EditInstanceClass(instanceClassTableModel, tableInstanceClass.convertRowIndexToModel(tableInstanceClass.getSelectedRow()));
-                instanceClassTableModel.fireTableDataChanged();
-            }*/
+            try {
+                manageDBInstances.EditInstanceClass();
+                this.manageDBInstances.loadInstanceClasses();
+            } catch (SQLException ex) {
+                Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            }
 
     }//GEN-LAST:event_btnEditInstanceClassActionPerformed
 
@@ -1528,7 +1527,13 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     }//GEN-LAST:event_btnSolverRefreshActionPerformed
 
     private void btnNewInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewInstanceClassActionPerformed
-        manageDBInstances.addInstanceClasses();
+        try {
+            jTreeInstanceClass.setSelectionPath(null);
+            manageDBInstances.addInstanceClasses();
+            manageDBInstances.loadInstanceClasses();
+        } catch (SQLException ex) {
+            Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
+        }
         /*tableInstanceClass.updateUI();
         unsavedChanges = true;*/
     }//GEN-LAST:event_btnNewInstanceClassActionPerformed
@@ -1552,15 +1557,16 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         }
     }//GEN-LAST:event_btnAddToClassActionPerformed
     private void btnRemoveFromClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveFromClassActionPerformed
-      /* int[] selectedRowsInstanceClass = tableInstanceClass.getSelectedRows();
-       for(int i = 0; i < selectedRowsInstanceClass.length; i++){
+      /*int[] selectedRowsInstanceClass = tableInstanceClass.getSelectedRows();
+
+      for(int i = 0; i < selectedRowsInstanceClass.length; i++){
            selectedRowsInstanceClass[i] = tableInstanceClass.convertRowIndexToModel(selectedRowsInstanceClass[i]);
        }
         manageDBInstances.RemoveInstanceFromInstanceClass(tableInstances.getSelectedRows(), selectedRowsInstanceClass);
         this.instanceTableModel.fireTableDataChanged();
         if(instanceTableModel.getRowCount() != 0){
            this.tableInstances.addRowSelectionInterval(0, 0);
-        }     */
+        }    */
     }//GEN-LAST:event_btnRemoveFromClassActionPerformed
     private JFileChooser exportFileChooser;
     private void btnExport(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExport
@@ -1600,22 +1606,16 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     }//GEN-LAST:event_tableInstancesMouseClicked
 
     private void btnRemoveInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstanceClassActionPerformed
-      /*    if(tableInstanceClass.getSelectedRows().length == 0){
+        if(jTreeInstanceClass.getSelectionCount() == 0){
              JOptionPane.showMessageDialog(panelManageDBInstances,
-                "No instances selected.",
+                "No instance class selected.",
                 "Warning",
                 JOptionPane.WARNING_MESSAGE);
           } else{
                 try {
-                    int tmp = tableInstanceClass.getRowCount();
-                    int select = tableInstanceClass.getSelectedRows()[0] - 1;
-                    manageDBInstances.RemoveInstanceClass(tableInstanceClass.getSelectedRows());
-                    instanceClassTableModel.fireTableDataChanged();
-                    if(tableInstanceClass.getRowCount() != 0 && select >= 0 && tmp != tableInstanceClass.getRowCount()){
-                        this.tableInstanceClass.addRowSelectionInterval(select, select);
-                    }else
-                        this.tableInstanceClass.addRowSelectionInterval(select + 1, select + 1);
-                } catch (SQLException ex){
+                    manageDBInstances.RemoveInstanceClass((DefaultMutableTreeNode)jTreeInstanceClass.getSelectionPath().getLastPathComponent());
+                    //instanceClassTableModel.fireTableDataChanged();                 ;
+                } catch (NoConnectionToDBException ex) {
                     Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (InstanceSourceClassHasInstance ex) {
                      JOptionPane.showMessageDialog(panelManageDBInstances,
@@ -1623,8 +1623,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                         " related instances.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
+                } catch (SQLException ex) {
+                    Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
                 }
-          }*/
+             }
     }//GEN-LAST:event_btnRemoveInstanceClassActionPerformed
 
     private void tableInstancesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableInstancesMousePressed

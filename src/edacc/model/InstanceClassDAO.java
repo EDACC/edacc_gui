@@ -290,12 +290,27 @@ public class InstanceClassDAO {
     private static DefaultMutableTreeNode getNodeWithChildren(int id) throws SQLException, SQLException{
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(getById(id));
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass FROM " + table + " WHERE parent=?");
-        st.setNull(1, id);
+        st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         while(rs.next()){
             root.add(getNodeWithChildren(rs.getInt(1)));
         }
         return root;
     }
+
+    public static boolean checkIfEmpty(Vector<InstanceClass> toRemove) throws SQLException {
+        PreparedStatement ps;
+        for(int i = 0; i < toRemove.size(); i++){
+            if(toRemove.get(i).isSource()){
+                ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT name FROM Instances WHERE instanceClass_idinstanceClass = ?");
+                ps.setInt(1, toRemove.get(i).getInstanceClassID());
+                ResultSet rs = ps.executeQuery();
+                if(rs.next()) return false;
+            }
+
+        }
+        return true;
+    }
+
 
 }
