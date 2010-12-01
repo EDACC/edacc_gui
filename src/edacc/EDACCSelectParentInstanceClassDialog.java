@@ -37,6 +37,7 @@ public class EDACCSelectParentInstanceClassDialog extends javax.swing.JDialog {
         initComponents();
         this.model = model;
         jTreeParents.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        jTreeParents.setRootVisible(false);
     }
 
     public InstanceClass getInstanceClassParent(){

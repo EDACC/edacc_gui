@@ -14,7 +14,10 @@ package edacc;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassAlreadyInDBException;
 import edacc.model.InstanceClassDAO;
+import edacc.model.NoConnectionToDBException;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -53,7 +56,13 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
             this.jButtonEdit.setVisible(true);
             this.jTextFieldName.setText(instanceClass.getName());
             this.jTextArea1.setText(instanceClass.getDescription());
-            this.jButtonSelectParent.setEnabled(false);
+            this.jButtonSelectParent.setEnabled(true);
+            DefaultMutableTreeNode checkParent =  (DefaultMutableTreeNode)node.getParent();
+            if((checkParent != null) && (!checkParent.isRoot())){
+                this.parent = (InstanceClass) checkParent.getUserObject();
+                this.jLabelSelectedParent.setText(parent.getName());
+            }
+            
             if(instanceClass.isSource())
                 this.jRadioButtonSourceClass.setSelected(true);
             else
@@ -329,18 +338,47 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButtonEditActionPerformed
 
     private void jButtonSelectParentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSelectParentActionPerformed
-        if(selectParent == null){
-            selectParent = new EDACCSelectParentInstanceClassDialog(EDACCApp.getApplication().getMainFrame(), true, (DefaultTreeModel)tree.getModel());            
+        try {
+            if (jRadioButtonSourceClass.isSelected()) {
+                selectParent = new EDACCSelectParentInstanceClassDialog(EDACCApp.getApplication().getMainFrame(), true, InstanceClassDAO.getSourceAsTree());
+            } else if (jRadioButtonUserClass.isSelected()) {
+                selectParent = new EDACCSelectParentInstanceClassDialog(EDACCApp.getApplication().getMainFrame(), true, InstanceClassDAO.getUserClassAsTree());
+            } else {
+                selectParent = new EDACCSelectParentInstanceClassDialog(EDACCApp.getApplication().getMainFrame(), true, (DefaultTreeModel) tree.getModel());
+            }
+            selectParent.setLocationRelativeTo(this);
+            selectParent.setAlwaysOnTop(true);
+            selectParent.initialize();
+            selectParent.setVisible(true);
+            InstanceClass tmpParent = parent;
+            parent = selectParent.getInstanceClassParent();
+            if (!jButtonEdit.isVisible()) {
+                if (parent != null) {
+                    jLabelSelectedParent.setText(parent.getName());
+                    if (parent.isSource()) {
+                        jRadioButtonSourceClass.setSelected(true);
+                    } else {
+                        jRadioButtonUserClass.setSelected(true);
+                    }
+                    jRadioButtonSourceClass.setEnabled(false);
+                    jRadioButtonUserClass.setEnabled(false);
+                } else {
+                    jLabelSelectedParent.setText("");
+                    jRadioButtonSourceClass.setEnabled(true);
+                    jRadioButtonUserClass.setEnabled(true);
+                }
+            } else {
+                if (parent == null) {
+                    parent = tmpParent;
+                } else {
+                    jLabelSelectedParent.setText(parent.getName());
+                }
+            }
+        } catch (NoConnectionToDBException ex) {
+            Logger.getLogger(EDACCCreateEditInstanceClassDialog.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(EDACCCreateEditInstanceClassDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
-        selectParent.setLocationRelativeTo(this);
-        selectParent.setAlwaysOnTop(true);
-        selectParent.initialize();
-        selectParent.setVisible(true);
-        parent = selectParent.getInstanceClassParent();
-        if(parent != null)
-            jLabelSelectedParent.setText(parent.getName());
-        else
-            jLabelSelectedParent.setText("");
     }//GEN-LAST:event_jButtonSelectParentActionPerformed
 
 

@@ -12,6 +12,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Vector;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  *
@@ -33,22 +34,12 @@ public class InstanceClassDAO {
      * @throws SQLException
      */
     public static InstanceClass createInstanceClass(String name, String description, InstanceClass parent, boolean source) throws SQLException, InstanceClassAlreadyInDBException {
-        PreparedStatement ps;
-        final String Query = "SELECT * FROM " + table + " WHERE name = ?";
-        ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
-        ps.setString(1, name);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            throw new InstanceClassAlreadyInDBException();
-        }
-
+        PreparedStatement ps;      
         InstanceClass i = new InstanceClass();
         i.setName(name);
         i.setDescription(description);
         i.setSource(source);
         save(i, parent);
-        rs.close();
-        ps.close();
         return i;
     }
 
@@ -158,28 +149,7 @@ public class InstanceClassDAO {
         return null;
     }
 
-    public static InstanceClass getByName(String name) throws NoConnectionToDBException, SQLException{
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass, name, description, source FROM " + table + " WHERE name=?");
-        st.setString(1, name);
-        ResultSet rs = st.executeQuery();
-        InstanceClass i = new InstanceClass();
-        if (rs.next()) {
-            i.setInstanceClassID(rs.getInt("idinstanceClass"));
-            i.setName(rs.getString("name"));
-            i.setDescription(rs.getString("description"));
-            i.setSource(rs.getBoolean("source"));
 
-            InstanceClass c = cache.getCached(i.getId());
-            if (c != null) {
-                return c;
-            } else {
-                i.setSaved();
-                cache.cache(i);
-                return i;
-            }
-        }
-        return null;
-    }
 
     /**
      * 
@@ -310,6 +280,28 @@ public class InstanceClassDAO {
 
         }
         return true;
+    }
+
+    public static DefaultTreeModel getSourceAsTree() throws NoConnectionToDBException, SQLException{
+         DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+        // First get all root InstanceClasses
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass FROM " + table + " WHERE parent IS NULL AND source;");
+        ResultSet rs = st.executeQuery();
+        while(rs.next()){
+            root.add(getNodeWithChildren(rs.getInt(1)));
+        }
+        return new DefaultTreeModel (root);
+    }
+
+    public static DefaultTreeModel getUserClassAsTree() throws NoConnectionToDBException, SQLException{
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+        // First get all root InstanceClasses
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass FROM " + table + " WHERE parent IS NULL AND NOT source;");
+        ResultSet rs = st.executeQuery();
+        while(rs.next()){
+            root.add(getNodeWithChildren(rs.getInt(1)));
+        }
+        return new DefaultTreeModel (root);
     }
 
 
