@@ -1557,16 +1557,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         }
     }//GEN-LAST:event_btnAddToClassActionPerformed
     private void btnRemoveFromClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveFromClassActionPerformed
-      /*int[] selectedRowsInstanceClass = tableInstanceClass.getSelectedRows();
-
-      for(int i = 0; i < selectedRowsInstanceClass.length; i++){
-           selectedRowsInstanceClass[i] = tableInstanceClass.convertRowIndexToModel(selectedRowsInstanceClass[i]);
-       }
-        manageDBInstances.RemoveInstanceFromInstanceClass(tableInstances.getSelectedRows(), selectedRowsInstanceClass);
+        manageDBInstances.RemoveInstanceFromInstanceClass(tableInstances.getSelectedRows(), jTreeInstanceClass.getSelectionPaths());
         this.instanceTableModel.fireTableDataChanged();
         if(instanceTableModel.getRowCount() != 0){
            this.tableInstances.addRowSelectionInterval(0, 0);
-        }    */
+        }
     }//GEN-LAST:event_btnRemoveFromClassActionPerformed
     private JFileChooser exportFileChooser;
     private void btnExport(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExport

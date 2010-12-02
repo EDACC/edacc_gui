@@ -11,15 +11,15 @@
 
 package edacc;
 
-import edacc.manageDB.AddInstanceInstanceClassTableModel;
+import edacc.manageDB.AddInstanceToInstanceSourceClassTreeSelectionListener;
+import edacc.manageDB.AddInstanceToInstanceUserClassTreeSelectionListener;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassDAO;
 import edacc.model.NoConnectionToDBException;
 import java.sql.SQLException;
-import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeSelectionModel;
 
 /**
  *
@@ -31,15 +31,19 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
     public EDACCAddInstanceToInstanceClass(java.awt.Frame parent, boolean modal) throws NoConnectionToDBException, SQLException {
         super(parent, modal);
         initComponents();
+        //Initiate the instance source class tree
+        jTreeSourceClass.setModel(InstanceClassDAO.getSourceAsTree());
+        jTreeSourceClass.setRootVisible(false);
+        jTreeSourceClass.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        jTreeSourceClass.addTreeSelectionListener(new AddInstanceToInstanceSourceClassTreeSelectionListener(this));
+        jTreeSourceClass.setRootVisible(false);
         //Initiate the instance source class table
-        AddInstanceInstanceClassTableModel sourceTableModel = new AddInstanceInstanceClassTableModel();
-        jTableSourceClass.setModel(sourceTableModel);
-        sourceTableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllSourceClass()));
 
-        //Initiate the instance source class table
-        AddInstanceInstanceClassTableModel userTableModel = new AddInstanceInstanceClassTableModel();
-        jTableUserClass.setModel(userTableModel);
-        userTableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllUserClass()));
+        jTreeUserClass.setModel(InstanceClassDAO.getUserClassAsTree());
+        jTreeUserClass.setRootVisible(false);
+        jTreeUserClass.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        jTreeUserClass.addTreeSelectionListener(new AddInstanceToInstanceUserClassTreeSelectionListener(this));
+        jTreeUserClass.setRootVisible(false);
     }
 
     public InstanceClass getInput(){
@@ -57,14 +61,14 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
 
         buttonGroupSourceOrUser = new javax.swing.ButtonGroup();
         jRadioButtonSourceClass = new javax.swing.JRadioButton();
-        jScrollPaneSourceClass = new javax.swing.JScrollPane();
-        jTableSourceClass = new javax.swing.JTable();
         jRadioButtonUserClass = new javax.swing.JRadioButton();
-        jScrollPaneUserClass = new javax.swing.JScrollPane();
-        jTableUserClass = new javax.swing.JTable();
         jPanelButton = new javax.swing.JPanel();
-        jButtonOk = new javax.swing.JButton();
         jButtonCancel = new javax.swing.JButton();
+        jButtonOk = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTreeSourceClass = new javax.swing.JTree();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTreeUserClass = new javax.swing.JTree();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAddInstanceToInstanceClass.class);
@@ -83,67 +87,12 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
         jRadioButtonSourceClass.setToolTipText(resourceMap.getString("jRadioButtonSourceClass.toolTipText")); // NOI18N
         jRadioButtonSourceClass.setName("jRadioButtonSourceClass"); // NOI18N
 
-        jScrollPaneSourceClass.setName("jScrollPaneSourceClass"); // NOI18N
-        jScrollPaneSourceClass.setPreferredSize(new java.awt.Dimension(375, 125));
-
-        jTableSourceClass.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jTableSourceClass.setToolTipText(resourceMap.getString("jTableSourceClass.toolTipText")); // NOI18N
-        jTableSourceClass.setName("jTableSourceClass"); // NOI18N
-        jTableSourceClass.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jTableSourceClassMouseClicked(evt);
-            }
-        });
-        jScrollPaneSourceClass.setViewportView(jTableSourceClass);
-
         buttonGroupSourceOrUser.add(jRadioButtonUserClass);
         jRadioButtonUserClass.setText(resourceMap.getString("jRadioButtonUserClass.text")); // NOI18N
         jRadioButtonUserClass.setToolTipText(resourceMap.getString("jRadioButtonUserClass.toolTipText")); // NOI18N
         jRadioButtonUserClass.setName("jRadioButtonUserClass"); // NOI18N
 
-        jScrollPaneUserClass.setName("jScrollPaneUserClass"); // NOI18N
-        jScrollPaneUserClass.setPreferredSize(new java.awt.Dimension(200, 200));
-
-        jTableUserClass.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jTableUserClass.setToolTipText(resourceMap.getString("jTableUserClass.toolTipText")); // NOI18N
-        jTableUserClass.setName("jTableUserClass"); // NOI18N
-        jTableUserClass.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jTableUserClassMouseClicked(evt);
-            }
-        });
-        jScrollPaneUserClass.setViewportView(jTableUserClass);
-
         jPanelButton.setName("jPanelButton"); // NOI18N
-
-        jButtonOk.setText(resourceMap.getString("jButtonOk.text")); // NOI18N
-        jButtonOk.setToolTipText(resourceMap.getString("jButtonOk.toolTipText")); // NOI18N
-        jButtonOk.setName("jButtonOk"); // NOI18N
-        jButtonOk.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonOkActionPerformed(evt);
-            }
-        });
 
         jButtonCancel.setText(resourceMap.getString("jButtonCancel.text")); // NOI18N
         jButtonCancel.setToolTipText(resourceMap.getString("jButtonCancel.toolTipText")); // NOI18N
@@ -154,26 +103,45 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
             }
         });
 
+        jButtonOk.setText(resourceMap.getString("jButtonOk.text")); // NOI18N
+        jButtonOk.setToolTipText(resourceMap.getString("jButtonOk.toolTipText")); // NOI18N
+        jButtonOk.setName("jButtonOk"); // NOI18N
+        jButtonOk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonOkActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanelButtonLayout = new javax.swing.GroupLayout(jPanelButton);
         jPanelButton.setLayout(jPanelButtonLayout);
         jPanelButtonLayout.setHorizontalGroup(
             jPanelButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelButtonLayout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(jButtonOk)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 245, Short.MAX_VALUE)
-                .addComponent(jButtonCancel)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 301, Short.MAX_VALUE)
+                .addComponent(jButtonCancel))
         );
 
         jPanelButtonLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButtonCancel, jButtonOk});
 
         jPanelButtonLayout.setVerticalGroup(
             jPanelButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(jButtonCancel)
-                .addComponent(jButtonOk))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelButtonLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanelButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonCancel)
+                    .addComponent(jButtonOk)))
         );
+
+        jScrollPane1.setName("jScrollPane1"); // NOI18N
+
+        jTreeSourceClass.setName("jTreeSourceClass"); // NOI18N
+        jScrollPane1.setViewportView(jTreeSourceClass);
+
+        jScrollPane2.setName("jScrollPane2"); // NOI18N
+
+        jTreeUserClass.setName("jTreeUserClass"); // NOI18N
+        jScrollPane2.setViewportView(jTreeUserClass);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -182,11 +150,11 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPaneUserClass, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
-                    .addComponent(jPanelButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jRadioButtonSourceClass, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
                     .addComponent(jRadioButtonUserClass, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPaneSourceClass, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
+                    .addComponent(jRadioButtonSourceClass, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -194,13 +162,13 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jRadioButtonSourceClass)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPaneSourceClass, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jRadioButtonUserClass)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPaneUserClass, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanelButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -218,23 +186,23 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
                     JOptionPane.ERROR_MESSAGE);
         }else{
             if(jRadioButtonSourceClass.isSelected()){
-                if(jTableSourceClass.getSelectedRow() == -1){
+                if(jTreeSourceClass.getSelectionCount() == 0){
                     JOptionPane.showMessageDialog(this,
-                    "Please select one of the instance source classes from the table",
+                    "Please select one of the instance source classes from the tree",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
                 }else{
-                    input = (InstanceClass) jTableSourceClass.getModel().getValueAt(jTableSourceClass.getSelectedRow(), 2);
+                    input = (InstanceClass) ((DefaultMutableTreeNode)jTreeSourceClass.getSelectionPath().getLastPathComponent()).getUserObject();
                     this.setVisible(false);
                 }
             }else{
-                if(jTableUserClass.getSelectedRow() == -1){
+                if(jTreeUserClass.getSelectionCount() == 0){
                     JOptionPane.showMessageDialog(this,
                     "Please select one of the instance user classes from the table",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
                 }else{
-                    input = (InstanceClass) jTableUserClass.getModel().getValueAt(jTableUserClass.getSelectedRow(), 2);
+                    input = (InstanceClass) ((DefaultMutableTreeNode)jTreeUserClass.getSelectionPath().getLastPathComponent()).getUserObject();
                     this.setVisible(false);
                 }
             }
@@ -248,8 +216,8 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         try {
-            ((AddInstanceInstanceClassTableModel)jTableSourceClass.getModel()).setClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllSourceClass()));
-            ((AddInstanceInstanceClassTableModel)jTableUserClass.getModel()).setClasses(new Vector<InstanceClass>(InstanceClassDAO.getAllUserClass()));
+            jTreeSourceClass.setModel(InstanceClassDAO.getSourceAsTree());
+            jTreeUserClass.setModel(InstanceClassDAO.getUserClassAsTree());
          } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this.rootPane,
                     ex.getMessage(),
@@ -263,16 +231,6 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_formWindowActivated
 
-    private void jTableSourceClassMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableSourceClassMouseClicked
-        this.jRadioButtonSourceClass.setSelected(true);
-        this.jTableUserClass.removeRowSelectionInterval(0, this.jTableUserClass.getRowCount() - 1);
-    }//GEN-LAST:event_jTableSourceClassMouseClicked
-
-    private void jTableUserClassMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableUserClassMouseClicked
-        this.jRadioButtonUserClass.setSelected(true);
-        this.jTableSourceClass.removeRowSelectionInterval(0, this.jTableSourceClass.getRowCount() - 1);
-    }//GEN-LAST:event_jTableUserClassMouseClicked
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroupSourceOrUser;
     private javax.swing.JButton jButtonCancel;
@@ -280,10 +238,18 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
     private javax.swing.JPanel jPanelButton;
     private javax.swing.JRadioButton jRadioButtonSourceClass;
     private javax.swing.JRadioButton jRadioButtonUserClass;
-    private javax.swing.JScrollPane jScrollPaneSourceClass;
-    private javax.swing.JScrollPane jScrollPaneUserClass;
-    private javax.swing.JTable jTableSourceClass;
-    private javax.swing.JTable jTableUserClass;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTree jTreeSourceClass;
+    private javax.swing.JTree jTreeUserClass;
     // End of variables declaration//GEN-END:variables
+
+    public void selectUserClass() {
+        jRadioButtonUserClass.setSelected(true);
+    }
+
+    public void selectSourceClass() {
+        jRadioButtonSourceClass.setSelected(true);
+    }
 
 }

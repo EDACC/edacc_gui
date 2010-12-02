@@ -22,6 +22,7 @@ import edacc.model.InstanceClassDAO;
 import edacc.model.InstanceClassMustBeSourceException;
 
 import edacc.model.InstanceDAO;
+import edacc.model.InstanceHasInstanceClass;
 import edacc.model.InstanceHasInstanceClassDAO;
 import edacc.model.InstanceIsInExperimentException;
 import edacc.model.InstanceSourceClassHasInstance;
@@ -828,6 +829,77 @@ public class ManageDBInstances implements Observer{
         }
         ret.add((InstanceClass) root.getUserObject());
         return ret;
+    }
+
+    public void RemoveInstanceFromInstanceClass(int[] selectedRows, TreePath[] selected) {
+        if(tableInstances.getSelectedRows().length == 0){
+             JOptionPane.showMessageDialog(panelManageDBInstances,
+                "No instances selected.",
+                "Warning",
+                JOptionPane.WARNING_MESSAGE);
+        }else if(selected == null){
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                "No instance class selected.",
+                "Warning",
+                JOptionPane.WARNING_MESSAGE);
+        }else{
+            Boolean isSource = false;
+
+            try {
+                Vector<Instance> toRemove = new Vector<Instance>();
+                for(int i = 0; i < selectedRows.length; i++){
+                    toRemove.add((Instance) main.instanceTableModel.getInstance(tableInstances.convertRowIndexToModel(selectedRows[i])));
+                }
+                // check if the user really want to remove the instances from the instace classes
+                InstanceTableModel tableModel = new InstanceTableModel();
+                tableModel.addInstances(toRemove);
+
+
+                if(EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
+                        EDACCApp.getApplication().getMainFrame(),
+                        "Do you really won't to remove  the listed instances from the selected instance classes?",
+                        new JTable(tableModel))==EDACCExtendedWarning.RET_OK_OPTION){
+                    Vector<InstanceClass> choosen = new Vector<InstanceClass>();
+                    for(int j = 0; j < selected.length; j++){
+                        choosen.addAll(getAllToEnd((DefaultMutableTreeNode) (selected[j].getLastPathComponent())));
+                    }
+
+                    for(int i = 0; i < toRemove.size(); i++){
+                        for(int j = 0; j < choosen.size(); j++){
+                            InstanceClass tempInstanceClass = choosen.get(j);
+                            if(tempInstanceClass.isSource()){
+                               isSource = true;
+                            }else{
+                                    InstanceHasInstanceClass rem = InstanceHasInstanceClassDAO.getInstanceHasInstanceClass(tempInstanceClass, toRemove.get(i));
+                                    if (rem != null) {
+                                        InstanceHasInstanceClassDAO.removeInstanceHasInstanceClass(rem);
+                                    }
+                            }
+                      }
+                   }
+                }
+
+                if(isSource){
+                    JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "Some of the choosen instance classes are source classes, " +
+                        "the selected instances couldn't removed from them.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+                loadInstanceClasses();
+
+            } catch (NoConnectionToDBException ex) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                    ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+           } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "There is a Problem with the database: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+           }
+        }
     }
 
 
