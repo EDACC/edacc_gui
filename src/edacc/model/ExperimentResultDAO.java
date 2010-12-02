@@ -187,7 +187,7 @@ public class ExperimentResultDAO {
         st.setInt(1, id);
         st.setInt(2, id);
         st.setInt(3, ExperimentResultStatus.RUNNING.getValue());*/
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("select MAX(date_modified) AS ermodified FROM " + table + " WHERE Experiment_idExperiment = ?");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("select MAX(TIMESTAMPADD(SECOND, 1, date_modified)) AS ermodified FROM " + table + " WHERE Experiment_idExperiment = ?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         rs.next(); // there will always be a timestamp
@@ -257,7 +257,7 @@ public class ExperimentResultDAO {
         ArrayList<ExperimentResult> v = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery
-                + "WHERE Experiment_idExperiment=? AND date_modified >= ?;");
+                + "WHERE Experiment_idExperiment=? AND IF(status = " + ExperimentResultStatus.RUNNING.getValue() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) >= ?;");
         st.setInt(1, id);
         st.setTimestamp(2, modified);
         ResultSet rs = st.executeQuery();
