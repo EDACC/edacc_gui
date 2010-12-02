@@ -6,667 +6,558 @@
 #include "log.h"
 #include "safeio.h"
 
-
-
-#define QUERY_EXPERIMENT_INFO "" \
-	"SELECT " \
-	"       timeOut, " \
-	"       name " \
-	"   FROM Experiment " \
-	"   WHERE idExperiment = %i "
-
-#define QUERY_GRID_SETTINGS "" \
-	"SELECT " \
-	"       numCPUs " \
-	"   FROM gridQueue " \
-	"   WHERE idgridQueue = %i " \
-
-#define QUERY_INSTANCES "" \
-	"SELECT " \
-	"       i.idInstance, " \
-	"       i.name, " \
-	"       i.instance, " \
-	"       i.md5 " \
-	"   FROM ExperimentResults AS er " \
-	"   LEFT JOIN Instances AS i " \
-	"       ON er.Instances_idInstance = i.idInstance " \
-	"   WHERE er.Experiment_idExperiment = %i " \
-	"   GROUP BY i.idInstance "
-
-#define QUERY_SOLVERS "" \
-	"SELECT " \
-	"       s.idSolver, " \
-	"       s.name, " \
-	"       s.binaryName, " \
-	"       s.binary, " \
-	"       s.md5 " \
-	"   FROM ExperimentResults AS er " \
-	"   LEFT JOIN SolverConfig AS sc " \
-	"       ON er.SolverConfig_idSolverConfig = sc.idSolverConfig " \
-	"   LEFT JOIN Solver AS s " \
-	"       ON sc.Solver_idSolver = s.idSolver " \
-	"   WHERE er.Experiment_idExperiment = %i " \
-	"   GROUP BY s.idSolver "
-
-/* Will be needed for the randomized job pick */
-#define QUERY_EXPERIMENT_JOBS "" \
-	"SELECT " \
-	"       idJob " \
-	"   FROM ExperimentResults " \
-	"   WHERE (status = -1 OR status = -2) " \
-	"      AND Experiment_idExperiment = %i "
-
-
-#define QUERY_JOB "" \
-	"SELECT " \
-	"       e.idJob, " \
-	"       s.binaryName, " \
-	"       i.name, " \
-	"       e.resultFileName " \
-	"   FROM ExperimentResults AS e " \
-	"   LEFT JOIN SolverConfig AS sc " \
-	"       ON e.SolverConfig_idSolverConfig = sc.IdSolverConfig " \
-	"   LEFT JOIN Solver AS s " \
-	"       ON s.idSolver = sc.Solver_idSolver " \
-	"   LEFT JOIN Instances AS i " \
-	"       ON e.Instances_idInstance = i.idInstance " \
-	"   WHERE e.idJob = %i "
-
-
-/*
-#define QUERY_JOB_PARAMS "" \
-	"SELECT " \
-	"       p.name, " \
-	"       p.prefix, " \
-	"       p.hasValue, " \
-	"       p.value, " \
-	"       scp.value " \
-	"   FROM ExperimentResults AS er " \
-	"   LEFT JOIN SolverConfig AS sc " \
-	"       ON er.SolverConfig_idSolverConfig = sc.idSolverConfig " \
-	"   LEFT JOIN Solver AS s " \
-	"       ON sc.Solver_idSolver = s.idSolver " \
-	"   LEFT JOIN Parameters AS p " \
-	"       ON p.Solver_idSolver = s.idSolver " \
-	"   LEFT JOIN SolverConfig_has_Parameters AS scp " \
-	"       ON p.idParameter = scp.Parameters_idParameter " \
-	"   WHERE er.idJob = %i "
- */
-
-#define QUERY_JOB_PARAMS "" \
-	"SELECT " \
-	"       p.name, " \
-	"       p.prefix, " \
-	"       p.hasValue, " \
-	"       p.value, " \
-	"       scp.value " \
-	"   FROM ExperimentResults AS er " \
-	"   LEFT JOIN SolverConfig_has_Parameters AS scp " \
-	"       ON er.SolverConfig_idSolverConfig = scp.SolverConfig_idSolverConfig " \
-	"   RIGHT JOIN Parameters AS p " \
-	"       ON scp.Parameters_idParameter = p.idParameter " \
-	"   WHERE er.idJob = %i "
-
-
-
-#define UPDATE_JOB ""           \
-	"UPDATE ExperimentResults SET " \
-	"       resultFileName = '%s', "  \
-	"       status = %i, "          \
-	"       seed = %i, "            \
-	"       time = %f, "            \
-	"       statusCode = %i, "      \
-	"       resultFile = '%s', "       \
-	"       startTime = '%s' " \
-	"   WHERE idJob = %i "
-
-
-#define QUERY_SOLVER "" \
-	"SELECT " \
-	"       binary, " \
-	"       md5 " \
-	"   FROM Solver " \
-	"   WHERE binaryName = '%s' "
-
-#define QUERY_INSTANCE "" \
-	"SELECT " \
-	"       instance, " \
-	"       md5 " \
-	"   FROM Instances " \
-	"   WHERE name = '%s' "
-
-#define QUERY_TIME "" \
-	"SELECT " \
-	"  CURTIME()"
-
-
-status dbFetchExperimentData(experiment *e) {
+status dbFetchExperimentData(experiment* e) {
 	MYSQL *conn;
 	MYSQL_RES *res;
 	MYSQL_ROW row;
+	int queryLength;
 
 	if (mysql_library_init(0, NULL, NULL)) {
-		logError("could not initialize MySQL library\n");
+		LOGERROR(AT, "could not initialize MySQL library\n");
 		return dbError;
 	}
-
 
 	char *queryExperimentInfo = NULL;
 	char *queryGridInfo = NULL;
-	char *querySolver = NULL;
-	char *queryInstance = NULL;
-
-	int i;
-	unsigned long *lengths = NULL;
-
-	e->md5Instances = NULL;
-	e->instances = NULL;
-	e->instanceNames = NULL;
-
-	e->lengthSolver = NULL;
-	e->md5Solvers = NULL;
-	e->solvers = NULL;
-	e->solverNames = NULL;
-
-	e->id=experimentId;
-
-	e->name=NULL;
-
-	sprintfAlloc(&queryExperimentInfo, QUERY_EXPERIMENT_INFO, experimentId);
-	sprintfAlloc(&queryGridInfo, QUERY_GRID_SETTINGS, gridQueueId);
-	sprintfAlloc(&querySolver, QUERY_SOLVERS, experimentId);
-	sprintfAlloc(&queryInstance, QUERY_INSTANCES, experimentId);
+	e->id = experimentId;
+	e->name = NULL;
 
 	conn = mysql_init(NULL);
-	logComment(1,"establishing a mysql-connection...");
-	if(mysql_real_connect(conn, host, username, password, database, 0, NULL, 0) == NULL) {
-		logError("could not establish a mysql connection!\n error message: %s",mysql_error(conn));
+	logComment(1, "establishing a MySQL-connection...");
+	if (mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)
+			== NULL) {
+		LOGERROR(AT,
+				"could not establish a mysql connection!\n error message: %s",
+				mysql_error(conn));
 		return dbError;
 	}
-	logComment(1,"done\n");
+	logComment(1, "done\n");
 
+	queryLength = sprintfAlloc(&queryExperimentInfo, QUERY_EXPERIMENT_INFO,
+			experimentId);
 
 	/* fetch experiment information */
-	if(mysql_query(conn, queryExperimentInfo) != 0) {
+	if (mysql_query(conn, queryExperimentInfo) != 0) {
+		LOGERROR(AT, "DB error message: %s", mysql_error(conn));
 		return dbError;
-		logError("DB error message: %s",mysql_error(conn));
-		//TODO:Error Meldung?
 	}
 
-	if((res = mysql_store_result(conn)) == NULL) {
+	if ((res = mysql_store_result(conn)) == NULL) {
+		LOGERROR(AT, "DB error message: %s", mysql_error(conn));
 		return dbError;
-		logError("DB error message: %s",mysql_error(conn));
-		//TODO:Error Meldung?
 	}
 
-	if((row = mysql_fetch_row(res)) != NULL) {
-		e->timeOut = atoi(row[0]);
-		e->name = malloc(256*sizeof(char));
-		strncpy(e->name, row[1], 256);
-		//TODO:Error Meldung?
+	if ((row = mysql_fetch_row(res)) != NULL) {
+		e->CPUTimeLimit = atoi(row[0]);
+		e->wallClockTimeLimit = atoi(row[1]);
+		e->memoryLimit = atoi(row[2]);
+		e->stackSizeLimit = atoi(row[3]);
+		e->outPutSizeLimit = atoi(row[4]);
+		e->name = malloc(256 * sizeof(char));
+		strncpy(e->name, row[5], 256);
+	} else {
+		LOGERROR(AT, "NO experiment data available for experiment with ID: %d",
+				experimentId);
+		return dbError;
 	}
-	logComment(2,"Experiment settings \n------------------------------\n");
-	logComment(2,"%20s : %s \n","name of experiment",e->name);
-	logComment(2,"%20s : %d s\n","timeOut for jobs",e->timeOut);
 
+	logComment(2, "Experiment settings \n------------------------------\n");
+	logComment(2, "%-30s : %s \n", "name of experiment", e->name);
+	logComment(2, "%-30s : %d (sec) \n", "CPU time-out for jobs",
+			e->CPUTimeLimit);
+	logComment(2, "%-30s : %d (sec) \n", "wall clock time out for jobs",
+			e->wallClockTimeLimit);
+	logComment(2, "%-30s : %d (MB) \n", "max memory  for jobs", e->memoryLimit);
+	logComment(2, "%-30s : %d (MB) \n", "max stack size for jobs",
+			e->stackSizeLimit);
+	logComment(2, "%-30s : %d (MB) \n", "max size output files for jobs",
+			e->outPutSizeLimit);
+	mysql_free_result(res);
 
 	/* fetch grid information */
-	if(mysql_query(conn, queryGridInfo) != 0) {
+
+	queryLength
+	= sprintfAlloc(&queryGridInfo, QUERY_GRID_SETTINGS, gridQueueId);
+
+	if (mysql_query(conn, queryGridInfo) != 0) {
 		mysql_free_result(res);
-		logError("DB error message: %s",mysql_error(conn));
+		LOGERROR(AT, "DB error message: %s", mysql_error(conn));
 		return dbError;
 	}
 
-	mysql_free_result(res);
-	if((res = mysql_store_result(conn)) == NULL) {
-		logError("DB error message: %s",mysql_error(conn));
+	if ((res = mysql_store_result(conn)) == NULL) {
+		LOGERROR(AT, "DB error message: %s", mysql_error(conn));
 		return dbError;
 	}
 
-	if((row = mysql_fetch_row(res)) != NULL) {
+	if ((row = mysql_fetch_row(res)) != NULL) {
 		e->numCPUs = atoi(row[0]);
 	}
 
-	logComment(2,"%20s : %d\n","numCpus per Node",e->numCPUs);
-	logComment(2,"------------------------------\n");
-
-	/* fetch instances */
-	if(mysql_query(conn, queryInstance) != 0) {
-		mysql_free_result(res);
-		logError("DB error message: %s",mysql_error(conn));
-		return dbError;
-
-	}
-
-	mysql_free_result(res);
-	if((res = mysql_store_result(conn)) == NULL) {
-		logError("DB error message: %s",mysql_error(conn));
-		return dbError;
-	}
-
-	e->numInstances = mysql_num_rows(res);
-	logComment(2,"Instances:\n------------------------------\n");
-	logComment(3,"%20s : %d\n","number of instances",e->numInstances);
-
-	if((e->md5Instances = malloc(e->numInstances*sizeof(char *))) == NULL) {
-		mysql_free_result(res);
-		logError("out of memory!\n");
-		return sysError;
-	}
-
-	if((e->instances = malloc(e->numInstances*sizeof(char *))) == NULL) {
-		mysql_free_result(res);
-		logError("out of memory!\n");
-		return sysError;
-	}
-
-	if((e->instanceNames = malloc(e->numInstances*sizeof(char *))) == NULL) {
-		mysql_free_result(res);
-		logError("out of memory!\n");
-		return sysError;
-	}
-
-	i=0;
-	logComment(4,"%20s : \n","instances");
-	while((row = mysql_fetch_row(res)) != NULL) {
-		lengths = mysql_fetch_lengths(res);
-		//TODO: Fehler wegen callocs
-		e->md5Instances[i] = malloc(60*sizeof(char));
-		strncpy(e->md5Instances[i], row[3], 60);
-
-		/* Size + 1, to fit the lest nullbyte */
-		e->instances[i] = calloc(lengths[2]+1,sizeof(char));
-		memcpy(e->instances[i], row[2], lengths[2]);
-
-		e->instanceNames[i] = calloc(lengths[1],sizeof(char*));
-		strncpy(e->instanceNames[i], row[1], lengths[1]);
-		logComment(4,"%d. %s \n",i+1,e->instanceNames[i]);
-
-		i++;
-	}
-	logComment(2,"------------------------------\n");
-
-
-
-	/* fetch solver binaries */
-	if(mysql_query(conn, querySolver) != 0) {
-		mysql_free_result(res);
-		logError("DB error message: %s",mysql_error(conn));
-		return dbError;
-	}
-
-	mysql_free_result(res);
-	if((res = mysql_store_result(conn)) == NULL) {
-		logError("DB error message: %s",mysql_error(conn));
-		return dbError;
-	}
-
-	e->numSolvers = mysql_num_rows(res);
-	logComment(2,"Solvers:\n------------------------------\n");
-	logComment(3,"%20s : %d\n","number of solvers",e->numSolvers);
-
-	if((e->lengthSolver = malloc(e->numSolvers*sizeof(char *))) == NULL) {
-		mysql_free_result(res);
-		return sysError;
-	}
-
-	if((e->md5Solvers = malloc(e->numSolvers*sizeof(char *))) == NULL) {
-		mysql_free_result(res);
-		return sysError;
-	}
-
-	if((e->solvers = malloc(e->numSolvers*sizeof(char *))) == NULL) {
-		mysql_free_result(res);
-		return sysError;
-	}
-
-	if((e->solverNames = malloc(e->numSolvers*sizeof(char *))) == NULL) {
-		mysql_free_result(res);
-		return sysError;
-	}
-
-	i=0;
-	logComment(4,"%20s : \n","solvers");
-	while((row = mysql_fetch_row(res)) != NULL) {
-		lengths = mysql_fetch_lengths(res);
-		//TODO: allocs fehler abfangen
-		e->lengthSolver[i] = lengths[3];
-
-		e->md5Solvers[i] = (char *)malloc(60*sizeof(char));
-		strncpy(e->md5Solvers[i], row[4], 60);
-
-		e->solvers[i] = (char *)malloc(lengths[3]*sizeof(char));
-		memcpy(e->solvers[i], row[3], lengths[3]);
-
-		if((e->solverNames[i] = calloc(lengths[2],sizeof(char))) == NULL) {
-			mysql_free_result(res);
-			return sysError;
-		}
-		strncpy(e->solverNames[i], row[2], lengths[2]);
-		logComment(4,"%d. %s \n",i+1,e->solverNames[i]);
-
-		i++;
-	}
+	logComment(2, "%-30s : %d\n", "numCpus per Node", e->numCPUs);
+	logComment(2, "------------------------------\n");
 
 	mysql_free_result(res);
 	mysql_close(conn);
 	mysql_library_end();
+
+	free(queryExperimentInfo);
+	free(queryGridInfo);
 	return success;
 }
 
 void freeExperimentData(experiment *e) {
-	int i;
-
-	for(i=0; i<e->numInstances; i++) {
-		if(e->md5Instances[i] != NULL) {
-			free(e->md5Instances[i]);
-		}
-
-		if(e->instances[i] != NULL) {
-			free(e->instances[i]);
-		}
-
-		if(e->instanceNames[i] != NULL) {
-			free(e->instanceNames[i]);
-		}
-	}
-
-	for(i=0; i<e->numSolvers; i++) {
-		if(e->md5Solvers[i] != NULL) {
-			free(e->md5Solvers[i]);
-		}
-
-		if(e->solverNames[i] != NULL) {
-			free(e->solverNames[i]);
-		}
-	}
-
-	if(e->md5Instances != NULL) {
-		free(e->md5Instances);
-	}
-
-	if(e->instances != NULL) {
-		free(e->instances);
-	}
-
-	if(e->instanceNames != NULL) {
-		free(e->instanceNames);
-	}
-
-	if(e->lengthSolver != NULL) {
-		free(e->lengthSolver);
-	}
-
-	if(e->md5Solvers != NULL) {
-		free(e->md5Solvers);
-	}
-
-	if(e->solvers != NULL) {
-		free(e->solvers);
-	}
-
-	if(e->solverNames != NULL) {
-		free(e->solverNames);
-	}
-
+	free(e->name);
 }
+
+/*int dbGetJob(job* j, status* s) {
+	MYSQL *conn = NULL;
+	MYSQL_RES *res = NULL;
+	MYSQL_ROW row;
+	int jobID;
+	int freeJobs=1; //indicates whether there are uncomputed jobs
+	int gotAJob=0;
+	int i;
+	char *queryRandomJob = NULL;
+	char *queryLockJob = NULL;
+
+	conn = mysql_init(NULL);
+	if (!mysql_real_connect(conn, host, username, password, database, port,
+			NULL, 0)) {
+		LOGERROR(AT, "could not establish mysql connection!\n");
+ *s = dbError;
+		mysql_close(conn);
+		return 1;
+	}
+	//Autocommit wird hier ausgeschaltet
+	if (mysql_autocommit(conn,0)!=0)
+		LOGERROR(AT, "db error: Could not switch autocommit OFF");
+
+	while ((freeJobs)&&(!gotAJob)){
+
+		sprintfAlloc(&queryRandomJob, QUERY_RANDOM_JOB,experimentId);
+		if (mysql_query(conn, queryRandomJob) != 0) {
+			LOGERROR(AT, "db query error, message: %s\n", mysql_error(conn));
+ *s = dbError;
+			mysql_close(conn);
+			free(queryJob);
+			return 1;
+		}
+		free(queryJob);	queryJob=NULL;
+
+		if ((res = mysql_store_result(conn)) == NULL) {
+			LOGERROR(AT, "store result error");
+ *s = dbError;
+			mysql_close(conn);
+			return 1;
+		}
+		i = mysql_num_rows(res);
+		if (i == 0) { //keine jobs mehr vorhanden!
+			mysql_free_result(res);
+ *s = success;
+			return 1;
+		}
+
+		if ((row = mysql_fetch_row(res)) != NULL) {
+			jobID = atoi(row[0]);
+		}
+
+		sprintfAlloc(&queryLockJob, QUERY_LOCK_JOB,jobID);
+
+		if (mysql_query(conn, queryJob) != 0) {
+			LOGERROR(AT, "could not lock Job %d: %s\n",jobID, mysql_error(conn));
+			return dbError;
+		}
+		if ((long)mysql_affected_rows(&mysql)==1){
+			gotAJob=1;
+			succes=1;
+		}
+		mysql_commit(conn);
+	}
+	mysql_close(conn);
+	free(queryJob);
+}*/
 
 int dbFetchJob(job* j, status* s) {
 	MYSQL *conn = NULL;
 	MYSQL_RES *res = NULL;
 	MYSQL_ROW row;
 
-	char *queryExpJob = NULL;
 	char *queryJob = NULL;
 	char *queryJobParams = NULL;
+	//char *queryJobParams = NULL;
+
+	int queryLength;
+
+	int jobID;
+
+	int gotAJob=0;
+
+	char *queryRandomJob = NULL;
+	char *queryLockJob = NULL;
 
 	char *params = NULL;
-
-	int lastId = 0;
+	char *temp = NULL;
 
 	int i;
 	unsigned long *lengths = NULL;
 
-	j->solverName = NULL;
-	j->resultFile = NULL;
+	j->startTime = NULL;
 
+	j->solverOutputFN = NULL;
+	j->launcherOutputFN = NULL;
+	j->watcherOutputFN = NULL;
+	j->verifierOutputFN = NULL;
+
+	j->solverOutput = NULL;
+	j->launcherOutput = NULL;
+	j->watcherOutput = NULL;
+	j->verifierOutput = NULL;
+
+	j->solverName = NULL;
+	j->solverVersion = NULL;
+	j->instanceName = NULL;
+	j->binaryName = NULL;
 
 	conn = mysql_init(NULL);
-	if(!mysql_real_connect(conn, host, username, password, database, port, NULL, 0)) {
-		logError("could not establish mysql connection!\n");
+	if (!mysql_real_connect(conn, host, username, password, database, port,
+			NULL, 0)) {
+		LOGERROR(AT, "could not establish mysql connection!\n");
 		*s = dbError;
+		mysql_close(conn);
 		return 1;
 	}
 
-	sprintfAlloc(&queryExpJob, QUERY_EXPERIMENT_JOBS, experimentId);
+	//Autocommit wird hier ausgeschaltet
+	if (mysql_autocommit(conn,0)!=0)
+		LOGERROR(AT, "db error: Could not switch autocommit OFF");
 
-	/* fetch the id's of the experiment jobs */
-	if(mysql_query(conn, queryExpJob) != 0) {
-		*s = dbError;
-		return 1;
+	while (!gotAJob){
+		sprintfAlloc(&queryRandomJob, QUERY_RANDOM_JOB,experimentId);
+		if (mysql_query(conn, queryRandomJob) != 0) {
+			LOGERROR(AT, "db query error, message: %s\n", mysql_error(conn));
+			*s = dbError;
+			mysql_close(conn);
+			free(queryJob);
+			return 1;
+		}
+
+		if ((res = mysql_store_result(conn)) == NULL) {
+			LOGERROR(AT, "store result error");
+			*s = dbError;
+			mysql_close(conn);
+			return 1;
+		}
+		i = mysql_num_rows(res);
+		if (i == 0) { //keine jobs mehr vorhanden!
+			mysql_free_result(res);
+			mysql_commit(conn);
+			if (mysql_autocommit(conn,1)!=0)
+			LOGERROR(AT, "db error: Could not switch autocommit ON");
+
+			*s = success;
+			return 1;
+		}
+
+		if ((row = mysql_fetch_row(res)) != NULL) {
+			jobID = atoi(row[0]);
+		}
+
+		sprintfAlloc(&queryLockJob, QUERY_LOCK_JOB,jobID);
+
+		if (mysql_query(conn, queryLockJob) != 0) {
+			LOGERROR(AT, "could not lock Job %d: %s\n",jobID, mysql_error(conn));
+			return dbError;
+		}
+		if ((long)mysql_affected_rows(conn)==1){
+			gotAJob=1;
+			*s = success;
+		}
+		mysql_commit(conn);
 	}
+	//autocommit turn on!
+	if (mysql_autocommit(conn,1)!=0)
+		LOGERROR(AT, "db error: Could not switch autocommit ON");
 
-	if((res = mysql_store_result(conn)) == NULL) {
-		*s = dbError;
-		return 1;
-	}
+	free(queryJob);	queryJob=NULL;
 
-	i = mysql_num_rows(res);
-
-	if(i==0) {
-		mysql_free_result(res);
-		*s = success;
-		return 1;
-	}
-	srand(clock());
-	mysql_data_seek(res, rand() % i);
-
-	if((row = mysql_fetch_row(res)) != NULL) {
-		lastId = atoi(row[0]);
-	}
-
-	sprintfAlloc(&queryJob, QUERY_JOB, lastId);
-	sprintfAlloc(&queryJobParams, QUERY_JOB_PARAMS, lastId);
+	queryLength = sprintfAlloc(&queryJob, QUERY_JOB, jobID);
 
 	/* fetch job information */
-	if(mysql_query(conn, queryJob) != 0) {
+	if (mysql_query(conn, queryJob) != 0) {
+		LOGERROR(AT, "db query error, message: %s\n", mysql_error(conn));
 		mysql_free_result(res);
 		*s = dbError;
 		return 1;
 	}
 
 	mysql_free_result(res);
-	if((res = mysql_store_result(conn)) == NULL) {
+	if ((res = mysql_store_result(conn)) == NULL) {
+		LOGERROR(AT, "store result error");
 		*s = dbError;
 		return 1;
 	}
 
-
-	if((row = mysql_fetch_row(res)) != NULL) {
+	if ((row = mysql_fetch_row(res)) != NULL) {
 		lengths = mysql_fetch_lengths(res);
 
 		j->id = atoi(row[0]);
 
-		j->solverName = (char *)calloc(lengths[1]+1,sizeof(char));
+		j->solverName = (char *) calloc(lengths[1] + 1, sizeof(char));
 		strncpy(j->solverName, row[1], lengths[1]);
 
-		j->instanceName = (char *)calloc(lengths[2]+1,sizeof(char));
-		strncpy(j->instanceName, row[2], lengths[2]);
+		j->solverVersion = (char *) calloc(lengths[2] + 1, sizeof(char));
+		strncpy(j->solverVersion, row[2], lengths[2]);
 
-		j->resultFileName = (char *)calloc(lengths[3]+1,sizeof(char));
-		strncpy(j->resultFileName, row[3], lengths[3]);
+		//binaryName is <solverName>_v<solverVersion>
+		j->binaryName = (char *) calloc(lengths[1] + lengths[2] + 3,
+				sizeof(char)); //+3 because of _v
+		strncpy(j->binaryName, row[1], lengths[1]);
+		strncat(j->binaryName, "_v", 2);
+		strncat(j->binaryName, row[2], lengths[2]);
+
+		j->instanceName = (char *) calloc(lengths[3] + 1, sizeof(char));
+		strncpy(j->instanceName, row[3], lengths[3]);
+
+		j->seed = atoi(row[4]);
+
+		j->solverOutputFN = (char *) calloc(lengths[5] + 1, sizeof(char));
+		strncpy(j->solverOutputFN, row[5], lengths[5]);
+
+		j->launcherOutputFN = (char *) calloc(lengths[6] + 1, sizeof(char));
+		strncpy(j->launcherOutputFN, row[6], lengths[6]);
+
+		j->watcherOutputFN = (char *) calloc(lengths[7] + 1, sizeof(char));
+		strncpy(j->watcherOutputFN, row[7], lengths[7]);
+
+		j->verifierOutputFN = (char *) calloc(lengths[8] + 1, sizeof(char));
+		strncpy(j->verifierOutputFN, row[8], lengths[8]);
 	}
-
+	queryLength = sprintfAlloc(&queryJobParams, QUERY_JOB_PARAMS, j->id);
 	/* fetch params information */
-	if(mysql_query(conn, queryJobParams) != 0) {
+	if (mysql_query(conn, queryJobParams) != 0) {
+		LOGERROR(AT, "query started:  %s\n", queryJobParams);
+		LOGERROR(AT, "db query error, message: %s\n", mysql_error(conn));
 		mysql_free_result(res);
 		*s = dbError;
 		return 1;
 	}
-
 	mysql_free_result(res);
-	if((res = mysql_store_result(conn)) == NULL) {
+
+	if ((res = mysql_store_result(conn)) == NULL) {
 		*s = dbError;
-		logError("No params found for job %i.\n", lastId);
+		LOGERROR(AT, "No params found for job %i.\n", jobID);
 		return 1;
 	}
 
+	//automatische Erkennung von seed und instance parameter: Werte werden automatisch eingesetzt.
 
-	params = (char *)calloc(256,sizeof(char));
+	params = (char *) calloc(1024, sizeof(char));
 
-	while((row = mysql_fetch_row(res)) != NULL) {
+	while ((row = mysql_fetch_row(res)) != NULL) {
+		lengths = mysql_fetch_lengths(res);
+
 		// every param starts with a prefix
-		params = strcat(params, row[1]);
+		if (row[1] != NULL)
+			params = strcat(params, row[1]);
 		//params = strcat(params, row[0]);
 
-		// check if it's a param with value
-		if(atoi(row[2])==1) {
-			// delimiter between paramname and value
-			params = strcat(params, " ");
-
-			// check for value in solver_has_config, if not
-			// present take the default from table parameters
-			if(row[4]!=NULL && (strcmp(row[4],"")!=0)) {
-				params = strcat(params, row[4]);
-			} else if(row[3]!=NULL && (strcmp(row[3],"")!=0)) {
-				params = strcat(params, row[3]);
-			} else {
-				logError("No value present for param %s.\n", row[1]);
-				return 1;
+		if (row[0] != NULL)
+			printf("\n %s \n", row[0]);
+		if (strcmp(row[0], "seed") == 0) { //seed parameter
+			temp = (char *) calloc(32, sizeof(char));
+			sprintf(temp, "%d", j->seed);
+			params = strcat(params, temp);
+			free(temp);
+		} else if (strcmp(row[0], "instance") == 0) {//instance parameter
+			//params = strcat(params, instancePath); //prepend path first
+			params = strcat(params, prependInstancePath(j->instanceName)); //TODO: path noch hinzufügen
+		} else
+			// check if it's a param with value
+			if (atoi(row[2]) == 1) {
+				// delimiter between paramname and value
+				params = strcat(params, " ");
+				if (row[3] != NULL && (strcmp(row[3], "") != 0)) {
+					params = strcat(params, row[3]);
+				} else {
+					LOGERROR(AT,
+							"No value found for param %s for solver %s_v%s.\n",
+							row[1], j->solverName, j->solverVersion);
+					return 1;
+				}
 			}
-		}
 
 		params = strcat(params, " ");
 
 	}
-
-	//	while((row = mysql_fetch_row(res)) != NULL) {
-	//		if (row[2]==NULL){
-	//			//fprintf(stderr,"No parameteres");
-	//			fflush(stderr);;}
-	//		else{
-	//
-	//			if(strcmp(row[2],"")!=0) {
-	//				params = strcat(params, row[1]);
-	//				params = strcat(params, row[0]);
-	//				params = strcat(params, " ");
-	//
-	//				if(row[2] != NULL) {
-	//					if(row[4] == NULL) {
-	//						params = strcat(params, row[3]);
-	//					} else {
-	//						params = strcat(params, row[4]);
-	//					}
-	//				}
-	//				params = strcat(params, " ");
-	//			}
-	//		}
-	//	}
-
 	strcpy(j->params, params);
-
 	free(params);
 	mysql_free_result(res);
 	mysql_close(conn);
 	*s = success;
+	free(queryJob);
 	return 0;
 }
 
-void freeJob(job *j) {
-	if(j->resultFileName != NULL) {
-		free(j->resultFileName);
+void freeJob(job *j) {//TODO: hier muss noch einiges befreit werden!
+	if (j->solverOutputFN != NULL) {
+		free(j->solverOutputFN);
 	}
 
-	if(j->solverName != NULL) {
+	if (j->solverName != NULL) {
 		free(j->solverName);
 	}
 
-	if(j->instanceName != NULL) {
+	if (j->instanceName != NULL) {
 		free(j->instanceName);
 	}
 }
 
-
 status dbUpdate(const job* j) {
 	MYSQL *conn = NULL;
 	char *queryJob = NULL;
-
-
-	sprintfAlloc(&queryJob, UPDATE_JOB,
-			j->resultFileName,
-			j->status,
-			j->seed,
-			j->time,
-			j->statusCode,
-			j->resultFile,
-			j->startTime,
-			j->id);
-
+	int queryLength;
 
 	conn = mysql_init(NULL);
-	if(!mysql_real_connect(conn, host, username, password, database, port, NULL, 0)) {
-		logError("could not establish mysql connection!\n");
+	if (!mysql_real_connect(conn, host, username, password, database, port,
+			NULL, 0)) {
+		LOGERROR(AT, "could not establilogCommentsh mysql connection!\n");
+		return dbError;
+	}
+	//TODO: SQL injection possibility with StartTime
+	queryLength = sprintfAlloc(&queryJob, UPDATE_JOB, j->status, j->startTime,
+			j->resultTime, j->computeQueue, j->id);
+
+	if (mysql_query(conn, queryJob) != 0) {
+		LOGERROR(AT, "db update query error, message: %s\n", mysql_error(conn));
+		return dbError;
+	}
+	mysql_commit(conn);
+	mysql_close(conn);
+	free(queryJob);
+
+	return success;
+}
+
+status dbUpdateResults(const job* j) {
+	MYSQL *conn = NULL;
+	char *queryJob = NULL;
+	char *escapedString1 = NULL;
+	char *escapedString2 = NULL;
+	char *escapedString3 = NULL;
+	char *escapedString4 = NULL;
+	int queryLength, length;
+
+	conn = mysql_init(NULL);
+	if (!mysql_real_connect(conn, host, username, password, database, port,NULL, 0)) {
+		LOGERROR(AT, "could not establish mysql connection!\n");
 		return dbError;
 	}
 
-	if(mysql_query(conn, queryJob) != 0) {
-		logError("db update query error, message: %s\n", mysql_error(conn));
+	length = strlen(j->solverOutput);
+	escapedString1 = (char*) malloc(length * 2 + 1);
+	mysql_real_escape_string(conn, escapedString1, j->solverOutput, length);
+
+	length = strlen(j->launcherOutput);
+	escapedString2 = (char*) malloc(length * 2 + 1);
+	mysql_real_escape_string(conn, escapedString2, j->launcherOutput, length);
+
+	length = strlen(j->watcherOutput);
+	escapedString3 = (char*) malloc(length * 2 + 1);
+	mysql_real_escape_string(conn, escapedString3, j->watcherOutput, length);
+
+	length = strlen(j->verifierOutput);
+	escapedString4 = (char*) malloc(length * 2 + 1);
+	mysql_real_escape_string(conn, escapedString4, j->verifierOutput, length);
+
+	queryLength = sprintfAlloc(&queryJob, UPDATE_JOB_RESULTS, j->status,
+			j->startTime, j->resultTime, j->resultCode, escapedString1,
+			escapedString2, escapedString3, escapedString4, j->solverExitCode,
+			j->watcherExitCode, j->verifierExitCode, j->computeQueue, j->id);
+
+	if (mysql_real_query(conn, queryJob, queryLength + 1) != 0) {
+		LOGERROR(AT, "db update query error, message: %s\n", mysql_error(conn));
+		LOGERROR(AT, "query launched: %s\n", queryJob);
 		return dbError;
 	}
 
 	mysql_commit(conn);
-
 	mysql_close(conn);
+	free(escapedString1);
+	free(escapedString2);
+	free(escapedString3);
+	free(escapedString4);
+
+	free(queryJob);
 	return success;
 }
 
 //Try to fetch the solver named solverName from the database
-status dbFetchSolver(const char* solverName, solver* s) {
+status dbFetchSolver(const char* solverName, const char* solverVersion,
+		solver* s) {
 	MYSQL *conn = NULL;
 	MYSQL_RES *res = NULL;
 	MYSQL_ROW row;
 
 	char *querySolver = NULL;
-	//char *queryJob = NULL;
+	char *escapedSolverName = NULL;
+	char *escapedSolverVersion = NULL;
+	int queryLength;
+	int length;
+
 	unsigned long *lengths = NULL;
 
-	sprintfAlloc(&querySolver, QUERY_SOLVER, solverName);
-
 	conn = mysql_init(NULL);
-	if(!mysql_real_connect(conn, host, username, password, database, port, NULL, 0)) {
-		logError("could not establish a mysql connection!\n error message: %s",mysql_error(conn));
+	if (!mysql_real_connect(conn, host, username, password, database, port,
+			NULL, 0)) {
+		LOGERROR(AT,
+				"could not establish a mysql connection!\n error message: %s",
+				mysql_error(conn));
 		return dbError;
 	}
 
+	length = strlen(solverName);
+	escapedSolverName = (char*) malloc(length * 2 + 1);
+	mysql_real_escape_string(conn, escapedSolverName, solverName, length);
+
+	length = strlen(solverVersion);
+	escapedSolverVersion = (char*) malloc(length * 2 + 1);
+	mysql_real_escape_string(conn, escapedSolverVersion, solverVersion, length);
+
+	queryLength = sprintfAlloc(&querySolver, QUERY_SOLVER, escapedSolverName,
+			escapedSolverVersion);
 
 	/* fetch job information */
-	if(mysql_query(conn, querySolver) != 0) {
-		logError("DB error message: %s\n",mysql_error(conn));
-		logError("Query lunched: %s\n",querySolver);
+	if (mysql_query(conn, querySolver) != 0) {
+		LOGERROR(AT, "DB error message: %s\n", mysql_error(conn));
+		LOGERROR(AT, "Query lunched: %s\n", querySolver);
 		return dbError;
 	}
 
-	if((res = mysql_store_result(conn)) == NULL) {
-		logError("DB error message: %s",mysql_error(conn));
+	if ((res = mysql_store_result(conn)) == NULL) {
+		LOGERROR(AT, "DB error message: %s", mysql_error(conn));
 		return dbError;
 	}
 
-	if((row = mysql_fetch_row(res)) != NULL) {
+	if ((row = mysql_fetch_row(res)) != NULL) {
 		lengths = mysql_fetch_lengths(res);
 
 		s->length = lengths[0];
 		s->md5 = row[1];
 
-		s->solver = (char *)malloc(lengths[0]*sizeof(char));
+		s->solver = (char *) malloc(lengths[0] * sizeof(char));
 		memcpy(s->solver, row[0], lengths[0]);
 	}
 
 	mysql_close(conn);
+	free(escapedSolverName);
+	free(escapedSolverVersion);
+	free(querySolver);
 	return success;
 }
 
 void freeSolver(solver* s) {
-	if(s->solver != NULL) {
+	if (s->solver != NULL) {
 		free(s->solver);
 	}
 }
@@ -677,44 +568,53 @@ status dbFetchInstance(const char* instanceName, instance* i) {
 	MYSQL_RES *res;
 	MYSQL_ROW row;
 
+	int queryLength;
+	char *escapedInstanceName;
+	int length;
+
 	char *queryInstance = NULL;
 	unsigned long *lengths;
 
-	sprintfAlloc(&queryInstance, QUERY_INSTANCE, instanceName);
-
 	conn = mysql_init(NULL);
-	if(!mysql_real_connect(conn, host, username, password, database, port, NULL, 0)) {
-		logError("could not establish mysql connection!\n");
+	if (!mysql_real_connect(conn, host, username, password, database, port,
+			NULL, 0)) {
+		LOGERROR(AT, "could not establish mysql connection!\n");
 		return dbError;
 	}
 
+	length = strlen(instanceName);
+	escapedInstanceName = (char*) malloc(length * 2 + 1);
+	mysql_real_escape_string(conn, escapedInstanceName, instanceName, length);
 
-	/* fetch job information */
-	if(mysql_query(conn, queryInstance) != 0) {
-		logError("Query error. Message: %s\n", mysql_error(conn));
+	queryLength = sprintfAlloc(&queryInstance, QUERY_INSTANCE,
+			escapedInstanceName);
+
+	/* fetch instance  */
+	if (mysql_query(conn, queryInstance) != 0) {//TODO: should it be real_query
+		LOGERROR(AT, "Query error. Message: %s\n", mysql_error(conn));
 		return dbError;
 	}
 
-	if((res = mysql_store_result(conn)) == NULL) {
-		logError("NULL result.\n");
+	if ((res = mysql_store_result(conn)) == NULL) {
+		LOGERROR(AT, "NULL result.\n");
 		return dbError;
 	}
 
-	if((row = mysql_fetch_row(res)) != NULL) {
+	if ((row = mysql_fetch_row(res)) != NULL) {
 		lengths = mysql_fetch_lengths(res);
-
 		i->md5 = row[1];
-
-		i->instance = (char *)calloc(lengths[0]+1,sizeof(char));
+		i->instance = (char *) calloc(lengths[0] + 1, sizeof(char));
 		memcpy(i->instance, row[0], lengths[0]);
 	}
 
 	mysql_close(conn);
+	free(escapedInstanceName);
+	free(queryInstance);
 	return success;
 }
 
 void freeInstance(instance *i) {
-	if(i->instance != NULL) {
+	if (i->instance != NULL) {
 		free(i->instance);
 	}
 }
@@ -726,37 +626,33 @@ status setMySQLTime(job *j) {
 	char *queryTime = NULL;
 	unsigned long *lengths;
 
-
 	sprintfAlloc(&queryTime, QUERY_TIME);
 
 	conn = mysql_init(NULL);
-	if(!mysql_real_connect(conn, host, username, password, database, port, NULL, 0)) {
-		logError("could not establish mysql connection!\n");
+	if (!mysql_real_connect(conn, host, username, password, database, port,
+			NULL, 0)) {
+		LOGERROR(AT, "could not establish mysql connection!\n");
 		return dbError;
 	}
 
-	if(mysql_query(conn, queryTime) != 0) {
-			logError("DB error message: %s\n",mysql_error(conn));
-			logError("Query lunched: %s\n",queryTime);
-			return dbError;
-		}
+	if (mysql_query(conn, queryTime) != 0) {
+		LOGERROR(AT, "DB error message: %s\n", mysql_error(conn));
+		LOGERROR(AT, "Query lunched: %s\n", queryTime);
+		return dbError;
+	}
 
-		if((res = mysql_store_result(conn)) == NULL) {
-			logError("DB error message: %s",mysql_error(conn));
-			return dbError;
-		}
+	if ((res = mysql_store_result(conn)) == NULL) {
+		LOGERROR(AT, "DB error message: %s", mysql_error(conn));
+		return dbError;
+	}
 
-		if((row = mysql_fetch_row(res)) != NULL) {
-			//j->startTime=row[0];
-
-			lengths = mysql_fetch_lengths(res);
-			j->startTime = (char *)calloc(lengths[0]+1,sizeof(char));
-			memcpy(j->startTime, row[0], lengths[0]);
-			//printf("StartTime from mysql server= %s", j->startTime);
-		}
-
-
+	if ((row = mysql_fetch_row(res)) != NULL) {
+		lengths = mysql_fetch_lengths(res);
+		j->startTime = (char *) calloc(lengths[0] + 1, sizeof(char));
+		memcpy(j->startTime, row[0], lengths[0]);
+	}
 
 	mysql_close(conn);
 	return success;
 }
+
