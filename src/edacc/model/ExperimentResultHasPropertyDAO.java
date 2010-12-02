@@ -39,7 +39,21 @@ public class ExperimentResultHasPropertyDAO {
     public static ExperimentResultHasProperty createExperimentResultHasPropertyDAO(ExperimentResult expResult, Property solvProperty)
             throws NoConnectionToDBException, SQLException {
         ExperimentResultHasProperty e = new ExperimentResultHasProperty();
+        e.setExpResId(expResult.getId());
+        e.setPropId(solvProperty.getId());
         e.setExpResult(expResult);
+        e.setSolvProperty(solvProperty);
+        e.setValue(null);
+        e.setNew();
+        save(e);
+        return e;
+    }
+
+     public static ExperimentResultHasProperty createExperimentResultHasPropertyDAO(int expResultId, Property solvProperty)
+            throws NoConnectionToDBException, SQLException {
+        ExperimentResultHasProperty e = new ExperimentResultHasProperty();
+        e.setExpResId(expResultId);
+        e.setPropId(solvProperty.getId());
         e.setSolvProperty(solvProperty);
         e.setValue(null);
         e.setNew();
@@ -66,8 +80,8 @@ public class ExperimentResultHasPropertyDAO {
             cache.remove(e);
         } else if (e.isModified()) {
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
-            ps.setInt(1, e.getExpResult().getId());
-            ps.setInt(2, e.getProperty().getId());
+            ps.setInt(1, e.getExpResId());
+            ps.setInt(2, e.getPropId());
             ps.setInt(3, e.getId());
             ps.executeUpdate();
 
@@ -87,8 +101,8 @@ public class ExperimentResultHasPropertyDAO {
             e.setSaved();
         } else if (e.isNew()) {
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
-            ps.setInt(1, e.getExpResult().getId());
-            ps.setInt(2, e.getProperty().getId());
+            ps.setInt(1, e.getExpResId());
+            ps.setInt(2, e.getPropId());
             ps.executeUpdate();
             ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -266,6 +280,8 @@ public class ExperimentResultHasPropertyDAO {
         }
     }
 
+
+
     /**
      * Returns and caches (if necessary) the ExperimentResultHasProperty object with the given id. The  values are kept in their order.
      * @param id <Integer> of the requested ExperimentResultHasProperty
@@ -293,8 +309,8 @@ public class ExperimentResultHasPropertyDAO {
             }
             res = new ExperimentResultHasProperty();
             res.setId(id);
-            res.setExpResult(ExperimentResultDAO.getById(rs.getInt(1)));
-            res.setSolvProperty(PropertyDAO.getById(rs.getInt(2)));
+            res.setExpResId(rs.getInt(1));
+            res.setPropId(rs.getInt(2));
 
             // Get the values for the value Vector of the ExperimentResultHasProperty object from the SolverPropertyValue table from the database
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(

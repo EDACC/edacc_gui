@@ -1211,6 +1211,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             EDACCApp.getApplication().show(this.addInstanceDialog);
             InstanceClass input = this.addInstanceDialog.getInput();
             int searchDepth = this.addInstanceDialog.getSearchDepth();
+            String fileExtension = this.addInstanceDialog.getFileExtension();
 
             //if the user doesn't cancel the dialog above, the fileChooser is shown.
             if (input != null) {
@@ -1224,7 +1225,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
                 File ret = jFileChooserManageDBInstance.getSelectedFile();
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    Tasks.startTask("addInstances", new Class[]{edacc.model.InstanceClass.class, java.io.File.class, edacc.model.Tasks.class, int.class}, new Object[]{input, ret, null, searchDepth}, manageDBInstances, EDACCManageDBMode.this);
+                    Tasks.startTask("addInstances", new Class[]{edacc.model.InstanceClass.class, java.io.File.class, edacc.model.Tasks.class, int.class, String.class}, new Object[]{input, ret, null, searchDepth, fileExtension}, manageDBInstances, EDACCManageDBMode.this);
                 }
             }
             input = null;

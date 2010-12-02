@@ -265,12 +265,14 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
 
     private void jTableSourceClassMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableSourceClassMouseClicked
         this.jRadioButtonSourceClass.setSelected(true);
-        this.jTableUserClass.removeRowSelectionInterval(0, this.jTableUserClass.getRowCount() - 1);
+        if(jTableUserClass.getRowCount() < 0)
+            this.jTableUserClass.removeRowSelectionInterval(0, this.jTableUserClass.getRowCount() - 1);
     }//GEN-LAST:event_jTableSourceClassMouseClicked
 
     private void jTableUserClassMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableUserClassMouseClicked
         this.jRadioButtonUserClass.setSelected(true);
-        this.jTableSourceClass.removeRowSelectionInterval(0, this.jTableSourceClass.getRowCount() - 1);
+        if(jTableSourceClass.getRowCount() < 0)
+            this.jTableSourceClass.removeRowSelectionInterval(0, this.jTableSourceClass.getRowCount() - 1);
     }//GEN-LAST:event_jTableUserClassMouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

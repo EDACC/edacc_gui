@@ -133,24 +133,21 @@ public class PropertyComputationController implements Runnable{
         while(rs.next()){
             for(int i = 0; i < givenProperties.size(); i++){
                 try {
-                    ExperimentResult expRes = ExperimentResultDAO.getById(rs.getInt(1));
                         try {
-                            ExperimentResultHasProperty tmp = ExperimentResultHasPropertyDAO.getByExperimentResultAndResultProperty(expRes, givenProperties.get(i));
+                            ExperimentResultHasProperty tmp = ExperimentResultHasPropertyDAO.getByExperimentResultAndResultProperty(rs.getInt(1), givenProperties.get(i).getId());
                             resultPropertyQueue.add(tmp);
                             if(recompute){
                                 tmp.setValue(new Vector<String>());
                                 ExperimentResultHasPropertyDAO.save(tmp);
                             }
                         } catch (ExpResultHasSolvPropertyNotInDBException ex) {
-                             resultPropertyQueue.add(ExperimentResultHasPropertyDAO.createExperimentResultHasPropertyDAO(expRes, givenProperties.get(i)));
+                             resultPropertyQueue.add(ExperimentResultHasPropertyDAO.createExperimentResultHasPropertyDAO(rs.getInt(1), givenProperties.get(i)));
                         } catch (PropertyTypeNotExistException ex) {
                             Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                         }
 
                 } catch (ExperimentResultNotInDBException ex) {
-                    Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (PropertyTypeNotExistException ex) {
-                    Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);           
                 } catch (IOException ex) {
                     Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (PropertyNotInDBException ex) {

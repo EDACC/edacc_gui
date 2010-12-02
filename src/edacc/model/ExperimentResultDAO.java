@@ -480,6 +480,31 @@ public class ExperimentResultDAO {
         return er;
     }
 
+     /**
+     *
+     * @param id of the requested ExperimentResult
+     * @return the ExperimentResult object with the given id
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws ExperimentResultNotInDBException
+     * @author rretz
+     */
+    public static ExperimentResult getByIdWithoutAssign(int id) throws NoConnectionToDBException, SQLException, ExperimentResultNotInDBException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                selectQuery
+                + "WHERE idJob=?;");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        if (!rs.next()) {
+            throw new ExperimentResultNotInDBException();
+        }
+        ExperimentResult er = getExperimentResultFromResultSet(rs);
+        ArrayList<ExperimentResult> tmp = new ArrayList<ExperimentResult>();
+        tmp.add(er);
+        //ExperimentResultHasPropertyDAO.assign(tmp, er.getExperimentId());
+        return er;
+    }
+
     /**
      * Copies the binary file of the client output of a ExperimentResult to a temporary location on the file system and retuns a File
      * reference on it.

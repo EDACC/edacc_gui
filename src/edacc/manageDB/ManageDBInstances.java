@@ -94,13 +94,14 @@ public class ManageDBInstances implements Observer{
      * instance files into the "instance table" of the MangeDBMode.
      */
 
-    public void addInstances(InstanceClass input, File ret, Tasks task, int searchDepth){
+    public void addInstances(InstanceClass input, File ret, Tasks task, int searchDepth, String fileExtension){
         try {
         
-            RecursiveFileScanner InstanceScanner = new RecursiveFileScanner("cnf");
+            RecursiveFileScanner InstanceScanner = new RecursiveFileScanner(fileExtension);
             Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
             if (instanceFiles.isEmpty()) {
                 JOptionPane.showMessageDialog(panelManageDBInstances, "No Instances have been found.", "Error", JOptionPane.WARNING_MESSAGE);
+                task.cancel(true);
                 return;
             }
             task.setOperationName("Adding Instances");
@@ -726,7 +727,7 @@ public class ManageDBInstances implements Observer{
             // Get the intersection of the instance classes of the selected Instances
             Vector<Instance> instances = new Vector<Instance>();
             for (int i = 0; i < selectedRows.length; i++) {
-                instances.add((Instance) tableInstances.getModel().getValueAt(tableInstances.convertRowIndexToModel(selectedRows[i]), 1));
+                instances.add((Instance) ((InstanceTableModel)tableInstances.getModel()).getInstance(tableInstances.convertRowIndexToModel(selectedRows[i])));
             }
             Vector<InstanceClass> instanceClasses = InstanceHasInstanceClassDAO.getIntersectionOfInstances(instances);
             AddInstanceInstanceClassTableModel tableModel = new AddInstanceInstanceClassTableModel();
@@ -745,6 +746,8 @@ public class ManageDBInstances implements Observer{
         PropertyComputationController p = new PropertyComputationController(instances, properties);
         new Thread(p).start();
     }
+
+
 }
 
 

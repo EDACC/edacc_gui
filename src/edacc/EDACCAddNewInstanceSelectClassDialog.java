@@ -27,6 +27,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     InstanceClass input;
     AddInstanceInstanceClassTableModel tableModel;
     private int searchDepth = 0;
+    private String fileExtension;
 
     /** Creates new form EDACCAddNewInstanceSelectClassDialog */
     public EDACCAddNewInstanceSelectClassDialog(java.awt.Frame parent, boolean modal) throws NoConnectionToDBException, SQLException {
@@ -60,6 +61,8 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         jRadioButtonAutomatic = new javax.swing.JRadioButton();
         jTextFieldSearchDepth = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
+        jLabelFileExtension = new javax.swing.JLabel();
+        jTextFieldFileExtension = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAddNewInstanceSelectClassDialog.class);
@@ -178,6 +181,17 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
         jLabel1.setName("jLabel1"); // NOI18N
 
+        jLabelFileExtension.setText(resourceMap.getString("jLabelFileExtension.text")); // NOI18N
+        jLabelFileExtension.setName("jLabelFileExtension"); // NOI18N
+
+        jTextFieldFileExtension.setText(resourceMap.getString("jTextFieldFileExtension.text")); // NOI18N
+        jTextFieldFileExtension.setName("jTextFieldFileExtension"); // NOI18N
+        jTextFieldFileExtension.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextFieldFileExtensionActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -185,6 +199,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jRadioButtonAutomatic, javax.swing.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -193,7 +208,10 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
                         .addComponent(jTextFieldSearchDepth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(10, 10, 10))
                     .addComponent(jRadioButtonChoose, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
-                    .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabelFileExtension)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTextFieldFileExtension, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -207,7 +225,11 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
                 .addGap(10, 10, 10)
                 .addComponent(jRadioButtonChoose)
                 .addGap(15, 15, 15)
-                .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
+                .addComponent(jScrollPaneInstanceTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelFileExtension)
+                    .addComponent(jTextFieldFileExtension, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -215,16 +237,16 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanelButtons, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanelButtons, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -253,8 +275,16 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
                 return;
+            }else if(jTextFieldFileExtension.getText().equals("")){
+                JOptionPane.showMessageDialog(this,
+                    "Please specify a file extension." ,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+
             }
             this.searchDepth = Integer.parseInt(this.jTextFieldSearchDepth.getText());
+            this.fileExtension = jTextFieldFileExtension.getText();
             this.input.setName("");
             this.setVisible(false);
           }else{
@@ -303,12 +333,17 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jTableInstanceClassMouseClicked
 
     private void jRadioButtonAutomaticActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonAutomaticActionPerformed
-       this.jTableInstanceClass.removeRowSelectionInterval(0, this.jTableInstanceClass.getRowCount() - 1);
+       if(this.jTableInstanceClass.getRowCount() > 0)
+            this.jTableInstanceClass.removeRowSelectionInterval(0, this.jTableInstanceClass.getRowCount() - 1);
     }//GEN-LAST:event_jRadioButtonAutomaticActionPerformed
 
     private void jTextFieldSearchDepthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldSearchDepthActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextFieldSearchDepthActionPerformed
+
+    private void jTextFieldFileExtensionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldFileExtensionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextFieldFileExtensionActionPerformed
 
     public InstanceClass getInput(){
         return input;
@@ -319,12 +354,14 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonOk;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabelFileExtension;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanelButtons;
     private javax.swing.JRadioButton jRadioButtonAutomatic;
     private javax.swing.JRadioButton jRadioButtonChoose;
     private javax.swing.JScrollPane jScrollPaneInstanceTable;
     private javax.swing.JTable jTableInstanceClass;
+    private javax.swing.JTextField jTextFieldFileExtension;
     private javax.swing.JTextField jTextFieldSearchDepth;
     // End of variables declaration//GEN-END:variables
 
@@ -346,6 +383,10 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    public String getFileExtension(){
+        return fileExtension;
     }
 
 }
