@@ -76,6 +76,7 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         jButtonCancel = new javax.swing.JButton();
         jButtonCreate = new javax.swing.JButton();
+        jButtonEdit = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabelName = new javax.swing.JLabel();
         jTextFieldName = new javax.swing.JTextField();
@@ -110,6 +111,9 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
             }
         });
 
+        jButtonEdit.setText(resourceMap.getString("jButtonEdit.text")); // NOI18N
+        jButtonEdit.setName("jButtonEdit"); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -117,7 +121,9 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButtonCancel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 188, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 131, Short.MAX_VALUE)
+                .addComponent(jButtonEdit)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonCreate)
                 .addContainerGap())
         );
@@ -130,7 +136,8 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonCreate)
-                    .addComponent(jButtonCancel)))
+                    .addComponent(jButtonCancel)
+                    .addComponent(jButtonEdit)))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -295,6 +302,7 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
     private javax.swing.ButtonGroup SourceOrUserClass;
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonCreate;
+    private javax.swing.JButton jButtonEdit;
     private javax.swing.JLabel jLabelDescription;
     private javax.swing.JLabel jLabelName;
     private javax.swing.JPanel jPanel1;
