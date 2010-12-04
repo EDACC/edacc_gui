@@ -65,8 +65,7 @@ public class ComputePropertiesController {
             compute.start();
             try {
                 condition.await();
-            } catch ( InterruptedException e ) {
-                Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, e);
+            } catch ( InterruptedException e ) {             
             } finally {
                 lock.unlock();
             }

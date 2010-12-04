@@ -743,8 +743,8 @@ public class ManageDBInstances implements Observer{
 
     public void computeProperties(Vector<Instance> instances, Vector<Property> properties) {
         System.out.println(instances.size() + " instances, " + properties.size() + " properties.");
-        PropertyComputationController p = new PropertyComputationController(instances, properties);
-        new Thread(p).start();
+        //PropertyComputationController p = new PropertyComputationController(instances, properties);
+        //new Thread(p).start();
     }
 
 
