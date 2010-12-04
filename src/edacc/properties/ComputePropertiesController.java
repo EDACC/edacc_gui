@@ -61,12 +61,12 @@ public class ComputePropertiesController {
         try {
             lock.lock();
             Condition condition = lock.newCondition();
-            Thread compute = new Thread(new PropertyComputationController(exp, toCalculate, recompute, task, condition, lock));
+            Thread compute = new Thread(new PropertyComputationController(exp, toCalculate, recompute, task, lock));
             compute.start();
             try {
                 condition.await();
             } catch ( InterruptedException e ) {
-
+                Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, e);
             } finally {
                 lock.unlock();
             }

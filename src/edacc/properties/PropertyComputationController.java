@@ -51,8 +51,8 @@ public class PropertyComputationController implements Runnable{
     private Condition condition;
     private Lock lock;
 
-    public PropertyComputationController(Experiment exp, Vector<Property> givenProperties, boolean recompute, Tasks task, Condition condition, Lock lock) throws NoConnectionToDBException, SQLException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException{
-        this.condition = condition;
+    public PropertyComputationController(Experiment exp, Vector<Property> givenProperties, boolean recompute, Tasks task, Lock lock) throws NoConnectionToDBException, SQLException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException{
+        this.condition = lock.newCondition();
         this.task = task;
         this.lock = lock;
         availableProcessors = Runtime.getRuntime().availableProcessors();
