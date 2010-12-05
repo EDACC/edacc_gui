@@ -185,7 +185,8 @@ public class PropertyDAO {
             ps.close();
             r.setSaved();
             cache.cache(r);
-            setRegularExpressions(r.getRegularExpression(), r.getId());
+            if(r.getRegularExpression() != null)
+                setRegularExpressions(r.getRegularExpression(), r.getId());
         }
     }
 

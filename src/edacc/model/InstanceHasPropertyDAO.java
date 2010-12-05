@@ -175,7 +175,7 @@ public class InstanceHasPropertyDAO {
 
     public static void removeAllOfProperty(Property r) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
          PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT id FROM " + table + "WHERE idProperty=?;");
+                "SELECT id FROM " + table + " WHERE idProperty=?;");
          ps.setInt(1, r.getId());
          ResultSet rs = ps.executeQuery();
          while(rs.next()){
