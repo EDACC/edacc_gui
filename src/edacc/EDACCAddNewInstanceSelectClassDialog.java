@@ -147,6 +147,11 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
 
         jTextFieldExtension.setText(resourceMap.getString("jTextFieldExtension.text")); // NOI18N
         jTextFieldExtension.setName("jTextFieldExtension"); // NOI18N
+        jTextFieldExtension.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextFieldExtensionActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -186,16 +191,16 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanelButtons, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanelButtons, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -262,9 +267,13 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_formComponentShown
 
-    private void jRadioButtonAutomaticActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonAutomaticActionPerformed
+    private void jTextFieldExtensionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldExtensionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextFieldExtensionActionPerformed
+
+    private void jRadioButtonAutomaticActionPerformed(java.awt.event.ActionEvent evt) {                                                      
        jTreeSourceClass.setSelectionPath(null);
-    }//GEN-LAST:event_jRadioButtonAutomaticActionPerformed
+    }                                                     
 
     public InstanceClass getInput(){
         return input;
@@ -304,6 +313,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     public void setManualSelection() {
         jRadioButtonChoose.setSelected(true);
     }
+
 
     public String getFileExtension(){
         return fileExtension;

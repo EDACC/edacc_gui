@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "mysql/include/mysql.h"
+#include "mysql/mysql.h"
 
 int fetchExdata();
 int saveExdata();

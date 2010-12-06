@@ -11,10 +11,12 @@
 
 package edacc;
 
+import edacc.events.TaskEvents;
 import edacc.manageDB.ManageDBInstances;
 import edacc.model.Instance;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
+import edacc.model.Tasks;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.AbstractListModel;
@@ -24,7 +26,7 @@ import javax.swing.JOptionPane;
  *
  * @author dgall
  */
-public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog {
+public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog implements TaskEvents {
 
     private Vector<Instance> instances;
     private ManageDBInstances manageDBInstances;
@@ -120,7 +122,7 @@ public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog {
 
     private void bComputeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bComputeActionPerformed
         Vector<Property> properties = ((PropertyListModel) listProperties.getModel()).getPropertyList();
-        manageDBInstances.computeProperties(instances, properties);
+        Tasks.startTask("computeProperties", new Class[]{Vector.class, Vector.class, edacc.model.Tasks.class}, new Object[]{instances, properties, null}, manageDBInstances, EDACCComputeInstancePropertyDialog.this);
     }//GEN-LAST:event_bComputeActionPerformed
 
     private void bCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bCancelActionPerformed
@@ -142,6 +144,19 @@ public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "An error occured while trying to load the properties from the DB: \n" + e.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    @Override
+    public void onTaskSuccessful(String methodName, Object result) {
+    }
+
+    @Override
+    public void onTaskStart(String methodName) {
+    }
+
+    @Override
+    public void onTaskFailed(String methodName, Throwable e) {
+        e.printStackTrace();
     }
 
     private class PropertyListModel extends AbstractListModel {

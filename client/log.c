@@ -5,10 +5,11 @@
 #include <stdio.h>
 
 
-void logError(const char* format, ...) {
+void LOGERROR(const char *location,const char* format, ...) {
 	va_list args;
 
 	va_start(args, format);
+	fprintf(stderr,"ERROR at %s:",location);
 	vfprintf(stderr, format, args);
 	va_end(args);
 }

@@ -1738,6 +1738,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         EDACCComputeResultProperties compute = new EDACCComputeResultProperties(EDACCApp.getApplication().getMainFrame(), true, expController.getActiveExperiment());
         compute.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         compute.setVisible(true);
+        resultBrowserETA = null;
+        Tasks.startTask("loadJobs", expController, this, false);
     }//GEN-LAST:event_btnComputeResultPropertiesActionPerformed
 
     private void txtWallClockTimeLimitKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtWallClockTimeLimitKeyReleased

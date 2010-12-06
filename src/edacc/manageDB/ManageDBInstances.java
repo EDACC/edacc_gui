@@ -43,6 +43,9 @@ import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -111,6 +114,7 @@ public class ManageDBInstances implements Observer{
             Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
             if (instanceFiles.isEmpty()) {
                 JOptionPane.showMessageDialog(panelManageDBInstances, "No Instances have been found.", "Error", JOptionPane.WARNING_MESSAGE);
+                task.cancel(true);
                 return;
             }
             task.setOperationName("Adding Instances");
@@ -689,7 +693,8 @@ public class ManageDBInstances implements Observer{
             EDACCApp.getApplication().show(main.instanceFilter);
 
             Vector<RowFilter<Object, Object>> filters  = main.instanceFilter.getFilter();
-            if(filters.isEmpty()){
+            if(filters != null){
+                 if(filters.isEmpty()){
                 removeFilter(tableInstances);
                 main.setFilterStatus("");
                 if(tableInstances.getRowCount() != 0)
@@ -703,8 +708,7 @@ public class ManageDBInstances implements Observer{
                     tableInstances.addRowSelectionInterval(0, 0);
                 main.setFilterStatus("This list of instances has filters applied to it. Use the filter button below to modify.");
             }
-        
-       
+            }
     }
 
     public void onTaskStart(String methodName) {
@@ -789,10 +793,19 @@ public class ManageDBInstances implements Observer{
         }
     }
 
-    public void computeProperties(Vector<Instance> instances, Vector<Property> properties) {
+    public void computeProperties(Vector<Instance> instances, Vector<Property> properties, Tasks task) {
         System.out.println(instances.size() + " instances, " + properties.size() + " properties.");
-        PropertyComputationController p = new PropertyComputationController(instances, properties);
+        Lock lock =  new ReentrantLock();
+        lock.lock();
+        Condition condition = lock.newCondition();
+        PropertyComputationController p = new PropertyComputationController(instances, properties, task, lock);
         new Thread(p).start();
+        try {
+            condition.await();
+        } catch ( InterruptedException e ) {
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void changeInstanceTable() {
@@ -901,11 +914,6 @@ public class ManageDBInstances implements Observer{
            }
         }
     }
-
-
-
-
-
 
 }
 

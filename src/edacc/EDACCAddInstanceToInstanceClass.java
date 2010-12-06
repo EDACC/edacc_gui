@@ -231,6 +231,16 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_formWindowActivated
 
+
+    private void jTableSourceClassMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableSourceClassMouseClicked
+    
+    }//GEN-LAST:event_jTableSourceClassMouseClicked
+
+    private void jTableUserClassMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableUserClassMouseClicked
+     
+    }//GEN-LAST:event_jTableUserClassMouseClicked
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroupSourceOrUser;
     private javax.swing.JButton jButtonCancel;

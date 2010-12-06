@@ -187,7 +187,7 @@ public class ExperimentResultDAO {
         st.setInt(1, id);
         st.setInt(2, id);
         st.setInt(3, ExperimentResultStatus.RUNNING.getValue());*/
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("select MAX(date_modified) AS ermodified FROM " + table + " WHERE Experiment_idExperiment = ?");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("select MAX(TIMESTAMPADD(SECOND, 1, date_modified)) AS ermodified FROM " + table + " WHERE Experiment_idExperiment = ?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         rs.next(); // there will always be a timestamp
@@ -257,7 +257,7 @@ public class ExperimentResultDAO {
         ArrayList<ExperimentResult> v = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery
-                + "WHERE Experiment_idExperiment=? AND date_modified >= ?;");
+                + "WHERE Experiment_idExperiment=? AND IF(status = " + ExperimentResultStatus.RUNNING.getValue() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) >= ?;");
         st.setInt(1, id);
         st.setTimestamp(2, modified);
         ResultSet rs = st.executeQuery();
@@ -477,6 +477,31 @@ public class ExperimentResultDAO {
         ArrayList<ExperimentResult> tmp = new ArrayList<ExperimentResult>();
         tmp.add(er);
         ExperimentResultHasPropertyDAO.assign(tmp, er.getExperimentId());
+        return er;
+    }
+
+     /**
+     *
+     * @param id of the requested ExperimentResult
+     * @return the ExperimentResult object with the given id
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws ExperimentResultNotInDBException
+     * @author rretz
+     */
+    public static ExperimentResult getByIdWithoutAssign(int id) throws NoConnectionToDBException, SQLException, ExperimentResultNotInDBException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                selectQuery
+                + "WHERE idJob=?;");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        if (!rs.next()) {
+            throw new ExperimentResultNotInDBException();
+        }
+        ExperimentResult er = getExperimentResultFromResultSet(rs);
+        ArrayList<ExperimentResult> tmp = new ArrayList<ExperimentResult>();
+        tmp.add(er);
+        //ExperimentResultHasPropertyDAO.assign(tmp, er.getExperimentId());
         return er;
     }
 
