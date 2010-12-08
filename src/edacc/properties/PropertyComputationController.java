@@ -69,8 +69,10 @@ public class PropertyComputationController implements Runnable{
         task.setTaskProgress(((float)(allJobs - resultPropertyQueue.size()))/((float)allJobs));
     }
 
-    public PropertyComputationController(Vector<Instance> instances, Vector<Property> givenProperties, Condition condition){
-        this.condition = condition;
+    public PropertyComputationController(Vector<Instance> instances, Vector<Property> givenProperties, Tasks task, Lock lock){
+        this.condition = lock.newCondition();
+        this.task = task;
+        this.lock = lock;
         availableProcessors = Runtime.getRuntime().availableProcessors();
         this.task.setOperationName("compute properties");
         this.task.setStatus("initialize the computation");
@@ -80,12 +82,6 @@ public class PropertyComputationController implements Runnable{
         allJobs = instancePropertyQueue.size();
         task.setStatus("computed " + (allJobs - instancePropertyQueue.size()) + " of " + allJobs + " properties");
         task.setTaskProgress(((float)(allJobs - instancePropertyQueue.size()))/((float)allJobs));
-    }
-
-    public void run(Tasks task){
-        task.setStatus("compute");
-        this.task = task;
-        run();
     }
 
     @Override
@@ -199,7 +195,8 @@ public class PropertyComputationController implements Runnable{
         for(int i = 0; i < instances.size(); i++){
             for(int j = 0; j < givenProperties.size(); j++){
                 try {
-                    InstanceHasProperty tmp = InstanceHasPropertyDAO.getByInstanceAndProperty(instances.get(i), givenProperties.get(j));  
+                    InstanceHasProperty tmp = InstanceHasPropertyDAO.getByInstanceAndProperty(instances.get(i), givenProperties.get(j));
+                    instancePropertyQueue.add(tmp);
                 } catch (NoConnectionToDBException ex) {
                     Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {

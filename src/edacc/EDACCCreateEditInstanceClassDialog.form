@@ -32,11 +32,11 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jPanel2" alignment="1" max="32767" attributes="2"/>
-                  <Component id="jPanel1" alignment="1" max="32767" attributes="2"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="jPanel2" alignment="0" max="32767" attributes="2"/>
+                  <Component id="jPanel1" alignment="0" max="32767" attributes="2"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -45,8 +45,8 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel2" max="32767" attributes="0"/>
+              <EmptySpace pref="16" max="32767" attributes="0"/>
+              <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -66,7 +66,7 @@
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jButtonCancel" linkSize="2" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="131" max="32767" attributes="0"/>
+                  <EmptySpace pref="202" max="32767" attributes="0"/>
                   <Component id="jButtonEdit" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jButtonCreate" linkSize="2" min="-2" max="-2" attributes="0"/>
@@ -111,6 +111,9 @@
             <Property name="text" type="java.lang.String" resourceKey="jButtonEdit.text"/>
             <Property name="name" type="java.lang.String" value="jButtonEdit" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonEditActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -127,18 +130,26 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jLabelName" alignment="0" min="-2" pref="57" max="-2" attributes="1"/>
                       <Component id="jLabelDescription" alignment="0" min="-2" pref="63" max="-2" attributes="1"/>
+                      <Component id="jLabelParent" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="jScrollPane1" pref="247" max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="jRadioButtonUserClass" alignment="0" pref="318" max="32767" attributes="1"/>
+                      <Component id="jScrollPane1" alignment="1" pref="318" max="32767" attributes="0"/>
+                      <Component id="jTextFieldName" alignment="0" pref="318" max="32767" attributes="0"/>
                       <Component id="jRadioButtonSourceClass" alignment="0" min="-2" max="-2" attributes="1"/>
-                      <Component id="jRadioButtonUserClass" alignment="0" pref="247" max="32767" attributes="1"/>
-                      <Component id="jTextFieldName" alignment="0" pref="247" max="32767" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="jButtonSelectParent" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="jLabelSelectedParent" min="-2" pref="36" max="-2" attributes="0"/>
+                          <EmptySpace pref="124" max="32767" attributes="0"/>
+                          <Component id="jButtonRemoveParent" min="-2" pref="87" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -155,12 +166,21 @@
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                       <Component id="jLabelDescription" min="-2" max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" min="-2" pref="111" max="-2" attributes="0"/>
+                      <Component id="jScrollPane1" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="jRadioButtonSourceClass" min="-2" pref="18" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="jRadioButtonUserClass" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="jButtonRemoveParent" pref="23" max="32767" attributes="0"/>
+                      <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                          <Component id="jButtonSelectParent" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabelParent" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabelSelectedParent" alignment="3" min="-2" pref="18" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -224,6 +244,36 @@
             <Property name="text" type="java.lang.String" resourceKey="jRadioButtonUserClass.text"/>
             <Property name="name" type="java.lang.String" value="jRadioButtonUserClass" noResource="true"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonSelectParent">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jButtonSelectParent.text"/>
+            <Property name="name" type="java.lang.String" value="jButtonSelectParent" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonSelectParentActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelSelectedParent">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jLabelSelectedParent.text"/>
+            <Property name="name" type="java.lang.String" value="jLabelSelectedParent" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelParent">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jLabelParent.text"/>
+            <Property name="name" type="java.lang.String" value="jLabelParent" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonRemoveParent">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jButtonRemoveParent.text"/>
+            <Property name="name" type="java.lang.String" value="jButtonRemoveParent" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonRemoveParentActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

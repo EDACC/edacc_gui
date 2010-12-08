@@ -13,11 +13,11 @@ import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
+import edacc.model.InstanceClassAlreadyInDBException;
 import edacc.model.InstanceNotInDBException;
 import edacc.model.Instance;
 import edacc.model.InstanceAlreadyInDBException;
 import edacc.model.InstanceClass;
-import edacc.model.InstanceClassAlreadyInDBException;
 import edacc.model.InstanceClassDAO;
 import edacc.model.InstanceClassMustBeSourceException;
 
@@ -38,9 +38,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -49,6 +54,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreePath;
 
 /**
  *
@@ -84,9 +92,14 @@ public class ManageDBInstances implements Observer{
     }
 
     public void loadInstanceClasses() throws SQLException{
-        main.instanceClassTableModel.classes.clear();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode)InstanceClassDAO.getAllAsTree();
+        main.instanceClassTreeModel.setRoot(root);
+        main.getInstanceClassTree().setRootVisible(false);
+        //main.instanceClassTreeModel.nodesWereInserted(((DefaultMutableTreeNode)main.instanceClassTreeModel.getRoot()), new int[] {((DefaultMutableTreeNode)main.instanceClassTreeModel.getRoot()).getIndex(child)});
+
+       /* main.instanceClassTableModel.classes.clear();
         main.instanceClassTableModel.classSelect.clear();
-        main.instanceClassTableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAll()));
+        main.instanceClassTableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAll()));*/
     }
 
     /**
@@ -94,7 +107,7 @@ public class ManageDBInstances implements Observer{
      * instance files into the "instance table" of the MangeDBMode.
      */
 
-    public void addInstances(InstanceClass input, File ret, Tasks task, int searchDepth, String fileExtension){
+    public void addInstances(InstanceClass input, File ret, Tasks task, String fileExtension){
         try {
         
             RecursiveFileScanner InstanceScanner = new RecursiveFileScanner(fileExtension);
@@ -107,7 +120,7 @@ public class ManageDBInstances implements Observer{
             task.setOperationName("Adding Instances");
             if (input.getName().equals("")) {
                 Vector<Instance> instances;
-                instances = buildInstancesAutogenerateClass(instanceFiles, ret, task, searchDepth);
+                instances = buildInstancesAutogenerateClass(instanceFiles, ret, task);
                 main.instanceTableModel.addInstances(instances);
                 loadInstanceClasses();
             } else {
@@ -115,6 +128,10 @@ public class ManageDBInstances implements Observer{
                 main.instanceTableModel.addInstances(instances);
                 loadInstanceClasses();
             }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstanceClassAlreadyInDBException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NullPointerException ex) {
@@ -265,7 +282,7 @@ public class ManageDBInstances implements Observer{
      * Sets all checkboxes of the instanceclass table true.
      */
     public void SelectAllInstanceClass(Tasks task) {
-        for(int i = 0; i < main.instanceClassTableModel.getRowCount(); i++){
+     /*   for(int i = 0; i < main.instanceClassTableModel.getRowCount(); i++){
            task.setStatus(i + " of " + main.instanceClassTableModel.getRowCount() + " instance classes are loaded.");
            task.setTaskProgress((float)i/(float)main.instanceClassTableModel.getRowCount());
             main.instanceClassTableModel.seSelected(i);
@@ -276,13 +293,13 @@ public class ManageDBInstances implements Observer{
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
     }
 
     public void DeselectAllInstanceClass(){
-        main.instanceClassTableModel.DeselectAll();
+       /* main.instanceClassTableModel.DeselectAll();
         main.instanceTableModel.clearTable();
-        main.instanceClassTableModel.fireTableDataChanged();
+        main.instanceClassTableModel.fireTableDataChanged();*/
     }
 
     /**
@@ -292,12 +309,9 @@ public class ManageDBInstances implements Observer{
      * @throws NoConnectionToDBException
      * @throws InstanceSourceClassHasInstance if one of the selected classes are a source class which has a refernce to an Instance.
      */
-    public void RemoveInstanceClass(int[] choosen) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance {
+    public void RemoveInstanceClass(DefaultMutableTreeNode node) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance {
         Vector<InstanceClass> toRemove = new Vector<InstanceClass>();
-        for(int i = 0; i < choosen.length; i++){
-            toRemove.add((InstanceClass) main.instanceClassTableModel.getValueAt(choosen[i], 4));
-        }
-
+        toRemove = getAllToEnd(node);
         AddInstanceInstanceClassTableModel tableModel = new AddInstanceInstanceClassTableModel();
         tableModel.addClasses(new Vector<InstanceClass> (toRemove));
         if(EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
@@ -305,24 +319,32 @@ public class ManageDBInstances implements Observer{
                 "Do you really won't to remove the listed instance classes?",
                 new JTable(tableModel))==
                 EDACCExtendedWarning.RET_OK_OPTION){
-            Vector<InstanceClass> errors = new Vector<InstanceClass>();
-            for(int i = 0; i < toRemove.size(); i++){
-                try {
-                    InstanceClassDAO.delete(toRemove.get(i));
-                    main.instanceClassTableModel.removeClass(toRemove.get(i));
-                } catch (InstanceSourceClassHasInstance ex) {
-                    errors.add(toRemove.get(i));
+            if(InstanceClassDAO.checkIfEmpty(toRemove)){
+                 Vector<InstanceClass> errors = new Vector<InstanceClass>();
+                for(int i = 0; i < toRemove.size(); i++){
+                    try {
+                        InstanceClassDAO.delete(toRemove.get(i));
+                    } catch (InstanceSourceClassHasInstance ex) {
+                        errors.add(toRemove.get(i));
+                    }
                 }
-            }
-
-            if(!errors.isEmpty()){
-                tableModel = new AddInstanceInstanceClassTableModel();
-                tableModel.addClasses(errors);
+                loadInstanceClasses();
+                if(!errors.isEmpty()){
+                    tableModel = new AddInstanceInstanceClassTableModel();
+                    tableModel.addClasses(errors);
+                    EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS,
+                        EDACCApp.getApplication().getMainFrame(),
+                        "A Problem occured by removing the following instance classes.  \n ",
+                        new JTable(tableModel));
+                }
+            }else{
                 EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS,
-                    EDACCApp.getApplication().getMainFrame(),
-                    "A Problem occured by removing the following instance classes.  \n " +
-                    "Check if all instances of the source classes are deleted or referenced to another class.",
-                    new JTable(tableModel));
+                        EDACCApp.getApplication().getMainFrame(),
+                        "A Problem occured by removing the following instance classes.  \n " +
+                        "The selected instance class or one of his Childrens are an source class \n " +
+                        "and is not Empty. Please remove all Instances from the source class before \n " +
+                        "before deleting them.",
+                        new JTable(tableModel));
             }
          }
     }
@@ -332,7 +354,7 @@ public class ManageDBInstances implements Observer{
      */
     public void addInstanceClasses() {
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        EDACCCreateEditInstanceClassDialog dialog = new EDACCCreateEditInstanceClassDialog(mainFrame, true, main.instanceClassTableModel, -1);
+        EDACCCreateEditInstanceClassDialog dialog = new EDACCCreateEditInstanceClassDialog(mainFrame, true, main.getInstanceClassTree());
         dialog.setLocationRelativeTo(mainFrame);
         EDACCApp.getApplication().show(dialog);
     }
@@ -417,32 +439,22 @@ public class ManageDBInstances implements Observer{
      * @throws InstanceException
      * @throws SQLException
      */
-    public Vector<Instance> buildInstancesAutogenerateClass(Vector<File> instanceFiles, File ret, Tasks task, int searchDepth) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException {
-        
+    public Vector<Instance> buildInstancesAutogenerateClass(Vector<File> instanceFiles, File ret, Tasks task) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException, InstanceClassAlreadyInDBException {
+      
         Vector<Instance> instances = new Vector<Instance>();
         Vector<String> errorsDB = new Vector<String>();
         Vector<String> errorsAdd = new Vector<String>();
         InstanceClass instanceClass;
         task.setTaskProgress((float)0 / (float)instanceFiles.size());
+         DefaultMutableTreeNode nodes = autoGenerateInstanceClasses(instanceFiles, ret);
         for (int i = 0; i < instanceFiles.size(); i++) {
-            try {
-                String name;
-                if(searchDepth == 0){
-                    name = autogenerateInstanceClassName(ret.getParent(), instanceFiles.get(i));
-                }
-                else{
-                    name = CutToSearchDepth(ret.getParent(), instanceFiles.get(i), searchDepth);
-                }
-                    
-                
-                try {
-                    instanceClass = InstanceClassDAO.createInstanceClass(name, "Autogenerated instance source class", true);
-                } catch (InstanceClassAlreadyInDBException ex) {
-                    instanceClass = InstanceClassDAO.getByName(name);
-                }
-                String md5 = calculateMD5(instanceFiles.get(i));
+            try {                  
+               String md5 = calculateMD5(instanceFiles.get(i));
                 try {
                     InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
+                    String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length()+1 , instanceFiles.get(i).getParent().length());
+                    String[] possibleInstanceClasses = rawPath.split("\\\\|/");
+                    instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes ,0);
                     Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, md5, instanceClass);
                     instances.add(temp);
                     InstanceDAO.save(temp);
@@ -479,15 +491,55 @@ public class ManageDBInstances implements Observer{
      
     }
 
-    /**
-     * Autogenerates the instance source class name. The name is generated by using the path of the file from
-     * the choosenDirectory down to the parent directory of the instance as the name.
-     * @param root
-     * @param instanceFile
-     * @return
-     */
-    public String autogenerateInstanceClassName(String root, File instanceFile) {
-        return instanceFile.getAbsolutePath().substring(root.length()+1 , instanceFile.getParent().length());
+    private InstanceClass getInstanceClassFromTree(String[] possibleInstanceClasses, DefaultMutableTreeNode node, int i) {
+        i++;
+        if(i == possibleInstanceClasses.length -1 ){
+            for(int j = 0; j < node.getChildCount(); j++){
+                InstanceClass tmp = (InstanceClass)((DefaultMutableTreeNode)node.getChildAt(j)).getUserObject();
+                if(tmp.getName().equals(possibleInstanceClasses[i]) ){
+                    return tmp;
+                }
+            }
+        }else{
+             for(int j = 0; j < node.getChildCount(); j++){
+                InstanceClass tmp = (InstanceClass)((DefaultMutableTreeNode)node.getChildAt(j)).getUserObject();
+                if(tmp.getName().equals(possibleInstanceClasses[i])){
+                    return getInstanceClassFromTree(possibleInstanceClasses, (DefaultMutableTreeNode)node.getChildAt(j), i);
+                }
+            }
+        }
+        return null;
+    }
+
+  
+    private DefaultMutableTreeNode autoGenerateInstanceClasses(Vector<File> files,  File root) throws SQLException, InstanceClassAlreadyInDBException{
+        DefaultMutableTreeNode node =null;
+        for(int i = 0; i < files.size(); i++){
+            String rawPath = files.get(i).getAbsolutePath().substring(root.getParent().length()+1 , files.get(i).getParent().length());
+            String[] possibleInstanceClasses = rawPath.split("\\\\|/");
+            if(node == null)
+                node = new DefaultMutableTreeNode(InstanceClassDAO.createInstanceClass(possibleInstanceClasses[i], "Autogenerated instance source class", null, true));
+            for(int j = 1; j < possibleInstanceClasses.length; j++){
+                addInstanceClassToTree(node, j, possibleInstanceClasses[j]);
+            }
+        }
+        return node;
+    }
+
+    private void addInstanceClassToTree(DefaultMutableTreeNode node, int j, String name) throws SQLException, InstanceClassAlreadyInDBException {
+        j--;
+        if(j==0){
+           for(int i = 0; i < node.getChildCount(); i++){
+               DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
+               if(((InstanceClass)child.getUserObject()).getName() == name)
+                   return;
+           }
+           node.add(new DefaultMutableTreeNode(InstanceClassDAO.createInstanceClass(name, "Autogenerated instance source class",(InstanceClass) node.getUserObject(), true)));
+        } else{
+             for(int i = 0; i < node.getChildCount(); i++){
+               addInstanceClassToTree((DefaultMutableTreeNode) node.getChildAt(i), j, name);
+           }
+        }
     }
 
     /**
@@ -496,7 +548,7 @@ public class ManageDBInstances implements Observer{
      * @param selectedRows The rows of the selected instances
      */
     public void addInstancesToClass(int[] selectedRows) throws IOException{
-         if(tableInstances.getSelectedRows().length == 0){
+        if(tableInstances.getSelectedRows().length == 0){
              JOptionPane.showMessageDialog(panelManageDBInstances,
                 "No instances selected.",
                 "Warning",
@@ -533,7 +585,7 @@ public class ManageDBInstances implements Observer{
                             InstanceHasInstanceClassDAO.createInstanceHasInstance( toChange.get(i), input);
                         }
                     }
-                    main.instanceClassTableModel.changeInstanceTable();
+                    loadInstanceClasses();
                 }
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
@@ -558,7 +610,7 @@ public class ManageDBInstances implements Observer{
      * @param selectedRowsInstanceClass rows of the InstanceClasses from which the selected instances have to be removed
      */
     public void RemoveInstanceFromInstanceClass(int[] selectedRowsInstance, int[] selectedRowsInstanceClass){
-       // check if a instance is selected, if not notify the user
+     /*  // check if a instance is selected, if not notify the user
         if(tableInstances.getSelectedRows().length == 0){
              JOptionPane.showMessageDialog(panelManageDBInstances,
                 "No instances selected.",
@@ -623,7 +675,7 @@ public class ManageDBInstances implements Observer{
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
            }
-        }
+        }*/
 
     }
 
@@ -641,7 +693,8 @@ public class ManageDBInstances implements Observer{
             EDACCApp.getApplication().show(main.instanceFilter);
 
             Vector<RowFilter<Object, Object>> filters  = main.instanceFilter.getFilter();
-            if(filters.isEmpty()){
+            if(filters != null){
+                 if(filters.isEmpty()){
                 removeFilter(tableInstances);
                 main.setFilterStatus("");
                 if(tableInstances.getRowCount() != 0)
@@ -655,8 +708,7 @@ public class ManageDBInstances implements Observer{
                     tableInstances.addRowSelectionInterval(0, 0);
                 main.setFilterStatus("This list of instances has filters applied to it. Use the filter button below to modify.");
             }
-        
-       
+            }
     }
 
     public void onTaskStart(String methodName) {
@@ -676,16 +728,16 @@ public class ManageDBInstances implements Observer{
      * @param instanceClassTableModel Table model of the instance classes of the ManageDBMode
      * @param convertRowIndexToModel the row of the selected instance class
      */
-    public void EditInstanceClass(InstanceClassTableModel instanceClassTableModel, int convertRowIndexToModel) {
+    public void EditInstanceClass() {
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        EDACCCreateEditInstanceClassDialog dialog = new EDACCCreateEditInstanceClassDialog(mainFrame, true, instanceClassTableModel, convertRowIndexToModel);
+        EDACCCreateEditInstanceClassDialog dialog = new EDACCCreateEditInstanceClassDialog(mainFrame, true, main.getInstanceClassTree());
         dialog.setLocationRelativeTo(mainFrame);
         EDACCApp.getApplication().show(dialog);
     }
 
     public void update(Observable o, Object arg) {
-        this.main.instanceTableModel.clearTable();
-        this.main.instanceClassTableModel.clearTable();
+       /* this.main.instanceTableModel.clearTable();
+        this.main.instanceClassTableModel.clearTable();*/
     }
 
     public void showInstanceClassButtons(boolean enable) {
@@ -741,12 +793,127 @@ public class ManageDBInstances implements Observer{
         }
     }
 
-    public void computeProperties(Vector<Instance> instances, Vector<Property> properties) {
+    public void computeProperties(Vector<Instance> instances, Vector<Property> properties, Tasks task) {
         System.out.println(instances.size() + " instances, " + properties.size() + " properties.");
-        //PropertyComputationController p = new PropertyComputationController(instances, properties);
-        //new Thread(p).start();
+        Lock lock =  new ReentrantLock();
+        lock.lock();
+        Condition condition = lock.newCondition();
+        PropertyComputationController p = new PropertyComputationController(instances, properties, task, lock);
+        new Thread(p).start();
+        try {
+            condition.await();
+        } catch ( InterruptedException e ) {
+        } finally {
+            lock.unlock();
+        }
     }
 
+    public void changeInstanceTable() {
+        ((InstanceTableModel)tableInstances.getModel()).clearTable();
+        TreePath[] selected = main.getInstanceClassTree().getSelectionPaths();
+        Vector<InstanceClass> choosen = new Vector<InstanceClass>();
+        for(int i = 0; i < selected.length; i++){
+            choosen.addAll(getAllToEnd((DefaultMutableTreeNode) (selected[i].getLastPathComponent())));
+            /*  DefaultMutableTreeNode[] nodes = getPath()
+
+            Enumeration<DefaultMutableTreeNode> tmp = nodes.children();
+             while(tmp.hasMoreElements()){
+                choosen.add((InstanceClass) tmp.nextElement().getUserObject());
+            }
+            choosen.add((InstanceClass) nodes.getUserObject());*/
+        }
+        if(!choosen.isEmpty()){
+            try {
+                LinkedList<Instance> test = InstanceDAO.getAllByInstanceClasses(choosen);
+                ((InstanceTableModel) tableInstances.getModel()).addInstances(new Vector<Instance>(test));
+            } catch (NoConnectionToDBException ex) {
+                Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        ((InstanceTableModel)tableInstances.getModel()).fireTableDataChanged();
+    }
+
+    private Vector<InstanceClass> getAllToEnd(DefaultMutableTreeNode root){
+        Vector<InstanceClass> ret = new Vector<InstanceClass>();
+        for(int i = 0; i < root.getChildCount(); i++){
+            ret.addAll(getAllToEnd((DefaultMutableTreeNode) root.getChildAt(i)));
+        }
+        ret.add((InstanceClass) root.getUserObject());
+        return ret;
+    }
+
+    public void RemoveInstanceFromInstanceClass(int[] selectedRows, TreePath[] selected) {
+        if(tableInstances.getSelectedRows().length == 0){
+             JOptionPane.showMessageDialog(panelManageDBInstances,
+                "No instances selected.",
+                "Warning",
+                JOptionPane.WARNING_MESSAGE);
+        }else if(selected == null){
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                "No instance class selected.",
+                "Warning",
+                JOptionPane.WARNING_MESSAGE);
+        }else{
+            Boolean isSource = false;
+
+            try {
+                Vector<Instance> toRemove = new Vector<Instance>();
+                for(int i = 0; i < selectedRows.length; i++){
+                    toRemove.add((Instance) main.instanceTableModel.getInstance(tableInstances.convertRowIndexToModel(selectedRows[i])));
+                }
+                // check if the user really want to remove the instances from the instace classes
+                InstanceTableModel tableModel = new InstanceTableModel();
+                tableModel.addInstances(toRemove);
+
+
+                if(EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
+                        EDACCApp.getApplication().getMainFrame(),
+                        "Do you really won't to remove  the listed instances from the selected instance classes?",
+                        new JTable(tableModel))==EDACCExtendedWarning.RET_OK_OPTION){
+                    Vector<InstanceClass> choosen = new Vector<InstanceClass>();
+                    for(int j = 0; j < selected.length; j++){
+                        choosen.addAll(getAllToEnd((DefaultMutableTreeNode) (selected[j].getLastPathComponent())));
+                    }
+
+                    for(int i = 0; i < toRemove.size(); i++){
+                        for(int j = 0; j < choosen.size(); j++){
+                            InstanceClass tempInstanceClass = choosen.get(j);
+                            if(tempInstanceClass.isSource()){
+                               isSource = true;
+                            }else{
+                                    InstanceHasInstanceClass rem = InstanceHasInstanceClassDAO.getInstanceHasInstanceClass(tempInstanceClass, toRemove.get(i));
+                                    if (rem != null) {
+                                        InstanceHasInstanceClassDAO.removeInstanceHasInstanceClass(rem);
+                                    }
+                            }
+                      }
+                   }
+                }
+
+                if(isSource){
+                    JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "Some of the choosen instance classes are source classes, " +
+                        "the selected instances couldn't removed from them.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+                loadInstanceClasses();
+
+            } catch (NoConnectionToDBException ex) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                    ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+           } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "There is a Problem with the database: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+           }
+        }
+    }
 
 }
 

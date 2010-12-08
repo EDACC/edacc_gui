@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Vector;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  *
@@ -26,27 +28,18 @@ public class InstanceClassDAO {
      * so it can be referenced by related objects. Checks if the instance class is already in the Datebase.
      * @param name
      * @param description
+     * @param parent 
      * @param source
      * @return
      * @throws SQLException
      */
-    public static InstanceClass createInstanceClass(String name, String description, boolean source) throws SQLException, InstanceClassAlreadyInDBException {
-        PreparedStatement ps;
-        final String Query = "SELECT * FROM " + table + " WHERE name = ?";
-        ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
-        ps.setString(1, name);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            throw new InstanceClassAlreadyInDBException();
-        }
-
+    public static InstanceClass createInstanceClass(String name, String description, InstanceClass parent, boolean source) throws SQLException, InstanceClassAlreadyInDBException {
+        PreparedStatement ps;      
         InstanceClass i = new InstanceClass();
         i.setName(name);
         i.setDescription(description);
         i.setSource(source);
-        save(i);
-        rs.close();
-        ps.close();
+        save(i, parent);
         return i;
     }
 
@@ -71,43 +64,60 @@ public class InstanceClassDAO {
      * @param instance The instance object to persist
      * @throws SQLException if an SQL error occurs while saving the instance.
      */
-    public static void save(InstanceClass instanceClass) throws SQLException {
+    public static void save(InstanceClass instanceClass, InstanceClass parent) throws SQLException {
         PreparedStatement ps;
         if (instanceClass.isNew()) {
             // insert query, set ID!
             // insert instance into db
-            final String insertQuery = "INSERT INTO " + table + " (name, description, source) "
-                    + "VALUES (?, ?, ?)";
+            final String insertQuery = "INSERT INTO " + table + " (name, description, source, parent) "
+                    + "VALUES (?, ?, ?, ?)";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
-        } else if (instanceClass.isModified()) {
-            // update query
-            final String updateQuery = "UPDATE " + table + " SET name=?, description=?, source=? "
-                    + "WHERE idinstanceClass=?";
-            ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
+            ps.setString(1, instanceClass.getName());
+            ps.setString(2, instanceClass.getDescription());
+            ps.setBoolean(3, instanceClass.isSource());
+            if(parent != null)
+                ps.setInt(4, parent.getId());
+            else
+                ps.setNull(4, java.sql.Types.NULL);
 
-            ps.setInt(4, instanceClass.getInstanceClassID());
+            ps.executeUpdate();
 
-        } else {
-            return;
-        }
-
-        ps.setString(1, instanceClass.getName());
-        ps.setString(2, instanceClass.getDescription());
-        ps.setBoolean(3, instanceClass.isSource());
-        ps.executeUpdate();
-
-        // set id
-        if (instanceClass.isNew()) {
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
                 instanceClass.setInstanceClassID(rs.getInt(1));
             }
             rs.close();
+            instanceClass.setSaved();
+            cache.cache(instanceClass);
+            ps.close();
+
+        } else if (instanceClass.isModified()) {
+            // update query
+            final String updateQuery = "UPDATE " + table + " SET name=?, description=?, source=?,  parent=? "
+                    + "WHERE idinstanceClass=?";
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
+
+            ps.setInt(5, instanceClass.getInstanceClassID());
+            ps.setString(1, instanceClass.getName());
+            ps.setString(2, instanceClass.getDescription());
+            ps.setBoolean(3, instanceClass.isSource());
+            if(parent != null)
+                ps.setInt(4, parent.getId());
+            else
+                ps.setNull(4, java.sql.Types.NULL);
+            
+            ps.executeUpdate();
+            instanceClass.setSaved();
+            cache.cache(instanceClass);
+            ps.close();
+
+        } else {
+            return;
         }
 
-        instanceClass.setSaved();
-        cache.cache(instanceClass);
-        ps.close();
+
+
+
     }
 
     /**
@@ -144,28 +154,7 @@ public class InstanceClassDAO {
         return null;
     }
 
-    public static InstanceClass getByName(String name) throws NoConnectionToDBException, SQLException{
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass, name, description, source FROM " + table + " WHERE name=?");
-        st.setString(1, name);
-        ResultSet rs = st.executeQuery();
-        InstanceClass i = new InstanceClass();
-        if (rs.next()) {
-            i.setInstanceClassID(rs.getInt("idinstanceClass"));
-            i.setName(rs.getString("name"));
-            i.setDescription(rs.getString("description"));
-            i.setSource(rs.getBoolean("source"));
 
-            InstanceClass c = cache.getCached(i.getId());
-            if (c != null) {
-                return c;
-            } else {
-                i.setSaved();
-                cache.cache(i);
-                return i;
-            }
-        }
-        return null;
-    }
 
     /**
      * 
@@ -260,6 +249,105 @@ public class InstanceClassDAO {
 
     public static void clearCache() {
         cache.clear();
+    }
+
+    public static DefaultMutableTreeNode getAllAsTree() throws NoConnectionToDBException, SQLException{
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+        // First get all root InstanceClasses
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass FROM " + table + " WHERE parent IS NULL");
+        ResultSet rs = st.executeQuery();
+        while(rs.next()){
+            root.add(getNodeWithChildren(rs.getInt(1)));
+        }
+        return root;
+    }
+
+    private static DefaultMutableTreeNode getNodeWithChildren(int id) throws SQLException, SQLException{
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(getById(id));
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass FROM " + table + " WHERE parent=?");
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        while(rs.next()){
+            root.add(getNodeWithChildren(rs.getInt(1)));
+        }
+        return root;
+    }
+
+    public static boolean checkIfEmpty(Vector<InstanceClass> toRemove) throws SQLException {
+        PreparedStatement ps;
+        for(int i = 0; i < toRemove.size(); i++){
+            if(toRemove.get(i).isSource()){
+                ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT name FROM Instances WHERE instanceClass_idinstanceClass = ?");
+                ps.setInt(1, toRemove.get(i).getInstanceClassID());
+                ResultSet rs = ps.executeQuery();
+                if(rs.next()) return false;
+            }
+
+        }
+        return true;
+    }
+
+    public static DefaultTreeModel getSourceAsTree() throws NoConnectionToDBException, SQLException{
+         DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+        // First get all root InstanceClasses
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass FROM " + table + " WHERE parent IS NULL AND source;");
+        ResultSet rs = st.executeQuery();
+        while(rs.next()){
+            root.add(getNodeWithChildren(rs.getInt(1)));
+        }
+        return new DefaultTreeModel (root);
+    }
+
+    public static DefaultTreeModel getUserClassAsTree() throws NoConnectionToDBException, SQLException{
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+        // First get all root InstanceClasses
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass FROM " + table + " WHERE parent IS NULL AND NOT source;");
+        ResultSet rs = st.executeQuery();
+        while(rs.next()){
+            root.add(getNodeWithChildren(rs.getInt(1)));
+        }
+        return new DefaultTreeModel (root);
+    }
+
+    public static DefaultTreeModel getSourceAsTreeWithoutNode(InstanceClass without) throws NoConnectionToDBException, SQLException{
+         DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+        // First get all root InstanceClasses
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass FROM " + table + " WHERE parent IS NULL AND source;");
+        ResultSet rs = st.executeQuery();
+        while(rs.next()){
+            if(rs.getInt(1) != without.getId()){
+                root.add(getNodeWithChildrenWithoutNode(rs.getInt(1), without));
+            }
+            
+        }
+        return new DefaultTreeModel (root);
+    }
+
+    public static DefaultTreeModel getUserClassAsTreeWithoutNode(InstanceClass without) throws NoConnectionToDBException, SQLException{
+         DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+        // First get all root InstanceClasses
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass FROM " + table + " WHERE parent IS NULL AND NOT source;");
+        ResultSet rs = st.executeQuery();
+        while(rs.next()){
+            if(rs.getInt(1) != without.getId()){
+                root.add(getNodeWithChildrenWithoutNode(rs.getInt(1), without));
+            }
+
+        }
+        return new DefaultTreeModel (root);
+    }
+
+   private static DefaultMutableTreeNode getNodeWithChildrenWithoutNode(int id, InstanceClass without) throws SQLException, SQLException{
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(getById(id));
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass FROM " + table + " WHERE parent=?");
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        while(rs.next()){
+            if(rs.getInt(1) != without.getId()){
+                root.add(getNodeWithChildrenWithoutNode(rs.getInt(1), without));
+            }
+        }
+        return root;
     }
 
 }

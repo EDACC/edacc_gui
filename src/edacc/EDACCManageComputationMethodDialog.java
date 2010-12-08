@@ -58,6 +58,10 @@ public class EDACCManageComputationMethodDialog extends javax.swing.JDialog {
         super(jFrame, b);
         initComponents();
     }
+
+    EDACCManageComputationMethodDialog(JFrame mainFrame, boolean b, EDACCCreateEditInstanceClassDialog aThis) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
