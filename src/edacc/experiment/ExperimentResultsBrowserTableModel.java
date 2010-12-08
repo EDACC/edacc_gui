@@ -33,26 +33,27 @@ import javax.swing.SwingUtilities;
 public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
     // constants for the columns
-    public static int COL_ID = 0;
-    public static int COL_COMPUTEQUEUE = 1;
-    public static int COL_SOLVER = 2;
-    public static int COL_PARAMETERS = 3;
-    public static int COL_INSTANCE = 4;
-    public static int COL_RUN = 5;
-    public static int COL_TIME = 6;
-    public static int COL_SEED = 7;
-    public static int COL_STATUS = 8;
-    public static int COL_RESULTCODE = 9;
-    public static int COL_SOLVER_OUTPUT = 10;
-    public static int COL_LAUNCHER_OUTPUT = 11;
-    public static int COL_WATCHER_OUTPUT = 12;
-    public static int COL_VERIFIER_OUTPUT = 13;
-    public static int COL_PROPERTY = 14;
+    public static final int COL_ID = 0;
+    public static final int COL_PRIORITY = 1;
+    public static final int COL_COMPUTEQUEUE = 2;
+    public static final int COL_SOLVER = 3;
+    public static final int COL_PARAMETERS = 4;
+    public static final int COL_INSTANCE = 5;
+    public static final int COL_RUN = 6;
+    public static final int COL_TIME = 7;
+    public static final int COL_SEED = 8;
+    public static final int COL_STATUS = 9;
+    public static final int COL_RESULTCODE = 10;
+    public static final int COL_SOLVER_OUTPUT = 11;
+    public static final int COL_LAUNCHER_OUTPUT = 12;
+    public static final int COL_WATCHER_OUTPUT = 13;
+    public static final int COL_VERIFIER_OUTPUT = 14;
+    public static final int COL_PROPERTY = 15;
     private ArrayList<ExperimentResult> jobs;
     // the constant columns
-    private String[] CONST_COLUMNS = {"ID", "Compute Queue", "Solver", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
+    private String[] CONST_COLUMNS = {"ID", "Priority", "Compute Queue", "Solver", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
     // the visibility of each column
-    private boolean[] CONST_VISIBLE = {false, true, true, true, true, true, true, true, true, true, false, false, false, false};
+    private boolean[] CONST_VISIBLE = {false, false, true, true, true, true, true, true, true, true, true, false, false, false, false};
     private String[] columns;
     private ArrayList<Property> solverProperties;
     private boolean[] visible;
@@ -320,31 +321,33 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         }
         ExperimentResult j = jobs.get(rowIndex);
         switch (columnIndex) {
-            case 0:
+            case COL_ID:
                 return j.getId();
-            case 1:
+            case COL_PRIORITY:
+                return j.getPriority();
+            case COL_COMPUTEQUEUE:
                 GridQueue q = gridQueues.get(j.getComputeQueue());
                 return q == null ? "none" : q.getName();
-            case 2:
+            case COL_SOLVER:
                 Solver solver = getSolver(rowIndex);
                 return solver == null ? "" : solver.getName();
-            case 3:
+            case COL_PARAMETERS:
                 String params = parameters.get(j.getSolverConfigId());
                 if (params == null) {
                     params = Util.getParameterString(getParameters(rowIndex));
                     parameters.put(j.getSolverConfigId(), params);
                 }
                 return params;
-            case 4:
+            case COL_INSTANCE:
                 Instance instance = getInstance(rowIndex);
                 return instance == null ? "" : instance.getName();
-            case 5:
+            case COL_RUN:
                 return j.getRun();
-            case 6:
+            case COL_TIME:
                 return j.getResultTime();
-            case 7:
+            case COL_SEED:
                 return j.getSeed();
-            case 8:
+            case COL_STATUS:
                 String status = j.getStatus().toString();
                 if (j.getStatus() == ExperimentResultStatus.RUNNING) {
                     int hours = j.getRunningTime() / 3600;
@@ -353,15 +356,15 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                     status += " (" + new Formatter().format("%02d:%02d:%02d", hours, minutes, seconds) + ")";
                 }
                 return status;
-            case 9:
+            case COL_RESULTCODE:
                 return j.getResultCode().toString();
-            case 10:
+            case COL_SOLVER_OUTPUT:
                 return j.getSolverOutputFilename();
-            case 11:
+            case COL_LAUNCHER_OUTPUT:
                 return j.getLauncherOutputFilename();
-            case 12:
+            case COL_WATCHER_OUTPUT:
                 return j.getWatcherOutputFilename();
-            case 13:
+            case COL_VERIFIER_OUTPUT:
                 return j.getVerifierOutputFilename();
             default:
                 int propertyIdx = columnIndex - COL_PROPERTY;

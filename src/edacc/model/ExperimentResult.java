@@ -4,12 +4,14 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 
 public class ExperimentResult extends BaseModel {
+
     public static final int SOLVER_OUTPUT = 0;
     public static final int LAUNCHER_OUTPUT = 1;
     public static final int WATCHER_OUTPUT = 2;
     public static final int VERIFIER_OUTPUT = 3;
     private int id;
     private int run;
+    private int priority;
     private ExperimentResultStatus status;
     private ExperimentResultResultCode resultCode;
     private int seed;
@@ -18,20 +20,17 @@ public class ExperimentResult extends BaseModel {
     private int ExperimentId;
     private int InstanceId;
     private int runningTime;
-
     private String solverOutputFilename;
     private String launcherOutputFilename;
     private String watcherOutputFilename;
     private String verifierOutputFilename;
-
     private int solverExitCode;
     private int watcherExitCode;
     private int verifierExitCode;
-
     private int computeQueue;
-
     private HashMap<Integer, ExperimentResultHasProperty> propertyValues;
     private Timestamp datemodified;
+
     protected ExperimentResult() {
     }
 
@@ -59,7 +58,6 @@ public class ExperimentResult extends BaseModel {
         hash = 67 * hash + this.InstanceId;
         return hash;
     }
-
 
     @Override
     public boolean equals(Object obj) {
@@ -264,5 +262,16 @@ public class ExperimentResult extends BaseModel {
 
     public void setDatemodified(Timestamp datemodified) {
         this.datemodified = datemodified;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 }

@@ -24,7 +24,9 @@ public class ExperimentResultDAO {
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idJob=?";
     protected static final String selectQuery = "SELECT SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance, "
             + "idJob, run, seed, status, resultTime, resultCode, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN, "
-            + "solverExitCode, watcherExitCode, verifierExitCode, computeQueue, TIMESTAMPDIFF(SECOND, startTime, NOW()) AS runningTime, IF(status = " + ExperimentResultStatus.RUNNING.getValue() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) AS date_modified "
+            + "solverExitCode, watcherExitCode, verifierExitCode, computeQueue, TIMESTAMPDIFF(SECOND, startTime, NOW()) AS runningTime, "
+            + "IF(status = " + ExperimentResultStatus.RUNNING.getValue() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) AS date_modified,"
+            + "priority "
             + "FROM " + table + " ";
 
     public static ExperimentResult createExperimentResult(int run, int status, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId) throws SQLException {
@@ -101,6 +103,35 @@ public class ExperimentResultDAO {
     }
 
     /**
+     * Updates the priority of the ExperimentResults at once (batch).
+     * @param v vector of ExperimentResults to be updated
+     * @throws SQLException
+     */
+    public static void batchUpdatePriority(ArrayList<ExperimentResult> v) throws SQLException {
+        boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
+        try {
+            DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+            final String query = "UPDATE " + table + " SET priority=? WHERE idJob=?";
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+            curSt = st;
+            for (ExperimentResult r : v) {
+                st.setInt(1, r.getPriority());
+                st.setInt(2, r.getId());
+                st.addBatch();
+                r.setSaved();
+            }
+            st.executeBatch();
+            st.close();
+        } catch (SQLException e) {
+            DatabaseConnector.getInstance().getConn().rollback();
+            throw e;
+        } finally {
+            curSt = null;
+            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+        }
+    }
+
+    /**
      * Deletes all experiment results at once (batch).
      * @param experimentResults the experiment results to be deleted
      * @throws SQLException
@@ -156,6 +187,7 @@ public class ExperimentResultDAO {
         r.setWatcherExitCode(rs.getInt("watcherExitCode"));
         r.setVerifierExitCode(rs.getInt("verifierExitCode"));
         r.setComputeQueue(rs.getInt("computeQueue"));
+        r.setPriority(rs.getInt("priority"));
 
         r.setDatemodified(rs.getTimestamp("date_modified"));
         if (r.getStatus() == ExperimentResultStatus.RUNNING) {

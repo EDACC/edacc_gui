@@ -631,7 +631,6 @@ public class ExperimentController {
                         public void run() {
                             main.tableJobs.updateUI();
                         }
-
                     });
                 }
             }
@@ -1063,6 +1062,25 @@ public class ExperimentController {
     }
 
     /**
+     * Sets the priority of the currently visible jobs in the job browser to <code>priority</code> and
+     * updates the local cached experiment results.
+     * @param priority the new priority for the jobs
+     */
+    public void setPriority(int priority) throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
+        ArrayList<ExperimentResult> jobs = main.jobsTableModel.getJobs();
+        ArrayList<ExperimentResult> updatedJobs = new ArrayList<ExperimentResult>();
+        for (int i = 0; i < main.tableJobs.getRowCount(); i++) {
+            int vis = main.getTableJobs().convertRowIndexToModel(i);
+            if (jobs.get(vis).getPriority() != priority) {
+                jobs.get(vis).setPriority(priority);
+                updatedJobs.add(jobs.get(vis));
+            }
+        }
+        ExperimentResultDAO.batchUpdatePriority(updatedJobs);
+        this.updateExperimentResults();
+    }
+
+    /**
      * Returns the experiment with the given name.
      * @param name
      * @return the experiment
@@ -1071,10 +1089,11 @@ public class ExperimentController {
     public Experiment getExperiment(String name) throws SQLException {
         return ExperimentDAO.getExperimentByName(name);
     }
-    
+
     public String getExperimentResultOutput(int type, ExperimentResult er) throws SQLException, NoConnectionToDBException, IOException {
         return ExperimentResultDAO.getOutputText(type, er);
     }
+
     /**
      * Checks if data in the experiment design tabs is modified.
      * @param numRuns

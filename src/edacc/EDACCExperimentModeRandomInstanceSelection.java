@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * EDACCExperimentModeRandomInstanceSelection.java
  *
  * Created on 17.09.2010, 16:54:10
