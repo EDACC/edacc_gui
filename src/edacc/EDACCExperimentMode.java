@@ -2082,7 +2082,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             if (er.getStatus().getValue() >= 1) {
                 count++;
                 avgTime += er.getResultTime();
-            } else if (er.getStatus().equals(ExperimentResultStatus.RUNNING)) {
+            } else if (er.getStatus().equals(ExperimentResultStatus.RUNNING) && er.getRunningTime() > 0) {
                 curRunningTime += er.getRunningTime();
             }
         }

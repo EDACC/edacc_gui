@@ -441,7 +441,8 @@ public class ExperimentController {
                         if (task.isCancelled()) {
                             throw new TaskCancelledException();
                         }
-                        ArrayList<ExperimentResult> tmp = ExperimentResultDAO.getAllByExperimentIdAndRun(activeExperiment.getId(), runs.get(i));
+
+                        ArrayList<ExperimentResult> tmp = this.getAllByRun(runs.get(i));
                         for (ExperimentResult er : tmp) {
                             er.setRun(i);
                         }
@@ -452,11 +453,17 @@ public class ExperimentController {
 
 
                     ExperimentResultDAO.batchUpdateRun(updateJobs);
-                } catch (SQLException ex) {
+                } catch (Exception ex) {
+                    System.out.println("ROLLBACK!");
+                    DatabaseConnector.getInstance().getConn().rollback();
                     if (ex.getMessage().contains("cancelled")) {
                         throw new TaskCancelledException();
                     }
-                    throw ex;
+                    if (ex instanceof SQLException) {
+                        throw (SQLException) ex;
+                    } else if (ex instanceof TaskCancelledException) {
+                        throw (TaskCancelledException) ex;
+                    }
                 } finally {
                     ExperimentResultDAO.setAutoCommit(true);
                 }
@@ -1106,6 +1113,22 @@ public class ExperimentController {
         ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
         for (ExperimentResult er : resultMap.values()) {
             if (set.contains(er.getRun())) {
+                res.add(er);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Returns all experiment results with the specified run for the active experiment.
+     * updateExperimentResults() should be called first.
+     * @param runs
+     * @return arraylist of experiment results
+     */
+    public synchronized ArrayList<ExperimentResult> getAllByRun(Integer run) {
+        ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
+        for (ExperimentResult er : resultMap.values()) {
+            if (er.getRun() == run) {
                 res.add(er);
             }
         }

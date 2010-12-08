@@ -611,7 +611,7 @@ CREATE EVENT IF NOT EXISTS MONITOR_JOBS
 ON SCHEDULE EVERY '20' MINUTE
 DO
 UPDATE ExperimentResults SET status=-1 WHERE idJob IN (
-select idJob FROM Experiment JOIN (SELECT * FROM ExperimentResults WHERE status=0) AS ERtmp on Experiment.idExperiment = Experiment_idExperiment WHERE TIME_TO_SEC(TIMEDIFF(NOW(), startTime))>CPUTimeLimit*1.3
+select idJob FROM (SELECT idJob, startTime, Experiment_idExperiment FROM ExperimentResults WHERE status=0) AS ERtmp JOIN Experiment on Experiment.idExperiment = Experiment_idExperiment WHERE TIME_TO_SEC(TIMEDIFF(NOW(), startTime))>CPUTimeLimit*1.3
 );
 
 SET SQL_MODE=@OLD_SQL_MODE;
