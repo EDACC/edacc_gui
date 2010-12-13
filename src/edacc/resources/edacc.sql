@@ -83,16 +83,15 @@ CREATE  TABLE IF NOT EXISTS `instanceClass` (
   `description` TEXT NULL COMMENT 'teh description should contain the source-url of the instances.\n' ,
   `source` TINYINT(1)  NOT NULL COMMENT 'tells if the class is a source class. ' ,
   `User_idUser` INT NULL ,
+  `parent` INT NULL ,
   PRIMARY KEY (`idinstanceClass`) ,
-  UNIQUE INDEX `name` (`name` ASC) ,
   INDEX `fk_instanceClass_User1` (`User_idUser` ASC) ,
   CONSTRAINT `fk_instanceClass_User1`
     FOREIGN KEY (`User_idUser` )
     REFERENCES `User` (`idUser` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-COMMENT = 'Enables to manage instances into classes.';
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
