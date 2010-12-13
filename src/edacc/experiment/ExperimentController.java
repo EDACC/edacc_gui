@@ -625,11 +625,13 @@ public class ExperimentController {
                     main.resultBrowserRowFilter.updateFilterTypes();
                     main.jobsTableModel.fireTableDataChanged();
                 } else {
+                    // repaint the table: updates the currently visible rectangle, otherwise there might be duplicates of rows.
+                    // this has to be done in the EDT.
                     SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
                         public void run() {
-                            main.tableJobs.updateUI();
+                            main.tableJobs.repaint();
                         }
                     });
                 }
