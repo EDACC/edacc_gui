@@ -29,6 +29,12 @@ public class ExperimentDAO {
         i.setName(name);
         i.setDescription(description);
         i.setDate(date);
+        i.setCPUTimeLimit(1000);
+        i.setMemoryLimit(-1);
+        i.setWallClockTimeLimit(-1);
+        i.setStackSizeLimit(-1);
+        i.setOutputSizeLimit(-1);
+        i.setMaxSeed(Integer.MAX_VALUE);
         save(i);
         cache.cache(i);
         return i;

@@ -230,6 +230,7 @@ CREATE  TABLE IF NOT EXISTS `ExperimentResults` (
   `Instances_idInstance` INT NOT NULL ,
   `idJob` INT NOT NULL AUTO_INCREMENT ,
   `run` INT NOT NULL COMMENT 'The run of a (solver,instance) tupple.' ,
+  `priority` INT NULL COMMENT 'The priority of the job' ,
   `seed` INT NULL COMMENT 'The seed for the solver. ' ,
   `status` INT NOT NULL COMMENT 'status of the job\n-5: launcher crash\n-4: watcher crash\n-3: solver crash\n-2: verifier crash\n-1: not started \n0: running\n1: finished normaly by solver\n2x: terminated by limit x' ,
   `startTime` DATETIME NULL COMMENT 'The start-time of the job.' ,
