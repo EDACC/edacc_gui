@@ -463,6 +463,7 @@
                     <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                       <action class="edacc.EDACCExperimentMode" id="btnLoadExperiment" methodName="btnLoadExperiment"/>
                     </Property>
+                    <Property name="text" type="java.lang.String" resourceKey="btnLoadExperiment.text"/>
                     <Property name="toolTipText" type="java.lang.String" resourceKey="btnLoadExperiment.toolTipText"/>
                     <Property name="name" type="java.lang.String" value="btnLoadExperiment" noResource="true"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -588,7 +589,7 @@
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="jScrollPane3" pref="1089" max="32767" attributes="0"/>
+                              <Component id="jScrollPane3" pref="1090" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>

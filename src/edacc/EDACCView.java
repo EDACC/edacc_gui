@@ -8,8 +8,6 @@ import edacc.model.NoConnectionToDBException;
 import java.awt.Component;
 import java.sql.SQLException;
 import java.util.Observable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
@@ -575,17 +573,22 @@ public class EDACCView extends FrameView implements Observer {
             }
         } else {
             javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-
         }
 
     }
 
     @Action
     public void btnGridSettings() {
-        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        EDACCManageGridQueuesDialog manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true, null);
-        manageGridQueues.setLocationRelativeTo(mainFrame);
-        manageGridQueues.setVisible(true);
+        try {
+            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+            EDACCManageGridQueuesDialog manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true, null);
+            manageGridQueues.setLocationRelativeTo(mainFrame);
+            manageGridQueues.setVisible(true);
+        } catch (NoConnectionToDBException ex) {
+            JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "A database error occured while loading the dialog: " + ex.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     @Action

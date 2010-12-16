@@ -1064,8 +1064,8 @@ public class ExperimentController {
     }
 
     /**
-     * Sets the priority of the currently visible jobs in the job browser to <code>priority</code> and
-     * updates the local cached experiment results.
+     * Sets the priority of the currently visible jobs in the job browser to <code>priority</code>,
+     * updates the local cached experiment results and updates the gui.
      * @param priority the new priority for the jobs
      */
     public void setPriority(int priority) throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
@@ -1079,7 +1079,7 @@ public class ExperimentController {
             }
         }
         ExperimentResultDAO.batchUpdatePriority(updatedJobs);
-        this.updateExperimentResults();
+        this.loadJobs();
     }
 
     /**

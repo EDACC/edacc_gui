@@ -11,6 +11,9 @@
 
 package edacc;
 
+import edacc.experiment.Util;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import org.jdesktop.application.Action;
 
 /**
@@ -24,6 +27,30 @@ public class EDACCExperimentModePrioritySelection extends javax.swing.JDialog {
         super(parent, modal);
         priority = null;
         initComponents();
+        txtPriority.selectAll();
+        txtPriority.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    btnApply();
+                } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    btnDismiss();
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() != KeyEvent.VK_ENTER) {
+                    txtPriority.setText(Util.getNumberText(txtPriority.getText()));
+                }
+            }
+        });
     }
 
     /** This method is called from within the constructor to

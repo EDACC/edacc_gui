@@ -5,6 +5,7 @@
  */
 package edacc;
 
+import edacc.experiment.Util;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import org.jdesktop.application.Action;
@@ -42,7 +43,7 @@ public class EDACCExperimentModeRandomInstanceSelection extends javax.swing.JDia
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() != KeyEvent.VK_ENTER) {
-                    txtCount.setText(expMode.getNumberText(txtCount.getText()));
+                    txtCount.setText(Util.getNumberText(txtCount.getText()));
                 }
             }
         });

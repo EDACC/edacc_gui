@@ -14,6 +14,7 @@ import edacc.experiment.ExperimentResultsBrowserTableModel;
 import edacc.experiment.ExperimentTableModel;
 import edacc.experiment.InstanceTableModel;
 import edacc.experiment.SolverTableModel;
+import edacc.experiment.Util;
 import edacc.gridqueues.GridQueuesController;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
@@ -38,13 +39,12 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.DefaultRowSorter;
 import javax.swing.ImageIcon;
@@ -750,6 +750,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnRemoveExperiment.setPreferredSize(new java.awt.Dimension(80, 25));
 
         btnLoadExperiment.setAction(actionMap.get("btnLoadExperiment")); // NOI18N
+        btnLoadExperiment.setText(resourceMap.getString("btnLoadExperiment.text")); // NOI18N
         btnLoadExperiment.setToolTipText(resourceMap.getString("btnLoadExperiment.toolTipText")); // NOI18N
         btnLoadExperiment.setName("btnLoadExperiment"); // NOI18N
         btnLoadExperiment.setPreferredSize(new java.awt.Dimension(80, 25));
@@ -857,7 +858,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 1089, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 1090, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -1625,7 +1626,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         int ss = txtCPUTimeLimit.getSelectionStart();
         int se = txtCPUTimeLimit.getSelectionEnd();
         int dot = txtCPUTimeLimit.getCaret().getDot();
-        txtCPUTimeLimit.setText(getNumberText(txtCPUTimeLimit.getText()));
+        txtCPUTimeLimit.setText(Util.getNumberText(txtCPUTimeLimit.getText()));
         txtCPUTimeLimit.getCaret().setDot(dot);
         txtCPUTimeLimit.setSelectionStart(ss);
         txtCPUTimeLimit.setSelectionEnd(se);
@@ -1636,7 +1637,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         int ss = txtMemoryLimit.getSelectionStart();
         int se = txtMemoryLimit.getSelectionEnd();
         int dot = txtMemoryLimit.getCaret().getDot();
-        txtMemoryLimit.setText(getNumberText(txtMemoryLimit.getText()));
+        txtMemoryLimit.setText(Util.getNumberText(txtMemoryLimit.getText()));
         txtMemoryLimit.getCaret().setDot(dot);
         txtMemoryLimit.setSelectionStart(ss);
         txtMemoryLimit.setSelectionEnd(se);
@@ -1647,7 +1648,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         int ss = txtMaxSeeds.getSelectionStart();
         int se = txtMaxSeeds.getSelectionEnd();
         int dot = txtMaxSeeds.getCaret().getDot();
-        txtMaxSeeds.setText(getNumberText(txtMaxSeeds.getText()));
+        txtMaxSeeds.setText(Util.getNumberText(txtMaxSeeds.getText()));
         if (txtMaxSeeds.getText().equals("-") || txtMaxSeeds.getText().equals("-1")) {
             txtMaxSeeds.setText("");
         }
@@ -1669,7 +1670,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         int ss = txtNumRuns.getSelectionStart();
         int se = txtNumRuns.getSelectionEnd();
         int dot = txtNumRuns.getCaret().getDot();
-        txtNumRuns.setText(getNumberText(txtNumRuns.getText()));
+        txtNumRuns.setText(Util.getNumberText(txtNumRuns.getText()));
         txtNumRuns.getCaret().setDot(dot);
         txtNumRuns.setSelectionStart(ss);
         txtNumRuns.setSelectionEnd(se);
@@ -1712,7 +1713,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }//GEN-LAST:event_tableExperimentsMouseClicked
 
     private void txtJobsTimerKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtJobsTimerKeyReleased
-        txtJobsTimer.setText(getNumberText(txtJobsTimer.getText()));
+        txtJobsTimer.setText(Util.getNumberText(txtJobsTimer.getText()));
         if (chkJobsTimer.isSelected()) {
             chkJobsTimer.setSelected(false);
             stopJobsTimer();
@@ -1734,7 +1735,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         int ss = txtWallClockTimeLimit.getSelectionStart();
         int se = txtWallClockTimeLimit.getSelectionEnd();
         int dot = txtWallClockTimeLimit.getCaret().getDot();
-        txtWallClockTimeLimit.setText(getNumberText(txtWallClockTimeLimit.getText()));
+        txtWallClockTimeLimit.setText(Util.getNumberText(txtWallClockTimeLimit.getText()));
         txtWallClockTimeLimit.getCaret().setDot(dot);
         txtWallClockTimeLimit.setSelectionStart(ss);
         txtWallClockTimeLimit.setSelectionEnd(se);
@@ -1745,7 +1746,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         int ss = txtStackSizeLimit.getSelectionStart();
         int se = txtStackSizeLimit.getSelectionEnd();
         int dot = txtStackSizeLimit.getCaret().getDot();
-        txtStackSizeLimit.setText(getNumberText(txtStackSizeLimit.getText()));
+        txtStackSizeLimit.setText(Util.getNumberText(txtStackSizeLimit.getText()));
         txtStackSizeLimit.getCaret().setDot(dot);
         txtStackSizeLimit.setSelectionStart(ss);
         txtStackSizeLimit.setSelectionEnd(se);
@@ -1756,7 +1757,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         int ss = txtOutputSizeLimit.getSelectionStart();
         int se = txtOutputSizeLimit.getSelectionEnd();
         int dot = txtOutputSizeLimit.getCaret().getDot();
-        txtOutputSizeLimit.setText(getNumberText(txtOutputSizeLimit.getText()));
+        txtOutputSizeLimit.setText(Util.getNumberText(txtOutputSizeLimit.getText()));
         txtOutputSizeLimit.getCaret().setDot(dot);
         txtOutputSizeLimit.setSelectionStart(ss);
         txtOutputSizeLimit.setSelectionEnd(se);
@@ -1769,39 +1770,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             jobsTimer = null;
             chkJobsTimer.setSelected(false);
         }
-    }
-
-    /**
-     * Returns the empty string or any string containing a non-negative number or -1.
-     * @param text
-     * @return the number text
-     */
-    public String getNumberText(String text) {
-        String res = "";
-        if (text.length() > 0) {
-            if (text.charAt(0) == '-') {
-                if (text.length() > 1) {
-                    if (text.charAt(1) == '1') {
-                        return "-1";
-                    } else {
-                        return "-";
-                    }
-                } else {
-                    return "-";
-                }
-            }
-        }
-        int begin;
-        for (begin = 0; begin < text.length() && text.charAt(begin) == '0'; begin++);
-        if (begin > 0 && begin == text.length()) {
-            return "0";
-        }
-        for (int i = begin; i < text.length(); i++) {
-            if (text.charAt(i) >= '0' && text.charAt(i) <= '9') {
-                res += text.charAt(i);
-            }
-        }
-        return res;
     }
 
     /**
@@ -2045,9 +2013,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Action
     public void btnBrowserColumnSelection() {
+        List sortKeys = tableJobs.getRowSorter().getSortKeys();
         EDACCResultsBrowserColumnSelection dialog = new EDACCResultsBrowserColumnSelection(EDACCApp.getApplication().getMainFrame(), true, jobsTableModel);
         dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         dialog.setVisible(true);
+        tableJobs.getRowSorter().setSortKeys(sortKeys);
+        Util.updateTableColumnWidth(tableJobs);
     }
 
     public void updateRuntimeEstimation() {
@@ -2370,10 +2341,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Action
     public void btnSelectQueue() {
-        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        EDACCManageGridQueuesDialog manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true, expController);
-        manageGridQueues.setLocationRelativeTo(mainFrame);
-        manageGridQueues.setVisible(true);
+        try {
+            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+            EDACCManageGridQueuesDialog manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true, expController);
+            manageGridQueues.setLocationRelativeTo(mainFrame);
+            manageGridQueues.setVisible(true);
+        } catch (NoConnectionToDBException ex) {
+            JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+        }
     }
 
     @Action
@@ -2477,10 +2453,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                         javax.swing.JOptionPane.showMessageDialog(Tasks.getTaskView(), ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
                     }
                 }
-
-
             });
-            
+
         }
     }
 }

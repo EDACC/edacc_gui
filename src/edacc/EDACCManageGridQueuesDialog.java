@@ -38,67 +38,64 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
     private QueueListModel queueListModel;
 
     /** Creates new form EDACCManageGridQueuesDialog */
-    public EDACCManageGridQueuesDialog(java.awt.Frame parent, boolean modal, ExperimentController expController) {
+    public EDACCManageGridQueuesDialog(java.awt.Frame parent, boolean modal, ExperimentController expController) throws NoConnectionToDBException, SQLException {
         super(parent, modal);
         gridSettings = new EDACCGridSettingsView(parent, true, this);
         initComponents();
         this.expController = expController;
         if (expController == null) {
             btnChooseQueues.setVisible(false);
+            btnCancel.setText("Done");
         } else {
             btnRemoveQueue.setVisible(false);
             btnEditQueue.setVisible(false);
+            btnCancel.setText("Cancel");
         }
-        try {
-            queueListModel = new QueueListModel(expController);
-            listQueues.setModel(queueListModel);
-            listQueues.addListSelectionListener(new QueueListSelectionListener());
-            listQueues.addMouseListener(new MouseAdapter() {
+        queueListModel = new QueueListModel(expController);
+        listQueues.setModel(queueListModel);
+        listQueues.addListSelectionListener(new QueueListSelectionListener());
+        listQueues.addMouseListener(new MouseAdapter() {
 
-                @Override
-                public void mouseClicked(MouseEvent event) {
-                    JList list = (JList) event.getSource();
+            @Override
+            public void mouseClicked(MouseEvent event) {
+                JList list = (JList) event.getSource();
 
-                    // Get index of item clicked
-                    int index = list.locationToIndex(event.getPoint());
-                    JCheckBox item = queueListModel.checkBoxes.get(index);
-                    // Toggle selected state
-                    item.setSelected(!item.isSelected());
-                    // Repaint cell
-                    list.repaint(list.getCellBounds(index, index));
-                }
-            });
-            listQueues.setCellRenderer(new ListCellRenderer() {
+                // Get index of item clicked
+                int index = list.locationToIndex(event.getPoint());
+                JCheckBox item = queueListModel.checkBoxes.get(index);
+                // Toggle selected state
+                item.setSelected(!item.isSelected());
+                // Repaint cell
+                list.repaint(list.getCellBounds(index, index));
+            }
+        });
+        listQueues.setCellRenderer(new ListCellRenderer() {
 
-                @Override
-                public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 
-                    if (EDACCManageGridQueuesDialog.this.expController != null) {
-                        return EDACCManageGridQueuesDialog.this.queueListModel.checkBoxes.get(index);
+                if (EDACCManageGridQueuesDialog.this.expController != null) {
+                    return EDACCManageGridQueuesDialog.this.queueListModel.checkBoxes.get(index);
+                } else {
+                    GridQueue queue = (GridQueue) value;
+                    JLabel lbl = new JLabel(queue.getName());
+                    lbl.setOpaque(true);
+                    if (isSelected) {
+                        lbl.setBackground(listQueues.getSelectionBackground());
+                        lbl.setForeground(listQueues.getSelectionForeground());
                     } else {
-                        GridQueue queue = (GridQueue) value;
-                        JLabel lbl = new JLabel(queue.getName());
-                        lbl.setOpaque(true);
-                        if (isSelected) {
-                            lbl.setBackground(listQueues.getSelectionBackground());
-                            lbl.setForeground(listQueues.getSelectionForeground());
-                        } else {
-                            lbl.setBackground(listQueues.getBackground());
-                            lbl.setForeground(listQueues.getForeground());
-                        }
-                        return lbl;
+                        lbl.setBackground(listQueues.getBackground());
+                        lbl.setForeground(listQueues.getForeground());
                     }
+                    return lbl;
                 }
-            });
-            listQueues.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            // deselect all queues and set the edit/del/choose-buttons disabled
-            listQueues.clearSelection();
-            setButtonStates(false);
-        } catch (NoConnectionToDBException ex) {
-            JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "A database error occured while loading the dialog: " + ex.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
-        }
+            }
+        });
+        listQueues.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        // deselect all queues and set the edit/del/choose-buttons disabled
+        listQueues.clearSelection();
+        setButtonStates(false);
+
     }
 
     /** This method is called from within the constructor to

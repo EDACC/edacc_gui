@@ -27,21 +27,39 @@ public class Util {
         // the maximum of the lengths of all cells within a column col will be in width[col]
         for (int col = 0; col < table.getColumnCount(); col++) {
             // set the width to the columns title width
-            width[col] = table.getFontMetrics(table.getFont()).stringWidth(table.getColumnName(col));
+            if (table.getColumnModel().getColumn(col).getHeaderRenderer() != null) {
+                width[col] = table.getColumnModel().getColumn(col).getHeaderRenderer().getTableCellRendererComponent(
+                        table,
+                        table.getColumnModel().getColumn(col).getHeaderValue(),
+                        false,
+                        false,
+                        0,
+                        0).getPreferredSize().width;
+            } else {
+                width[col] = table.getDefaultRenderer(String.class).getTableCellRendererComponent(
+                        table,
+                        table.getColumnModel().getColumn(col).getHeaderValue(),
+                        false,
+                        false,
+                        0,
+                        0).getPreferredSize().width;
+            }
+
             for (int row = 0; row < table.getRowCount(); row++) {
                 // get the component which represents the value and determine its witdth
-                int len = table.getCellRenderer(row, col).getTableCellRendererComponent(table, table.getValueAt(row, col), false, true, table.convertRowIndexToModel(row), col).getPreferredSize().width;
+                int len = table.getCellRenderer(row, col).getTableCellRendererComponent(table, table.getValueAt(row, col), false, true, row, col).getPreferredSize().width;
                 if (len > width[col]) {
                     width[col] = len;
                 }
             }
+            width[col] += table.getIntercellSpacing().width;
             colsum += width[col];
         }
         // get the weight for a pixel
         double proz = (double) tableWidth / (double) colsum;
         for (int col = 0; col < table.getColumnCount(); col++) {
             // multiplicate the width of a column with the weight
-            table.getColumnModel().getColumn(col).setPreferredWidth((int) (proz * width[col]));
+            table.getColumnModel().getColumn(col).setPreferredWidth((int) Math.round(proz * width[col]));
         }
     }
 
@@ -100,5 +118,38 @@ public class Util {
         } catch (Exception e) {
             return null;
         }
+    }
+    
+    /**
+     * Returns the empty string or any string containing a non-negative number or -1.
+     * @param text
+     * @return the number text
+     */
+    public static String getNumberText(String text) {
+        String res = "";
+        if (text.length() > 0) {
+            if (text.charAt(0) == '-') {
+                if (text.length() > 1) {
+                    if (text.charAt(1) == '1') {
+                        return "-1";
+                    } else {
+                        return "-";
+                    }
+                } else {
+                    return "-";
+                }
+            }
+        }
+        int begin;
+        for (begin = 0; begin < text.length() && text.charAt(begin) == '0'; begin++);
+        if (begin > 0 && begin == text.length()) {
+            return "0";
+        }
+        for (int i = begin; i < text.length(); i++) {
+            if (text.charAt(i) >= '0' && text.charAt(i) <= '9') {
+                res += text.charAt(i);
+            }
+        }
+        return res;
     }
 }
