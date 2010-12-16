@@ -25,35 +25,41 @@ public class Util {
         int width[] = new int[table.getColumnCount()];
         // iterate over all not filtered cells and get the length from each one.
         // the maximum of the lengths of all cells within a column col will be in width[col]
-        for (int col = 0; col < table.getColumnCount(); col++) {
-            // set the width to the columns title width
-            if (table.getColumnModel().getColumn(col).getHeaderRenderer() != null) {
-                width[col] = table.getColumnModel().getColumn(col).getHeaderRenderer().getTableCellRendererComponent(
-                        table,
-                        table.getColumnModel().getColumn(col).getHeaderValue(),
-                        false,
-                        false,
-                        0,
-                        0).getPreferredSize().width;
-            } else {
-                width[col] = table.getDefaultRenderer(String.class).getTableCellRendererComponent(
-                        table,
-                        table.getColumnModel().getColumn(col).getHeaderValue(),
-                        false,
-                        false,
-                        0,
-                        0).getPreferredSize().width;
+        if (table.getRowCount() == 0) {
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                width[i] = table.getWidth() / table.getColumnCount();
             }
-
-            for (int row = 0; row < table.getRowCount(); row++) {
-                // get the component which represents the value and determine its witdth
-                int len = table.getCellRenderer(row, col).getTableCellRendererComponent(table, table.getValueAt(row, col), false, true, row, col).getPreferredSize().width;
-                if (len > width[col]) {
-                    width[col] = len;
+        } else {
+            for (int col = 0; col < table.getColumnCount(); col++) {
+                // set the width to the columns title width
+                if (table.getColumnModel().getColumn(col).getHeaderRenderer() != null) {
+                    width[col] = table.getColumnModel().getColumn(col).getHeaderRenderer().getTableCellRendererComponent(
+                            table,
+                            table.getColumnModel().getColumn(col).getHeaderValue(),
+                            false,
+                            false,
+                            0,
+                            0).getPreferredSize().width;
+                } else {
+                    width[col] = table.getDefaultRenderer(String.class).getTableCellRendererComponent(
+                            table,
+                            table.getColumnModel().getColumn(col).getHeaderValue(),
+                            false,
+                            false,
+                            0,
+                            0).getPreferredSize().width;
                 }
+
+                for (int row = 0; row < table.getRowCount(); row++) {
+                    // get the component which represents the value and determine its witdth
+                    int len = table.getCellRenderer(row, col).getTableCellRendererComponent(table, table.getValueAt(row, col), false, true, row, col).getPreferredSize().width;
+                    if (len > width[col]) {
+                        width[col] = len;
+                    }
+                }
+                width[col] += table.getIntercellSpacing().width;
+                colsum += width[col];
             }
-            width[col] += table.getIntercellSpacing().width;
-            colsum += width[col];
         }
         // get the weight for a pixel
         double proz = (double) tableWidth / (double) colsum;
@@ -119,7 +125,7 @@ public class Util {
             return null;
         }
     }
-    
+
     /**
      * Returns the empty string or any string containing a non-negative number or -1.
      * @param text
