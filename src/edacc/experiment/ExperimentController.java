@@ -226,14 +226,24 @@ public class ExperimentController {
      * @throws SQLException
      */
     public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
-
+        // TODO: there are some points where this task should never be canceled (by an application crash or lost db connection)... fix them!
         task.setStatus("Checking jobs..");
+
+        // check for deleted solver configurations (jobs have to be deleted)
         ArrayList<SolverConfiguration> deletedSolverConfigurations = SolverConfigurationDAO.getAllDeleted();
         final ArrayList<ExperimentResult> deletedJobs = new ArrayList<ExperimentResult>();
         for (SolverConfiguration sc : deletedSolverConfigurations) {
             deletedJobs.addAll(ExperimentResultDAO.getAllBySolverConfiguration(sc));
         }
 
+        // check for modified solver configurations (jobs have to be deleted)
+        // this will append (to deletedJobs) all modified solver configurations, i.e. the solver configurations are not marked as deleted and
+        //  * the seed group of the solver configurations has been changed or
+        //  * some parameter instances have been modified/deleted or added
+        ArrayList<SolverConfiguration> modifiedSolverConfigurations = solverConfigPanel.getModifiedSolverConfigurations();
+        for (SolverConfiguration sc : modifiedSolverConfigurations) {
+            deletedJobs.addAll(ExperimentResultDAO.getAllBySolverConfiguration(sc));
+        }
         if (deletedJobs.size() > 0) {
             int notDeletableJobsCount = 0;
             for (ExperimentResult job : deletedJobs) {
@@ -243,11 +253,12 @@ public class ExperimentController {
             }
             String msg = "";
             if (notDeletableJobsCount > 0) {
-                msg = "There are " + notDeletableJobsCount + " started jobs and " + (deletedJobs.size() - notDeletableJobsCount) + " jobs waiting in the database which would be deleted. Do you want to continue?";
+                msg = "There are " + notDeletableJobsCount + " started jobs and " + (deletedJobs.size() - notDeletableJobsCount) + " jobs waiting in the database which would be deleted. ";
             } else {
-                msg = "There are " + deletedJobs.size() + " jobs waiting in the database which would be deleted. Do you want to continue?";
+                msg = "There are " + deletedJobs.size() + " jobs waiting in the database which would be deleted. ";
             }
-            int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), msg, "Jobs would be deleted", javax.swing.JOptionPane.YES_NO_OPTION);
+            msg += "Do you want to continue?";
+            int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), msg, "Jobs would be changed", javax.swing.JOptionPane.YES_NO_OPTION);
             if (userInput == 1) {
                 return;
             } else {
@@ -1067,6 +1078,14 @@ public class ExperimentController {
      * Sets the priority of the currently visible jobs in the job browser to <code>priority</code>,
      * updates the local cached experiment results and updates the gui.
      * @param priority the new priority for the jobs
+     * @throws SQLException
+     * @throws IOException
+     * @throws PropertyTypeNotExistException
+     * @throws PropertyNotInDBException
+     * @throws NoConnectionToDBException
+     * @throws ComputationMethodDoesNotExistException
+     * @throws ExpResultHasSolvPropertyNotInDBException
+     * @throws ExperimentResultNotInDBException
      */
     public void setPriority(int priority) throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
         ArrayList<ExperimentResult> jobs = main.jobsTableModel.getJobs();
@@ -1079,6 +1098,25 @@ public class ExperimentController {
             }
         }
         ExperimentResultDAO.batchUpdatePriority(updatedJobs);
+        this.loadJobs();
+    }
+
+    /**
+     * Sets the status of all currently visible jobs in the job browser to <code>status</code>,
+     * updates the local cached experiment results and updates the gui.
+     * @param status the new status for the jobs
+     * @throws SQLException
+     */
+    public void setStatus(ExperimentResultStatus status) throws SQLException {
+        ArrayList<ExperimentResult> jobs = main.jobsTableModel.getJobs();
+        ArrayList<ExperimentResult> updatedJobs = new ArrayList<ExperimentResult>();
+        for (int i = 0; i < main.tableJobs.getRowCount(); i++) {
+            int vis = main.getTableJobs().convertRowIndexToModel(i);
+            if (!jobs.get(vis).getStatus().equals(status)) {
+                updatedJobs.add(jobs.get(vis));
+            }
+        }
+        ExperimentResultDAO.batchUpdateStatus(updatedJobs, status);
         this.loadJobs();
     }
 

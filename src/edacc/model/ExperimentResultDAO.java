@@ -122,9 +122,52 @@ public class ExperimentResultDAO {
             }
             st.executeBatch();
             st.close();
-        } catch (SQLException e) {
+        } catch (Throwable e) {
             DatabaseConnector.getInstance().getConn().rollback();
-            throw e;
+            if (e instanceof SQLException) {
+                throw (SQLException) e;
+            }
+        } finally {
+            curSt = null;
+            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+        }
+    }
+
+    /**
+     * Updates the status of the experiment results to <code>status</code>.
+     * If <code>status</code> equals <code>ExperimentResultStatus.NOTSTARTED</code> then all fields which are set when saving results (client)
+     * are set to <code>NULL</code>.<br/><br/>
+     * <b>Note</b>: After that operation the local cached experiment results should be reloaded to prevent inconsistency.
+     * @param v
+     * @param status
+     * @throws SQLException
+     */
+    public static void batchUpdateStatus(ArrayList<ExperimentResult> v, ExperimentResultStatus status) throws SQLException {
+        boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
+        try {
+            DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+
+            String updateString = "status = "+status.getValue();
+            if (status == ExperimentResultStatus.NOTSTARTED) {
+                updateString += ",startTime=NULL, resultTime = NULL, resultCode = NULL, solverOutput = NULL, launcherOutput = NULL, "
+                        + "verifierOutput = NULL, watcherOutput = NULL, solverExitCode = NULL, watcherExitCode = NULL, "
+                        + "verifierExitCode = NULL, computeQueue = NULL";
+            }
+            final String query = "UPDATE " + table + " SET " + updateString + " WHERE idJob=?";
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+            curSt = st;
+            for (ExperimentResult r : v) {
+                st.setInt(1, r.getId());
+                st.addBatch();
+                r.setSaved();
+            }
+            st.executeBatch();
+            st.close();
+        } catch (Throwable e) {
+            DatabaseConnector.getInstance().getConn().rollback();
+            if (e instanceof SQLException) {
+                throw (SQLException) e;
+            }
         } finally {
             curSt = null;
             DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);

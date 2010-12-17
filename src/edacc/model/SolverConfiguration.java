@@ -28,6 +28,7 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
         }
     }
 
+    @Override
     public int getId() {
         return id;
     }

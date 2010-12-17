@@ -37,19 +37,26 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
         this.fireTableDataChanged();
     }
 
+    /**
+     * checks if some parameter instances have been changed or there are new parameter instances.
+     * @return <code>true</code>, iff some data has been changed
+     */
     public boolean isModified() {
         for (int i = 0; i < parameterInstances.length; i++) {
             if (selected[i]) {
                 if (parameterInstances[i] == null) {
+                    // new parameter instance
                     return true;
                 }
                 if (parameters[i].getId() == parameterInstances[i].getParameter_id()) {
+                    // modified parameter instance
                     if (parameters[i].getHasValue() && !values[i].equals(parameterInstances[i].getValue())) {
                         return true;
                     }
                 }
             } else {
                 if (parameterInstances[i] != null) {
+                    // deleted parameter instance
                     return true;
                 }
             }

@@ -197,4 +197,13 @@ public class SolverConfigurationDAO {
         }
         return res;
     }
+
+    /**
+     * Checks if the solver configuration <code>sc</code> is deleted.
+     * @param sc the solver configuration
+     * @return
+     */
+    public static boolean isDeleted(SolverConfiguration sc) {
+        return sc.isDeleted();
+    }
 }

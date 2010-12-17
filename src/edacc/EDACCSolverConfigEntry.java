@@ -236,6 +236,11 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         txtSeedGroup.setText(resourceMap.getString("txtSeedGroup.text")); // NOI18N
         txtSeedGroup.setToolTipText(resourceMap.getString("txtSeedGroup.toolTipText")); // NOI18N
         txtSeedGroup.setName("txtSeedGroup"); // NOI18N
+        txtSeedGroup.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtSeedGroupFocusLost(evt);
+            }
+        });
         txtSeedGroup.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txtSeedGroupKeyReleased(evt);
@@ -255,7 +260,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                         .addComponent(lblSeedGroup)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtSeedGroup, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
                         .addComponent(btnRemove))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
@@ -286,8 +291,15 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             }
         }
         txtSeedGroup.setText(res);
-        parent.setTitles();
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+            txtSeedGroup.transferFocus();
+        }
+        
     }//GEN-LAST:event_txtSeedGroupKeyReleased
+
+    private void txtSeedGroupFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtSeedGroupFocusLost
+        parent.setTitles();
+    }//GEN-LAST:event_txtSeedGroupFocusLost
 
     @Action
     public void btnReplicate() {
@@ -311,14 +323,16 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     /**
-     * Checks for unsaved data
-     * @return true, if and only if data is unsaved, false otherwise
+     * Checks for unsaved data, i.e. checks iff the seed group has been changed or the parameter instances have been changed.
+     * If the seed group is not a valid integer it will be substituted and used as 0.
+     * @return <code>true</code>, if and only if data is unsaved, false otherwise
      */
     public boolean isModified() {
-        int seedGroup = -1;
+        int seedGroup = 0;
         try {
             seedGroup = Integer.parseInt(txtSeedGroup.getText());
         } catch (NumberFormatException _) {
+            txtSeedGroup.setText("0");
         }
 
         if (solverConfiguration == null || solverConfiguration.getSeed_group() != seedGroup) {

@@ -195,6 +195,18 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tableJobs.setDefaultRenderer(String.class, tableJobsStringRenderer);
         tableJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.setDefaultRenderer(Float.class, new EDACCExperimentModeJobsCellRenderer());
+        tableJobs.addKeyListener(new java.awt.event.KeyAdapter() {
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_U) {
+                    JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+                    EDACCExperimentModeUpdateStatus updateStatusDialog = new EDACCExperimentModeUpdateStatus(mainFrame, true, expController);
+                    updateStatusDialog.setLocationRelativeTo(mainFrame);
+                    updateStatusDialog.setVisible(true);
+                }
+            }
+        });
         /* -------------------------------- end of jobs browser tab -------------------------------- */
         /* -------------------------------- analyze tab -------------------------------- */
         analysePanel = new AnalysisPanel(expController);

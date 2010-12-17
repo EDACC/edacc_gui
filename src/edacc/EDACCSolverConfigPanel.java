@@ -14,6 +14,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.swing.border.TitledBorder;
 
@@ -280,6 +281,24 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
         }
         // ... unchanged
         return false;
+    }
+
+    /**
+     * Returns an <code>ArrayList</code> of all modified solver configurations and solver configurations for which the seed group has been changed. <br><br>
+     * <b>Note:</b> Here a modified solver configuration doesn't mean a new/deleted solver configuration.
+     * @return ArrayList of all modified solver configurations
+     */
+    public ArrayList<SolverConfiguration> getModifiedSolverConfigurations() {
+        ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
+        for (Component comp : this.getComponents()) {
+            if (comp instanceof EDACCSolverConfigEntry) {
+                EDACCSolverConfigEntry entry = (EDACCSolverConfigEntry) comp;
+                if (entry.isModified() && entry.getSolverConfiguration() != null && !SolverConfigurationDAO.isDeleted(entry.getSolverConfiguration())) {
+                    res.add(entry.getSolverConfiguration());
+                }
+            }
+        }
+        return res;
     }
 
     @Override
