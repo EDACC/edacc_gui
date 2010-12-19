@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -35,6 +36,14 @@ import java.util.zip.ZipOutputStream;
  */
 public class Util {
 
+    /**
+     * Calculates the MD5 sum of the given file.
+     * @param file
+     * @return the MD5 sum representing the given file.
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     */
     public static String calculateMD5(File file) throws FileNotFoundException, IOException, NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("MD5");
         InputStream is = new FileInputStream(file);
@@ -58,6 +67,35 @@ public class Util {
         }
         String res = buf.toString();
         return buf.toString();     
+    }
+
+    /**
+     * Calculates the MD5 sum of the given String
+     * @param formula
+     * @return the MD5 sum representing the given String
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     */
+     public static String calculateMD5(String formula) throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("MD5");
+        byte[] buffer = formula.getBytes();
+        digest.update(buffer);
+        byte[] md5sum = digest.digest();
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < md5sum.length; i++) {
+            int halfbyte = (md5sum[i] >>> 4) & 0x0F;
+            int two_halfs = 0;
+            do {
+                if ((0 <= halfbyte) && (halfbyte <= 9))
+                    buf.append((char) ('0' + halfbyte));
+                else
+                     buf.append((char) ('a' + (halfbyte - 10)));
+                halfbyte = md5sum[i] & 0x0F;
+            } while(two_halfs++ < 1);
+        }
+        String res = buf.toString();
+        return buf.toString();
     }
 
     public static ByteArrayOutputStream zipDirectoryToByteStream(File dir) throws IOException {

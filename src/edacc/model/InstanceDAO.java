@@ -1,5 +1,7 @@
 package edacc.model;
 
+import com.mysql.jdbc.Util;
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.InvalidVariableException;
 import edacc.satinstances.SATInstance;
@@ -9,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.sql.*;
 import java.util.ArrayList;
@@ -91,6 +94,27 @@ public class InstanceDAO {
         return i;
     }
 
+    public static Instance createInstance(String name, String formula, InstanceClass instanceClass) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException, InstanceAlreadyInDBException{
+        String md5 = edacc.manageDB.Util.calculateMD5(formula);
+        PreparedStatement ps;
+        final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ? OR name = ?";
+        ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
+        ps.setString(1, md5);
+        ps.setString(2, name);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            throw new InstanceAlreadyInDBException();
+        }
+        Instance i = new Instance();
+        i.setName(name);
+        i.setMd5(md5);
+        i.setInstanceClass(instanceClass);
+        save(i, formula);
+        rs.close();
+        ps.close();
+        return i;
+    }
+
     public static void delete(Instance i) throws NoConnectionToDBException, SQLException, InstanceIsInExperimentException {
         if (!IsInAnyExperiment(i.getId())) {
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM Instances WHERE idInstance=?");
@@ -103,6 +127,57 @@ public class InstanceDAO {
             throw new InstanceIsInExperimentException();
         }
 
+    }
+
+    private static void save (Instance instance, String formula){
+        if (instance.isNew()) {
+            try {
+                // insert query, set ID!
+                // TODO insert instance blob
+                // insert instance into db
+                PreparedStatement ps;
+                final String insertQuery = "INSERT INTO " + table + " (name, md5, instanceClass_idinstanceClass, instance) "
+                        + "VALUES (?, ?, ?, ?)";
+                ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+                ps.setString(1, instance.getName());
+                ps.setString(2, instance.getMd5());
+                if (instance.getInstanceClass() != null) {
+                    ps.setInt(3, instance.getInstanceClass().getInstanceClassID());
+                } else {
+                    ps.setNull(3, Types.INTEGER);
+                }
+
+                if (!formula.isEmpty()) {
+                    InputStream input = new ByteInputStream();
+                    input.read(formula.getBytes())
+;
+                    //output = new File(instance.getFile().getName());
+                    //Util.sevenZipEncode(input, output);
+
+                    ps.setBinaryStream(4, input);
+
+                } else {
+                    ps.setNull(4, Types.BLOB);
+                }
+
+                ps.executeUpdate();
+
+
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    instance.setId(rs.getInt(1));
+                }
+                cache.cache(instance);
+
+                ps.close();
+                instance.setSaved();
+
+                //                output.delete();
+                //input.delete();
+            } catch (Exception ex) {
+                Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     /**
