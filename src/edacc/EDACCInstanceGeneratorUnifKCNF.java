@@ -10,15 +10,24 @@
  */
 package edacc;
 
+import edacc.model.InstanceClass;
+import edacc.model.InstanceClassDAO;
+import edacc.model.NoConnectionToDBException;
 import java.text.DecimalFormat;
 import javax.swing.JOptionPane;
 import edacc.model.instanceGeneratorUnifKCNFController;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  *
  * @author balint
  */
 public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
+
+    private InstanceClass parentClass;
 
     /** Creates new form EDACCInstanceGeneratorUnifKCNF */
     public EDACCInstanceGeneratorUnifKCNF(java.awt.Frame parent, boolean modal) {
@@ -62,6 +71,8 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         cbSeries = new javax.swing.JCheckBox();
+        btSelParClass = new javax.swing.JButton();
+        lbParentClass = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -157,6 +168,17 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
             }
         });
 
+        btSelParClass.setText(resourceMap.getString("btSelParClass.text")); // NOI18N
+        btSelParClass.setName("btSelParClass"); // NOI18N
+        btSelParClass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btSelParClassActionPerformed(evt);
+            }
+        });
+
+        lbParentClass.setText(resourceMap.getString("lbParentClass.text")); // NOI18N
+        lbParentClass.setName("lbParentClass"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -194,13 +216,20 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
                 .addContainerGap(10, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(cbGC, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
+                .addComponent(cbGC, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
+                .addGap(10, 10, 10))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btSelParClass)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lbParentClass, javax.swing.GroupLayout.DEFAULT_SIZE, 154, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnGenerate)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 141, Short.MAX_VALUE)
                         .addComponent(btnCancel)))
-                .addGap(10, 10, 10))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -235,6 +264,10 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
                     .addComponent(tfNV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(7, 7, 7)
                 .addComponent(cbGC)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btSelParClass)
+                    .addComponent(lbParentClass, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnGenerate)
@@ -424,6 +457,25 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
         this.jLabel3.setEnabled(cbSeries.isSelected());
     }//GEN-LAST:event_cbSeriesStateChanged
 
+    private void btSelParClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSelParClassActionPerformed
+        try {
+            EDACCSelectParentInstanceClassDialog selectParent = new EDACCSelectParentInstanceClassDialog(EDACCApp.getApplication().getMainFrame(), true, new DefaultTreeModel(InstanceClassDAO.getAllAsTree()));
+
+
+            selectParent.setLocationRelativeTo(this);
+            selectParent.setAlwaysOnTop(true);
+            selectParent.initialize();
+            selectParent.setVisible(true);
+            parentClass = selectParent.getInstanceClassParent();
+            this.lbParentClass.setText(parentClass.getName());
+
+        } catch (NoConnectionToDBException ex) {
+            Logger.getLogger(EDACCCreateEditInstanceClassDialog.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(EDACCCreateEditInstanceClassDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btSelParClassActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -443,6 +495,7 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btSelParClass;
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnGenerate;
     private javax.swing.JCheckBox cbGC;
@@ -454,6 +507,7 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel lbParentClass;
     private javax.swing.JTextField tfK;
     private javax.swing.JTextField tfNV;
     private javax.swing.JTextField tfR;

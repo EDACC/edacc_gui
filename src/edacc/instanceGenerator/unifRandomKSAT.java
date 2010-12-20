@@ -188,4 +188,13 @@ public class unifRandomKSAT {
                 + this.numVariables + "-c" + this.numClauses + "-S" + this.seed
                 + ".cnf";
     }
+
+    /**
+     *
+     * @return a String with the suggested class name for this formula
+     */
+    public String suggestedClassName() {
+        return "UnifRandom-k" + this.clauseLength + "-r" + this.ratio;
+    }
+
 }

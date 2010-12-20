@@ -65,15 +65,24 @@
           </Group>
           <Group type="102" attributes="0">
               <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="cbGC" alignment="0" pref="283" max="32767" attributes="1"/>
-                  <Group type="102" attributes="0">
+              <Component id="cbGC" pref="283" max="32767" attributes="1"/>
+              <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+          </Group>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="btSelParClass" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="lbParentClass" pref="154" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
                       <Component id="btnGenerate" min="-2" max="-2" attributes="0"/>
                       <EmptySpace pref="141" max="32767" attributes="0"/>
                       <Component id="btnCancel" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -116,6 +125,11 @@
               </Group>
               <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
               <Component id="cbGC" min="-2" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="btSelParClass" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lbParentClass" alignment="3" min="-2" pref="19" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnGenerate" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -252,6 +266,21 @@
       <Events>
         <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="cbSeriesStateChanged"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="btSelParClass">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="btSelParClass.text"/>
+        <Property name="name" type="java.lang.String" value="btSelParClass" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btSelParClassActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lbParentClass">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lbParentClass.text"/>
+        <Property name="name" type="java.lang.String" value="lbParentClass" noResource="true"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>
