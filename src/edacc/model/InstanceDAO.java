@@ -147,7 +147,7 @@ public class InstanceDAO {
                 }
 
                 if (!formula.isEmpty()) {
-                    InputStream input = new ByteArrayInputStream(formula.getBytes());
+                    ByteArrayInputStream input = new ByteArrayInputStream(formula.getBytes());
                     //output = new File(instance.getFile().getName());
                     //Util.sevenZipEncode(input, output);
 
