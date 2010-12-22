@@ -1,10 +1,9 @@
 package edacc.model;
 
-import com.mysql.jdbc.Util;
-//import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.InvalidVariableException;
 import edacc.satinstances.SATInstance;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -148,13 +147,11 @@ public class InstanceDAO {
                 }
 
                 if (!formula.isEmpty()) {
-                  //  InputStream input = new ByteInputStream();
-                    //input.read(formula.getBytes())
-;
+                    InputStream input = new ByteArrayInputStream(formula.getBytes());
                     //output = new File(instance.getFile().getName());
                     //Util.sevenZipEncode(input, output);
 
-                    //ps.setBinaryStream(4, input);
+                    ps.setBinaryStream(4, input);
 
                 } else {
                     ps.setNull(4, Types.BLOB);
