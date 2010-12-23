@@ -5,6 +5,9 @@
 package edacc.model;
 
 import edacc.instanceGenerator.unifRandomKSAT;
+import edacc.model.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -23,8 +26,10 @@ public class instanceGeneratorUnifKCNFController {
      * @param num number of instances per class
      * @param genClass generate instance classes
      */
-    public void generate(int k, double r, int n, boolean series, int step, int stop, int num, boolean genClass) {
+    public void generate(int k, double r, int n, boolean series, int step, int stop, int num, boolean genClass,InstanceClass parent) {
         unifRandomKSAT instance;
+        InstanceDAO instanceController = new InstanceDAO();
+
         //parent classe braucht man noch
         String className="";
         if (!series) {
@@ -43,6 +48,10 @@ public class instanceGeneratorUnifKCNFController {
                 instance = new unifRandomKSAT(k, r, i);
                 System.out.println(className + " : " + instance.suggestedFN());
                 //add instance to the specified class
+                try{
+                instanceController.createInstance(instance.suggestedFN(), instance.toDIMACS(),parent);
+                }catch (Exception ex) {Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);}
+
                 
             }
         }

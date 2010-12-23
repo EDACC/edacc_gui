@@ -365,7 +365,7 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
             genClass = this.cbGC.isSelected();
             //das muss noch in einer progressbar rein!!!
             //call Controller to generate and add instances
-            controller.generate(k, r, n, series, step, stop, num, genClass);
+            controller.generate(k, r, n, series, step, stop, num, genClass,this.parentClass);
 
             
             this.setVisible(false);
