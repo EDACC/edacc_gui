@@ -8,7 +8,6 @@ package edacc;
 import edacc.events.TaskEvents;
 import edacc.experiment.AnalysisController;
 import edacc.experiment.AnalysisPanel;
-import edacc.experiment.ExperimentInstanceClassTableModel;
 import edacc.experiment.ExperimentController;
 import edacc.experiment.ExperimentResultsBrowserTableModel;
 import edacc.experiment.ExperimentTableModel;
@@ -21,6 +20,7 @@ import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultStatus;
+import edacc.model.InstanceClass;
 import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.PropertyNotInDBException;
@@ -29,7 +29,6 @@ import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
 import edacc.properties.PropertyTypeNotExistException;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
@@ -38,6 +37,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
@@ -49,7 +49,6 @@ import javax.swing.JFileChooser;
 import javax.swing.DefaultRowSorter;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -63,8 +62,11 @@ import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 /**
  *
@@ -76,11 +78,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public ExperimentTableModel expTableModel;
     public InstanceTableModel insTableModel;
     public SolverTableModel solTableModel;
-    public ExperimentInstanceClassTableModel instanceClassModel;
     public ExperimentResultsBrowserTableModel jobsTableModel;
     public EDACCSolverConfigPanel solverConfigPanel;
     public TableRowSorter<InstanceTableModel> sorter;
     public EDACCJobsFilter resultBrowserRowFilter;
+    public DefaultTreeModel instanceClassTreeModel;
     //  private EDACCExperimentModeVirtualExperimentSettings pnlVirtualExperimentSettings = new EDACCExperimentModeVirtualExperimentSettings();
     private EDACCInstanceFilter instanceFilter;
     private EDACCOutputViewer outputViewer;
@@ -155,22 +157,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             @Override
             public void run() {
                 instanceFilter = new EDACCInstanceFilter(EDACCApp.getApplication().getMainFrame(), true, tableInstances, true);
-                instanceClassModel = new ExperimentInstanceClassTableModel(insTableModel, instanceFilter, expController);
-                tableInstanceClasses.setModel(instanceClassModel);
             }
         });
 
-        // center third column
-        tableInstanceClasses.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
-
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-                JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                lbl.setHorizontalAlignment(JLabel.CENTER);
-                return lbl;
-            }
-        });
+        instanceClassTreeModel = new DefaultTreeModel(null);
+        jTreeInstanceClass.setModel(instanceClassTreeModel);
+        jTreeInstanceClass.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        jTreeInstanceClass.setRootVisible(false);
+        jTreeInstanceClass.setShowsRootHandles(true);
         /* -------------------------------- end of instances tab -------------------------------- */
         /* -------------------------------- generate jobs tab -------------------------------- */
 
@@ -336,8 +330,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }
 
     public void reinitializeInstances() {
-        btnDeselectAllInstnaceClassesActionPerformed(null);
         instanceFilter.clearFilters();
+        jTreeInstanceClass.setSelectionPath(null);
+        for (int i = jTreeInstanceClass.getRowCount()-1; i >= 0; i--) {
+            jTreeInstanceClass.collapseRow(i);
+        }
         lblFilterStatus.setText("");
     }
 
@@ -471,11 +468,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         panelChooseInstances = new javax.swing.JPanel();
         jSplitPane2 = new javax.swing.JSplitPane();
         jPanel4 = new javax.swing.JPanel();
-        jScrollPane5 = new javax.swing.JScrollPane();
-        tableInstanceClasses = new javax.swing.JTable();
-        jPanel6 = new javax.swing.JPanel();
-        btnDeselectAllInstnaceClasses = new javax.swing.JButton();
-        btnSelectAllInstanceClasses = new javax.swing.JButton();
+        jTreeInstanceClass = new javax.swing.JTree();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tableInstances = new javax.swing.JTable();
@@ -970,66 +963,29 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jSplitPane2.setResizeWeight(0.4);
         jSplitPane2.setName("jSplitPane2"); // NOI18N
 
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel4.border.title"))); // NOI18N
         jPanel4.setName("jPanel4"); // NOI18N
 
-        jScrollPane5.setName("jScrollPane5"); // NOI18N
-
-        tableInstanceClasses.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tableInstanceClasses.setToolTipText(resourceMap.getString("tableInstanceClasses.toolTipText")); // NOI18N
-        tableInstanceClasses.setName("tableInstanceClasses"); // NOI18N
-        jScrollPane5.setViewportView(tableInstanceClasses);
-
-        jPanel6.setName("jPanel6"); // NOI18N
-
-        btnDeselectAllInstnaceClasses.setText(resourceMap.getString("btnDeselectAllInstnaceClasses.text")); // NOI18N
-        btnDeselectAllInstnaceClasses.setToolTipText(resourceMap.getString("btnDeselectAllInstnaceClasses.toolTipText")); // NOI18N
-        btnDeselectAllInstnaceClasses.setName("btnDeselectAllInstnaceClasses"); // NOI18N
-        btnDeselectAllInstnaceClasses.setPreferredSize(new java.awt.Dimension(109, 25));
-        btnDeselectAllInstnaceClasses.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDeselectAllInstnaceClassesActionPerformed(evt);
+        jTreeInstanceClass.setName("jTreeInstanceClass"); // NOI18N
+        jTreeInstanceClass.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                jTreeInstanceClassValueChanged(evt);
             }
         });
-        jPanel6.add(btnDeselectAllInstnaceClasses);
-
-        btnSelectAllInstanceClasses.setText(resourceMap.getString("btnSelectAllInstanceClasses.text")); // NOI18N
-        btnSelectAllInstanceClasses.setToolTipText(resourceMap.getString("btnSelectAllInstanceClasses.toolTipText")); // NOI18N
-        btnSelectAllInstanceClasses.setName("btnSelectAllInstanceClasses"); // NOI18N
-        btnSelectAllInstanceClasses.setPreferredSize(new java.awt.Dimension(109, 25));
-        btnSelectAllInstanceClasses.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSelectAllInstanceClassesActionPerformed(evt);
-            }
-        });
-        jPanel6.add(btnSelectAllInstanceClasses);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE)
-                .addContainerGap())
+            .addGap(0, 295, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jTreeInstanceClass, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 527, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGap(0, 557, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jTreeInstanceClass, javax.swing.GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE))
         );
 
         jSplitPane2.setLeftComponent(jPanel4);
@@ -1626,14 +1582,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         packageFileChooser.setVisible(true);
     }//GEN-LAST:event_btnGeneratePackage
 
-    private void btnSelectAllInstanceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstanceClassesActionPerformed
-        expController.selectAllInstanceClasses();
-    }//GEN-LAST:event_btnSelectAllInstanceClassesActionPerformed
-
-    private void btnDeselectAllInstnaceClassesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeselectAllInstnaceClassesActionPerformed
-        expController.deselectAllInstanceClasses();
-    }//GEN-LAST:event_btnDeselectAllInstnaceClassesActionPerformed
-
     private void txtCPUTimeLimitKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCPUTimeLimitKeyReleased
         int ss = txtCPUTimeLimit.getSelectionStart();
         int se = txtCPUTimeLimit.getSelectionEnd();
@@ -1775,6 +1723,18 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         txtOutputSizeLimit.setSelectionEnd(se);
         setTitles();
     }//GEN-LAST:event_txtOutputSizeLimitKeyReleased
+
+    private void jTreeInstanceClassValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTreeInstanceClassValueChanged
+        instanceFilter.clearInstanceClassIds();
+        if (jTreeInstanceClass.getSelectionPaths() != null) {
+            for (TreePath path : jTreeInstanceClass.getSelectionPaths()) {
+                for (Integer id : Util.getInstanceClassIdsFromPath((DefaultMutableTreeNode) (path.getLastPathComponent()))) {
+                    instanceFilter.addInstanceClassId(id);
+                }
+            }
+            insTableModel.fireTableDataChanged();
+        }
+    }//GEN-LAST:event_jTreeInstanceClassValueChanged
 
     public void stopJobsTimer() {
         if (jobsTimer != null) {
@@ -2091,7 +2051,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JButton btnComputeResultProperties;
     private javax.swing.JButton btnCreateExperiment;
     private javax.swing.JButton btnDeselectAllInstances;
-    private javax.swing.JButton btnDeselectAllInstnaceClasses;
     private javax.swing.JButton btnDeselectAllSolvers;
     private javax.swing.JButton btnDiscardExperiment;
     private javax.swing.JButton btnEditExperiment;
@@ -2110,7 +2069,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JButton btnReverseSolverSelection;
     private javax.swing.JButton btnSaveInstances;
     private javax.swing.JButton btnSaveSolverConfigurations;
-    private javax.swing.JButton btnSelectAllInstanceClasses;
     private javax.swing.JButton btnSelectAllInstances;
     private javax.swing.JButton btnSelectAllSolvers;
     private javax.swing.JButton btnSelectQueue;
@@ -2134,15 +2092,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
+    private javax.swing.JTree jTreeInstanceClass;
     private javax.swing.JLabel lblCurNumRuns;
     private javax.swing.JLabel lblETA;
     private javax.swing.JLabel lblFilterStatus;
@@ -2158,7 +2115,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JPanel pnlEditExperiment;
     private javax.swing.JScrollPane scrollPaneExperimentsTable;
     private javax.swing.JTable tableExperiments;
-    private javax.swing.JTable tableInstanceClasses;
     private javax.swing.JTable tableInstances;
     public javax.swing.JTable tableJobs;
     private javax.swing.JTable tableSolvers;
@@ -2414,7 +2370,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Action
     public void btnSelectedInstances() {
-        btnSelectAllInstanceClassesActionPerformed(null);
         LinkedList<SortKey> sortKeys = new LinkedList<SortKey>();
         sortKeys.add(new SortKey(InstanceTableModel.COL_SELECTED, SortOrder.DESCENDING));
         tableInstances.getRowSorter().setSortKeys(sortKeys);

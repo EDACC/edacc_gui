@@ -66,6 +66,7 @@ import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  * Experiment design more controller class, handles requests by the GUI
@@ -114,11 +115,10 @@ public class ExperimentController {
         v.addAll(ExperimentDAO.getAll());
         experiments = v;
         main.expTableModel.setExperiments(experiments);
-        Vector<InstanceClass> vic = new Vector<InstanceClass>();
         try {
-            vic.addAll(InstanceClassDAO.getAll());
-
-            main.instanceClassModel.setClasses(vic);
+            // todo load instance classes
+            DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getAllAsTree();
+            main.instanceClassTreeModel.setRoot(root);
             ArrayList<Instance> instances = new ArrayList<Instance>();
             instances.addAll(InstanceDAO.getAll());
             main.insTableModel.setInstances(instances);
@@ -875,22 +875,6 @@ public class ExperimentController {
         } finally {
             DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
         }
-    }
-
-    public void selectAllInstanceClasses() {
-        main.instanceClassModel.beginUpdate();
-        for (int i = 0; i < main.instanceClassModel.getRowCount(); i++) {
-            main.instanceClassModel.setInstanceClassSelected(i);
-        }
-        main.instanceClassModel.endUpdate();
-    }
-
-    public void deselectAllInstanceClasses() {
-        main.instanceClassModel.beginUpdate();
-        for (int i = 0; i < main.instanceClassModel.getRowCount(); i++) {
-            main.instanceClassModel.setInstanceClassDeselected(i);
-        }
-        main.instanceClassModel.endUpdate();
     }
 
     private void addConfigurationFile(ZipOutputStream zos, Experiment activeExperiment, GridQueue activeQueue) throws IOException {

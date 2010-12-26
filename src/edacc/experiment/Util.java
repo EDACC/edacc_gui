@@ -1,5 +1,6 @@
 package edacc.experiment;
 
+import edacc.model.InstanceClass;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstance;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import javax.swing.JTable;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  * Static class with some useful(!) utility methods.
@@ -156,6 +158,15 @@ public class Util {
                 res += text.charAt(i);
             }
         }
+        return res;
+    }
+
+    public static ArrayList<Integer> getInstanceClassIdsFromPath(DefaultMutableTreeNode root) {
+        ArrayList<Integer> res = new ArrayList<Integer>();
+        for (int i = 0; i < root.getChildCount(); i++) {
+            res.addAll(getInstanceClassIdsFromPath((DefaultMutableTreeNode) root.getChildAt(i)));
+        }
+        res.add(((InstanceClass) root.getUserObject()).getId());
         return res;
     }
 }
