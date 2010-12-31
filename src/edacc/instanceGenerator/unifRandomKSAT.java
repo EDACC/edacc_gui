@@ -156,10 +156,13 @@ public class unifRandomKSAT {
      * @return a String representing the formula
      */
     public String toDIMACS() {
-        String output;
+     int literalLength=String.valueOf(this.numVariables).length()+2;//literal+sign+space
+        int dimacsLength=this.comment.length()+this.parameterLine.length()+
+                this.numClauses*(this.clauseLength*literalLength+2);
+        StringBuilder output=new StringBuilder();
         int i = 1;
-        output = this.comment;
-        output += this.parameterLine;
+        output.append(comment);
+        output.append(parameterLine);
         HashSet<Integer> clause;
         // Vector<HashSet<Integer>> f
         // =(Vector<HashSet<Integer>>)formula.values();
@@ -167,18 +170,18 @@ public class unifRandomKSAT {
             // output+=i+" : ";
             clause = (HashSet<Integer>) itrC.next();
             for (Iterator<Integer> itrL = clause.iterator(); itrL.hasNext();) {
-                output += itrL.next();
+                output.append(itrL.next());
                 if (itrL.hasNext()) {
-                    output += " ";
+                    output.append(" ");
                 } else {
-                    output += " 0\n";
+                    output.append(" 0\n");
                 }
             }
         }
-        return output;
+        return output.toString();
     }
 
-    /**
+     /**
      *
      * @return a String with the suggested file name for this formula as used in
      *         the SAT Competiton
