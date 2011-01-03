@@ -11,12 +11,15 @@
 package edacc;
 
 import edacc.model.InstanceClass;
+import edacc.model.InstanceClassAlreadyInDBException;
 import edacc.model.InstanceClassDAO;
 import edacc.model.NoConnectionToDBException;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import javax.swing.JOptionPane;
 import edacc.model.instanceGeneratorUnifKCNFController;
 import java.sql.SQLException;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.tree.DefaultTreeModel;
@@ -31,6 +34,7 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
 
     /** Creates new form EDACCInstanceGeneratorUnifKCNF */
     public EDACCInstanceGeneratorUnifKCNF(java.awt.Frame parent, boolean modal) {
+
         super(parent, modal);
         this.setTitle("Genrate uniform random k-SAT Formulas");
         this.setResizable(false);
@@ -41,6 +45,9 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
         this.jLabel3.setEnabled(false);
         this.tfVStop.setEnabled(false);
         this.tfNV.setText("1");
+        this.lbParentClass.setText("");
+
+
 
         //Nur zahlen möglich und nur positive
     }
@@ -59,7 +66,7 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
         tfVStep = new javax.swing.JTextField();
         tfVStop = new javax.swing.JTextField();
         btnCancel = new javax.swing.JButton();
-        tfR = new javax.swing.JFormattedTextField(DecimalFormat.getNumberInstance());
+        tfR = new javax.swing.JFormattedTextField(DecimalFormat.getNumberInstance(Locale.ENGLISH));
         btnGenerate = new javax.swing.JButton();
         cbGC = new javax.swing.JCheckBox();
         jLabel9 = new javax.swing.JLabel();
@@ -176,7 +183,9 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
             }
         });
 
+        lbParentClass.setFont(resourceMap.getFont("lbParentClass.font")); // NOI18N
         lbParentClass.setText(resourceMap.getString("lbParentClass.text")); // NOI18N
+        lbParentClass.setFocusable(false);
         lbParentClass.setName("lbParentClass"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -223,8 +232,8 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btSelParClass)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lbParentClass, javax.swing.GroupLayout.DEFAULT_SIZE, 154, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addComponent(lbParentClass, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnGenerate)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 141, Short.MAX_VALUE)
@@ -350,25 +359,53 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
                     JOptionPane.WARNING_MESSAGE);
         } else {
             //hier müssen alle parse-fehler noch abgefangen werden!!!!
-            k = Integer.parseInt(this.tfK.getText());
-            n = Integer.parseInt(this.tfVStart.getText());
-            num = Integer.parseInt(this.tfNV.getText());
-            r = Double.parseDouble(this.tfR.getText());
-            series = this.cbSeries.isSelected();
-            if (series) {
-                step = Integer.parseInt(this.tfVStep.getText());
-                stop = Integer.parseInt(this.tfVStop.getText());
-            } else {
-                step = n;
-                stop = 1;
-            }
-            genClass = this.cbGC.isSelected();
-            //das muss noch in einer progressbar rein!!!
-            //call Controller to generate and add instances
-            controller.generate(k, r, n, series, step, stop, num, genClass,this.parentClass);
+            try {
+                k = Integer.parseInt(this.tfK.getText());
+                n = Integer.parseInt(this.tfVStart.getText());
+                num = Integer.parseInt(this.tfNV.getText());
+                //r = Double.parseDouble(this.tfR.getText());
+                try {
+                    r = DecimalFormat.getNumberInstance(Locale.ENGLISH).parse(tfR.getText()).doubleValue();
+                    series = this.cbSeries.isSelected();
+                    if (series) {
+                        step = Integer.parseInt(this.tfVStep.getText());
+                        stop = Integer.parseInt(this.tfVStop.getText());
+                    } else {
+                        step = n;
+                        stop = 1;
+                    }
+                    genClass = this.cbGC.isSelected();
+                    //das muss noch in einer progressbar rein!!!
+                    //call Controller to generate and add instances
+                    try {
+                        controller.generate(k, r, n, series, step, stop, num, genClass, this.parentClass);
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(this,
+                                "There is a Problem with the database: " + ex.getMessage(),
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    } catch (InstanceClassAlreadyInDBException ex) {
+                        JOptionPane.showMessageDialog(this,
+                                "Instance class is already in the system.",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
 
-            
-            this.setVisible(false);
+                    this.setVisible(false);
+                } catch (ParseException ex) {
+                    Logger.getLogger(EDACCInstanceGeneratorUnifKCNF.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(this.getParent(),
+                            "Values specified for ratio is invalid!",
+                            "Invalid values specified!",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this.getParent(),
+                        "Values specified are invalid!" + ex.getMessage(),
+                        "Invalid values specified!",
+                        JOptionPane.ERROR_MESSAGE);
+
+            }
         }
     }//GEN-LAST:event_btnGenerateActionPerformed
 
@@ -460,14 +497,16 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
     private void btSelParClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSelParClassActionPerformed
         try {
             EDACCSelectParentInstanceClassDialog selectParent = new EDACCSelectParentInstanceClassDialog(EDACCApp.getApplication().getMainFrame(), true, new DefaultTreeModel(InstanceClassDAO.getAllAsTree()));
-
-
             selectParent.setLocationRelativeTo(this);
             selectParent.setAlwaysOnTop(true);
             selectParent.initialize();
             selectParent.setVisible(true);
-            parentClass = selectParent.getInstanceClassParent();
-            this.lbParentClass.setText(parentClass.getName());
+            if (selectParent.getInstanceClassParent() != null) {
+                parentClass = selectParent.getInstanceClassParent();
+                this.lbParentClass.setText(parentClass.getName());
+            } else {
+                this.lbParentClass.setText("");
+            }
 
         } catch (NoConnectionToDBException ex) {
             Logger.getLogger(EDACCCreateEditInstanceClassDialog.class.getName()).log(Level.SEVERE, null, ex);

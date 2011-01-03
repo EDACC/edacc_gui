@@ -73,8 +73,8 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="btSelParClass" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="lbParentClass" pref="154" max="32767" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="lbParentClass" pref="142" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="btnGenerate" min="-2" max="-2" attributes="0"/>
@@ -188,7 +188,7 @@
         <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tfRKeyReleased"/>
       </Events>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JFormattedTextField(DecimalFormat.getNumberInstance())"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JFormattedTextField(DecimalFormat.getNumberInstance(Locale.ENGLISH))"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JButton" name="btnGenerate">
@@ -278,7 +278,9 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lbParentClass">
       <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="lbParentClass.font"/>
         <Property name="text" type="java.lang.String" resourceKey="lbParentClass.text"/>
+        <Property name="focusable" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="lbParentClass" noResource="true"/>
       </Properties>
     </Component>

@@ -51,7 +51,8 @@ public class unifRandomKSAT {
         this.seed = this.generateSeed();
         random = new Random(this.seed);
 
-        this.comment = "c uniform random k-SAT generated instance with: \n";
+        this.comment = "c Uniform Random k-SAT Generator from EDACC \n";
+        this.comment += "c uniform random k-SAT generated instance with: \n";
         this.comment += "c seed: " + this.seed + " \n";
         this.comment += "c number variables: " + this.numVariables + " \n";
         this.comment += "c number clauses: " + this.numClauses + " \n";
