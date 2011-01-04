@@ -483,5 +483,6 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         for (int i = CONST_VISIBLE.length; i < visible.length; i++) {
             visible[i] = true;
         }
+        fireTableStructureChanged();
     }
 }
