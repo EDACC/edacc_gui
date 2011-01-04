@@ -928,6 +928,84 @@ public class ManageDBInstances implements Observer{
         }
     }
 
+    public void exportInstanceClass(DefaultMutableTreeNode selected, String path, Tasks task) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException {
+        task.setOperationName("Exporting instance classes");
+        InstanceClass root = (InstanceClass) selected.getUserObject();
+        Vector<InstanceClass> tmp = new Vector<InstanceClass>();
+        Vector<Instance> md5Error = new Vector<Instance>();
+        tmp.add(root);
+        Vector<Instance> toExport = new Vector<Instance>(InstanceDAO.getAllByInstanceClasses(tmp));
+        
+        File dir = new File(path + System.getProperty("file.separator") + root.getName());
+        if (!dir.isDirectory()) 
+            dir.mkdir();
+
+        //Creates all files of the Instances related to the the InstanceClass
+        for(int i = 0; i < toExport.size(); i++){
+           task.setStatus(i + " of " + toExport.size() + " instances from the class " + root.getName());
+           task.setTaskProgress((float)i/(float)toExport.size());
+            File f = new File(dir.getAbsolutePath() + System.getProperty("file.separator") +
+                    toExport.get(i).getName());
+            if(!f.exists())
+                InstanceDAO.getBinaryFileOfInstance(toExport.get(i), f);
+            String md5File = Util.calculateMD5(f);
+            // If the file is corrupted delete it
+            if (!md5File.equals(toExport.get(i).getMd5())){
+                md5Error.add(toExport.get(i));
+                f.delete();
+            }
+        }
+         task.setStatus(toExport.size() + " of " + toExport.size() + " instances from the class " + root.getName());
+         task.setTaskProgress(1);
+        //Creates all files of the Instances related to the the childs of the InstanceClass
+        for(int i = 0; i < selected.getChildCount(); i++){
+            md5Error.addAll(exportInstanceClasses( (DefaultMutableTreeNode) selected.getChildAt(i), dir.getAbsolutePath(), task));
+        }
+
+         if(!md5Error.isEmpty()){
+            InstanceTableModel tableModel = new InstanceTableModel();
+            tableModel.addInstances(md5Error);
+            EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(), "Following instances couldn't be written. Because the MD5checksum wasn't valid.", new JTable(tableModel));
+        }
+    }
+
+    private Vector<Instance> exportInstanceClasses(DefaultMutableTreeNode selected, String path, Tasks task) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException{
+        task.setOperationName("Exporting instance classes");
+        InstanceClass root = (InstanceClass) selected.getUserObject();
+        Vector<InstanceClass> tmp = new Vector<InstanceClass>();
+        Vector<Instance> md5Error = new Vector<Instance>();
+        tmp.add(root);
+        Vector<Instance> toExport = new Vector<Instance>(InstanceDAO.getAllByInstanceClasses(tmp));
+
+        File dir = new File(path + System.getProperty("file.separator") + root.getName());
+        if (!dir.isDirectory())
+            dir.mkdir();
+
+        //Creates all files of the Instances related to the the InstanceClass
+        for(int i = 0; i < toExport.size(); i++){
+            task.setStatus(i + " of " + toExport.size() + " instances from the class " + root.getName());
+            task.setTaskProgress((float)i/(float)toExport.size());
+            File f = new File(dir.getAbsolutePath() + System.getProperty("file.separator") +
+                    toExport.get(i).getName());
+            if(!f.exists())
+                InstanceDAO.getBinaryFileOfInstance(toExport.get(i), f);
+            String md5File = Util.calculateMD5(f);
+            // If the file is corrupted delete it
+            if (!md5File.equals(toExport.get(i).getMd5())){
+                md5Error.add(toExport.get(i));
+                f.delete();
+            }
+        }
+
+         task.setStatus(toExport.size() + " of " + toExport.size() + " instances from the class " + root.getName());
+         task.setTaskProgress(1);
+        //Creates all files of the Instances related to the the childs of the InstanceClass
+        for(int i = 0; i < selected.getChildCount(); i++){
+            md5Error.addAll(exportInstanceClasses( (DefaultMutableTreeNode) selected.getChildAt(i), dir.getAbsolutePath(), task));
+        }
+        return md5Error;
+    }
+
 }
 
 
