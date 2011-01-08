@@ -2371,6 +2371,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     @Action
     public void btnSelectedInstances() {
         LinkedList<SortKey> sortKeys = new LinkedList<SortKey>();
+        jTreeInstanceClass.setSelectionInterval(0, jTreeInstanceClass.getRowCount()-1);
         sortKeys.add(new SortKey(InstanceTableModel.COL_SELECTED, SortOrder.DESCENDING));
         tableInstances.getRowSorter().setSortKeys(sortKeys);
     }
