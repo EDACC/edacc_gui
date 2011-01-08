@@ -332,7 +332,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public void reinitializeInstances() {
         instanceFilter.clearFilters();
         jTreeInstanceClass.setSelectionPath(null);
-        for (int i = jTreeInstanceClass.getRowCount()-1; i >= 0; i--) {
+        for (int i = jTreeInstanceClass.getRowCount() - 1; i >= 0; i--) {
             jTreeInstanceClass.collapseRow(i);
         }
         lblFilterStatus.setText("");
@@ -1804,7 +1804,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     @Action
     public void btnCreateExperiment() {
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        EDACCExperimentModeNewExp dialogNewExp = new EDACCExperimentModeNewExp(mainFrame, true);
+        EDACCExperimentModeNewExp dialogNewExp = new EDACCExperimentModeNewExp(mainFrame, true, expController);
         dialogNewExp.setLocationRelativeTo(mainFrame);
         try {
             while (true) {
@@ -1821,9 +1821,25 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
             }
             if (!dialogNewExp.canceled) {
-                expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc);
-                tableExperiments.getSelectionModel().setSelectionInterval(tableExperiments.getRowCount() - 1, tableExperiments.getRowCount() - 1);
-                tableExperiments.requestFocusInWindow();
+                final Experiment newExp = expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc);
+                final Experiment importFrom = dialogNewExp.getSelectedExperiment();
+                Tasks.startTask(new TaskRunnable() {
+
+                    @Override
+                    public void run(Tasks task) {
+                        try {
+                            if (importFrom != null) {
+                                expController.importDataFromExperimentToExperiment(importFrom, newExp);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            // TODO: ERROR
+                        } finally {
+                            tableExperiments.getSelectionModel().setSelectionInterval(tableExperiments.getRowCount() - 1, tableExperiments.getRowCount() - 1);
+                            tableExperiments.requestFocusInWindow();
+                        }
+                    }
+                });
             }
         } catch (SQLException ex) {
             createDatabaseErrorMessage(ex);
@@ -2325,7 +2341,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
 
         Experiment exp = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
-        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription());
+        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription(), expController);
         dialogEditExp.setLocationRelativeTo(mainFrame);
         try {
             while (true) {
@@ -2371,7 +2387,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     @Action
     public void btnSelectedInstances() {
         LinkedList<SortKey> sortKeys = new LinkedList<SortKey>();
-        jTreeInstanceClass.setSelectionInterval(0, jTreeInstanceClass.getRowCount()-1);
+        jTreeInstanceClass.setSelectionInterval(0, jTreeInstanceClass.getRowCount() - 1);
         sortKeys.add(new SortKey(InstanceTableModel.COL_SELECTED, SortOrder.DESCENDING));
         tableInstances.getRowSorter().setSortKeys(sortKeys);
     }

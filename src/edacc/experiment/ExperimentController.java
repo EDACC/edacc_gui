@@ -21,7 +21,6 @@ import edacc.model.ExperimentResultStatus;
 import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
 import edacc.model.Instance;
-import edacc.model.InstanceClass;
 import edacc.model.InstanceClassDAO;
 import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.InstanceDAO;
@@ -205,10 +204,11 @@ public class ExperimentController {
      * @throws PropertyTypeNotExistException
      * @throws ComputationMethodDoesNotExistException
      */
-    public void createExperiment(String name, String description) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
+    public Experiment createExperiment(String name, String description) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         java.util.Date d = new java.util.Date();
-        ExperimentDAO.createExperiment(name, new Date(d.getTime()), description);
+        Experiment res = ExperimentDAO.createExperiment(name, new Date(d.getTime()), description);
         initialize();
+        return res;
     }
 
     /**
@@ -1104,6 +1104,10 @@ public class ExperimentController {
         this.loadJobs();
     }
 
+    public ArrayList<Experiment> getExperiments() {
+        return experiments;
+    }
+
     /**
      * Returns the experiment with the given name.
      * @param name
@@ -1116,6 +1120,29 @@ public class ExperimentController {
 
     public String getExperimentResultOutput(int type, ExperimentResult er) throws SQLException, NoConnectionToDBException, IOException {
         return ExperimentResultDAO.getOutputText(type, er);
+    }
+
+    public void importDataFromExperimentToExperiment(Experiment from, Experiment to) throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
+        Vector<ExperimentHasInstance> ehi = ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(from.getId());
+        ArrayList<SolverConfiguration> solverConfigs = SolverConfigurationDAO.getSolverConfigurationByExperimentId(from.getId());
+        ArrayList<ExperimentResult> results = ExperimentResultDAO.getAllByExperimentId(from.getId());
+        HashMap<Integer, Integer> mapSolverConfigIds = new HashMap<Integer,Integer>();
+        HashMap<Integer, Integer> mapInstanceIds = new HashMap<Integer, Integer>();
+        ArrayList<SolverConfiguration> newSolverConfigs = new ArrayList<SolverConfiguration>();
+        for (SolverConfiguration sc : solverConfigs) {
+            newSolverConfigs.add(SolverConfigurationDAO.createSolverConfiguration(sc.getSolver_id(), to.getId(), sc.getSeed_group()));
+        }
+        SolverConfigurationDAO.saveAll();
+        for (int i = 0; i < solverConfigs.size(); i++) {
+            mapSolverConfigIds.put(solverConfigs.get(i).getId(), newSolverConfigs.get(i).getId());
+        }
+        for (ExperimentHasInstance e : ehi) {
+            mapInstanceIds.put(e.getId(), ExperimentHasInstanceDAO.createExperimentHasInstance(to.getId(), e.getId()).getId());
+        }
+        
+        for (ExperimentResult res : results) {
+            
+        }
     }
 
     /**

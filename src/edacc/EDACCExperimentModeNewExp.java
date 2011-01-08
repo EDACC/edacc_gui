@@ -5,6 +5,9 @@
  */
 package edacc;
 
+import edacc.experiment.ExperimentController;
+import edacc.experiment.ExperimentTableModel;
+import edacc.model.Experiment;
 import java.awt.event.KeyEvent;
 
 /**
@@ -17,21 +20,43 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     public String expDesc;
     public boolean canceled;
 
+    private ExperimentTableModel model;
+
     /** Creates new form EDACCExperimentModeNewExp */
-    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal) {
+    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, ExperimentController expController) {
         super(parent, modal);
         initComponents();
+        model = new ExperimentTableModel();
+        model.setExperiments(expController.getExperiments());
+        tblExperiments.setModel(model);
+        tblExperiments.setVisible(false);
+
         this.txtExperimentName.requestFocus();
         this.getRootPane().setDefaultButton(this.btnCreateExperiment);
     }
 
-
-    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, String expName, String expDescription) {
-        this(parent, modal);
+    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, String expName, String expDescription, ExperimentController expController) {
+        this(parent, modal, expController);
         txtExperimentName.setText(expName);
         txtExperimentDescription.setText(expDescription);
         btnCreateExperiment.setText("Save");
+        jScrollPaneExperiments.setVisible(false);
+        lblImport.setVisible(false);
+        chkImport.setVisible(false);
+        this.pack();
         this.setTitle("Edit experiment");
+    }
+
+    /**
+     * Returns the selected experiment to import data from or <code>null</code> if there isn't any.
+     * @return
+     */
+    public Experiment getSelectedExperiment() {
+        int sel;
+        if (chkImport.isSelected() && (sel = tblExperiments.getSelectedRow()) != -1) {
+            return model.getExperimentAt(tblExperiments.convertRowIndexToModel(sel));
+        }
+        return null;
     }
 
     /** This method is called from within the constructor to
@@ -50,6 +75,10 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         txtExperimentDescription = new javax.swing.JTextArea();
         btnCreateExperiment = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
+        jScrollPaneExperiments = new javax.swing.JScrollPane();
+        tblExperiments = new javax.swing.JTable();
+        lblImport = new javax.swing.JLabel();
+        chkImport = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentModeNewExp.class);
@@ -114,6 +143,33 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             }
         });
 
+        jScrollPaneExperiments.setName("jScrollPaneExperiments"); // NOI18N
+
+        tblExperiments.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tblExperiments.setName("tblExperiments"); // NOI18N
+        jScrollPaneExperiments.setViewportView(tblExperiments);
+
+        lblImport.setText(resourceMap.getString("lblImport.text")); // NOI18N
+        lblImport.setName("lblImport"); // NOI18N
+
+        chkImport.setText(resourceMap.getString("chkImport.text")); // NOI18N
+        chkImport.setName("chkImport"); // NOI18N
+        chkImport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkImportActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -122,16 +178,20 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lblExperimentDescription, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblExperimentName))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(lblExperimentDescription, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lblExperimentName))
+                            .addComponent(lblImport))
                         .addGap(12, 12, 12)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
-                            .addComponent(txtExperimentName, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
+                            .addComponent(txtExperimentName, javax.swing.GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
+                            .addComponent(chkImport)
+                            .addComponent(jScrollPaneExperiments, javax.swing.GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(btnCreateExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -145,12 +205,19 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblExperimentDescription)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnCreateExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(chkImport)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPaneExperiments, javax.swing.GroupLayout.DEFAULT_SIZE, 154, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnCreateExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(lblImport))
+                .addContainerGap())
         );
 
         pack();
@@ -196,12 +263,20 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             this.btnCancelActionPerformed(null);
         }
     }//GEN-LAST:event_btnCancelKeyPressed
+
+    private void chkImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkImportActionPerformed
+        tblExperiments.setVisible(chkImport.isSelected());
+    }//GEN-LAST:event_chkImportActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnCreateExperiment;
+    private javax.swing.JCheckBox chkImport;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPaneExperiments;
     private javax.swing.JLabel lblExperimentDescription;
     private javax.swing.JLabel lblExperimentName;
+    private javax.swing.JLabel lblImport;
+    private javax.swing.JTable tblExperiments;
     private javax.swing.JTextArea txtExperimentDescription;
     private javax.swing.JTextField txtExperimentName;
     // End of variables declaration//GEN-END:variables
