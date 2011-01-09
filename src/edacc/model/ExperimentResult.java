@@ -38,8 +38,9 @@ public class ExperimentResult extends BaseModel implements Serializable {
     protected ExperimentResult() {
     }
 
-    protected ExperimentResult(int run, int status, int seed, float resultTime, int SolverConfigId, int ExperimentId, int InstanceId) {
+    protected ExperimentResult(int run, int priority, int status, int seed, float resultTime, int SolverConfigId, int ExperimentId, int InstanceId) {
         this.run = run;
+        this.priority = priority;
         this.status = ExperimentResultStatus.getExperimentResultStatus(status);
         this.seed = seed;
         this.resultTime = resultTime;

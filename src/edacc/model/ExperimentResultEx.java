@@ -11,8 +11,8 @@ public class ExperimentResultEx extends ExperimentResult {
     private byte[] watcherOutput, launcherOutput, verifierOutput, solverOutput;
     private Timestamp startTime;
 
-    protected ExperimentResultEx(int run, int status, ExperimentResultResultCode resultCode, int seed, float resultTime, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
-        super(run, status, seed, resultTime, SolverConfigId, ExperimentId, InstanceId);
+    protected ExperimentResultEx(int run, int priority, int status, ExperimentResultResultCode resultCode, int seed, float resultTime, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
+        super(run, priority, status, seed, resultTime, SolverConfigId, ExperimentId, InstanceId);
         this.resultCode = resultCode;
         this.startTime = startTime;
         this.solverOutput = solverOutput;

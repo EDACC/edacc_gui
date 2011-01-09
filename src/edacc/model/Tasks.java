@@ -32,6 +32,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
      * @param parameters The parameters which sould be passed to this method as a array of Object
      * @param target The target object in which this method is declared and set as public.
      * @param view The corresponding view which implements EDACCTaskEvents to have control over this task.
+     * @deprecated use <code>startTask(TaskRunnable runnable, boolean withTaskView)</code> instead
      */
     public static void startTask(String methodName, Class[] signature, Object[] parameters, Object target, TaskEvents view, boolean withTaskView) {
         if (withTaskView && taskView != null) {
@@ -68,6 +69,15 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
         }
     }
 
+    /**
+     *
+     * @param methodName
+     * @param signature
+     * @param parameters
+     * @param target
+     * @param view
+     * @deprecated use <code>startTask(TaskRunnable runnable)</code> instead
+     */
     public static void startTask(String methodName, Class[] signature, Object[] parameters, Object target, TaskEvents view) {
         startTask(methodName, signature, parameters, target, view, true);
     }
@@ -78,11 +88,20 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
      * @param methodName
      * @param target
      * @param view
+     * @deprecated use <code>startTask(TaskRunnable runnable)</code> instead
      */
     public static void startTask(String methodName, Object target, TaskEvents view) {
         startTask(methodName, target, view, true);
     }
 
+    /**
+     *
+     * @param methodName
+     * @param target
+     * @param view
+     * @param withTaskView
+     * @deprecated use <code>startTask(TaskRunnable runnable, boolean withTaskView)</code> instead
+     */
     public static void startTask(String methodName, Object target, TaskEvents view, boolean withTaskView) {
         startTask(methodName, new Class[]{}, new Object[]{}, target, view, withTaskView);
     }

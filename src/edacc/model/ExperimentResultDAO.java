@@ -12,15 +12,18 @@ import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class ExperimentResultDAO {
 
     protected static PreparedStatement curSt = null;
     protected static final String table = "ExperimentResults";
     protected static final String insertQuery = "INSERT INTO " + table + " (SolverConfig_idSolverConfig, Experiment_idExperiment,"
-            + "Instances_idInstance, run, status, seed, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN) VALUES (?,?,?,?,?,?,?,?,?,?)";
+            + "Instances_idInstance, run, status, seed, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN, solverOutput, launcherOutput, watcherOutput, verifierOutput, startTime, priority) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idJob=?";
     protected static final String selectQuery = "SELECT SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance, "
             + "idJob, run, seed, status, resultTime, resultCode, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN, "
@@ -29,8 +32,14 @@ public class ExperimentResultDAO {
             + "priority "
             + "FROM " + table + " ";
 
-    public static ExperimentResult createExperimentResult(int run, int status, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId) throws SQLException {
-        ExperimentResult r = new ExperimentResult(run, status, seed, time, SolverConfigId, ExperimentId, InstanceId);
+    public static ExperimentResult createExperimentResult(int run, int priority, int status, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId) throws SQLException {
+        ExperimentResult r = new ExperimentResult(run, priority, status, seed, time, SolverConfigId, ExperimentId, InstanceId);
+        r.setNew();
+        return r;
+    }
+
+    public static ExperimentResultEx createExperimentResult(int run, int priority, int status, ExperimentResultResultCode resultCode, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
+        ExperimentResultEx r = new ExperimentResultEx(run, priority, status, resultCode, seed, time, SolverConfigId, ExperimentId, InstanceId, startTime, solverOutput, launcherOutput, watcherOutput, verifierOutput);
         r.setNew();
         return r;
     }
@@ -57,6 +66,21 @@ public class ExperimentResultDAO {
                 st.setString(8, r.getLauncherOutputFilename());
                 st.setString(9, r.getWatcherOutputFilename());
                 st.setString(10, r.getVerifierOutputFilename());
+                if (r instanceof ExperimentResultEx) {
+                    ExperimentResultEx rx = (ExperimentResultEx) r;
+                    st.setBytes(11, rx.getSolverOutput());
+                    st.setBytes(12, rx.getLauncherOutput());
+                    st.setBytes(13, rx.getWatcherOutput());
+                    st.setBytes(14, rx.getVerifierOutput());
+                    st.setTimestamp(15, rx.getStartTime());
+                } else {
+                    st.setNull(11, java.sql.Types.BLOB);
+                    st.setNull(12, java.sql.Types.BLOB);
+                    st.setNull(13, java.sql.Types.BLOB);
+                    st.setNull(14, java.sql.Types.BLOB);
+                    st.setNull(15, java.sql.Types.TIMESTAMP);
+                }
+                st.setInt(16, r.getPriority());
                 st.addBatch();
 
                 r.setSaved();
@@ -370,6 +394,49 @@ public class ExperimentResultDAO {
         st.close();
         return v;
     }
+
+    public static ArrayList<ExperimentResultEx> getExtendedExperimentResultsFromExperimentResults(List<ExperimentResult> results) throws NoConnectionToDBException, SQLException {
+        ArrayList<ExperimentResultEx> resx = new ArrayList<ExperimentResultEx>();
+        if (results.isEmpty()) {
+            return resx;
+        }
+        HashMap<Integer, ExperimentResult> resultMap = new HashMap<Integer, ExperimentResult>();
+        String constTable = "(";
+        for (ExperimentResult er : results) {
+            resultMap.put(er.getId(), er);
+            constTable += ""+er.getId()+",";
+        }
+        constTable = constTable.substring(0, constTable.length()-1) + ")";
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+        ResultSet rs = st.executeQuery("SELECT idJob, startTime, solverOutput, launcherOutput, watcherOutput, verifierOutput FROM " + table + " WHERE idJob IN " + constTable);
+        while (rs.next()) {
+            Timestamp startTime = null;
+            try {
+                startTime = rs.getTimestamp(2);
+            } catch (Exception e) {
+                // fails if the db DateTime objekt could not be converted to a Timestamp (illegal date.)
+            }
+            ExperimentResult er = resultMap.get(rs.getInt(1));
+            ExperimentResultEx erx = createExperimentResult(er.getRun(), er.getPriority(), er.getStatus().getValue(),
+                    er.getResultCode(), er.getSeed(), er.getResultTime(), er.getSolverConfigId(), er.getExperimentId(),
+                    er.getInstanceId(),
+                    startTime,
+                    rs.getBytes(3),
+                    rs.getBytes(4),
+                    rs.getBytes(5),
+                    rs.getBytes(6));
+            // set other fields
+            erx.setResultTime(er.getResultTime());
+            erx.setSolverExitCode(er.getSolverExitCode());
+            erx.setVerifierExitCode(er.getVerifierExitCode());
+            erx.setWatcherExitCode(er.getWatcherExitCode());
+            resx.add(erx);
+        }
+        rs.close();
+        st.close();
+        return resx;
+    }
+
 
     /**
      * Returns all runs for an experiment specified by id
