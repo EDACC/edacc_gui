@@ -51,6 +51,8 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         lblPassword = new javax.swing.JLabel();
         chkUseSSL = new javax.swing.JCheckBox();
         lblPassword1 = new javax.swing.JLabel();
+        chkCompress = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCDatabaseSettingsView.class);
@@ -178,6 +180,12 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         lblPassword1.setName("lblPassword1"); // NOI18N
         lblPassword1.setPreferredSize(new java.awt.Dimension(100, 17));
 
+        chkCompress.setText(resourceMap.getString("chkCompress.text")); // NOI18N
+        chkCompress.setName("chkCompress"); // NOI18N
+
+        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
+        jLabel1.setName("jLabel1"); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -189,9 +197,11 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
                     .addComponent(lblDatabase, 0, 0, Short.MAX_VALUE)
                     .addComponent(lblUsername, 0, 0, Short.MAX_VALUE)
                     .addComponent(lblPassword, 0, 0, Short.MAX_VALUE)
-                    .addComponent(lblPassword1, 0, 0, Short.MAX_VALUE))
+                    .addComponent(lblPassword1, 0, 0, Short.MAX_VALUE)
+                    .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkCompress)
                     .addComponent(chkUseSSL)
                     .addComponent(txtUsername, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
                     .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
@@ -229,6 +239,10 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkUseSSL)
                     .addComponent(lblPassword1, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCompress)
+                    .addComponent(jLabel1))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -274,7 +288,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
             @Override
             public void run(Tasks task) {
                 try {
-                    DatabaseConnector.getInstance().connect(txtHostname.getText(), Integer.parseInt(txtPort.getText()), txtUsername.getText(), txtDatabase.getText(), txtPassword.getText(), chkUseSSL.isSelected());
+                    DatabaseConnector.getInstance().connect(txtHostname.getText(), Integer.parseInt(txtPort.getText()), txtUsername.getText(), txtDatabase.getText(), txtPassword.getText(), chkUseSSL.isSelected(), chkCompress.isSelected());
                     EDACCDatabaseSettingsView.this.setVisible(false);
                 } catch (ClassNotFoundException e) {
                     JOptionPane.showMessageDialog(EDACCDatabaseSettingsView.this, "Couldn't find the MySQL jdbc driver Connector-J. Make sure it's in your Java class path", "Database driver not found", JOptionPane.ERROR_MESSAGE);
@@ -370,7 +384,9 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnConnect;
+    private javax.swing.JCheckBox chkCompress;
     private javax.swing.JCheckBox chkUseSSL;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblDatabase;
     private javax.swing.JLabel lblHostname;

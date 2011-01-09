@@ -104,9 +104,11 @@
                       <Component id="lblUsername" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
                       <Component id="lblPassword" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
                       <Component id="lblPassword1" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
+                      <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="chkCompress" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="chkUseSSL" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="txtUsername" alignment="0" pref="327" max="32767" attributes="0"/>
                       <Component id="txtPassword" alignment="0" pref="327" max="32767" attributes="0"/>
@@ -152,6 +154,11 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="chkUseSSL" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="lblPassword1" alignment="3" min="-2" pref="22" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="chkCompress" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -298,6 +305,18 @@
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[100, 17]"/>
             </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="chkCompress">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="chkCompress.text"/>
+            <Property name="name" type="java.lang.String" value="chkCompress" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel1">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jLabel1.text"/>
+            <Property name="name" type="java.lang.String" value="jLabel1" noResource="true"/>
           </Properties>
         </Component>
       </SubComponents>
