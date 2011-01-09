@@ -23,7 +23,7 @@ public class ExperimentResultDAO {
     protected static PreparedStatement curSt = null;
     protected static final String table = "ExperimentResults";
     protected static final String insertQuery = "INSERT INTO " + table + " (SolverConfig_idSolverConfig, Experiment_idExperiment,"
-            + "Instances_idInstance, run, status, seed, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN, solverOutput, launcherOutput, watcherOutput, verifierOutput, startTime, priority) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            + "Instances_idInstance, run, status, seed, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN, solverOutput, launcherOutput, watcherOutput, verifierOutput, startTime, priority, resultTime, computeQueue) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idJob=?";
     protected static final String selectQuery = "SELECT SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance, "
             + "idJob, run, seed, status, resultTime, resultCode, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN, "
@@ -32,14 +32,14 @@ public class ExperimentResultDAO {
             + "priority "
             + "FROM " + table + " ";
 
-    public static ExperimentResult createExperimentResult(int run, int priority, int status, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId) throws SQLException {
-        ExperimentResult r = new ExperimentResult(run, priority, status, seed, time, SolverConfigId, ExperimentId, InstanceId);
+    public static ExperimentResult createExperimentResult(int run, int priority, int computeQueue, int status, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId) throws SQLException {
+        ExperimentResult r = new ExperimentResult(run, priority, computeQueue, status, seed, time, SolverConfigId, ExperimentId, InstanceId);
         r.setNew();
         return r;
     }
 
-    public static ExperimentResultEx createExperimentResult(int run, int priority, int status, ExperimentResultResultCode resultCode, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
-        ExperimentResultEx r = new ExperimentResultEx(run, priority, status, resultCode, seed, time, SolverConfigId, ExperimentId, InstanceId, startTime, solverOutput, launcherOutput, watcherOutput, verifierOutput);
+    public static ExperimentResultEx createExperimentResult(int run, int priority, int computeQueue, int status, ExperimentResultResultCode resultCode, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
+        ExperimentResultEx r = new ExperimentResultEx(run, priority, computeQueue, status, resultCode, seed, time, SolverConfigId, ExperimentId, InstanceId, startTime, solverOutput, launcherOutput, watcherOutput, verifierOutput);
         r.setNew();
         return r;
     }
@@ -81,6 +81,8 @@ public class ExperimentResultDAO {
                     st.setNull(15, java.sql.Types.TIMESTAMP);
                 }
                 st.setInt(16, r.getPriority());
+                st.setFloat(17, r.getResultTime());
+                st.setInt(18, r.getComputeQueue());
                 st.addBatch();
 
                 r.setSaved();
@@ -417,7 +419,7 @@ public class ExperimentResultDAO {
                 // fails if the db DateTime objekt could not be converted to a Timestamp (illegal date.)
             }
             ExperimentResult er = resultMap.get(rs.getInt(1));
-            ExperimentResultEx erx = createExperimentResult(er.getRun(), er.getPriority(), er.getStatus().getValue(),
+            ExperimentResultEx erx = createExperimentResult(er.getRun(), er.getPriority(), er.getComputeQueue(), er.getStatus().getValue(),
                     er.getResultCode(), er.getSeed(), er.getResultTime(), er.getSolverConfigId(), er.getExperimentId(),
                     er.getInstanceId(),
                     startTime,
