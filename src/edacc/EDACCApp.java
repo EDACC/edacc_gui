@@ -1,7 +1,6 @@
 /*
  * EDACCApp.java
  */
-
 package edacc;
 
 import java.awt.EventQueue;
@@ -14,12 +13,14 @@ import org.jdesktop.application.SingleFrameApplication;
  * The main class of the application.
  */
 public class EDACCApp extends SingleFrameApplication {
+
     private static ErrorLogger logger;
 
     /**
      * At startup create and show the main frame of the application.
      */
-    @Override protected void startup() {
+    @Override
+    protected void startup() {
         show(new EDACCView(this));
     }
 
@@ -28,7 +29,8 @@ public class EDACCApp extends SingleFrameApplication {
      * Windows shown in our application come fully initialized from the GUI
      * builder, so this additional configuration is not needed.
      */
-    @Override protected void configureWindow(java.awt.Window root) {
+    @Override
+    protected void configureWindow(java.awt.Window root) {
     }
 
     /**
@@ -54,8 +56,7 @@ public class EDACCApp extends SingleFrameApplication {
         String logPath;
         if (f.isDirectory()) {
             logPath = f.getPath() + System.getProperty("file.separator") + "edacc_errors.log";
-        }
-        else {
+        } else {
             logPath = f.getParent() + System.getProperty("file.separator") + "edacc_errors.log";
         }
         logger = new ErrorLogger(logPath);

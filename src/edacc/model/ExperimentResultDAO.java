@@ -23,7 +23,9 @@ public class ExperimentResultDAO {
     protected static PreparedStatement curSt = null;
     protected static final String table = "ExperimentResults";
     protected static final String insertQuery = "INSERT INTO " + table + " (SolverConfig_idSolverConfig, Experiment_idExperiment,"
-            + "Instances_idInstance, run, status, seed, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN, solverOutput, launcherOutput, watcherOutput, verifierOutput, startTime, priority, resultTime, computeQueue) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            + "Instances_idInstance, run, status, seed, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN, "
+            + "solverOutput, launcherOutput, watcherOutput, verifierOutput, startTime, priority, resultTime, computeQueue, resultCode) "
+            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idJob=?";
     protected static final String selectQuery = "SELECT SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance, "
             + "idJob, run, seed, status, resultTime, resultCode, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN, "
@@ -83,6 +85,7 @@ public class ExperimentResultDAO {
                 st.setInt(16, r.getPriority());
                 st.setFloat(17, r.getResultTime());
                 st.setInt(18, r.getComputeQueue());
+                st.setInt(19, (r.getResultCode() == null)?0:r.getResultCode().getValue());
                 st.addBatch();
 
                 r.setSaved();

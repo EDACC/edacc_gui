@@ -46,6 +46,7 @@ public class EDACCView extends FrameView implements Observer {
         super(app);
 
         initComponents();
+        
         UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
         DatabaseConnector.getInstance().addObserver(this);
 
@@ -75,6 +76,8 @@ public class EDACCView extends FrameView implements Observer {
         idleIcon = resourceMap.getIcon("StatusBar.idleIcon");
         statusAnimationLabel.setIcon(idleIcon);
         progressBar.setVisible(false);
+
+        this.getFrame().setIconImage(resourceMap.getImageIcon("edacc.icon").getImage());
 
         // connecting action tasks to status bar via TaskMonitor
         TaskMonitor taskMonitor = new TaskMonitor(getApplication().getContext());
