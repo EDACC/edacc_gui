@@ -1655,6 +1655,17 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 this.instanceGenKCNF.setLocationRelativeTo(mainFrame);
             }
             EDACCApp.getApplication().show(this.instanceGenKCNF);
+        try {
+            manageDBInstances.loadInstanceClasses();
+            //try {
+            /* } catch (NoConnectionToDBException ex) {
+            Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+            Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
+            }*/
+        } catch (SQLException ex) {
+            Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         //try {
 

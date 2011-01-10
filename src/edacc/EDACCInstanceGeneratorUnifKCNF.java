@@ -10,10 +10,12 @@
  */
 package edacc;
 
+import edacc.events.TaskEvents;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassAlreadyInDBException;
 import edacc.model.InstanceClassDAO;
 import edacc.model.NoConnectionToDBException;
+import edacc.model.Tasks;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import javax.swing.JOptionPane;
@@ -28,7 +30,7 @@ import javax.swing.tree.DefaultTreeModel;
  *
  * @author balint
  */
-public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
+public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog implements TaskEvents{
 
     private InstanceClass parentClass;
 
@@ -377,20 +379,9 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
                     genClass = this.cbGC.isSelected();
                     //das muss noch in einer progressbar rein!!!
                     //call Controller to generate and add instances
-                    try {
-                        controller.generate(k, r, n, series, step, stop, num, genClass, this.parentClass);
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(this,
-                                "There is a Problem with the database: " + ex.getMessage(),
-                                "Error",
-                                JOptionPane.ERROR_MESSAGE);
-                    } catch (InstanceClassAlreadyInDBException ex) {
-                        JOptionPane.showMessageDialog(this,
-                                "Instance class is already in the system.",
-                                "Error",
-                                JOptionPane.ERROR_MESSAGE);
-                    }
 
+                    Tasks.startTask("generate", new Class[]{int.class, double.class, int.class, boolean.class, int.class, int.class, int.class, boolean.class, InstanceClass.class, edacc.model.Tasks.class}, new Object[]{k, r, n, series, step, stop, num, genClass, this.parentClass, null}, controller, EDACCInstanceGeneratorUnifKCNF.this);
+                                        
                     this.setVisible(false);
                 } catch (ParseException ex) {
                     Logger.getLogger(EDACCInstanceGeneratorUnifKCNF.class.getName()).log(Level.SEVERE, null, ex);
@@ -554,4 +545,33 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog {
     private javax.swing.JTextField tfVStep;
     private javax.swing.JTextField tfVStop;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void onTaskSuccessful(String methodName, Object result) {
+        
+    }
+
+    @Override
+    public void onTaskStart(String methodName) {
+
+    }
+
+    @Override
+    public void onTaskFailed(String methodName, Throwable e) {
+        if(methodName.equals("generate")){
+            if(e instanceof SQLException) {
+                JOptionPane.showMessageDialog(this,
+                    "There is a Problem with the database: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            }else if(e instanceof InstanceClassAlreadyInDBException) {
+                JOptionPane.showMessageDialog(this,
+                    "Instance class is already in the system.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+
+        }
+
+    }
 }
