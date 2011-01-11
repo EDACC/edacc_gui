@@ -28,7 +28,7 @@ public class instanceGeneratorUnifKCNFController {
      * @param genClass generate instance classes
      */
     public void generate(int k, double r, int n, boolean series, int step, int stop, int num, boolean genClass, InstanceClass parent, Tasks task) throws SQLException, InstanceClassAlreadyInDBException {
-        task.setOperationName("Generate instances");
+       
         unifRandomKSAT instance;
         InstanceDAO instanceController = new InstanceDAO();
         InstanceClass ic;
@@ -39,16 +39,18 @@ public class instanceGeneratorUnifKCNFController {
             step = 1;
         }
         int tmp = stop - n;
-        int steps = 0;
-        if(tmp > 0){
-             steps = Math.round((float)tmp / (float)step);
-        }
-        int count = 0;
+        //int steps = 0;
+        int steps = ((stop-n)/step+1)*num;
+        //if(tmp > 0){
+          //   steps = Math.round((float)tmp / (float)step);
+        //}
+        int count =1;
         for (int i = n; i <= stop; i = i + step) {
-             task.setStatus("Generated " + count + " of " + steps + " instances" );
+             //task.setStatus("Generated " + count + " of " + steps + " instances" );
              task.setTaskProgress((float)count / (float) steps);
             if (genClass) {
                 className = "v" + i;
+                task.setStatus("Generating class: "+ className);
                 ic = InstanceClassDAO.createInstanceClass(className, "Automated generated Class by unif-KSAT Generator", parent, true);
             } else{
                 ic=parent;
@@ -56,10 +58,14 @@ public class instanceGeneratorUnifKCNFController {
             }
             //the input to the generator has to be correct 
             for (int j = 0; j < num; j++) {
-                task.setStatus("Generated " + count + " of " + steps + " instances" );
+                task.setOperationName("Generating uniform random k-SAT instances"+"(" + count + "/" + steps + ")");
+                
                 task.setTaskProgress((float)count / (float) steps);
                 instance = new unifRandomKSAT(k, r, i);
-                System.out.println(className + " : " + instance.suggestedFN());
+                task.setStatus(className+" ("+(j+1)+"/"+num+"):"+ instance.suggestedFN() );
+                //task.setStatus("Generated fdkg jdfkl  df sdfg sdf fdg instance:"+ instance.suggestedFN() );
+                //System.out.println(className + " : " + instance.suggestedFN());
+
                 count++;
                 //add instance to the specified class
                 try {
