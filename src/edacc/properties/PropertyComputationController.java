@@ -89,7 +89,16 @@ public class PropertyComputationController implements Runnable{
         task.setOperationName("Property computation");
         for(int i = 0; i < availableProcessors; i++){
             if(instancePropertyQueue != null){
-                
+                if(i == 0 && instancePropertyQueue.isEmpty()){
+                    task.cancel(true);
+                    lock.lock();
+                    try{
+                        condition.signal();
+                    } finally{
+                        lock.unlock();
+                    }
+                    return;
+                }
                 if(instancePropertyQueue.isEmpty()){
                     jobs = i;
                     return;
@@ -100,6 +109,16 @@ public class PropertyComputationController implements Runnable{
                     Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }else if(resultPropertyQueue != null){
+                if(resultPropertyQueue.isEmpty() && i == 0){
+                    task.cancel(true);
+                    lock.lock();
+                    try{
+                        condition.signal();
+                    } finally{
+                        lock.unlock();
+                    }
+                    return;
+                }
                 try {
                     if (resultPropertyQueue.isEmpty()) {
                         jobs = i;
