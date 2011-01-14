@@ -811,8 +811,8 @@ public class ManageDBInstances implements Observer{
         Lock lock =  new ReentrantLock();
         lock.lock();
         Condition condition = lock.newCondition();
-        PropertyComputationController p = new PropertyComputationController(instances, properties, task, lock);
-        new Thread(p).start();
+        Thread compute = new Thread(new PropertyComputationController(instances, properties, task, lock));
+        compute.start();
         try {
             condition.await();
         } catch ( InterruptedException e ) {
