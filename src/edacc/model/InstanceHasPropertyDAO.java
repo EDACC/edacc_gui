@@ -58,13 +58,13 @@ public class InstanceHasPropertyDAO {
             st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             cache.cache(i);
             i.setSaved();
+            st.setString(3, i.getValue());
         } else {
             st = null;
             return;
         }
         st.setInt(1, i.getInstance().getId());
         st.setInt(2, i.getProperty().getId());
-        st.setString(3, i.getValue());
         st.executeUpdate();
 
         // set id if necessary
@@ -106,8 +106,9 @@ public class InstanceHasPropertyDAO {
     }
 
     private static InstanceHasProperty getInstanceHasInstancePropertyFromResultSet(ResultSet rs) throws SQLException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
+        rs.next();
         Instance i = InstanceDAO.getById(rs.getInt("idInstance"));
-        Property p = PropertyDAO.getByName(rs.getString("idProperty"));
+        Property p = PropertyDAO.getById(rs.getInt("idProperty"));
         String value = rs.getString("value");
         return new InstanceHasProperty(i, p, value);
     }
@@ -187,7 +188,8 @@ public class InstanceHasPropertyDAO {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idInstance, idProperty, value FROM " + table + " WHERE id=?;");
         ps.setInt(1, id);
-        return getInstanceHasInstancePropertyFromResultSet(ps.executeQuery());
+        ResultSet rs = ps.executeQuery();
+        return getInstanceHasInstancePropertyFromResultSet(rs);
     }
 
     public static InstanceHasProperty getByInstanceAndProperty(Instance instance, Property property) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, InstanceHasPropertyNotInDBException {
