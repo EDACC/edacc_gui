@@ -25,6 +25,8 @@ public class InstanceHasPropertyDAO {
     protected static final String table = "Instance_has_Property";
     protected static final String insertQuery = "INSERT INTO " + table + " (idInstance, idProperty, value) VALUES (?, ?, ?)";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idInstance=? AND idProperty=?";
+     private static String updateQuery = "UPDATE " + table + " SET value=? WHERE idInstance=? AND idProperty=?";
+
     private static final ObjectCache<InstanceHasProperty> cache = new ObjectCache<InstanceHasProperty>();
 
     /**
@@ -59,6 +61,13 @@ public class InstanceHasPropertyDAO {
             cache.cache(i);
             i.setSaved();
             st.setString(3, i.getValue());
+        } else if (i.isModified()){
+            st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
+            st.setString(1, i.getValue());
+            st.setInt(2, i.getInstance().getId());
+            st.setInt(3, i.getProperty().getId());
+            st.executeUpdate();
+            return;
         } else {
             st = null;
             return;
