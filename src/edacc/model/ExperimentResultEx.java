@@ -9,12 +9,9 @@ import java.sql.Timestamp;
 public class ExperimentResultEx extends ExperimentResult {
 
     private byte[] watcherOutput, launcherOutput, verifierOutput, solverOutput;
-    private Timestamp startTime;
-
+    
     protected ExperimentResultEx(int run, int priority, int computeQueue, int status, ExperimentResultResultCode resultCode, int seed, float resultTime, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
-        super(run, priority, computeQueue, status, seed, resultTime, SolverConfigId, ExperimentId, InstanceId);
-        this.resultCode = resultCode;
-        this.startTime = startTime;
+        super(run, priority, computeQueue, status, seed, resultCode, resultTime, SolverConfigId, ExperimentId, InstanceId, startTime);
         this.solverOutput = solverOutput;
         this.launcherOutput = launcherOutput;
         this.watcherOutput = watcherOutput;
@@ -60,17 +57,6 @@ public class ExperimentResultEx extends ExperimentResult {
 
     public void setWatcherOutput(byte[] watcherOutput) {
         this.watcherOutput = watcherOutput;
-        if (isSaved()) {
-            setModified();
-        }
-    }
-
-    public Timestamp getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Timestamp startTime) {
-        this.startTime = startTime;
         if (isSaved()) {
             setModified();
         }
