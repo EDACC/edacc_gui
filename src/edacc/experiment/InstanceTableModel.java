@@ -254,7 +254,7 @@ public class InstanceTableModel extends AbstractTableModel {
                 return null;
             }
             InstanceHasProperty ip = instances.get(rowIndex).getPropertyValues().get(properties.get(propertyIdx).getId());
-            if (ip == null) {
+            if (ip == null || ip.getValue() == null) {
                 return null;
             }
             try {
