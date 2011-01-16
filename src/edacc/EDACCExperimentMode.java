@@ -36,6 +36,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
@@ -1814,7 +1815,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     javax.swing.JOptionPane.showMessageDialog(null, "The experiment must have a name.", "Create experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
                 } else if (expController.getExperiment(dialogNewExp.expName) != null) {
                     javax.swing.JOptionPane.showMessageDialog(null, "There exists already an experiment with the same name.", "Create experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
-                } else if (!dialogNewExp.canceled && dialogNewExp.getSelectedExperiment() != null && expController.getActiveExperiment() != null) {
+                } else if (!dialogNewExp.canceled && dialogNewExp.getSelectedExperiments().isEmpty() && expController.getActiveExperiment() != null) {
                     javax.swing.JOptionPane.showMessageDialog(null, "Operation failed. To import data from another experiment you have to unload the current loaded experiment.", "Create experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
                 } else {
                     break;
@@ -1822,17 +1823,20 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
             if (!dialogNewExp.canceled) {
                 final Experiment newExp = expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc);
-                final Experiment importFrom = dialogNewExp.getSelectedExperiment();
+                final ArrayList<Experiment> importFrom = dialogNewExp.getSelectedExperiments();
                 Tasks.startTask(new TaskRunnable() {
 
                     @Override
                     public void run(Tasks task) {
                         try {
-                            if (importFrom != null) {
-                                expController.importDataFromExperimentToExperiment(task, importFrom, newExp);
+                            expController.loadExperiment(newExp, task);
+                            if (!importFrom.isEmpty()) {
+                                boolean[] duplicate = new boolean[importFrom.size()];
+                                expController.importDataFromExperiments(task, importFrom, duplicate);
+                                expController.loadExperiment(newExp, task);
                             }
                         } catch (Exception e) {
-                            javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Error while importing data from experiment " + importFrom.getName(), javax.swing.JOptionPane.ERROR_MESSAGE);
+                            javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Error while importing data", javax.swing.JOptionPane.ERROR_MESSAGE);
                         } finally {
                             tableExperiments.getSelectionModel().setSelectionInterval(tableExperiments.getRowCount() - 1, tableExperiments.getRowCount() - 1);
                             tableExperiments.requestFocusInWindow();

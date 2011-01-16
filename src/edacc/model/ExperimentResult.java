@@ -32,22 +32,25 @@ public class ExperimentResult extends BaseModel implements Serializable {
     private int verifierExitCode;
 
     private int computeQueue;
-
+    private Timestamp startTime;
+    
     private transient HashMap<Integer, ExperimentResultHasProperty> propertyValues;
     private Timestamp datemodified;
     protected ExperimentResult() {
     }
 
-    protected ExperimentResult(int run, int priority, int computeQueue, int status, int seed, float resultTime, int SolverConfigId, int ExperimentId, int InstanceId) {
+    protected ExperimentResult(int run, int priority, int computeQueue, int status, int seed, ExperimentResultResultCode resultCode, float resultTime, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime) {
         this.run = run;
         this.priority = priority;
         this.computeQueue = computeQueue;
         this.status = ExperimentResultStatus.getExperimentResultStatus(status);
         this.seed = seed;
+        this.resultCode = resultCode;
         this.resultTime = resultTime;
         this.SolverConfigId = SolverConfigId;
         this.ExperimentId = ExperimentId;
         this.InstanceId = InstanceId;
+        this.startTime = startTime;
         String filename = "results/" + this.ExperimentId + "_" + this.SolverConfigId + "_" + this.InstanceId + "_R" + this.run + ".res";
         this.solverOutputFilename = filename + ".solver";
         this.launcherOutputFilename = filename + ".launcher";
@@ -280,5 +283,16 @@ public class ExperimentResult extends BaseModel implements Serializable {
 
     public void setDatemodified(Timestamp datemodified) {
         this.datemodified = datemodified;
+    }
+
+    public Timestamp getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Timestamp startTime) {
+        this.startTime = startTime;
+        if (isSaved()) {
+            setModified();
+        }
     }
 }

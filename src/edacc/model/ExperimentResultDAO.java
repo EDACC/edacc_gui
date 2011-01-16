@@ -31,11 +31,18 @@ public class ExperimentResultDAO {
             + "idJob, run, seed, status, resultTime, resultCode, solverOutputFN, launcherOutputFN, watcherOutputFN, verifierOutputFN, "
             + "solverExitCode, watcherExitCode, verifierExitCode, computeQueue, TIMESTAMPDIFF(SECOND, startTime, NOW()) AS runningTime, "
             + "IF(status = " + ExperimentResultStatus.RUNNING.getValue() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) AS date_modified,"
-            + "priority "
+            + "priority, startTime "
             + "FROM " + table + " ";
+    protected static final String copyOutputQuery = "UPDATE ExperimentResults as dest, ExperimentResults as src "
+            + "SET "
+            + "dest.solverOutput = src.solverOutput, "
+            + "dest.watcherOutput = src.watcherOutput, "
+            + "dest.launcherOutput = src.launcherOutput, "
+            + "dest.verifierOutput = src.verifierOutput "
+            + "WHERE src.idJob = ? AND dest.idJob = ?";
 
-    public static ExperimentResult createExperimentResult(int run, int priority, int computeQueue, int status, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId) throws SQLException {
-        ExperimentResult r = new ExperimentResult(run, priority, computeQueue, status, seed, time, SolverConfigId, ExperimentId, InstanceId);
+    public static ExperimentResult createExperimentResult(int run, int priority, int computeQueue, int status, int seed, ExperimentResultResultCode resultCode, float time, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime) throws SQLException {
+        ExperimentResult r = new ExperimentResult(run, priority, computeQueue, status, seed, resultCode, time, SolverConfigId, ExperimentId, InstanceId, startTime);
         r.setNew();
         return r;
     }
@@ -74,18 +81,17 @@ public class ExperimentResultDAO {
                     st.setBytes(12, rx.getLauncherOutput());
                     st.setBytes(13, rx.getWatcherOutput());
                     st.setBytes(14, rx.getVerifierOutput());
-                    st.setTimestamp(15, rx.getStartTime());
                 } else {
                     st.setNull(11, java.sql.Types.BLOB);
                     st.setNull(12, java.sql.Types.BLOB);
                     st.setNull(13, java.sql.Types.BLOB);
                     st.setNull(14, java.sql.Types.BLOB);
-                    st.setNull(15, java.sql.Types.TIMESTAMP);
                 }
+                st.setTimestamp(15, r.getStartTime());
                 st.setInt(16, r.getPriority());
                 st.setFloat(17, r.getResultTime());
                 st.setInt(18, r.getComputeQueue());
-                st.setInt(19, (r.getResultCode() == null)?0:r.getResultCode().getValue());
+                st.setInt(19, (r.getResultCode() == null) ? 0 : r.getResultCode().getValue());
                 st.addBatch();
 
                 r.setSaved();
@@ -125,6 +131,44 @@ public class ExperimentResultDAO {
         } catch (SQLException e) {
             DatabaseConnector.getInstance().getConn().rollback();
             throw e;
+        } finally {
+            curSt = null;
+            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+        }
+    }
+
+    /**
+     * This will copy the output from the experiment results specified in the <code>from</code>-ArrayList to the experiment results
+     * specified in the <code>to</code>-ArrayList.
+     * @param from
+     * @param to
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws IllegalArgumentException if <code>from.size() != to.size()</code> or <code>from == null</code> or <code>to == null</code>
+     */
+    public static void batchCopyOutputs(ArrayList<ExperimentResult> from, ArrayList<ExperimentResult> to) throws NoConnectionToDBException, SQLException {
+        if (from.size() != to.size() || from == null || to == null) {
+            throw new IllegalArgumentException("from.size() != to.size()");
+        }
+        boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
+        try {
+            DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+            final String query = copyOutputQuery;
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+            curSt = st;
+            for (int i = 0; i < from.size(); i++) {
+                st.setInt(1, from.get(i).getId());
+                st.setInt(2, to.get(i).getId());
+                st.addBatch();
+            }
+
+            st.executeBatch();
+            st.close();
+        } catch (Throwable e) {
+            DatabaseConnector.getInstance().getConn().rollback();
+            if (e instanceof SQLException) {
+                throw (SQLException) e;
+            }
         } finally {
             curSt = null;
             DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
@@ -176,7 +220,7 @@ public class ExperimentResultDAO {
         try {
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
 
-            String updateString = "status = "+status.getValue();
+            String updateString = "status = " + status.getValue();
             if (status == ExperimentResultStatus.NOTSTARTED) {
                 updateString += ",startTime=NULL, resultTime = NULL, resultCode = NULL, solverOutput = NULL, launcherOutput = NULL, "
                         + "verifierOutput = NULL, watcherOutput = NULL, solverExitCode = NULL, watcherExitCode = NULL, "
@@ -260,6 +304,7 @@ public class ExperimentResultDAO {
         r.setVerifierExitCode(rs.getInt("verifierExitCode"));
         r.setComputeQueue(rs.getInt("computeQueue"));
         r.setPriority(rs.getInt("priority"));
+        r.setStartTime(rs.getTimestamp("startTime"));
 
         r.setDatemodified(rs.getTimestamp("date_modified"));
         if (r.getStatus() == ExperimentResultStatus.RUNNING) {
@@ -409,9 +454,9 @@ public class ExperimentResultDAO {
         String constTable = "(";
         for (ExperimentResult er : results) {
             resultMap.put(er.getId(), er);
-            constTable += ""+er.getId()+",";
+            constTable += "" + er.getId() + ",";
         }
-        constTable = constTable.substring(0, constTable.length()-1) + ")";
+        constTable = constTable.substring(0, constTable.length() - 1) + ")";
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
         ResultSet rs = st.executeQuery("SELECT idJob, startTime, solverOutput, launcherOutput, watcherOutput, verifierOutput FROM " + table + " WHERE idJob IN " + constTable);
         while (rs.next()) {
@@ -441,7 +486,6 @@ public class ExperimentResultDAO {
         st.close();
         return resx;
     }
-
 
     /**
      * Returns all runs for an experiment specified by id
@@ -627,7 +671,7 @@ public class ExperimentResultDAO {
         return er;
     }
 
-     /**
+    /**
      *
      * @param id of the requested ExperimentResult
      * @return the ExperimentResult object with the given id
@@ -689,58 +733,60 @@ public class ExperimentResultDAO {
     }
 
     public static Blob getLauncherOutput(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, ExperimentResultNotInDBException {
-       PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT lancherOutput "
                 + "FROM " + table + " "
                 + "WHERE idJob=?;");
         ps.setInt(1, expRes.getId());
         ResultSet rs = ps.executeQuery();
-        if(rs.next())
+        if (rs.next()) {
             return rs.getBlob(1);
-        else
+        } else {
             throw new ExperimentResultNotInDBException();
+        }
     }
 
     public static Blob getSolverOutput(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, ExperimentResultNotInDBException {
-       PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT solverOutput "
                 + "FROM " + table + " "
                 + "WHERE idJob=?;");
         ps.setInt(1, expRes.getId());
         ResultSet rs = ps.executeQuery();
-        if(rs.next())
+        if (rs.next()) {
             return rs.getBlob(1);
-        else
+        } else {
             throw new ExperimentResultNotInDBException();
+        }
     }
 
     public static Blob getVerifierOutput(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, ExperimentResultNotInDBException {
-       PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT verifierOutput "
                 + "FROM " + table + " "
                 + "WHERE idJob=?;");
         ps.setInt(1, expRes.getId());
         ResultSet rs = ps.executeQuery();
-        if(rs.next())
+        if (rs.next()) {
             return rs.getBlob(1);
-        else
+        } else {
             throw new ExperimentResultNotInDBException();
+        }
     }
 
     public static Blob getWatcherOutput(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, ExperimentResultNotInDBException {
-       PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT watcherOutput "
                 + "FROM " + table + " "
                 + "WHERE idJob=?;");
         ps.setInt(1, expRes.getId());
         ResultSet rs = ps.executeQuery();
-        if(rs.next()){
+        if (rs.next()) {
             Blob blob = rs.getBlob(1);
-             return blob;
-        }
-          
-        else
+            return blob;
+        } else {
             throw new ExperimentResultNotInDBException();
+        }
     }
 
     /**

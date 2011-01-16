@@ -9,6 +9,7 @@ import edacc.experiment.ExperimentController;
 import edacc.experiment.ExperimentTableModel;
 import edacc.model.Experiment;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 /**
  *
@@ -19,7 +20,6 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     public String expName;
     public String expDesc;
     public boolean canceled;
-
     private ExperimentTableModel model;
 
     /** Creates new form EDACCExperimentModeNewExp */
@@ -48,15 +48,17 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     }
 
     /**
-     * Returns the selected experiment to import data from or <code>null</code> if there isn't any.
+     * Returns a list of all selected experiments to import data from or the empty list if there isn't any.
      * @return
      */
-    public Experiment getSelectedExperiment() {
-        int sel;
-        if (chkImport.isSelected() && (sel = tblExperiments.getSelectedRow()) != -1) {
-            return model.getExperimentAt(tblExperiments.convertRowIndexToModel(sel));
+    public ArrayList<Experiment> getSelectedExperiments() {
+        ArrayList<Experiment> res = new ArrayList<Experiment>();
+        if (chkImport.isSelected()) {
+            for (int sel : tblExperiments.getSelectedRows()) {
+                res.add(model.getExperimentAt(tblExperiments.convertRowIndexToModel(sel)));
+            }
         }
-        return null;
+        return res;
     }
 
     /** This method is called from within the constructor to

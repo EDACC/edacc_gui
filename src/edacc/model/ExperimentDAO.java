@@ -239,6 +239,20 @@ public class ExperimentDAO {
         }
     }
 
+    public static int getRunCountInExperimentForSolverConfigurationAndInstance(Experiment exp, Integer idSolverConfig, Integer idInstance) throws SQLException {
+        final String query = "select count(idJob) from ExperimentResults WHERE Experiment_idExperiment = ? AND solverConfig_idSolverConfig = ? AND Instances_idInstance = ?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, exp.getId());
+        ps.setInt(2, idSolverConfig);
+        ps.setInt(3, idInstance);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        } else {
+            return 0;
+        }
+    }
+
     public static void clearCache() {
         cache.clear();
     }
