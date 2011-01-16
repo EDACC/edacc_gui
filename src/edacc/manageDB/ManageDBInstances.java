@@ -69,6 +69,8 @@ public class ManageDBInstances implements Observer{
     JFileChooser jFileChooserManageDBInstance;
     JFileChooser jFileChooserManageDBExportInstance;
     JTable tableInstances;
+    Lock lock =  new ReentrantLock();
+    Condition condition;
 
     public ManageDBInstances(EDACCManageDBMode main, JPanel panelManageDBInstances, 
             JFileChooser jFileChooserManageDBInstance,  JFileChooser jFileChooserManageDBExportInstance,
@@ -806,14 +808,16 @@ public class ManageDBInstances implements Observer{
         }
     }
 
+    
     public void computeProperties(Vector<Instance> instances, Vector<Property> properties, Tasks task) {
         System.out.println(instances.size() + " instances, " + properties.size() + " properties.");
-        Lock lock =  new ReentrantLock();
+        
         lock.lock();
         Condition condition = lock.newCondition();
-        PropertyComputationController p = new PropertyComputationController(instances, properties, task, lock);
-        new Thread(p).start();
+        Thread compute = new Thread(new PropertyComputationController(instances, properties, task, lock));       
         try {
+            compute.setPriority(1);
+            compute.start();
             condition.await();
         } catch ( InterruptedException e ) {
         } finally {

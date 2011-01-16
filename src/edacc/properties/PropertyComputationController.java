@@ -89,7 +89,16 @@ public class PropertyComputationController implements Runnable{
         task.setOperationName("Property computation");
         for(int i = 0; i < availableProcessors; i++){
             if(instancePropertyQueue != null){
-                
+                if(i == 0 && instancePropertyQueue.isEmpty()){
+                    task.cancel(true);
+                    lock.lock();
+                    try{
+                        condition.signal();
+                    } finally{
+                        lock.unlock();
+                    }
+                    return;
+                }
                 if(instancePropertyQueue.isEmpty()){
                     jobs = i;
                     return;
@@ -100,6 +109,16 @@ public class PropertyComputationController implements Runnable{
                     Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }else if(resultPropertyQueue != null){
+                if(resultPropertyQueue.isEmpty() && i == 0){
+                    task.cancel(true);
+                    lock.lock();
+                    try{
+                        condition.signal();
+                    } finally{
+                        lock.unlock();
+                    }
+                    return;
+                }
                 try {
                     if (resultPropertyQueue.isEmpty()) {
                         jobs = i;
@@ -119,23 +138,23 @@ public class PropertyComputationController implements Runnable{
         if(instancePropertyQueue != null){
             if(!instancePropertyQueue.isEmpty())
                 try {
-                new Thread(new PropertyComputationUnit(instancePropertyQueue.take(), this)).start();
-                jobs++;
-                task.setStatus("computed " + (allJobs - instancePropertyQueue.size()) + " of " + allJobs + " properties");
-                task.setTaskProgress(((float)(allJobs - instancePropertyQueue.size()))/((float)allJobs));
-            } catch (InterruptedException ex) {
-                Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                    new Thread(new PropertyComputationUnit(instancePropertyQueue.take(), this)).start();
+                    jobs++;
+                    task.setStatus("computed " + (allJobs - instancePropertyQueue.size()) + " of " + allJobs + " properties");
+                    task.setTaskProgress(((float)(allJobs - instancePropertyQueue.size()))/((float)allJobs));
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
+                }
         }else if(resultPropertyQueue != null){
             if(!resultPropertyQueue.isEmpty())
                 try {
                 new Thread(new PropertyComputationUnit(resultPropertyQueue.take(), this)).start();
-                jobs++;
-                task.setStatus("computed " + (allJobs - resultPropertyQueue.size()) + " of " + allJobs + " properties");
-                task.setTaskProgress(((float)(allJobs - resultPropertyQueue.size()))/((float)allJobs));
-            } catch (InterruptedException ex) {
-                Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                    jobs++;
+                    task.setStatus("computed " + (allJobs - resultPropertyQueue.size()) + " of " + allJobs + " properties");
+                    task.setTaskProgress(((float)(allJobs - resultPropertyQueue.size()))/((float)allJobs));
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
+                }
         }
         jobs--;
         if(jobs == 0){
@@ -145,9 +164,7 @@ public class PropertyComputationController implements Runnable{
             condition.signal();
           } finally{
             lock.unlock();
-          }
-          
-          
+          }         
           return;         
         }
 

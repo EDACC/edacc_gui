@@ -34,7 +34,7 @@ public class ExperimentDAO {
         i.setWallClockTimeLimit(-1);
         i.setStackSizeLimit(-1);
         i.setOutputSizeLimit(-1);
-        i.setMaxSeed(Integer.MAX_VALUE);
+        i.setMaxSeed(Integer.MAX_VALUE-1);
         save(i);
         cache.cache(i);
         return i;

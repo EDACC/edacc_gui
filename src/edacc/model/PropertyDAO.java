@@ -282,11 +282,11 @@ public class PropertyDAO {
     public static Property getByName(String name) throws NoConnectionToDBException, SQLException, PropertyNotInDBException,
             PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
          PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-            "SELECT idSolverProperty FROM " + table + " WHERE name=?;");
+            "SELECT idProperty FROM " + table + " WHERE name=?;");
          ps.setString(1, name);
          ResultSet rs = ps.executeQuery();
          rs.next();
-         return getById(rs.getInt("idSolverProperty"));
+         return getById(rs.getInt("idProperty"));
     }
 
     private static Vector<String> getRegularExpressions(int id) throws NoConnectionToDBException, SQLException{

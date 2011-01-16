@@ -262,9 +262,17 @@ public class PropertyComputationUnit implements Runnable {
     private void parseInstanceName() {
         if(ihp != null){
             Vector<String> res = parse(ihp.getInstance().getName());
-            if(!res.isEmpty())
+            if(!res.isEmpty()){
                 ihp.setValue(res.firstElement());
+                try {
+                    InstanceHasPropertyDAO.save(ihp);
+                } catch (SQLException ex) {
+                    Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+                
         }
+
     }
 
     public static void main(String[] args) {
