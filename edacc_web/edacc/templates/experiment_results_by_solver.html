@@ -10,6 +10,7 @@
     <form method="get" action="{{url_for('frontend.experiment_results_by_solver', database=database, experiment_id=experiment.idExperiment)}}">
         Solver: {{form.solver_config}}
         <input type="submit" value="Show" />
+        <input type="submit" name="details" value="Show solver details" />
         <input type="submit" name="csv" value="CSV"/>
     </form>
     {% if results %}
@@ -22,9 +23,10 @@
             </thead>
             <tbody>
                 {% for result in results %}
+                    {% set rowloop = loop %}
                     <tr>
-                        <td nowrap="nowrap">
-                            <a href="{{ url_for('frontend.instance_details', database=database, instance_id=result.0.idInstance) }}">{{ result.0.name }}</a>
+                        <td class="{{'even' if rowloop.index0 % 2 == 0 else 'odd'}}" nowrap="nowrap">
+                            <a href="{{ url_for('frontend.experiment_results_by_instance', database=database, experiment_id=experiment.idExperiment)}}?instance={{result.0.idInstance}}">{{ result.0.name }}</a>
                         </td>
                         {% for run in result.1 %}
                             <td style="text-align: center; vertical-align: middle; background-color: {{run.resultCode|job_result_code_color}};"><a style="color: black;" href="{{ url_for('frontend.experiment_result', database=database, experiment_id=experiment.idExperiment, result_id=run.idJob) }}">{{ run.get_time()|result_time}}</a></td>

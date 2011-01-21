@@ -10,6 +10,7 @@
     <form method="get" action="{{url_for('frontend.experiment_results_by_instance', database=database, experiment_id=experiment.idExperiment)}}">
         Instance: {{form.instance}}
         <input type="submit" value="Show" />
+        <input type="submit" name="details" value="Show instance details" />
         <input type="submit" name="csv" value="CSV"/>
     </form>
     {% if results %}
@@ -18,7 +19,7 @@
                 <tr>
                     <th>Run</th>
                     {% for result in results %}
-                    <th nowrap="nowrap"><a href="{{ url_for('frontend.solver_configuration_details', database=database, experiment_id=experiment.idExperiment, solver_configuration_id=result.0.idSolverConfig) }}">{{ result.0}}</a></th>
+                    <th nowrap="nowrap"><a href="{{ url_for('frontend.experiment_results_by_solver', database=database, experiment_id=experiment.idExperiment)}}?solver_config={{result.0.idSolverConfig}}">{{ result.0}}</a></th>
                     {% endfor %}
                 </tr>
             </thead>
@@ -34,6 +35,22 @@
                         {% endfor %}
                     </tr>
                 {% endfor %}
+                <tr class="even">
+                    <td>Mean</td>
+                    {% for result in results %}
+                    <td>
+                        {{result[2]|result_time|round(4)}}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr class="odd">
+                    <td>Median</td>
+                    {% for result in results %}
+                    <td>
+                        {{result[3]|result_time|round(4)}}
+                    </td>
+                    {% endfor %}
+                </tr>
             </tbody>
         </table>
     {% else %}
