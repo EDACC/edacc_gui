@@ -1,21 +1,21 @@
 {% autoescape false %}
 var instances = new Array();
-{% for instance in form.instances.query %}
+{% for instance in form.i.query %}
 instances[{{loop.index0}}] = new Object();
 instances[{{loop.index0}}]["idInstance"] = {{instance.idInstance}};
 instances[{{loop.index0}}]["name"] = "{{instance.name}}";
 {% set outer_loop = loop %}
-    {% for prop in db.get_instance_properties() %}
+    {% for prop in instance_properties %}
         instances[{{outer_loop.index0}}]["{{prop.name}}"] = {{instance.get_property_value(prop.idProperty, db) or "''"}};
     {% endfor %}
 {% endfor %}
 {% endautoescape %}
 var selected_instances = new Array();
-{% for instance in request.args.getlist('instances') %}selected_instances.push({{instance}});{% endfor %}
+{% for instance in request.args.getlist('i') %}selected_instances.push({{instance}});{% endfor %}
 
 function match(instance, filter) {
     if (filter == '') return true;
-    fields = [{% for prop in db.get_instance_properties() %}"{{prop.name}}", {% endfor %}]
+    fields = ["name", {% for prop in instance_properties %}"{{prop.name}}", {% endfor %}]
     for (f in fields) {
         var re = new RegExp(fields[f], 'g');
         if (typeof instance[fields[f]] == 'string') {
@@ -30,7 +30,7 @@ function match(instance, filter) {
 
 $('#instance_filter_apply').click(function() {
     var filter = $('#instance_filter').val();
-    $('#instances > option').remove();
+    $('#i > option').remove();
     for (instance in instances) {
         if (match(instances[instance], filter)) {
             opt = $('<option></option>').val(instances[instance]["idInstance"]).html(instances[instance]["name"]);
@@ -41,7 +41,7 @@ $('#instance_filter_apply').click(function() {
                 }
             }
 
-            $('#instances').append(opt);
+            $('#i').append(opt);
         }
     }
 });
@@ -61,6 +61,6 @@ $('#instance_filter').keypress(function(e) {
 
 $('#instance_filter_apply').click();
 
-{% if not form.instances.data %}
-$('#instances option').attr("selected", "selected");
+{% if not form.i.data %}
+$('#i option').attr("selected", "selected");
 {% endif %}

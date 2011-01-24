@@ -1,5 +1,16 @@
+{% from "_formhelpers.html" import render_field, render_radio_field %}
 {% extends "base.html" %}
 {% block title %}Ranking{% endblock %}
+{% block head %}
+    {{ super() }}
+    <script type="text/javascript" src="{{url_for('static', filename='js/jquery.tablesorter.js')}}"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('#results').tablesorter();
+            {% include '/analysis/multiple_instances_filter_js.html' %}
+          });
+    </script>
+{% endblock %}
 {% block content %}
     <div class="navigation">
         » <a href="{{url_for('frontend.experiments_index', database=database)}}">Experiments</a> ::
@@ -7,13 +18,28 @@
         Ranking
     </div>
     <h2>Ranking</h2>
+    <div style="margin-left: 5px;">
+        <form method="get" action="{{url_for('analysis.solver_ranking', database=database, experiment_id=experiment.idExperiment)}}">
+            <table>
+                {{ render_field(form.i, explanation='Hold Ctrl to select multiple instances.', size=10, width=29) }}
+                <tr>
+                    <td style="vertical-align: middle;">Filter instances</td>
+                    <td>{{form.instance_filter}}<img id="instance_filter_apply" src="{{url_for('static', filename='img/search.png')}}"/><img id="instance_filter_clear" src="{{url_for('static', filename='img/clear.png')}}"/><br/>
+                        JS expression filter. Valid variables are name, {% for prop in instance_properties %}{{prop.name}}, {% endfor %} <br/>
+                        Example: (numAtoms >= 6000 && numAtoms <= 8000)
+                    </td>
+                </tr>
+                <tr><td colspan="2"><input type="submit" value="Show" /></td></tr>
+            </table>
+        </form>
+    </div>
     <div>
         The virtual best solver (VBS) solves an instance if any of the experiment's solvers are<br/>
         sucessful on that instance in any of their <i>numRuns</i> runs. In this case the VBS gets<br/>
         <i>numRuns</i> successful runs on that instance and for each run the run time of the best solver.
     </div>
     <h3>Ranking by the number of successful runs</h3>
-    <table class="results">
+    <table id="results" class="results">
         <thead>
             <tr>
                 <th>#</th>
@@ -22,7 +48,8 @@
                 <th>% of all runs</th>
                 <th>% of VBS runs</th>
                 <th>cumulated CPU time</th>
-                <th>average CPU time per successful run</th>
+                <th>avg. CPU time per successful run</th>
+                <th>avg. deviation of successful runs</th>
             </tr>
         </thead>
         <tbody>
@@ -35,6 +62,7 @@
                 <td>{{(sc.3 * 100.0)|round(2)}} %</td>
                 <td>{{sc.4|round(2)}}</td>
                 <td>{{sc.5|round(2)}}</td>
+                <td>{{sc.6|round(2)}}</td>
             </tr>
         {% endfor %}
         </tbody>

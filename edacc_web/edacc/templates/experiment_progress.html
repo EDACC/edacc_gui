@@ -2,12 +2,12 @@
 {% block title %}{{experiment.name}} Experiment{% endblock %}
 {% block head %}
     {{ super() }}
-    <link rel="stylesheet" href="/static/css/datatable.css" type="text/css" />
-    <link rel="stylesheet" href="/static/css/ColVis.css" type="text/css" />
-    <script src="/static/js/jquery.dataTables.min.js" type="text/javascript"></script>
-    <script src="/static/js/jquery.timers-1.2.js" type="text/javascript"></script>
-    <script src="/static/js/jquery.dataTables.ajaxReloadPlugin.js" type="text/javascript"></script>
-    <script src="/static/js/ColVis.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/datatable.css')}}" type="text/css" />
+    <link rel="stylesheet" href="{{url_for('static', filename='css/ColVis.css')}}" type="text/css" />
+    <script src="{{url_for('static', filename='js/jquery.dataTables.min.js')}}" type="text/javascript"></script>
+    <script src="{{url_for('static', filename='js/jquery.timers-1.2.js')}}" type="text/javascript"></script>
+    <script src="{{url_for('static', filename='js/jquery.dataTables.ajaxReloadPlugin.js')}}" type="text/javascript"></script>
+    <script src="{{url_for('static', filename='js/ColVis.min.js')}}" type="text/javascript"></script>
     <script type="text/javascript">
         /* <![CDATA[ */
         $(document).ready(function() {
@@ -34,7 +34,7 @@
                 "aoColumns": [null, null, null, null, null, null, null, null, {"bVisible": false}, {% for prop in db.get_result_properties() %}null, {%endfor%}]
             });
 
-            $('#table_jobs_filter').append('<img id="img_clear" style="margin-left: 3px; margin-top: 3px;" src="/static/img/clear.png" title="Clear"/>');
+            $('#table_jobs_filter').append('<img id="img_clear" style="margin-left: 3px; margin-top: 3px;" src="{{url_for('static', filename='img/clear.png')}}" title="Clear"/>');
 
             $('#img_clear').click(function() {
                 if ($('#table_jobs_filter input').val() != "") {
@@ -42,8 +42,23 @@
                 }
             });
 
+	    function updateExperimentStats() {
+		$.ajax({
+		    url: "{{url_for('frontend.experiment_stats_ajax', database=database, experiment_id=experiment.idExperiment)}}",
+		    dataType: 'json',
+		    success: function(data) {
+			$('#stats').html('finished: ' + data['num_jobs_finished'] + '/' + data['num_jobs'] +
+                        ', not started: ' + data['num_jobs_not_started'] + ', running: ' +
+                        data['num_jobs_running'] + ', crashed: ' + data['num_jobs_error'] +
+                        ', ETA: ' + data['eta']
+                        );
+		    }
+		});
+	    }
+
             $('#refresh').click(function() {
                 oTable.fnReloadAjax();
+		updateExperimentStats();
                 return false;
             });
 
@@ -117,6 +132,7 @@
                         oTable.fnReloadAjax(null, function() {
                             $("body").css("cursor", "auto");
                         });
+			updateExperimentStats();
                     });
                 }
             });
@@ -129,9 +145,12 @@
                     oTable.fnReloadAjax(null, function() {
                         $("body").css("cursor", "auto");
                     });
+		    updateExperimentStats();
                     return false;
                 }
             });
+
+	    updateExperimentStats();
         });
         /* ]]> */
     </script>
@@ -153,7 +172,7 @@
         Notice that the F5 key was overriden on this page to use Ajax to refresh the table data without having to reload the whole page. You can also use the following link or set a periodic refresh interval:
     </div>
     -->
-
+    <div style="font-weight: bold; margin-bottom: 5px;"><span id="stats"></stats></div>
     <a id="get_csv" href="#">Download as CSV</a> | <a id="refresh" href="#">Refresh Data</a> <strong>Refresh Interval:</strong>
     <select id="refresh_interval"><option value="-" selected="selected">-</option><option value="2">2s</option><option value="5">5s</option><option value="10">10s</option><option value="30">30s</option></select><br/>
     <div style="max-width: 98%">

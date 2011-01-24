@@ -33,6 +33,7 @@ import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,7 +46,7 @@ public class PropertyComputationController implements Runnable{
     LinkedBlockingQueue<InstanceHasProperty> instancePropertyQueue;
      LinkedBlockingQueue<ExperimentResultHasProperty> resultPropertyQueue;
     boolean recompute;
-    private int jobs;
+    private  Integer jobs = new Integer(0);
     private Tasks task;
     private int allJobs;
     private Condition condition;
@@ -245,6 +246,17 @@ public class PropertyComputationController implements Runnable{
 
             }
         }
+    }
+
+    public synchronized boolean completed(){
+        synchronized(this.jobs){
+            if(jobs > 0)
+                return false;
+            else
+                return true;
+        }
+
+
     }
 
 }

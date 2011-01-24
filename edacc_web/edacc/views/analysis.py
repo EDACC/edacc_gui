@@ -11,6 +11,7 @@
 
 import math
 import numpy
+import scipy
 
 from flask import Module
 from flask import render_template as render
@@ -41,44 +42,68 @@ def solver_ranking(database, experiment_id):
     db = models.get_database(database) or abort(404)
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
-    num_runs = experiment.get_num_runs(db)
-    num_runs_per_solver = num_runs * len(experiment.instances)
+    form = forms.CactusPlotForm(request.args)
+    form.i.query = sorted(experiment.get_instances(db), key=lambda i: i.name) or EmptyQuery()
+    GET_data = "&".join(['='.join(list(t)) for t in request.args.items(multi=True)])
 
-    vbs_num_solved = 0
-    vbs_cumulated_cpu = 0
-    for i in experiment.instances:
-        best_solver_run = db.session.query(db.ExperimentResult).filter_by(experiment=experiment)\
-                                    .filter(db.ExperimentResult.resultCode.like('1%')) \
-                                    .filter_by(instance=i).order_by(db.ExperimentResult.resultTime) \
-                                    .first()
-        if best_solver_run:
-            vbs_num_solved += num_runs
-            vbs_cumulated_cpu += best_solver_run.resultTime * num_runs
+    if form.i.data:
+        instance_ids = [i.idInstance for i in form.i.data]
 
-    ranked_solvers = ranking.number_of_solved_instances_ranking(experiment)
-    data = [('Virtual Best Solver (VBS)',           # name of the solver
-             vbs_num_solved,                        # number of successful runs
-             0.0 if num_runs_per_solver == 0 else vbs_num_solved / float(num_runs_per_solver) ,  # % of all runs
-             1.0,                                   # % of vbs runs
-             vbs_cumulated_cpu,                     # cumulated CPU time
-             (0.0 if vbs_num_solved == 0 else vbs_cumulated_cpu / vbs_num_solved),    # average CPU time per successful run
-             )]
-    for solver in ranked_solvers:
-        successful_runs = db.session.query(db.ExperimentResult).filter(db.ExperimentResult.resultCode.like('1%')) \
-                                    .filter_by(experiment=experiment, solver_configuration=solver, status=1).all()
-        num_successful_runs = len(successful_runs)
-        data.append((
-            solver.get_name(),
-            num_successful_runs,
-            0 if num_runs_per_solver == 0 else num_successful_runs / float(num_runs_per_solver),
-            0 if vbs_num_solved == 0 else num_successful_runs / float(vbs_num_solved),
-            sum(j.get_time() for j in successful_runs),
-            numpy.average([j.get_time() for j in successful_runs] or 0)
-        ))
+        num_runs = experiment.get_num_runs(db)
+        num_runs_per_solver = num_runs * len(instance_ids)
+
+        vbs_num_solved = 0
+        vbs_cumulated_cpu = 0
+        from sqlalchemy import func
+        best_instance_runtimes = db.session.query(func.min(db.ExperimentResult.resultTime)).filter_by(experiment=experiment) \
+            .filter(db.ExperimentResult.resultCode.like('1%')) \
+            .filter(db.ExperimentResult.Instances_idInstance.in_(instance_ids)) \
+            .group_by(db.ExperimentResult.Instances_idInstance).all()
+
+        vbs_num_solved = len(best_instance_runtimes) * num_runs
+        vbs_cumulated_cpu = sum(r[0] for r in best_instance_runtimes) * num_runs
+
+        ranked_solvers = ranking.number_of_solved_instances_ranking(db, experiment, instance_ids)
+
+        data = [('Virtual Best Solver (VBS)',           # name of the solver
+                 vbs_num_solved,                        # number of successful runs
+                 0.0 if num_runs_per_solver == 0 else vbs_num_solved / float(num_runs_per_solver) ,  # % of all runs
+                 1.0,                                   # % of vbs runs
+                 vbs_cumulated_cpu,                     # cumulated CPU time
+                 (0.0 if vbs_num_solved == 0 else vbs_cumulated_cpu / vbs_num_solved),    # average CPU time per successful run
+                 0.0
+                 )]
+
+        for solver in ranked_solvers:
+            successful_runs = db.session.query(db.ExperimentResult.resultTime).filter(db.ExperimentResult.resultCode.like('1%')) \
+                                        .filter(db.ExperimentResult.Instances_idInstance.in_(instance_ids)) \
+                                        .filter_by(experiment=experiment, solver_configuration=solver, status=1).all()
+
+            avg_stddev_runtime = 0.0
+            for instance in form.i.data:
+                instance_runtimes = db.session.query(db.ExperimentResult.resultTime).filter(db.ExperimentResult.resultCode.like('1%')) \
+                                            .filter_by(instance=instance) \
+                                            .filter_by(experiment=experiment, solver_configuration=solver, status=1).all()
+                avg_stddev_runtime += scipy.std([j[0] for j in instance_runtimes])
+            avg_stddev_runtime /= float(len(form.i.data))
+
+            num_successful_runs = len(successful_runs)
+            data.append((
+                solver.get_name(),
+                num_successful_runs,
+                0 if num_runs_per_solver == 0 else num_successful_runs / float(num_runs_per_solver),
+                0 if vbs_num_solved == 0 else num_successful_runs / float(vbs_num_solved),
+                sum(j[0] for j in successful_runs),
+                numpy.average([j[0] for j in successful_runs] or 0),
+                avg_stddev_runtime
+            ))
+
+        return render('/analysis/ranking.html', database=database, db=db,
+                      experiment=experiment, ranked_solvers=ranked_solvers,
+                      data=data, form=form)
 
     return render('/analysis/ranking.html', database=database, db=db,
-                  experiment=experiment, ranked_solvers=ranked_solvers,
-                  data=data)
+              experiment=experiment, form=form)
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/cactus/')
@@ -96,15 +121,17 @@ def cactus_plot(database, experiment_id):
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
     form = forms.CactusPlotForm(request.args)
-    form.instances.query = sorted(experiment.instances, key=lambda i: i.name) or EmptyQuery()
+    form.i.query = sorted(experiment.get_instances(db), key=lambda i: i.name) or EmptyQuery()
     result_properties = db.get_plotable_result_properties()
     result_properties = zip([p.idProperty for p in result_properties], [p.name for p in result_properties])
     form.result_property.choices = [('cputime', 'CPU Time')] + result_properties
+    form.sc.query = experiment.solver_configurations or EmptyQuery()
 
     GET_data = "&".join(['='.join(list(t)) for t in request.args.items(multi=True)])
 
     return render('/analysis/solved_instances.html', database=database,
-                  experiment=experiment, db=db, form=form, GET_data=GET_data)
+                  experiment=experiment, db=db, form=form, GET_data=GET_data,
+                  instance_properties=db.get_instance_properties())
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/rtd-comparison/')
@@ -184,7 +211,8 @@ def result_property_comparison(database, experiment_id):
 
 
     return render('/analysis/result_property_comparison.html', database=database,
-                  experiment=experiment, db=db, form=form, GET_data=GET_data)
+                  experiment=experiment, db=db, form=form, GET_data=GET_data,
+                  instance_properties=db.get_instance_properties())
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/property-distributions/')
@@ -210,7 +238,8 @@ def property_distributions(database, experiment_id):
     GET_data = "&".join(['='.join(list(t)) for t in request.args.items(multi=True)])
 
     return render('/analysis/property_distributions.html', database=database,
-                  experiment=experiment, db=db, form=form, GET_data=GET_data)
+                  experiment=experiment, db=db, form=form, GET_data=GET_data,
+                  instance_properties=db.get_instance_properties())
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/scatter-two-solvers/')
@@ -232,7 +261,7 @@ def scatter_2solver_1property(database, experiment_id):
     form = forms.TwoSolversOnePropertyScatterPlotForm(request.args)
     form.solver_config1.query = experiment.solver_configurations or EmptyQuery()
     form.solver_config2.query = experiment.solver_configurations or EmptyQuery()
-    form.instances.query = sorted(experiment.instances, key=lambda i: i.name) or EmptyQuery()
+    form.i.query = sorted(experiment.instances, key=lambda i: i.name) or EmptyQuery()
     form.run.choices = [('average', 'All runs - average'),
                         ('median', 'All runs - median'),
                         ('all', 'All runs')
@@ -245,7 +274,7 @@ def scatter_2solver_1property(database, experiment_id):
     if form.solver_config1.data and form.solver_config2.data:
         points = plot.scatter_2solver_1property_points(db, experiment,
                         form.solver_config1.data, form.solver_config2.data,
-                        form.instances.data, form.result_property.data, form.run.data)
+                        form.i.data, form.result_property.data, form.run.data)
 
         # log transform data if axis scaling is enabled, only affects pearson's coeff.
         if form.xscale.data == 'log':
@@ -259,7 +288,8 @@ def scatter_2solver_1property(database, experiment_id):
     return render('/analysis/scatter_2solver_1property.html', database=database,
                   experiment=experiment, db=db, form=form, GET_data=GET_data,
                   spearman_r=spearman_r, spearman_p_value=spearman_p_value,
-                  pearson_r=pearson_r, pearson_p_value=pearson_p_value)
+                  pearson_r=pearson_r, pearson_p_value=pearson_p_value,
+                  instance_properties=db.get_instance_properties())
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/scatter-instance-vs-result/')
@@ -286,7 +316,7 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
     form.solver_config.query = experiment.solver_configurations or EmptyQuery()
     form.result_property.choices = [('cputime', 'CPU Time')] + result_properties
     form.instance_property.choices = instance_properties
-    form.instances.query = sorted(experiment.instances, key=lambda i: i.name) or EmptyQuery()
+    form.i.query = sorted(experiment.instances, key=lambda i: i.name) or EmptyQuery()
     form.run.choices = [('average', 'All runs - average'),
                         ('median', 'All runs - median'),
                         ('all', 'All runs')
@@ -297,7 +327,7 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
     pearson_r, pearson_p_value = None, None
     if form.solver_config.data and form.instance_property.data:
         points = plot.scatter_1solver_instance_vs_result_property_points(db, experiment,
-                        form.solver_config.data, form.instances.data,
+                        form.solver_config.data, form.i.data,
                         form.instance_property.data, form.result_property.data,
                         form.run.data)
 
@@ -313,7 +343,8 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
     return render('/analysis/scatter_solver_instance_vs_result.html', database=database,
                   experiment=experiment, db=db, form=form, GET_data=GET_data,
                   spearman_r=spearman_r, spearman_p_value=spearman_p_value,
-                  pearson_r=pearson_r, pearson_p_value=pearson_p_value)
+                  pearson_r=pearson_r, pearson_p_value=pearson_p_value,
+                  instance_properties=db.get_instance_properties())
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/scatter-result-vs-result/')
@@ -337,7 +368,7 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
     form.solver_config.query = experiment.solver_configurations or EmptyQuery()
     form.result_property1.choices = [('cputime', 'CPU Time')] + result_properties
     form.result_property2.choices = [('cputime', 'CPU Time')] + result_properties
-    form.instances.query = sorted(experiment.instances, key=lambda i: i.name) or EmptyQuery()
+    form.i.query = sorted(experiment.instances, key=lambda i: i.name) or EmptyQuery()
     form.run.choices = [('average', 'All runs - average'),
                         ('median', 'All runs - median'),
                         ('all', 'All runs')
@@ -348,7 +379,7 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
     pearson_r, pearson_p_value = None, None
     if form.solver_config.data:
         points = plot.scatter_1solver_result_vs_result_property_plot(db, experiment,
-                    form.solver_config.data, form.instances.data,
+                    form.solver_config.data, form.i.data,
                     form.result_property1.data, form.result_property2.data, form.run.data)
 
         # log transform data if axis scaling is enabled, only affects pearson's coeff.
@@ -363,7 +394,8 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
     return render('/analysis/scatter_solver_result_vs_result.html', database=database,
                   experiment=experiment, db=db, form=form, GET_data=GET_data,
                   spearman_r=spearman_r, spearman_p_value=spearman_p_value,
-                  pearson_r=pearson_r, pearson_p_value=pearson_p_value)
+                  pearson_r=pearson_r, pearson_p_value=pearson_p_value,
+                  instance_properties=db.get_instance_properties())
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/property-distribution/')
@@ -386,7 +418,8 @@ def property_distribution(database, experiment_id):
     GET_data = "&".join(['='.join(list(t)) for t in request.args.items(multi=True)])
 
     return render('/analysis/property_distribution.html', database=database, experiment=experiment,
-                  db=db, form=form, GET_data=GET_data)
+                  db=db, form=form, GET_data=GET_data,
+                  instance_properties=db.get_instance_properties())
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/probabilistic-domination/')
@@ -435,10 +468,10 @@ def probabilistic_domination(database, experiment_id):
         return render('/analysis/probabilistic_domination.html',
                       database=database, db=db, experiment=experiment,
                       form=form, sc1_dom_sc2=sc1_dom_sc2, sc2_dom_sc1=sc2_dom_sc1,
-                      no_dom=no_dom)
+                      no_dom=no_dom, instance_properties=db.get_instance_properties())
 
     return render('/analysis/probabilistic_domination.html', database=database, db=db,
-                  experiment=experiment, form=form)
+                  experiment=experiment, form=form, instance_properties=db.get_instance_properties())
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/box-plots/')
@@ -453,11 +486,12 @@ def box_plots(database, experiment_id):
 
     form = forms.BoxPlotForm(request.args)
     form.solver_configs.query = experiment.solver_configurations or EmptyQuery()
-    form.instances.query = experiment.instances or EmptyQuery()
+    form.i.query = experiment.instances or EmptyQuery()
     result_properties = db.get_plotable_result_properties()
     result_properties = zip([p.idProperty for p in result_properties], [p.name for p in result_properties])
     form.result_property.choices = [('cputime', 'CPU Time')] + result_properties
     GET_data = "&".join(['='.join(list(t)) for t in request.args.items(multi=True)])
 
     return render('/analysis/box_plots.html', database=database, db=db,
-                  experiment=experiment, form=form, GET_data=GET_data)
+                  experiment=experiment, form=form, GET_data=GET_data,
+                  instance_properties=db.get_instance_properties())
