@@ -111,7 +111,9 @@ public class EDACCFilter extends javax.swing.JDialog {
      */
     public void clearFilters() {
         pnlArguments.removeAll();
+        filterArguments.clear();
         txtExpression.setText("");
+        expression = "";
     }
 
     /**

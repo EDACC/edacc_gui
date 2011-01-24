@@ -62,7 +62,7 @@ public class ExperimentResultDAO {
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         try {
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
-            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             curSt = st;
             for (ExperimentResult r : v) {
                 st.setInt(1, r.getSolverConfigId());
@@ -93,10 +93,15 @@ public class ExperimentResultDAO {
                 st.setInt(18, r.getComputeQueue());
                 st.setInt(19, (r.getResultCode() == null) ? 0 : r.getResultCode().getValue());
                 st.addBatch();
-
-                r.setSaved();
             }
             st.executeBatch();
+            ResultSet rs = st.getGeneratedKeys();
+            int i = 0;
+            while (rs.next()) {
+                v.get(i).setSaved();
+                v.get(i).setId(rs.getInt(1));
+                i++;
+            }
             st.close();
         } catch (SQLException e) {
             DatabaseConnector.getInstance().getConn().rollback();

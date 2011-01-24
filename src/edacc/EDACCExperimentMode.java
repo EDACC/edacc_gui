@@ -1425,6 +1425,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }// </editor-fold>//GEN-END:initComponents
 
     public boolean hasUnsavedChanges() {
+        if (expController.getActiveExperiment() == null) {
+            return false;
+        }
         return solverConfigPanel.isModified() || insTableModel.isModified() || experimentIsModified();
     }
 
@@ -1802,8 +1805,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Action
     public void btnCreateExperiment() {
+        btnDiscardExperiment();
+        if (expController.getActiveExperiment() != null) {
+            return;
+        }
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        EDACCExperimentModeNewExp dialogNewExp = new EDACCExperimentModeNewExp(mainFrame, true, expController);
+        final EDACCExperimentModeNewExp dialogNewExp = new EDACCExperimentModeNewExp(mainFrame, true, expController);
         dialogNewExp.setLocationRelativeTo(mainFrame);
         try {
             while (true) {
@@ -1815,24 +1822,31 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     javax.swing.JOptionPane.showMessageDialog(null, "The experiment must have a name.", "Create experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
                 } else if (expController.getExperiment(dialogNewExp.expName) != null) {
                     javax.swing.JOptionPane.showMessageDialog(null, "There exists already an experiment with the same name.", "Create experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
-                } else if (!dialogNewExp.canceled && dialogNewExp.getSelectedExperiments().isEmpty() && expController.getActiveExperiment() != null) {
-                    javax.swing.JOptionPane.showMessageDialog(null, "Operation failed. To import data from another experiment you have to unload the current loaded experiment.", "Create experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
                 } else {
                     break;
                 }
             }
             if (!dialogNewExp.canceled) {
-                final Experiment newExp = expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc);
-                final ArrayList<Experiment> importFrom = dialogNewExp.getSelectedExperiments();
+                final ArrayList<Integer> selectedSolverConfigIds = dialogNewExp.getSelectedSolverConfigIds();
+                final ArrayList<Boolean> duplicate = dialogNewExp.getDuplicateListForSelectedSolverConfigs();
                 Tasks.startTask(new TaskRunnable() {
 
                     @Override
                     public void run(Tasks task) {
+                        Experiment newExp;
+                        try {
+                            newExp = expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc);
+                        } catch (SQLException ex) {
+                            createDatabaseErrorMessage(ex);
+                            return;
+                        } catch (Exception ex) {
+                            javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage(), "Create experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
                         try {
                             expController.loadExperiment(newExp, task);
-                            if (!importFrom.isEmpty()) {
-                                boolean[] duplicate = new boolean[importFrom.size()];
-                                expController.importDataFromExperiments(task, importFrom, duplicate);
+                            if (!selectedSolverConfigIds.isEmpty()) {
+                                expController.importDataFromSolverConfigurations(task, selectedSolverConfigIds, duplicate);
                                 expController.loadExperiment(newExp, task);
                             }
                         } catch (Exception e) {
@@ -1846,8 +1860,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         } catch (SQLException ex) {
             createDatabaseErrorMessage(ex);
-        } catch (Exception ex) {
-            javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage(), "Create experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
         } finally {
             dialogNewExp.dispose();
         }
@@ -2205,7 +2217,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             setJobsFilterStatus("");
         }
         jobsTableModel.fireTableDataChanged();
-        // jobsFilter.setVisible(true);
     }
 
     @Action
