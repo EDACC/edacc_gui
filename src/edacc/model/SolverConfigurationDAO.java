@@ -99,6 +99,25 @@ public class SolverConfigurationDAO {
         return res;
     }
 
+    public static void updateName(SolverConfiguration sc) throws NoConnectionToDBException, SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM (SELECT count(*) AS lcount FROM " + table + " WHERE Experiment_IdExperiment=? AND Solver_IdSolver=? AND idSolverConfig <= ?) AS t1 JOIN (SELECT count(*) AS acount FROM " + table + " WHERE Experiment_IdExperiment=? AND Solver_IdSolver=?) AS t2");
+        st.setInt(1, sc.getExperiment_id());
+        st.setInt(2, sc.getSolver_id());
+        st.setInt(3, sc.getId());
+        st.setInt(4, sc.getExperiment_id());
+        st.setInt(5, sc.getSolver_id());
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            int count = rs.getInt(1);
+            int acount = rs.getInt(2);
+            if (acount == 1) {
+                sc.setName(SolverDAO.getById(sc.getSolver_id()).getName());
+            } else {
+                sc.setName(SolverDAO.getById(sc.getSolver_id()).getName() + " (" + count + ")");
+            } 
+        }
+    }
+
     public static SolverConfiguration getSolverConfigurationById(int id) throws SQLException {
         SolverConfiguration sc = cache.getCached(id);
         if (sc != null) {
@@ -132,9 +151,9 @@ public class SolverConfigurationDAO {
     public static ArrayList<Integer> getAllSolverConfigIdsByExperimentId(int id) throws SQLException {
         ArrayList<Integer> res = new ArrayList<Integer>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idSolverConfig " +
-                "FROM " + table + " " +
-                "WHERE Experiment_idExperiment=? GROUP BY idSolverConfig ORDER BY idSolverConfig;");
+                "SELECT idSolverConfig "
+                + "FROM " + table + " "
+                + "WHERE Experiment_idExperiment=? GROUP BY idSolverConfig ORDER BY idSolverConfig;");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {

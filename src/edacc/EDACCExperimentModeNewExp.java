@@ -8,6 +8,7 @@ package edacc;
 import edacc.experiment.ExperimentController;
 import edacc.experiment.ExperimentTableModel;
 import edacc.experiment.SolverConfigurationTableModel;
+import edacc.experiment.Util;
 import edacc.model.Experiment;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
@@ -49,11 +50,15 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             ArrayList<ExperimentSolverConfiguration> items = new ArrayList<ExperimentSolverConfiguration>();
             for (Experiment exp : expController.getExperiments()) {
                 for (SolverConfiguration sc : SolverConfigurationDAO.getSolverConfigurationByExperimentId(exp.getId())) {
-                    items.add(new ExperimentSolverConfiguration(exp.getName(), SolverDAO.getById(sc.getSolver_id()).getName(), "tbd", exp.getId(), sc.getId()));
+                    if (sc.getName() == null) {
+                        SolverConfigurationDAO.updateName(sc);
+                    }
+                    items.add(new ExperimentSolverConfiguration(exp.getName(), sc.getName(), Util.getParameterString(SolverConfigurationDAO.getSolverConfigurationParameters(sc)), exp.getId(), sc.getId()));
                 }
             }
             experimentSolverConfigTableModel.setItems(items);
         } catch (Exception e) {
+            e.printStackTrace();
             // TODO: ERROR!
         }
         experimentSolverConfigRowFilter = new ExperimentSolverConfigurationRowFilter();
@@ -396,9 +401,6 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                 if ((sel = tblExperiments.convertRowIndexToModel(tblExperiments.getSelectedRow())) > -1) {
                     Experiment exp = experimentTableModel.getExperimentAt(sel);
                     ArrayList<SolverConfiguration> sc = SolverConfigurationDAO.getSolverConfigurationByExperimentId(exp.getId());
-                    for (SolverConfiguration s : sc) {
-                        s.setName(SolverDAO.getById(s.getSolver_id()).getName());
-                    }
                     solverConfigTableModel.setSolverConfigurations(sc);
                     for (int i = 0; i < solverConfigTableModel.getRowCount(); i++) {
                         if (experimentSolverConfigRowFilter.contains(new ExperimentSolverConfiguration(null, null, null, exp.getId(), solverConfigTableModel.getSolverConfigurationAt(i).getId()))) {
