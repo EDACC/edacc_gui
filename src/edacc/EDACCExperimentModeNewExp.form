@@ -188,7 +188,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jSplitPane1" pref="919" max="32767" attributes="0"/>
+                  <Component id="splitExperimentsSelectedSolverConfigs" pref="919" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -197,17 +197,17 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jSplitPane1" pref="305" max="32767" attributes="0"/>
+                  <Component id="splitExperimentsSelectedSolverConfigs" pref="305" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Container class="javax.swing.JSplitPane" name="jSplitPane1">
+        <Container class="javax.swing.JSplitPane" name="splitExperimentsSelectedSolverConfigs">
           <Properties>
             <Property name="orientation" type="int" value="0"/>
-            <Property name="name" type="java.lang.String" value="jSplitPane1" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="splitExperimentsSelectedSolverConfigs" noResource="true"/>
           </Properties>
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout"/>

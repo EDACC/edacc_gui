@@ -31,45 +31,23 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     public String expName;
     public String expDesc;
     public boolean canceled;
+    private boolean importInitialized;
     private Experiment currentExperiment;
     private ExperimentTableModel experimentTableModel;
     private SolverConfigurationTableModel solverConfigTableModel;
     private ExperimentSolverConfigurationTableModel experimentSolverConfigTableModel;
     private ExperimentSolverConfigurationRowFilter experimentSolverConfigRowFilter;
+    private ExperimentController expController;
 
     /** Creates new form EDACCExperimentModeNewExp */
     public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, ExperimentController expController) {
         super(parent, modal);
+        this.expController = expController;
         experimentTableModel = new ExperimentTableModel();
         solverConfigTableModel = new SolverConfigurationTableModel();
         experimentSolverConfigTableModel = new ExperimentSolverConfigurationTableModel();
         initComponents();
-
-        try {
-            ArrayList<ExperimentSolverConfiguration> items = new ArrayList<ExperimentSolverConfiguration>();
-            for (Experiment exp : expController.getExperiments()) {
-                for (SolverConfiguration sc : SolverConfigurationDAO.getSolverConfigurationByExperimentId(exp.getId())) {
-                    if (sc.getName() == null) {
-                        SolverConfigurationDAO.updateName(sc);
-                    }
-                    items.add(new ExperimentSolverConfiguration(exp.getName(), sc.getName(), Util.getParameterString(SolverConfigurationDAO.getSolverConfigurationParameters(sc)), exp.getId(), sc.getId()));
-                }
-            }
-            experimentSolverConfigTableModel.setItems(items);
-        } catch (Exception e) {
-            e.printStackTrace();
-            // TODO: ERROR!
-        }
-        experimentSolverConfigRowFilter = new ExperimentSolverConfigurationRowFilter();
-        ((TableRowSorter) tblExperimentSolverConfiguration.getRowSorter()).setRowFilter(experimentSolverConfigRowFilter);
-        experimentTableModel.setExperiments(expController.getExperiments());
-        tblExperiments.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                tblExperimentsSelectionModelValueChanged(e);
-            }
-        });
+        importInitialized = false;
 
         pnlImport.setVisible(false);
         this.pack();
@@ -138,7 +116,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         lblImport = new javax.swing.JLabel();
         chkImport = new javax.swing.JCheckBox();
         pnlImport = new javax.swing.JPanel();
-        jSplitPane1 = new javax.swing.JSplitPane();
+        splitExperimentsSelectedSolverConfigs = new javax.swing.JSplitPane();
         jPanel2 = new javax.swing.JPanel();
         splitExperimentsSolverConfigs = new javax.swing.JSplitPane();
         jScrollPaneExperiments = new javax.swing.JScrollPane();
@@ -226,8 +204,8 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         pnlImport.setName("pnlImport"); // NOI18N
         pnlImport.setPreferredSize(new java.awt.Dimension(0, 0));
 
-        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-        jSplitPane1.setName("jSplitPane1"); // NOI18N
+        splitExperimentsSelectedSolverConfigs.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        splitExperimentsSelectedSolverConfigs.setName("splitExperimentsSelectedSolverConfigs"); // NOI18N
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel2.border.title"))); // NOI18N
         jPanel2.setName("jPanel2"); // NOI18N
@@ -283,7 +261,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             .addComponent(splitExperimentsSolverConfigs, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
         );
 
-        jSplitPane1.setTopComponent(jPanel2);
+        splitExperimentsSelectedSolverConfigs.setTopComponent(jPanel2);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel1.border.title"))); // NOI18N
         jPanel1.setName("jPanel1"); // NOI18N
@@ -307,7 +285,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
         );
 
-        jSplitPane1.setRightComponent(jPanel1);
+        splitExperimentsSelectedSolverConfigs.setRightComponent(jPanel1);
 
         javax.swing.GroupLayout pnlImportLayout = new javax.swing.GroupLayout(pnlImport);
         pnlImport.setLayout(pnlImportLayout);
@@ -315,14 +293,14 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             pnlImportLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlImportLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 919, Short.MAX_VALUE)
+                .addComponent(splitExperimentsSelectedSolverConfigs, javax.swing.GroupLayout.DEFAULT_SIZE, 919, Short.MAX_VALUE)
                 .addContainerGap())
         );
         pnlImportLayout.setVerticalGroup(
             pnlImportLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlImportLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
+                .addComponent(splitExperimentsSelectedSolverConfigs, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -423,10 +401,39 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCancelKeyPressed
 
     private void chkImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkImportActionPerformed
-        int div = splitExperimentsSolverConfigs.getDividerLocation();
+        if (chkImport.isSelected() && !importInitialized) {
+
+            try {
+                ArrayList<ExperimentSolverConfiguration> items = new ArrayList<ExperimentSolverConfiguration>();
+                for (Experiment exp : expController.getExperiments()) {
+                    for (SolverConfiguration sc : SolverConfigurationDAO.getSolverConfigurationByExperimentId(exp.getId())) {
+                        if (sc.getName() == null) {
+                            SolverConfigurationDAO.updateName(sc);
+                        }
+                        items.add(new ExperimentSolverConfiguration(exp.getName(), sc.getName(), Util.getParameterString(SolverConfigurationDAO.getSolverConfigurationParameters(sc)), exp.getId(), sc.getId()));
+                    }
+                }
+                experimentSolverConfigTableModel.setItems(items);
+            } catch (Exception e) {
+                e.printStackTrace();
+                // TODO: ERROR!
+            }
+            experimentSolverConfigRowFilter = new ExperimentSolverConfigurationRowFilter();
+            ((TableRowSorter) tblExperimentSolverConfiguration.getRowSorter()).setRowFilter(experimentSolverConfigRowFilter);
+            experimentTableModel.setExperiments(expController.getExperiments());
+            tblExperiments.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+                @Override
+                public void valueChanged(ListSelectionEvent e) {
+                    tblExperimentsSelectionModelValueChanged(e);
+                }
+            });
+            importInitialized = true;
+        }
         pnlImport.setVisible(chkImport.isSelected());
         this.pack();
         splitExperimentsSolverConfigs.setDividerLocation(.5);
+        splitExperimentsSelectedSolverConfigs.setDividerLocation(.5);
     }//GEN-LAST:event_chkImportActionPerformed
 
     private void tblExperimentsMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblExperimentsMouseReleased
@@ -480,11 +487,11 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPaneExperiments;
-    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JLabel lblExperimentDescription;
     private javax.swing.JLabel lblExperimentName;
     private javax.swing.JLabel lblImport;
     private javax.swing.JPanel pnlImport;
+    private javax.swing.JSplitPane splitExperimentsSelectedSolverConfigs;
     private javax.swing.JSplitPane splitExperimentsSolverConfigs;
     private javax.swing.JTable tblExperimentSolverConfiguration;
     private javax.swing.JTable tblExperiments;
