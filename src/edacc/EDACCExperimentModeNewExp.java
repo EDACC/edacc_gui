@@ -12,7 +12,6 @@ import edacc.experiment.Util;
 import edacc.model.Experiment;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
-import edacc.model.SolverDAO;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -139,13 +138,16 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         lblImport = new javax.swing.JLabel();
         chkImport = new javax.swing.JCheckBox();
         pnlImport = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        tblExperimentSolverConfiguration = new javax.swing.JTable();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        jPanel2 = new javax.swing.JPanel();
         splitExperimentsSolverConfigs = new javax.swing.JSplitPane();
         jScrollPaneExperiments = new javax.swing.JScrollPane();
         tblExperiments = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblSolverConfigs = new javax.swing.JTable();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tblExperimentSolverConfiguration = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentModeNewExp.class);
@@ -224,13 +226,11 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         pnlImport.setName("pnlImport"); // NOI18N
         pnlImport.setPreferredSize(new java.awt.Dimension(0, 0));
 
-        jScrollPane3.setName("jScrollPane3"); // NOI18N
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.setName("jSplitPane1"); // NOI18N
 
-        tblExperimentSolverConfiguration.setModel(experimentSolverConfigTableModel);
-        tblExperimentSolverConfiguration.setName("tblExperimentSolverConfiguration"); // NOI18N
-        tblExperimentSolverConfiguration.setRowSelectionAllowed(false);
-        tblExperimentSolverConfiguration.setRowSorter(new TableRowSorter<ExperimentSolverConfigurationTableModel>(experimentSolverConfigTableModel));
-        jScrollPane3.setViewportView(tblExperimentSolverConfiguration);
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel2.border.title"))); // NOI18N
+        jPanel2.setName("jPanel2"); // NOI18N
 
         splitExperimentsSolverConfigs.setDividerLocation(350);
         splitExperimentsSolverConfigs.setName("splitExperimentsSolverConfigs"); // NOI18N
@@ -272,19 +272,58 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
 
         splitExperimentsSolverConfigs.setRightComponent(jScrollPane2);
 
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(splitExperimentsSolverConfigs, javax.swing.GroupLayout.DEFAULT_SIZE, 905, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(splitExperimentsSolverConfigs, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
+        );
+
+        jSplitPane1.setTopComponent(jPanel2);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel1.border.title"))); // NOI18N
+        jPanel1.setName("jPanel1"); // NOI18N
+
+        jScrollPane3.setName("jScrollPane3"); // NOI18N
+
+        tblExperimentSolverConfiguration.setModel(experimentSolverConfigTableModel);
+        tblExperimentSolverConfiguration.setName("tblExperimentSolverConfiguration"); // NOI18N
+        tblExperimentSolverConfiguration.setRowSelectionAllowed(false);
+        tblExperimentSolverConfiguration.setRowSorter(new TableRowSorter<ExperimentSolverConfigurationTableModel>(experimentSolverConfigTableModel));
+        jScrollPane3.setViewportView(tblExperimentSolverConfiguration);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 905, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
+        );
+
+        jSplitPane1.setRightComponent(jPanel1);
+
         javax.swing.GroupLayout pnlImportLayout = new javax.swing.GroupLayout(pnlImport);
         pnlImport.setLayout(pnlImportLayout);
         pnlImportLayout.setHorizontalGroup(
             pnlImportLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
-            .addComponent(splitExperimentsSolverConfigs, javax.swing.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
+            .addGroup(pnlImportLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 919, Short.MAX_VALUE)
+                .addContainerGap())
         );
         pnlImportLayout.setVerticalGroup(
             pnlImportLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlImportLayout.createSequentialGroup()
-                .addComponent(splitExperimentsSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -306,10 +345,12 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                             .addComponent(lblImport))
                         .addGap(12, 12, 12)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
-                            .addComponent(txtExperimentName, javax.swing.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
+                            .addComponent(txtExperimentName, javax.swing.GroupLayout.DEFAULT_SIZE, 860, Short.MAX_VALUE)
                             .addComponent(chkImport)
-                            .addComponent(pnlImport, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE))))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 860, Short.MAX_VALUE))))
+                .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(pnlImport, javax.swing.GroupLayout.DEFAULT_SIZE, 939, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -325,15 +366,15 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblImport)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(chkImport)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(pnlImport, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
+                        .addComponent(pnlImport, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnCreateExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(lblImport))
+                            .addComponent(btnCreateExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
 
@@ -433,10 +474,13 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnCreateExperiment;
     private javax.swing.JCheckBox chkImport;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPaneExperiments;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JLabel lblExperimentDescription;
     private javax.swing.JLabel lblExperimentName;
     private javax.swing.JLabel lblImport;

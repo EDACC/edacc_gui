@@ -1157,7 +1157,9 @@ public class ExperimentController {
                 haveToDuplicate |= duplicate.get(i);
                 int scId = solverConfigIds.get(i);
                 SolverConfiguration sc = SolverConfigurationDAO.getSolverConfigurationById(scId);
-                // TODO: sc name is not set ... do it in the model classes
+                if (sc.getName() == null) {
+                    SolverConfigurationDAO.updateName(sc);
+                }
                 task.setOperationName("Processing data from solver configuration " + sc.getName() + " (" + (i + 1) + " / " + solverConfigIds.size() + "):");
                 task.setTaskProgress((float) (i+1) / solverConfigIds.size());
                 RunCountSCId tmp = this.importDataFromSolverConfiguration(task, sc);
@@ -1207,7 +1209,7 @@ public class ExperimentController {
             }
             generateJobs(numRuns, task);
             task.setStatus("Finalizing..");
-            // TODO SET EXP SETTINGS
+            activeExperiment.setCPUTimeLimit(-1);
             ExperimentDAO.save(activeExperiment);
             updateExperimentResults();
         } catch (Exception e) {
