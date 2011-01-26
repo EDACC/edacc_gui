@@ -7,6 +7,7 @@ package edacc.model;
 
 import edacc.properties.PropertyTypeNotExistException;
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -16,7 +17,9 @@ import java.util.logging.Logger;
  *
  * @author rretz
  */
-public class ExperimentResultHasProperty extends BaseModel implements IntegerPKModel {
+public class ExperimentResultHasProperty extends BaseModel implements IntegerPKModel,Serializable {
+
+    private static final long serialVersionUID = -32532623683246235L;
 
     private int id;
     private ExperimentResult expResult;

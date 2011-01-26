@@ -1013,4 +1013,22 @@ public class ExperimentResultDAO {
             return null;
         }
     }
+
+    public static ArrayList<ExperimentResult> getAllByInstanceId(int id) throws NoConnectionToDBException, SQLException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
+        ArrayList<ExperimentResult> v = new ArrayList<ExperimentResult>();
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
+                selectQuery
+                + "WHERE Instances_idInstance=?;");
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            ExperimentResult er = getExperimentResultFromResultSet(rs);
+            v.add(er);
+            er.setSaved();
+        }
+        ExperimentResultHasPropertyDAO.assign(v, id);
+        rs.close();
+        st.close();
+        return v;
+    }
 }

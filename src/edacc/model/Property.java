@@ -185,6 +185,9 @@ public class Property extends BaseModel implements IntegerPKModel{
             case 6:
                 this.source = PropertySource.InstanceName;
                 break;
+            case 7:
+                this.source = PropertySource.ExperimentResults;
+                break;
             default:
                 throw new PropertyTypeNotExistException();
 
@@ -216,6 +219,8 @@ public class Property extends BaseModel implements IntegerPKModel{
                 return 5;
             case InstanceName:
                 return 6;
+            case ExperimentResults:
+                return 7;
             default:
                 return -1;
         }

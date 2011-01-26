@@ -211,6 +211,7 @@ public class InstanceHasPropertyDAO {
             throw new InstanceHasPropertyNotInDBException();
         InstanceHasProperty res = new InstanceHasProperty(instance, property, rs.getString(2));
         res.setId(rs.getInt(1));
+        res.setSaved();
         return res;
     }
 }
