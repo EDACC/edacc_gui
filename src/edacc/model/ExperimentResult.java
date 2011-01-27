@@ -5,6 +5,9 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 
 public class ExperimentResult extends BaseModel implements Serializable {
+
+    private static final long serialVersionUID = -235326236723623L;
+
     public static final int SOLVER_OUTPUT = 0;
     public static final int LAUNCHER_OUTPUT = 1;
     public static final int WATCHER_OUTPUT = 2;

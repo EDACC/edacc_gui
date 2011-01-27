@@ -1,10 +1,15 @@
 package edacc.model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author simon
  */
-public class ExperimentResultResultCode {
+public class ExperimentResultResultCode implements Serializable {
+
+    private static final long serialVersionUID = -235236236L;
+
     public static final ExperimentResultResultCode SAT = new ExperimentResultResultCode(11);
     public static final ExperimentResultResultCode UNSAT = new ExperimentResultResultCode(10);
     public static final ExperimentResultResultCode UNKNOWN = new ExperimentResultResultCode(0);

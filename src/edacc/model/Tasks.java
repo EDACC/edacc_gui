@@ -239,16 +239,36 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
             f = 1.f;
         }
         this.setProgress(f);
-        taskView.setProgress(f * 100);
+        final float ff = f * 100;
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                if (taskView != null) {
+                    taskView.setProgress(ff);
+                }
+            }
+
+        });
+        
     }
 
     /**
      * Sets the status text in the status bar.
      * @param s the status text to be set
      */
-    public void setStatus(String s) {
+    public void setStatus(final String s) {
         this.setMessage(s);
-        taskView.setMessage(s);
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                if (taskView != null)
+                    taskView.setMessage(s);
+            }
+
+        });
+        
     }
 
     /**

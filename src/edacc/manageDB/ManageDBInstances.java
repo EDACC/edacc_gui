@@ -815,9 +815,7 @@ public class ManageDBInstances implements Observer{
         Thread compute = new Thread(comCon);
         try {
             compute.start();
-            if(!comCon.completed()){
-                condition.await();
-            }
+            condition.await();
         } catch ( InterruptedException e ) {
         } finally {
             lock.unlock();

@@ -49,7 +49,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     private ManagePropertyController controller;
     private PropertyTableModel propertyTableModel;
     private PropertySource[] ResultPropertySources = {PropertySource.LauncherOutput, PropertySource.SolverOutput, PropertySource.VerifierOutput, PropertySource.WatcherOutput};
-    private PropertySource[] InstancePropertySources = {PropertySource.Instance, PropertySource.InstanceName};
+    private PropertySource[] InstancePropertySources = {PropertySource.Instance, PropertySource.InstanceName, PropertySource.ExperimentResults};
     private PropertyType[] propertyTypes = {PropertyType.InstanceProperty, PropertyType.ResultProperty};
     private EDACCManagePropertyValueTypesDialog PropertyValueTypesDialog;
     private boolean editing = false;
@@ -709,6 +709,13 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 this.radioBtnComputationMethod.setEnabled(true);
                 this.radioBtnRegExpression.setEnabled(true);
                 this.textAreaRegularExpressions.setEnabled(true);
+                this.textFieldComputationmethodParameter.setEnabled(true);
+                this.buttonNewComputationMethod.setEnabled(true);
+                comboBoxComputationMethod.setEnabled(true);
+            }else if (this.comboBoxPropertySource.getSelectedItem().equals(PropertySource.ExperimentResults)){
+                this.radioBtnComputationMethod.setEnabled(true);
+                this.radioBtnRegExpression.setEnabled(false);
+                this.textAreaRegularExpressions.setEnabled(false);
                 this.textFieldComputationmethodParameter.setEnabled(true);
                 this.buttonNewComputationMethod.setEnabled(true);
                 comboBoxComputationMethod.setEnabled(true);
