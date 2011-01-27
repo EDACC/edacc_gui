@@ -822,6 +822,7 @@ public class ManageDBInstances implements Observer{
         } finally {
             lock.unlock();
         }
+        task.cancel(true);
     }
 
     public void changeInstanceTable() {

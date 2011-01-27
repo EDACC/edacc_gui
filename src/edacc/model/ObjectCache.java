@@ -50,6 +50,14 @@ public class ObjectCache<T extends IntegerPKModel> {
     }
 
     /**
+     * removes the object related to the given id from the cache
+     * @param id
+     */
+    protected void removeById(int id){
+        cache.remove(id);
+    }
+
+    /**
      * returns an enumeration of all elements in the cache
      * @return
      */
