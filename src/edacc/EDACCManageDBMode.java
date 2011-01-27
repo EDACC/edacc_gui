@@ -12,6 +12,7 @@ package edacc;
 
 import edacc.events.TaskEvents;
 import edacc.manageDB.*;
+import edacc.manageDB.InstanceParser.InstanceException;
 import edacc.model.Instance;
 import edacc.model.InstanceNotInDBException;
 import edacc.model.InstanceClass;
@@ -1209,6 +1210,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
             //if the user doesn't cancel the dialog above, the fileChooser is shown.
             if (input != null) {
+                if(fileExtension.isEmpty()){
+                      
+                     JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "No fileextension is given.",
+                    "Warning",
+                    JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
                 //When the user choos autogenerate only directorys can be choosen, else files and directorys.
                 if (input.getName().equals("")) {
                     jFileChooserManageDBInstance.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -1955,7 +1964,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                         "SQL-Exception: " + e.getMessage(),
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
+            } else if (e instanceof InstanceException){
+                JOptionPane.showMessageDialog(panelManageDBInstances, 
+                        "No Instances have been found.", "Error", 
+                        JOptionPane.WARNING_MESSAGE);
             }
+
         }
         Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, e);
     }
