@@ -791,6 +791,8 @@ public class ExperimentController {
                 // add client binary
                 addClient(zos);
 
+                // add runsolver
+                addRunsolver(zos);
                 // add empty result library
                 entry = new ZipEntry("results" + System.getProperty("file.separator") + "~");
                 zos.putNextEntry(entry);
@@ -923,17 +925,49 @@ public class ExperimentController {
     }
 
     private void addClient(ZipOutputStream zos) throws IOException, ClientBinaryNotFoundException {
-        InputStream in = EDACCApp.class.getClassLoader().getResourceAsStream("edacc/resources/client");
+        InputStream in = new FileInputStream(new File(Util.getPath() + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "client"));
         if (in == null) {
             throw new ClientBinaryNotFoundException();
         }
         ZipEntry entry = new ZipEntry("client");
         zos.putNextEntry(entry);
 
+        byte[] buf = new byte[1024];
         int data;
 
-        while ((data = in.read()) > -1) {
-            zos.write(data);
+        while ((data = in.read(buf)) > -1) {
+            zos.write(buf, 0, data);
+        }
+        zos.closeEntry();
+        in.close();
+    }
+
+    private void addRunsolver(ZipOutputStream zos) throws IOException, ClientBinaryNotFoundException {
+        InputStream in = new FileInputStream(new File(Util.getPath() + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "runsolver"));
+        if (in == null) {
+            throw new ClientBinaryNotFoundException();
+        }
+        ZipEntry entry = new ZipEntry("runsolver");
+        zos.putNextEntry(entry);
+
+        byte[] buf = new byte[1024];
+        int data;
+
+        while ((data = in.read(buf)) > -1) {
+            zos.write(buf, 0, data);
+        }
+        zos.closeEntry();
+        in.close();
+
+        in = new FileInputStream(new File(Util.getPath() + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "runsolver_copyright.txt"));
+        if (in == null) {
+            throw new ClientBinaryNotFoundException();
+        }
+        entry = new ZipEntry("runsolver_copyright.txt");
+        zos.putNextEntry(entry);
+ 
+        while ((data = in.read(buf)) > -1) {
+            zos.write(buf, 0, data);
         }
         zos.closeEntry();
         in.close();
