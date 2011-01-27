@@ -211,7 +211,7 @@ public class PropertyComputationUnit implements Runnable {
                 }
                 bin.setExecutable(true);
                 System.out.println(bin.getAbsolutePath());
-                Process p = Runtime.getRuntime().exec("java -jar " + bin.getAbsolutePath());
+                Process p = Runtime.getRuntime().exec(bin.getAbsolutePath());
                 Blob instance = InstanceDAO.getBinary(ihp.getInstance().getId());
                 BufferedReader instanceReader = new BufferedReader(new InputStreamReader(instance.getBinaryStream()));
                 // The std input stream of the external program. We pipe the content of the instance file into that stream
