@@ -27,7 +27,7 @@ status dbFetchExperimentData(experiment* e) {
 	}
 	int tries=0;
 	for (tries=0;tries<connectAttempts;tries++){
-		if (mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)== NULL) {
+		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
 			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s",mysql_error(conn));
 			sleep(waitForDB);
 		}
@@ -192,7 +192,6 @@ int dbFetchJob(job* j, status* s) {
 
 	char *queryJob = NULL;
 	char *queryJobParams = NULL;
-	//char *queryJobParams = NULL;
 
 	int queryLength;
 
@@ -235,7 +234,7 @@ int dbFetchJob(job* j, status* s) {
 	}
 	int tries=0;
 	for (tries=0;tries<connectAttempts;tries++){
-		if (mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)== NULL) {
+		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
 			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s",mysql_error(conn));
 			sleep(waitForDB);
 		}
@@ -462,7 +461,7 @@ status dbUpdate(const job* j) {
 	}
 	int tries=0;
 	for (tries=0;tries<connectAttempts;tries++){
-		if (mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)== NULL) {
+		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
 			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s",mysql_error(conn));
 			sleep(waitForDB);
 		}
@@ -504,7 +503,7 @@ status dbUpdateResults(const job* j) {
 	}
 	int tries=0;
 	for (tries=0;tries<connectAttempts;tries++){
-		if (mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)== NULL) {
+		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
 			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s",mysql_error(conn));
 			sleep(waitForDB);
 		}
@@ -575,7 +574,7 @@ status dbFetchSolver(const char* solverName, const char* solverVersion,
 	}
 	int tries=0;
 	for (tries=0;tries<connectAttempts;tries++){
-		if (mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)== NULL) {
+		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
 			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s",mysql_error(conn));
 			sleep(waitForDB);
 		}
@@ -652,7 +651,7 @@ status dbFetchInstance(const char* instanceName, instance* i) {
 	}
 	int tries=0;
 	for (tries=0;tries<connectAttempts;tries++){
-		if (mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)== NULL) {
+		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
 			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s",mysql_error(conn));
 			sleep(waitForDB);
 		}
@@ -716,7 +715,7 @@ status setMySQLTime(job *j) {
 	}
 	int tries=0;
 	for (tries=0;tries<connectAttempts;tries++){
-		if (mysql_real_connect(conn, host, username, password, database, 0, NULL, 0)== NULL) {
+		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
 			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s",mysql_error(conn));
 			sleep(waitForDB);
 		}

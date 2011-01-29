@@ -263,7 +263,7 @@ NUL 	NUL byte (0x00). Represent this character by “\0” (a backslash followed
 	const char *ptr =j->watcherOutput;
 	while (sscanf(ptr,"%31[^\n]\n%n", prefix,&n)==1 ){ //read line by line maximum of 31 chars
 		if (sscanf(prefix,"CPU time (s): %f",&time)==1){
-			printf("HAB DIE ZEIT:%f\n",time);
+			printf("time extracted for jobID: %d =%f\n",j->id,time);
 			j->status=1;
 			break;
 		}
@@ -288,24 +288,30 @@ NUL 	NUL byte (0x00). Represent this character by “\0” (a backslash followed
 	if (j->status!=21){	//limit not exceeded
 		ptr =j->solverOutput;
 		while (sscanf(ptr,"%31[^\n]\n%n", prefix,&n)==1 ){ //read line by line maximum of 31 chars
-			if (sscanf(prefix,"%s s UNSATISFIABLE%s",&dummy,&dummy)==1){
-				printf("Matching line: %s", prefix);
-				j->resultCode=10;
-				printf("s UNSATISFIABLE gefunden");fflush(stdout);
-				return success;
-				break;
+			//printf("try to matching in line: %s\n", prefix);
+			if (sscanf(prefix,"%*s %*s %s %*s",&dummy)==1){
+				if (strcmp(dummy,"UNSATISFIABLE")==0){
+					j->resultCode=10;
+					printf("s UNSATISFIABLE found\n");fflush(stdout);
+					return success;
+					break;
+				}
 			}
-			if (sscanf(prefix,"%s s UNKNOWN",&dummy)==1){
-				j->resultCode=0;
-				printf("s UNKNOWN gefunden");fflush(stdout);
-				return success;
-				break;
+			if (sscanf(prefix,"%*s s %s %*s",&dummy)==1){
+				if (strcmp(dummy,"UNKNOWN")==0){
+					j->resultCode=0;
+					printf("s UNKNOWN found\n");fflush(stdout);
+					return success;
+					break;
+				}
 			}
-			if (sscanf(prefix,"%s s SATISFIABLE",&dummy)==1){
-				j->resultCode=11;
-				printf("s SATISFIABLE gefunden");fflush(stdout);
-				return success;
-				break;
+			if (sscanf(prefix,"%*s s %s %*s",&dummy)==1){
+				if (strcmp(dummy,"SATISFIABLE")==0){
+					j->resultCode=11;
+					printf("s SATISFIABLE found\n");fflush(stdout);
+					return success;
+					break;
+				}
 			}
 			ptr+=n;
 		}
@@ -517,7 +523,6 @@ status handleChildren(int cnt) {
 		if (WIFSIGNALED(retval)) { //watcher was terminated by a signal
 			j->status=-4*100-WTERMSIG(retval); //watcher crash has code: -4xx : xx=signal number
 			//The process terminated abnormally
-			//TODO: remove outputfiles
 
 			//solverOutput=prependResultPath(j->solverOutputFN);
 			j->pid=0;
@@ -700,7 +705,7 @@ void printUsage(){
 void initDefaultParameters(){
 	verbosity=4;
 	keepResults=0;
-	waitForDB=60; //60sec.
+	waitForDB=20; //60sec.
 	connectAttempts=5;
 	waitForJobs=3600;
 	scanForJobs=60;
@@ -792,7 +797,7 @@ int main(int argc, char **argv) {
 			for(j=jobs; j->pid!=0; ++j);
 
 			//Try to load a job from the database and write it to j
-			logComment(2,"loading job from DB...\n");
+			logComment(2,"\n\nloading job from DB...\n");
 			//for (jobTries=0;jobTries<waitForJobs/scanForJobs;jobTries++,sleep(scanForJobs)){
 			if(fetchJob(j, &s)!=0) {
 				//Unable to retrieve a job from the database
@@ -813,7 +818,7 @@ int main(int argc, char **argv) {
 			//				break;
 			//}
 
-			logComment(1,"\n------------------------------\n");
+			logComment(1,"------------------------------\n");
 			logComment(2,"job details: \n");
 			logComment(1,"%20s : %d\n","jobID", j->id);
 			logComment(1,"%20s : %s\n","solver", j->solverName);
@@ -833,6 +838,7 @@ int main(int argc, char **argv) {
 
 			//Set the job state to running in the database
 			j->status=0;
+			j->resultTime=0.0;
 			j->computeQueue=gridQueueId;
 			s=update(j);
 			if(s!=success) {

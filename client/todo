@@ -1,0 +1,5 @@
+- include port option -> to be read from config file
+- "get free job"-query to be changed
+- write information about node into ExperimentResults 
+- fix memory leaks
+- if the client finds no more jobs in the DB is should check again after each of its children terminates!
