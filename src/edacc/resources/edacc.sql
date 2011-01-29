@@ -253,6 +253,9 @@ CREATE  TABLE IF NOT EXISTS `ExperimentResults` (
   INDEX `fk_ExperimentResults_SolverConfig1` (`SolverConfig_idSolverConfig` ASC) ,
   INDEX `fk_ExperimentResults_Experiment1` (`Experiment_idExperiment` ASC) ,
   INDEX `fk_ExperimentResults_Instances1` (`Instances_idInstance` ASC) ,
+  INDEX `status` (`status` ASC) ,
+  INDEX `computeQueue` (`computeQueue` ASC) ,
+  INDEX `priority` (`priority` ASC) ,
   CONSTRAINT `fk_ExperimentResults_SolverConfig1`
     FOREIGN KEY (`SolverConfig_idSolverConfig` )
     REFERENCES `SolverConfig` (`idSolverConfig` )
