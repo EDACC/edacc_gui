@@ -1,9 +1,11 @@
 package edacc.experiment;
 
+import edacc.EDACCApp;
 import edacc.model.InstanceClass;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstance;
+import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -168,5 +170,14 @@ public class Util {
         }
         res.add(((InstanceClass) root.getUserObject()).getId());
         return res;
+    }
+
+    public static String getPath() {
+        File f = new File(EDACCApp.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+        if (f.isDirectory()) {
+            return f.getPath();
+        } else {
+            return f.getParent();
+        }
     }
 }

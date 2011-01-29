@@ -72,4 +72,31 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <target name="-post-jar">
+        <echo>Copying runsolver and client</echo>
+        <mkdir dir="${dist.dir}/bin" />
+        <copy todir="${dist.dir}/bin">
+            <fileset file="client/client"/>
+            <fileset file="client/runsolver"/>
+            <fileset file="client/runsolver_copyright.txt"/>
+        </copy>
+        <echo>Copying Experiment Mode - README.txt</echo>
+        <copy todir="${dist.dir}">
+            <fileset file="Experiment Mode - README.txt"/>
+        </copy>
+    </target>
+
+    <target name="-pre-jar">
+        <delete dir="${build.classes.dir}/bin"/>
+    </target>
+
+    <target name="-post-compile">
+        <echo>Copying runsolver and client</echo>
+        <mkdir dir="${build.classes.dir}/bin" />
+        <copy todir="${build.classes.dir}/bin">
+            <fileset file="client/client"/>
+            <fileset file="client/runsolver"/>
+            <fileset file="client/runsolver_copyright.txt"/>
+        </copy>
+    </target>
 </project>

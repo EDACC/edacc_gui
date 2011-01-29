@@ -15,8 +15,8 @@ public class InstanceException extends Exception
 	/**
 	 * Construct a new InstanceException
 	 */
-	public InstanceException()
-	{
+	public InstanceException(){
+            super();
 	}
 
 	/**

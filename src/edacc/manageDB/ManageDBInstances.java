@@ -107,16 +107,12 @@ public class ManageDBInstances implements Observer{
      * instance files into the "instance table" of the MangeDBMode.
      */
 
-    public void addInstances(InstanceClass input, File ret, Tasks task, String fileExtension){
+    public void addInstances(InstanceClass input, File ret, Tasks task, String fileExtension) throws InstanceException{
         try {
         
             RecursiveFileScanner InstanceScanner = new RecursiveFileScanner(fileExtension);
             Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
-            if (instanceFiles.isEmpty()) {
-                JOptionPane.showMessageDialog(panelManageDBInstances, "No Instances have been found.", "Error", JOptionPane.WARNING_MESSAGE);
-                task.cancel(true);
-                return;
-            }
+
             task.setOperationName("Adding Instances");
             if (input.getName().equals("")) {
                 Vector<Instance> instances;
@@ -389,14 +385,10 @@ public class ManageDBInstances implements Observer{
         for (int i = 0; i < instanceFiles.size(); i++) {
             try {
                 String md5 = calculateMD5(instanceFiles.get(i));
-                try {
-                    InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
-                    Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, md5, instanceClass);
+                    String fileName = instanceFiles.get(i).getName();
+                    Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), fileName, md5, instanceClass);
                     instances.add(temp);
                     InstanceDAO.save(temp);
-                } catch (InstanceException e) {
-                    errorsAdd.add(instanceFiles.get(i).getAbsolutePath());
-                }
             } catch (InstanceAlreadyInDBException ex) {
                 errorsDB.add(instanceFiles.get(i).getAbsolutePath());
             }
@@ -822,6 +814,7 @@ public class ManageDBInstances implements Observer{
         } finally {
             lock.unlock();
         }
+        task.cancel(true);
     }
 
     public void changeInstanceTable() {
