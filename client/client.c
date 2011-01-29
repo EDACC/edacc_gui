@@ -19,6 +19,9 @@
 #include <time.h>
 
 
+
+
+
 //This array stores the arguments for a solver run we execute via execve
 static char* jobArgs[4]={NULL, NULL, NULL, NULL};
 
@@ -30,14 +33,16 @@ static int jobsLen;
 //The timeout in seconds for each solver run
 int CPUTimeLimit;
 
+//If the experiment is used only to see if a instance is solvable.
+int solveOnce=0;
 
-//Test if a file exists
 int fileExists(const char* fileName) {
 	struct stat buf;
 	if(stat(fileName, &buf)==-1 && errno==ENOENT)
 		return 0;
 	return 1;
 }
+
 
 //Create a file and verify the md5 sum
 status createFile(const char* fileName, const char* content, size_t contentLen, const char* md5sum, mode_t mode) {
@@ -119,6 +124,11 @@ status initExpData(experiment* exp) {
 	}
 
 	return success;
+}
+
+//Set the startTime field in j to the current local date - time
+status setStartTime(job *j) {
+	return setMySQLTime(j);
 }
 
 inline int fetchJob(job* j, status* s) {
@@ -247,7 +257,7 @@ NUL 	NUL byte (0x00). Represent this character by “\0” (a backslash followed
 	//TODO: resultTime parsen
 
 	char prefix[32];
-	char dummy[2];
+	char dummy[80];
 	float time;
 	int n;
 	const char *ptr =j->watcherOutput;
@@ -262,7 +272,8 @@ NUL 	NUL byte (0x00). Represent this character by “\0” (a backslash followed
 		fflush(stdout);
 	}
 	j->resultTime=time;
-	j->resultCode=11;
+
+
 	ptr =j->watcherOutput;
 	while (sscanf(ptr,"%31[^\n]\n%n", prefix,&n)==1 ){ //read line by line maximum of 31 chars
 		if (sscanf(prefix,"Maximum CPU time exceeded:%1s",&dummy)==1){
@@ -274,6 +285,32 @@ NUL 	NUL byte (0x00). Represent this character by “\0” (a backslash followed
 		}
 		ptr+=n;
 	}
+	if (j->status!=21){	//limit not exceeded
+		ptr =j->solverOutput;
+		while (sscanf(ptr,"%31[^\n]\n%n", prefix,&n)==1 ){ //read line by line maximum of 31 chars
+			if (sscanf(prefix,"%s s UNSATISFIABLE%s",&dummy,&dummy)==1){
+				printf("Matching line: %s", prefix);
+				j->resultCode=10;
+				printf("s UNSATISFIABLE gefunden");fflush(stdout);
+				return success;
+				break;
+			}
+			if (sscanf(prefix,"%s s UNKNOWN",&dummy)==1){
+				j->resultCode=0;
+				printf("s UNKNOWN gefunden");fflush(stdout);
+				return success;
+				break;
+			}
+			if (sscanf(prefix,"%s s SATISFIABLE",&dummy)==1){
+				j->resultCode=11;
+				printf("s SATISFIABLE gefunden");fflush(stdout);
+				return success;
+				break;
+			}
+			ptr+=n;
+		}
+	}
+	//Hier kommt die Suche nach dem Resultcode im solveroutput
 
 
 
@@ -471,8 +508,10 @@ status handleChildren(int cnt) {
 				freeJob(j);
 				return success;
 			}
-			remove(j->solverOutputFN);
-			remove(j->watcherOutputFN);
+			if (!keepResults){
+				remove(j->solverOutputFN);
+				remove(j->watcherOutputFN);
+			}
 			freeJob(j);
 		}
 		if (WIFSIGNALED(retval)) { //watcher was terminated by a signal
@@ -653,22 +692,69 @@ void freeJobArgs() {
 	free(jobArgs[2]);
 }
 
-//Set the startTime field in j to the current local time
-//TODO : Get db time and set starttime to DB-time
-status setStartTime(job *j) {
-	return setMySQLTime(j);
+
+void printUsage(){
+	//TODO: Print usage
 }
 
+void initDefaultParameters(){
+	verbosity=4;
+	keepResults=0;
+	waitForDB=60; //60sec.
+	connectAttempts=5;
+	waitForJobs=3600;
+	scanForJobs=60;
+}
 
-int main(int argc, char *argv[]) {
-	//TODO: hier sollte ein argument parser eingebaut werden
+int main(int argc, char **argv) {
 
-	if(argc>1)
-		verbosity=atoi(argv[1]);
-	else
-		verbosity=2; //default value for verbosity
+	initDefaultParameters();
 
 
+
+	static const struct option long_options[] =	{
+			{ "verbosity", required_argument,       0, 'v' },
+			{ "solve_once", no_argument,       0, 's' },
+			{ "keep_results", no_argument,       0, 'k' },
+			{ "wait_for_db", required_argument,       0, 'w' },
+			{ "wait_for_jobs", required_argument,       0, 'j' },
+			{ "connect_attempts", required_argument,       0, 'c' },
+			0	};
+
+	while (optind < argc)
+	{
+		int index = -1;
+		struct option * opt = 0;
+		int result = getopt_long(argc, argv,"v:sk",long_options, &index);
+		if (result == -1) break; /* end of list */
+		switch (result)
+		{
+		case 'v': verbosity=atoi(optarg);		break;
+		case 's': solveOnce=1;		break;
+		case 'k': keepResults=1;		break;
+		case 'w': waitForDB=atoi(optarg);		break;
+		case 'j': waitForJobs=atoi(optarg);		break;
+		case 'c': connectAttempts=atoi(optarg);		break;
+		case 0: /* all parameter that do not */
+			/* appear in the optstring */
+			opt = (struct option *)&(long_options[index]);
+			printf("'%s' was specified.",
+					opt->name);
+			if (opt->has_arg == required_argument)
+				printf("Arg: <%s>", optarg);
+			printf("\n");
+			break;
+		default:
+			printf("parameter not known!");
+			printUsage();
+			exit(0);
+			break;
+		}
+	}
+
+	//TODO: die startParameter angeben!
+
+	int jobTries;
 	experiment exp;
 	int numJobs;
 	status s;
@@ -687,6 +773,7 @@ int main(int argc, char *argv[]) {
 	}
 	logComment(1,"starting the init-process for experiment with ID %d \n------------------------------\n",experimentId);
 	initPath();
+	checkPath();
 	s=initExpData(&exp);
 	logComment(1,"\n------------------------------\n");
 	if(s!=success) {
@@ -706,15 +793,26 @@ int main(int argc, char *argv[]) {
 
 			//Try to load a job from the database and write it to j
 			logComment(2,"loading job from DB...\n");
+			//for (jobTries=0;jobTries<waitForJobs/scanForJobs;jobTries++,sleep(scanForJobs)){
 			if(fetchJob(j, &s)!=0) {
 				//Unable to retrieve a job from the database
 				if(s==success) {
 					//No error occured, but there's no job left in the database.
 					//Wait until all child processes have terminated.
+					logComment(2,"no more jobs found!\n");
 					s=handleChildren(numJobs);
+					//						if (jobTries+1!=waitForJobs/scanForJobs){
+					//							logComment(2,"No jobs in DB going to sleep for %d seconds ", scanForJobs);
+					//							continue;
 				}
+				//						else //waited a lot
+				//							s=handleChildren(numJobs);
+				//					}
 				exitClient(s);
 			}
+			//				break;
+			//}
+
 			logComment(1,"\n------------------------------\n");
 			logComment(2,"job details: \n");
 			logComment(1,"%20s : %d\n","jobID", j->id);
@@ -756,7 +854,7 @@ int main(int argc, char *argv[]) {
 			if(!fileExists(fileName)) {
 				s=dbFetchSolver(j->solverName,j->solverVersion, &solv);
 				if(s!=success) {
-				free(fileName);
+					free(fileName);
 					j->status=-5;
 					s=update(j);
 					exitClient(s);
@@ -866,4 +964,5 @@ int main(int argc, char *argv[]) {
 	//Avoid compiler warnings
 	return success;
 }
+
 

@@ -4,6 +4,13 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <sys/types.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+#include <sys/stat.h>
+#include "log.h"
+#include <errno.h>
 
 //A version of sprintf that sets str to newly allocated memory containing the output string.
 //If the function succeeds (i.e. returns a non-negative value), the memory pointed to by str
@@ -14,6 +21,9 @@ int sprintfAlloc(char** str, const char* format, ...);
 //and must not be freed.
 char* pidToFileName(pid_t p);
 
+int fileExists(const char* fileName);
+
+void checkPath();
 void initPath();
 
 //Prepend fileName by basename. On success, the function returns a pointer
