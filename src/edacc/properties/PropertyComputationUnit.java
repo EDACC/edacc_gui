@@ -2,12 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package edacc.properties;
 
 import edacc.model.ComputationMethodDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
+import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.ExperimentResultHasProperty;
 import edacc.model.ExperimentResultHasPropertyDAO;
@@ -26,9 +26,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,11 +43,11 @@ import java.util.regex.Pattern;
  * @author dgall
  */
 public class PropertyComputationUnit implements Runnable {
+
     private ExperimentResultHasProperty erhp;
     private InstanceHasProperty ihp;
     private PropertyComputationController callback;
     private Property property;
-
     /**
      * Defines the maximum time the unit will wait for a value of an external program (in millis).
      * default: 10 sec
@@ -55,7 +57,7 @@ public class PropertyComputationUnit implements Runnable {
     PropertyComputationUnit(ExperimentResultHasProperty erhp, PropertyComputationController callback) {
         this.property = erhp.getProperty();
         this.erhp = erhp;
-        this.callback = callback;      
+        this.callback = callback;
     }
 
     PropertyComputationUnit(InstanceHasProperty ihp, PropertyComputationController callback) {
@@ -66,7 +68,7 @@ public class PropertyComputationUnit implements Runnable {
 
     @Override
     public void run() {
-        if(erhp != null){
+        if (erhp != null) {
             try {
                 Property property = erhp.getProperty();
                 switch (property.getPropertySource()) {
@@ -91,8 +93,10 @@ public class PropertyComputationUnit implements Runnable {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (Exception e) { e.printStackTrace(); }
-        }else if(ihp != null){
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (ihp != null) {
             try {
                 switch (property.getPropertySource()) {
                     case Instance:
@@ -100,10 +104,13 @@ public class PropertyComputationUnit implements Runnable {
                             compute(InstanceDAO.getBinary(ihp.getInstance().getId()));
                         } catch (InstanceNotInDBException ex) {
                             Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
-                        } 
+                        }
                         break;
                     case InstanceName:
                         parseInstanceName();
+                        break;
+                    case ExperimentResults:
+                        computeFromExperimentResults();
                         break;
                 }
             } catch (NoConnectionToDBException ex) {
@@ -114,20 +121,94 @@ public class PropertyComputationUnit implements Runnable {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (Exception e) { e.printStackTrace(); }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        callback.callback();  
+        callback.callback();
+    }
+    public static final Object sync = new Object();
+
+    private void computeFromExperimentResults() throws NoConnectionToDBException, SQLException, ComputationMethodDoesNotExistException, FileNotFoundException, IOException, InstanceNotInDBException, ErrorInExternalProgramException {
+        if (ihp == null) {
+            // only instance properties can be computed from experiment results
+            return;
+        }
+        File bin;
+        synchronized (sync) {
+            bin = ComputationMethodDAO.getBinaryOfComputationMethod(property.getComputationMethod());
+        }
+        bin.setExecutable(true);
+
+        // only java files, we pipe objects :-)
+        Process p = Runtime.getRuntime().exec("java -jar " + bin.getAbsolutePath());
+
+        // The std output stream of the external program (-> output of the program). We read the calculated value from this stream.
+        BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        // The error stream of the program
+        BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+        try {
+            ArrayList<ExperimentResult> er;
+            synchronized (sync) {
+                er = ExperimentResultDAO.getAllByInstanceId(ihp.getInstance().getId());
+            }
+            ObjectOutputStream os = new ObjectOutputStream(p.getOutputStream());
+            os.writeUnshared(er);
+            os.flush();
+            os.close();
+        } catch (Exception e) {
+            // TODO: error
+            e.printStackTrace();
+        }
+
+        // check, if already an error occured
+        if (err.ready()) {
+            throw new ErrorInExternalProgramException(err.readLine());
+        }
+        // check, if program already has terminated
+        try {
+            int exit;
+            if ((exit = p.exitValue()) != 0) {
+                throw new ErrorInExternalProgramException("External program exited with errors! Exit value: " + exit);
+            }
+        } catch (IllegalThreadStateException e) {
+            // do nothing if program is still running
+        }
+
+        long time = System.currentTimeMillis();
+        while (System.currentTimeMillis() - time < MAX_WAIT_TIME && !in.ready()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                break;
+            }
+        }
+        // if no value is available after waitng time, kill the program
+        if (!in.ready()) {
+            p.destroy();
+            throw new ErrorInExternalProgramException("Time limit of external calculation exceeded! The external program has been terminated!");
+        }
+        // Read first line of program output
+        String value = in.readLine();
+
+        // set the value and save it
+        ihp.setValue(value);
+        InstanceHasPropertyDAO.save(ihp);
     }
 
     private void compute(Blob b) throws FileNotFoundException, IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, ComputationMethodDoesNotExistException, ErrorInExternalProgramException {
-        if(b == null){
+        if (b == null) {
             return;
         }
-        if(property.getComputationMethod() != null){
+        if (property.getComputationMethod() != null) {
 
             // parse instance file (external program call)
             if (ihp != null) {
-                File bin = ComputationMethodDAO.getBinaryOfComputationMethod(property.getComputationMethod());
+                File bin;
+                synchronized (sync) {
+                    bin = ComputationMethodDAO.getBinaryOfComputationMethod(property.getComputationMethod());
+                }
                 bin.setExecutable(true);
                 System.out.println(bin.getAbsolutePath());
                 Process p = Runtime.getRuntime().exec(bin.getAbsolutePath());
@@ -152,24 +233,26 @@ public class PropertyComputationUnit implements Runnable {
                     if (!e.getMessage().contains("Broken pipe")) {
                         e.printStackTrace();
                         throw e;
-                    } 
+                    }
                 }
+
                 // Close output stream, after whole instance file has been written to program input
                 out.close();
 
                 // check, if already an error occured
-                if (err.ready())
+                if (err.ready()) {
                     throw new ErrorInExternalProgramException(err.readLine());
+                }
                 // check, if program already has terminated
                 try {
                     int exit;
                     if ((exit = p.exitValue()) != 0) {
                         throw new ErrorInExternalProgramException("External program exited with errors! Exit value: " + exit);
-                }
+                    }
                 } catch (IllegalThreadStateException e) {
                     // do nothing if program is still running
                 }
-                                    
+
                 /**
                  * Read the program output and save it as value of the property
                  * for the given instance.
@@ -183,7 +266,13 @@ public class PropertyComputationUnit implements Runnable {
                  */
                 // wait some time till program output is available (maybe external program needs some time to calculate the property)
                 long time = System.currentTimeMillis();
-                while (System.currentTimeMillis() - time < MAX_WAIT_TIME && !in.ready());
+                while (System.currentTimeMillis() - time < MAX_WAIT_TIME && !in.ready()) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        break;
+                    }
+                }
                 // if no value is available after waitng time, kill the program
                 if (!in.ready()) {
                     p.destroy();
@@ -191,11 +280,12 @@ public class PropertyComputationUnit implements Runnable {
                 }
                 // Read first line of program output
                 String value = in.readLine();
+
                 // set the value and save it
                 ihp.setValue(value);
                 System.out.println(value);
                 InstanceHasPropertyDAO.save(ihp);
-            } else if (erhp != null){
+            } else if (erhp != null) {
                 File bin = ComputationMethodDAO.getBinaryOfComputationMethod(property.getComputationMethod());
                 bin.setExecutable(true);
                 Process p = Runtime.getRuntime().exec(bin.getAbsolutePath());
@@ -208,37 +298,38 @@ public class PropertyComputationUnit implements Runnable {
                 // pipe the content of the output file to the input of the external program
                 try {
                     int i;
-                    while ((i = outputFileReader.read()) != -1)
+                    while ((i = outputFileReader.read()) != -1) {
                         out.write(i);
+                    }
                 } catch (IOException e) {
                     if (!e.getMessage().contains("Broken pipe")) {
                         throw e;
                     }
                 }
                 Vector<String> value = new Vector<String>();
-                while(in.ready()){
+                while (in.ready()) {
                     value.add(in.readLine());
                 }
                 erhp.setValue(value);
                 ExperimentResultHasPropertyDAO.save(erhp);
             }
-        }else if(property.getRegularExpression() != null){
+        } else if (property.getRegularExpression() != null) {
             Vector<String> res = new Vector<String>();
             BufferedReader buf = new BufferedReader(new InputStreamReader(b.getBinaryStream()));
             String tmp;
             Vector<String> toAdd = new Vector<String>();
-            while((tmp = buf.readLine()) != null){
-                if(!(toAdd = parse(tmp)).isEmpty()){
+            while ((tmp = buf.readLine()) != null) {
+                if (!(toAdd = parse(tmp)).isEmpty()) {
                     res.addAll(toAdd);
-                    if(!property.isMultiple() || ihp != null)
+                    if (!property.isMultiple() || ihp != null) {
                         break;
+                    }
                 }
             }
-            if(ihp  != null){
+            if (ihp != null) {
                 ihp.setValue(res.firstElement());
                 InstanceHasPropertyDAO.save(ihp);
-            }
-            else if(erhp != null){
+            } else if (erhp != null) {
                 erhp.setValue(res);
                 ExperimentResultHasPropertyDAO.save(erhp);
             }
@@ -247,22 +338,23 @@ public class PropertyComputationUnit implements Runnable {
 
     private Vector<String> parse(String toParse) {
         Vector<String> res = new Vector<String>();
-        for(int i = 0; i < property.getRegularExpression().size(); i++){
+        for (int i = 0; i < property.getRegularExpression().size(); i++) {
             Pattern pat = Pattern.compile(property.getRegularExpression().get(i));
             Matcher m = pat.matcher(toParse);
             while (m.find()) {
                 res.add(m.group(1));
-                if(!property.isMultiple() || ihp != null)
+                if (!property.isMultiple() || ihp != null) {
                     return res;
-            }    
+                }
+            }
         }
         return res;
     }
 
     private void parseInstanceName() {
-        if(ihp != null){
+        if (ihp != null) {
             Vector<String> res = parse(ihp.getInstance().getName());
-            if(!res.isEmpty()){
+            if (!res.isEmpty()) {
                 ihp.setValue(res.firstElement());
                 try {
                     InstanceHasPropertyDAO.save(ihp);
@@ -270,7 +362,7 @@ public class PropertyComputationUnit implements Runnable {
                     Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-                
+
         }
 
     }
@@ -297,5 +389,4 @@ public class PropertyComputationUnit implements Runnable {
             e.printStackTrace();
         }
     }
-
 }

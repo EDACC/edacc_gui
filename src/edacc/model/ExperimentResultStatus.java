@@ -1,10 +1,15 @@
 package edacc.model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author simon
  */
-public class ExperimentResultStatus {
+public class ExperimentResultStatus implements Serializable {
+
+    private static final long serialVersionUID = -53256782673L;
+
     public static ExperimentResultStatus LAUNCHERCRASH =    new ExperimentResultStatus(-5);
     public static ExperimentResultStatus WATCHERCRASH =     new ExperimentResultStatus(-4);
     public static ExperimentResultStatus SOLVERCRASH =      new ExperimentResultStatus(-3);
