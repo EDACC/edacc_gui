@@ -1,15 +1,21 @@
 This file contains version information about the client of EDACC part of http://sourceforge.net/projects/edacc/
 
 
-v 0.9-79
------
+
+31.01.2011
+---------
+- rewritten the job-get-wait-loop
+- client rescans for jobs in the DB after each finished job (this makes the client stick better to the queue)
+	this means that a rescan for jobs through the DB is done only when an existing job finishes! 
+
+
+29.01.2011
+----------
 - added port support 
 - time bug removed
 
-
-
--updated querie for job selection
--updated DB connections 
-
-
--The first version of this code was written by Boris Junk and Raffael Bild
+long ago
+--------
+- updated querie for job selection
+- updated DB connections 
+- The first version of this code was written by Boris Junk and Raffael Bild

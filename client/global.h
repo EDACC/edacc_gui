@@ -20,7 +20,7 @@ int connectAttempts;
 int waitForJobs;
 
 //how long should the client wait till the next scan for jobs
-int scanForJobs;
+int scanForJobsPeriod;
 
 
 
