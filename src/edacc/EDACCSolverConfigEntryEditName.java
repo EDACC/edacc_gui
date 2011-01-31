@@ -18,7 +18,7 @@ public class EDACCSolverConfigEntryEditName extends javax.swing.JDialog {
     public EDACCSolverConfigEntryEditName(java.awt.Frame parent, boolean modal, String name) {
         super(parent, modal);
         initComponents();
-        this.name = name == null? "" : name; // for compatibility
+        this.name = name;
         txtName.setText(this.name);
     }
 
@@ -40,6 +40,7 @@ public class EDACCSolverConfigEntryEditName extends javax.swing.JDialog {
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCSolverConfigEntryEditName.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
+        setResizable(false);
 
         jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
         jLabel1.setName("jLabel1"); // NOI18N
