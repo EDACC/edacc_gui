@@ -350,7 +350,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     /**
      * Checks for unsaved data, i.e. checks iff the seed group, the parameter instances or the idx have been changed.<br/>
      * If the seed group is not a valid integer it will be substituted and used as 0.
-     * @param idx the idx to check the equality. If <code>idx == -1</code> it will be ignored.
+     * @param idx the idx to check the equality. If <code>idx == -1</code> the idx and name of the solver configuration will not be checked
      * @return <code>true</code>, if and only if data is unsaved, false otherwise
      */
     public boolean isModified(int idx) {
@@ -361,7 +361,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             txtSeedGroup.setText("0");
         }
 
-        if (solverConfiguration == null || solverConfiguration.getSeed_group() != seedGroup || !border.getTitle().equals(solverConfiguration.getName()) || (idx != -1 && solverConfiguration.getIdx() != idx)) {
+        if (solverConfiguration == null || solverConfiguration.getSeed_group() != seedGroup || (idx != -1 && (!border.getTitle().equals(solverConfiguration.getName()) || solverConfiguration.getIdx() != idx))) {
             return true;
         }
         return solverConfigEntryTableModel.isModified();
