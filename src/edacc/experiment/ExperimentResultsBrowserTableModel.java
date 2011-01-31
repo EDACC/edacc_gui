@@ -3,6 +3,8 @@ package edacc.experiment;
 import edacc.satinstances.ConvertException;
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultHasProperty;
@@ -37,23 +39,24 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public static final int COL_PRIORITY = 1;
     public static final int COL_COMPUTEQUEUE = 2;
     public static final int COL_SOLVER = 3;
-    public static final int COL_PARAMETERS = 4;
-    public static final int COL_INSTANCE = 5;
-    public static final int COL_RUN = 6;
-    public static final int COL_TIME = 7;
-    public static final int COL_SEED = 8;
-    public static final int COL_STATUS = 9;
-    public static final int COL_RESULTCODE = 10;
-    public static final int COL_SOLVER_OUTPUT = 11;
-    public static final int COL_LAUNCHER_OUTPUT = 12;
-    public static final int COL_WATCHER_OUTPUT = 13;
-    public static final int COL_VERIFIER_OUTPUT = 14;
-    public static final int COL_PROPERTY = 15;
+    public static final int COL_SOLVERCONFIGURATION = 4;
+    public static final int COL_PARAMETERS = 5;
+    public static final int COL_INSTANCE = 6;
+    public static final int COL_RUN = 7;
+    public static final int COL_TIME = 8;
+    public static final int COL_SEED = 9;
+    public static final int COL_STATUS = 10;
+    public static final int COL_RESULTCODE = 11;
+    public static final int COL_SOLVER_OUTPUT = 12;
+    public static final int COL_LAUNCHER_OUTPUT = 13;
+    public static final int COL_WATCHER_OUTPUT = 14;
+    public static final int COL_VERIFIER_OUTPUT = 15;
+    public static final int COL_PROPERTY = 16;
     private ArrayList<ExperimentResult> jobs;
     // the constant columns
-    private String[] CONST_COLUMNS = {"ID", "Priority", "Compute Queue", "Solver", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
+    private String[] CONST_COLUMNS = {"ID", "Priority", "Compute Queue", "Solver", "Solver Configuration", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
     // the visibility of each column
-    private boolean[] CONST_VISIBLE = {false, false, true, true, true, true, true, true, true, true, true, false, false, false, false};
+    private boolean[] CONST_VISIBLE = {false, false, true, true, true, true, true, true, true, true, true, true, false, false, false, false};
     private String[] columns;
     private ArrayList<Property> solverProperties;
     private boolean[] visible;
@@ -331,6 +334,12 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             case COL_SOLVER:
                 Solver solver = getSolver(rowIndex);
                 return solver == null ? "" : solver.getName();
+            case COL_SOLVERCONFIGURATION:
+                try {
+                    return SolverConfigurationDAO.getSolverConfigurationById(j.getSolverConfigId()).getName();
+                } catch (SQLException ex) {
+                    return "-";
+                }
             case COL_PARAMETERS:
                 String params = parameters.get(j.getSolverConfigId());
                 if (params == null) {

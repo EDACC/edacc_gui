@@ -18,8 +18,8 @@ public class SolverConfigurationDAO {
 
     private static final String table = "SolverConfig";
     private static final String deleteQuery = "DELETE FROM " + table + " WHERE idSolverConfig=?";
-    private static final String insertQuery = "INSERT INTO " + table + " (Solver_IdSolver, Experiment_IdExperiment, seed_group) VALUES (?,?,?)";
-    private static final String updateQuery = "UPDATE " + table + " SET seed_group=? WHERE idSolverConfig=?";
+    private static final String insertQuery = "INSERT INTO " + table + " (Solver_IdSolver, Experiment_IdExperiment, seed_group, name, idx) VALUES (?,?,?,?,?)";
+    private static final String updateQuery = "UPDATE " + table + " SET seed_group=?, name=?, idx=? WHERE idSolverConfig=?";
     private static final ObjectCache<SolverConfiguration> cache = new ObjectCache<SolverConfiguration>();
 
     private static SolverConfiguration getSolverConfigurationFromResultset(ResultSet rs) throws SQLException {
@@ -28,6 +28,8 @@ public class SolverConfigurationDAO {
         i.setSolver_id(rs.getInt("Solver_IdSolver"));
         i.setId(rs.getInt("IdSolverConfig"));
         i.setSeed_group(rs.getInt("seed_group"));
+        i.setName(rs.getString("name"));
+        i.setIdx(rs.getInt("idx"));
         return i;
     }
 
@@ -42,6 +44,8 @@ public class SolverConfigurationDAO {
             st.setInt(1, i.getSolver_id());
             st.setInt(2, i.getExperiment_id());
             st.setInt(3, i.getSeed_group());
+            st.setString(4, i.getName());
+            st.setInt(5, i.getIdx());
             st.executeUpdate();
             ResultSet generatedKeys = st.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -52,7 +56,10 @@ public class SolverConfigurationDAO {
         } else if (i.isModified()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
             st.setInt(1, i.getSeed_group());
-            st.setInt(2, i.getId());
+            st.setString(2, i.getName());
+            st.setInt(3, i.getIdx());
+            st.setInt(4, i.getId());
+            System.out.println("UPDATE!!" + i.getIdx());
             st.executeUpdate();
             i.setSaved();
         }
@@ -70,11 +77,13 @@ public class SolverConfigurationDAO {
         solverConfig.setDeleted();
     }
 
-    public static SolverConfiguration createSolverConfiguration(int solverId, int experimentId, int seed_group) throws SQLException {
+    public static SolverConfiguration createSolverConfiguration(int solverId, int experimentId, int seed_group, String name, int idx) throws SQLException {
         SolverConfiguration i = new SolverConfiguration();
         i.setSolver_id(solverId);
         i.setExperiment_id(experimentId);
         i.setSeed_group(seed_group);
+        i.setName(name);
+        i.setIdx(idx);
         save(i);
         cache.cache(i);
         return i;
@@ -82,7 +91,7 @@ public class SolverConfigurationDAO {
 
     public static ArrayList<SolverConfiguration> getSolverConfigurationByExperimentId(int experimentId) throws SQLException {
         ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Experiment_IdExperiment=? ORDER BY Solver_IdSolver");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Experiment_IdExperiment=? ORDER BY Solver_IdSolver,idx");
         st.setInt(1, experimentId);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
@@ -99,25 +108,6 @@ public class SolverConfigurationDAO {
         return res;
     }
 
-    public static void updateName(SolverConfiguration sc) throws NoConnectionToDBException, SQLException {
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM (SELECT count(*) AS lcount FROM " + table + " WHERE Experiment_IdExperiment=? AND Solver_IdSolver=? AND idSolverConfig <= ?) AS t1 JOIN (SELECT count(*) AS acount FROM " + table + " WHERE Experiment_IdExperiment=? AND Solver_IdSolver=?) AS t2");
-        st.setInt(1, sc.getExperiment_id());
-        st.setInt(2, sc.getSolver_id());
-        st.setInt(3, sc.getId());
-        st.setInt(4, sc.getExperiment_id());
-        st.setInt(5, sc.getSolver_id());
-        ResultSet rs = st.executeQuery();
-        if (rs.next()) {
-            int count = rs.getInt(1);
-            int acount = rs.getInt(2);
-            if (acount == 1) {
-                sc.setName(SolverDAO.getById(sc.getSolver_id()).getName());
-            } else {
-                sc.setName(SolverDAO.getById(sc.getSolver_id()).getName() + " (" + count + ")");
-            } 
-        }
-    }
-
     public static SolverConfiguration getSolverConfigurationById(int id) throws SQLException {
         SolverConfiguration sc = cache.getCached(id);
         if (sc != null) {
@@ -129,10 +119,7 @@ public class SolverConfigurationDAO {
         ResultSet rs = st.executeQuery();
         sc = new SolverConfiguration();
         if (rs.next()) {
-            sc.setId(rs.getInt("idSolverConfig"));
-            sc.setSolver_id(rs.getInt("Solver_idSolver"));
-            sc.setExperiment_id(rs.getInt("Experiment_idExperiment"));
-            sc.setSeed_group(rs.getInt("seed_group"));
+            sc = getSolverConfigurationFromResultset(rs);
             sc.setSaved();
             cache.cache(sc);
             sc.setSaved();
@@ -140,6 +127,18 @@ public class SolverConfigurationDAO {
         }
         rs.close();
         return null;
+    }
+
+    public static int getSolverConfigurationCount(int expId, int solverId) throws NoConnectionToDBException, SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT count(*) FROM " + table + " WHERE Experiment_idExperiment=? AND Solver_idSolver=?");
+        st.setInt(1, expId);
+        st.setInt(2, solverId);
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        } else {
+            return 0;
+        }
     }
 
     /**

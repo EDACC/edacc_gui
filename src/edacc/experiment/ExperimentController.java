@@ -1,9 +1,9 @@
 package edacc.experiment;
 
-import edacc.EDACCApp;
 import edacc.EDACCExperimentMode;
 import edacc.EDACCSolverConfigEntry;
 import edacc.EDACCSolverConfigPanel;
+import edacc.EDACCSolverConfigPanelSolver;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
 import edacc.model.ExpResultHasSolvPropertyNotInDBException;
@@ -15,7 +15,6 @@ import edacc.model.ExperimentHasInstance;
 import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
-import edacc.model.ExperimentResultEx;
 import edacc.model.ExperimentResultHasProperty;
 import edacc.model.ExperimentResultNotInDBException;
 import edacc.model.ExperimentResultResultCode;
@@ -64,7 +63,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
@@ -274,24 +272,31 @@ public class ExperimentController {
         }
         task.setStatus("Saving solver configurations..");
         boolean invalidSeedGroup = false;
-        for (int i = 0; i < solverConfigPanel.getComponentCount(); i++) {
-            EDACCSolverConfigEntry entry = (EDACCSolverConfigEntry) solverConfigPanel.getComponent(i);
-            int seed_group = 0;
-            try {
-                seed_group = Integer.valueOf(entry.getSeedGroup().getText());
-            } catch (NumberFormatException e) {
-                seed_group = 0;
-                entry.getSeedGroup().setText("0");
-                invalidSeedGroup = true;
+
+        for (EDACCSolverConfigPanelSolver solPanel : solverConfigPanel.getAllSolverConfigSolverPanels()) {
+            // iterate over solvers
+            int idx = 0;
+            for (EDACCSolverConfigEntry entry : solPanel.getAllSolverConfigEntries()) {
+                // iterate over solver configs
+                int seed_group = 0;
+                try {
+                    seed_group = Integer.valueOf(entry.getSeedGroup().getText());
+                } catch (NumberFormatException e) {
+                    seed_group = 0;
+                    entry.getSeedGroup().setText("0");
+                    invalidSeedGroup = true;
+                }
+                if (entry.getSolverConfiguration() == null) {
+                    entry.setSolverConfiguration(SolverConfigurationDAO.createSolverConfiguration(entry.getSolverId(), activeExperiment.getId(), seed_group, entry.getTitle(), idx));
+                } else {
+                    entry.getSolverConfiguration().setName(entry.getTitle());
+                    entry.getSolverConfiguration().setSeed_group(seed_group);
+                    entry.getSolverConfiguration().setIdx(idx);
+
+                }
+                entry.saveParameterInstances();
+                idx++;
             }
-            if (entry.getSolverConfiguration() == null) {
-                entry.setSolverConfiguration(SolverConfigurationDAO.createSolverConfiguration(entry.getSolverId(), activeExperiment.getId(), seed_group));
-                solverConfigPanel.setSolverConfigurationName(entry);
-            } else {
-                entry.getSolverConfiguration().setSeed_group(seed_group);
-                entry.getSolverConfiguration().setModified();
-            }
-            entry.saveParameterInstances();
         }
         SolverConfigurationDAO.saveAll();
         if (invalidSeedGroup) {
@@ -966,7 +971,7 @@ public class ExperimentController {
         }
         entry = new ZipEntry("runsolver_copyright.txt");
         zos.putNextEntry(entry);
- 
+
         while ((data = in.read(buf)) > -1) {
             zos.write(buf, 0, data);
         }
@@ -1192,11 +1197,11 @@ public class ExperimentController {
                 haveToDuplicate |= duplicate.get(i);
                 int scId = solverConfigIds.get(i);
                 SolverConfiguration sc = SolverConfigurationDAO.getSolverConfigurationById(scId);
-                if (sc.getName() == null) {
-                    SolverConfigurationDAO.updateName(sc);
-                }
+                /*   if (sc.getName() == null) {
+                SolverConfigurationDAO.updateName(sc);
+                }*/
                 task.setOperationName("Processing data from solver configuration " + sc.getName() + " (" + (i + 1) + " / " + solverConfigIds.size() + "):");
-                task.setTaskProgress((float) (i+1) / solverConfigIds.size());
+                task.setTaskProgress((float) (i + 1) / solverConfigIds.size());
                 RunCountSCId tmp = this.importDataFromSolverConfiguration(task, sc);
                 if (tmp.runcount > numRuns) {
                     numRuns = tmp.runcount;
@@ -1217,7 +1222,7 @@ public class ExperimentController {
                         }
                         if (duplicate.get(k)) {
                             int runCount = this.getResults(newIds.get(k), instance.getId()).size();
-                           // int runCount = ExperimentDAO.getRunCountInExperimentForSolverConfigurationAndInstance(activeExperiment, newIds.get(k), instance.getId());
+                            // int runCount = ExperimentDAO.getRunCountInExperimentForSolverConfigurationAndInstance(activeExperiment, newIds.get(k), instance.getId());
                             ArrayList<ExperimentResult> results = getResults(newIds.get(k), instance.getId());
                             if (results.size() > 0) {
                                 for (int t = runCount; t < numRuns; t++) {
@@ -1324,7 +1329,7 @@ public class ExperimentController {
             int newId;
             if (equalId == null) {
                 // didn't find solver config -> add one
-                SolverConfiguration newSc = SolverConfigurationDAO.createSolverConfiguration(solverConfig.getSolver_id(), activeExperiment.getId(), 0);
+                SolverConfiguration newSc = SolverConfigurationDAO.createSolverConfiguration(solverConfig.getSolver_id(), activeExperiment.getId(), 0, solverConfig.getName(), SolverConfigurationDAO.getSolverConfigurationCount(activeExperiment.getId(), solverConfig.getSolver_id()));
                 SolverConfigurationDAO.saveAll();
                 for (ParameterInstance pi : ParameterInstanceDAO.getBySolverConfigId(solverConfig.getId())) {
                     ParameterInstanceDAO.createParameterInstance(pi.getParameter_id(), newSc.getId(), pi.getValue());
@@ -1351,7 +1356,7 @@ public class ExperimentController {
                     throw new TaskCancelledException();
                 }
                 int runCount = this.getResults(newId, i.getId()).size();
-              //  int runCount = ExperimentDAO.getRunCountInExperimentForSolverConfigurationAndInstance(activeExperiment, newId, i.getId());
+                //  int runCount = ExperimentDAO.getRunCountInExperimentForSolverConfigurationAndInstance(activeExperiment, newId, i.getId());
                 for (ExperimentResult er : results) {
                     if (er.getSolverConfigId() == solverConfig.getId() && er.getInstanceId() == i.getId() && er.getStatus() == ExperimentResultStatus.SUCCESSFUL) {
                         newResults.add(ExperimentResultDAO.createExperimentResult(runCount++, er.getPriority(), er.getComputeQueue(), er.getStatus().getValue(), er.getSeed(), er.getResultCode(), er.getResultTime(), newId, activeExperiment.getId(), er.getInstanceId(), er.getStartTime()));

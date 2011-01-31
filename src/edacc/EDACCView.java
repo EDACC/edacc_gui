@@ -46,7 +46,7 @@ public class EDACCView extends FrameView implements Observer {
         super(app);
 
         initComponents();
-        
+
         UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
         DatabaseConnector.getInstance().addObserver(this);
 
@@ -534,12 +534,18 @@ public class EDACCView extends FrameView implements Observer {
             @Override
             public void run(Tasks task) {
                 try {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            mainPanelLayout.replace(mode, experimentMode);
+                            mode = experimentMode;
+                            manageExperimentModeMenuItem.setSelected(true);
+                            manageDBModeMenuItem.setSelected(false);
+                            statusMessageLabel.setText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+                        }
+                    });
                     experimentMode.initialize();
-                    mainPanelLayout.replace(mode, experimentMode);
-                    mode = experimentMode;
-                    manageExperimentModeMenuItem.setSelected(true);
-                    manageDBModeMenuItem.setSelected(false);
-                    statusMessageLabel.setText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
                 } catch (final Exception e) {
                     SwingUtilities.invokeLater(new Runnable() {
 
