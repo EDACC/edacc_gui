@@ -1,5 +1,9 @@
-- include port option -> to be read from config file
-- "get free job"-query to be changed
+- logLauncher method needed!
+
+
 - write information about node into ExperimentResults 
 - fix memory leaks
-- if the client finds no more jobs in the DB is should check again after each of its children terminates!
+
+
+- inlcude verifier
+- implement a wait method: tells the client how long to wait for jobs

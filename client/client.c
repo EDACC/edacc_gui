@@ -18,34 +18,29 @@
 #include <stdarg.h>
 #include <time.h>
 
-
-
-
-
 //This array stores the arguments for a solver run we execute via execve
-static char* jobArgs[4]={NULL, NULL, NULL, NULL};
+static char* jobArgs[4] = { NULL, NULL, NULL, NULL };
 
 //An array for keeping track of the jobs we're currently processing
 static job* jobs;
-static int jobsLen;
-
+static int maxNumJobs;
 
 //The timeout in seconds for each solver run
 int CPUTimeLimit;
 
 //If the experiment is used only to see if a instance is solvable.
-int solveOnce=0;
+int solveOnce = 0;
 
 int fileExists(const char* fileName) {
 	struct stat buf;
-	if(stat(fileName, &buf)==-1 && errno==ENOENT)
+	if (stat(fileName, &buf) == -1 && errno == ENOENT)
 		return 0;
 	return 1;
 }
 
-
 //Create a file and verify the md5 sum
-status createFile(const char* fileName, const char* content, size_t contentLen, const char* md5sum, mode_t mode) {
+status createFile(const char* fileName, const char* content, size_t contentLen,
+		const char* md5sum, mode_t mode) {
 	FILE* dst;
 	unsigned char md5Buffer[16];
 	char md5String[33];
@@ -54,8 +49,8 @@ status createFile(const char* fileName, const char* content, size_t contentLen, 
 	int posDiff;
 
 	//Create the file
-	dst=fopen(fileName, "w+");
-	if(dst==NULL) {
+	dst = fopen(fileName, "w+");
+	if (dst == NULL) {
 		LOGERROR(" Unable to open %s: %s\n", fileName, strerror(errno));
 		return sysError;
 	}
@@ -66,20 +61,22 @@ status createFile(const char* fileName, const char* content, size_t contentLen, 
 
 	//Verify the md5sum
 	rewind(dst);
-	if(md5_stream(dst, &md5Buffer)!=0) {
-		LOGERROR(AT,"Error in md5_stream()\n");
+	if (md5_stream(dst, &md5Buffer) != 0) {
+		LOGERROR(AT, "Error in md5_stream()\n");
 		fclose(dst);
 		return sysError;
 	}
-	for(i=0, md5StringPtr=md5String; i<16; ++i, md5StringPtr+=2)
+	for (i = 0, md5StringPtr = md5String; i < 16; ++i, md5StringPtr += 2)
 		sprintf(md5StringPtr, "%02x", md5Buffer[i]);
-	md5String[32]='\0';
-	posDiff=strcmp(md5String, md5sum);
-	if(posDiff!=0) {
-		LOGERROR(AT,"\nThere might be a problem with the md5 sums for file: %s\n", fileName);
-		LOGERROR(AT,"%20s = %s\n","DB md5 sum",md5sum);
-		LOGERROR(AT,"%20s = %s\n","Computed md5 sum",md5String);
-		LOGERROR(AT,"position where they start to differ = %d\n",posDiff);
+	md5String[32] = '\0';
+	posDiff = strcmp(md5String, md5sum);
+	if (posDiff != 0) {
+		LOGERROR(AT,
+				"\nThere might be a problem with the md5 sums for file: %s\n",
+				fileName);
+		LOGERROR(AT, "%20s = %s\n", "DB md5 sum", md5sum);
+		LOGERROR(AT, "%20s = %s\n", "Computed md5 sum", md5String);
+		LOGERROR(AT, "position where they start to differ = %d\n", posDiff);
 		//fclose(dst);
 		//remove(fileName);
 		//return sysError;
@@ -88,16 +85,14 @@ status createFile(const char* fileName, const char* content, size_t contentLen, 
 	fclose(dst);
 
 	//Set the file permissions
-	if(chmod(fileName, mode)==-1) {
-		LOGERROR(AT,"Unable to change permissions for %s: %s\n", fileName, strerror(errno));
+	if (chmod(fileName, mode) == -1) {
+		LOGERROR(AT, "Unable to change permissions for %s: %s\n", fileName,
+				strerror(errno));
 		return sysError;
 	}
 
 	return success;
 }
-
-
-
 
 status initExpData(experiment* exp) {
 
@@ -105,21 +100,15 @@ status initExpData(experiment* exp) {
 	status s;
 	//int i;
 
-	logComment(2,"starting to fetch experiment data:\n------------------------------------------------------------\n");
+	logComment(2, "starting to fetch experiment data:\n\n");
+	s = dbFetchExperimentData(exp);
 
-	s=dbFetchExperimentData(exp);
-
-	logComment(2,"------------------------------------------------------------\n");
-	if(s!=success)
+	if (s != success)
 		return s;
-
-	jobsLen=exp->numCPUs;
-	CPUTimeLimit=exp->CPUTimeLimit;
-
-
-
-	jobs=calloc(jobsLen, sizeof(job));
-	if(jobs==NULL) {
+	maxNumJobs = exp->numCPUs;
+	CPUTimeLimit = exp->CPUTimeLimit;
+	jobs = calloc(maxNumJobs, sizeof(job));
+	if (jobs == NULL) {
 		return sysError;
 	}
 
@@ -135,7 +124,7 @@ inline int fetchJob(job* j, status* s) {
 	int retval;
 
 	deferSignals();
-	retval=dbFetchJob(j, s);
+	retval = dbFetchJob(j, s);
 	resetSignalHandler();
 
 	return retval;
@@ -145,7 +134,7 @@ inline status update(const job* j) {
 	status retval;
 
 	deferSignals();
-	retval=dbUpdate(j);
+	retval = dbUpdate(j);
 	resetSignalHandler();
 
 	return retval;
@@ -155,7 +144,7 @@ inline status updateResults(const job* j) {
 	status retval;
 
 	deferSignals();
-	retval=dbUpdateResults(j);
+	retval = dbUpdateResults(j);
 	resetSignalHandler();
 
 	return retval;
@@ -171,12 +160,12 @@ void exitClient(status retval) {
 	kill(0, SIGTERM);
 
 	//Update the database entries of the processes that were still running
-	for(i=0; i<jobsLen; ++i) {
-		if(jobs[i].pid!=0) {
-			jobs[i].status=-5;
+	for (i = 0; i < maxNumJobs; ++i) {
+		if (jobs[i].pid != 0) {
+			jobs[i].status = -5;
 			update(&(jobs[i]));
-			fileName=prependResultPath(pidToFileName(jobs[i].pid));
-			if(fileName!=NULL) {
+			fileName = prependResultPath(pidToFileName(jobs[i].pid));
+			if (fileName != NULL) {
 				remove(fileName);
 				free(fileName);
 			}
@@ -184,8 +173,8 @@ void exitClient(status retval) {
 	}
 
 	//Try to give the child processes time to shut down cleanly
-	for(i=0; i<jobsLen; ++i) {
-		if(jobs[i].pid!=0) {
+	for (i = 0; i < maxNumJobs; ++i) {
+		if (jobs[i].pid != 0) {
 			waitpid(jobs[i].pid, NULL, 0);
 			freeJob(&(jobs[i]));
 		}
@@ -195,24 +184,21 @@ void exitClient(status retval) {
 	exit(retval);
 }
 
-status loadFile(const char *filename, char **result)
-{
+status loadFile(const char *filename, char **result) {
 	unsigned int size = 0;
 	FILE *f = fopen(filename, "rb");
-	if (f == NULL)
-	{
+	if (f == NULL) {
 		*result = NULL;
-		LOGERROR(AT,"Error: Not able to open file: %s\n",filename);
+		LOGERROR(AT, "Error: Not able to open file: %s\n", filename);
 		return sysError; // -1 means file opening fail
 	}
 	fseek(f, 0, SEEK_END);
 	size = ftell(f);
 	fseek(f, 0, SEEK_SET);
-	*result = (char *)malloc(size+1);
-	if (size != fread(*result, sizeof(char), size, f))
-	{
+	*result = (char *) malloc(size + 1);
+	if (size != fread(*result, sizeof(char), size, f)) {
 		free(*result);
-		LOGERROR(AT,"Error: Not able to read from file: %s\n",filename);
+		LOGERROR(AT, "Error: Not able to read from file: %s\n", filename);
 		return sysError; // -2 means file reading fail
 	}
 	fclose(f);
@@ -221,9 +207,9 @@ status loadFile(const char *filename, char **result)
 }
 
 void signalHandler(int signum) {
-	if(signum==SIGUSR1)
+	if (signum == SIGUSR1)
 		exitClient(sysError);
-	else if(signum==SIGUSR2)
+	else if (signum == SIGUSR2)
 		exitClient(dbError);
 	else
 		exitClient(success);
@@ -233,24 +219,23 @@ void signalHandler(int signum) {
 status processResultsN(job* j) {
 	/*TODO: GANZ WICHTIG
 	 *  If you want to insert binary data into a string column (such as a BLOB column), the following characters must be represented by escape sequences.
-NUL 	NUL byte (0x00). Represent this character by “\0” (a backslash followed by an ASCII “0” character).
-\ 	Backslash (ASCII 92). Represent this character by “\\”.
-' 	Single quote (ASCII 39). Represent this character by “\'”.
-" 	Double quote (ASCII 34). Represent this character by “\"”.
+	 NUL 	NUL byte (0x00). Represent this character by “\0” (a backslash followed by an ASCII “0” character).
+	 \ 	Backslash (ASCII 92). Represent this character by “\\”.
+	 ' 	Single quote (ASCII 39). Represent this character by “\'”.
+	 " 	Double quote (ASCII 34). Represent this character by “\"”.
 	 */
-	if (loadFile(j->solverOutputFN,&j->solverOutput)!=success)
+	if (loadFile(j->solverOutputFN, &j->solverOutput) != success)
 		return sysError;
-	if (loadFile(j->watcherOutputFN,&j->watcherOutput)!=success)
+	if (loadFile(j->watcherOutputFN, &j->watcherOutput) != success)
 		return sysError;
-
 
 	//printf("%s",j->watcherOutput);
 	//TODO: LauncherOutput erstenllen
-	j->launcherOutput=(char*)malloc(5*sizeof(char));
-	strcpy(j->launcherOutput,"NULL");
+	//j->launcherOutput = (char*) malloc(5 * sizeof(char));
+	//strcpy(j->launcherOutput, "NULL");
 
-	j->verifierOutput=(char*)malloc(5*sizeof(char));
-	strcpy(j->verifierOutput,"NULL");
+	j->verifierOutput = (char*) malloc(5 * sizeof(char));
+	strcpy(j->verifierOutput, "NULL");
 	//TODO: to be uncommented as soon as there is a verifier output
 	//if (loadFile(j->verifierOutputFN,&j->verifierOutput)!=success)
 	//		return sysError;
@@ -260,75 +245,74 @@ NUL 	NUL byte (0x00). Represent this character by “\0” (a backslash followed
 	char dummy[80];
 	float time;
 	int n;
-	const char *ptr =j->watcherOutput;
-	while (sscanf(ptr,"%31[^\n]\n%n", prefix,&n)==1 ){ //read line by line maximum of 31 chars
-		if (sscanf(prefix,"CPU time (s): %f",&time)==1){
-			printf("time extracted for jobID: %d =%f\n",j->id,time);
-			j->status=1;
+	const char *ptr = j->watcherOutput;
+	while (sscanf(ptr, "%31[^\n]\n%n", prefix, &n) == 1) { //read line by line maximum of 31 chars
+		if (sscanf(prefix, "CPU time (s): %f", &time) == 1) {
+			printf("time extracted for jobID: %d =%f\n", j->id, time);
+			j->status = 1;
 			break;
 		}
-		ptr+=n;
+		ptr += n;
 		//printf("Gelesen: %s \n Length: %d\n ",prefix,n);
 		fflush(stdout);
 	}
-	j->resultTime=time;
+	j->resultTime = time;
 
-
-	ptr =j->watcherOutput;
-	while (sscanf(ptr,"%31[^\n]\n%n", prefix,&n)==1 ){ //read line by line maximum of 31 chars
-		if (sscanf(prefix,"Maximum CPU time exceeded:%1s",&dummy)==1){
-			j->status=21;
-			j->resultCode=-21;
-			printf("Limit gefunden");fflush(stdout);
+	ptr = j->watcherOutput;
+	while (sscanf(ptr, "%31[^\n]\n%n", prefix, &n) == 1) { //read line by line maximum of 31 chars
+		if (sscanf(prefix, "Maximum CPU time exceeded:%1s", &dummy) == 1) {
+			j->status = 21;
+			j->resultCode = -21;
+			printf("Limit gefunden");
+			fflush(stdout);
 			return success;
 			break;
 		}
-		ptr+=n;
+		ptr += n;
 	}
-	if (j->status!=21){	//limit not exceeded
-		ptr =j->solverOutput;
-		while (sscanf(ptr,"%31[^\n]\n%n", prefix,&n)==1 ){ //read line by line maximum of 31 chars
+	if (j->status != 21) { //limit not exceeded
+		ptr = j->solverOutput;
+		while (sscanf(ptr, "%31[^\n]\n%n", prefix, &n) == 1) { //read line by line maximum of 31 chars
 			//printf("try to matching in line: %s\n", prefix);
-			if (sscanf(prefix,"%*s %*s %s %*s",&dummy)==1){
-				if (strcmp(dummy,"UNSATISFIABLE")==0){
-					j->resultCode=10;
-					printf("s UNSATISFIABLE found\n");fflush(stdout);
+			if (sscanf(prefix, "%*s %*s %s %*s", &dummy) == 1) {
+				if (strcmp(dummy, "UNSATISFIABLE") == 0) {
+					j->resultCode = 10;
+					printf("s UNSATISFIABLE found\n");
+					fflush(stdout);
 					return success;
 					break;
 				}
 			}
-			if (sscanf(prefix,"%*s s %s %*s",&dummy)==1){
-				if (strcmp(dummy,"UNKNOWN")==0){
-					j->resultCode=0;
-					printf("s UNKNOWN found\n");fflush(stdout);
+			if (sscanf(prefix, "%*s s %s %*s", &dummy) == 1) {
+				if (strcmp(dummy, "UNKNOWN") == 0) {
+					j->resultCode = 0;
+					printf("s UNKNOWN found\n");
+					fflush(stdout);
 					return success;
 					break;
 				}
 			}
-			if (sscanf(prefix,"%*s s %s %*s",&dummy)==1){
-				if (strcmp(dummy,"SATISFIABLE")==0){
-					j->resultCode=11;
-					printf("s SATISFIABLE found\n");fflush(stdout);
+			if (sscanf(prefix, "%*s s %s %*s", &dummy) == 1) {
+				if (strcmp(dummy, "SATISFIABLE") == 0) {
+					j->resultCode = 11;
+					printf("s SATISFIABLE found\n");
+					fflush(stdout);
 					return success;
 					break;
 				}
 			}
-			ptr+=n;
+			ptr += n;
 		}
 	}
 	//Hier kommt die Suche nach dem Resultcode im solveroutput
 
 
-
-
 	/*status s=updateResults(j);
-	if (s!=success){
-		j->status=-5;
-		update(j);
-		return s;
-	}*/
-
-
+	 if (s!=success){
+	 j->status=-5;
+	 update(j);
+	 return s;
+	 }*/
 
 	//TODO: exitCodeSolver parsen
 	//TODO: exitCodeVerifier
@@ -350,11 +334,11 @@ status processResults(job* j) {
 	long outputLen;
 
 	//Set the status to -2 in case anything goes wrong in this function
-	j->status=-2;
+	j->status = -2;
 
-	fileName=prependResultPath(pidToFileName(j->pid));
-	if(fileName==NULL) {
-		LOGERROR(AT,"Error: Out of memory\n");
+	fileName = prependResultPath(pidToFileName(j->pid));
+	if (fileName == NULL) {
+		LOGERROR(AT, "Error: Out of memory\n");
 		return sysError;
 	}
 
@@ -364,111 +348,117 @@ status processResults(job* j) {
 
 	//Parse the temporary result file of j
 
-	logComment(4, "Trying to open for parsing results: %s\n",fileName);
-	filePtr=fopen(fileName, "r");
-	if(filePtr==NULL) {
-		LOGERROR(AT,"Unable to open %s: %s\n", fileName, strerror(errno));
+	logComment(4, "Trying to open for parsing results: %s\n", fileName);
+	filePtr = fopen(fileName, "r");
+	if (filePtr == NULL) {
+		LOGERROR(AT, "Unable to open %s: %s\n", fileName, strerror(errno));
 		free(fileName);
 		return sysError;
 	}
 
 	/*	if(fscanf(filePtr, "Command terminated by signal %d", &signum)==1) {//TODO: das hier kann nicht stimmen
-		logComment(4,"Terminating solver due to signal %d\n",signum);
-		//The solver was terminated by signal signum
-		if(signum==SIGXCPU)
-			j->status=2;
-		else
-			j->status=3;
-	} else {
+	 logComment(4,"Terminating solver due to signal %d\n",signum);
+	 //The solver was terminated by signal signum
+	 if(signum==SIGXCPU)
+	 j->status=2;
+	 else
+	 j->status=3;
+	 } else {
 
 
-		logComment(4,"No signal detected! Trying to parse run-time!\n");*/
+	 logComment(4,"No signal detected! Trying to parse run-time!\n");*/
 
 	//Extract the solver output
-	{do {
-		if(fscanf(filePtr, "Command terminated by signal %d", &signum)==1){ //TODO: das hier kann nicht stimmen
-			logComment(4,"Terminating solver due to signal %d\n",signum);
-			if(signum==SIGXCPU)
-				j->status=-21;
-			else
-				j->status=3;
-			continue;
-		}
-		c=getc(filePtr);
+	{
+		do {
+			if (fscanf(filePtr, "Command terminated by signal %d", &signum)
+					== 1) { //TODO: das hier kann nicht stimmen
+				logComment(4, "Terminating solver due to signal %d\n", signum);
+				if (signum == SIGXCPU)
+					j->status = -21;
+				else
+					j->status = 3;
+				continue;
+			}
+			c = getc(filePtr);
 
-		if(c==EOF) {
-			LOGERROR(AT,"Error parsing %s: Unexpected format\n", fileName);
-			free(fileName);
-			return sysError;
-		}
-	} while(c!=(int)'$');
+			if (c == EOF) {
+				LOGERROR(AT, "Error parsing %s: Unexpected format\n", fileName);
+				free(fileName);
+				return sysError;
+			}
+		} while (c != (int) '$');
 
-
-	outputLen=ftell(filePtr);
-	if(outputLen==-1) {
-		LOGERROR(AT,"Error in ftell(): %s\n", strerror(errno));
-		free(fileName);
-		return sysError;
-	}
-	j->solverOutput=malloc(outputLen);
-	if(j->solverOutput==NULL) {
-		LOGERROR(AT,"Error: Out of memory\n");
-		free(fileName);
-		return sysError;
-	}
-	rewind(filePtr);
-	resultFilePtr=j->solverOutput;
-	do {
-		c=getc(filePtr);
-		if(c==EOF) {
-			LOGERROR(AT,"Error parsing %s: Unexpected format\n", fileName);
+		outputLen = ftell(filePtr);
+		if (outputLen == -1) {
+			LOGERROR(AT, "Error in ftell(): %s\n", strerror(errno));
 			free(fileName);
 			return sysError;
 		}
-		*resultFilePtr=(char)c;
-	} while(c!=(int)'$');
-	*resultFilePtr='\0';
-	//Skip the file content until the next '§' character
-	do {
-		c=getc(filePtr);
-		if(c==EOF) {
-			LOGERROR(AT,"Error parsing %s: Unexpected format\n", fileName);
+		j->solverOutput = malloc(outputLen);
+		if (j->solverOutput == NULL) {
+			LOGERROR(AT, "Error: Out of memory\n");
 			free(fileName);
 			return sysError;
 		}
-	} while(c!=(int)'$');
-	//Extract the runtime and return value of the solver
-	if(fscanf(filePtr, "%f$%d", &(j->resultTime), &(j->resultCode))!=2){
-		LOGERROR(AT,"Error parsing %s: Unexpected format\n", fileName);
-		free(fileName);
-		return sysError;
-	}
-	j->solverOutput[outputLen-1]='\0';
-	if (j->status<1)
-		j->status=1;
-	//Append the content of fileName to j->resultFileName
-	rewind(filePtr);
-	resultFile=fopen(j->solverOutputFN, "a");
-	if(resultFile==NULL) {
-		LOGERROR(AT,"Unable to open %s: %s\n", j->solverOutputFN, strerror(errno));
-		free(fileName);
-		return sysError;
-	}
-	while((c=safeGetc(filePtr))!=EOF) {
-		if(safeFputc(c, resultFile)==EOF) {
-			LOGERROR(AT,"An error occured while copying a character from %s to %s\n", fileName, j->solverOutputFN);
+		rewind(filePtr);
+		resultFilePtr = j->solverOutput;
+		do {
+			c = getc(filePtr);
+			if (c == EOF) {
+				LOGERROR(AT, "Error parsing %s: Unexpected format\n", fileName);
+				free(fileName);
+				return sysError;
+			}
+			*resultFilePtr = (char) c;
+		} while (c != (int) '$');
+		*resultFilePtr = '\0';
+		//Skip the file content until the next '§' character
+		do {
+			c = getc(filePtr);
+			if (c == EOF) {
+				LOGERROR(AT, "Error parsing %s: Unexpected format\n", fileName);
+				free(fileName);
+				return sysError;
+			}
+		} while (c != (int) '$');
+		//Extract the runtime and return value of the solver
+		if (fscanf(filePtr, "%f$%d", &(j->resultTime), &(j->resultCode)) != 2) {
+			LOGERROR(AT, "Error parsing %s: Unexpected format\n", fileName);
 			free(fileName);
 			return sysError;
 		}
-	}
-	if(safeFputc((int)'\n', resultFile)==EOF) {
-		LOGERROR(AT,"An error occured while writing a character to %s\n", j->solverOutputFN);
-		free(fileName);
-		return sysError;
-	}
-	//time ( &rawtime );
-	logComment(4, "parsing results from : %s  finished\n",fileName);
-	fclose(resultFile);
+		j->solverOutput[outputLen - 1] = '\0';
+		if (j->status < 1)
+			j->status = 1;
+		//Append the content of fileName to j->resultFileName
+		rewind(filePtr);
+		resultFile = fopen(j->solverOutputFN, "a");
+		if (resultFile == NULL) {
+			LOGERROR(AT, "Unable to open %s: %s\n", j->solverOutputFN,
+					strerror(errno));
+			free(fileName);
+			return sysError;
+		}
+		while ((c = safeGetc(filePtr)) != EOF) {
+			if (safeFputc(c, resultFile) == EOF) {
+				LOGERROR(
+						AT,
+						"An error occured while copying a character from %s to %s\n",
+						fileName, j->solverOutputFN);
+				free(fileName);
+				return sysError;
+			}
+		}
+		if (safeFputc((int) '\n', resultFile) == EOF) {
+			LOGERROR(AT, "An error occured while writing a character to %s\n",
+					j->solverOutputFN);
+			free(fileName);
+			return sysError;
+		}
+		//time ( &rawtime );
+		logComment(4, "parsing results from : %s  finished\n", fileName);
+		fclose(resultFile);
 	}
 
 	fclose(filePtr);
@@ -486,64 +476,67 @@ status handleChildren(int cnt) {
 	pid_t pid;
 	//FILE* solverOutput;
 
-	for(i=0; i<cnt; ++i) {
+	for (i = 0; i < cnt; ++i) {
 		//Wait until a child process terminates
-		pid=wait(&retval);
-		if(pid==-1){
-			LOGERROR(AT,"Error in wait(): %s\n", strerror(errno));
+		pid = wait(&retval);
+		if (pid == -1) {
+			LOGERROR(AT, "Error in wait(): %s\n", strerror(errno));
 			return sysError;
 		}
 
 		//Point j to the entry in jobs corresponding to the terminated child process
-		for(j=jobs; j->pid!=pid; ++j);
-		if (WIFEXITED(retval)) { //watcher terminated normally
-			j->watcherExitCode=WEXITSTATUS(retval); //save exitCode of watcher
-			s=processResultsN(j);
-			j->pid=0;
-			if(s!=success) {
-				j->status=-5;
+		for (j = jobs; j->pid != pid; ++j)
+			;
+		if (
+		WIFEXITED(retval)) { //watcher terminated normally
+			j->watcherExitCode =
+			WEXITSTATUS(retval); //save exitCode of watcher
+			s = processResultsN(j);
+			j->pid = 0;
+			if (s != success) {
+				j->status = -5;
 				update(j);
 				freeJob(j);
 				return success;
 			}
-			s=updateResults(j);
+			s = updateResults(j);
 
-			if(s!=success) {
-				j->status=-5;
+			if (s != success) {
+				j->status = -5;
 				update(j);
 				freeJob(j);
 				return success;
 			}
-			if (!keepResults){
+			if (!keepResults) {
 				remove(j->solverOutputFN);
 				remove(j->watcherOutputFN);
 			}
 			freeJob(j);
 		}
 		if (WIFSIGNALED(retval)) { //watcher was terminated by a signal
-			j->status=-4*100-WTERMSIG(retval); //watcher crash has code: -4xx : xx=signal number
+			j->status = -4 * 100 -
+			WTERMSIG(retval); //watcher crash has code: -4xx : xx=signal number
 			//The process terminated abnormally
 
 			//solverOutput=prependResultPath(j->solverOutputFN);
-			j->pid=0;
-			s=update(j);
+			j->pid = 0;
+			s = update(j);
 			freeJob(j);
 			/*if(solverOutput==NULL) {
-				LOGERROR(AT,"Error: Out of memory\n");
-				if(s==success)
-					s=sysError;
-				return s;
-			}
-			remove(solverOutput);
-			free(solverOutput);
-			if(s!=success) {
-				return s;
-			}*/
+			 LOGERROR(AT,"Error: Out of memory\n");
+			 if(s==success)
+			 s=sysError;
+			 return s;
+			 }
+			 remove(solverOutput);
+			 free(solverOutput);
+			 if(s!=success) {
+			 return s;
+			 }*/
 		}
 	}
 	return success;
 }
-
 
 //Fill jobArgs with the information in j. If the function succeeds, some parts of
 //jobArgs might be set to allocated memory that can be freed with freeJobArg().
@@ -553,44 +546,45 @@ status setJobArgs(const job* j) {
 	char* solverName;
 	char* instanceName;
 
-	fileName=prependResultPath(pidToFileName(getpid()));
-	if(fileName==NULL) {
-		LOGERROR(AT,"Error: Out of memory\n");
+	fileName = prependResultPath(pidToFileName(getpid()));
+	if (fileName == NULL) {
+		LOGERROR(AT, "Error: Out of memory\n");
 		return sysError;
 	}
-	solverName=prependSolverPath(j->solverName);
-	if(solverName==NULL) {
-		LOGERROR(AT,"Error: Out of memory\n");
+	solverName = prependSolverPath(j->solverName);
+	if (solverName == NULL) {
+		LOGERROR(AT, "Error: Out of memory\n");
 		free(fileName);
 		return sysError;
 	}
-	instanceName=prependInstancePath(j->instanceName);
-	if(instanceName==NULL) {
-		LOGERROR(AT,"Error: Out of memory\n");
+	instanceName = prependInstancePath(j->instanceName);
+	if (instanceName == NULL) {
+		LOGERROR(AT, "Error: Out of memory\n");
 		free(fileName);
 		free(solverName);
 		return sysError;
 	}
 	//TODO: hier kann runsolver hinzugefuegt werden
-	if(sprintfAlloc(&command,
+	if (sprintfAlloc(
+			&command,
 			"ulimit -S -t %d && /usr/bin/time -a -o %s -f \"$%%C$%%U$%%x\" %s %s %s >> %s",
-			CPUTimeLimit, fileName, solverName, j->params, instanceName, fileName          ) < 0) {
-		LOGERROR(AT,"Error in sprintfAlloc()\n");
+			CPUTimeLimit, fileName, solverName, j->params, instanceName,
+			fileName) < 0) {
+		LOGERROR(AT, "Error in sprintfAlloc()\n");
 		free(fileName);
 		free(solverName);
 		free(instanceName);
 		return sysError;
 	}
-	logComment(1,"starting solver with command: %s\n", command);
+	logComment(1, "starting solver with command: %s\n", command);
 
-	jobArgs[0]="/bin/bash";
-	jobArgs[1]="-c";
-	jobArgs[2]=command;
-	jobArgs[3]=NULL;
+	jobArgs[0] = "/bin/bash";
+	jobArgs[1] = "-c";
+	jobArgs[2] = command;
+	jobArgs[3] = NULL;
 
 	return success;
 }
-
 
 status setWatcherArgs(const job* j, const experiment exp) {
 	char* command;
@@ -600,32 +594,32 @@ status setWatcherArgs(const job* j, const experiment exp) {
 	char* watcherOutput;
 	char temp[1024];
 
-	solverBinary=prependSolverPath(j->binaryName);
-	if(solverBinary==NULL) {
-		LOGERROR(AT,"Error: Out of memory\n");
+	solverBinary = prependSolverPath(j->binaryName);
+	if (solverBinary == NULL) {
+		LOGERROR(AT, "Error: Out of memory\n");
 		free(solverBinary);
 		return sysError;
 	}
-	instanceName=prependInstancePath(j->instanceName);
-	if(instanceName==NULL) {
-		LOGERROR(AT,"Error: Out of memory\n");
+	instanceName = prependInstancePath(j->instanceName);
+	if (instanceName == NULL) {
+		LOGERROR(AT, "Error: Out of memory\n");
 		free(solverBinary);
 		free(instanceName);
 		return sysError;
 	}
-	solverOutput=prependBasename(j->solverOutputFN);
+	solverOutput = prependBasename(j->solverOutputFN);
 	//solverOutput=prependResultPath(j->solverOutputFN);
-	if(solverOutput==NULL) {
-		LOGERROR(AT,"Error: Out of memory\n");
+	if (solverOutput == NULL) {
+		LOGERROR(AT, "Error: Out of memory\n");
 		free(solverBinary);
 		free(instanceName);
 		free(solverOutput);
 		return sysError;
 	}
-	watcherOutput=prependBasename(j->watcherOutputFN);
+	watcherOutput = prependBasename(j->watcherOutputFN);
 	//watcherOutput=prependResultPath(j->watcherOutputFN);
-	if(watcherOutput==NULL) {
-		LOGERROR(AT,"Error: Out of memory\n");
+	if (watcherOutput == NULL) {
+		LOGERROR(AT, "Error: Out of memory\n");
 		free(solverBinary);
 		free(instanceName);
 		free(solverOutput);
@@ -636,128 +630,141 @@ status setWatcherArgs(const job* j, const experiment exp) {
 	//no limitation of the output length yet
 	//if a limit is -1 then this limit should not be imposed
 	//TODO: Den Aufbau von command schoener gestallten. und den Speicher freigeben
-	strcpy(temp,"./runsolver --timestamp -w %s -o %s ");
+	strcpy(temp, "./runsolver --timestamp -w %s -o %s ");
 
-	if(sprintfAlloc(&command,temp,watcherOutput,solverOutput) < 0)
-		LOGERROR(AT,"Error in sprintfAlloc()\n");//hier noch free...
-	strcpy(temp,command);
+	if (sprintfAlloc(&command, temp, watcherOutput, solverOutput) < 0)
+		LOGERROR(AT, "Error in sprintfAlloc()\n");//hier noch free...
+	strcpy(temp, command);
 
-	if (exp.CPUTimeLimit!=-1){
-		strcat(temp,"-C %d ");
-		if(sprintfAlloc(&command,temp,exp.CPUTimeLimit) < 0)
-			LOGERROR(AT,"Error in sprintfAlloc()\n");
+	if (exp.CPUTimeLimit != -1) {
+		strcat(temp, "-C %d ");
+		if (sprintfAlloc(&command, temp, exp.CPUTimeLimit) < 0)
+			LOGERROR(AT, "Error in sprintfAlloc()\n");
 	}
 
-	strcpy(temp,command);
+	strcpy(temp, command);
 
-	if (exp.wallClockTimeLimit!=-1){
-		strcat(temp,"-W %d ");
-		if(sprintfAlloc(&command,temp,exp.wallClockTimeLimit) < 0)
-			LOGERROR(AT,"Error in sprintfAlloc()\n");
+	if (exp.wallClockTimeLimit != -1) {
+		strcat(temp, "-W %d ");
+		if (sprintfAlloc(&command, temp, exp.wallClockTimeLimit) < 0)
+			LOGERROR(AT, "Error in sprintfAlloc()\n");
 	}
 
-	strcpy(temp,command);
+	strcpy(temp, command);
 
-	if (exp.memoryLimit!=-1){
-		strcat(temp,"-M %d ");
-		if(sprintfAlloc(&command,temp,exp.memoryLimit) < 0)
-			LOGERROR(AT,"Error in sprintfAlloc()\n");
+	if (exp.memoryLimit != -1) {
+		strcat(temp, "-M %d ");
+		if (sprintfAlloc(&command, temp, exp.memoryLimit) < 0)
+			LOGERROR(AT, "Error in sprintfAlloc()\n");
 	}
 
-	strcpy(temp,command);
+	strcpy(temp, command);
 
-	if (exp.stackSizeLimit!=-1){
-		strcat(temp,"-S %d ");
-		if(sprintfAlloc(&command,temp,exp.stackSizeLimit) < 0)
-			LOGERROR(AT,"Error in sprintfAlloc()\n");
+	if (exp.stackSizeLimit != -1) {
+		strcat(temp, "-S %d ");
+		if (sprintfAlloc(&command, temp, exp.stackSizeLimit) < 0)
+			LOGERROR(AT, "Error in sprintfAlloc()\n");
 	}
-	strcpy(temp,command);
-	strcat(temp,"%s %s");
+	strcpy(temp, command);
+	strcat(temp, "%s %s");
 
-	if(sprintfAlloc(&command,temp,solverBinary,j->params) < 0) {
-		LOGERROR(AT,"Error in sprintfAlloc()\n");
+	if (sprintfAlloc(&command, temp, solverBinary, j->params) < 0) {
+		LOGERROR(AT, "Error in sprintfAlloc()\n");
 		free(solverBinary);
 		free(instanceName);
 		free(solverOutput);
 		free(solverOutput);
 		return sysError;
 	}
-	logComment(1,"starting solver with command: %s\n", command);
+	logComment(1, "starting solver with command: %s\n", command);
 
-	jobArgs[0]="/bin/bash";
-	jobArgs[1]="-c";
-	jobArgs[2]=command;
-	jobArgs[3]=NULL;
+	jobArgs[0] = "/bin/bash";
+	jobArgs[1] = "-c";
+	jobArgs[2] = command;
+	jobArgs[3] = NULL;
 
 	return success;
 }
-
 
 void freeJobArgs() {
 	free(jobArgs[2]);
 }
 
-
-void printUsage(){
-	//TODO: Print usage
+void printUsage() {
+	printf("This is EDACC client \n"
+		"by Adrian Balint based on code by B. Junk and R. Bild\n");
+	printf("---------------------\n");
+	printf("usage: ./client [-v <verbosity_level>] [-k] [-w <wait_for_DB>] ");
+	printf("[-j <wait_for_jobs>] [-c <connect_attempts>]\n");
+	printf("Parameters:\n");
+	printf("---------------------\n");
+	printf("verbosity: -v value (0..4)[4]\n");
+	printf("keep results (do not delete after uploading to DB): -k \n");
+	printf("wait for DB(sec): -w value [20]\n");
+	printf("wait for jobs(sec): -j value [3600]\n");
+	printf("connect attempts: -c value [5]\n");
+	printf("---------------------\n");
 }
 
-void initDefaultParameters(){
-	verbosity=4;
-	keepResults=0;
-	waitForDB=20; //60sec.
-	connectAttempts=5;
-	waitForJobs=3600;
-	scanForJobs=60;
+void initDefaultParameters() {
+	verbosity = 4;
+	keepResults = 0;
+	waitForDB = 20;
+	connectAttempts = 5;
+	waitForJobs = 600;
+	scanForJobsPeriod = 60;
 }
 
 int main(int argc, char **argv) {
-
 	initDefaultParameters();
+	static const struct option long_options[] = { { "verbosity",
+			required_argument, 0, 'v' }, { "solve_once", no_argument, 0, 's' },
+			{ "keep_results", no_argument, 0, 'k' }, { "wait_for_db",
+					required_argument, 0, 'w' }, { "wait_for_jobs",
+					required_argument, 0, 'j' }, { "connect_attempts",
+					required_argument, 0, 'c' }, 0 };
 
-
-
-	static const struct option long_options[] =	{
-			{ "verbosity", required_argument,       0, 'v' },
-			{ "solve_once", no_argument,       0, 's' },
-			{ "keep_results", no_argument,       0, 'k' },
-			{ "wait_for_db", required_argument,       0, 'w' },
-			{ "wait_for_jobs", required_argument,       0, 'j' },
-			{ "connect_attempts", required_argument,       0, 'c' },
-			0	};
-
-	while (optind < argc)
-	{
+	while (optind < argc) {
 		int index = -1;
 		struct option * opt = 0;
-		int result = getopt_long(argc, argv,"v:sk",long_options, &index);
-		if (result == -1) break; /* end of list */
-		switch (result)
-		{
-		case 'v': verbosity=atoi(optarg);		break;
-		case 's': solveOnce=1;		break;
-		case 'k': keepResults=1;		break;
-		case 'w': waitForDB=atoi(optarg);		break;
-		case 'j': waitForJobs=atoi(optarg);		break;
-		case 'c': connectAttempts=atoi(optarg);		break;
+		int result =
+				getopt_long(argc, argv, "v:skw:j:c:", long_options, &index); //
+		if (result == -1)
+			break; /* end of list */
+		switch (result) {
+		case 'v':
+			verbosity = atoi(optarg);
+			break;
+		case 's':
+			solveOnce = 1;
+			break;
+		case 'k':
+			keepResults = 1;
+			break;
+		case 'w':
+			waitForDB = atoi(optarg);
+			break;
+		case 'j':
+			waitForJobs = atoi(optarg);
+			break;
+		case 'c':
+			connectAttempts = atoi(optarg);
+			break;
 		case 0: /* all parameter that do not */
 			/* appear in the optstring */
-			opt = (struct option *)&(long_options[index]);
-			printf("'%s' was specified.",
-					opt->name);
+			opt = (struct option *) &(long_options[index]);
+			printf("'%s' was specified.", opt->name);
 			if (opt->has_arg == required_argument)
 				printf("Arg: <%s>", optarg);
 			printf("\n");
 			break;
 		default:
-			printf("parameter not known!");
+			printf("parameter not known!\n");
 			printUsage();
 			exit(0);
 			break;
 		}
 	}
-
-	//TODO: die startParameter angeben!
 
 	int jobTries;
 	experiment exp;
@@ -769,206 +776,230 @@ int main(int argc, char **argv) {
 	instance inst;
 	char* fileName;
 
-	logComment(1,"reading from configuration file...\n------------------------------\n");
-	s=read_config();
-	logComment(1,"------------------------------\n");
-	if(s!=success) {
-		LOGERROR(AT,"couldn't read configuration of the experiment successfully.");
+	logComment(1,
+			"reading from configuration file...\n------------------------------\n");
+	s = read_config();
+	logComment(1, "------------------------------\n");
+	if (s != success) {
+		LOGERROR(AT,
+				"couldn't read configuration of the experiment successfully.");
 		exit(s);
 	}
-	logComment(1,"starting the init-process for experiment with ID %d \n------------------------------\n",experimentId);
+	logComment(
+			1,
+			"starting the init-process for experiment with ID %d \n------------------------------\n",
+			experimentId);
 	initPath();
 	checkPath();
-	s=initExpData(&exp);
-	logComment(1,"\n------------------------------\n");
-	if(s!=success) {
-		LOGERROR(AT,"couldn't init successfully, for experiment %i.\n", experimentId);
+	s = initExpData(&exp);
+	logComment(1, "\n------------------------------\n");
+	if (s != success) {
+		LOGERROR(AT, "couldn't init successfully, for experiment %i.\n",
+				experimentId);
 		exit(s);
 	}
-	logComment(1,"init-process finished\n------------------------------\n");
-
+	logComment(1, "init-process finished\n------------------------------\n");
 
 	setSignalHandler(signalHandler);
-
-	for(numJobs=0; ;--numJobs) {
-		//Run jobsLen child processes, each of them processing one job
-		for(; numJobs<jobsLen; ++numJobs) {
-			//Point j to a free slot in the jobs array
-			for(j=jobs; j->pid!=0; ++j);
-
-			//Try to load a job from the database and write it to j
-			logComment(2,"\n\nloading job from DB...\n");
-			//for (jobTries=0;jobTries<waitForJobs/scanForJobs;jobTries++,sleep(scanForJobs)){
-			if(fetchJob(j, &s)!=0) {
-				//Unable to retrieve a job from the database
-				if(s==success) {
-					//No error occured, but there's no job left in the database.
-					//Wait until all child processes have terminated.
-					logComment(2,"no more jobs found!\n");
-					s=handleChildren(numJobs);
-					//						if (jobTries+1!=waitForJobs/scanForJobs){
-					//							logComment(2,"No jobs in DB going to sleep for %d seconds ", scanForJobs);
-					//							continue;
-				}
-				//						else //waited a lot
-				//							s=handleChildren(numJobs);
-				//					}
+	numJobs = 0;
+	while (numJobs <= maxNumJobs) {
+		if (numJobs == maxNumJobs) { //no more free slots available; wait for one to get free
+			s = handleChildren(1);
+			if (s != success) {
 				exitClient(s);
 			}
-			//				break;
-			//}
+			numJobs--;
+		}
+		//for(numJobs=0; ;--numJobs) {
+		//Run jobsLen child processes, each of them processing one job
+		//for(; numJobs<maxNumJobs; ++numJobs) {
 
-			logComment(1,"------------------------------\n");
-			logComment(2,"job details: \n");
-			logComment(1,"%20s : %d\n","jobID", j->id);
-			logComment(1,"%20s : %s\n","solver", j->solverName);
-			logComment(1,"%20s : %s\n","binary", j->binaryName);
-			logComment(1,"%20s : %s\n","parameters", j->params);
-			logComment(1,"%20s : %d\n","seed", j->seed);
-			logComment(1,"%20s : %s\n","instance", j->instanceName);
-			logComment(1,"%20s : %s\n","resultFile", j->solverOutputFN);
+		for (j = jobs; j->pid != 0; ++j)
+			//Point j to a free slot in the jobs array
+			;
 
+		//Try to load a job from the database and write it to j
+		logComment(2, "\n\n trying to  load job from DB with positive priority...");
+		//for (jobTries=0;jobTries<waitForJobs/scanForJobs;jobTries++,sleep(scanForJobs)){
+		if (fetchJob(j, &s) != 0) { //Unable to retrieve a job from the database
+			if (s == success) {
+				//No error occured, but there's no job left in the database.
+				//Wait until one child processes have terminated.
+				logComment(2, "no more jobs found for the moment in DB with positive priority!\n");
+				if (numJobs > 0) {
+					s = handleChildren(1); //waiting until one jobs finishes
+					if (s != success) {
+						exitClient(s);
+					}
+					numJobs--; //one job finished
+				} else
+					//No more jobs to wait for and no more new jobs
+					break; //break out of the job-get-wait-loop and terminate clean
 
+			} else {
+				LOGERROR(AT, "Couldn't get a job with positive priority!\n");
+				exitClient(s);
+			}
+
+		} else { //got a job and starting to procces
+			logComment(2, "got job with id:%d\n",j->id);
+			numJobs++;
+			sprintfAlloc(&j->launcherOutput, "job details: \n "
+				"%20s : %d\n "
+				"%20s : %s\n "
+				"%20s : %s\n "
+				"%20s : %s\n "
+				"%20s : %d\n "
+				"%20s : %s\n "
+				"%20s : %s\n ",
+				"jobID", j->id,
+				"solver", j->solverName,
+				"binary", j->binaryName,
+				"parameters", j->params,
+				"seed",	j->seed,
+				"instance", j->instanceName,
+				"resultFile",j->solverOutputFN);
+
+			 logComment(1, "------------------------------\n");
+			 logComment(2, "job details: \n");
+			 logComment(1, "%20s : %d\n", "jobID", j->id);
+			 logComment(1, "%20s : %s\n", "solver", j->solverName);
+			 logComment(1, "%20s : %s\n", "binary", j->binaryName);
+			 logComment(1, "%20s : %s\n", "parameters", j->params);
+			 logComment(1, "%20s : %d\n", "seed", j->seed);
+			 logComment(1, "%20s : %s\n", "instance", j->instanceName);
+			 logComment(1, "%20s : %s\n", "resultFile", j->solverOutputFN);
 
 			//Set j->startTime to the DB-time
-			s=setStartTime(j);
-			if(s!=success) {
+			s = setStartTime(j);
+			if (s != success) {
 				exitClient(s);
 			}
-
+			logComment(4, "Start-time (DB-time) of the job %d is: %s\n", j->id,j->startTime);
+			sprintfAlloc(&j->launcherOutput, "%s \n Start-time (DB-time) of the job %d is: %s\n", j->launcherOutput, j->id,j->startTime);
 			//Set the job state to running in the database
-			j->status=0;
-			j->resultTime=0.0;
-			j->computeQueue=gridQueueId;
-			s=update(j);
-			if(s!=success) {
+			j->status = 0;
+			j->resultTime = 0.0;
+			j->computeQueue = gridQueueId;
+			//TODO: hier kommt node Bezeichung
+
+			logComment(1, "preparing job: %d\n", j->id);
+			s = update(j);
+			if (s != success) {
 				exitClient(s);
 			}
 
 			//Create the solver binary if it doesn't exist yet
 
-			fileName=prependSolverPath(j->binaryName);
+			fileName = prependSolverPath(j->binaryName);
+			logComment(2, "checking for solver binary: %s ...", fileName);
+			if (fileName == NULL) {
+				LOGERROR(AT, "Error: Out of memory\n");
 
-			logComment(2,"checking for solver binary: %s ...",fileName);
-			if(fileName==NULL) {
-				LOGERROR(AT,"Error: Out of memory\n");
-
-				j->status=-5;
-				s=update(j);
+				j->status = -5;
+				s = update(j);
 				exitClient(sysError);
 			}
-			if(!fileExists(fileName)) {
-				s=dbFetchSolver(j->solverName,j->solverVersion, &solv);
-				if(s!=success) {
+			if (!fileExists(fileName)) {
+				s = dbFetchSolver(j->solverName, j->solverVersion, &solv);
+				if (s != success) {
 					free(fileName);
-					j->status=-5;
-					s=update(j);
+					j->status = -5;
+					s = update(j);
 					exitClient(s);
 				}
-				if(createFile(fileName, solv.solver, solv.length, solv.md5, 0555)!=success) {
-
+				if (createFile(fileName, solv.solver, solv.length, solv.md5,
+						0555) != success) {
 					free(fileName);
 					freeSolver(&solv);
-					j->status=-5;
-					s=update(j);
+					j->status = -5;
+					s = update(j);
 					exitClient(sysError);
 				}
 				freeSolver(&solv);
-				logComment(2,"%d Bytes downloaded!\n",solv.length);
-			}
-			else{
-				logComment(2,"present locally!\n");
+				logComment(2, "%d Bytes downloaded!\n", solv.length);
+			} else {
+				logComment(2, "present locally!\n");
 			}
 			free(fileName);
 
 			//Create the instance file if it doesn't exist yet
 
-			fileName=prependInstancePath(j->instanceName);
-			logComment(2,"checking for instance: %s ...",fileName);
-			if(fileName==NULL) {
-				LOGERROR(AT,"Error: Out of memory\n");
-				j->status=-5;
-				s=update(j);
+			fileName = prependInstancePath(j->instanceName);
+			logComment(2, "checking for instance: %s ...", fileName);
+			if (fileName == NULL) {
+				LOGERROR(AT, "Error: Out of memory\n");
+				j->status = -5;
+				s = update(j);
 				exitClient(sysError);
 			}
-			if(!fileExists(fileName)) {
-				s=dbFetchInstance(j->instanceName, &inst);
-				if(s!=success) {
+			if (!fileExists(fileName)) {
+				s = dbFetchInstance(j->instanceName, &inst);
+				if (s != success) {
 					free(fileName);
-					j->status=-5;
-					s=update(j);
+					j->status = -5;
+					s = update(j);
 					exitClient(s);
 				}
-				if(createFile(fileName, inst.instance, strlen(inst.instance), inst.md5, 0444)!=success) {
+				if (createFile(fileName, inst.instance, strlen(inst.instance),
+						inst.md5, 0444) != success) {
 					free(fileName);
 					freeInstance(&inst);
-					j->status=-5;
-					s=update(j);
+					j->status = -5;
+					s = update(j);
 					exitClient(sysError);
 				}
-				logComment(2,"%d Bytes downloaded!\n",strlen(inst.instance));
+				logComment(2, "%d Bytes downloaded!\n", strlen(inst.instance));
 				freeInstance(&inst);
-			}
-			else{
-				logComment(2,"present locally!\n");
+			} else {
+				logComment(2, "present locally!\n");
 			}
 			free(fileName);
 
 			//Create a process for processing the job
 
-			pid=fork();
-			if (pid!=0)
-				logComment(1,"starting job with pid=%d\n",pid);
+			pid = fork();
+			if (pid != 0)
+				logComment(1, "starting job with pid=%d\n", pid);
 
-			if(pid==-1) {
-				LOGERROR(AT,"Error in fork(): %s\n", strerror(errno));
-				j->status=-5;
+			if (pid == -1) {
+				LOGERROR(AT, "Error in fork(): %s\n", strerror(errno));
+				j->status = -5;
 				update(j);
 				exitClient(sysError);
-			} else if(pid==0) {
+			} else if (pid == 0) {
 				//This is the child process. Disable the inherited signal handler.
 				deferSignals();
 				//Set up jobArgs and run the command
-				if(s==success && (s=setWatcherArgs(j,exp))==success) {
-					/*                     for(t = jobArgs; t!=NULL; ++t) {
-					 *                         printf("jobArgs: %s\n", t);
-					 *                     }
-					 */
-					logComment(1,"------------------------------\n");
-					if(execve("/bin/bash", jobArgs, NULL)==-1) {
-						LOGERROR(AT,"Error in execve(): %s\n", strerror(errno));
+				if (s == success && (s = setWatcherArgs(j, exp)) == success) {
+					logComment(1, "------------------------------\n");
+					if (execve("/bin/bash", jobArgs, NULL) == -1) {
+						LOGERROR(AT, "Error in execve(): %s\n", strerror(errno));
 						freeJobArgs();
-						s=sysError;
+						s = sysError;
 					}
 				}
 				//Something is seriously wrong. Send the father process a signal indicating the error.
-				j->status=-5;
-				update(j);
-				if(s==sysError) {
-					if(kill(getppid(), SIGUSR1)!=0) {
-						LOGERROR(AT,"Error in kill(): %s\n", strerror(errno));
+				//j->status = -5;
+				//update(j);
+				if (s == sysError) {
+					if (kill(getppid(), SIGUSR1) != 0) {
+						LOGERROR(AT, "Error in kill(): %s\n", strerror(errno));
 					}
 				} else {
-					if(kill(getppid(), SIGUSR2)!=0) {
-						LOGERROR(AT,"Error in kill(): %s\n", strerror(errno));
+					if (kill(getppid(), SIGUSR2) != 0) {
+						LOGERROR(AT, "Error in kill(): %s\n", strerror(errno));
 					}
 				}
 				//Now that was a shitty short life :-/
 				exit(sysError);
 			}
-			j->pid=pid;
-		}
-
-		//Wait until one child process terminates and handle the result
-		s=handleChildren(1);
-		if(s!=success) {
-
-			exitClient(s);
+			j->pid = pid;
 		}
 	}
 	freeExperimentData(&exp);
+	logComment(1, "\n %c Ou revoir und auf Wiedersehen!", 237);
 	//Avoid compiler warnings
 	return success;
 }
-
 
