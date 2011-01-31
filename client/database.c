@@ -253,21 +253,13 @@ int dbFetchJob(job* j, status* s) {
 	}
 
 
-	//	conn = mysql_init(NULL);
-	//	if (!mysql_real_connect(conn, host, username, password, database, port,
-	//			NULL, 0)) {
-	//		LOGERROR(AT, "could not establish mysql connection!\n");
-	//		*s = dbError;
-	//		mysql_close(conn);
-	//		return 1;
-	//	}
 
-	//Autocommit wird hier ausgeschaltet
+	//disable autocommit
 	if (mysql_autocommit(conn,0)!=0)
 		LOGERROR(AT, "db error: Could not switch autocommit OFF");
 
 	while (!gotAJob){
-		sprintfAlloc(&queryRandomJob, QUERY_RANDOM_JOB,experimentId);
+		sprintfAlloc(&queryRandomJob, QUERY_RANDOM_JOB,experimentId,experimentId);
 		if (mysql_query(conn, queryRandomJob) != 0) {
 			LOGERROR(AT, "db query error, message: %s\n", mysql_error(conn));
 			*s = dbError;
@@ -450,8 +442,8 @@ void freeJob(job *j) {//TODO: hier muss noch einiges befreit werden!
 status dbUpdate(const job* j) {
 	MYSQL *conn = NULL;
 	char *queryJob = NULL;
-	int queryLength;
-
+	int length,queryLength;
+	char *escapedString1 = NULL;
 	//	conn = mysql_init(NULL);
 	//	if (!mysql_real_connect(conn, host, username, password, database, port,
 	//			NULL, 0)) {
@@ -479,14 +471,19 @@ status dbUpdate(const job* j) {
 		return dbError;
 	}
 
-	//TODO: SQL injection possibility with StartTime
+	length = strlen(j->launcherOutput);
+	escapedString1 = (char*) malloc(length * 2 + 1);
+	mysql_real_escape_string(conn, escapedString1, j->launcherOutput, length);
 	queryLength = sprintfAlloc(&queryJob, UPDATE_JOB, j->status, j->startTime,
-			j->resultTime, j->computeQueue, j->id);
+			j->resultTime, j->computeQueue, escapedString1,j->id);
 
-	if (mysql_query(conn, queryJob) != 0) {
+	if (mysql_real_query(conn, queryJob, queryLength + 1) != 0) {
 		LOGERROR(AT, "db update query error, message: %s\n", mysql_error(conn));
+		LOGERROR(AT, "query launched: %s\n", queryJob);
 		return dbError;
 	}
+
+
 	mysql_commit(conn);
 	mysql_close(conn);
 	free(queryJob);

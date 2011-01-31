@@ -231,8 +231,8 @@ status processResultsN(job* j) {
 
 	//printf("%s",j->watcherOutput);
 	//TODO: LauncherOutput erstenllen
-	j->launcherOutput = (char*) malloc(5 * sizeof(char));
-	strcpy(j->launcherOutput, "NULL");
+	//j->launcherOutput = (char*) malloc(5 * sizeof(char));
+	//strcpy(j->launcherOutput, "NULL");
 
 	j->verifierOutput = (char*) malloc(5 * sizeof(char));
 	strcpy(j->verifierOutput, "NULL");
@@ -716,7 +716,6 @@ void initDefaultParameters() {
 }
 
 int main(int argc, char **argv) {
-
 	initDefaultParameters();
 	static const struct option long_options[] = { { "verbosity",
 			required_argument, 0, 'v' }, { "solve_once", no_argument, 0, 's' },
@@ -820,46 +819,64 @@ int main(int argc, char **argv) {
 			;
 
 		//Try to load a job from the database and write it to j
-		logComment(2, "\n\nloading job from DB...\n");
+		logComment(2, "\n\n trying to  load job from DB with positive priority...");
 		//for (jobTries=0;jobTries<waitForJobs/scanForJobs;jobTries++,sleep(scanForJobs)){
 		if (fetchJob(j, &s) != 0) { //Unable to retrieve a job from the database
 			if (s == success) {
 				//No error occured, but there's no job left in the database.
 				//Wait until one child processes have terminated.
-				logComment(2, "no more jobs found for the moment in DB!\n");
+				logComment(2, "no more jobs found for the moment in DB with positive priority!\n");
 				if (numJobs > 0) {
 					s = handleChildren(1); //waiting until one jobs finishes
 					if (s != success) {
 						exitClient(s);
 					}
 					numJobs--; //one job finished
-				} else //No more jobs to wait for and no more new jobs
+				} else
+					//No more jobs to wait for and no more new jobs
 					break; //break out of the job-get-wait-loop and terminate clean
 
-			} else{
-				LOGERROR(AT, "Couldn't get a job!\n");
+			} else {
+				LOGERROR(AT, "Couldn't get a job with positive priority!\n");
 				exitClient(s);
 			}
 
 		} else { //got a job and starting to procces
+			logComment(2, "got job with id:%d\n",j->id);
 			numJobs++;
-			logComment(1, "------------------------------\n");
-			logComment(2, "job details: \n");
-			logComment(1, "%20s : %d\n", "jobID", j->id);
-			logComment(1, "%20s : %s\n", "solver", j->solverName);
-			logComment(1, "%20s : %s\n", "binary", j->binaryName);
-			logComment(1, "%20s : %s\n", "parameters", j->params);
-			logComment(1, "%20s : %d\n", "seed", j->seed);
-			logComment(1, "%20s : %s\n", "instance", j->instanceName);
-			logComment(1, "%20s : %s\n", "resultFile", j->solverOutputFN);
+			sprintfAlloc(&j->launcherOutput, "job details: \n "
+				"%20s : %d\n "
+				"%20s : %s\n "
+				"%20s : %s\n "
+				"%20s : %s\n "
+				"%20s : %d\n "
+				"%20s : %s\n "
+				"%20s : %s\n ",
+				"jobID", j->id,
+				"solver", j->solverName,
+				"binary", j->binaryName,
+				"parameters", j->params,
+				"seed",	j->seed,
+				"instance", j->instanceName,
+				"resultFile",j->solverOutputFN);
+
+			 logComment(1, "------------------------------\n");
+			 logComment(2, "job details: \n");
+			 logComment(1, "%20s : %d\n", "jobID", j->id);
+			 logComment(1, "%20s : %s\n", "solver", j->solverName);
+			 logComment(1, "%20s : %s\n", "binary", j->binaryName);
+			 logComment(1, "%20s : %s\n", "parameters", j->params);
+			 logComment(1, "%20s : %d\n", "seed", j->seed);
+			 logComment(1, "%20s : %s\n", "instance", j->instanceName);
+			 logComment(1, "%20s : %s\n", "resultFile", j->solverOutputFN);
 
 			//Set j->startTime to the DB-time
 			s = setStartTime(j);
 			if (s != success) {
 				exitClient(s);
 			}
-			logComment(4, "Start-time (DB-time) of the job %d is: %s\n", j->id,
-					j->startTime);
+			logComment(4, "Start-time (DB-time) of the job %d is: %s\n", j->id,j->startTime);
+			sprintfAlloc(&j->launcherOutput, "%s \n Start-time (DB-time) of the job %d is: %s\n", j->launcherOutput, j->id,j->startTime);
 			//Set the job state to running in the database
 			j->status = 0;
 			j->resultTime = 0.0;
@@ -981,7 +998,7 @@ int main(int argc, char **argv) {
 		}
 	}
 	freeExperimentData(&exp);
-	logComment(1,"\n %c Ou revoir und auf Wiedersehen!",237);
+	logComment(1, "\n %c Ou revoir und auf Wiedersehen!", 237);
 	//Avoid compiler warnings
 	return success;
 }

@@ -7,6 +7,8 @@ This file contains version information about the client of EDACC part of http://
 - rewritten the job-get-wait-loop
 - client rescans for jobs in the DB after each finished job (this makes the client stick better to the queue)
 	this means that a rescan for jobs through the DB is done only when an existing job finishes! 
+- client takes priority into account; negative priority jobs are never computed
+- output of the launcher is written at the beginning of the job to the DB
 
 
 29.01.2011
