@@ -27,7 +27,7 @@ static char* jobArgs[4]={NULL, NULL, NULL, NULL};
 
 //An array for keeping track of the jobs we're currently processing
 static job* jobs;
-static int jobsLen;
+static int maxNumJobs;
 
 
 //The timeout in seconds for each solver run
@@ -105,20 +105,14 @@ status initExpData(experiment* exp) {
 	status s;
 	//int i;
 
-	logComment(2,"starting to fetch experiment data:\n------------------------------------------------------------\n");
-
+	logComment(2,"starting to fetch experiment data:\n\n");
 	s=dbFetchExperimentData(exp);
 
-	logComment(2,"------------------------------------------------------------\n");
 	if(s!=success)
 		return s;
-
-	jobsLen=exp->numCPUs;
+	maxNumJobs=exp->numCPUs;
 	CPUTimeLimit=exp->CPUTimeLimit;
-
-
-
-	jobs=calloc(jobsLen, sizeof(job));
+	jobs=calloc(maxNumJobs, sizeof(job));
 	if(jobs==NULL) {
 		return sysError;
 	}
@@ -171,7 +165,7 @@ void exitClient(status retval) {
 	kill(0, SIGTERM);
 
 	//Update the database entries of the processes that were still running
-	for(i=0; i<jobsLen; ++i) {
+	for(i=0; i<maxNumJobs; ++i) {
 		if(jobs[i].pid!=0) {
 			jobs[i].status=-5;
 			update(&(jobs[i]));
@@ -184,7 +178,7 @@ void exitClient(status retval) {
 	}
 
 	//Try to give the child processes time to shut down cleanly
-	for(i=0; i<jobsLen; ++i) {
+	for(i=0; i<maxNumJobs; ++i) {
 		if(jobs[i].pid!=0) {
 			waitpid(jobs[i].pid, NULL, 0);
 			freeJob(&(jobs[i]));
@@ -699,13 +693,25 @@ void freeJobArgs() {
 
 
 void printUsage(){
-	//TODO: Print usage
+	printf("This is EDACC client \n"
+			"by Adrian Balint based on code by B. Junk and R. Bild\n");
+	printf("---------------------\n");
+	printf("usage: ./client [-v <verbosity_level>] [-k] [-w <wait_for_DB>] ");
+	printf("[-j <wait_for_jobs>] [-c <connect_attempts>]\n");
+	printf("Parameters:\n");
+	printf("---------------------\n");
+	printf("verbosity: -v value (0..4)[4]\n");
+	printf("keep results (do not delete after uploading to DB): -k \n");
+	printf("wait for DB(sec): -w value [20]\n");
+	printf("wait for jobs(sec): -j value [3600]\n");
+	printf("connect attempts: -c value [5]\n");
+	printf("---------------------\n");
 }
 
 void initDefaultParameters(){
 	verbosity=4;
 	keepResults=0;
-	waitForDB=20; //60sec.
+	waitForDB=20;
 	connectAttempts=5;
 	waitForJobs=3600;
 	scanForJobs=60;
@@ -714,9 +720,6 @@ void initDefaultParameters(){
 int main(int argc, char **argv) {
 
 	initDefaultParameters();
-
-
-
 	static const struct option long_options[] =	{
 			{ "verbosity", required_argument,       0, 'v' },
 			{ "solve_once", no_argument,       0, 's' },
@@ -730,7 +733,7 @@ int main(int argc, char **argv) {
 	{
 		int index = -1;
 		struct option * opt = 0;
-		int result = getopt_long(argc, argv,"v:sk",long_options, &index);
+		int result = getopt_long(argc, argv,"v:skw:j:c:",long_options, &index); //
 		if (result == -1) break; /* end of list */
 		switch (result)
 		{
@@ -750,14 +753,14 @@ int main(int argc, char **argv) {
 			printf("\n");
 			break;
 		default:
-			printf("parameter not known!");
+			printf("parameter not known!\n");
 			printUsage();
 			exit(0);
 			break;
 		}
 	}
 
-	//TODO: die startParameter angeben!
+
 
 	int jobTries;
 	experiment exp;
@@ -792,7 +795,7 @@ int main(int argc, char **argv) {
 
 	for(numJobs=0; ;--numJobs) {
 		//Run jobsLen child processes, each of them processing one job
-		for(; numJobs<jobsLen; ++numJobs) {
+		for(; numJobs<maxNumJobs; ++numJobs) {
 			//Point j to a free slot in the jobs array
 			for(j=jobs; j->pid!=0; ++j);
 
@@ -970,5 +973,6 @@ int main(int argc, char **argv) {
 	//Avoid compiler warnings
 	return success;
 }
+
 
 

@@ -1,19 +1,15 @@
 This file contains version information about the client of EDACC part of http://sourceforge.net/projects/edacc/
 
 
-v 1.2
+v 0.9-79
 -----
-TODO: 
--specify port
--
+- added port support 
+- time bug removed
 
 
-v 1.1
------
+
 -updated querie for job selection
 -updated DB connections 
 
 
-v 1.0 
------
-The first version of this code was written by Boris Junk and Raffael Bild
+-The first version of this code was written by Boris Junk and Raffael Bild

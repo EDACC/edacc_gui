@@ -1,5 +1,8 @@
-- include port option -> to be read from config file
+v0.9-79- include port option -> to be read from config file
 - "get free job"-query to be changed
 - write information about node into ExperimentResults 
 - fix memory leaks
 - if the client finds no more jobs in the DB is should check again after each of its children terminates!
+- get job should take priority into account
+- inlcude verifier
+- implement a wait method: tells the client how long to wait for jobs
