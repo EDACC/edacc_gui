@@ -59,7 +59,6 @@ public class SolverConfigurationDAO {
             st.setString(2, i.getName());
             st.setInt(3, i.getIdx());
             st.setInt(4, i.getId());
-            System.out.println("UPDATE!!" + i.getIdx());
             st.executeUpdate();
             i.setSaved();
         }
