@@ -670,9 +670,7 @@ public class ExperimentResultDAO {
             throw new ExperimentResultNotInDBException();
         }
         ExperimentResult er = getExperimentResultFromResultSet(rs);
-        ArrayList<ExperimentResult> tmp = new ArrayList<ExperimentResult>();
-        tmp.add(er);
-        ExperimentResultHasPropertyDAO.assign(tmp, er.getExperimentId());
+        ExperimentResultHasPropertyDAO.assign(er);
         return er;
     }
 
