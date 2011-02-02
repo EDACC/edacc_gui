@@ -505,7 +505,7 @@ status handleChildren(int cnt) {
 				j->status = -5;
 				update(j);
 				freeJob(j);
-				return success;
+				return s;
 			}
 			if (!keepResults) {
 				remove(j->solverOutputFN);
