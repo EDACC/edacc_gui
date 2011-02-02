@@ -488,9 +488,9 @@ status handleChildren(int cnt) {
 		for (j = jobs; j->pid != pid; ++j)
 			;
 		if (
-		WIFEXITED(retval)) { //watcher terminated normally
+				WIFEXITED(retval)) { //watcher terminated normally
 			j->watcherExitCode =
-			WEXITSTATUS(retval); //save exitCode of watcher
+					WEXITSTATUS(retval); //save exitCode of watcher
 			s = processResultsN(j);
 			j->pid = 0;
 			if (s != success) {
@@ -515,7 +515,7 @@ status handleChildren(int cnt) {
 		}
 		if (WIFSIGNALED(retval)) { //watcher was terminated by a signal
 			j->status = -4 * 100 -
-			WTERMSIG(retval); //watcher crash has code: -4xx : xx=signal number
+					WTERMSIG(retval); //watcher crash has code: -4xx : xx=signal number
 			//The process terminated abnormally
 
 			//solverOutput=prependResultPath(j->solverOutputFN);
@@ -692,7 +692,7 @@ void freeJobArgs() {
 
 void printUsage() {
 	printf("This is EDACC client \n"
-		"by Adrian Balint based on code by B. Junk and R. Bild\n");
+			"by Adrian Balint based on code by B. Junk and R. Bild\n");
 	printf("---------------------\n");
 	printf("usage: ./client [-v <verbosity_level>] [-k] [-w <wait_for_DB>] ");
 	printf("[-j <wait_for_jobs>] [-c <connect_attempts>]\n");
@@ -721,8 +721,8 @@ int main(int argc, char **argv) {
 			required_argument, 0, 'v' }, { "solve_once", no_argument, 0, 's' },
 			{ "keep_results", no_argument, 0, 'k' }, { "wait_for_db",
 					required_argument, 0, 'w' }, { "wait_for_jobs",
-					required_argument, 0, 'j' }, { "connect_attempts",
-					required_argument, 0, 'c' }, 0 };
+							required_argument, 0, 'j' }, { "connect_attempts",
+									required_argument, 0, 'c' }, 0 };
 
 	while (optind < argc) {
 		int index = -1;
@@ -845,30 +845,30 @@ int main(int argc, char **argv) {
 			logComment(2, "got job with id:%d\n",j->id);
 			numJobs++;
 			sprintfAlloc(&j->launcherOutput, "job details: \n "
-				"%20s : %d\n "
-				"%20s : %s\n "
-				"%20s : %s\n "
-				"%20s : %s\n "
-				"%20s : %d\n "
-				"%20s : %s\n "
-				"%20s : %s\n ",
-				"jobID", j->id,
-				"solver", j->solverName,
-				"binary", j->binaryName,
-				"parameters", j->params,
-				"seed",	j->seed,
-				"instance", j->instanceName,
-				"resultFile",j->solverOutputFN);
+					"%20s : %d\n "
+					"%20s : %s\n "
+					"%20s : %s\n "
+					"%20s : %s\n "
+					"%20s : %d\n "
+					"%20s : %s\n "
+					"%20s : %s\n ",
+					"jobID", j->id,
+					"solver", j->solverName,
+					"binary", j->binaryName,
+					"parameters", j->params,
+					"seed",	j->seed,
+					"instance", j->instanceName,
+					"resultFile",j->solverOutputFN);
 
-			 logComment(1, "------------------------------\n");
-			 logComment(2, "job details: \n");
-			 logComment(1, "%20s : %d\n", "jobID", j->id);
-			 logComment(1, "%20s : %s\n", "solver", j->solverName);
-			 logComment(1, "%20s : %s\n", "binary", j->binaryName);
-			 logComment(1, "%20s : %s\n", "parameters", j->params);
-			 logComment(1, "%20s : %d\n", "seed", j->seed);
-			 logComment(1, "%20s : %s\n", "instance", j->instanceName);
-			 logComment(1, "%20s : %s\n", "resultFile", j->solverOutputFN);
+			logComment(1, "------------------------------\n");
+			logComment(2, "job details: \n");
+			logComment(1, "%20s : %d\n", "jobID", j->id);
+			logComment(1, "%20s : %s\n", "solver", j->solverName);
+			logComment(1, "%20s : %s\n", "binary", j->binaryName);
+			logComment(1, "%20s : %s\n", "parameters", j->params);
+			logComment(1, "%20s : %d\n", "seed", j->seed);
+			logComment(1, "%20s : %s\n", "instance", j->instanceName);
+			logComment(1, "%20s : %s\n", "resultFile", j->solverOutputFN);
 
 			//Set j->startTime to the DB-time
 			s = setStartTime(j);
@@ -980,8 +980,8 @@ int main(int argc, char **argv) {
 					}
 				}
 				//Something is seriously wrong. Send the father process a signal indicating the error.
-				//j->status = -5;
-				//update(j);
+				j->status = -5;
+				update(j);
 				if (s == sysError) {
 					if (kill(getppid(), SIGUSR1) != 0) {
 						LOGERROR(AT, "Error in kill(): %s\n", strerror(errno));

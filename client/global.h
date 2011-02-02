@@ -104,7 +104,7 @@ typedef struct {
 
 	char *solverName; // the used solver for this job.
 	char *solverVersion; // the used solver for this job.
-	char params[1024]; // the full param string
+	char params[4096]; // the full param string
 	char *instanceName; //the name of the instance
 	char *binaryName;
 } job;

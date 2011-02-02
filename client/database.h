@@ -57,8 +57,7 @@
 		"   WHERE status <0 " \
 		"      AND Experiment_idExperiment = %i "
 //This is the old one, that produced good results but was still buggy
-//#define QUERY_RANDOM_JOB "SELECT idJob FROM ExperimentResults WHERE status<0 "\
-				"AND Experiment_idExperiment= %d ORDER BY RAND() LIMIT 1 FOR UPDATE"
+//#define QUERY_RANDOM_JOB "SELECT idJob FROM ExperimentResults WHERE status<0 "\"AND Experiment_idExperiment= %d ORDER BY RAND() LIMIT 1 FOR UPDATE"
 
 #define QUERY_RANDOM_JOB "SELECT idJob FROM ExperimentResults WHERE status<0 "\
 				"AND Experiment_idExperiment= %d AND priority>=0 AND "\
