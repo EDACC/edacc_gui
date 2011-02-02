@@ -28,7 +28,7 @@ status dbFetchExperimentData(experiment* e) {
 	int tries=0;
 	for (tries=0;tries<connectAttempts;tries++){
 		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
-			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n",mysql_error(conn));
+			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",mysql_error(conn),mysql_errno(conn));
 			logComment(1,"waiting for: %d seconds\n",waitForDB);
 			sleep(waitForDB);
 			logComment(1,"trying to reconnect!\n",mysql_error(conn));
@@ -237,7 +237,7 @@ int dbFetchJob(job* j, status* s) {
 	int tries=0;
 	for (tries=0;tries<connectAttempts;tries++){
 		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
-			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n",mysql_error(conn));
+			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",mysql_error(conn),mysql_errno(conn));
 			logComment(1,"waiting for: %d seconds\n",waitForDB);
 			sleep(waitForDB);
 			logComment(1,"trying to reconnect!\n",mysql_error(conn));
@@ -378,7 +378,7 @@ int dbFetchJob(job* j, status* s) {
 
 	//automatische Erkennung von seed und instance parameter: Werte werden automatisch eingesetzt.
 
-	params = (char *) calloc(1024, sizeof(char));
+	params = (char *) calloc(4096, sizeof(char));
 
 	while ((row = mysql_fetch_row(res)) != NULL) {
 		lengths = mysql_fetch_lengths(res);
@@ -392,7 +392,7 @@ int dbFetchJob(job* j, status* s) {
 		//			printf("\n %s \n", row[0]);
 		if (strcmp(row[0], "seed") == 0) { //seed parameter
 			temp = (char *) calloc(32, sizeof(char));
-			sprintf(temp, "%d", j->seed);
+			sprintf(temp, " %d", j->seed);
 			params = strcat(params, temp);
 			free(temp);
 		} else if (strcmp(row[0], "instance") == 0) {//instance parameter
@@ -459,7 +459,7 @@ status dbUpdate(const job* j) {
 	int tries=0;
 	for (tries=0;tries<connectAttempts;tries++){
 		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
-			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n",mysql_error(conn));
+			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",mysql_error(conn),mysql_errno(conn));
 			logComment(1,"waiting for: %d seconds\n",waitForDB);
 			sleep(waitForDB);
 			logComment(1,"trying to reconnect!\n",mysql_error(conn));
@@ -508,7 +508,7 @@ status dbUpdateResults(const job* j) {
 	int tries=0;
 	for (tries=0;tries<connectAttempts;tries++){
 		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
-			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n",mysql_error(conn));
+			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",mysql_error(conn),mysql_errno(conn));
 			logComment(1,"waiting for: %d seconds\n",waitForDB);
 			sleep(waitForDB);
 			logComment(1,"trying to reconnect!\n",mysql_error(conn));
@@ -581,7 +581,7 @@ status dbFetchSolver(const char* solverName, const char* solverVersion,
 	int tries=0;
 	for (tries=0;tries<connectAttempts;tries++){
 		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
-			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n",mysql_error(conn));
+			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",mysql_error(conn),mysql_errno(conn));
 			logComment(1,"waiting for: %d seconds\n",waitForDB);
 			sleep(waitForDB);
 			logComment(1,"trying to reconnect!\n",mysql_error(conn));
@@ -660,7 +660,7 @@ status dbFetchInstance(const char* instanceName, instance* i) {
 	int tries=0;
 	for (tries=0;tries<connectAttempts;tries++){
 		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
-			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n",mysql_error(conn));
+			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",mysql_error(conn),mysql_errno(conn));
 			logComment(1,"waiting for: %d seconds\n",waitForDB);
 			sleep(waitForDB);
 			logComment(1,"trying to reconnect!\n",mysql_error(conn));
@@ -726,7 +726,7 @@ status setMySQLTime(job *j) {
 	int tries=0;
 	for (tries=0;tries<connectAttempts;tries++){
 		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
-			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n",mysql_error(conn));
+			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",mysql_error(conn),mysql_errno(conn));
 			logComment(1,"waiting for: %d seconds\n",waitForDB);
 			sleep(waitForDB);
 			logComment(1,"trying to reconnect!\n",mysql_error(conn));
