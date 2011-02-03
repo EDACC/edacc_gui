@@ -25,7 +25,7 @@ public class ExperimentResultHasPropertyDAO {
     private static final String deleteQuery = "DELETE FROM " + table + " WHERE idExperimentResult_has_Property=?";
     private static String updateQuery = "UPDATE " + table + " SET idExperimentResults=?, idProperty=? WHERE idExperimentResult_has_Property=?";
     private static String insertQuery = "INSERT INTO " + table + " (idExperimentResults, idProperty) VALUES (?, ?)";
-    private static final String deleteValueQuery = "DELETE FROM " + valueTable + " WHERE id=?";
+    private static final String deleteValueQuery = "DELETE FROM " + valueTable + " WHERE idExperimentResult_has_Property=?";
     private static String insertValueQuery = "INSERT INTO " + valueTable + " (idExperimentResult_has_Property, value, `order`) VALUES (?, ?, ?)";
 
     /**
@@ -84,20 +84,23 @@ public class ExperimentResultHasPropertyDAO {
             ps.setInt(2, e.getPropId());
             ps.setInt(3, e.getId());
             ps.executeUpdate();
+            ps.close();
 
             // Replace the value Vector in the SolverPropertyValue table of the database with the modified one
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteValueQuery);
             ps.setInt(1, e.getId());
             ps.executeUpdate();
+            ps.close();
+
             for (int i = 0; i < e.getValue().size(); i++) {
                 ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertValueQuery);
                 ps.setInt(1, e.getId());
                 ps.setString(2, e.getValue().get(i));
                 ps.setInt(3, i);
                 ps.execute();
+                ps.close();
             }
 
-            ps.close();
             e.setSaved();
         } else if (e.isNew()) {
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -254,6 +257,7 @@ public class ExperimentResultHasPropertyDAO {
             String value = rs.getString(6);
             erhp.getValue().add(value);
         }
+        ps.close();
     }
 
     /**

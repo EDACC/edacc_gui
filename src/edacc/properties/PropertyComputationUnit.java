@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
@@ -315,7 +316,9 @@ public class PropertyComputationUnit implements Runnable {
             }
         } else if (property.getRegularExpression() != null) {
             Vector<String> res = new Vector<String>();
-            BufferedReader buf = new BufferedReader(new InputStreamReader(b.getBinaryStream()));
+            InputStream is = b.getBinaryStream();
+            InputStreamReader ir = new InputStreamReader(is);
+            BufferedReader buf = new BufferedReader(ir);
             String tmp;
             Vector<String> toAdd = new Vector<String>();
             while ((tmp = buf.readLine()) != null) {
@@ -333,6 +336,9 @@ public class PropertyComputationUnit implements Runnable {
                 erhp.setValue(res);
                 ExperimentResultHasPropertyDAO.save(erhp);
             }
+            buf.close();
+            ir.close();
+            is.close();
         }
     }
 
