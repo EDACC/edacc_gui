@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Vector;
@@ -261,6 +262,44 @@ public class InstanceClassDAO {
 
     public static void clearCache() {
         cache.clear();
+    }
+
+    public static DefaultMutableTreeNode getAllAsTreeFast() throws NoConnectionToDBException, SQLException {
+        loadAllInstanceClasses();
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+        ResultSet rs = st.executeQuery("SELECT idInstanceClass, parent FROM " + table);
+        HashMap<Integer, LinkedList<Integer>> mapIds = new HashMap<Integer, LinkedList<Integer>>();
+        LinkedList<DefaultMutableTreeNode> toIterate = new LinkedList<DefaultMutableTreeNode>();
+        while (rs.next()) {
+            int id = rs.getInt(1);
+            Integer parent = rs.getInt(2);
+            if (rs.wasNull()) {
+                DefaultMutableTreeNode tmp = new DefaultMutableTreeNode(getById(id));
+                root.add(tmp);
+                toIterate.add(tmp);
+            } else {
+                LinkedList idList = mapIds.get(parent);
+                if (idList == null) {
+                    idList = new LinkedList<Integer>();
+                    mapIds.put(parent, idList);
+                }
+                idList.add(id);
+            }
+        }
+        while (toIterate.size() > 0) {
+            DefaultMutableTreeNode node = toIterate.pop();
+            InstanceClass i = (InstanceClass) node.getUserObject();
+            LinkedList<Integer> idList = mapIds.get(i.getId());
+            if (idList != null) {
+                for (Integer id : idList) {
+                    DefaultMutableTreeNode tmp = new DefaultMutableTreeNode(getById(id));
+                    node.add(tmp);
+                    toIterate.add(tmp);
+                }
+            }
+        }
+        return root;
     }
 
     public static DefaultMutableTreeNode getAllAsTree() throws NoConnectionToDBException, SQLException{

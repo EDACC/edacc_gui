@@ -119,7 +119,7 @@ public class ExperimentController {
         experiments = v;
         main.expTableModel.setExperiments(experiments);
         try {
-            DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getAllAsTree();
+            DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getAllAsTreeFast();
             main.instanceClassTreeModel.setRoot(root);
             ArrayList<Instance> instances = new ArrayList<Instance>();
             instances.addAll(InstanceDAO.getAll());
