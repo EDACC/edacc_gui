@@ -207,7 +207,6 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
                         }
                     });
                     DatabaseConnector.getInstance().releaseConnection();
-                    System.out.println("RELEASED: " + Thread.currentThread());
                 } catch (final java.lang.reflect.InvocationTargetException e) {
                     if (taskView != null) {
                         taskView.dispose();
