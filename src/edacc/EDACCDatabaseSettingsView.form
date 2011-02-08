@@ -31,17 +31,17 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Group type="102" alignment="0" attributes="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jPanel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
                       <Component id="btnCancel" min="-2" pref="93" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace pref="303" max="32767" attributes="0"/>
                       <Component id="btnConnect" min="-2" pref="93" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jPanel1" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -50,10 +50,10 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="btnCancel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnConnect" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnCancel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -96,32 +96,59 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="1" attributes="0">
+              <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="lblHostname" alignment="0" pref="82" max="32767" attributes="1"/>
-                      <Component id="lblDatabase" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
-                      <Component id="lblUsername" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
-                      <Component id="lblPassword" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
-                      <Component id="lblPassword1" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
-                      <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="chkCompress" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="chkUseSSL" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtUsername" alignment="0" pref="327" max="32767" attributes="0"/>
-                      <Component id="txtPassword" alignment="0" pref="327" max="32767" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="txtHostname" min="-2" pref="219" max="-2" attributes="0"/>
-                          <EmptySpace pref="20" max="32767" attributes="0"/>
-                          <Component id="lblPort" min="-2" pref="43" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtPort" min="-2" pref="41" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="lblHostname" alignment="0" pref="108" max="32767" attributes="1"/>
+                                  <Component id="lblDatabase" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
+                                  <Component id="lblUsername" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
+                                  <Component id="lblPassword" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <Component id="lblPassword1" min="0" pref="0" max="32767" attributes="1"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <Component id="txtDatabase" alignment="0" pref="327" max="32767" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="61" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="chkCompress" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="238" max="32767" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="1" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="txtMaxConnections" pref="353" max="32767" attributes="0"/>
+                              <Component id="txtUsername" alignment="0" pref="353" max="32767" attributes="0"/>
+                              <Component id="txtPassword" alignment="0" pref="353" max="32767" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="txtHostname" min="-2" pref="219" max="-2" attributes="0"/>
+                                  <EmptySpace pref="46" max="32767" attributes="0"/>
+                                  <Component id="lblPort" min="-2" pref="43" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="txtPort" min="-2" pref="41" max="-2" attributes="0"/>
+                              </Group>
+                              <Component id="txtDatabase" alignment="0" pref="353" max="32767" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="chkUseSSL" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="244" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
               </Group>
           </Group>
         </DimensionLayout>
@@ -152,13 +179,18 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="chkUseSSL" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="lblPassword1" alignment="3" min="-2" pref="22" max="-2" attributes="0"/>
+                      <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtMaxConnections" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="chkCompress" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="lblPassword1" alignment="3" min="-2" pref="22" max="-2" attributes="0"/>
+                      <Component id="chkUseSSL" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkCompress" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -318,6 +350,21 @@
             <Property name="text" type="java.lang.String" resourceKey="jLabel1.text"/>
             <Property name="name" type="java.lang.String" value="jLabel1" noResource="true"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel2">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jLabel2.text"/>
+            <Property name="name" type="java.lang.String" value="jLabel2" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="txtMaxConnections">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="txtMaxConnections.text"/>
+            <Property name="name" type="java.lang.String" value="txtMaxConnections" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtMaxConnectionsKeyPressed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

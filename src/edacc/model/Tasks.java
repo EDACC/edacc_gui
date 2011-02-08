@@ -178,6 +178,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
                     taskView.dispose();
                     taskView = null;
                 }
+                DatabaseConnector.getInstance().releaseConnection();
                 return null;
             } else {
                 try {
@@ -205,7 +206,8 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
                             view.onTaskSuccessful(methodName, res);
                         }
                     });
-
+                    DatabaseConnector.getInstance().releaseConnection();
+                    System.out.println("RELEASED: " + Thread.currentThread());
                 } catch (final java.lang.reflect.InvocationTargetException e) {
                     if (taskView != null) {
                         taskView.dispose();
@@ -218,7 +220,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
                             view.onTaskFailed(methodName, e.getTargetException());
                         }
                     });
-
+                    DatabaseConnector.getInstance().releaseConnection();
                 } catch (Exception e) {
                     System.out.println("This should not happen. Called a method which should not be called. Be sure that your method is declared as public. Exception as follows: " + e);
                     EDACCApp.getLogger().logException(e);

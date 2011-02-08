@@ -79,29 +79,41 @@ public class ExperimentResultHasPropertyDAO {
             ps.close();
             cache.remove(e);
         } else if (e.isModified()) {
-            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
-            ps.setInt(1, e.getExpResId());
-            ps.setInt(2, e.getPropId());
-            ps.setInt(3, e.getId());
-            ps.executeUpdate();
-            ps.close();
-
-            // Replace the value Vector in the SolverPropertyValue table of the database with the modified one
-            ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteValueQuery);
-            ps.setInt(1, e.getId());
-            ps.executeUpdate();
-            ps.close();
-
-            for (int i = 0; i < e.getValue().size(); i++) {
-                ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertValueQuery);
-                ps.setInt(1, e.getId());
-                ps.setString(2, e.getValue().get(i));
-                ps.setInt(3, i);
-                ps.execute();
+            boolean autocommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
+            try {
+                DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+                PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
+                ps.setInt(1, e.getExpResId());
+                ps.setInt(2, e.getPropId());
+                ps.setInt(3, e.getId());
+                ps.executeUpdate();
                 ps.close();
-            }
 
-            e.setSaved();
+                // Replace the value Vector in the SolverPropertyValue table of the database with the modified one
+                ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteValueQuery);
+                ps.setInt(1, e.getId());
+                ps.executeUpdate();
+                ps.close();
+
+                DatabaseConnector.getInstance().getConn().commit();
+                // prevents deadlock in mysql: can't delete AND insert on non unique columns in WHERE-clause in one commit
+
+                for (int i = 0; i < e.getValue().size(); i++) {
+                    ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertValueQuery);
+                    ps.setInt(1, e.getId());
+                    ps.setString(2, e.getValue().get(i));
+                    ps.setInt(3, i);
+                    ps.execute();
+                    ps.close();
+                }
+
+                e.setSaved();
+            } catch (SQLException ex) {
+                DatabaseConnector.getInstance().getConn().rollback();
+                throw ex;
+            } finally {
+                DatabaseConnector.getInstance().getConn().setAutoCommit(autocommit);
+            }
         } else if (e.isNew()) {
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setInt(1, e.getExpResId());
