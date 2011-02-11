@@ -17,7 +17,7 @@ public class DBTest {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
-        DatabaseConnector.getInstance().connect("localhost", 3306, "root", "EDACC", "", false, false);
+        DatabaseConnector.getInstance().connect("localhost", 3306, "root", "EDACC", "", false, false,2);
 
         ArrayList<ExperimentResult> v = ExperimentResultDAO.getAllByExperimentId(10);
 

@@ -670,9 +670,8 @@ public class ExperimentResultDAO {
             throw new ExperimentResultNotInDBException();
         }
         ExperimentResult er = getExperimentResultFromResultSet(rs);
-        ArrayList<ExperimentResult> tmp = new ArrayList<ExperimentResult>();
-        tmp.add(er);
-        ExperimentResultHasPropertyDAO.assign(tmp, er.getExperimentId());
+        ps.close();
+        ExperimentResultHasPropertyDAO.assign(er);
         return er;
     }
 
@@ -745,7 +744,11 @@ public class ExperimentResultDAO {
         ps.setInt(1, expRes.getId());
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
-            return rs.getBlob(1);
+            try {
+                return rs.getBlob(1);
+            } finally {
+                ps.close();
+            }
         } else {
             throw new ExperimentResultNotInDBException();
         }
@@ -759,7 +762,11 @@ public class ExperimentResultDAO {
         ps.setInt(1, expRes.getId());
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
-            return rs.getBlob(1);
+            try {
+                return rs.getBlob(1);
+            } finally {
+                ps.close();
+            }
         } else {
             throw new ExperimentResultNotInDBException();
         }
@@ -773,7 +780,11 @@ public class ExperimentResultDAO {
         ps.setInt(1, expRes.getId());
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
+            try {
             return rs.getBlob(1);
+            } finally {
+                ps.close();
+            }
         } else {
             throw new ExperimentResultNotInDBException();
         }
@@ -788,6 +799,7 @@ public class ExperimentResultDAO {
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
             Blob blob = rs.getBlob(1);
+            ps.close();
             return blob;
         } else {
             throw new ExperimentResultNotInDBException();

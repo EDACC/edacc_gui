@@ -27,6 +27,8 @@ public class Util {
         int tableWidth = table.getWidth();
         int colsum = 0;
         int width[] = new int[table.getColumnCount()];
+        int minwidth[] = new int[table.getColumnCount()];
+        int minwidthsum = 0;
         // iterate over all not filtered cells and get the length from each one.
         // the maximum of the lengths of all cells within a column col will be in width[col]
         if (table.getRowCount() == 0) {
@@ -53,7 +55,8 @@ public class Util {
                             0,
                             0).getPreferredSize().width;
                 }
-
+                minwidth[col] = width[col];
+                minwidthsum += width[col];
                 for (int row = 0; row < table.getRowCount(); row++) {
                     // get the component which represents the value and determine its witdth
                     int len = table.getCellRenderer(row, col).getTableCellRendererComponent(table, table.getValueAt(row, col), false, true, row, col).getPreferredSize().width;
@@ -65,11 +68,20 @@ public class Util {
                 colsum += width[col];
             }
         }
-        // get the weight for a pixel
-        double proz = (double) tableWidth / (double) colsum;
         for (int col = 0; col < table.getColumnCount(); col++) {
+            // get the weight for a pixel
+            double proz = (double) tableWidth / (double) colsum;
             // multiplicate the width of a column with the weight
-            table.getColumnModel().getColumn(col).setPreferredWidth((int) Math.round(proz * width[col]));
+            int w = (int) Math.round(proz * width[col]);
+            if (w < minwidth[col]) {
+                w = minwidth[col];
+            }
+            if (tableWidth - w < minwidthsum - minwidth[col]) {
+                w = tableWidth - minwidthsum;
+            }
+            table.getColumnModel().getColumn(col).setPreferredWidth(w);
+            minwidthsum -= minwidth[col];
+            tableWidth -= w;
         }
     }
 
