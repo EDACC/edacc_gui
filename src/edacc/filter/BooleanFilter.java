@@ -86,7 +86,7 @@ public class BooleanFilter extends javax.swing.JPanel implements FilterInterface
     @Override
     public boolean include(Object value) {
         if (value instanceof Boolean) {
-            return valTrue && (Boolean) value || valFalse && (Boolean) value;
+            return valTrue && (Boolean) value || valFalse && !(Boolean) value;
         }
         return true;
     }

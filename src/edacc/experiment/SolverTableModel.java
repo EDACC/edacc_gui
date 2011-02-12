@@ -90,7 +90,7 @@ public class SolverTableModel extends AbstractTableModel {
         if (isCompetition) {
             col--;
         }
-        if (col == 4) {
+        if (col == 5) {
             return true;
         }
         return false;
@@ -101,7 +101,7 @@ public class SolverTableModel extends AbstractTableModel {
         if (isCompetition) {
             col--;
         }
-        if (col == 4) {
+        if (col == 5) {
             selected[row] = (Boolean) value;
         }
         fireTableCellUpdated(row, col);
@@ -137,7 +137,7 @@ public class SolverTableModel extends AbstractTableModel {
         for (int i = 0; i < solvers.size(); i++) {
             if (solvers.get(i).getId() == solverId) {
                 selected[i] = value;
-                this.fireTableCellUpdated(i, 4);
+                this.fireTableCellUpdated(i, 5);
                 break;
             }
         }
