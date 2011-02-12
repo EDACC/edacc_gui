@@ -13,8 +13,8 @@ import java.util.HashMap;
  */
 public class SolverTableModel extends AbstractTableModel {
 
-    private static final String[] columns_noCompetition = {"Name", "binary name", "md5", "description", "Selected"};
-    private static final String[] columns_competition = {"Name", "binary name", "md5", "description", "categories", "Selected"};
+    private static final String[] columns_noCompetition = {"Name", "Version", "binary name", "md5", "description", "Selected"};
+    private static final String[] columns_competition = {"Name", "Version", "binary name", "md5", "description", "categories", "Selected"};
     private String[] columns = columns_competition;
     private String[] categories;
     private boolean isCompetition;
@@ -113,18 +113,20 @@ public class SolverTableModel extends AbstractTableModel {
             case 0:
                 return solvers.get(rowIndex).getName();
             case 1:
-                return solvers.get(rowIndex).getBinaryName();
+                return solvers.get(rowIndex).getVersion();
             case 2:
-                return solvers.get(rowIndex).getMd5();
+                return solvers.get(rowIndex).getBinaryName();
             case 3:
-                return solvers.get(rowIndex).getDescription();
+                return solvers.get(rowIndex).getMd5();
             case 4:
+                return solvers.get(rowIndex).getDescription();
+            case 5:
                 if (isCompetition) {
                     return categories[rowIndex] == null ? "" : categories[rowIndex];
                 } else {
                     return selected[rowIndex];
                 }
-            case 5:
+            case 6:
                 return selected[rowIndex];
             default:
                 return "";
