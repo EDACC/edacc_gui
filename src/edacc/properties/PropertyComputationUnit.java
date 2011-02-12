@@ -212,7 +212,11 @@ public class PropertyComputationUnit implements Runnable {
                 }
                 bin.setExecutable(true);
                 System.out.println(bin.getAbsolutePath());
-                Process p = Runtime.getRuntime().exec(bin.getAbsolutePath());
+                String prefix = "";
+                if (System.getProperty("os.name") != null && System.getProperty("os.name").contains("Windows")) {
+                    prefix = "cmd /c ";
+                }
+                Process p = Runtime.getRuntime().exec(prefix + bin.getAbsolutePath() + " " + property.getComputationMethodParameters());
                 Blob instance = InstanceDAO.getBinary(ihp.getInstance().getId());
                 BufferedReader instanceReader = new BufferedReader(new InputStreamReader(instance.getBinaryStream()));
                 // The std input stream of the external program. We pipe the content of the instance file into that stream
@@ -230,16 +234,14 @@ public class PropertyComputationUnit implements Runnable {
                         out.newLine();
                     }
                 } catch (IOException e) {
-                    // if a program stops reading from the stream, stop writing to it but show no error. Otherwise show an error message
-                    if (!e.getMessage().contains("Broken pipe")) {
-                        e.printStackTrace();
-                        throw e;
-                    }
+                    // if a program stops reading from the stream, stop writing to it but show no error. //!Otherwise show an error message
                 }
 
                 // Close output stream, after whole instance file has been written to program input
-                out.close();
-
+                try {
+                    out.close();
+                } catch (Exception e) {
+                }
                 // check, if already an error occured
                 if (err.ready()) {
                     throw new ErrorInExternalProgramException(err.readLine());
@@ -375,7 +377,7 @@ public class PropertyComputationUnit implements Runnable {
 
     public static void main(String[] args) {
         try {
-            DatabaseConnector.getInstance().connect("edacc.informatik.uni-ulm.de", 3306, "edacc", "EDACC2", "edaccteam", false, false,1);
+            DatabaseConnector.getInstance().connect("edacc.informatik.uni-ulm.de", 3306, "edacc", "EDACC2", "edaccteam", false, false, 1);
 
             PropertyComputationUnit unit = new PropertyComputationUnit(InstanceHasPropertyDAO.createInstanceHasInstanceProperty(InstanceDAO.getById(1), PropertyDAO.getById(1)), null);
             unit.compute(null);

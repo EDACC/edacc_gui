@@ -653,7 +653,9 @@ public class ExperimentController {
 
                         @Override
                         public void run() {
+                            main.tableJobs.invalidate();
                             main.tableJobs.revalidate();
+                            main.tableJobs.repaint();
                         }
                     });
                 }
