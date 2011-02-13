@@ -414,7 +414,7 @@ CREATE  TABLE IF NOT EXISTS `ComputationMethod` (
   `description` TEXT NULL ,
   `md5` VARCHAR(60) NULL ,
   `binaryName` VARCHAR(255) NULL ,
-  `binaryFile` BLOB NULL ,
+  `binaryFile` LONGBLOB NULL ,
   PRIMARY KEY (`idComputationMethod`) ,
   UNIQUE INDEX `name_UNIQUE` (`name` ASC) ,
   UNIQUE INDEX `md5_UNIQUE` (`md5` ASC) )
