@@ -217,14 +217,16 @@ public class PropertyComputationUnit implements Runnable {
                     prefix = "cmd /c ";
                 }
                 Process p = Runtime.getRuntime().exec(prefix + bin.getAbsolutePath() + " " + property.getComputationMethodParameters());
-                Blob instance = InstanceDAO.getBinary(ihp.getInstance().getId());
-                BufferedReader instanceReader = new BufferedReader(new InputStreamReader(instance.getBinaryStream()));
+                InputStream is = b.getBinaryStream();
+                InputStreamReader ir = new InputStreamReader(is);
+                BufferedReader instanceReader = new BufferedReader(ir);
                 // The std input stream of the external program. We pipe the content of the instance file into that stream
                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
                 // The std output stream of the external program (-> output of the program). We read the calculated value from this stream.
                 BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
                 // The error stream of the program
                 BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
 
                 // pipe the content of the instance file to the input of the external program
                 try {
@@ -235,13 +237,18 @@ public class PropertyComputationUnit implements Runnable {
                     }
                 } catch (IOException e) {
                     // if a program stops reading from the stream, stop writing to it but show no error. //!Otherwise show an error message
+                } finally {
+                    // Close output stream, after whole instance file has been written to program input
+                    try {
+                        instanceReader.close();
+                        ir.close();
+                        is.close();
+                        out.close();
+                    } catch (Exception e) {
+                    }
                 }
 
-                // Close output stream, after whole instance file has been written to program input
-                try {
-                    out.close();
-                } catch (Exception e) {
-                }
+
                 // check, if already an error occured
                 if (err.ready()) {
                     throw new ErrorInExternalProgramException(err.readLine());

@@ -25,7 +25,7 @@ public class BooleanFilter extends javax.swing.JPanel implements FilterInterface
         btnGroup.add(radioFalse);
         radioTrue.setSelected(true);
         valTrue = true;
-        valFalse = true;
+        valFalse = false;
     }
 
     /** This method is called from within the constructor to

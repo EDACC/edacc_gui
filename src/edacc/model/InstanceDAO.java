@@ -93,7 +93,7 @@ public class InstanceDAO {
         return i;
     }
 
-    public static Instance createInstance(String name, String formula, InstanceClass instanceClass) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException, InstanceAlreadyInDBException{
+    public static Instance createInstance(String name, String formula, InstanceClass instanceClass) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException, InstanceAlreadyInDBException {
         String md5 = edacc.manageDB.Util.calculateMD5(formula);
         PreparedStatement ps;
         final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ? OR name = ?";
@@ -128,7 +128,7 @@ public class InstanceDAO {
 
     }
 
-    private static void save (Instance instance, String formula){
+    private static void save(Instance instance, String formula) {
         if (instance.isNew()) {
             try {
                 // insert query, set ID!
@@ -375,10 +375,14 @@ public class InstanceDAO {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
 
         ResultSet rs = st.executeQuery("SELECT i.instance FROM " + table + " AS i WHERE i.idInstance = " + id);
-        if (rs.next()) {
-            return rs.getBlob("instance");
-        } else {
-            throw new InstanceNotInDBException();
+        try {
+            if (rs.next()) {
+                return rs.getBlob("instance");
+            } else {
+                throw new InstanceNotInDBException();
+            }
+        } finally {
+            st.close();
         }
     }
 
@@ -534,8 +538,7 @@ public class InstanceDAO {
      * @throws SQLException
      */
     public static String getBenchmarkType(Instance i) throws NoConnectionToDBException, SQLException {
-        PreparedStatement ps = DatabaseConnector.getInstance().getConn()
-                .prepareStatement("SELECT BenchmarkType.name as name FROM BenchmarkType JOIN Instances ON idBenchmarkType=BenchmarkType_idBenchmarkType "
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT BenchmarkType.name as name FROM BenchmarkType JOIN Instances ON idBenchmarkType=BenchmarkType_idBenchmarkType "
                 + "WHERE idInstance=?");
         ps.setInt(1, i.getId());
         ResultSet rs = ps.executeQuery();
@@ -553,8 +556,7 @@ public class InstanceDAO {
      */
     public static HashMap<Integer, String> getBenchmarkTypes() throws NoConnectionToDBException, SQLException {
         HashMap<Integer, String> res = new HashMap<Integer, String>();
-        PreparedStatement ps = DatabaseConnector.getInstance().getConn()
-                .prepareStatement("SELECT idInstance, BenchmarkType.name as name "
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idInstance, BenchmarkType.name as name "
                 + "FROM BenchmarkType JOIN Instances ON idBenchmarkType=BenchmarkType_idBenchmarkType");
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
