@@ -153,7 +153,7 @@ public class PropertyComputationUnit implements Runnable {
             ArrayList<ExperimentResult> er = ExperimentResultDAO.getAllByInstanceId(ihp.getInstance().getId());
             ObjectOutputStream os = new ObjectOutputStream(p.getOutputStream());
             os.writeUnshared(er);
-            //os.flush();
+            os.flush();
             os.close();
         } catch (Exception e) {
             // TODO: error

@@ -368,13 +368,13 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             case COL_RESULTCODE:
                 return j.getResultCode().toString();
             case COL_SOLVER_OUTPUT:
-                return j.getSolverOutputFilename();
+                return j.getSolverOutputFilename() == null? "-" : j.getSolverOutputFilename();
             case COL_LAUNCHER_OUTPUT:
-                return j.getLauncherOutputFilename();
+                return j.getLauncherOutputFilename() == null? "-" : j.getLauncherOutputFilename();
             case COL_WATCHER_OUTPUT:
-                return j.getWatcherOutputFilename();
+                return j.getWatcherOutputFilename() == null? "-" : j.getWatcherOutputFilename();
             case COL_VERIFIER_OUTPUT:
-                return j.getVerifierOutputFilename();
+                return j.getVerifierOutputFilename() == null? "-" : j.getVerifierOutputFilename();
             default:
                 int propertyIdx = columnIndex - COL_PROPERTY;
                 if (solverProperties.size() <= propertyIdx) {

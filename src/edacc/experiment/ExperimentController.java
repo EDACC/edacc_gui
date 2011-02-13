@@ -1662,6 +1662,17 @@ public class ExperimentController {
      * @return null, iff the experiment result`s status is RUNNING, NOTSTARTED, LAUNCHERCRASH, VERIFIERCRASH, WATCHERCRASH or the property isn't calculated or the result isn't successfully verified. In case of the cpu-time property CPUTimeLmit can be returned.
      */
     public Double getValue(ExperimentResult result, Property property) {
+        return getValue(result, property, true);
+    }
+
+    /**
+     * Returns the value for the given property and the given experiment result.
+     * @param result
+     * @param property
+     * @param useTimeOutForCPUProp
+     * @return null, iff the experiment result`s status is RUNNING, NOTSTARTED, LAUNCHERCRASH, VERIFIERCRASH, WATCHERCRASH or the property isn't calculated or the result isn't successfully verified. In case of the cpu-time property CPUTimeLmit can be returned.
+     */
+    public Double getValue(ExperimentResult result, Property property, boolean useTimeOutForCPUProp) {
 
         if (result.getStatus() == ExperimentResultStatus.RUNNING
                 || result.getStatus() == ExperimentResultStatus.NOTSTARTED
@@ -1672,7 +1683,11 @@ public class ExperimentController {
         }
         if (property == PROP_CPUTIME) {
             if (!String.valueOf(result.getResultCode().getValue()).startsWith("1")) {
+                if (useTimeOutForCPUProp) {
                 return new Double(experiment.getCPUTimeLimit());
+                } else {
+                    return null;
+                }
             }
             return Double.valueOf(result.getResultTime());
         } else {

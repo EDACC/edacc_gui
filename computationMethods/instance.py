@@ -1,5 +1,12 @@
 #!/usr/bin/python
+import os
 import sys
+if os.path.exists("/usr/bin/pypy") and not sys.executable == "/usr/bin/pypy":
+  args = ""
+  for arg in sys.argv[1:]:
+    args += arg + " "
+  os.system("/usr/bin/pypy " + os.path.join(sys.path[0], sys.argv[0]) + " " + args)
+  exit()
 def print_help():
   print "Instance Property Parser"
   print "------------------------"

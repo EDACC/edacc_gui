@@ -123,7 +123,7 @@ public class CactusPlot extends Plot {
                 if (run == ALLRUNS) {
                     ArrayList<ExperimentResult> tmp = expController.getResults(sc.getId(), instanceId, statusCodes);
                     for (ExperimentResult er : tmp) {
-                        Double value = expController.getValue(er, property);
+                        Double value = expController.getValue(er, property, false);
                         if (value != null) {
                             resultValues.add(value);
                         }
@@ -132,9 +132,9 @@ public class CactusPlot extends Plot {
                     ArrayList<ExperimentResult> results = expController.getResults(sc.getId(), instanceId, statusCodes);
                     Double value;
                     if (run == MEDIAN) {
-                        value = getMedian(results, property);
+                        value = getMedian(results, property, false);
                     } else {
-                        value = getAverage(results, property);
+                        value = getAverage(results, property, false);
                     }
                     if (value != null) {
                         resultValues.add(value);
@@ -144,7 +144,7 @@ public class CactusPlot extends Plot {
                     if (res == null) {
                         continue;
                     }
-                    Double value = expController.getValue(res, property);
+                    Double value = expController.getValue(res, property, false);
                     if (value == null) {
                         continue;
                     }

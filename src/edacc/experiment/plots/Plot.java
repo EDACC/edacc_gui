@@ -57,6 +57,17 @@ public abstract class Plot {
      * @return the average of the ExperimentResult values
      */
     public Double getAverage(ArrayList<ExperimentResult> results, Property property) {
+        return getAverage(results, property, true);
+    }
+
+    /**
+     * Calculates the average property value for the given ExperimentResults, i.e. the sum of the property values divided by the count
+     * @param results
+     * @param property
+     * @param useTimeOutForCPUProp
+     * @return the average of the ExperimentResult values
+     */
+    public Double getAverage(ArrayList<ExperimentResult> results, Property property, boolean useTimeOutForCPUProp) {
         if (results.isEmpty()) {
             return null;
         }
@@ -64,7 +75,7 @@ public abstract class Plot {
         double res = 0.;
         int count = 0;
         for (ExperimentResult result : results) {
-            Double value = expController.getValue(result, property);
+            Double value = expController.getValue(result, property, useTimeOutForCPUProp);
             if (value != null) {
                 count++;
                 res += value;
@@ -84,13 +95,24 @@ public abstract class Plot {
      * @return the median of the ExperimentResult values
      */
     public Double getMedian(ArrayList<ExperimentResult> results, Property property) {
+        return getMedian(results, property, true);
+    }
+
+    /**
+     * Returns the median property value of the given ExperimentResults
+     * @param results
+     * @param property
+     * @param useTimeOutForCPUProp
+     * @return the median of the ExperimentResult values
+     */
+    public Double getMedian(ArrayList<ExperimentResult> results, Property property, boolean useTimeOutForCPUProp) {
         if (results.isEmpty()) {
             return null;
         }
 
         ArrayList<Double> values = new ArrayList<Double>();
         for (ExperimentResult res : results) {
-            Double value = expController.getValue(res, property);
+            Double value = expController.getValue(res, property, useTimeOutForCPUProp);
             if (value != null) {
                 values.add(value);
             }
