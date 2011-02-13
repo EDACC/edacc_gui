@@ -8,7 +8,6 @@
  *
  * Created on 19.10.2010, 15:47:29
  */
-
 package edacc;
 
 import edacc.events.TaskEvents;
@@ -123,9 +122,11 @@ public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog impl
     private void bComputeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bComputeActionPerformed
         //Vector<Property> properties = ((PropertyListModel) listProperties.getModel()).getPropertyList();
         Vector<Property> properties = new Vector<Property>();
-        for (int i = 0; i < listProperties.getVisibleRowCount(); i++) {
-            if (listProperties.isSelectedIndex(i)) {
-                properties.add((Property) ((PropertyListModel) listProperties.getModel()).getElementAt(i));
+        // for (int i = 0; i < listProperties.getVisibleRowCount(); i++) {
+        Object[] objs = listProperties.getSelectedValues();
+        for (Object obj : objs) {
+            if (obj instanceof Property) {
+                properties.add((Property) obj);
             }
         }
         Tasks.startTask("computeProperties", new Class[]{Vector.class, Vector.class, edacc.model.Tasks.class}, new Object[]{instances, properties, null}, manageDBInstances, EDACCComputeInstancePropertyDialog.this);
@@ -134,7 +135,6 @@ public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog impl
     private void bCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bCancelActionPerformed
         this.dispose();
     }//GEN-LAST:event_bCancelActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bCancel;
     private javax.swing.JButton bCompute;
@@ -191,5 +191,4 @@ public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog impl
             return (Vector<Property>) properties.clone();
         }
     }
-
 }

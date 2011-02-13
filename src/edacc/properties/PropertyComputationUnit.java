@@ -138,11 +138,11 @@ public class PropertyComputationUnit implements Runnable {
         File bin;
         synchronized (sync) {
             bin = ComputationMethodDAO.getBinaryOfComputationMethod(property.getComputationMethod());
+            bin.setExecutable(true);
         }
-        bin.setExecutable(true);
-
+        System.out.println("java -jar " + bin.getAbsolutePath() + " " + property.getComputationMethodParameters());
         // only java files, we pipe objects :-)
-        Process p = Runtime.getRuntime().exec("java -jar " + bin.getAbsolutePath());
+        Process p = Runtime.getRuntime().exec("java -jar " + bin.getAbsolutePath() + " " + property.getComputationMethodParameters());
 
         // The std output stream of the external program (-> output of the program). We read the calculated value from this stream.
         BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -150,13 +150,10 @@ public class PropertyComputationUnit implements Runnable {
         BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
         try {
-            ArrayList<ExperimentResult> er;
-            synchronized (sync) {
-                er = ExperimentResultDAO.getAllByInstanceId(ihp.getInstance().getId());
-            }
+            ArrayList<ExperimentResult> er = ExperimentResultDAO.getAllByInstanceId(ihp.getInstance().getId());
             ObjectOutputStream os = new ObjectOutputStream(p.getOutputStream());
             os.writeUnshared(er);
-            os.flush();
+            //os.flush();
             os.close();
         } catch (Exception e) {
             // TODO: error
