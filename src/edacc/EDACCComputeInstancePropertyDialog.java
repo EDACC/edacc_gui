@@ -121,7 +121,13 @@ public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog impl
     }// </editor-fold>//GEN-END:initComponents
 
     private void bComputeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bComputeActionPerformed
-        Vector<Property> properties = ((PropertyListModel) listProperties.getModel()).getPropertyList();
+        //Vector<Property> properties = ((PropertyListModel) listProperties.getModel()).getPropertyList();
+        Vector<Property> properties = new Vector<Property>();
+        for (int i = 0; i < listProperties.getVisibleRowCount(); i++) {
+            if (listProperties.isSelectedIndex(i)) {
+                properties.add((Property) ((PropertyListModel) listProperties.getModel()).getElementAt(i));
+            }
+        }
         Tasks.startTask("computeProperties", new Class[]{Vector.class, Vector.class, edacc.model.Tasks.class}, new Object[]{instances, properties, null}, manageDBInstances, EDACCComputeInstancePropertyDialog.this);
     }//GEN-LAST:event_bComputeActionPerformed
 
