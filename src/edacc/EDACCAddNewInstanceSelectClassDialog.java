@@ -155,6 +155,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
             }
         });
 
+        chkCompress.setSelected(true);
         chkCompress.setText(resourceMap.getString("chkCompress.text")); // NOI18N
         chkCompress.setName("chkCompress"); // NOI18N
 

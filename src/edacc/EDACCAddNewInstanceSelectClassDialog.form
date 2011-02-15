@@ -226,6 +226,7 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="chkCompress">
           <Properties>
+            <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" resourceKey="chkCompress.text"/>
             <Property name="name" type="java.lang.String" value="chkCompress" noResource="true"/>
           </Properties>
