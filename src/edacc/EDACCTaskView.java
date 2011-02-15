@@ -23,8 +23,12 @@ public class EDACCTaskView extends javax.swing.JDialog {
         initComponents();
         this.task = task;
         btnCancel.setVisible(false);
-        progressBar.setMaximum(1000);
+        progressBar.setMaximum(10000);
+        progressBar2.setMaximum(10000);
         progressBar.setIndeterminate(true);
+        progressBar2.setIndeterminate(true);
+        progressBar2.setVisible(false);
+        this.pack();
     }
 
     /** This method is called from within the constructor to
@@ -40,6 +44,8 @@ public class EDACCTaskView extends javax.swing.JDialog {
         lblMessage = new javax.swing.JLabel();
         btnCancel = new javax.swing.JButton();
         lblOperationName = new javax.swing.JLabel();
+        progressBar2 = new javax.swing.JProgressBar();
+        jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -62,6 +68,22 @@ public class EDACCTaskView extends javax.swing.JDialog {
         lblOperationName.setMaximumSize(new java.awt.Dimension(32767, 14));
         lblOperationName.setName("lblOperationName"); // NOI18N
 
+        progressBar2.setName("progressBar2"); // NOI18N
+
+        jPanel1.setMinimumSize(new java.awt.Dimension(410, 14));
+        jPanel1.setName("jPanel1"); // NOI18N
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 410, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 14, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -69,10 +91,19 @@ public class EDACCTaskView extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE)
-                    .addComponent(progressBar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE)
-                    .addComponent(lblOperationName, javax.swing.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE)
-                    .addComponent(btnCancel, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(progressBar2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
+                            .addComponent(progressBar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
+                            .addComponent(lblOperationName, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE))
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
+                        .addGap(216, 216, 216))))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(335, Short.MAX_VALUE)
+                .addComponent(btnCancel)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -82,33 +113,55 @@ public class EDACCTaskView extends javax.swing.JDialog {
                 .addComponent(lblOperationName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(1, 1, 1)
+                .addComponent(progressBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnCancel)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblMessage;
     private javax.swing.JLabel lblOperationName;
     private javax.swing.JProgressBar progressBar;
+    private javax.swing.JProgressBar progressBar2;
     // End of variables declaration//GEN-END:variables
 
-    public void setMessage(String description) {
-        lblMessage.setText(description);
+    public void setMessage(final String description) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                lblMessage.setText(description);
+                EDACCTaskView.this.pack();
+            }
+        });
+
     }
 
-    public void setOperationName(String name) {
-        lblOperationName.setText(name);
+    public void setOperationName(final String name) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                lblOperationName.setText(name);
+                EDACCTaskView.this.pack();
+            }
+        });
+
     }
 
     public void setProgress(final double progress) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 if (progress == 0.) {
                     progressBar.setIndeterminate(true);
@@ -116,26 +169,68 @@ public class EDACCTaskView extends javax.swing.JDialog {
                     if (progressBar.isIndeterminate()) {
                         progressBar.setIndeterminate(false);
                     }
-                    progressBar.setValue((int) (progress * 10));
+                    progressBar.setValue((int) (progress * 100));
                 }
 
             }
         });
-
-
     }
 
-    public void setCancelable(boolean cancelable) {
-        if (cancelable) {
-            btnCancel.setVisible(true);
-        } else {
-            btnCancel.setVisible(false);
-        }
+    public void setProgress2(final double progress) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                if (progress == 0.) {
+                    progressBar2.setIndeterminate(true);
+                } else {
+                    if (progressBar2.isIndeterminate()) {
+                        progressBar2.setIndeterminate(false);
+                    }
+                    progressBar2.setValue((int) (progress * 100));
+                }
+
+            }
+        });
+    }
+
+    public void setTwoProgressbars(final boolean flag) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                progressBar2.setVisible(flag);
+                EDACCTaskView.this.pack();
+            }
+        });
+    }
+
+    public void setCancelable(final boolean cancelable) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                if (cancelable) {
+                    btnCancel.setVisible(true);
+                } else {
+                    btnCancel.setVisible(false);
+                }
+                EDACCTaskView.this.pack();
+            }
+        });
+
     }
 
     @Action
     public void btnCancel() {
-        btnCancel.setEnabled(false);
-        task.cancel(false);
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                btnCancel.setEnabled(false);
+                EDACCTaskView.this.pack();
+                task.cancel(false);
+            }
+        });
     }
 }

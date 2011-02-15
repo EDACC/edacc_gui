@@ -10,6 +10,7 @@ import SevenZip.Compression.LZMA.Encoder;
 import SevenZip.ICodeProgress;
 import SevenZip.InvalidParamException;
 import edacc.model.DatabaseConnector;
+import edacc.model.DecompressedInputStream;
 import edacc.model.ExperimentDAO;
 import edacc.model.GridQueueDAO;
 import edacc.model.InstanceClassDAO;
@@ -17,6 +18,7 @@ import edacc.model.InstanceDAO;
 import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstanceDAO;
 import edacc.model.SolverDAO;
+import edacc.model.Tasks;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
@@ -38,6 +40,7 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -265,26 +268,7 @@ public class Util {
     }*/
     public static final String lzma_identifier = "LZMA";
 
-    public static void sevenZipEncode(InputStream is, OutputStream os, final long size) throws IOException {
-        SevenZip.ICodeProgress progr = new SevenZip.ICodeProgress() {
-
-            Long last = 0l;
-            long time;
-            String eta = "";
-
-            @Override
-            public void SetProgress(long done, long done_compr) {
-                if (System.currentTimeMillis() - time > 1000) {
-                    long leta = (size - done) * 1000 / (done - last) / (System.currentTimeMillis() - time);
-                    eta = leta + " sec";
-                    last = done;
-                    time = System.currentTimeMillis();
-                    System.out.println(done + " of " + size + " " + done / (float) size * 100 + "% " + eta);
-                }
-
-
-            }
-        };
+    public static void sevenZipEncode(InputStream is, OutputStream os, final long size, ICodeProgress progr) throws IOException {
         SevenZip.Compression.LZMA.Encoder enc = new SevenZip.Compression.LZMA.Encoder();
         enc.SetCoderProperties(new int[]{CoderPropID.Algorithm, CoderPropID.DictionarySize, CoderPropID.MatchFinder, CoderPropID.LitContextBits, CoderPropID.LitPosBits, CoderPropID.PosStateBits, CoderPropID.NumFastBytes}, new int[]{0, 1 << 8, enc.EMatchFinderType_BT4B, 3, 0, 2, 128});
         for (int i = 0; i < lzma_identifier.length(); i++) {
@@ -360,52 +344,9 @@ public class Util {
 
     public static InputStream getDecompressedInputStream(final InputStream input) throws IOException {
         if (isLZMA(input)) {
-            
             final Decoder dec = getDecoder(input);
             final long outSize = getOutSize(input);
-            return new InputStream() {
-                long outPos = 0;
-                int bufPos = 0;
-                int curBufSize = 0;
-                final static int maxBufSize = 256 * 1024;
-                int[] buf = new int[maxBufSize * 2];
-
-                @Override
-                public synchronized void reset() throws IOException {
-                    // this is a hack, possible error
-                    // TODO: fix
-                    bufPos = 0;
-                    outPos = 0;
-                }
-
-                @Override
-                public int read() throws IOException {
-                    if (outPos >= outSize) {
-                        return -1;
-                    }
-                    if (bufPos >= curBufSize) {
-                        bufPos = 0;
-
-                        long bytesToRead = maxBufSize;
-                        if (outSize - outPos < bytesToRead) {
-                            bytesToRead = outSize - outPos;
-                        }
-
-                        dec.Code(input, new OutputStream() {
-
-                            @Override
-                            public void write(int b) throws IOException {
-
-                                buf[bufPos++] = b;
-                            }
-                        }, outSize, bytesToRead, null);
-                        curBufSize = bufPos;
-                        bufPos = 0;
-                    }
-                    outPos++;
-                    return buf[bufPos++];
-                }
-            };
+            return new DecompressedInputStream(dec, outSize, input);
         } else {
             return input;
         }

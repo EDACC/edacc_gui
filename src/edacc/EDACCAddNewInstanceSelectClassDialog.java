@@ -66,6 +66,8 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         jTreeSourceClass = new javax.swing.JTree();
         jLabelExtension = new javax.swing.JLabel();
         jTextFieldExtension = new javax.swing.JTextField();
+        chkCompress = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAddNewInstanceSelectClassDialog.class);
@@ -153,6 +155,12 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
             }
         });
 
+        chkCompress.setText(resourceMap.getString("chkCompress.text")); // NOI18N
+        chkCompress.setName("chkCompress"); // NOI18N
+
+        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
+        jLabel1.setName("jLabel1"); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -166,9 +174,13 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
                         .addGap(80, 80, 80))
                     .addComponent(jRadioButtonChoose, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabelExtension)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabelExtension)
+                            .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextFieldExtension, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkCompress)
+                            .addComponent(jTextFieldExtension, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -180,11 +192,15 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
                 .addComponent(jRadioButtonChoose)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(chkCompress)
+                    .addComponent(jLabel1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabelExtension)
                     .addComponent(jTextFieldExtension, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -281,8 +297,10 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroupAutomaticOrManuel;
+    private javax.swing.JCheckBox chkCompress;
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonOk;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabelExtension;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanelButtons;
@@ -317,6 +335,10 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
 
     public String getFileExtension(){
         return fileExtension;
+    }
+
+    public Boolean isCompress() {
+        return chkCompress.isSelected();
     }
 
 }

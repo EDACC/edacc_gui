@@ -182,7 +182,7 @@ public class InstanceDAO {
      * @throws SQLException if an SQL error occurs while saving the instance.
      * @throws FileNotFoundException if the file of the instance couldn't be found.
      */
-    public static void save(Instance instance) throws SQLException, FileNotFoundException, IOException {
+    public static void save(Instance instance, boolean compressBinary) throws SQLException, FileNotFoundException, IOException {
         PreparedStatement ps;
         if (instance.isNew()) {
             try {
@@ -207,13 +207,14 @@ public class InstanceDAO {
                 if (instance.getFile() != null) {
 
                     input = instance.getFile();
-                    //output = new File(instance.getFile().getName());
-                    //Util.sevenZipEncode(input, output);
                     fInStream = new FileInputStream(input);
-                    java.sql.Blob b = DatabaseConnector.getInstance().getConn().createBlob();
-
-                    Util.sevenZipEncode(fInStream, b.setBinaryStream(1), input.length());
-                    ps.setBlob(4, b);
+                    if (compressBinary) {
+                        java.sql.Blob b = DatabaseConnector.getInstance().getConn().createBlob();
+                        Util.sevenZipEncode(fInStream, b.setBinaryStream(1), input.length(), new TaskICodeProgress(input.length()));
+                        ps.setBlob(4, b);
+                    } else {
+                        ps.setBinaryStream(4, fInStream);
+                    }
 
                 } else {
                     ps.setNull(4, Types.BLOB);
@@ -385,7 +386,6 @@ public class InstanceDAO {
             st.close();
         }
     }
-
 
     /**
      * 

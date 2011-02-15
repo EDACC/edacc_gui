@@ -52,6 +52,7 @@ public class InstanceClassDAO {
         i.setName(name);
         i.setDescription(description);
         i.setSource(source);
+        i.setParentId(parent.getInstanceClassID());
         save(i, parent);
         return i;
     }
@@ -146,7 +147,7 @@ public class InstanceClassDAO {
         }
 
 
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass, name, description, source FROM " + table + " WHERE idinstanceClass=?");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idinstanceClass, name, description, source, parent FROM " + table + " WHERE idinstanceClass=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         InstanceClass i = new InstanceClass();
@@ -155,7 +156,8 @@ public class InstanceClassDAO {
             i.setName(rs.getString("name"));
             i.setDescription(rs.getString("description"));
             i.setSource(rs.getBoolean("source"));
-
+            i.setParentId(rs.getInt("parent"));
+            
             i.setSaved();
             cache.cache(i);
             rs.close();
@@ -179,7 +181,7 @@ public class InstanceClassDAO {
      */
     public static LinkedList<InstanceClass> getAllSourceClass() throws NoConnectionToDBException, SQLException{
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        ResultSet rs = st.executeQuery("SELECT idInstanceClass, name, description, source FROM " + table +
+        ResultSet rs = st.executeQuery("SELECT idInstanceClass, name, description, source, parent FROM " + table +
                 " WHERE source = 1");
         LinkedList<InstanceClass> res = new LinkedList<InstanceClass>();
         while (rs.next()) {
@@ -188,6 +190,7 @@ public class InstanceClassDAO {
             i.setName(rs.getString("name"));
             i.setDescription(rs.getString("description"));
             i.setSource(rs.getBoolean("source"));
+            i.setParentId(rs.getInt("parent"));
 
             InstanceClass c = cache.getCached(i.getId());
 
@@ -211,7 +214,7 @@ public class InstanceClassDAO {
     public static LinkedList<InstanceClass> getAll() throws SQLException {
         // return linked list with all instances
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        ResultSet rs = st.executeQuery("SELECT idInstanceClass, name, description, source FROM " + table);
+        ResultSet rs = st.executeQuery("SELECT idInstanceClass, name, description, source, parent FROM " + table);
         LinkedList<InstanceClass> res = new LinkedList<InstanceClass>();
         while (rs.next()) {
             InstanceClass i = new InstanceClass();
@@ -219,7 +222,8 @@ public class InstanceClassDAO {
             i.setName(rs.getString("name"));
             i.setDescription(rs.getString("description"));
             i.setSource(rs.getBoolean("source"));
-
+            i.setParentId(rs.getInt("parent"));
+            
             InstanceClass c = cache.getCached(i.getId());
 
             if (c != null) {
@@ -236,7 +240,7 @@ public class InstanceClassDAO {
 
     public static LinkedList<InstanceClass> getAllUserClass() throws NoConnectionToDBException, SQLException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        ResultSet rs = st.executeQuery("SELECT idInstanceClass, name, description, source FROM " + table +
+        ResultSet rs = st.executeQuery("SELECT idInstanceClass, name, description, source, parent FROM " + table +
                 " WHERE source = 0");
         LinkedList<InstanceClass> res = new LinkedList<InstanceClass>();
         while (rs.next()) {
@@ -245,6 +249,7 @@ public class InstanceClassDAO {
             i.setName(rs.getString("name"));
             i.setDescription(rs.getString("description"));
             i.setSource(rs.getBoolean("source"));
+            i.setParentId(rs.getInt("parent"));
 
             InstanceClass c = cache.getCached(i.getId());
 
@@ -427,13 +432,15 @@ public class InstanceClassDAO {
 
     private static void loadAllInstanceClasses() throws SQLException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        ResultSet rs = st.executeQuery("SELECT idInstanceClass, name, description, source FROM " + table);
+        ResultSet rs = st.executeQuery("SELECT idInstanceClass, name, description, source, parent FROM " + table);
         while (rs.next()) {
             InstanceClass i = new InstanceClass();
             i.setInstanceClassID(rs.getInt("idinstanceClass"));
             i.setName(rs.getString("name"));
             i.setDescription(rs.getString("description"));
             i.setSource(rs.getBoolean("source"));
+            i.setParentId(rs.getInt("parent"));
+            
             InstanceClass c = cache.getCached(i.getId());
             if (c != null) {
 

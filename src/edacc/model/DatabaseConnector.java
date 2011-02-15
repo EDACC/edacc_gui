@@ -75,13 +75,13 @@ public class DatabaseConnector extends Observable {
             properties.put("user", username);
             properties.put("password", password);
             properties.put("rewriteBatchedStatements", "true");
-            properties.put("useServerPrepStmts", "true");
+        //    properties.put("useServerPrepStmts", "true");
             if (useSSL) {
-                properties.put("useSSL", true);
-                properties.put("requireSSL", true);
+                properties.put("useSSL", "true");
+                properties.put("requireSSL", "true");
             }
             if (compress) {
-                properties.put("useCompression", true);
+                properties.put("useCompression", "true");
             }
             Class.forName("com.mysql.jdbc.Driver");
             java.io.PrintWriter w =

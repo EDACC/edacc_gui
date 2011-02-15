@@ -4,9 +4,11 @@
  */
 package edacc.properties;
 
+import edacc.manageDB.Util;
 import edacc.model.ComputationMethodDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
+import edacc.model.DecompressedInputStream;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.ExperimentResultHasProperty;
@@ -19,6 +21,7 @@ import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
 import edacc.model.PropertyNotInDBException;
+import edacc.model.Tasks;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -35,6 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -100,8 +104,8 @@ public class PropertyComputationUnit implements Runnable {
                 switch (property.getPropertySource()) {
                     case Instance:
                         try {
-
-                            compute(InstanceDAO.getBinary(ihp.getInstance().getId()));
+                            InputStream inputStream = InstanceDAO.getBinary(ihp.getInstance().getId());
+                            compute(inputStream);
                         } catch (InstanceNotInDBException ex) {
                             Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
                         }
