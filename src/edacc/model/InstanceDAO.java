@@ -76,10 +76,9 @@ public class InstanceDAO {
     public static Instance createInstance(File file, String name, String md5, InstanceClass instanceClass) throws SQLException, FileNotFoundException,
             InstanceAlreadyInDBException {
         PreparedStatement ps;
-        final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ? OR name = ?";
+        final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ?";
         ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
         ps.setString(1, md5);
-        ps.setString(2, name);
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
             throw new InstanceAlreadyInDBException();
@@ -97,10 +96,9 @@ public class InstanceDAO {
     public static Instance createInstance(String name, String formula, InstanceClass instanceClass) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException, InstanceAlreadyInDBException {
         String md5 = edacc.manageDB.Util.calculateMD5(formula);
         PreparedStatement ps;
-        final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ? OR name = ?";
+        final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ?;";
         ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
         ps.setString(1, md5);
-        ps.setString(2, name);
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
             throw new InstanceAlreadyInDBException();
