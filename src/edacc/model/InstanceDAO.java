@@ -1,5 +1,6 @@
 package edacc.model;
 
+import edacc.manageDB.Util;
 import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.InvalidVariableException;
 import edacc.satinstances.SATInstance;
@@ -211,13 +212,14 @@ public class InstanceDAO {
                     //output = new File(instance.getFile().getName());
                     //Util.sevenZipEncode(input, output);
                     fInStream = new FileInputStream(input);
+                    java.sql.Blob b = DatabaseConnector.getInstance().getConn().createBlob();
 
-                    ps.setBinaryStream(4, fInStream);
+                    Util.sevenZipEncode(fInStream, b.setBinaryStream(1), input.length());
+                    ps.setBlob(4, b);
 
                 } else {
                     ps.setNull(4, Types.BLOB);
                 }
-
                 ps.executeUpdate();
 
 
@@ -371,13 +373,13 @@ public class InstanceDAO {
      * @throws SQLException
      * @throws InstanceNotInDBException
      */
-    public static Blob getBinary(int id) throws NoConnectionToDBException, SQLException, InstanceNotInDBException {
+    public static InputStream getBinary(int id) throws NoConnectionToDBException, SQLException, InstanceNotInDBException, IOException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
 
         ResultSet rs = st.executeQuery("SELECT i.instance FROM " + table + " AS i WHERE i.idInstance = " + id);
         try {
             if (rs.next()) {
-                return rs.getBlob("instance");
+                return Util.getDecompressedInputStream(rs.getBlob("instance").getBinaryStream());
             } else {
                 throw new InstanceNotInDBException();
             }
@@ -385,6 +387,7 @@ public class InstanceDAO {
             st.close();
         }
     }
+
 
     /**
      * 
@@ -440,7 +443,7 @@ public class InstanceDAO {
      * @param i
      * @return
      */
-    public static File getBinaryFileOfInstance(Instance i) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+    public static File getBinaryFileOfInstance(Instance i) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, InstanceNotInDBException {
         File f = new File("tmp" + System.getProperty("file.separator") + i.getId() + "_" + i.getName());
         // create missing directories
         f.getParentFile().mkdirs();
@@ -457,69 +460,16 @@ public class InstanceDAO {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public static void getBinaryFileOfInstance(Instance i, File f) throws NoConnectionToDBException, FileNotFoundException, IOException {
+    public static void getBinaryFileOfInstance(Instance i, File f) throws FileNotFoundException, IOException, NoConnectionToDBException, InstanceNotInDBException {
+        FileOutputStream out = new FileOutputStream(f);
         try {
-            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `instance` FROM " + table + " WHERE idInstance=?");
-
-            ps.setInt(1, i.getId());
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                FileOutputStream out = new FileOutputStream(f);
-                InputStream in = rs.getBinaryStream(1);
-                int len = 0;
-                byte[] buffer = new byte[256 * 1024];
-                while ((len = in.read(buffer)) > -1) {
-                    out.write(buffer, 0, len);
-                }
-                out.close();
-                in.close();
-            }
-            /*
-            File input = new File(f.getAbsolutePath() + "test");
-            input.getParentFile().mkdirs();
-            if (rs.next()) {
-            FileOutputStream out = new FileOutputStream(input);
-            InputStream in = rs.getBinaryStream("instance");
-            int len;
-            byte[] buf = new byte[256 * 1024];
-            while ((len = in.read(buf)) > -1) {
-            out.write(buf, 0, len);
-            }
-            out.flush();
+            Util.sevenZipDecode(getBinary(i.getId()), out);
+        } catch (SQLException e) {
+            // TODO: error
+            e.printStackTrace();
+        } finally {
             out.close();
-            in.close();
-            try{
-            Util.sevenZipDecode(input, f);
-            } catch (Exception ex) {
-            Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            input.delete();
-            }*/
-        } catch (SQLException ex) {
-            Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
-        /*
-        File input = new File(f.getAbsolutePath() + "test");
-        input.getParentFile().mkdirs();
-        if (rs.next()) {
-        FileOutputStream out = new FileOutputStream(input);
-        InputStream in = rs.getBinaryStream("instance");
-        int len;
-        byte[] buf = new byte[256 * 1024];
-        while ((len = in.read(buf)) > -1) {
-        out.write(buf, 0, len);
-        }
-        out.flush();
-        out.close();
-        in.close();
-
-        try{
-        Util.sevenZipDecode(input, f);
-        } catch (Exception ex) {
-        Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        input.delete();
-        }*/
     }
 
     public static void clearCache() {
@@ -527,7 +477,7 @@ public class InstanceDAO {
     }
 
     public static SATInstance getSATFormulaOfInstance(Instance i) throws IOException, InvalidVariableException, InstanceNotInDBException, SQLException {
-        return edacc.satinstances.InstanceParser.getInstance().parseInstance(getBinary(i.getId()).getBinaryStream());
+        return edacc.satinstances.InstanceParser.getInstance().parseInstance(getBinary(i.getId()));
     }
 
     /**

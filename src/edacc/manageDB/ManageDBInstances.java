@@ -926,7 +926,7 @@ public class ManageDBInstances implements Observer{
         }
     }
 
-    public void exportInstanceClass(DefaultMutableTreeNode selected, String path, Tasks task) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException {
+    public void exportInstanceClass(DefaultMutableTreeNode selected, String path, Tasks task) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException, InstanceNotInDBException {
         task.setOperationName("Exporting instance classes");
         InstanceClass root = (InstanceClass) selected.getUserObject();
         Vector<InstanceClass> tmp = new Vector<InstanceClass>();
@@ -967,7 +967,7 @@ public class ManageDBInstances implements Observer{
         }
     }
 
-    private Vector<Instance> exportInstanceClasses(DefaultMutableTreeNode selected, String path, Tasks task) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException{
+    private Vector<Instance> exportInstanceClasses(DefaultMutableTreeNode selected, String path, Tasks task) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException, InstanceNotInDBException{
         task.setOperationName("Exporting instance classes");
         InstanceClass root = (InstanceClass) selected.getUserObject();
         Vector<InstanceClass> tmp = new Vector<InstanceClass>();

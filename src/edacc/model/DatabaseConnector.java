@@ -1,5 +1,6 @@
 package edacc.model;
 
+import com.mysql.jdbc.MySQLConnection;
 import edacc.EDACCApp;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,7 +9,10 @@ import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.Observable;
+import java.util.Properties;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * singleton class handling the database connection.
@@ -27,9 +31,10 @@ public class DatabaseConnector extends Observable {
     private String database;
     private String username;
     private String password;
-    private String properties;
+    private Properties properties;
     private final Object sync = new Object();
     private ConnectionWatchDog watchDog;
+
 
     private DatabaseConnector() {
         connections = new LinkedList<ThreadConnection>();
@@ -66,14 +71,22 @@ public class DatabaseConnector extends Observable {
             this.username = username;
             this.password = password;
             this.database = database;
-            properties = "?user=" + username + "&password=" + password + "&rewriteBatchedStatements=true";
+            properties = new Properties();
+            properties.put("user", username);
+            properties.put("password", password);
+            properties.put("rewriteBatchedStatements", "true");
+            properties.put("useServerPrepStmts", "true");
             if (useSSL) {
-                properties += "&useSSL=true&requireSSL=true";
+                properties.put("useSSL", true);
+                properties.put("requireSSL", true);
             }
             if (compress) {
-                properties += "&useCompression=true";
+                properties.put("useCompression", true);
             }
             Class.forName("com.mysql.jdbc.Driver");
+            java.io.PrintWriter w =
+                    new java.io.PrintWriter(new java.io.OutputStreamWriter(System.out));
+            DriverManager.setLogWriter(w);
             this.maxconnections = maxconnections;
             watchDog = new ConnectionWatchDog();
             connections.add(new ThreadConnection(Thread.currentThread(), getNewConnection(), System.currentTimeMillis()));
@@ -90,7 +103,8 @@ public class DatabaseConnector extends Observable {
     }
 
     private Connection getNewConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + properties);
+        MySQLConnection conn = (MySQLConnection)DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database, properties);
+        return conn;
     }
 
     public int getMaxconnections() {

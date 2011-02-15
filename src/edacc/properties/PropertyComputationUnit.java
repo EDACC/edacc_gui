@@ -23,13 +23,11 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
-import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -74,16 +72,16 @@ public class PropertyComputationUnit implements Runnable {
                 Property property = erhp.getProperty();
                 switch (property.getPropertySource()) {
                     case LauncherOutput:
-                        compute(ExperimentResultDAO.getLauncherOutput(erhp.getExpResult()));
+                        compute(ExperimentResultDAO.getLauncherOutput(erhp.getExpResult()).getBinaryStream());
                         break;
                     case SolverOutput:
-                        compute(ExperimentResultDAO.getSolverOutput(erhp.getExpResult()));
+                        compute(ExperimentResultDAO.getSolverOutput(erhp.getExpResult()).getBinaryStream());
                         break;
                     case VerifierOutput:
-                        compute(ExperimentResultDAO.getVerifierOutput(erhp.getExpResult()));
+                        compute(ExperimentResultDAO.getVerifierOutput(erhp.getExpResult()).getBinaryStream());
                         break;
                     case WatcherOutput:
-                        compute(ExperimentResultDAO.getWatcherOutput(erhp.getExpResult()));
+                        compute(ExperimentResultDAO.getWatcherOutput(erhp.getExpResult()).getBinaryStream());
                         break;
                 }
             } catch (NoConnectionToDBException ex) {
@@ -102,6 +100,7 @@ public class PropertyComputationUnit implements Runnable {
                 switch (property.getPropertySource()) {
                     case Instance:
                         try {
+
                             compute(InstanceDAO.getBinary(ihp.getInstance().getId()));
                         } catch (InstanceNotInDBException ex) {
                             Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
@@ -195,8 +194,8 @@ public class PropertyComputationUnit implements Runnable {
         InstanceHasPropertyDAO.save(ihp);
     }
 
-    private void compute(Blob b) throws FileNotFoundException, IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, ComputationMethodDoesNotExistException, ErrorInExternalProgramException {
-        if (b == null) {
+    private void compute(InputStream input) throws FileNotFoundException, IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, ComputationMethodDoesNotExistException, ErrorInExternalProgramException {
+        if (input == null) {
             return;
         }
         if (property.getComputationMethod() != null) {
@@ -214,7 +213,7 @@ public class PropertyComputationUnit implements Runnable {
                     prefix = "cmd /c ";
                 }
                 Process p = Runtime.getRuntime().exec(prefix + bin.getAbsolutePath() + " " + property.getComputationMethodParameters());
-                InputStream is = b.getBinaryStream();
+                InputStream is = input;
                 InputStreamReader ir = new InputStreamReader(is);
                 BufferedReader instanceReader = new BufferedReader(ir);
                 // The std input stream of the external program. We pipe the content of the instance file into that stream
@@ -296,7 +295,7 @@ public class PropertyComputationUnit implements Runnable {
                 File bin = ComputationMethodDAO.getBinaryOfComputationMethod(property.getComputationMethod());
                 bin.setExecutable(true);
                 Process p = Runtime.getRuntime().exec(bin.getAbsolutePath());
-                BufferedReader outputFileReader = new BufferedReader(new InputStreamReader(b.getBinaryStream()));
+                BufferedReader outputFileReader = new BufferedReader(new InputStreamReader(input));
                 // The std input stream of the external program. We pipe the content of the Blob b
                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
                 // The std output stream of the external program (-> output of the program). We read the calculated value from this stream.
@@ -322,7 +321,7 @@ public class PropertyComputationUnit implements Runnable {
             }
         } else if (property.getRegularExpression() != null) {
             Vector<String> res = new Vector<String>();
-            InputStream is = b.getBinaryStream();
+            InputStream is = input;
             InputStreamReader ir = new InputStreamReader(is);
             BufferedReader buf = new BufferedReader(ir);
             String tmp;
