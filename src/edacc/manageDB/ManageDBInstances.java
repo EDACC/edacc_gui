@@ -112,9 +112,6 @@ public class ManageDBInstances implements Observer {
 
             RecursiveFileScanner InstanceScanner = new RecursiveFileScanner(fileExtension);
             Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
-            if (compress) {
-                Tasks.getTaskView().setTwoProgressbars(true);
-            }
             task.setOperationName("Adding Instances");
             if (input.getName().equals("")) {
                 Vector<Instance> instances;
@@ -138,8 +135,6 @@ public class ManageDBInstances implements Observer {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            Tasks.getTaskView().setTwoProgressbars(false);
         }
     }
 

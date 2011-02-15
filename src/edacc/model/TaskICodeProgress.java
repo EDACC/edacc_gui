@@ -4,6 +4,7 @@
  */
 package edacc.model;
 
+import edacc.EDACCTaskView;
 import javax.swing.SwingUtilities;
 
 /**
@@ -16,9 +17,16 @@ public class TaskICodeProgress implements SevenZip.ICodeProgress {
     private long time;
     private String eta = "";
     private long size;
+    private Integer id;
+    private EDACCTaskView view;
 
-    public TaskICodeProgress(long size) {
+    public TaskICodeProgress(long size, String name) {
         this.size = size;
+        this.view = Tasks.getTaskView();
+        if (view != null) {
+            id = view.getSubTaskId();
+            view.setMessage(id, name);
+        }
     }
 
     @Override
@@ -35,12 +43,18 @@ public class TaskICodeProgress implements SevenZip.ICodeProgress {
 
             @Override
             public void run() {
-                if (Tasks.getTaskView() != null) {
-                    Tasks.getTaskView().setProgress2(done / (float) size * 100);
+                if (view != null && id != null) {
+                    view.setProgress(id, done / (float) size * 100);
                 }
             }
         });
 
 
+    }
+
+    public void finished() {
+       if (view != null) {
+           view.subTaskFinished(id);
+       }
     }
 }

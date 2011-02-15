@@ -210,7 +210,9 @@ public class InstanceDAO {
                     fInStream = new FileInputStream(input);
                     if (compressBinary) {
                         java.sql.Blob b = DatabaseConnector.getInstance().getConn().createBlob();
-                        Util.sevenZipEncode(fInStream, b.setBinaryStream(1), input.length(), new TaskICodeProgress(input.length()));
+                        TaskICodeProgress progress = new TaskICodeProgress(input.length(), "Compressing " + input.getName());
+                        Util.sevenZipEncode(fInStream, b.setBinaryStream(1), input.length(), progress);
+                        progress.finished();
                         ps.setBlob(4, b);
                     } else {
                         ps.setBinaryStream(4, fInStream);
