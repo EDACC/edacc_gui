@@ -36,7 +36,7 @@ public class TaskICodeProgress implements SevenZip.ICodeProgress {
             @Override
             public void run() {
                 if (Tasks.getTaskView() != null) {
-                    Tasks.getTaskView().setProgress2(done / (float) size);
+                    Tasks.getTaskView().setProgress2(done / (float) size * 100);
                 }
             }
         });
