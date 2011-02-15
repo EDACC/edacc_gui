@@ -122,12 +122,12 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jScrollPane1" alignment="0" pref="333" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" alignment="0" pref="353" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="jRadioButtonAutomatic" pref="253" max="32767" attributes="0"/>
+                          <Component id="jRadioButtonAutomatic" pref="273" max="32767" attributes="0"/>
                           <EmptySpace min="-2" pref="80" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="jRadioButtonChoose" alignment="0" pref="333" max="32767" attributes="0"/>
+                      <Component id="jRadioButtonChoose" alignment="0" pref="353" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="jLabelExtension" min="-2" max="-2" attributes="0"/>

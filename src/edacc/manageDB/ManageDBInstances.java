@@ -168,7 +168,7 @@ public class ManageDBInstances implements Observer {
         EDACCApp.getApplication().show(removeInstances); */
         if (EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
                 EDACCApp.getApplication().getMainFrame(),
-                "Do you really won't to remove the listed instances?",
+                "Do you really want to remove the listed instances?",
                 new JTable(tableModel))
                 == EDACCExtendedWarning.RET_OK_OPTION) {
             Tasks.startTask("TryToRemoveInstances", new Class[]{Vector.class, edacc.model.Tasks.class}, new Object[]{toRemove, null}, this, this.main);
