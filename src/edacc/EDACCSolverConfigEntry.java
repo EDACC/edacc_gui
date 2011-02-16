@@ -13,10 +13,20 @@ import edacc.model.ParameterInstanceDAO;
 import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
+import edacc.model.SolverDAO;
 import java.awt.Component;
 import java.awt.Graphics;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
@@ -95,13 +105,13 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
      * @throws SQLException
      */
     public EDACCSolverConfigEntry(Solver solver, int num) throws SQLException {
+        this(solver, num > 1 ? solver.getName() + " (" + num + ")" : solver.getName());
+    }
+
+    public EDACCSolverConfigEntry(Solver solver, String name) throws SQLException {
         this(solver.getId());
         this.solver = solver;
-        if (num > 1) {
-            border.setTitle(solver.getName() + " (" + num + ")");
-        } else {
-            border.setTitle(solver.getName());
-        }
+        border.setTitle(name);
     }
 
     @Override
@@ -212,6 +222,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         lblSeedGroup = new javax.swing.JLabel();
         txtSeedGroup = new javax.swing.JTextField();
         btnEditName = new javax.swing.JButton();
+        btnMassReplication = new javax.swing.JButton();
 
         setName("Form"); // NOI18N
 
@@ -260,6 +271,14 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             }
         });
 
+        btnMassReplication.setText(resourceMap.getString("btnMassReplication.text")); // NOI18N
+        btnMassReplication.setName("btnMassReplication"); // NOI18N
+        btnMassReplication.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMassReplicationActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -273,13 +292,15 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                         .addComponent(lblSeedGroup)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtSeedGroup, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnMassReplication)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 99, Short.MAX_VALUE)
                         .addComponent(btnEditName)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnRemove, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -293,7 +314,8 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                     .addComponent(btnReplicate)
                     .addComponent(lblSeedGroup)
                     .addComponent(txtSeedGroup, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnEditName))
+                    .addComponent(btnEditName)
+                    .addComponent(btnMassReplication))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -325,8 +347,99 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         parent.setTitles();
     }//GEN-LAST:event_btnEditNameActionPerformed
 
+    private void btnMassReplicationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMassReplicationActionPerformed
+        EDACCSolverConfigReplicateUsingFiles replicator = new EDACCSolverConfigReplicateUsingFiles(EDACCApp.getApplication().getMainFrame(), true, this);
+        replicator.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+        EDACCApp.getApplication().show(replicator);
+        File dir;
+        if ((dir = replicator.getChosenFolder()) != null) {
+            File[] files = dir.listFiles();
+            SolverConfigEntryTableModel model = replicator.getModel();
+            Pattern[] patterns = new Pattern[model.getRowCount()];
+            String[] values = new String[model.getRowCount()];
+            for (int i = 0; i < model.getRowCount(); i++) {
+                if ((Boolean) model.getValueAt(i, 0)) {
+                    // is selected
+                    if ((Boolean) model.getValueAt(i, 6)) {
+                        // is regex
+                        patterns[i] = Pattern.compile((String) model.getValueAt(i, 3));
+                    }
+                }
+            }
+            for (File file : files) {
+                if (!file.isFile()) {
+                    continue;
+                }
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    if ((Boolean) model.getValueAt(i, 0)) {
+                        if (!(Boolean) model.getValueAt(i, 6)) {
+                            values[i] = (String) model.getValueAt(i, 3);
+                        } else {
+                            values[i] = null;
+                        }
+                    }
+                }
+                BufferedReader input = null;
+
+                try {
+                    input = new BufferedReader(new FileReader(file));
+                    String line;
+                    while ((line = input.readLine()) != null) {
+                        for (int i = 0; i < model.getRowCount(); i++) {
+                            if (patterns[i] != null) {
+                                Matcher m = patterns[i].matcher(line);
+                                if (m.matches()) {
+                                    if (m.groupCount() > 0) {
+                                        if (values[i] != null || m.groupCount() > 1) {
+                                            // TODO: WARNING
+                                        } else {
+                                            values[i] = m.group(1);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (solver == null) {
+                        solver = SolverDAO.getById(this.getSolverId());
+                    }
+                    EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solver, ((TitledBorder) this.getBorder()).getTitle() + "-" + file.getName());
+                    entry.txtSeedGroup.setText(getSeedGroup().getText());
+                    for (int i = 0; i < model.getRowCount(); i++) {
+                        if (values[i] != null) {
+                            entry.solverConfigEntryTableModel.setValueAt(values[i], i, 3);
+                            entry.solverConfigEntryTableModel.setValueAt(true, i, 0);
+                        }
+                    }
+                    entry.setParent(parent);
+                    parent.addEntryAfterEntry(entry, this);
+                } catch (FileNotFoundException ex) {
+                    // TODO: error
+                } catch (IOException ex) {
+                    // TODO: error
+                } catch (SQLException ex) {
+                    // TODO: error
+                } finally {
+                    if (input != null) {
+                        try {
+                            input.close();
+                        } catch (IOException ex) {
+                        }
+                    }
+                }
+            }
+        }
+
+    }//GEN-LAST:event_btnMassReplicationActionPerformed
     @Action
     public void btnReplicate() {
+
+
+
+
+
+
         try {
             parent.replicateEntry(this);
         } catch (SQLException ex) {
@@ -339,6 +452,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEditName;
+    private javax.swing.JButton btnMassReplication;
     private javax.swing.JButton btnRemove;
     private javax.swing.JButton btnReplicate;
     private javax.swing.JScrollPane jScrollPane2;
@@ -346,6 +460,18 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     private javax.swing.JTable parameterTable;
     private javax.swing.JTextField txtSeedGroup;
     // End of variables declaration//GEN-END:variables
+
+    public ArrayList<Parameter> getParameters() {
+        return solverConfigEntryTableModel.getParameters();
+    }
+
+    public ArrayList<ParameterInstance> getParameterInstances() {
+        return solverConfigEntryTableModel.getParameterInstances();
+    }
+
+    public SolverConfigEntryTableModel getModel() {
+        return solverConfigEntryTableModel;
+    }
 
     /**
      * Checks for unsaved data, i.e. checks iff the seed group, the parameter instances or the idx have been changed.<br/>

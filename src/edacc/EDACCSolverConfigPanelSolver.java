@@ -117,6 +117,19 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
         doRepaint();
     }
 
+    public void addEntryAfterEntry(EDACCSolverConfigEntry toAdd, EDACCSolverConfigEntry afterEntry) {
+        int pos = 0;
+        for (int i = 0; i < this.getComponentCount(); i++) {
+            if (this.getComponent(i) == afterEntry) {
+                pos = i;
+                break;
+            }
+        }
+        this.add(toAdd, pos+1);
+        setGridBagConstraints();
+        doRepaint();
+    }
+
     /**
      * Removes an EDACCSolverConfigEntry. If the solver configuration exists in the database
      * it is marked as deleted.
