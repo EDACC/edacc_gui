@@ -156,7 +156,7 @@ public class EDACCManagePropertyValueTypesDialog extends javax.swing.JDialog {
             .addGroup(panelMainLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE)
                     .addGroup(panelMainLayout.createSequentialGroup()
                         .addComponent(buttonChooseClassFile)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)

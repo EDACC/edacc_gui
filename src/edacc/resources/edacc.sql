@@ -202,6 +202,8 @@ CREATE  TABLE IF NOT EXISTS `SolverConfig` (
   `Solver_idSolver` INT NOT NULL ,
   `Experiment_idExperiment` INT NOT NULL ,
   `seed_group` INT NULL DEFAULT 0 ,
+  `name` VARCHAR(255) NOT NULL ,
+  `idx` INT NOT NULL ,
   PRIMARY KEY (`idSolverConfig`) ,
   INDEX `fk_SolverConfig_Solver1` (`Solver_idSolver` ASC) ,
   INDEX `fk_SolverConfig_Experiment1` (`Experiment_idExperiment` ASC) ,
@@ -253,6 +255,9 @@ CREATE  TABLE IF NOT EXISTS `ExperimentResults` (
   INDEX `fk_ExperimentResults_SolverConfig1` (`SolverConfig_idSolverConfig` ASC) ,
   INDEX `fk_ExperimentResults_Experiment1` (`Experiment_idExperiment` ASC) ,
   INDEX `fk_ExperimentResults_Instances1` (`Instances_idInstance` ASC) ,
+  INDEX `status` (`status` ASC) ,
+  INDEX `computeQueue` (`computeQueue` ASC) ,
+  INDEX `priority` (`priority` ASC) ,
   CONSTRAINT `fk_ExperimentResults_SolverConfig1`
     FOREIGN KEY (`SolverConfig_idSolverConfig` )
     REFERENCES `SolverConfig` (`idSolverConfig` )
@@ -409,7 +414,7 @@ CREATE  TABLE IF NOT EXISTS `ComputationMethod` (
   `description` TEXT NULL ,
   `md5` VARCHAR(60) NULL ,
   `binaryName` VARCHAR(255) NULL ,
-  `binaryFile` BLOB NULL ,
+  `binaryFile` LONGBLOB NULL ,
   PRIMARY KEY (`idComputationMethod`) ,
   UNIQUE INDEX `name_UNIQUE` (`name` ASC) ,
   UNIQUE INDEX `md5_UNIQUE` (`md5` ASC) )
@@ -607,12 +612,12 @@ DELIMITER ;
 -- -----------------------------------------------------
 DROP EVENT IF EXISTS MONITOR_JOBS;
 
-CREATE EVENT IF NOT EXISTS MONITOR_JOBS
-ON SCHEDULE EVERY '20' MINUTE
-DO
-UPDATE ExperimentResults SET status=-1 WHERE idJob IN (
-select idJob FROM (SELECT idJob, startTime, Experiment_idExperiment FROM ExperimentResults WHERE status=0) AS ERtmp JOIN Experiment on Experiment.idExperiment = Experiment_idExperiment WHERE TIME_TO_SEC(TIMEDIFF(NOW(), startTime))>CPUTimeLimit*1.3
-);
+-- CREATE EVENT IF NOT EXISTS MONITOR_JOBS
+-- ON SCHEDULE EVERY '20' MINUTE
+-- DO
+-- UPDATE ExperimentResults SET status=-1 WHERE idJob IN (
+-- select idJob FROM (SELECT idJob, startTime, Experiment_idExperiment FROM ExperimentResults WHERE status=0) AS ERtmp JOIN Experiment on Experiment.idExperiment = Experiment_idExperiment WHERE TIME_TO_SEC(TIMEDIFF(NOW(), startTime))>CPUTimeLimit*1.3
+-- );
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

@@ -188,8 +188,11 @@ public class InstanceHasPropertyDAO {
                 "SELECT id FROM " + table + " WHERE idProperty=?;");
          ps.setInt(1, r.getId());
          ResultSet rs = ps.executeQuery();
+         PreparedStatement psDelete = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM " + table + " WHERE idProperty=?" );
+         psDelete.setInt(1, r.getId());
+         psDelete.executeUpdate();
          while(rs.next()){
-             removeInstanceHasInstanceProperty(getById(rs.getInt(1)));
+             removeInstanceHasInstancePropertyFromCache(rs.getInt(1));
          }
     }
 
@@ -213,5 +216,9 @@ public class InstanceHasPropertyDAO {
         res.setId(rs.getInt(1));
         res.setSaved();
         return res;
+    }
+
+    private static void removeInstanceHasInstancePropertyFromCache(int id) {
+       cache.removeById(id);
     }
 }

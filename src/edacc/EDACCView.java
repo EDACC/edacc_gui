@@ -46,7 +46,7 @@ public class EDACCView extends FrameView implements Observer {
         super(app);
 
         initComponents();
-        
+
         UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
         DatabaseConnector.getInstance().addObserver(this);
 
@@ -386,21 +386,12 @@ public class EDACCView extends FrameView implements Observer {
 
     @Action
     public void btnDisconnect() {
-        try {
-            if (experimentMode.hasUnsavedChanges() || manageDBMode.unsavedChanges) {
-                if (JOptionPane.showConfirmDialog(mode,
-                        "Any unsaved changes will be lost, are you sure you want to disconnect from the database?",
-                        "Warning!",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+        if (experimentMode.hasUnsavedChanges() || manageDBMode.unsavedChanges) {
+            if (JOptionPane.showConfirmDialog(mode,
+                    "Any unsaved changes will be lost, are you sure you want to disconnect from the database?",
+                    "Warning!",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
-                    Util.clearCaches();
-                    DatabaseConnector.getInstance().disconnect();
-                    experimentMode.expController.unloadExperiment();
-                    manageDBModeMenuItem.setSelected(false);
-                    manageExperimentModeMenuItem.setSelected(false);
-                    noMode();
-                }
-            } else {
                 Util.clearCaches();
                 DatabaseConnector.getInstance().disconnect();
                 experimentMode.expController.unloadExperiment();
@@ -408,8 +399,13 @@ public class EDACCView extends FrameView implements Observer {
                 manageExperimentModeMenuItem.setSelected(false);
                 noMode();
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "An error occured while closing the database connection: \n" + ex.getMessage(), "Couldn't close database connection", JOptionPane.ERROR_MESSAGE);
+        } else {
+            Util.clearCaches();
+            DatabaseConnector.getInstance().disconnect();
+            experimentMode.expController.unloadExperiment();
+            manageDBModeMenuItem.setSelected(false);
+            manageExperimentModeMenuItem.setSelected(false);
+            noMode();
         }
     }
 
@@ -534,12 +530,18 @@ public class EDACCView extends FrameView implements Observer {
             @Override
             public void run(Tasks task) {
                 try {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            mainPanelLayout.replace(mode, experimentMode);
+                            mode = experimentMode;
+                            manageExperimentModeMenuItem.setSelected(true);
+                            manageDBModeMenuItem.setSelected(false);
+                            statusMessageLabel.setText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+                        }
+                    });
                     experimentMode.initialize();
-                    mainPanelLayout.replace(mode, experimentMode);
-                    mode = experimentMode;
-                    manageExperimentModeMenuItem.setSelected(true);
-                    manageDBModeMenuItem.setSelected(false);
-                    statusMessageLabel.setText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
                 } catch (final Exception e) {
                     SwingUtilities.invokeLater(new Runnable() {
 

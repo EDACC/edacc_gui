@@ -8,7 +8,21 @@
 #include <sys/types.h>
 
 //#define VALUELENGTH 64
+//some parameters that controll the behaviour of the client
 int verbosity;
+int keepResults;
+//specify how many seconds the client should wait for the DB if no connection is possible
+int waitForDB;
+//how many times should the client try to connect?
+int connectAttempts;
+
+//how long should the client wait for jobs?
+int waitForJobs;
+
+//how long should the client wait till the next scan for jobs
+int scanForJobsPeriod;
+
+
 
 
 /* experiment info */
@@ -90,7 +104,7 @@ typedef struct {
 
 	char *solverName; // the used solver for this job.
 	char *solverVersion; // the used solver for this job.
-	char params[1024]; // the full param string
+	char params[4096]; // the full param string
 	char *instanceName; //the name of the instance
 	char *binaryName;
 } job;

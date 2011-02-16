@@ -25,8 +25,8 @@ public class ExperimentResultHasPropertyDAO {
     private static final String deleteQuery = "DELETE FROM " + table + " WHERE idExperimentResult_has_Property=?";
     private static String updateQuery = "UPDATE " + table + " SET idExperimentResults=?, idProperty=? WHERE idExperimentResult_has_Property=?";
     private static String insertQuery = "INSERT INTO " + table + " (idExperimentResults, idProperty) VALUES (?, ?)";
-    private static final String deleteValueQuery = "DELETE FROM " + valueTable + " WHERE id=?";
-    private static String insertValueQuery = "INSERT INTO " + valueTable + " (idExperimentResult_has_Property, value, EDACC5.ExperimentResult_has_PropertyValue.order) VALUES (?, ?, ?)";
+    private static final String deleteValueQuery = "DELETE FROM " + valueTable + " WHERE idExperimentResult_has_Property=?";
+    private static String insertValueQuery = "INSERT INTO " + valueTable + " (idExperimentResult_has_Property, value, `order`) VALUES (?, ?, ?)";
 
     /**
      * Creates a new  ExperimentResultHasProperty object, saves it into the database and cache, and returns it.
@@ -49,7 +49,7 @@ public class ExperimentResultHasPropertyDAO {
         return e;
     }
 
-     public static ExperimentResultHasProperty createExperimentResultHasPropertyDAO(int expResultId, Property solvProperty)
+    public static ExperimentResultHasProperty createExperimentResultHasPropertyDAO(int expResultId, Property solvProperty)
             throws NoConnectionToDBException, SQLException {
         ExperimentResultHasProperty e = new ExperimentResultHasProperty();
         e.setExpResId(expResultId);
@@ -79,26 +79,41 @@ public class ExperimentResultHasPropertyDAO {
             ps.close();
             cache.remove(e);
         } else if (e.isModified()) {
-            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
-            ps.setInt(1, e.getExpResId());
-            ps.setInt(2, e.getPropId());
-            ps.setInt(3, e.getId());
-            ps.executeUpdate();
+            boolean autocommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
+            try {
+                DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+                PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
+                ps.setInt(1, e.getExpResId());
+                ps.setInt(2, e.getPropId());
+                ps.setInt(3, e.getId());
+                ps.executeUpdate();
+                ps.close();
 
-            // Replace the value Vector in the SolverPropertyValue table of the database with the modified one
-            ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteValueQuery);
-            ps.setInt(1, e.getId());
-            ps.executeUpdate();
-            for (int i = 0; i < e.getValue().size(); i++) {
-                ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertValueQuery);
+                // Replace the value Vector in the SolverPropertyValue table of the database with the modified one
+                ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteValueQuery);
                 ps.setInt(1, e.getId());
-                ps.setString(2, e.getValue().get(i));
-                ps.setInt(3, i);
-                ps.execute();
-            }
+                ps.executeUpdate();
+                ps.close();
 
-            ps.close();
-            e.setSaved();
+                DatabaseConnector.getInstance().getConn().commit();
+                // prevents deadlock in mysql: can't delete AND insert on non unique columns in WHERE-clause in one commit
+
+                for (int i = 0; i < e.getValue().size(); i++) {
+                    ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertValueQuery);
+                    ps.setInt(1, e.getId());
+                    ps.setString(2, e.getValue().get(i));
+                    ps.setInt(3, i);
+                    ps.execute();
+                    ps.close();
+                }
+
+                e.setSaved();
+            } catch (SQLException ex) {
+                DatabaseConnector.getInstance().getConn().rollback();
+                throw ex;
+            } finally {
+                DatabaseConnector.getInstance().getConn().setAutoCommit(autocommit);
+            }
         } else if (e.isNew()) {
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setInt(1, e.getExpResId());
@@ -139,7 +154,7 @@ public class ExperimentResultHasPropertyDAO {
      * @throws PropertyNotInDBException
      */
     public static Vector<ExperimentResultHasProperty> getAllByExperimentResult(ExperimentResult expResult)
-            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, 
+            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException,
             PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
         Vector<ExperimentResultHasProperty> res = new Vector<ExperimentResultHasProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
@@ -167,7 +182,7 @@ public class ExperimentResultHasPropertyDAO {
      * @throws PropertyNotInDBException
      */
     public static Vector<ExperimentResultHasProperty> getAllByProperty(Property Property)
-            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, 
+            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException,
             PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
         Vector<ExperimentResultHasProperty> res = new Vector<ExperimentResultHasProperty>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
@@ -194,16 +209,16 @@ public class ExperimentResultHasPropertyDAO {
         ps.setInt(1, property.getId());
         ps.setInt(2, expResult.getId());
         ResultSet rs = ps.executeQuery();
-        if(!rs.next()){
+        if (!rs.next()) {
             throw new ExpResultHasSolvPropertyNotInDBException();
         }
-       ExperimentResultHasProperty res = getById(rs.getInt(1));
+        ExperimentResultHasProperty res = getById(rs.getInt(1));
         rs.close();
         ps.close();
         return res;
     }
 
-        public static ExperimentResultHasProperty getByExperimentResultAndResultProperty(int jobId, int propId)
+    public static ExperimentResultHasProperty getByExperimentResultAndResultProperty(int jobId, int propId)
             throws SQLException, NoConnectionToDBException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException,
             PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
@@ -213,13 +228,48 @@ public class ExperimentResultHasPropertyDAO {
         ps.setInt(1, propId);
         ps.setInt(2, jobId);
         ResultSet rs = ps.executeQuery();
-        if(!rs.next()){
+        if (!rs.next()) {
             throw new ExpResultHasSolvPropertyNotInDBException();
         }
-       ExperimentResultHasProperty res = getById(rs.getInt(1));
+        ExperimentResultHasProperty res = getById(rs.getInt(1));
         rs.close();
         ps.close();
         return res;
+    }
+
+    public static void assign(ExperimentResult er) throws NoConnectionToDBException, SQLException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
+        HashMap<Integer, Property> solverProperties = new HashMap<Integer, Property>();
+        for (Property sp : PropertyDAO.getAllResultProperties()) {
+            solverProperties.put(sp.getId(), sp);
+        }
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT erhp.idExperimentResult_has_Property, erhp.idExperimentResults, erhp.idProperty, " + // ExperimentResult_has_Property
+                "erhpv.id, erhpv.idExperimentResult_has_Property, erhpv.value, erhpv.order " + // SolverPropertyValue
+                "FROM " + table + " AS erhp "
+                + "RIGHT JOIN " + valueTable + " AS erhpv ON (erhp.idExperimentResult_has_Property = erhpv.idExperimentResult_has_Property) "
+                + "RIGHT JOIN Property AS p ON (erhp.idProperty = p.idProperty) "
+                + "LEFT JOIN ExperimentResults as er ON (erhp.idExperimentResults = er.idJob) "
+                + "WHERE idExperimentResults = ? "
+                + "ORDER BY `order`");
+
+        ps.setInt(1, er.getId());
+        ResultSet rs = ps.executeQuery();
+        er.setPropertyValues(new HashMap<Integer, ExperimentResultHasProperty>());
+        while (rs.next()) {
+            int idSolverProperty = rs.getInt(3);
+            ExperimentResultHasProperty erhp = er.getPropertyValues().get(rs.getInt(3));
+            if (erhp == null) {
+                erhp = new ExperimentResultHasProperty();
+                erhp.setId(rs.getInt(1));
+                erhp.setExpResult(er);
+                erhp.setSolvProperty(solverProperties.get(idSolverProperty));
+                erhp.setValue(new Vector<String>());
+                er.getPropertyValues().put(idSolverProperty, erhp);
+            }
+            String value = rs.getString(6);
+            erhp.getValue().add(value);
+        }
+        ps.close();
     }
 
     /**
@@ -243,28 +293,28 @@ public class ExperimentResultHasPropertyDAO {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT erhp.idExperimentResult_has_Property, erhp.idExperimentResults, erhp.idProperty, " + // ExperimentResult_has_Property
                 "erhpv.id, erhpv.idExperimentResult_has_Property, erhpv.value, erhpv.order " + // SolverPropertyValue
-                "FROM " + table + " AS erhp " +
-                "RIGHT JOIN " + valueTable + " AS erhpv ON (erhp.idExperimentResult_has_Property = erhpv.idExperimentResult_has_Property) " +
-                "RIGHT JOIN Property AS p ON (erhp.idProperty = p.idProperty) " +
-                "LEFT JOIN ExperimentResults as er ON (erhp.idExperimentResults = er.idJob) " +
-                "WHERE er.Experiment_idExperiment = ? " +
-                "ORDER BY `order`");
-
-               /* "SELECT erhsp.idER_h_SP, erhsp.ExperimentResults_idJob, erhsp.SolverProperty_idSolverProperty, "
-                + "spv.idSolverPropertyValue, spv.ExperimentResult_has_SolverProperty_idER_h_SP, spv.value, spv.order " 
-                + "FROM ExperimentResult_has_SolverProperty AS erhsp "
-                + "RIGHT JOIN SolverPropertyValue AS spv ON (erhsp.idER_h_SP = spv.ExperimentResult_has_SolverProperty_idER_h_SP) "
-                + "RIGHT JOIN SolverProperty AS sp ON (erhsp.SolverProperty_idSolverProperty = sp.idSolverProperty) "
-                + "LEFT JOIN ExperimentResults AS er ON (erhsp.ExperimentResults_idJob = er.idJob) "
+                "FROM " + table + " AS erhp "
+                + "RIGHT JOIN " + valueTable + " AS erhpv ON (erhp.idExperimentResult_has_Property = erhpv.idExperimentResult_has_Property) "
+                + "RIGHT JOIN Property AS p ON (erhp.idProperty = p.idProperty) "
+                + "LEFT JOIN ExperimentResults as er ON (erhp.idExperimentResults = er.idJob) "
                 + "WHERE er.Experiment_idExperiment = ? "
-                + "ORDER BY `order`");*/
+                + "ORDER BY `order`");
+
+        /* "SELECT erhsp.idER_h_SP, erhsp.ExperimentResults_idJob, erhsp.SolverProperty_idSolverProperty, "
+        + "spv.idSolverPropertyValue, spv.ExperimentResult_has_SolverProperty_idER_h_SP, spv.value, spv.order "
+        + "FROM ExperimentResult_has_SolverProperty AS erhsp "
+        + "RIGHT JOIN SolverPropertyValue AS spv ON (erhsp.idER_h_SP = spv.ExperimentResult_has_SolverProperty_idER_h_SP) "
+        + "RIGHT JOIN SolverProperty AS sp ON (erhsp.SolverProperty_idSolverProperty = sp.idSolverProperty) "
+        + "LEFT JOIN ExperimentResults AS er ON (erhsp.ExperimentResults_idJob = er.idJob) "
+        + "WHERE er.Experiment_idExperiment = ? "
+        + "ORDER BY `order`");*/
         ps.setInt(1, experimentId);
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
             int idJob = rs.getInt(2);
             int idSolverProperty = rs.getInt(3);
             ExperimentResult job = experimentResults.get(idJob);
-            if (job != null) {  
+            if (job != null) {
                 ExperimentResultHasProperty erhp = job.getPropertyValues().get(rs.getInt(3));
                 if (erhp == null) {
                     erhp = new ExperimentResultHasProperty();
@@ -280,8 +330,6 @@ public class ExperimentResultHasPropertyDAO {
         }
     }
 
-
-
     /**
      * Returns and caches (if necessary) the ExperimentResultHasProperty object with the given id. The  values are kept in their order.
      * @param id <Integer> of the requested ExperimentResultHasProperty
@@ -293,7 +341,7 @@ public class ExperimentResultHasPropertyDAO {
      * @throws PropertyNotInDBException
      */
     public static ExperimentResultHasProperty getById(int id)
-            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, 
+            throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException,
             PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
         ExperimentResultHasProperty res = cache.getCached(id);
         if (res != null) {

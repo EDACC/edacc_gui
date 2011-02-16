@@ -1,10 +1,6 @@
 #include "safeio.h"
 
-#include <unistd.h>
-#include <stdlib.h>
-#include <time.h>
-#include <string.h>
-#include "log.h"
+
 
 //The maximal disk access rate in bytes per seconds for safeGetc and safeFputc
 const long bps=190*1000;
@@ -19,6 +15,23 @@ static int  solverPathLen,instancePathLen,resultPathLen;
 //The length of basename without the terminating '\0' character
 static int basenameLen;
 
+//Test if a file exists
+
+void checkPath(){
+	if (!fileExists(prependBasename(solverPath))){
+		mkdir(prependBasename(solverPath), S_IRWXU | S_IRWXG | S_IRWXO);
+		logComment(4,"created folder: %s\n",prependBasename(solverPath));
+	}
+	if (!fileExists(prependBasename(instancePath))){
+		mkdir(prependBasename(instancePath), S_IRWXU | S_IRWXG | S_IRWXO);
+		logComment(4,"created folder: %s\n",prependBasename(instancePath));
+	}
+	if (!fileExists(prependBasename(resultPath))){
+		mkdir(prependBasename(resultPath), S_IRWXU | S_IRWXG | S_IRWXO);
+		logComment(4,"created folder: %s\n",prependBasename(resultPath));
+	}
+	return;
+}
 
 void initPath(){
 	basenameLen=strlen(basename);
@@ -130,7 +143,7 @@ char* prependResultPath(const char* fileName) {
 }
 
 int safeGetc(FILE *stream) {
-/*	int retval;
+	/*	int retval;
 	struct timespec req;
 
 	req.tv_sec=0;
@@ -145,7 +158,7 @@ int safeGetc(FILE *stream) {
 }
 
 int safeFputc(int c, FILE *stream) {
-/*	int retval;
+	/*	int retval;
 	struct timespec req;
 
 	req.tv_sec=0;

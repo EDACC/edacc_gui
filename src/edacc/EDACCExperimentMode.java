@@ -354,8 +354,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnEditExperiment.setEnabled(false);
         btnLoadExperiment.setEnabled(false);
         expController.initialize();
-        tableInstances.moveColumn(InstanceTableModel.COL_SELECTED, insTableModel.getColumnCount() - 1);
-        edacc.experiment.Util.updateTableColumnWidth(tableExperiments);
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                tableInstances.moveColumn(InstanceTableModel.COL_SELECTED, insTableModel.getColumnCount() - 1);
+                edacc.experiment.Util.updateTableColumnWidth(tableExperiments);
+            }
+        });
+
     }
 
     private void disableEditExperiment() {

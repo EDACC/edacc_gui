@@ -5,6 +5,7 @@
 
 package edacc.manageDB;
 
+import edacc.manageDB.InstanceParser.InstanceException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class RecursiveFileScanner {
 	 * @param fileExtension the file-extension which the has to search for
 	 */
 	public RecursiveFileScanner(String fileExtension){
-		this.fileExtension = fileExtension;
+		this.fileExtension = "." + fileExtension;
 	}
 
 	/**
@@ -30,7 +31,7 @@ public class RecursiveFileScanner {
 	 * @param path initiate the root of the search.
 	 * @return LinkedList <File> of all filedirectories, which where found or null if no File is found.
 	 */
-	public Vector<File> searchFileExtension(File root)throws IOException, FileNotFoundException{
+	public Vector<File> searchFileExtension(File root)throws IOException, FileNotFoundException, InstanceException{
 		Vector <File> files = new Vector<File>();
 		try{
                     if(root.isDirectory()){
@@ -50,6 +51,10 @@ public class RecursiveFileScanner {
                 catch ( IOException e ){
                   throw new IOException();
                 }
-		return files;
+                if (files.isEmpty()) {
+                    InstanceException instancExcep = new InstanceException();               
+                    throw instancExcep;
+                }
+                return files;
 	}
 }

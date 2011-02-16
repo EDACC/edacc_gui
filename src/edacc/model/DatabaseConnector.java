@@ -1,13 +1,18 @@
 package edacc.model;
 
+import com.mysql.jdbc.MySQLConnection;
 import edacc.EDACCApp;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.*;
+import java.util.LinkedList;
 import java.util.Observable;
+import java.util.Properties;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * singleton class handling the database connection.
@@ -15,16 +20,24 @@ import java.util.Vector;
  * @author daniel
  */
 public class DatabaseConnector extends Observable {
+    // time after an idling connection is closed
 
+    public static final int CONNECTION_TIMEOUT = 60000;
     private static DatabaseConnector instance = null;
-    private Connection conn;
+    private int maxconnections;
+    private LinkedList<ThreadConnection> connections;
     private String hostname;
     private int port;
     private String database;
     private String username;
     private String password;
+    private Properties properties;
+    private final Object sync = new Object();
+    private ConnectionWatchDog watchDog;
+
 
     private DatabaseConnector() {
+        connections = new LinkedList<ThreadConnection>();
     }
 
     public static DatabaseConnector getInstance() {
@@ -44,9 +57,13 @@ public class DatabaseConnector extends Observable {
      * @throws ClassNotFoundException if the driver couldn't be found.
      * @throws SQLException if an error occurs while trying to establish the connection.
      */
-    public void connect(String hostname, int port, String username, String database, String password, boolean useSSL, boolean compress) throws ClassNotFoundException, SQLException {
-        if (conn != null) {
-            conn.close();
+    public void connect(String hostname, int port, String username, String database, String password, boolean useSSL, boolean compress, int maxconnections) throws ClassNotFoundException, SQLException {
+        while (connections.size() > 0) {
+            ThreadConnection tconn = connections.pop();
+            tconn.conn.close();
+        }
+        if (watchDog != null) {
+            watchDog.terminate();
         }
         try {
             this.hostname = hostname;
@@ -54,15 +71,26 @@ public class DatabaseConnector extends Observable {
             this.username = username;
             this.password = password;
             this.database = database;
-            String properties = "?user=" + username + "&password=" + password + "&rewriteBatchedStatements=true";
+            properties = new Properties();
+            properties.put("user", username);
+            properties.put("password", password);
+            properties.put("rewriteBatchedStatements", "true");
+        //    properties.put("useServerPrepStmts", "true");
             if (useSSL) {
-                properties += "&useSSL=true&requireSSL=true";
+                properties.put("useSSL", "true");
+                properties.put("requireSSL", "true");
             }
             if (compress) {
-                properties += "&useCompression=true";
+                properties.put("useCompression", "true");
             }
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + properties);
+            java.io.PrintWriter w =
+                    new java.io.PrintWriter(new java.io.OutputStreamWriter(System.out));
+            DriverManager.setLogWriter(w);
+            this.maxconnections = maxconnections;
+            watchDog = new ConnectionWatchDog();
+            connections.add(new ThreadConnection(Thread.currentThread(), getNewConnection(), System.currentTimeMillis()));
+            watchDog.start();
         } catch (ClassNotFoundException e) {
             throw e;
         } catch (SQLException e) {
@@ -74,31 +102,126 @@ public class DatabaseConnector extends Observable {
         }
     }
 
+    private Connection getNewConnection() throws SQLException {
+        MySQLConnection conn = (MySQLConnection)DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database, properties);
+        return conn;
+    }
+
+    public int getMaxconnections() {
+        return maxconnections;
+    }
+
     /**
      * Closes an existing connection. If no connection exists, this method does nothing.
      * @throws SQLException if an error occurs while trying to close the connection.
      */
-    public void disconnect() throws SQLException {
-        if (conn != null) {
-            conn.close();
-            this.setChanged();
-            this.notifyObservers("disconnect");
+    public void disconnect() {
+        watchDog.terminate();
+        synchronized (sync) {
+            if (!connections.isEmpty()) {
+                while (connections.size() > 0) {
+                    ThreadConnection tconn = connections.pop();
+                    try {
+                        tconn.conn.rollback();
+                        tconn.conn.close();
+                    } catch (SQLException e) {
+                    }
+                }
+            }
+        }
+        this.setChanged();
+        this.notifyObservers("disconnect");
+    }
+
+    public void releaseConnection() {
+        synchronized (sync) {
+            for (ThreadConnection tconn : connections) {
+                if (tconn.thread == Thread.currentThread()) {
+                    tconn.thread = null;
+                    tconn.time = System.currentTimeMillis();
+                    break;
+                }
+            }
         }
     }
 
-    public Connection getConn() throws NoConnectionToDBException {
-        try {
-            if (!isConnected()) {
-                // inform Obeservers of lost connection
-                this.setChanged();
-                this.notifyObservers();
-                throw new NoConnectionToDBException();
+    public int freeConnectionCount() {
+        int res;
+        synchronized (sync) {
+            res = maxconnections - connections.size();
+            for (ThreadConnection tconn : connections) {
+                if (tconn.thread == null || !tconn.thread.isAlive()) {
+                    res++;
+                }
             }
-            return conn;
-        } catch (SQLException e) {
-            conn = null;
+        }
+        return res;
+    }
+
+    public Connection getConn() throws SQLException {
+        return getConn(0);
+    }
+
+    private Connection getConn(int retryCount) throws SQLException {
+        if (retryCount > 5) {
+            throw new SQLException("No connections available.");
+        }
+        if (!isConnected()) {
+            // inform Obeservers of lost connection
+            this.setChanged();
+            this.notifyObservers();
             throw new NoConnectionToDBException();
         }
+        try {
+            synchronized (sync) {
+                // try to find the connection of this thread: every thread can only have one connection at a time
+                for (ThreadConnection tconn : connections) {
+                    if (tconn.thread == Thread.currentThread()) {
+                        if (tconn.conn.isValid(10)) {
+                            tconn.time = System.currentTimeMillis();
+                            return tconn.conn;
+                        }
+                    }
+                }
+                // try to take a connection from a dead thread
+                for (ThreadConnection tconn : connections) {
+                    if (tconn.thread == null || !tconn.thread.isAlive()) {
+                        tconn.thread = Thread.currentThread();
+                        if (tconn.conn.isValid(10)) {
+                            tconn.time = System.currentTimeMillis();
+                            return tconn.conn;
+                        }
+                    }
+                }
+                // create new connection if max connection count isn't reached
+                if (connections.size() < maxconnections) {
+                    Connection conn = getNewConnection();
+                    connections.add(new ThreadConnection(Thread.currentThread(), conn, System.currentTimeMillis()));
+                    return conn;
+                }
+                // try to steal a connection from a living thread. It is safe to use
+                // connections where autoCommit is true (no data to commit/rollback)
+                for (ThreadConnection tconn : connections) {
+                    if (tconn.conn.getAutoCommit() && System.currentTimeMillis() - tconn.time > 500) {
+                        tconn.thread = Thread.currentThread();
+                        if (tconn.conn.isValid(10)) {
+                            return tconn.conn;
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            this.disconnect();
+            throw new NoConnectionToDBException();
+        }
+        // didn't find any connection and maximum connection count is reached:
+        // wait 1 sec and try again.
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            throw new SQLException("No connections available.");
+        }
+        return getConn(retryCount + 1);
     }
 
     /**
@@ -106,10 +229,60 @@ public class DatabaseConnector extends Observable {
      * @return if a valid connection exists.
      */
     public boolean isConnected() {
-        try {
-            return conn != null && conn.isValid(10);
-        } catch (SQLException ex) {
-            return false;
+        synchronized (sync) {
+            return connections.size() > 0;
+        }
+    }
+
+    private class ConnectionWatchDog extends Thread {
+
+        private boolean terminated = false;
+
+        public void terminate() {
+            this.terminated = true;
+        }
+
+        @Override
+        public void run() {
+            terminated = true;
+            while (!terminated) {
+                synchronized (DatabaseConnector.this.sync) {
+                    for (int i = connections.size() - 1; i >= 0; i--) {
+                        ThreadConnection tconn = connections.get(i);
+                        if (tconn.thread == null) {
+                            if (System.currentTimeMillis() - tconn.time > CONNECTION_TIMEOUT) {
+                                try {
+                                    tconn.conn.close();
+                                    System.out.println("CLOSED CONNECTION!");
+                                } catch (SQLException e) {
+                                }
+                                connections.remove(i);
+                            }
+                        } else if (!tconn.thread.isAlive()) {
+                            tconn.thread = null;
+                            tconn.time = System.currentTimeMillis();
+                        }
+                    }
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        }
+    }
+
+    private class ThreadConnection {
+
+        Thread thread;
+        Connection conn;
+        long time;
+
+        public ThreadConnection(Thread thread, Connection conn, long time) {
+            this.thread = thread;
+            this.conn = conn;
+            this.time = time;
         }
     }
 

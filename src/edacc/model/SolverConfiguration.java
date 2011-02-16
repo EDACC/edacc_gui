@@ -5,16 +5,17 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
     private int experiment_id;
     private int id;
     private int seed_group;
+    private int idx;
     private String name;
     public int getSeed_group() {
         return seed_group;
     }
 
     public void setSeed_group(int seed_group) {
-        this.seed_group = seed_group;
-        if (this.isSaved()) {
+        if (this.seed_group != seed_group && this.isSaved()) {
             this.setModified();
         }
+        this.seed_group = seed_group;
     }
 
     public int getExperiment_id() {
@@ -53,16 +54,27 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
     }
 
     public void setName(String name) {
+        if (!name.equals(this.name) && this.isSaved()) {
+            this.setModified();
+        }
         this.name = name;
     }
 
+    public int getIdx() {
+        return idx;
+    }
+
+    public void setIdx(int idx) {
+        if (this.idx != idx && this.isSaved()) {
+            this.setModified();
+        }
+        this.idx = idx;
+    }
+
+
+
     @Override
     public String toString() {
-        /*try {
-            return SolverDAO.getById(solver_id).getName();
-        } catch (Exception e) {
-            return "Error.";
-        }*/
         return name;
     }
 

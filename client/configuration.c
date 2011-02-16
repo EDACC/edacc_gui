@@ -56,7 +56,7 @@ status read_config() { //TODO: kann das nicht verkürzt werden wenn man mit scan
     char *value=NULL;
     char *end=NULL;
     int valueLen, keyLen;
-
+    port=3306;
     if((conf = fopen("./config", "r")) == NULL) {
         LOGERROR(AT,"could not open configuration file!\n");
         return sysError;

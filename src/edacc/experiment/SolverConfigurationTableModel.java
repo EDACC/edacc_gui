@@ -5,8 +5,12 @@ import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstance;
 import edacc.model.ParameterInstanceDAO;
 import edacc.model.SolverConfiguration;
+import edacc.model.SolverDAO;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -14,17 +18,19 @@ import javax.swing.table.AbstractTableModel;
  * @author simon
  */
 public class SolverConfigurationTableModel extends AbstractTableModel {
+
     public static final int COL_SEL = 0;
-    public static final int COL_NAME = 1;
-    public static final int COL_PARAMETERS = 2;
-    private String[] columns = {"Selected", "Solvername", "Parameters"};
+    public static final int COL_SOLVER = 1;
+    public static final int COL_NAME = 2;
+    public static final int COL_PARAMETERS = 3;
+    private String[] columns = {"Selected", "Solver", "Solver Configuration", "Parameters"};
     public boolean[] selected;
     private ArrayList<SolverConfiguration> solverConfigurations;
     private HashMap<Integer, ArrayList<ParameterInstance>> parameterInstances;
-    
+
     @Override
     public int getRowCount() {
-        return solverConfigurations==null?0:solverConfigurations.size();
+        return solverConfigurations == null ? 0 : solverConfigurations.size();
     }
 
     @Override
@@ -32,7 +38,7 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
         return columns.length;
     }
 
-        /**
+    /**
      * Returns all parameter instances for that job
      * @param row
      * @return null, if there was an error
@@ -60,10 +66,17 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
         return columns[column];
     }
 
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
             case COL_SEL:
                 return selected[rowIndex];
+            case COL_SOLVER:
+                try {
+                    return SolverDAO.getById(solverConfigurations.get(rowIndex).getSolver_id()).getName();
+                } catch (SQLException ex) {
+                    return "-";
+                }
             case COL_NAME:
                 return solverConfigurations.get(rowIndex).getName();
             case COL_PARAMETERS:
@@ -83,7 +96,7 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return columnIndex==0?true:false;
+        return columnIndex == 0 ? true : false;
     }
 
     @Override
@@ -96,8 +109,9 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
     public void setSolverConfigurations(ArrayList<SolverConfiguration> solverConfigurations) {
         parameterInstances = new HashMap<Integer, ArrayList<ParameterInstance>>();
         selected = new boolean[solverConfigurations.size()];
-        for (int i = 0; i < selected.length; i++)
+        for (int i = 0; i < selected.length; i++) {
             selected[i] = false;
+        }
         this.solverConfigurations = solverConfigurations;
     }
 

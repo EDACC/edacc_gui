@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * EDACCNoMode.java
  *
  * Created on Jan 7, 2010, 11:06:39 PM
@@ -11,16 +6,36 @@
 
 package edacc;
 
+import java.awt.Graphics;
+import java.awt.Image;
+import javax.swing.ImageIcon;
+
 /**
  *
  * @author simon
  */
 public class EDACCNoMode extends javax.swing.JPanel {
-
+    private ImageIcon baseImage;
+    private Image image;
     /** Creates new form EDACCNoMode */
     public EDACCNoMode() {
         initComponents();
+        baseImage = EDACCApp.getApplication().getContext().getResourceMap(EDACCView.class).getImageIcon("edacc.icon");
     }
+
+
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (image != null) {
+            int x = (getWidth() - image.getWidth(this)) / 2;
+            int y = (getHeight() - image.getHeight(this)) / 2;
+            g.drawImage(image, x, y, this);
+        }
+    }
+
+
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -32,6 +47,11 @@ public class EDACCNoMode extends javax.swing.JPanel {
     private void initComponents() {
 
         setName("Form"); // NOI18N
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                formComponentResized(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -44,6 +64,17 @@ public class EDACCNoMode extends javax.swing.JPanel {
             .addGap(0, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
+        if (this.getWidth() > 0 && this.getHeight() > 0) {
+            int size = getWidth() > getHeight() ? getHeight() : getWidth();
+            image = baseImage.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+            this.invalidate();
+            this.repaint();
+        } else {
+            image = null;
+        }
+    }//GEN-LAST:event_formComponentResized
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

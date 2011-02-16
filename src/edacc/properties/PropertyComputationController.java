@@ -56,7 +56,8 @@ public class PropertyComputationController implements Runnable{
         this.condition = lock.newCondition();
         this.task = task;
         this.lock = lock;
-        availableProcessors = Runtime.getRuntime().availableProcessors();
+       // availableProcessors = Runtime.getRuntime().availableProcessors();
+        availableProcessors = DatabaseConnector.getInstance().getMaxconnections();
         this.task.setOperationName("compute properties");
         this.task.setStatus("initialize the computation");
         this.recompute = recompute;    
@@ -74,11 +75,11 @@ public class PropertyComputationController implements Runnable{
         this.condition = lock.newCondition();
         this.task = task;
         this.lock = lock;
-        availableProcessors = Runtime.getRuntime().availableProcessors();
+        //availableProcessors = Runtime.getRuntime().availableProcessors();
+        availableProcessors = DatabaseConnector.getInstance().getMaxconnections();
         this.task.setOperationName("compute properties");
         this.task.setStatus("initialize the computation");
         this.recompute = recompute;
-        availableProcessors = Runtime.getRuntime().availableProcessors();
         createJobQueue(instances, givenProperties);
         allJobs = instancePropertyQueue.size();
         task.setStatus("computed " + (allJobs - instancePropertyQueue.size()) + " of " + allJobs + " properties");
@@ -87,7 +88,7 @@ public class PropertyComputationController implements Runnable{
 
     @Override
     public void run() {
-        task.setOperationName("Property computation");
+             task.setOperationName("Property computation");
         for(int i = 0; i < availableProcessors; i++){
             if(instancePropertyQueue != null){
                 if(i == 0 && instancePropertyQueue.isEmpty()){
@@ -111,7 +112,6 @@ public class PropertyComputationController implements Runnable{
                 }
             }else if(resultPropertyQueue != null){
                 if(resultPropertyQueue.isEmpty() && i == 0){
-                    task.cancel(true);
                     lock.lock();
                     try{
                         condition.signal();
@@ -131,16 +131,20 @@ public class PropertyComputationController implements Runnable{
                 }
             }           
         }
-        jobs = availableProcessors;
+        jobs = availableProcessors;       
+        
+
     }
 
-    public void callback() {
-        
-        if(instancePropertyQueue != null){
+    public  void callback() {
+        PropertyComputationUnit unit = null;
+             if(instancePropertyQueue != null){
             if(!instancePropertyQueue.isEmpty())
                 try {
-                    new Thread(new PropertyComputationUnit(instancePropertyQueue.take(), this)).start();
-                    jobs++;
+                    unit = new PropertyComputationUnit(instancePropertyQueue.take(), this);
+                    synchronized (PropertyComputationUnit.sync) {
+                        jobs++;
+                    }
                     task.setStatus("computed " + (allJobs - instancePropertyQueue.size()) + " of " + allJobs + " properties");
                     task.setTaskProgress(((float)(allJobs - instancePropertyQueue.size()))/((float)allJobs));
                 } catch (InterruptedException ex) {
@@ -149,26 +153,50 @@ public class PropertyComputationController implements Runnable{
         }else if(resultPropertyQueue != null){
             if(!resultPropertyQueue.isEmpty())
                 try {
-                new Thread(new PropertyComputationUnit(resultPropertyQueue.take(), this)).start();
-                    jobs++;
+                unit = new PropertyComputationUnit(resultPropertyQueue.take(), this);
+                    synchronized (PropertyComputationUnit.sync) {
+                        jobs++;
+                    }
                     task.setStatus("computed " + (allJobs - resultPropertyQueue.size()) + " of " + allJobs + " properties");
                     task.setTaskProgress(((float)(allJobs - resultPropertyQueue.size()))/((float)allJobs));
                 } catch (InterruptedException ex) {
                     Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 }
         }
-        jobs--;
-        if(jobs == 0){
-          task.cancel(true);        
-          lock.lock();
-          try{
-            condition.signal();
-          } finally{
-            lock.unlock();
-          }         
-          return;         
-        }
 
+        if (unit != null) {
+            unit.run();
+        }
+        synchronized (PropertyComputationUnit.sync) {
+            jobs--;
+        }
+         if(instancePropertyQueue != null){
+              if(jobs == 0 && instancePropertyQueue.isEmpty()){
+                task.cancel(true);
+                lock.lock();
+                 try{
+                    condition.signal();
+                } finally{
+                    lock.unlock();
+                }
+                return;
+            }
+
+         }else if(resultPropertyQueue != null){
+              if(jobs == 0 && resultPropertyQueue.isEmpty()){
+                task.cancel(true);
+                lock.lock();
+                 try{
+                    condition.signal();
+                } finally{
+                    lock.unlock();
+                }
+                return;
+            }
+         }
+       
+
+       
     }
 
     private void createJobQueue(Experiment exp, Vector<Property> givenProperties) throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException {
@@ -207,7 +235,7 @@ public class PropertyComputationController implements Runnable{
         }
     }
 
-    private void createJobQueue(Vector<Instance> instances, Vector<Property> givenProperties) {
+    private  void createJobQueue(Vector<Instance> instances, Vector<Property> givenProperties) {
         instancePropertyQueue = new LinkedBlockingQueue<InstanceHasProperty>();
         // create all InstanceHasProperty objects and adds them to the instancePropertyQueue
         for(int i = 0; i < instances.size(); i++){
@@ -250,13 +278,19 @@ public class PropertyComputationController implements Runnable{
 
     public synchronized boolean completed(){
         synchronized(this.jobs){
-            if(jobs > 0)
-                return false;
-            else
-                return true;
+            if(instancePropertyQueue != null){
+                if(jobs <= 0 && instancePropertyQueue.isEmpty() )
+                    return true;
+                else
+                    return false;               
+             }else if(resultPropertyQueue != null){
+                if(jobs <= 0 && resultPropertyQueue.isEmpty() )
+                    return true;
+                else
+                    return false;   
+             }
+             return true;
         }
-
-
     }
 
 }

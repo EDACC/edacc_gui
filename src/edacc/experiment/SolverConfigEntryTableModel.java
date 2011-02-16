@@ -3,6 +3,7 @@ package edacc.experiment;
 import edacc.model.Parameter;
 import edacc.model.ParameterInstance;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -67,7 +68,6 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
     public void setParameterInstances(ArrayList<ParameterInstance> params) {
         for (int i = 0; i < params.size(); i++) {
             for (int j = 0; j < parameters.length; j++) {
-
                 if (parameters[j].getId() == params.get(i).getParameter_id()) {
                     parameterInstances[j] = params.get(i);
                     this.values[j] = params.get(i).getValue();
@@ -111,7 +111,7 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
         if (col == 0) {
             return true;
         }
-        if (col == 3 && ((Parameter) getValueAt(row, 5)).getHasValue()) {
+        if (col == 3 && parameters[row].getHasValue()) {
             return selected[row];
         }
         return false;
@@ -138,7 +138,7 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
             case 1:
                 return parameters[rowIndex].getName();
             case 2:
-                return parameters[rowIndex].getPrefix()==null?"":parameters[rowIndex].getPrefix();
+                return parameters[rowIndex].getPrefix() == null ? "" : parameters[rowIndex].getPrefix();
             case 3:
                 if (parameters[rowIndex].getHasValue()) {
                     return values[rowIndex];
@@ -154,5 +154,21 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
             default:
                 return "";
         }
+    }
+
+    public ArrayList<Parameter> getParameters() {
+        ArrayList<Parameter> res = new ArrayList<Parameter>();
+        res.addAll(Arrays.asList(parameters));
+        return res;
+    }
+
+    public ArrayList<ParameterInstance> getParameterInstances() {
+        ArrayList<ParameterInstance> res = new ArrayList<ParameterInstance>();
+        for (ParameterInstance pi : parameterInstances) {
+            if (pi != null) {
+                res.add(pi);
+            }
+        }
+        return res;
     }
 }

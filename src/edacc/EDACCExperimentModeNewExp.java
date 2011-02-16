@@ -407,9 +407,9 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                 ArrayList<ExperimentSolverConfiguration> items = new ArrayList<ExperimentSolverConfiguration>();
                 for (Experiment exp : expController.getExperiments()) {
                     for (SolverConfiguration sc : SolverConfigurationDAO.getSolverConfigurationByExperimentId(exp.getId())) {
-                        if (sc.getName() == null) {
+                     /*   if (sc.getName() == null) {
                             SolverConfigurationDAO.updateName(sc);
-                        }
+                        }*/
                         items.add(new ExperimentSolverConfiguration(exp.getName(), sc.getName(), Util.getParameterString(SolverConfigurationDAO.getSolverConfigurationParameters(sc)), exp.getId(), sc.getId()));
                     }
                 }

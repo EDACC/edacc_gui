@@ -1,9 +1,9 @@
 package edacc.experiment;
 
-import edacc.EDACCApp;
 import edacc.EDACCExperimentMode;
 import edacc.EDACCSolverConfigEntry;
 import edacc.EDACCSolverConfigPanel;
+import edacc.EDACCSolverConfigPanelSolver;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
 import edacc.model.ExpResultHasSolvPropertyNotInDBException;
@@ -15,7 +15,6 @@ import edacc.model.ExperimentHasInstance;
 import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
-import edacc.model.ExperimentResultEx;
 import edacc.model.ExperimentResultHasProperty;
 import edacc.model.ExperimentResultNotInDBException;
 import edacc.model.ExperimentResultResultCode;
@@ -27,6 +26,7 @@ import edacc.model.InstanceClassDAO;
 import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasProperty;
+import edacc.model.InstanceNotInDBException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.ParameterInstance;
 import edacc.model.ParameterInstanceDAO;
@@ -64,7 +64,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
@@ -121,7 +120,7 @@ public class ExperimentController {
         experiments = v;
         main.expTableModel.setExperiments(experiments);
         try {
-            DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getAllAsTree();
+            DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getAllAsTreeFast();
             main.instanceClassTreeModel.setRoot(root);
             ArrayList<Instance> instances = new ArrayList<Instance>();
             instances.addAll(InstanceDAO.getAll());
@@ -274,24 +273,31 @@ public class ExperimentController {
         }
         task.setStatus("Saving solver configurations..");
         boolean invalidSeedGroup = false;
-        for (int i = 0; i < solverConfigPanel.getComponentCount(); i++) {
-            EDACCSolverConfigEntry entry = (EDACCSolverConfigEntry) solverConfigPanel.getComponent(i);
-            int seed_group = 0;
-            try {
-                seed_group = Integer.valueOf(entry.getSeedGroup().getText());
-            } catch (NumberFormatException e) {
-                seed_group = 0;
-                entry.getSeedGroup().setText("0");
-                invalidSeedGroup = true;
+
+        for (EDACCSolverConfigPanelSolver solPanel : solverConfigPanel.getAllSolverConfigSolverPanels()) {
+            // iterate over solvers
+            int idx = 0;
+            for (EDACCSolverConfigEntry entry : solPanel.getAllSolverConfigEntries()) {
+                // iterate over solver configs
+                int seed_group = 0;
+                try {
+                    seed_group = Integer.valueOf(entry.getSeedGroup().getText());
+                } catch (NumberFormatException e) {
+                    seed_group = 0;
+                    entry.getSeedGroup().setText("0");
+                    invalidSeedGroup = true;
+                }
+                if (entry.getSolverConfiguration() == null) {
+                    entry.setSolverConfiguration(SolverConfigurationDAO.createSolverConfiguration(entry.getSolverId(), activeExperiment.getId(), seed_group, entry.getTitle(), idx));
+                } else {
+                    entry.getSolverConfiguration().setName(entry.getTitle());
+                    entry.getSolverConfiguration().setSeed_group(seed_group);
+                    entry.getSolverConfiguration().setIdx(idx);
+
+                }
+                entry.saveParameterInstances();
+                idx++;
             }
-            if (entry.getSolverConfiguration() == null) {
-                entry.setSolverConfiguration(SolverConfigurationDAO.createSolverConfiguration(entry.getSolverId(), activeExperiment.getId(), seed_group));
-                solverConfigPanel.setSolverConfigurationName(entry);
-            } else {
-                entry.getSolverConfiguration().setSeed_group(seed_group);
-                entry.getSolverConfiguration().setModified();
-            }
-            entry.saveParameterInstances();
         }
         SolverConfigurationDAO.saveAll();
         if (invalidSeedGroup) {
@@ -648,7 +654,9 @@ public class ExperimentController {
 
                         @Override
                         public void run() {
+                            main.tableJobs.invalidate();
                             main.tableJobs.revalidate();
+                            main.tableJobs.repaint();
                         }
                     });
                 }
@@ -687,7 +695,7 @@ public class ExperimentController {
     /**
      * Generates a ZIP archive with the necessary files for the grid.
      */
-    public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException {
+    public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException, InstanceNotInDBException {
         boolean foundSolverWithSameName = false;
         File tmpDir = new File("tmp");
         tmpDir.mkdir();
@@ -792,6 +800,8 @@ public class ExperimentController {
                 // add client binary
                 addClient(zos);
 
+                // add runsolver
+                addRunsolver(zos);
                 // add empty result library
                 entry = new ZipEntry("results" + System.getProperty("file.separator") + "~");
                 zos.putNextEntry(entry);
@@ -924,17 +934,49 @@ public class ExperimentController {
     }
 
     private void addClient(ZipOutputStream zos) throws IOException, ClientBinaryNotFoundException {
-        InputStream in = EDACCApp.class.getClassLoader().getResourceAsStream("edacc/resources/client");
+        InputStream in = new FileInputStream(new File(Util.getPath() + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "client"));
         if (in == null) {
             throw new ClientBinaryNotFoundException();
         }
         ZipEntry entry = new ZipEntry("client");
         zos.putNextEntry(entry);
 
+        byte[] buf = new byte[1024];
         int data;
 
-        while ((data = in.read()) > -1) {
-            zos.write(data);
+        while ((data = in.read(buf)) > -1) {
+            zos.write(buf, 0, data);
+        }
+        zos.closeEntry();
+        in.close();
+    }
+
+    private void addRunsolver(ZipOutputStream zos) throws IOException, ClientBinaryNotFoundException {
+        InputStream in = new FileInputStream(new File(Util.getPath() + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "runsolver"));
+        if (in == null) {
+            throw new ClientBinaryNotFoundException();
+        }
+        ZipEntry entry = new ZipEntry("runsolver");
+        zos.putNextEntry(entry);
+
+        byte[] buf = new byte[1024];
+        int data;
+
+        while ((data = in.read(buf)) > -1) {
+            zos.write(buf, 0, data);
+        }
+        zos.closeEntry();
+        in.close();
+
+        in = new FileInputStream(new File(Util.getPath() + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "runsolver_copyright.txt"));
+        if (in == null) {
+            throw new ClientBinaryNotFoundException();
+        }
+        entry = new ZipEntry("runsolver_copyright.txt");
+        zos.putNextEntry(entry);
+
+        while ((data = in.read(buf)) > -1) {
+            zos.write(buf, 0, data);
         }
         zos.closeEntry();
         in.close();
@@ -1150,20 +1192,77 @@ public class ExperimentController {
         final boolean autocommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         DatabaseConnector.getInstance().getConn().setAutoCommit(false);
         try {
+            HashSet<Integer> experimentIds = new HashSet<Integer>();
+            for (int scId : solverConfigIds) {
+                experimentIds.add(SolverConfigurationDAO.getSolverConfigurationById(scId).getExperiment_id());
+            }
+            boolean first = true;
+            boolean useNotFinishedJobs = true;
+            for (int expId : experimentIds) {
+                Experiment exp = ExperimentDAO.getById(expId);
+                if (first) {
+                    first = false;
+                    activeExperiment.setAutoGeneratedSeeds(exp.isAutoGeneratedSeeds());
+                    activeExperiment.setCPUTimeLimit(exp.getCPUTimeLimit());
+                    activeExperiment.setLinkSeeds(exp.isLinkSeeds());
+                    activeExperiment.setMaxSeed(exp.getMaxSeed());
+                    activeExperiment.setMemoryLimit(exp.getMemoryLimit());
+                    activeExperiment.setOutputSizeLimit(exp.getOutputSizeLimit());
+                    activeExperiment.setStackSizeLimit(exp.getStackSizeLimit());
+                    activeExperiment.setWallClockTimeLimit(exp.getWallClockTimeLimit());
+                } else {
+                    activeExperiment.setAutoGeneratedSeeds(activeExperiment.isAutoGeneratedSeeds() | exp.isAutoGeneratedSeeds());
+                    activeExperiment.setLinkSeeds(activeExperiment.isLinkSeeds() | exp.isLinkSeeds());
+                    if (activeExperiment.getMaxSeed() < exp.getMaxSeed()) {
+                        activeExperiment.setMaxSeed(exp.getMaxSeed());
+                    }
+                    if (activeExperiment.getCPUTimeLimit() != exp.getCPUTimeLimit()) {
+                        useNotFinishedJobs = false;
+                        if (activeExperiment.getCPUTimeLimit() < exp.getCPUTimeLimit() && activeExperiment.getCPUTimeLimit() != -1) {
+                            activeExperiment.setCPUTimeLimit(exp.getCPUTimeLimit());
+                        }
+                    }
+                    if (activeExperiment.getMemoryLimit() != exp.getMemoryLimit()) {
+                        useNotFinishedJobs = false;
+                        if (activeExperiment.getMemoryLimit() < exp.getMemoryLimit() && activeExperiment.getMemoryLimit() != -1) {
+                            activeExperiment.setMemoryLimit(exp.getMemoryLimit());
+                        }
+                    }
+                    if (activeExperiment.getOutputSizeLimit() != exp.getOutputSizeLimit()) {
+                        useNotFinishedJobs = false;
+                        if (activeExperiment.getOutputSizeLimit() < exp.getOutputSizeLimit() && activeExperiment.getOutputSizeLimit() != -1) {
+                            activeExperiment.setOutputSizeLimit(exp.getOutputSizeLimit());
+                        }
+                    }
+                    if (activeExperiment.getStackSizeLimit() != exp.getStackSizeLimit()) {
+                        useNotFinishedJobs = false;
+                        if (activeExperiment.getStackSizeLimit() < exp.getStackSizeLimit() && activeExperiment.getStackSizeLimit() != -1) {
+                            activeExperiment.setStackSizeLimit(exp.getStackSizeLimit());
+                        }
+                    }
+                    if (activeExperiment.getWallClockTimeLimit() != exp.getWallClockTimeLimit()) {
+                        useNotFinishedJobs = false;
+                        if (activeExperiment.getWallClockTimeLimit() < exp.getWallClockTimeLimit() && activeExperiment.getWallClockTimeLimit() != -1) {
+                            activeExperiment.setWallClockTimeLimit(exp.getWallClockTimeLimit());
+                        }
+                    }
+                }
+            }
+
             boolean haveToDuplicate = false;
-            activeExperiment.setAutoGeneratedSeeds(true);
+            //activeExperiment.setAutoGeneratedSeeds(true);
             int numRuns = 0;
             ArrayList<Integer> newIds = new ArrayList<Integer>();
             for (int i = 0; i < solverConfigIds.size(); i++) {
                 haveToDuplicate |= duplicate.get(i);
                 int scId = solverConfigIds.get(i);
                 SolverConfiguration sc = SolverConfigurationDAO.getSolverConfigurationById(scId);
-                if (sc.getName() == null) {
-                    SolverConfigurationDAO.updateName(sc);
-                }
+                /*   if (sc.getName() == null) {
+                SolverConfigurationDAO.updateName(sc);
+                }*/
                 task.setOperationName("Processing data from solver configuration " + sc.getName() + " (" + (i + 1) + " / " + solverConfigIds.size() + "):");
-                task.setTaskProgress((float) (i+1) / solverConfigIds.size());
-                RunCountSCId tmp = this.importDataFromSolverConfiguration(task, sc);
+                task.setTaskProgress((float) (i + 1) / solverConfigIds.size());
+                RunCountSCId tmp = this.importDataFromSolverConfiguration(task, sc, useNotFinishedJobs);
                 if (tmp.runcount > numRuns) {
                     numRuns = tmp.runcount;
                 }
@@ -1183,7 +1282,7 @@ public class ExperimentController {
                         }
                         if (duplicate.get(k)) {
                             int runCount = this.getResults(newIds.get(k), instance.getId()).size();
-                           // int runCount = ExperimentDAO.getRunCountInExperimentForSolverConfigurationAndInstance(activeExperiment, newIds.get(k), instance.getId());
+                            // int runCount = ExperimentDAO.getRunCountInExperimentForSolverConfigurationAndInstance(activeExperiment, newIds.get(k), instance.getId());
                             ArrayList<ExperimentResult> results = getResults(newIds.get(k), instance.getId());
                             if (results.size() > 0) {
                                 for (int t = runCount; t < numRuns; t++) {
@@ -1210,8 +1309,8 @@ public class ExperimentController {
             }
             generateJobs(numRuns, task);
             task.setStatus("Finalizing..");
-            activeExperiment.setCPUTimeLimit(-1);
             ExperimentDAO.save(activeExperiment);
+            ExperimentDAO.updateNumRuns(activeExperiment);
             updateExperimentResults();
         } catch (Exception e) {
             DatabaseConnector.getInstance().getConn().rollback();
@@ -1232,7 +1331,7 @@ public class ExperimentController {
         }
     }
 
-    private RunCountSCId importDataFromSolverConfiguration(Tasks task, SolverConfiguration solverConfig) throws SQLException, Exception {
+    private RunCountSCId importDataFromSolverConfiguration(Tasks task, SolverConfiguration solverConfig, boolean useNotFinishedJobs) throws SQLException, Exception {
 
         Tasks.getTaskView().setCancelable(true);
         final boolean autocommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
@@ -1290,7 +1389,7 @@ public class ExperimentController {
             int newId;
             if (equalId == null) {
                 // didn't find solver config -> add one
-                SolverConfiguration newSc = SolverConfigurationDAO.createSolverConfiguration(solverConfig.getSolver_id(), activeExperiment.getId(), 0);
+                SolverConfiguration newSc = SolverConfigurationDAO.createSolverConfiguration(solverConfig.getSolver_id(), activeExperiment.getId(), 0, solverConfig.getName(), SolverConfigurationDAO.getSolverConfigurationCount(activeExperiment.getId(), solverConfig.getSolver_id()));
                 SolverConfigurationDAO.saveAll();
                 for (ParameterInstance pi : ParameterInstanceDAO.getBySolverConfigId(solverConfig.getId())) {
                     ParameterInstanceDAO.createParameterInstance(pi.getParameter_id(), newSc.getId(), pi.getValue());
@@ -1317,9 +1416,9 @@ public class ExperimentController {
                     throw new TaskCancelledException();
                 }
                 int runCount = this.getResults(newId, i.getId()).size();
-              //  int runCount = ExperimentDAO.getRunCountInExperimentForSolverConfigurationAndInstance(activeExperiment, newId, i.getId());
+                //  int runCount = ExperimentDAO.getRunCountInExperimentForSolverConfigurationAndInstance(activeExperiment, newId, i.getId());
                 for (ExperimentResult er : results) {
-                    if (er.getSolverConfigId() == solverConfig.getId() && er.getInstanceId() == i.getId() && er.getStatus() == ExperimentResultStatus.SUCCESSFUL) {
+                    if (er.getSolverConfigId() == solverConfig.getId() && er.getInstanceId() == i.getId() && (useNotFinishedJobs || er.getStatus() == ExperimentResultStatus.SUCCESSFUL)) {
                         newResults.add(ExperimentResultDAO.createExperimentResult(runCount++, er.getPriority(), er.getComputeQueue(), er.getStatus().getValue(), er.getSeed(), er.getResultCode(), er.getResultTime(), newId, activeExperiment.getId(), er.getInstanceId(), er.getStartTime()));
                         oldResults.add(er);
                     }
@@ -1337,7 +1436,6 @@ public class ExperimentController {
             if (task.isCancelled()) {
                 throw new TaskCancelledException();
             }
-            ExperimentDAO.updateNumRuns(activeExperiment);
             return new RunCountSCId(numRuns, newId);
         } catch (Exception e) {
             DatabaseConnector.getInstance().getConn().rollback();
@@ -1565,6 +1663,17 @@ public class ExperimentController {
      * @return null, iff the experiment result`s status is RUNNING, NOTSTARTED, LAUNCHERCRASH, VERIFIERCRASH, WATCHERCRASH or the property isn't calculated or the result isn't successfully verified. In case of the cpu-time property CPUTimeLmit can be returned.
      */
     public Double getValue(ExperimentResult result, Property property) {
+        return getValue(result, property, true);
+    }
+
+    /**
+     * Returns the value for the given property and the given experiment result.
+     * @param result
+     * @param property
+     * @param useTimeOutForCPUProp
+     * @return null, iff the experiment result`s status is RUNNING, NOTSTARTED, LAUNCHERCRASH, VERIFIERCRASH, WATCHERCRASH or the property isn't calculated or the result isn't successfully verified. In case of the cpu-time property CPUTimeLmit can be returned.
+     */
+    public Double getValue(ExperimentResult result, Property property, boolean useTimeOutForCPUProp) {
 
         if (result.getStatus() == ExperimentResultStatus.RUNNING
                 || result.getStatus() == ExperimentResultStatus.NOTSTARTED
@@ -1575,7 +1684,11 @@ public class ExperimentController {
         }
         if (property == PROP_CPUTIME) {
             if (!String.valueOf(result.getResultCode().getValue()).startsWith("1")) {
+                if (useTimeOutForCPUProp) {
                 return new Double(experiment.getCPUTimeLimit());
+                } else {
+                    return null;
+                }
             }
             return Double.valueOf(result.getResultTime());
         } else {

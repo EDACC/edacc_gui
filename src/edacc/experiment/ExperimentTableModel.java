@@ -6,7 +6,12 @@ import edacc.model.Experiment;
 
 
 public class ExperimentTableModel extends AbstractTableModel {
-    private String[] columns = {"Name", "Date", "Number of runs", "Description"};
+    public static final int COL_ID = 0;
+    public static final int COL_NAME = 1;
+    public static final int COL_DATE = 2;
+    public static final int COL_NUMRUNS = 3;
+    public static final int COL_DESCRIPTION = 4;
+    private String[] columns = {"ID", "Name", "Date", "Number of runs", "Description"};
     private ArrayList<Experiment> experiments;
 
     public ExperimentTableModel() {
@@ -47,16 +52,16 @@ public class ExperimentTableModel extends AbstractTableModel {
             return null;
         }
         switch (columnIndex) {
-            case 0:
-                return experiments.get(rowIndex).getName();
-            case 1:
-                return experiments.get(rowIndex).getDate();
-            case 2:
-                return experiments.get(rowIndex).getNumRuns();
-            case 3:
-                return experiments.get(rowIndex).getDescription();
-            case 4:
+            case COL_ID:
                 return experiments.get(rowIndex).getId();
+            case COL_NAME:
+                return experiments.get(rowIndex).getName();
+            case COL_DATE:
+                return experiments.get(rowIndex).getDate();
+            case COL_NUMRUNS:
+                return experiments.get(rowIndex).getNumRuns();
+            case COL_DESCRIPTION:
+                return experiments.get(rowIndex).getDescription();
             default:
                 return "";
         }

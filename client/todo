@@ -1,0 +1,9 @@
+- logLauncher method needed!
+
+
+- write information about node into ExperimentResults 
+- fix memory leaks
+
+
+- inlcude verifier
+- implement a wait method: tells the client how long to wait for jobs
