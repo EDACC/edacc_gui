@@ -42,7 +42,8 @@ public class InstanceDAO {
         String from = " ";
         int tbl = 0;
         for (Property p : props) {
-            from += "LEFT JOIN (SELECT idInstance, value FROM Instance_has_Property WHERE idProperty = \"" + p.getId() + "\") AS tbl_" + tbl++ + " USING (idInstance) ";
+           // from += "LEFT JOIN (SELECT idInstance, value FROM Instance_has_Property WHERE idProperty = \"" + p.getId() + "\") AS tbl_" + tbl++ + " USING (idInstance) ";
+           from += "LEFT OUTER JOIN Instance_has_Property AS tbl_" + tbl++ + " ON i.idInstance=tbl_" + (tbl-1) + ".idInstance AND tbl_" + (tbl-1) + ".idProperty=" + p.getId() + " ";
         }
         return from;
     }
