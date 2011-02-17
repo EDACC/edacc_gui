@@ -222,12 +222,12 @@ public class ExperimentDAO {
      */
     public static void updateNumRuns(Experiment exp) {
         try {
-            //final String query = "SELECT MAX(run)+1 from ExperimentResults where Experiment_idExperiment=?";
-            final String query = "select rCount DIV (iCount*sCount) from (select count(*) AS sCount from (select idSolverConfig from SolverConfig WHERE Experiment_idExperiment=? GROUP BY idSolverConfig) AS solverConfigs) AS tblS JOIN (select count(*) AS rCount from ExperimentResults WHERE Experiment_idExperiment=?) AS tblR JOIN (select count(*) AS iCount from (select Instances_idInstance from ExperimentResults WHERE Experiment_idExperiment=? GROUP BY Instances_idInstance) AS instances) AS tblI";
+            final String query = "SELECT MAX(run)+1 from ExperimentResults where Experiment_idExperiment=?";
+         //   final String query = "select rCount DIV (iCount*sCount) from (select count(*) AS sCount from (select idSolverConfig from SolverConfig WHERE Experiment_idExperiment=? GROUP BY idSolverConfig) AS solverConfigs) AS tblS JOIN (select count(*) AS rCount from ExperimentResults WHERE Experiment_idExperiment=?) AS tblR JOIN (select count(*) AS iCount from (select Instances_idInstance from ExperimentResults WHERE Experiment_idExperiment=? GROUP BY Instances_idInstance) AS instances) AS tblI";
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
             ps.setInt(1, exp.getId());
-            ps.setInt(2, exp.getId());
-            ps.setInt(3, exp.getId());
+           // ps.setInt(2, exp.getId());
+          //  ps.setInt(3, exp.getId());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 exp.setNumRuns(rs.getInt(1));

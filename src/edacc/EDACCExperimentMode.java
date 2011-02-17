@@ -1523,7 +1523,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 jobsTableModel.setJobs(null);
             } catch (SQLException ex) {
             }
-            jobsTableModel.updateSolverProperties();
+            jobsTableModel.updateProperties();
 
             // first draw the results browser, then load the jobs (SwingUtilites)
             SwingUtilities.invokeLater(new Runnable() {

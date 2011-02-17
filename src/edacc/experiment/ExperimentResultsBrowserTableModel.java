@@ -1,10 +1,9 @@
 package edacc.experiment;
 
+import edacc.model.NoConnectionToDBException;
 import edacc.satinstances.ConvertException;
 import java.sql.SQLException;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultHasProperty;
@@ -13,6 +12,8 @@ import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
+import edacc.model.InstanceHasProperty;
+import edacc.model.InstanceHasPropertyDAO;
 import edacc.model.ParameterInstance;
 import edacc.model.ParameterInstanceDAO;
 import edacc.model.Solver;
@@ -21,6 +22,7 @@ import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
+import edacc.model.PropertyType;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.HashMap;
@@ -58,11 +60,12 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     // the visibility of each column
     private boolean[] CONST_VISIBLE = {false, false, true, true, true, true, true, true, true, true, true, true, false, false, false, false};
     private String[] columns;
-    private ArrayList<Property> solverProperties;
+    private ArrayList<Property> properties;
     private boolean[] visible;
     private HashMap<Integer, ArrayList<ParameterInstance>> parameterInstances;
     private HashMap<Integer, GridQueue> gridQueues;
     private HashMap<Integer, String> parameters;
+    private int firstInstancePropertyColumn;
 
     public ExperimentResultsBrowserTableModel() {
         columns = new String[CONST_COLUMNS.length];
@@ -73,31 +76,33 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         }
     }
 
-    public void updateSolverProperties() {
+    public void updateProperties() {
         ArrayList<Property> tmp = new ArrayList<Property>();
         try {
             tmp.addAll(PropertyDAO.getAllResultProperties());
+            firstInstancePropertyColumn = COL_PROPERTY + tmp.size();
+            tmp.addAll(PropertyDAO.getAllInstanceProperties());
         } catch (Exception e) {
             if (edacc.ErrorLogger.DEBUG) {
                 e.printStackTrace();
             }
         }
-        if (!tmp.equals(solverProperties)) {
-            solverProperties = tmp;
+        if (!tmp.equals(properties)) {
+            properties = tmp;
 
-            for (int i = solverProperties.size() - 1; i >= 0; i--) {
-                if (solverProperties.get(i).isMultiple()) {
-                    solverProperties.remove(i);
+            for (int i = properties.size() - 1; i >= 0; i--) {
+                if (properties.get(i).isMultiple()) {
+                    properties.remove(i);
                 }
             }
-            columns = java.util.Arrays.copyOf(columns, CONST_COLUMNS.length + solverProperties.size());
-            visible = java.util.Arrays.copyOf(visible, CONST_VISIBLE.length + solverProperties.size());
+            columns = java.util.Arrays.copyOf(columns, CONST_COLUMNS.length + properties.size());
+            visible = java.util.Arrays.copyOf(visible, CONST_VISIBLE.length + properties.size());
             int j = 0;
             for (int i = CONST_COLUMNS.length; i < columns.length; i++) {
-                columns[i] = solverProperties.get(j).getName();
-                visible[i] = true;
+                columns[i] = properties.get(j).getName();
                 j++;
             }
+            this.resetColumnVisibility();
             this.fireTableStructureChanged();
         }
 
@@ -283,13 +288,13 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         } else {
             if (col >= COL_PROPERTY) {
                 int propertyIdx = col - COL_PROPERTY;
-                if (propertyIdx >= solverProperties.size()) {
+                if (propertyIdx >= properties.size()) {
                     return String.class;
                 }
-                if (solverProperties.get(propertyIdx).getPropertyValueType() == null) {
+                if (properties.get(propertyIdx).getPropertyValueType() == null) {
                     return String.class;
                 }
-                return solverProperties.get(propertyIdx).getPropertyValueType().getJavaType();
+                return properties.get(propertyIdx).getPropertyValueType().getJavaType();
             } else {
                 return getRealValueAt(0, col).getClass();
             }
@@ -368,27 +373,47 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             case COL_RESULTCODE:
                 return j.getResultCode().toString();
             case COL_SOLVER_OUTPUT:
-                return j.getSolverOutputFilename() == null? "-" : j.getSolverOutputFilename();
+                return j.getSolverOutputFilename() == null ? "-" : j.getSolverOutputFilename();
             case COL_LAUNCHER_OUTPUT:
-                return j.getLauncherOutputFilename() == null? "-" : j.getLauncherOutputFilename();
+                return j.getLauncherOutputFilename() == null ? "-" : j.getLauncherOutputFilename();
             case COL_WATCHER_OUTPUT:
-                return j.getWatcherOutputFilename() == null? "-" : j.getWatcherOutputFilename();
+                return j.getWatcherOutputFilename() == null ? "-" : j.getWatcherOutputFilename();
             case COL_VERIFIER_OUTPUT:
-                return j.getVerifierOutputFilename() == null? "-" : j.getVerifierOutputFilename();
+                return j.getVerifierOutputFilename() == null ? "-" : j.getVerifierOutputFilename();
             default:
                 int propertyIdx = columnIndex - COL_PROPERTY;
-                if (solverProperties.size() <= propertyIdx) {
+                if (properties.size() <= propertyIdx) {
                     return null;
                 }
-                ExperimentResultHasProperty erp = j.getPropertyValues().get(solverProperties.get(propertyIdx).getId());
-                if (erp != null && !erp.getValue().isEmpty()) {
-                    try {
-                        if (solverProperties.get(propertyIdx).getPropertyValueType() == null) {
-                            return erp.getValue().get(0);
+                Property prop = properties.get(propertyIdx);
+                if (prop.getType().equals(PropertyType.ResultProperty)) {
+                    ExperimentResultHasProperty erp = j.getPropertyValues().get(prop.getId());
+                    if (erp != null && !erp.getValue().isEmpty()) {
+                        try {
+                            if (prop.getPropertyValueType() == null) {
+                                return erp.getValue().get(0);
+                            }
+                            return prop.getPropertyValueType().getJavaTypeRepresentation(erp.getValue().get(0));
+                        } catch (ConvertException ex) {
+                            return null;
                         }
-                        return solverProperties.get(propertyIdx).getPropertyValueType().getJavaTypeRepresentation(erp.getValue().get(0));
-                    } catch (ConvertException ex) {
+                    } else {
                         return null;
+                    }
+                } else if (prop.getType().equals(PropertyType.InstanceProperty)) {
+                    InstanceHasProperty ihp = null;
+                    try {
+                        ihp = InstanceDAO.getById(j.getInstanceId()).getPropertyValues().get(prop.getId());
+                    } catch (Exception e) {
+                    }
+                    if (ihp == null) {
+                        return null;
+                    } else {
+                        try {
+                            return prop.getPropertyValueType().getJavaTypeRepresentation(ihp.getValue());
+                        } catch (ConvertException ex) {
+                            return null;
+                        }
                     }
                 } else {
                     return null;
@@ -407,6 +432,10 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             columnIndex = getIndexForColumn(columnIndex);
         }
         return getRealValueAt(rowIndex, columnIndex);
+    }
+
+    public int getFirstInstancePropertyColumn() {
+        return firstInstancePropertyColumn;
     }
 
     /**
@@ -490,7 +519,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public void resetColumnVisibility() {
         System.arraycopy(CONST_VISIBLE, 0, visible, 0, CONST_VISIBLE.length);
         for (int i = CONST_VISIBLE.length; i < visible.length; i++) {
-            visible[i] = true;
+            visible[i] = false;
         }
         fireTableStructureChanged();
     }
