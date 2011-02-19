@@ -660,6 +660,14 @@ public class ExperimentController {
                         }
                     });
                 }
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        main.updateJobsFilterStatus();
+                    }
+
+                });
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1415,8 +1423,7 @@ public class ExperimentController {
                 if (task.isCancelled()) {
                     throw new TaskCancelledException();
                 }
-                int runCount = this.getResults(newId, i.getId()).size();
-                //  int runCount = ExperimentDAO.getRunCountInExperimentForSolverConfigurationAndInstance(activeExperiment, newId, i.getId());
+                int runCount = ExperimentDAO.getRunCountInExperimentForSolverConfigurationAndInstance(activeExperiment, newId, i.getId());
                 for (ExperimentResult er : results) {
                     if (er.getSolverConfigId() == solverConfig.getId() && er.getInstanceId() == i.getId() && (useNotFinishedJobs || er.getStatus() == ExperimentResultStatus.SUCCESSFUL)) {
                         newResults.add(ExperimentResultDAO.createExperimentResult(runCount++, er.getPriority(), er.getComputeQueue(), er.getStatus().getValue(), er.getSeed(), er.getResultCode(), er.getResultTime(), newId, activeExperiment.getId(), er.getInstanceId(), er.getStartTime()));

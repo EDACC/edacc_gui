@@ -345,7 +345,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         resultBrowserRowFilter.clearFilters();
         jobsTableModel.resetColumnVisibility();
-        setJobsFilterStatus("");
+        updateJobsFilterStatus();
         jobsTimerWasActive = false;
     }
 
@@ -2215,15 +2215,19 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Action
     public void btnFilterJobs() {
-        // EDACCJobsFilter jobsFilter = new EDACCJobsFilter(EDACCApp.getApplication().getMainFrame(), true, this);
-        // jobsFilter.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         EDACCApp.getApplication().show(resultBrowserRowFilter);
-        if (resultBrowserRowFilter.hasFiltersApplied()) {
-            setJobsFilterStatus("This list of jobs has filters applied to it. Use the filter button below to modify.");
-        } else {
-            setJobsFilterStatus("");
-        }
         jobsTableModel.fireTableDataChanged();
+        updateJobsFilterStatus();
+    }
+
+    public void updateJobsFilterStatus() {
+        lblJobsFilterStatus.setIcon(new ImageIcon("warning-icon.png"));
+        lblJobsFilterStatus.setForeground(Color.red);
+        if (resultBrowserRowFilter.hasFiltersApplied()) {
+            lblJobsFilterStatus.setText("This list of jobs has filters applied to it. Use the filter button below to modify. Showing " + tableJobs.getRowCount() + " Jobs.");
+        } else {
+            lblJobsFilterStatus.setText("");
+        }
     }
 
     @Action
@@ -2311,12 +2315,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         lblFilterStatus.setForeground(Color.red);
         lblFilterStatus.setText(status);
 
-    }
-
-    public void setJobsFilterStatus(String status) {
-        lblJobsFilterStatus.setIcon(new ImageIcon("warning-icon.png"));
-        lblJobsFilterStatus.setForeground(Color.red);
-        lblJobsFilterStatus.setText(status);
     }
 
     @Action
