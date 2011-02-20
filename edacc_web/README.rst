@@ -27,8 +27,8 @@ WSGI-compatible, which means it can be deployed on any web server supporting Pyt
 Dependencies
 ------------
 
-- Python 2.6.5 http://www.python.org
-- SQLAlchemy 0.6.4 (SQL Toolkit and Object Relational Mapper)
+- Python 2.6.5 or 2.7.1 http://www.python.org
+- SQLAlchemy 0.6.5 (SQL Toolkit and Object Relational Mapper)
 - mysql-python 1.2.3c1 (Python MySQL adapter)
 - Flask 0.6 (Micro Webframework)
 - Flask-WTF 0.3.3 (Flask extension for WTForms)
@@ -44,7 +44,7 @@ Dependencies
 Installation
 ------------
 
-The required libraries can most likely be installed using the
+The required Python libraries can most likely be installed using the
 package management tool of your favorite Linux distribution.
 However, they are also available in the Python Package Index "PyPi" http://pypi.python.org/pypi
 and can be installed using easy_install or pip. (http://pypi.python.org/pypi/setuptools  http://pypi.python.org/pypi/pip)
@@ -56,6 +56,8 @@ available for the web frontend.
 To get rpy2 working the GNU linker (ld) has to be able to find libR.so. Add the folder containing
 libR.so (usually /usr/lib/R/lib) to the ld config: Create a file called R.conf containing the
 path in the folder /etc/ld.so.conf.d/ and run ldconfig without parameters as root to update.
+Additionally, you have to install the R package 'np' which provides non-parametric statistical
+methods. This package can be installed by running "install.packages('np')" within the R interpreter.
 
 For further information see http://flask.pocoo.org/docs/installation/ and http://flask.pocoo.org/docs/deploying/
 
@@ -63,14 +65,14 @@ Quick Installation Guide
 ------------------------
 
 To illustrate an installation here's what you would have to do on a linux system (assuming Python and pip are installed,
-using e.g. the distribution's package manager)
+using e.g. the distribution's package manager) to get the development server running.
 
 1. Install R and configure ld as described above
 2. Install virtualenv: "pip install virtualenv"
 3. Create a virtual python environment in the subdirectory env of the current directory: "virtualenv env"
 4. Activate the virtual environment: "source env/bin/activate" (This will set up some environment variables so
-   Python installs to the virtual environment)
-5. Install the dependencies: "pip install mysql-python sqlalchemy flask rpy2"
+   Python packages are installed to the virtual environment)
+5. Install the dependencies: "pip install mysql-python sqlalchemy flask rpy2 flask-wtf flask-actions mysql-python pylzma numpy" (some of them need to be compiled and require the appropriate libraries. On Windows and some linux distributions you can find binaries)
 6. Change to the folder containing the file server.py that comes with the web frontend
 7. Adjust the configuration in ./edacc/config.py
 8. Run "python server.py" which will start a web server on port 5000 listening on all IPs of the machine (Make sure

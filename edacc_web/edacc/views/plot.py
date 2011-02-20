@@ -36,7 +36,6 @@ def filter_results(l1, l2):
     r2 = [l2[i] for i in xrange(len(l2)) if l2[i] is not None and l1[i] is not None]
     return r1, r2
 
-
 def scatter_2solver_1property_points(db, exp, sc1, sc2, instances, result_property, run):
     results1 = db.session.query(db.ExperimentResult)
     results1.enable_eagerloads(True).options(joinedload(db.ExperimentResult.instance, db.ExperimentResult.solver_configuration))
@@ -113,7 +112,12 @@ def scatter_2solver_1property(database, experiment_id):
 
     s1 = int(request.args['solver_config1'])
     s2 = int(request.args['solver_config2'])
-    instances = [db.session.query(db.Instance).filter_by(idInstance=int(id)).first() for id in request.args.getlist('i')]
+    
+    instances = [db.session.query(db.Instance).filter(db.Instance.idInstance.in_(map(int, request.args.getlist('i')))).all()]
+    instance_groups_count = int(request.args.get('instance_groups_count', 1))
+    for i in xrange(1, instance_groups_count):
+        instances.append(db.session.query(db.Instance).filter(db.Instance.idInstance.in_(map(int, request.args.getlist('i'+str(i))))).all())
+        
     run = request.args['run']
     xscale = request.args['xscale']
     yscale = request.args['yscale']
@@ -124,37 +128,40 @@ def scatter_2solver_1property(database, experiment_id):
     sc1 = db.session.query(db.SolverConfiguration).get(s1) or abort(404)
     sc2 = db.session.query(db.SolverConfiguration).get(s2) or abort(404)
 
-    points = scatter_2solver_1property_points(db, exp, sc1, sc2, instances, result_property, run)
+    points = []
+    for instance_group in instances:
+        points.append(scatter_2solver_1property_points(db, exp, sc1, sc2, instance_group, result_property, run))
 
-    max_x = max([p[0] for p in points] or [0])
-    max_y = max([p[1] for p in points] or [0])
+    max_x = max([max([p[0] for p in ig] or [0]) for ig in points] or [0])
+    max_y = max([max([p[1] for p in ig] or [0]) for ig in points] or [0])
     max_x = max_y = max(max_x, max_y) * 1.1
 
-    title = sc1.solver.name + ' vs. ' + sc2.solver.name
+    title = sc1.get_name() + ' vs. ' + sc2.get_name()
     if result_property == 'cputime':
-        xlabel = sc1.solver.name + ' CPU Time'
-        ylabel = sc2.solver.name + ' CPU Time'
+        xlabel = sc1.get_name() + ' CPU Time'
+        ylabel = sc2.get_name() + ' CPU Time'
     else:
-        xlabel = sc1.solver.name + ' ' + solver_prop.name
-        ylabel = sc2.solver.name + ' ' + solver_prop.name
+        xlabel = sc1.get_name() + ' ' + solver_prop.name
+        ylabel = sc2.get_name() + ' ' + solver_prop.name
 
     if request.args.has_key('csv'):
         csv_response = StringIO.StringIO()
         csv_writer = csv.writer(csv_response)
         csv_writer.writerow(['Instance', xlabel, ylabel])
-        for x, y, i in points:
-            csv_writer.writerow([str(i), x, y])
+        for ig in points:
+            for x, y, i in ig:
+                csv_writer.writerow([str(i), x, y])
         csv_response.seek(0)
 
         headers = Headers()
         headers.add('Content-Type', 'text/csv')
-        headers.add('Content-Disposition', 'attachment', filename=secure_filename(exp.name + "_scatter_" + sc1.solver.name + '_vs_' + sc2.solver.name + ".csv"))
+        headers.add('Content-Disposition', 'attachment', filename=secure_filename(exp.name + "_scatter_" + sc1.get_name() + '_vs_' + sc2.get_name() + ".csv"))
         return Response(response=csv_response.read(), headers=headers)
     elif request.args.has_key('pdf'):
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + '.pdf'
         plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, format='pdf', xscale=xscale, yscale=yscale, diagonal_line=True)
         headers = Headers()
-        headers.add('Content-Disposition', 'attachment', filename=secure_filename(sc1.solver.name + '_vs_' + sc2.solver.name + '.pdf'))
+        headers.add('Content-Disposition', 'attachment', filename=secure_filename(sc1.get_name() + '_vs_' + sc2.get_name() + '.pdf'))
         response = Response(response=open(filename, 'rb').read(), mimetype='application/pdf', headers=headers)
         os.remove(filename)
         return response
@@ -162,7 +169,7 @@ def scatter_2solver_1property(database, experiment_id):
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + '.eps'
         plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, format='eps', xscale=xscale, yscale=yscale, diagonal_line=True)
         headers = Headers()
-        headers.add('Content-Disposition', 'attachment', filename=secure_filename(sc1.solver.name + '_vs_' + sc2.solver.name + '.eps'))
+        headers.add('Content-Disposition', 'attachment', filename=secure_filename(sc1.get_name() + '_vs_' + sc2.get_name() + '.eps'))
         response = Response(response=open(filename, 'rb').read(), mimetype='application/eps', headers=headers)
         os.remove(filename)
         return response
@@ -170,16 +177,18 @@ def scatter_2solver_1property(database, experiment_id):
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + '.txt'
         plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, format='rscript', xscale=xscale, yscale=yscale, diagonal_line=True)
         headers = Headers()
-        headers.add('Content-Disposition', 'attachment', filename=secure_filename(sc1.solver.name + '_vs_' + sc2.solver.name + '.txt'))
+        headers.add('Content-Disposition', 'attachment', filename=secure_filename(sc1.get_name() + '_vs_' + sc2.get_name() + '.txt'))
         response = Response(response=open(filename, 'rb').read(), mimetype='text/plain', headers=headers)
         os.remove(filename)
         return response
     else:
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + '.png'
         pts = plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, xscale=xscale, yscale=yscale, diagonal_line=True)
-        points = [(pts[i][0], pts[i][1], points[i][0], points[i][1], points[i][2]) for i in xrange(len(points))]
+        pts2 = []
+        for j in xrange(len(points)):
+            pts2 += [(pts[j][i][0], pts[j][i][1], points[j][i][0], points[j][i][1], points[j][i][2]) for i in xrange(len(points[j]))]
         if request.args.has_key('imagemap'):
-            return render('/analysis/imagemap_2solver_1property.html', database=database, points=points, sc1=sc1, sc2=sc2)
+            return render('/analysis/imagemap_2solver_1property.html', database=database, points=pts2, sc1=sc1, sc2=sc2)
         else:
             response = Response(response=open(filename, 'rb').read(), mimetype='image/png')
         os.remove(filename)
@@ -246,7 +255,10 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
     result_property = request.args['result_property']
     instance_property = request.args['instance_property']
 
-    instances = [db.session.query(db.Instance).filter_by(idInstance=int(id)).first() for id in request.args.getlist('i')]
+    instances = [db.session.query(db.Instance).filter(db.Instance.idInstance.in_(map(int, request.args.getlist('i')))).all()]
+    instance_groups_count = int(request.args.get('instance_groups_count', 1))
+    for i in xrange(1, instance_groups_count):
+        instances.append(db.session.query(db.Instance).filter(db.Instance.idInstance.in_(map(int, request.args.getlist('i'+str(i))))).all())
 
     if result_property != 'cputime':
         solver_prop = db.session.query(db.Property).get(int(result_property))
@@ -255,7 +267,9 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
 
     solver_config = db.session.query(db.SolverConfiguration).get(solver_config) or abort(404)
 
-    points = scatter_1solver_instance_vs_result_property_points(db, exp, solver_config, instances, int(instance_property), result_property, run)
+    points = []
+    for instance_group in instances:
+        points.append(scatter_1solver_instance_vs_result_property_points(db, exp, solver_config, instance_group, int(instance_property), result_property, run))
 
     xlabel = instance_prop.name
 
@@ -266,8 +280,8 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
 
     title = str(solver_config)
 
-    max_x = max([p[0] for p in points] or [0]) * 1.1
-    max_y = max([p[1] for p in points] or [0]) * 1.1
+    max_x = max([max([p[0] for p in ig] or [0]) for ig in points] or [0]) * 1.1
+    max_y = max([max([p[1] for p in ig] or [0]) for ig in points] or [0]) * 1.1
 
     if request.args.has_key('csv'):
         csv_response = StringIO.StringIO()
@@ -308,9 +322,11 @@ def scatter_1solver_instance_vs_result_property(database, experiment_id):
     else:
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + '.png'
         pts = plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, xscale=xscale, yscale=yscale)
-        points = [(pts[i][0], pts[i][1], points[i][0], points[i][1], points[i][2]) for i in xrange(len(points))]
+        pts2 = []
+        for j in xrange(len(points)):
+            pts2 += [(pts[j][i][0], pts[j][i][1], points[j][i][0], points[j][i][1], points[j][i][2]) for i in xrange(len(points[j]))]
         if request.args.has_key('imagemap'):
-            return render('/analysis/imagemap_instance_vs_result.html', database=database, points=points, sc=solver_config)
+            return render('/analysis/imagemap_instance_vs_result.html', database=database, points=pts2, sc=solver_config)
         else:
             response = Response(response=open(filename, 'rb').read(), mimetype='image/png')
         os.remove(filename)
@@ -378,7 +394,10 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
     result_property1 = request.args['result_property1']
     result_property2 = request.args['result_property2']
 
-    instances = [db.session.query(db.Instance).filter_by(idInstance=int(id)).first() for id in request.args.getlist('i')]
+    instances = [db.session.query(db.Instance).filter(db.Instance.idInstance.in_(map(int, request.args.getlist('i')))).all()]
+    instance_groups_count = int(request.args.get('instance_groups_count', 1))
+    for i in xrange(1, instance_groups_count):
+        instances.append(db.session.query(db.Instance).filter(db.Instance.idInstance.in_(map(int, request.args.getlist('i'+str(i))))).all())
 
     if result_property1 != 'cputime':
         solver_prop1 = db.session.query(db.Property).get(int(result_property1))
@@ -387,8 +406,10 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
         solver_prop2 = db.session.query(db.Property).get(int(result_property2))
 
     solver_config = db.session.query(db.SolverConfiguration).get(solver_config) or abort(404)
-
-    points = scatter_1solver_result_vs_result_property_plot(db, exp, solver_config, instances, result_property1, result_property2, run)
+    
+    points = []
+    for instance_group in instances:
+        points.append( scatter_1solver_result_vs_result_property_plot(db, exp, solver_config, instance_group, result_property1, result_property2, run))
 
     if result_property1 == 'cputime':
         xlabel = 'CPU Time'
@@ -402,8 +423,8 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
 
     title = str(solver_config)
 
-    max_x = max([p[0] for p in points] or [0]) * 1.1
-    max_y = max([p[1] for p in points] or [0]) * 1.1
+    max_x = max([max([p[0] for p in ig] or [0]) for ig in points] or [0]) * 1.1
+    max_y = max([max([p[1] for p in ig] or [0]) for ig in points] or [0]) * 1.1
 
     if request.args.has_key('csv'):
         csv_response = StringIO.StringIO()
@@ -444,9 +465,11 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
     else:
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + '.png'
         pts = plots.scatter(points, xlabel, ylabel, title, max_x, max_y, filename, xscale=xscale, yscale=yscale)
-        points = [(pts[i][0], pts[i][1], points[i][0], points[i][1], points[i][2]) for i in xrange(len(points))]
+        pts2 = []
+        for j in xrange(len(points)):
+            pts2 += [(pts[j][i][0], pts[j][i][1], points[j][i][0], points[j][i][1], points[j][i][2]) for i in xrange(len(points[j]))]
         if request.args.has_key('imagemap'):
-            return render('/analysis/imagemap_result_vs_result.html', database=database, points=points, sc=solver_config)
+            return render('/analysis/imagemap_result_vs_result.html', database=database, points=pts2, sc=solver_config)
         else:
             response = Response(response=open(filename, 'rb').read(), mimetype='image/png')
         os.remove(filename)
@@ -464,12 +487,19 @@ def cactus_plot(database, experiment_id):
     db = models.get_database(database) or abort(404)
     exp = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
+    instance_groups_count = int(request.args.get('instance_groups_count', 0))
+    use_colors_for = request.args.get('use_colors_for', 'solvers')
+    colored_instance_groups = (use_colors_for == 'instance_groups')
+    log_y = request.args.has_key('log_y')
 
     results = db.session.query(db.ExperimentResult)
     results.enable_eagerloads(True).options(joinedload(db.ExperimentResult.solver_configuration))
     results.options(joinedload(db.ExperimentResult.properties))
     results = results.filter_by(experiment=exp)
-    instances = [int(id) for id in request.args.getlist('i')]
+    instances = [[int(id) for id in request.args.getlist('i')]]
+    for i in xrange(1, instance_groups_count):
+        instances.append([int(id) for id in request.args.getlist('i'+str(i))])
+
     result_property = request.args.get('result_property') or 'cputime'
     if result_property != 'cputime':
         solver_prop = db.session.query(db.Property).get(int(result_property))
@@ -478,18 +508,20 @@ def cactus_plot(database, experiment_id):
 
     solvers = []
 
-    for sc in solver_configs:
-        s = {'xs': [], 'ys': [], 'name': sc.get_name()}
-        sc_res = results.filter_by(solver_configuration=sc, status=1).filter(db.ExperimentResult.resultCode.like('1%')).all()
-        sc_res = sorted(sc_res, key=lambda r: r.get_property_value(result_property, db))
-        i = 1
-        for r in sc_res:
-            if r.Instances_idInstance in instances:
-                s['ys'].append(r.get_property_value(result_property, db))
-                s['xs'].append(i)
-                i += 1
-        solvers.append(s)
+    for instance_group in xrange(instance_groups_count):
+        for sc in solver_configs:
+            s = {'xs': [], 'ys': [], 'name': sc.get_name(), 'instance_group': instance_group}
+            sc_res = results.filter_by(solver_configuration=sc, status=1).filter(db.ExperimentResult.resultCode.like('1%')).all()
+            sc_res = sorted(sc_res, key=lambda r: r.get_property_value(result_property, db))
+            i = 1
+            for r in sc_res:
+                if r.Instances_idInstance in instances[instance_group]:
+                    s['ys'].append(r.get_property_value(result_property, db))
+                    s['xs'].append(i)
+                    i += 1
+            solvers.append(s)
 
+    min_y = min([min(s['xs'] or [0.1]) for s in solvers] or [0.1])
     max_x = max([max(s['xs'] or [0]) for s in solvers] or [0]) + 10
     max_y = max([max(s['ys'] or [0]) for s in solvers] or [0]) * 1.1
 
@@ -504,7 +536,7 @@ def cactus_plot(database, experiment_id):
         csv_response = StringIO.StringIO()
         csv_writer = csv.writer(csv_response)
         for s in solvers:
-            csv_writer.writerow([s['name']])
+            csv_writer.writerow(['%s (G%d)' % (s['name'], s['instance_group'])])
             csv_writer.writerow(['number of solved instances'] + map(str, s['xs']))
             csv_writer.writerow(['CPU Time (s)'] + map(str, s['ys']))
         csv_response.seek(0)
@@ -515,7 +547,7 @@ def cactus_plot(database, experiment_id):
         return Response(response=csv_response.read(), headers=headers)
     elif request.args.has_key('pdf'):
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'cactus.pdf'
-        plots.cactus(solvers, max_x, max_y, ylabel, title, filename, format='pdf')
+        plots.cactus(solvers, instance_groups_count, colored_instance_groups, max_x, max_y, min_y, log_y, ylabel, title, filename, format='pdf')
         headers = Headers()
         headers.add('Content-Disposition', 'attachment', filename=secure_filename(exp.name + '_cactus.pdf'))
         response = Response(response=open(filename, 'rb').read(), mimetype='application/pdf', headers=headers)
@@ -523,7 +555,7 @@ def cactus_plot(database, experiment_id):
         return response
     elif request.args.has_key('eps'):
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'cactus.eps'
-        plots.cactus(solvers, max_x, max_y, ylabel, title, filename, format='eps')
+        plots.cactus(solvers, instance_groups_count, colored_instance_groups, max_x, max_y, min_y, log_y, ylabel, title, filename, format='eps')
         headers = Headers()
         headers.add('Content-Disposition', 'attachment', filename=secure_filename(exp.name + '_cactus.eps'))
         response = Response(response=open(filename, 'rb').read(), mimetype='application/eps', headers=headers)
@@ -531,7 +563,7 @@ def cactus_plot(database, experiment_id):
         return response
     else:
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'cactus.png'
-        plots.cactus(solvers, max_x, max_y, ylabel, title, filename)
+        plots.cactus(solvers, instance_groups_count, colored_instance_groups, max_x, max_y, min_y, log_y, ylabel, title, filename)
         response = Response(response=open(filename, 'rb').read(), mimetype='image/png')
         os.remove(filename)
         return response

@@ -67,7 +67,7 @@ def register(database):
             db.session.add(user)
             try:
                 db.session.commit()
-            except:
+            except Exception,e :
                 db.session.rollback()
                 errors.append('Error when trying to save the account. Please \
                               contact an administrator.')
@@ -299,7 +299,7 @@ def submit_solver(database, id=None):
                 db.session.add(param)
             try:
                 db.session.commit()
-            except Exception as e:
+            except:
                 db.session.rollback()
                 flash("Couldn't save solver to the database. Please contact an administrator for support.")
                 return render('/accounts/submit_solver.html', database=database,
