@@ -12,8 +12,6 @@ status dbFetchExperimentData(experiment* e) {
 	MYSQL_ROW row;
 	int queryLength;
 
-
-
 	char *queryExperimentInfo = NULL;
 	char *queryGridInfo = NULL;
 	e->id = experimentId;
@@ -21,21 +19,25 @@ status dbFetchExperimentData(experiment* e) {
 
 	logComment(1, "establishing a MySQL-connection...");
 	conn = mysql_init(NULL);
-	if (conn==NULL){
-		LOGERROR(AT,"could not init mysql library: Out of memory!\n");
+	if (conn == NULL) {
+		LOGERROR(AT, "could not init mysql library: Out of memory!\n");
 		return dbError;
 	}
-	int tries=0;
-	for (tries=0;tries<connectAttempts;tries++){
-		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
-			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",mysql_error(conn),mysql_errno(conn));
-			logComment(1,"waiting for: %d seconds\n",waitForDB);
+	int tries = 0;
+	for (tries = 0; tries < connectAttempts; tries++) {
+		if (mysql_real_connect(conn, host, username, password, database, port,
+				NULL, 0) == NULL) {
+			LOGERROR(
+					AT,
+					"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",
+					mysql_error(conn), mysql_errno(conn));
+			logComment(1, "waiting for: %d seconds\n", waitForDB);
 			sleep(waitForDB);
-			logComment(1,"trying to reconnect!\n",mysql_error(conn));
-		}
-		else break;
+			logComment(1, "trying to reconnect!\n", mysql_error(conn));
+		} else
+			break;
 	}
-	if (tries==connectAttempts){
+	if (tries == connectAttempts) {
 		mysql_close(conn);
 		return dbError;
 	}
@@ -86,7 +88,7 @@ status dbFetchExperimentData(experiment* e) {
 	/* fetch grid information */
 
 	queryLength
-	= sprintfAlloc(&queryGridInfo, QUERY_GRID_SETTINGS, gridQueueId);
+			= sprintfAlloc(&queryGridInfo, QUERY_GRID_SETTINGS, gridQueueId);
 
 	if (mysql_query(conn, queryGridInfo) != 0) {
 		mysql_free_result(res);
@@ -120,72 +122,72 @@ void freeExperimentData(experiment *e) {
 }
 
 /*int dbGetJob(job* j, status* s) {
-	MYSQL *conn = NULL;
-	MYSQL_RES *res = NULL;
-	MYSQL_ROW row;
-	int jobID;
-	int freeJobs=1; //indicates whether there are uncomputed jobs
-	int gotAJob=0;
-	int i;
-	char *queryRandomJob = NULL;
-	char *queryLockJob = NULL;
+ MYSQL *conn = NULL;
+ MYSQL_RES *res = NULL;
+ MYSQL_ROW row;
+ int jobID;
+ int freeJobs=1; //indicates whether there are uncomputed jobs
+ int gotAJob=0;
+ int i;
+ char *queryRandomJob = NULL;
+ char *queryLockJob = NULL;
 
-	conn = mysql_init(NULL);
-	if (!mysql_real_connect(conn, host, username, password, database, port,
-			NULL, 0)) {
-		LOGERROR(AT, "could not establish mysql connection!\n");
+ conn = mysql_init(NULL);
+ if (!mysql_real_connect(conn, host, username, password, database, port,
+ NULL, 0)) {
+ LOGERROR(AT, "could not establish mysql connection!\n");
  *s = dbError;
-		mysql_close(conn);
-		return 1;
-	}
-	//Autocommit wird hier ausgeschaltet
-	if (mysql_autocommit(conn,0)!=0)
-		LOGERROR(AT, "db error: Could not switch autocommit OFF");
+ mysql_close(conn);
+ return 1;
+ }
+ //Autocommit wird hier ausgeschaltet
+ if (mysql_autocommit(conn,0)!=0)
+ LOGERROR(AT, "db error: Could not switch autocommit OFF");
 
-	while ((freeJobs)&&(!gotAJob)){
+ while ((freeJobs)&&(!gotAJob)){
 
-		sprintfAlloc(&queryRandomJob, QUERY_RANDOM_JOB,experimentId);
-		if (mysql_query(conn, queryRandomJob) != 0) {
-			LOGERROR(AT, "db query error, message: %s\n", mysql_error(conn));
+ sprintfAlloc(&queryRandomJob, QUERY_RANDOM_JOB,experimentId);
+ if (mysql_query(conn, queryRandomJob) != 0) {
+ LOGERROR(AT, "db query error, message: %s\n", mysql_error(conn));
  *s = dbError;
-			mysql_close(conn);
-			free(queryJob);
-			return 1;
-		}
-		free(queryJob);	queryJob=NULL;
+ mysql_close(conn);
+ free(queryJob);
+ return 1;
+ }
+ free(queryJob);	queryJob=NULL;
 
-		if ((res = mysql_store_result(conn)) == NULL) {
-			LOGERROR(AT, "store result error");
+ if ((res = mysql_store_result(conn)) == NULL) {
+ LOGERROR(AT, "store result error");
  *s = dbError;
-			mysql_close(conn);
-			return 1;
-		}
-		i = mysql_num_rows(res);
-		if (i == 0) { //keine jobs mehr vorhanden!
-			mysql_free_result(res);
+ mysql_close(conn);
+ return 1;
+ }
+ i = mysql_num_rows(res);
+ if (i == 0) { //keine jobs mehr vorhanden!
+ mysql_free_result(res);
  *s = success;
-			return 1;
-		}
+ return 1;
+ }
 
-		if ((row = mysql_fetch_row(res)) != NULL) {
-			jobID = atoi(row[0]);
-		}
+ if ((row = mysql_fetch_row(res)) != NULL) {
+ jobID = atoi(row[0]);
+ }
 
-		sprintfAlloc(&queryLockJob, QUERY_LOCK_JOB,jobID);
+ sprintfAlloc(&queryLockJob, QUERY_LOCK_JOB,jobID);
 
-		if (mysql_query(conn, queryJob) != 0) {
-			LOGERROR(AT, "could not lock Job %d: %s\n",jobID, mysql_error(conn));
-			return dbError;
-		}
-		if ((long)mysql_affected_rows(&mysql)==1){
-			gotAJob=1;
-			succes=1;
-		}
-		mysql_commit(conn);
-	}
-	mysql_close(conn);
-	free(queryJob);
-}*/
+ if (mysql_query(conn, queryJob) != 0) {
+ LOGERROR(AT, "could not lock Job %d: %s\n",jobID, mysql_error(conn));
+ return dbError;
+ }
+ if ((long)mysql_affected_rows(&mysql)==1){
+ gotAJob=1;
+ succes=1;
+ }
+ mysql_commit(conn);
+ }
+ mysql_close(conn);
+ free(queryJob);
+ }*/
 
 int dbFetchJob(job* j, status* s) {
 	MYSQL *conn = NULL;
@@ -197,9 +199,9 @@ int dbFetchJob(job* j, status* s) {
 
 	int queryLength;
 
-	int jobID;
+	int i,jobID;
 
-	int gotAJob=0;
+	int gotAJob = 0;
 
 	char *queryRandomJob = NULL;
 	char *queryLockJob = NULL;
@@ -207,7 +209,7 @@ int dbFetchJob(job* j, status* s) {
 	char *params = NULL;
 	char *temp = NULL;
 
-	int i;
+	int randomCount;
 	unsigned long *lengths = NULL;
 
 	j->startTime = NULL;
@@ -227,39 +229,67 @@ int dbFetchJob(job* j, status* s) {
 	j->instanceName = NULL;
 	j->binaryName = NULL;
 
-
-
 	conn = mysql_init(NULL);
-	if (conn==NULL){
-		LOGERROR(AT,"could not init mysql library: Out of memory!\n");
+	if (conn == NULL) {
+		LOGERROR(AT, "could not init mysql library: Out of memory!\n");
 		return dbError;
 	}
-	int tries=0;
-	for (tries=0;tries<connectAttempts;tries++){
-		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
-			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",mysql_error(conn),mysql_errno(conn));
-			logComment(1,"waiting for: %d seconds\n",waitForDB);
+	int tries = 0;
+	for (tries = 0; tries < connectAttempts; tries++) {
+		if (mysql_real_connect(conn, host, username, password, database, port,
+				NULL, 0) == NULL) {
+			LOGERROR(
+					AT,
+					"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",
+					mysql_error(conn), mysql_errno(conn));
+			logComment(1, "waiting for: %d seconds\n", waitForDB);
 			sleep(waitForDB);
-			logComment(1,"trying to reconnect!\n",mysql_error(conn));
+			logComment(1, "trying to reconnect!\n", mysql_error(conn));
 
-		}
-		else break;
+		} else
+			break;
 	}
-	if (tries==connectAttempts){
+	if (tries == connectAttempts) {
 		mysql_close(conn);
 		*s = dbError;
 		mysql_close(conn);
 		return 1;
 	}
 
-
-
 	//disable autocommit
-	if (mysql_autocommit(conn,0)!=0)
+	if (mysql_autocommit(conn, 0) != 0)
 		LOGERROR(AT, "db error: Could not switch autocommit OFF");
+	while (!gotAJob) {
 
-	while (!gotAJob){
-		sprintfAlloc(&queryRandomJob, QUERY_RANDOM_JOB,experimentId,experimentId);
+		/*sprintfAlloc(&queryRandomJob, QUERY_RANDOM_JOB,experimentId,experimentId);
+		 if (mysql_query(conn, queryRandomJob) != 0) {
+		 LOGERROR(AT, "db query error, message: %s\n", mysql_error(conn));
+		 *s = dbError;
+		 mysql_close(conn);
+		 free(queryJob);
+		 return 1;
+		 }
+
+		 if ((res = mysql_store_result(conn)) == NULL) {
+		 LOGERROR(AT, "store result error");
+		 *s = dbError;
+		 mysql_close(conn);
+		 return 1;
+		 }
+
+		 i = mysql_num_rows(res);
+		 if (i == 0) { //keine jobs mehr vorhanden!
+		 mysql_free_result(res);
+		 mysql_commit(conn);
+		 if (mysql_autocommit(conn, 1) != 0)
+		 LOGERROR(AT, "db error: Could not switch autocommit ON");
+		 mysql_close(conn);
+		 *s = success;
+		 return 1;
+		 }
+
+		 */
+		sprintfAlloc(&queryRandomJob, QUERY_RANDOM_JOB1, experimentId);
 		if (mysql_query(conn, queryRandomJob) != 0) {
 			LOGERROR(AT, "db query error, message: %s\n", mysql_error(conn));
 			*s = dbError;
@@ -274,13 +304,41 @@ int dbFetchJob(job* j, status* s) {
 			mysql_close(conn);
 			return 1;
 		}
+
+		if ((row = mysql_fetch_row(res)) != NULL) {
+			randomCount = atoi(row[0]);
+		} else {
+			LOGERROR(AT, "Could not grab a job!", experimentId);
+			return dbError;
+		}
+
+		free(queryRandomJob);
+		queryRandomJob = NULL;
+		sprintfAlloc(&queryRandomJob, QUERY_RANDOM_JOB2, experimentId,
+				randomCount);
+		//printf("\nSQL:%s", queryRandomJob);
+		if (mysql_query(conn, queryRandomJob) != 0) {
+			LOGERROR(AT, "db query error, message: %s\n", mysql_error(conn));
+			*s = dbError;
+			mysql_close(conn);
+			free(queryJob);
+			return 1;
+		}
+
+		if ((res = mysql_store_result(conn)) == NULL) {
+			LOGERROR(AT, "store result error");
+			break;
+			*s = dbError;
+			mysql_close(conn);
+			return 1;
+		}
 		i = mysql_num_rows(res);
 		if (i == 0) { //keine jobs mehr vorhanden!
 			mysql_free_result(res);
 			mysql_commit(conn);
-			if (mysql_autocommit(conn,1)!=0)
+			if (mysql_autocommit(conn, 1) != 0)
 				LOGERROR(AT, "db error: Could not switch autocommit ON");
-
+			mysql_close(conn);
 			*s = success;
 			return 1;
 		}
@@ -289,23 +347,25 @@ int dbFetchJob(job* j, status* s) {
 			jobID = atoi(row[0]);
 		}
 
-		sprintfAlloc(&queryLockJob, QUERY_LOCK_JOB,jobID);
+		sprintfAlloc(&queryLockJob, QUERY_LOCK_JOB, jobID);
 
 		if (mysql_query(conn, queryLockJob) != 0) {
-			LOGERROR(AT, "could not lock Job %d: %s\n",jobID, mysql_error(conn));
+			LOGERROR(AT, "could not lock Job %d: %s\n", jobID,
+					mysql_error(conn));
 			return dbError;
 		}
-		if ((long)mysql_affected_rows(conn)==1){
-			gotAJob=1;
+		if ((long) mysql_affected_rows(conn) == 1) {
+			gotAJob = 1;
 			*s = success;
 		}
 		mysql_commit(conn);
 	}
 	//autocommit turn on!
-	if (mysql_autocommit(conn,1)!=0)
+	if (mysql_autocommit(conn, 1) != 0)
 		LOGERROR(AT, "db error: Could not switch autocommit ON");
 
-	free(queryJob);	queryJob=NULL;
+	free(queryJob);
+	queryJob = NULL;
 
 	queryLength = sprintfAlloc(&queryJob, QUERY_JOB, jobID);
 
@@ -399,19 +459,19 @@ int dbFetchJob(job* j, status* s) {
 			//params = strcat(params, instancePath); //prepend path first
 			params = strcat(params, prependInstancePath(j->instanceName)); //TODO: path noch hinzufügen
 		} else
-			// check if it's a param with value
-			if (atoi(row[2]) == 1) {
-				// delimiter between paramname and value
-				params = strcat(params, " ");
-				if (row[3] != NULL && (strcmp(row[3], "") != 0)) {
-					params = strcat(params, row[3]);
-				} else {
-					LOGERROR(AT,
-							"No value found for param %s for solver %s_v%s.\n",
-							row[1], j->solverName, j->solverVersion);
-					return 1;
-				}
+		// check if it's a param with value
+		if (atoi(row[2]) == 1) {
+			// delimiter between paramname and value
+			params = strcat(params, " ");
+			if (row[3] != NULL && (strcmp(row[3], "") != 0)) {
+				params = strcat(params, row[3]);
+			} else {
+				LOGERROR(AT,
+						"No value found for param %s for solver %s_v%s.\n",
+						row[1], j->solverName, j->solverVersion);
+				return 1;
 			}
+		}
 
 		params = strcat(params, " ");
 
@@ -442,7 +502,7 @@ void freeJob(job *j) {//TODO: hier muss noch einiges befreit werden!
 status dbUpdate(const job* j) {
 	MYSQL *conn = NULL;
 	char *queryJob = NULL;
-	int length,queryLength;
+	int length, queryLength;
 	char *escapedString1 = NULL;
 	//	conn = mysql_init(NULL);
 	//	if (!mysql_real_connect(conn, host, username, password, database, port,
@@ -452,21 +512,25 @@ status dbUpdate(const job* j) {
 	//	}
 
 	conn = mysql_init(NULL);
-	if (conn==NULL){
-		LOGERROR(AT,"could not init mysql library: Out of memory!\n");
+	if (conn == NULL) {
+		LOGERROR(AT, "could not init mysql library: Out of memory!\n");
 		return dbError;
 	}
-	int tries=0;
-	for (tries=0;tries<connectAttempts;tries++){
-		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
-			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",mysql_error(conn),mysql_errno(conn));
-			logComment(1,"waiting for: %d seconds\n",waitForDB);
+	int tries = 0;
+	for (tries = 0; tries < connectAttempts; tries++) {
+		if (mysql_real_connect(conn, host, username, password, database, port,
+				NULL, 0) == NULL) {
+			LOGERROR(
+					AT,
+					"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",
+					mysql_error(conn), mysql_errno(conn));
+			logComment(1, "waiting for: %d seconds\n", waitForDB);
 			sleep(waitForDB);
-			logComment(1,"trying to reconnect!\n",mysql_error(conn));
-		}
-		else break;
+			logComment(1, "trying to reconnect!\n", mysql_error(conn));
+		} else
+			break;
 	}
-	if (tries==connectAttempts){
+	if (tries == connectAttempts) {
 		mysql_close(conn);
 		return dbError;
 	}
@@ -475,14 +539,13 @@ status dbUpdate(const job* j) {
 	escapedString1 = (char*) malloc(length * 2 + 1);
 	mysql_real_escape_string(conn, escapedString1, j->launcherOutput, length);
 	queryLength = sprintfAlloc(&queryJob, UPDATE_JOB, j->status, j->startTime,
-			j->resultTime, j->computeQueue, escapedString1,j->id);
+			j->resultTime, j->computeQueue, escapedString1, j->id);
 
 	if (mysql_real_query(conn, queryJob, queryLength + 1) != 0) {
 		LOGERROR(AT, "db update query error, message: %s\n", mysql_error(conn));
 		LOGERROR(AT, "query launched: %s\n", queryJob);
 		return dbError;
 	}
-
 
 	mysql_commit(conn);
 	mysql_close(conn);
@@ -501,21 +564,25 @@ status dbUpdateResults(const job* j) {
 	int queryLength, length;
 
 	conn = mysql_init(NULL);
-	if (conn==NULL){
-		LOGERROR(AT,"could not init mysql library: Out of memory!\n");
+	if (conn == NULL) {
+		LOGERROR(AT, "could not init mysql library: Out of memory!\n");
 		return dbError;
 	}
-	int tries=0;
-	for (tries=0;tries<connectAttempts;tries++){
-		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
-			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",mysql_error(conn),mysql_errno(conn));
-			logComment(1,"waiting for: %d seconds\n",waitForDB);
+	int tries = 0;
+	for (tries = 0; tries < connectAttempts; tries++) {
+		if (mysql_real_connect(conn, host, username, password, database, port,
+				NULL, 0) == NULL) {
+			LOGERROR(
+					AT,
+					"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",
+					mysql_error(conn), mysql_errno(conn));
+			logComment(1, "waiting for: %d seconds\n", waitForDB);
 			sleep(waitForDB);
-			logComment(1,"trying to reconnect!\n",mysql_error(conn));
-		}
-		else break;
+			logComment(1, "trying to reconnect!\n", mysql_error(conn));
+		} else
+			break;
 	}
-	if (tries==connectAttempts){
+	if (tries == connectAttempts) {
 		mysql_close(conn);
 		return dbError;
 	}
@@ -574,21 +641,25 @@ status dbFetchSolver(const char* solverName, const char* solverVersion,
 	unsigned long *lengths = NULL;
 
 	conn = mysql_init(NULL);
-	if (conn==NULL){
-		LOGERROR(AT,"could not init mysql library: Out of memory!\n");
+	if (conn == NULL) {
+		LOGERROR(AT, "could not init mysql library: Out of memory!\n");
 		return dbError;
 	}
-	int tries=0;
-	for (tries=0;tries<connectAttempts;tries++){
-		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
-			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",mysql_error(conn),mysql_errno(conn));
-			logComment(1,"waiting for: %d seconds\n",waitForDB);
+	int tries = 0;
+	for (tries = 0; tries < connectAttempts; tries++) {
+		if (mysql_real_connect(conn, host, username, password, database, port,
+				NULL, 0) == NULL) {
+			LOGERROR(
+					AT,
+					"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",
+					mysql_error(conn), mysql_errno(conn));
+			logComment(1, "waiting for: %d seconds\n", waitForDB);
 			sleep(waitForDB);
-			logComment(1,"trying to reconnect!\n",mysql_error(conn));
-		}
-		else break;
+			logComment(1, "trying to reconnect!\n", mysql_error(conn));
+		} else
+			break;
 	}
-	if (tries==connectAttempts){
+	if (tries == connectAttempts) {
 		mysql_close(conn);
 		return dbError;
 	}
@@ -653,21 +724,25 @@ status dbFetchInstance(const char* instanceName, instance* i) {
 	unsigned long *lengths;
 
 	conn = mysql_init(NULL);
-	if (conn==NULL){
-		LOGERROR(AT,"could not init mysql library: Out of memory!\n");
+	if (conn == NULL) {
+		LOGERROR(AT, "could not init mysql library: Out of memory!\n");
 		return dbError;
 	}
-	int tries=0;
-	for (tries=0;tries<connectAttempts;tries++){
-		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
-			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",mysql_error(conn),mysql_errno(conn));
-			logComment(1,"waiting for: %d seconds\n",waitForDB);
+	int tries = 0;
+	for (tries = 0; tries < connectAttempts; tries++) {
+		if (mysql_real_connect(conn, host, username, password, database, port,
+				NULL, 0) == NULL) {
+			LOGERROR(
+					AT,
+					"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",
+					mysql_error(conn), mysql_errno(conn));
+			logComment(1, "waiting for: %d seconds\n", waitForDB);
 			sleep(waitForDB);
-			logComment(1,"trying to reconnect!\n",mysql_error(conn));
-		}
-		else break;
+			logComment(1, "trying to reconnect!\n", mysql_error(conn));
+		} else
+			break;
 	}
-	if (tries==connectAttempts){
+	if (tries == connectAttempts) {
 		mysql_close(conn);
 		return dbError;
 	}
@@ -719,21 +794,25 @@ status setMySQLTime(job *j) {
 	sprintfAlloc(&queryTime, QUERY_TIME);
 
 	conn = mysql_init(NULL);
-	if (conn==NULL){
-		LOGERROR(AT,"could not init mysql library: Out of memory!\n");
+	if (conn == NULL) {
+		LOGERROR(AT, "could not init mysql library: Out of memory!\n");
 		return dbError;
 	}
-	int tries=0;
-	for (tries=0;tries<connectAttempts;tries++){
-		if (mysql_real_connect(conn, host, username, password, database, port, NULL, 0)== NULL) {
-			LOGERROR(AT,"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",mysql_error(conn),mysql_errno(conn));
-			logComment(1,"waiting for: %d seconds\n",waitForDB);
+	int tries = 0;
+	for (tries = 0; tries < connectAttempts; tries++) {
+		if (mysql_real_connect(conn, host, username, password, database, port,
+				NULL, 0) == NULL) {
+			LOGERROR(
+					AT,
+					"could not establish a mysql connection!\n error message: %s\n,error code: %d\n",
+					mysql_error(conn), mysql_errno(conn));
+			logComment(1, "waiting for: %d seconds\n", waitForDB);
 			sleep(waitForDB);
-			logComment(1,"trying to reconnect!\n",mysql_error(conn));
-		}
-		else break;
+			logComment(1, "trying to reconnect!\n", mysql_error(conn));
+		} else
+			break;
 	}
-	if (tries==connectAttempts){
+	if (tries == connectAttempts) {
 		mysql_close(conn);
 		return dbError;
 	}
