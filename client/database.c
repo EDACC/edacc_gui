@@ -199,7 +199,7 @@ int dbFetchJob(job* j, status* s) {
 
 	int queryLength;
 
-	int i,jobID;
+	int i, jobID;
 
 	int gotAJob = 0;
 
@@ -289,15 +289,18 @@ int dbFetchJob(job* j, status* s) {
 		 }
 
 		 */
+
+		//choose a random number from the number of uncomputed jobs
+		queryRandomJob = NULL;
 		sprintfAlloc(&queryRandomJob, QUERY_RANDOM_JOB1, experimentId);
 		if (mysql_query(conn, queryRandomJob) != 0) {
 			LOGERROR(AT, "db query error, message: %s\n", mysql_error(conn));
 			*s = dbError;
 			mysql_close(conn);
-			free(queryJob);
+			free(queryRandomJob);
 			return 1;
 		}
-
+		free(queryRandomJob);
 		if ((res = mysql_store_result(conn)) == NULL) {
 			LOGERROR(AT, "store result error");
 			*s = dbError;
@@ -312,19 +315,20 @@ int dbFetchJob(job* j, status* s) {
 			return dbError;
 		}
 
-		free(queryRandomJob);
+
 		queryRandomJob = NULL;
+		//select a job with radomCount
 		sprintfAlloc(&queryRandomJob, QUERY_RANDOM_JOB2, experimentId,
 				randomCount);
-		//printf("\nSQL:%s", queryRandomJob);
+
 		if (mysql_query(conn, queryRandomJob) != 0) {
 			LOGERROR(AT, "db query error, message: %s\n", mysql_error(conn));
 			*s = dbError;
 			mysql_close(conn);
-			free(queryJob);
+			free(queryRandomJob);
 			return 1;
 		}
-
+		free(queryRandomJob);
 		if ((res = mysql_store_result(conn)) == NULL) {
 			LOGERROR(AT, "store result error");
 			break;
@@ -332,6 +336,7 @@ int dbFetchJob(job* j, status* s) {
 			mysql_close(conn);
 			return 1;
 		}
+
 		i = mysql_num_rows(res);
 		if (i == 0) { //keine jobs mehr vorhanden!
 			mysql_free_result(res);
@@ -342,23 +347,47 @@ int dbFetchJob(job* j, status* s) {
 			*s = success;
 			return 1;
 		}
-
 		if ((row = mysql_fetch_row(res)) != NULL) {
 			jobID = atoi(row[0]);
 		}
 
-		sprintfAlloc(&queryLockJob, QUERY_LOCK_JOB, jobID);
+		queryRandomJob = NULL;
 
-		if (mysql_query(conn, queryLockJob) != 0) {
-			LOGERROR(AT, "could not lock Job %d: %s\n", jobID,
-					mysql_error(conn));
-			return dbError;
+		sprintfAlloc(&queryRandomJob, QUERY_RANDOM_JOB3, jobID);
+
+		if (mysql_query(conn, queryRandomJob) != 0) {
+			LOGERROR(AT, "db query error, message: %s\n", mysql_error(conn));
+			*s = dbError;
+			mysql_close(conn);
+			free(queryRandomJob);
+			return 1;
 		}
-		if ((long) mysql_affected_rows(conn) == 1) {
-			gotAJob = 1;
-			*s = success;
+		free(queryRandomJob);
+		if ((res = mysql_store_result(conn)) == NULL) {
+			LOGERROR(AT, "store result error");
+			break;
+			*s = dbError;
+			mysql_close(conn);
+			return 1;
 		}
-		mysql_commit(conn);
+		i = mysql_num_rows(res);
+		if (i != 0) { //job was NOT taken by other client
+
+			sprintfAlloc(&queryLockJob, QUERY_LOCK_JOB, jobID);
+
+			if (mysql_query(conn, queryLockJob) != 0) {
+				LOGERROR(AT, "could not lock Job %d: %s\n", jobID, mysql_error(
+						conn));
+				free(queryLockJob);
+				return dbError;
+			}
+			if ((long) mysql_affected_rows(conn) == 1) {
+				gotAJob = 1;
+				*s = success;
+			}
+			mysql_commit(conn);
+			free(queryLockJob);
+		}
 	}
 	//autocommit turn on!
 	if (mysql_autocommit(conn, 1) != 0)

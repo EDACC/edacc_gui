@@ -68,7 +68,9 @@
 #define QUERY_RANDOM_JOB1 "select Floor(rand()*count(idJob)) as ra  from ExperimentResults WHERE status=-1 "\
 				"AND Experiment_idExperiment= %d AND priority>=0 "
 
-#define QUERY_RANDOM_JOB2 "select idJob from ExperimentResults WHERE status=-1 AND Experiment_idExperiment= %d AND priority>=0 LIMIT %d,1 FOR UPDATE"
+#define QUERY_RANDOM_JOB2 "select idJob from ExperimentResults WHERE status=-1 AND Experiment_idExperiment= %d AND priority>=0 LIMIT %d,1"
+
+#define QUERY_RANDOM_JOB3 "select idJob from ExperimentResults WHERE idJob = %d  AND status=-1 FOR UPDATE"
 
 //TODO: der obige querey geht viel schneller wenn man folgendes verwendet:
 // select Floor(rand()*count()) as ra from experimentResults where status...
