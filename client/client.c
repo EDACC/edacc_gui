@@ -24,6 +24,7 @@ static char* jobArgs[4] = { NULL, NULL, NULL, NULL };
 //An array for keeping track of the jobs we're currently processing
 static job* jobs;
 static int maxNumJobs;
+int expID;
 
 //The timeout in seconds for each solver run
 int CPUTimeLimit;
@@ -241,8 +242,9 @@ status processResultsN(job* j) {
 	//		return sysError;
 	//TODO: resultTime parsen
 
-	char prefix[32];
+	char prefix[64];
 	char dummy[80];
+	int signal;
 	float time;
 	int n;
 	const char *ptr = j->watcherOutput;
@@ -257,7 +259,7 @@ status processResultsN(job* j) {
 		fflush(stdout);
 	}
 	j->resultTime = time;
-
+	j->resultCode = 0;
 	ptr = j->watcherOutput;
 	while (sscanf(ptr, "%31[^\n]\n%n", prefix, &n) == 1) { //read line by line maximum of 31 chars
 		if (sscanf(prefix, "Maximum CPU time exceeded:%1s", &dummy) == 1) {
@@ -270,7 +272,20 @@ status processResultsN(job* j) {
 		}
 		ptr += n;
 	}
-	if (j->status != 21) { //limit not exceeded
+	//Child ended because it received signal 9 (SIGKILL)
+	ptr = j->watcherOutput;
+		while (sscanf(ptr, "%64[^\n]\n%n", prefix, &n) == 1) { //read line by line maximum of 31 chars
+			if (sscanf(prefix, "Child ended because it received signal %d", &signal) == 1) {//
+				j->status = -3;
+				j->resultCode = -(300+signal);
+				printf("Solver recieveed signal!");
+				fflush(stdout);
+				return success;
+				break;
+			}
+			ptr += n;
+		}
+	if (j->status = 1) { //Solver ended normally!
 		ptr = j->solverOutput;
 		while (sscanf(ptr, "%31[^\n]\n%n", prefix, &n) == 1) { //read line by line maximum of 31 chars
 			//printf("try to matching in line: %s\n", prefix);
@@ -279,7 +294,6 @@ status processResultsN(job* j) {
 					j->resultCode = 10;
 					printf("s UNSATISFIABLE found\n");
 					fflush(stdout);
-					return success;
 					break;
 				}
 			}
@@ -288,7 +302,6 @@ status processResultsN(job* j) {
 					j->resultCode = 0;
 					printf("s UNKNOWN found\n");
 					fflush(stdout);
-					return success;
 					break;
 				}
 			}
@@ -297,13 +310,16 @@ status processResultsN(job* j) {
 					j->resultCode = 11;
 					printf("s SATISFIABLE found\n");
 					fflush(stdout);
-					return success;
 					break;
 				}
 			}
 			ptr += n;
 		}
 	}
+	//free(j->solverOutput);
+
+	//j->solverOutput = (char*) malloc(5 * sizeof(char));
+	//strcpy(j->solverOutput, "NULL");
 	//Hier kommt die Suche nach dem Resultcode im solveroutput
 
 
@@ -711,8 +727,9 @@ void initDefaultParameters() {
 	keepResults = 0;
 	waitForDB = 20;
 	connectAttempts = 5;
-	waitForJobs = 600;
-	scanForJobsPeriod = 60;
+	waitForJobs = 60;
+	scanForJobsPeriod = 10;
+	expID=-1;
 }
 
 int main(int argc, char **argv) {
@@ -722,13 +739,14 @@ int main(int argc, char **argv) {
 			{ "keep_results", no_argument, 0, 'k' }, { "wait_for_db",
 					required_argument, 0, 'w' }, { "wait_for_jobs",
 					required_argument, 0, 'j' }, { "connect_attempts",
-					required_argument, 0, 'c' }, 0 };
+					required_argument, 0, 'c' },{ "expID",
+							required_argument, 0, 'e' }, 0 };
 
 	while (optind < argc) {
 		int index = -1;
 		struct option * opt = 0;
-		int result =
-				getopt_long(argc, argv, "v:skw:j:c:", long_options, &index); //
+		int result = getopt_long(argc, argv, "v:skw:j:c:e:", long_options,
+				&index); //
 		if (result == -1)
 			break; /* end of list */
 		switch (result) {
@@ -740,6 +758,9 @@ int main(int argc, char **argv) {
 			break;
 		case 'k':
 			keepResults = 1;
+			break;
+		case 'e':
+			expID = atoi(optarg);
 			break;
 		case 'w':
 			waitForDB = atoi(optarg);
@@ -775,11 +796,13 @@ int main(int argc, char **argv) {
 	solver solv;
 	instance inst;
 	char* fileName;
-	int numRescan=0;
+	int numRescan = 0;
 
 	logComment(1,
 			"reading from configuration file...\n------------------------------\n");
 	s = read_config();
+	if (expID>0)
+		experimentId=expID;
 	logComment(1, "------------------------------\n");
 	if (s != success) {
 		LOGERROR(AT,
@@ -793,6 +816,7 @@ int main(int argc, char **argv) {
 	initPath();
 	checkPath();
 	s = initExpData(&exp);
+
 	logComment(1, "\n------------------------------\n");
 	if (s != success) {
 		LOGERROR(AT, "couldn't init successfully, for experiment %i.\n",
@@ -835,9 +859,11 @@ int main(int argc, char **argv) {
 						exitClient(s);
 					}
 					numJobs--; //one job finished
-				} else
-					if (numRescan * scanForJobsPeriod <= waitForJobs) {
-					logComment(2,"no more jobs in DB and no more jobs to finish: going to sleep for %d seconds\n",scanForJobsPeriod);
+				} else if (numRescan * scanForJobsPeriod <= waitForJobs) {
+					logComment(
+							2,
+							"no more jobs in DB and no more jobs to finish: going to sleep for %d seconds\n",
+							scanForJobsPeriod);
 					sleep(scanForJobsPeriod);
 					numRescan++;
 					continue;
@@ -851,7 +877,7 @@ int main(int argc, char **argv) {
 			}
 
 		} else { //got a job and starting to procces
-			numRescan=0; //reset the counter for rescan of jobs tries
+			numRescan = 0; //reset the counter for rescan of jobs tries
 			logComment(2, "got job with id:%d\n", j->id);
 			numJobs++;
 			sprintfAlloc(&j->launcherOutput, "job details: \n "

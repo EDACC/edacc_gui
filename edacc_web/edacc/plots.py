@@ -8,19 +8,34 @@
     :copyright: (c) 2010 by Daniel Diepold.
     :license: MIT, see LICENSE for details.
 """
+import sys, os
+
 from functools import wraps
 from rpy2 import robjects
 from rpy2.robjects.packages import importr
+from edacc.utils import newline_split_string
 
 grdevices = importr('grDevices') # plotting target devices
-np = importr('np') # non-parametric kernel smoothing methods
 stats = importr('stats') # statistical methods
-robjects.r("library('np')")
+
+with open(os.devnull) as devnull:
+    # redirect the annoying np package import output to nirvana
+    stdout, stderr = sys.stdout, sys.stderr
+    sys.stdout = sys.stderr = devnull
+    np = importr('np') # non-parametric kernel smoothing methods
+    robjects.r("library('np')")
+    sys.stdout, sys.stderr = stdout, stderr
 
 robjects.r.setEPS() # set some default options for postscript in EPS format
 
 from threading import Lock
 global_lock = Lock()
+
+# list of colors used in the defined order for the different solvers/instance groups in plots
+colors = [
+    'red', 'green', 'blue', 'darkgoldenrod1', 'darkolivegreen',
+    'darkorchid', 'deeppink', 'darkgreen', 'blue4'
+] * 10
 
 def synchronized(f):
     """Thread synchronization decorator. Only allows exactly one thread
@@ -33,7 +48,7 @@ def synchronized(f):
             try:
                 return f(*args, **kwargs)
             except Exception, e:
-                raise
+                raise e
         finally:
             global_lock.release()
     return lockedfunc
@@ -46,19 +61,19 @@ def scatter(points, xlabel, ylabel, title, max_x, max_y, filename, format='png',
         Returns a list with the points in device (pixel) coordinates.
     """
     if format == 'png':
-        grdevices.png(file=filename, units="px", width=dim,
-                      height=dim, type="cairo")
+        grdevices.png(file=filename, units="px", width=800,
+                      height=600, type="cairo")
     elif format == 'pdf':
-        grdevices.bitmap(file=filename, type="pdfwrite")
+        grdevices.bitmap(file=filename, type="pdfwrite", height=7, width=9)
     elif format == 'eps':
-        grdevices.postscript(file=filename)
+        grdevices.postscript(file=filename, height=7, width=9)
     elif format == 'rscript':
         file = open(filename, 'w')
 
     # set margins to fit in labels on the right and top
-    robjects.r.par(mar=robjects.FloatVector([4,4,6,6]))
+    robjects.r.par(mar = robjects.FloatVector([5, 4, 4, 15]))
     if format == 'rscript':
-        file.write('par(mar=c(4,4,6,6))\n')
+        file.write('par(mar=c(5,4,4,15))\n')
 
     if ((xscale == 'log' and yscale == 'log') or (xscale == '' and yscale == '')) and diagonal_line:
         # plot dashed line from (0,0) to (max_x,max_y)
@@ -78,9 +93,11 @@ def scatter(points, xlabel, ylabel, title, max_x, max_y, filename, format='png',
                        'yaxt="n", xlab="", ylab="")\n') % (max_x, max_y, max_x, max_y))
             file.write('par(new=1)\n')
 
-
-    xs = [p[0] for p in points]
-    ys = [p[1] for p in points]
+    xs = []
+    ys = []
+    for ig in points:
+        xs += [p[0] for p in ig]
+        ys += [p[1] for p in ig]
 
     robjects.r.options(scipen=10)
     if format == 'rscript':
@@ -101,23 +118,45 @@ def scatter(points, xlabel, ylabel, title, max_x, max_y, filename, format='png',
         min_y = min([y for y in ys if y > 0.0] or [0.01])
 
     min_v = min(min_x, min_y)
-
-    # plot running times
-    robjects.r.plot(robjects.FloatVector(xs), robjects.FloatVector(ys),
-                    type='p', col='red', las = 1,
-                    xlim=robjects.r.c(min_v,max_x), ylim=robjects.r.c(min_v,max_y),
-                    xaxs='i', yaxs='i', log=log,
-                    xlab='', ylab='', pch=3, tck=0.015,
-                    **{'cex.axis': 1.2, 'cex.main': 1.5})
+    
+    legend_colors = []
+    legend_strs = []
+    legend_point_styles = []
+    col = 0
+    pch = 3 # 3 looks nice
+    for ig in points:
+        ig_xs = [p[0] for p in ig]
+        ig_ys = [p[1] for p in ig]
+        
+        # plot running times
+        robjects.r.plot(robjects.FloatVector(ig_xs), robjects.FloatVector(ig_ys),
+                        type='p', col=colors[col], las = 1,
+                        xlim=robjects.r.c(min_v,max_x), ylim=robjects.r.c(min_v,max_y),
+                        xaxs='i', yaxs='i', log=log,
+                        xlab='', ylab='', pch=pch, tck=0.015,
+                        **{'cex.axis': 1.2, 'cex.main': 1.5})
+        robjects.r.par(new=1)
+        legend_colors.append(colors[col])
+        legend_point_styles.append(pch)
+        legend_strs.append('Group %d' % (col))
+        col += 1
+        pch += 1
 
     # plot labels and axis
     robjects.r.axis(side=4, tck=0.015, las=1,
                     **{'cex.axis': 1.2, 'cex.main': 1.5}) # plot right axis
     robjects.r.axis(side=3, tck=0.015, las=1,
                     **{'cex.axis': 1.2, 'cex.main': 1.5}) # plot top axis
-    robjects.r.mtext(ylabel, side=4, line=3, cex=1.2) # right axis label
+    robjects.r.mtext(ylabel, side=4, line=4, cex=1.2) # right axis label
     robjects.r.mtext(xlabel, side=3, padj=0, line=3, cex=1.2) # top axis label
     robjects.r.mtext(title, padj=-1.7, side=3, line=3, cex=1.7) # plot title
+    
+    robjects.r.par(xpd=True)
+    robjects.r.legend("right", inset=-0.35,
+                      legend=robjects.StrVector(legend_strs),
+                      col=robjects.StrVector(legend_colors),
+                      pch=robjects.IntVector(legend_point_styles))
+    
     if format == 'rscript':
         file.write(('plot(c(%s), c(%s), type="p", col="red", las=1,' + \
                    'xlim=c(%f, %f), ylim=c(%f, %f),' + \
@@ -131,15 +170,19 @@ def scatter(points, xlabel, ylabel, title, max_x, max_y, filename, format='png',
         file.write('mtext("%s", side=3, padj=0, line=3, cex=1.2)\n' % (xlabel,))
         file.write('mtext("%s", padj=-1.7, side=3, line=3, cex=1.7)\n' % (title,))
         file.close()
-
-    pts = zip(robjects.r.grconvertX(robjects.FloatVector(xs), "user", "device"),
-              robjects.r.grconvertY(robjects.FloatVector(ys), "user", "device"))
+    
+    pts = []
+    for ig in points:
+        xs = [p[0] for p in ig]
+        ys = [p[1] for p in ig]
+        pts.append(zip(robjects.r.grconvertX(robjects.FloatVector(xs), "user", "device"),
+              robjects.r.grconvertY(robjects.FloatVector(ys), "user", "device")))
     grdevices.dev_off()
     return pts
 
 
 @synchronized
-def cactus(solvers, max_x, max_y, ylabel, title, filename, format='png'):
+def cactus(solvers, instance_groups_count, colored_instance_groups, max_x, max_y, min_y, log_y, ylabel, title, filename, format='png'):
     """ Cactus plot of the passed solvers configurations. `solvers` has to be
         a list of dictionaries with the keys `xs`, `ys` and `name`. For each
         y in `ys` the corresponding x in `xs` should be the number of
@@ -153,31 +196,55 @@ def cactus(solvers, max_x, max_y, ylabel, title, filename, format='png'):
     elif format == 'eps':
         grdevices.postscript(file=filename, height=7, width=9)
 
-    # list of colors used in the defined order for the different solvers
-    colors = [
-        'red', 'green', 'blue', 'darkgoldenrod1', 'darkolivegreen',
-        'darkorchid', 'deeppink', 'darkgreen', 'blue4'
-    ] * 10
-
     robjects.r.par(mar = robjects.FloatVector([5, 4, 4, 15]))
 
+    log = 'y' if log_y else ''
+    
+    robjects.r.options(scipen=10)
     # plot without data to create the frame
     robjects.r.plot(robjects.FloatVector([]), robjects.FloatVector([]),
-                    type='p', col='red', las = 1,
-                    xlim=robjects.r.c(0,max_x), ylim=robjects.r.c(0,max_y),
+                    type='p', col='red', las = 1, log=log,
+                    xlim=robjects.r.c(0,max_x), ylim=robjects.r.c(min_y,max_y),
                     xaxs='i', yaxs='i',
                     xlab='',ylab='', **{'cex.main': 1.5})
     robjects.r.par(new=1)
 
-    point_style = 0
+    legend_strs = []
+    legend_colors = []
+    legend_point_styles = []
+
+    if colored_instance_groups:
+        point_styles = {}
+        color_styles = dict((i, colors[i]) for i in xrange(instance_groups_count))
+        point_style = 0
+        for s in solvers:
+            if not s['name'] in point_styles:
+                point_styles[s['name']] = point_style
+                point_style += 1
+    else:
+        point_styles = dict((i, i) for i in xrange(instance_groups_count))
+        color_styles = {}
+        i = 0
+        for s in solvers:
+            if not s['name'] in color_styles:
+                color_styles[s['name']] = colors[i]
+                i += 1
+
     for s in solvers:
         xs = s['xs']
         ys = s['ys']
 
         # plot points
+        if colored_instance_groups:
+            col = color_styles[s['instance_group']]
+            pch = point_styles[s['name']]
+        else:
+            col = color_styles[s['name']]
+            pch = point_styles[s['instance_group']]
+
         robjects.r.plot(robjects.FloatVector(xs), robjects.FloatVector(ys),
-                        type='p', col=colors[point_style], pch=point_style,
-                        xlim=robjects.r.c(0,max_x), ylim=robjects.r.c(0,max_y),
+                        type='p', col=col, pch=pch, log=log,
+                        xlim=robjects.r.c(0,max_x), ylim=robjects.r.c(min_y,max_y),
                         xaxs='i', yaxs='i',
                         xaxt='n', yaxt='n',
                         axes=False, xlab='',ylab='', **{'cex.main': 1.5})
@@ -185,14 +252,16 @@ def cactus(solvers, max_x, max_y, ylabel, title, filename, format='png'):
 
         # plot lines
         robjects.r.plot(robjects.FloatVector(xs), robjects.FloatVector(ys),
-                        type='l', col=colors[point_style],lty=1,
-                        xlim=robjects.r.c(0,max_x), ylim=robjects.r.c(0,max_y),
+                        type='l', col=col,lty=1, log=log,
+                        xlim=robjects.r.c(0,max_x), ylim=robjects.r.c(min_y,max_y),
                         xaxs='i', yaxs='i',
                         xaxt='n', yaxt='n',
                         axes=False, xlab='',ylab='', **{'cex.main': 1.5})
         robjects.r.par(new=1)
 
-        point_style += 1
+        legend_strs.append('%s (G%d)' % (newline_split_string(s['name'], 20), s['instance_group']))
+        legend_colors.append(col)
+        legend_point_styles.append(pch)
 
     # plot labels and axes
     robjects.r.mtext('number of solved instances', side=1,
@@ -203,11 +272,12 @@ def cactus(solvers, max_x, max_y, ylabel, title, filename, format='png'):
                      padj=1, side=3, line=3, cex=1.7) # plot title
 
     robjects.r.par(xpd=True)
+    
     # plot legend
-    robjects.r.legend("right", inset=-0.35,
-                      legend=robjects.StrVector([s['name'] for s in solvers]),
-                      col=robjects.StrVector(colors[:len(solvers)]),
-                      pch=robjects.IntVector(range(len(solvers))), lty=1)
+    robjects.r.legend("right", inset=-0.40,
+                      legend=robjects.StrVector(legend_strs),
+                      col=robjects.StrVector(legend_colors),
+                      pch=robjects.IntVector(legend_point_styles), lty=1)
 
     grdevices.dev_off()
 

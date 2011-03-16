@@ -11,15 +11,15 @@
     :license: MIT, see LICENSE for details.
 """
 
-import pylzma
+import pylzma, struct
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, MetaData, func
 from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import mapper, sessionmaker, scoped_session, deferred
-from sqlalchemy.orm import relation, relationship, joinedload, joinedload_all
-from sqlalchemy.sql import and_, or_, not_, select, functions, func
+from sqlalchemy.orm import relation, relationship, joinedload_all
+from sqlalchemy.sql import and_, not_, select
 
-from edacc import config
+from edacc import config, utils
 from edacc.constants import *
 
 
@@ -59,14 +59,17 @@ class EDACCDatabase(object):
                     return 0
                 else:
                     return same_solvers.index(self) + 1
-
+            
             def get_name(self):
                 """ Returns the name of the solver configuration. """
-                n = self.get_number()
-                if n == 0:
-                    return self.solver.name
+                if hasattr(self, 'name'):
+                    return self.name
                 else:
-                    return "%s (%s)" % (self.solver.name, str(n))
+                    n = self.get_number()
+                    if n == 0:
+                        return self.solver.name
+                    else:
+                        return "%s (%s)" % (self.solver.name, str(n))
 
             def __str__(self):
                 return self.get_name()
@@ -90,17 +93,36 @@ class EDACCDatabase(object):
             def get_property_value(self, property, db):
                 """ Returns the value of the property with the given name. """
                 try:
-                    property = db.session.query(db.Property).get(int(property))
-                    pv = db.session.query(db.InstanceProperties) \
-                            .filter_by(property=property, instance=self).first()
-                    return pv.get_value()
+                    for p in self.properties:
+                        if p.idProperty == int(property):
+                            return p.get_value()
                 except:
                     return None
 
+            def get_instance(self, db):
+                """
+                    Decompresses the instance blob if necessary and returns it as string.
+                    EDACC can store compressed and uncompressed instances. To distinguish
+                    between them, we prepend the ASCII characters "LZMA" to a compressed instance.
 
-            def get_instance(self):
-                """ Decompresses the instance blob and returns it as string """
-                return pylzma.decompress(self.instance)
+                """
+                table = db.metadata.tables['Instances']
+                c_instance = table.c['instance']
+                c_id = table.c['idInstance']
+                # get prefix
+                instance_header = db.session.connection().execute(select([func.substring(c_instance, 1, 4)],
+                                            c_id==self.idInstance).select_from(table)).first()[0]
+                data_length = db.session.connection().execute(select([func.length(c_instance)],
+                                            c_id==self.idInstance).select_from(table)).first()[0]
+                if data_length > 32 * 1024 * 1024:
+                    return "Instance too large for processing. Please use the EDACC GUI application."
+                if instance_header == 'LZMA': # compressed instance?
+                    # get blob without LZMA prefix
+                    instance_blob = db.session.connection().execute(select([func.substring(c_instance, 5)],
+                                                c_id==self.idInstance).select_from(table)).first()[0]
+                    return utils.lzma_decompress(instance_blob)
+                else:
+                    return self.instance
 
             def set_instance(self, uncompressed_instance):
                 """ Compresses the instance and sets the instance blob attribute """
@@ -151,7 +173,7 @@ class EDACCDatabase(object):
                 return db.session.query(db.Instance).filter(db.Instance.experiments.contains(self)).filter(not_(db.Instance.idInstance.in_(list(r[0] for r in ids)))).all()
 
             def get_instances(self, db):
-                return db.session.query(db.Instance).options(joinedload_all('properties.property')) \
+                return db.session.query(db.Instance).options(joinedload_all('properties')) \
                         .filter(db.Instance.experiments.contains(self)).distinct().all()
 
             def get_num_solver_configs(self, db):
@@ -361,6 +383,12 @@ class EDACCDatabase(object):
                 'launcherOutputFN': deferred(metadata.tables['ExperimentResults'].c.launcherOutputFN),
                 'watcherOutputFN': deferred(metadata.tables['ExperimentResults'].c.watcherOutputFN),
                 'verifierOutputFN': deferred(metadata.tables['ExperimentResults'].c.verifierOutputFN),
+                'solverExitCode': deferred(metadata.tables['ExperimentResults'].c.solverExitCode),
+                'watcherExitCode': deferred(metadata.tables['ExperimentResults'].c.watcherExitCode),
+                'verifierExitCode': deferred(metadata.tables['ExperimentResults'].c.verifierExitCode),
+                'date_modified': deferred(metadata.tables['ExperimentResults'].c.date_modified),
+                'seed': deferred(metadata.tables['ExperimentResults'].c.seed),
+                'computeQueue': deferred(metadata.tables['ExperimentResults'].c.computeQueue),
                 'solver_configuration': relation(SolverConfiguration),
                 'properties': relationship(ExperimentResultProperty, backref='experiment_result'),
                 'experiment': relation(Experiment, backref='experiment_results'),
@@ -409,6 +437,12 @@ class EDACCDatabase(object):
             dbConfig.competitionPhase = None
             self.session.add(dbConfig)
             self.session.commit()
+            
+        self.db_is_competition = self.session.query(self.DBConfiguration).get(0).competition
+        if not self.db_is_competition:
+            self.db_competition_phase = None
+        else:
+            self.db_competition_phase = self.session.query(self.DBConfiguration).get(0).competitionPhase
 
     def get_result_properties(self):
         """ Returns a list of the result properties in the database that are
@@ -442,21 +476,24 @@ class EDACCDatabase(object):
         """ returns whether this database is a competition database (user management etc.
         necessary) or not
         """
-        return self.session.query(self.DBConfiguration).get(0).competition
+        return self.db_is_competition
 
     def set_competition(self, b):
         self.session.query(self.DBConfiguration).get(0).competition = b
+        self.db_is_competition = b
+        if b == False:
+            self.db_competition_phase = None
 
     def competition_phase(self):
         """ returns the competition phase this database is in (or None,
         if is_competition() == False) as integer
         """
-        if not self.is_competition(): return None
-        return self.session.query(self.DBConfiguration).get(0).competitionPhase
+        return self.db_competition_phase
 
     def set_competition_phase(self, phase):
         if phase is not None and phase not in (1,2,3,4,5,6,7): return
         self.session.query(self.DBConfiguration).get(0).competitionPhase = phase
+        self.db_competition_phase = phase
 
     def __str__(self):
         return self.label

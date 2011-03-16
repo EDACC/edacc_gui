@@ -15,7 +15,6 @@ import datetime
 import json
 import numpy
 import StringIO
-import datetime
 
 from flask import Module
 from flask import render_template as render
@@ -129,7 +128,6 @@ def experiment_solver_configurations(database, experiment_id):
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
     solver_configurations = experiment.solver_configurations
-    solver_configurations.sort(key=lambda sc: sc.solver.name.lower())
 
     # if competition db, show only own solvers if the phase is in OWN_RESULTS
     if not is_admin() and db.is_competition() and db.competition_phase() in OWN_RESULTS:
@@ -359,18 +357,25 @@ def experiment_stats_ajax(database, experiment_id):
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
     num_jobs = db.session.query(db.ExperimentResult).filter_by(experiment=experiment).count()
+    num_jobs_active = db.session.query(db.ExperimentResult) \
+                            .filter_by(experiment=experiment) \
+                            .filter(db.ExperimentResult.priority>=0).count()
     num_jobs_not_started = db.session.query(db.ExperimentResult) \
-            .filter_by(experiment=experiment, status=STATUS_NOT_STARTED).count()
+            .filter_by(experiment=experiment, status=STATUS_NOT_STARTED) \
+            .filter(db.ExperimentResult.priority>=0).count()
     num_jobs_running = db.session.query(db.ExperimentResult) \
-            .filter_by(experiment=experiment, status=STATUS_RUNNING).count()
+            .filter_by(experiment=experiment, status=STATUS_RUNNING) \
+            .filter(db.ExperimentResult.priority>=0).count()
     num_jobs_finished = db.session.query(db.ExperimentResult) \
-            .filter_by(experiment=experiment).filter(db.ExperimentResult.status.in_([STATUS_FINISHED] + list(STATUS_EXCEEDED_LIMITS))).count()
+            .filter_by(experiment=experiment).filter(db.ExperimentResult.status.in_([STATUS_FINISHED] + list(STATUS_EXCEEDED_LIMITS))) \
+            .filter(db.ExperimentResult.priority>=0).count()
     num_jobs_error = db.session.query(db.ExperimentResult) \
-            .filter_by(experiment=experiment).filter(db.ExperimentResult.status.in_(list(STATUS_ERRORS))).count()
+            .filter_by(experiment=experiment).filter(db.ExperimentResult.status.in_(list(STATUS_ERRORS))) \
+            .filter(db.ExperimentResult.priority>=0).count()
 
     avg_time = db.session.query(func.avg(db.ExperimentResult.resultTime)) \
                 .filter_by(experiment=experiment) \
-                .filter_by(experiment=experiment) \
+                .filter(db.ExperimentResult.priority>=0) \
                 .filter(db.ExperimentResult.status.in_(
                         [STATUS_FINISHED] + list(STATUS_EXCEEDED_LIMITS))) \
                 .first()
@@ -384,6 +389,7 @@ def experiment_stats_ajax(database, experiment_id):
 
     return json.dumps({
         'num_jobs': num_jobs,
+        'num_jobs_active': num_jobs_active,
         'num_jobs_not_started': num_jobs_not_started,
         'num_jobs_running': num_jobs_running,
         'num_jobs_finished': num_jobs_finished,
@@ -440,6 +446,7 @@ def experiment_progress_ajax(database, experiment_id):
         where_clause += "ExperimentResults.seed LIKE %s OR "
         where_clause += "ExperimentResults.status LIKE %s OR "
         where_clause += "ExperimentResults.resultCode LIKE %s OR "
+        where_clause += "SolverConfig.name LIKE %s OR "
         where_clause += """
                     CASE ExperimentResults.status
                         """ + '\n'.join(["WHEN %d THEN '%s'" % (k, v) for k, v in JOB_STATUS.iteritems()]) + """
@@ -448,7 +455,7 @@ def experiment_progress_ajax(database, experiment_id):
                     CASE ExperimentResults.resultCode
                         """ + '\n'.join(["WHEN %d THEN '%s'" % (k, v) for k, v in JOB_RESULT_CODE.iteritems()]) + """
                     END LIKE %s) """
-        params += ['%' + request.args.get('sSearch') + '%'] * 9 # 9 conditions
+        params += ['%' + request.args.get('sSearch') + '%'] * 10 # 10 conditions
 
     if where_clause != "": where_clause += " AND "
     where_clause += "ExperimentResults.Experiment_idExperiment = %s "
@@ -576,7 +583,7 @@ def instance_details(database, instance_id):
         if instance.source_class.user != g.User:
             abort(403)
 
-    instance_blob = instance.instance
+    instance_blob = instance.get_instance(db)
     if len(instance_blob) > 1024:
         # show only the first and last 512 characters if the instance is larger than 1kB
         instance_text = instance_blob[:512] + "\n\n... [truncated " + \
@@ -588,7 +595,7 @@ def instance_details(database, instance_id):
     instance_properties = db.get_instance_properties()
 
     return render('instance_details.html', instance=instance,
-                  instance_text=instance_text, blob_size=len(instance.instance),
+                  instance_text=instance_text, blob_size=len(instance_blob),
                   database=database, db=db,
                   instance_properties=instance_properties)
 
@@ -608,7 +615,7 @@ def instance_download(database, instance_id):
     headers.add('Content-Type', 'text/plain')
     headers.add('Content-Disposition', 'attachment', filename=instance.name)
 
-    return Response(response=instance.instance, headers=headers)
+    return Response(response=instance.get_instance(db), headers=headers)
 
 
 @frontend.route('/<database>/experiment/<int:experiment_id>/solver-configurations/<int:solver_configuration_id>')

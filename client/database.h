@@ -65,10 +65,12 @@
 
 #define QUERY_LOCK_JOB "UPDATE ExperimentResults SET status=0 WHERE idJob= %i AND status<0"
 
-#define QUERY_RANDOM_JOB1 "select Floor(rand()*count(idJob)) as ra  from ExperimentResults"\
-						"where status<0 and Experiment_idExperiment = %i  "
+#define QUERY_RANDOM_JOB1 "select Floor(rand()*count(idJob)) as ra  from ExperimentResults WHERE status=-1 "\
+				"AND Experiment_idExperiment= %d AND priority>=0 "
 
-#define QUERY_RANDOM_JOB2 "select idJob from ExperimentResults where status = -1 limit %d,1"
+#define QUERY_RANDOM_JOB2 "select idJob from ExperimentResults WHERE status=-1 AND Experiment_idExperiment= %d AND priority>=0 LIMIT %d,1"
+
+#define QUERY_RANDOM_JOB3 "select idJob from ExperimentResults WHERE idJob = %d  AND status=-1 FOR UPDATE"
 
 //TODO: der obige querey geht viel schneller wenn man folgendes verwendet:
 // select Floor(rand()*count()) as ra from experimentResults where status...
@@ -96,7 +98,6 @@
 		"       ON e.Instances_idInstance = i.idInstance " \
 		"   WHERE e.idJob = %i "
 
-
 /*#define QUERY_JOB "" \
 		"SELECT " \
 		"       e.idJob, " \
@@ -116,7 +117,7 @@
 		"   LEFT JOIN Instances AS i " \
 		"       ON e.Instances_idInstance = i.idInstance " \
 		"   WHERE status<-1 limit %d,1 "
-*/
+ */
 
 #define QUERY_JOB_PARAMS "" \
 		"SELECT " \
@@ -132,8 +133,6 @@
 		"       ON scp.Parameters_idParameter = p.idParameter " \
 		"   WHERE er.idJob = %i " \
 		"   ORDER BY `order` "
-
-
 
 #define UPDATE_JOB ""           \
 		"UPDATE ExperimentResults SET " \
@@ -160,7 +159,6 @@
 		"       computeQueue = %d " \
 		"   WHERE idJob = %i "
 
-
 #define QUERY_SOLVER "" \
 		"SELECT " \
 		"       `binary`, " \
@@ -178,7 +176,6 @@
 #define QUERY_TIME "" \
 		"SELECT " \
 		"  NOW()"
-
 
 //Try to fetch all neede information about the experiment
 //we want to execute from the database.
@@ -202,7 +199,8 @@ status dbUpdate(const job* j);
 status dbUpdateResults(const job* j);
 
 //Try to fetch the solver named solverName from the database
-status dbFetchSolver(const char* solverName,const char* solverVersion, solver* s);
+status dbFetchSolver(const char* solverName, const char* solverVersion,
+		solver* s);
 
 //Try to fetch the instance named instanceName from the database
 status dbFetchInstance(const char* instanceName, instance* i);
@@ -212,5 +210,4 @@ void freeInstance(instance *s);
 
 status setMySQLTime(job *j);
 #endif
-
 

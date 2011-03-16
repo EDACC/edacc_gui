@@ -11,7 +11,7 @@
 
 from flaskext.wtf import Form, TextField, PasswordField, TextAreaField, RadioField
 from flaskext.wtf import FileField, Required, Length, Email, EqualTo, SelectField
-from flaskext.wtf import ValidationError
+from flaskext.wtf import ValidationError, BooleanField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField,\
                                             QuerySelectField
 
@@ -147,7 +147,8 @@ class CactusPlotForm(Form):
     result_property = SelectField('Property')
     sc = QuerySelectMultipleField('Solver Configurations')
     instance_filter = TextField('Filter Instances')
-    i = QuerySelectMultipleField('Instances', get_pk=lambda i: i.idInstance, allow_blank=True)
+    log_y = BooleanField("Logarithmic y-axis")
+    i = QuerySelectMultipleField('Instances (Group 0)', get_pk=lambda i: i.idInstance, allow_blank=True)
 
 class RTDComparisonForm(Form):
     solver_config1 = QuerySelectField('First Solver Configuration')
@@ -182,4 +183,5 @@ class BoxPlotForm(Form):
 
 class RankingForm(Form):
     i = QuerySelectMultipleField('Instances', get_pk=lambda i: i.idInstance, allow_blank=True)
+    calculate_average_dev = BooleanField('Calculate avg. deviation (slow)')
     instance_filter = TextField('Filter Instances')

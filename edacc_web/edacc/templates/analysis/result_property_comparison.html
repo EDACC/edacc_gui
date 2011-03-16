@@ -20,7 +20,7 @@
     <div style="margin-left: 5px; float: left;">
         <h2>Result Property Distribution Comparison</h2>
         <form method="get" action="{{url_for('analysis.result_property_comparison', database=database, experiment_id=experiment.idExperiment)}}">
-            <table>
+            <table id="form_table">
                 {{ render_field(form.solver_config1) }}
                 {{ render_field(form.solver_config2) }}
                 {{ render_field(form.result_property) }}
@@ -29,6 +29,7 @@
                     <td style="vertical-align: middle;">Filter instances</td>
                     <td>{{form.instance_filter}}<img id="instance_filter_apply" src="{{url_for('static', filename='img/search.png')}}"/><img id="instance_filter_clear" src="{{url_for('static', filename='img/clear.png')}}"/><br/>
                         JS expression filter. Valid variables are name, {% for prop in instance_properties %}{{prop.name}}, {% endfor %} <br/>
+                        Example: (numAtoms >= 6000 && numAtoms <= 8000 && name.match(/k3/))
                     </td>
                 </tr>
                 <tr><td colspan="2"><input type="submit" value="Show" /></td></tr>
