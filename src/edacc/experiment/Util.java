@@ -25,6 +25,9 @@ public class Util {
      */
     public static void updateTableColumnWidth(JTable table) {
         int tableWidth = table.getWidth();
+        if (table.getAutoResizeMode() == JTable.AUTO_RESIZE_OFF) {
+            tableWidth = Integer.MAX_VALUE;
+        }
         int colsum = 0;
         int width[] = new int[table.getColumnCount()];
         int minwidth[] = new int[table.getColumnCount()];
@@ -45,7 +48,7 @@ public class Util {
                             false,
                             false,
                             0,
-                            0).getPreferredSize().width;
+                            0).getPreferredSize().width + 10;
                 } else {
                     width[col] = table.getDefaultRenderer(String.class).getTableCellRendererComponent(
                             table,
@@ -53,7 +56,7 @@ public class Util {
                             false,
                             false,
                             0,
-                            0).getPreferredSize().width;
+                            0).getPreferredSize().width + 10;
                 }
                 minwidth[col] = width[col];
                 minwidthsum += width[col];
@@ -69,8 +72,14 @@ public class Util {
             }
         }
         for (int col = 0; col < table.getColumnCount(); col++) {
+            double proz;
             // get the weight for a pixel
-            double proz = (double) tableWidth / (double) colsum;
+            if (table.getAutoResizeMode() == JTable.AUTO_RESIZE_OFF) {
+                proz = 1.;
+            } else {
+
+                proz = (double) tableWidth / (double) colsum;
+            }
             // multiplicate the width of a column with the weight
             int w = (int) Math.round(proz * width[col]);
             if (w < minwidth[col]) {

@@ -62,6 +62,7 @@ public class Solver extends BaseModel implements IntegerPKModel {
         }
     }
 
+    @Override
     public int getId() {
         return id;
     }
@@ -133,5 +134,15 @@ public class Solver extends BaseModel implements IntegerPKModel {
         return hash;
     }
 
-
+    @Override
+    public String toString() {
+        String res = name;
+        if (version != null && !"".equals(version)) {
+            res += " " + version;
+        }
+        if (authors != null && !"".equals(authors)) {
+            res += ", " + authors;
+        }
+        return res;
+    }
 }

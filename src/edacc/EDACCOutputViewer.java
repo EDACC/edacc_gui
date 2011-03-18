@@ -97,16 +97,16 @@ public class EDACCOutputViewer extends javax.swing.JDialog implements TaskEvents
         int ot = -1;
         if (column == ExperimentResultsBrowserTableModel.COL_SOLVER_OUTPUT) {
             ot = ExperimentResult.SOLVER_OUTPUT;
-            title += "solver output - " + expResult.getSolverOutputFilename();
+            title += "solver output";
             } else if (column == ExperimentResultsBrowserTableModel.COL_VERIFIER_OUTPUT) {
             ot = ExperimentResult.VERIFIER_OUTPUT;
-            title += "verifier output - " + expResult.getVerifierOutputFilename();
+            title += "verifier output";
             } else if (column == ExperimentResultsBrowserTableModel.COL_WATCHER_OUTPUT) {
             ot = ExperimentResult.WATCHER_OUTPUT;
-            title += "watcher output - " + expResult.getWatcherOutputFilename();
+            title += "watcher output";
             } else if (column == ExperimentResultsBrowserTableModel.COL_LAUNCHER_OUTPUT) {
             ot = ExperimentResult.LAUNCHER_OUTPUT;
-            title += "launcher output - " + expResult.getLauncherOutputFilename();
+            title += "launcher output";
         }
         setTitle(title);
         if (ot != -1) {

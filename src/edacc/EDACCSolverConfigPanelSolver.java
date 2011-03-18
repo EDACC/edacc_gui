@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * EDACCSolverConfigPanelSolver.java
  *
  * Created on 31.01.2011, 14:37:53
@@ -44,7 +39,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
         layout = new GridBagLayout();
         this.setLayout(layout);
         this.solver = solver;
-        ((TitledBorder) this.getBorder()).setTitle(solver.getName() + " " + solver.getVersion() + ", " + solver.getAuthors());
+        ((TitledBorder) this.getBorder()).setTitle(solver.toString());
     }
 
     /** Creates new form EDACCSolverConfigPanelSolver */
@@ -152,6 +147,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
         }
         if (lastSolver) {
             parent.getSolTableModel().setSolverSelected(entry.getSolverId(), false);
+            parent.remove(this);
         }
         doRepaint();
     }

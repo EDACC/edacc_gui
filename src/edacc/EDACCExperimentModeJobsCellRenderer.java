@@ -22,14 +22,18 @@ public class EDACCExperimentModeJobsCellRenderer extends DefaultTableCellRendere
         this.setOpaque(true);
     }
 
-
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-        if (value == null && ((ExperimentResultsBrowserTableModel) table.getModel()).getIndexForColumn(col) >= ExperimentResultsBrowserTableModel.COL_PROPERTY) {
-            value = "not yet calculated";
+        if (value == null) {
+            int column = ((ExperimentResultsBrowserTableModel) table.getModel()).getIndexForColumn(col);
+            if (column >= ExperimentResultsBrowserTableModel.COL_PROPERTY) {
+                value = "not yet calculated";
+            } else if (column == ExperimentResultsBrowserTableModel.COL_RUNTIME) {
+                value = "not running";
+            }
         }
         final Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-        
+
         row = table.convertRowIndexToModel(row);
         Integer status = ((ExperimentResultsBrowserTableModel) table.getModel()).getStatus(row).getValue();
         if (status == null) {

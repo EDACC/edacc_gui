@@ -1,6 +1,5 @@
 package edacc.experiment;
 
-import edacc.model.NoConnectionToDBException;
 import edacc.satinstances.ConvertException;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -13,7 +12,6 @@ import edacc.model.GridQueueDAO;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasProperty;
-import edacc.model.InstanceHasPropertyDAO;
 import edacc.model.ParameterInstance;
 import edacc.model.ParameterInstanceDAO;
 import edacc.model.Solver;
@@ -48,17 +46,18 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public static final int COL_TIME = 8;
     public static final int COL_SEED = 9;
     public static final int COL_STATUS = 10;
-    public static final int COL_RESULTCODE = 11;
-    public static final int COL_SOLVER_OUTPUT = 12;
-    public static final int COL_LAUNCHER_OUTPUT = 13;
-    public static final int COL_WATCHER_OUTPUT = 14;
-    public static final int COL_VERIFIER_OUTPUT = 15;
-    public static final int COL_PROPERTY = 16;
+    public static final int COL_RUNTIME = 11;
+    public static final int COL_RESULTCODE = 12;
+    public static final int COL_SOLVER_OUTPUT = 13;
+    public static final int COL_LAUNCHER_OUTPUT = 14;
+    public static final int COL_WATCHER_OUTPUT = 15;
+    public static final int COL_VERIFIER_OUTPUT = 16;
+    public static final int COL_PROPERTY = 17;
     private ArrayList<ExperimentResult> jobs;
     // the constant columns
-    private String[] CONST_COLUMNS = {"ID", "Priority", "Compute Queue", "Solver", "Solver Configuration", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
+    private String[] CONST_COLUMNS = {"ID", "Priority", "Compute Queue", "Solver", "Solver Configuration", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Run time", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
     // the visibility of each column
-    private boolean[] CONST_VISIBLE = {false, false, true, true, true, true, true, true, true, true, true, true, false, false, false, false};
+    private boolean[] CONST_VISIBLE = {false, false, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false};
     private String[] columns;
     private ArrayList<Property> properties;
     private boolean[] visible;
@@ -296,7 +295,11 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 }
                 return properties.get(propertyIdx).getPropertyValueType().getJavaType();
             } else {
-                return getRealValueAt(0, col).getClass();
+                if (getRealValueAt(0, col) == null) {
+                    return String.class;
+                } else {
+                    return getRealValueAt(0, col).getClass();
+                }
             }
         }
     }
@@ -362,24 +365,25 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             case COL_SEED:
                 return j.getSeed();
             case COL_STATUS:
-                String status = j.getStatus().toString();
+                return j.getStatus().toString();
+            case COL_RUNTIME:
                 if (j.getStatus() == ExperimentResultStatus.RUNNING) {
                     int hours = j.getRunningTime() / 3600;
                     int minutes = (j.getRunningTime() / 60) % 60;
                     int seconds = j.getRunningTime() % 60;
-                    status += " (" + new Formatter().format("%02d:%02d:%02d", hours, minutes, seconds) + ")";
+                    return new Formatter().format("%02d:%02d:%02d", hours, minutes, seconds);
                 }
-                return status;
+                return null;
             case COL_RESULTCODE:
                 return j.getResultCode().toString();
             case COL_SOLVER_OUTPUT:
-                return j.getSolverOutputFilename() == null ? "-" : j.getSolverOutputFilename();
+                return "view";
             case COL_LAUNCHER_OUTPUT:
-                return j.getLauncherOutputFilename() == null ? "-" : j.getLauncherOutputFilename();
+                return "view";
             case COL_WATCHER_OUTPUT:
-                return j.getWatcherOutputFilename() == null ? "-" : j.getWatcherOutputFilename();
+                return "view";
             case COL_VERIFIER_OUTPUT:
-                return j.getVerifierOutputFilename() == null ? "-" : j.getVerifierOutputFilename();
+                return "view";
             default:
                 int propertyIdx = columnIndex - COL_PROPERTY;
                 if (properties.size() <= propertyIdx) {

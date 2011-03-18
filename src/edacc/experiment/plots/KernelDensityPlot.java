@@ -79,11 +79,11 @@ public class KernelDensityPlot extends Plot {
             instance = (Instance) comboInstance.getSelectedItem();
             property = (Property) comboProperty.getSelectedItem();
         }
-        expController.updateExperimentResults();
+        expController.getExperimentResults().updateExperimentResults();
         title = "Kernel density estimation for " + sc.getName() + " on " + instance.getName() + " for property "+ property.getName() + expController.getActiveExperiment().getName() + ")";
 
         ArrayList<Double> values = new ArrayList<Double>();
-        for (ExperimentResult er : expController.getResults(sc.getId(), instance.getId())) {
+        for (ExperimentResult er : expController.getExperimentResults().getResults(sc.getId(), instance.getId())) {
             Double value = expController.getValue(er, property);
             if (value == null) {
                 // TODO: warning
