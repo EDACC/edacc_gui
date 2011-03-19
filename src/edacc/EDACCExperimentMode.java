@@ -510,12 +510,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         panelExperimentParams = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblGenerateJobs = new javax.swing.JTable();
+        tblGenerateJobs = new MultipleCellSelectionTable();
         jPanel6 = new javax.swing.JPanel();
         btnSelectQueue = new javax.swing.JButton();
         btnGeneratePackage = new javax.swing.JButton();
         btnGenerateJobs = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        btnSetNumRuns = new javax.swing.JButton();
         panelJobBrowser = new javax.swing.JPanel();
         jScrollPane6 = new javax.swing.JScrollPane();
         tableJobs = tableJobs = new JTable() {
@@ -1208,7 +1208,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         ));
         tblGenerateJobs.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         tblGenerateJobs.setAutoscrolls(false);
-        tblGenerateJobs.setColumnSelectionAllowed(true);
         tblGenerateJobs.setDoubleBuffered(true);
         tblGenerateJobs.setName("tblGenerateJobs"); // NOI18N
         tblGenerateJobs.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -1237,11 +1236,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnGenerateJobs.setName("btnGenerateJobs"); // NOI18N
         btnGenerateJobs.setPreferredSize(new java.awt.Dimension(197, 25));
 
-        jButton1.setText(resourceMap.getString("jButton1.text")); // NOI18N
-        jButton1.setName("jButton1"); // NOI18N
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnSetNumRuns.setText(resourceMap.getString("btnSetNumRuns.text")); // NOI18N
+        btnSetNumRuns.setName("btnSetNumRuns"); // NOI18N
+        btnSetNumRuns.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnSetNumRunsActionPerformed(evt);
             }
         });
 
@@ -1254,7 +1253,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnGeneratePackage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnSetNumRuns, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 618, Short.MAX_VALUE)
                 .addComponent(btnGenerateJobs, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1267,7 +1266,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     .addComponent(btnSelectQueue)
                     .addComponent(btnGenerateJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnGeneratePackage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
+                    .addComponent(btnSetNumRuns))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1770,23 +1769,22 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         packageFileChooser.setVisible(true);
 }//GEN-LAST:event_btnGeneratePackage
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        EDACCExperimentModeNumRunsSetter dialogNumRuns = new EDACCExperimentModeNumRunsSetter(EDACCApp.getApplication().getMainFrame(), true, tblGenerateJobs.getSelectedRow() == -1);
+    private void btnSetNumRunsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSetNumRunsActionPerformed
+        MultipleCellSelectionTable table = (MultipleCellSelectionTable) tblGenerateJobs;
+        EDACCExperimentModeNumRunsSetter dialogNumRuns = new EDACCExperimentModeNumRunsSetter(EDACCApp.getApplication().getMainFrame(), true, table.getSelectedCount() == 0);
         dialogNumRuns.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         EDACCApp.getApplication().show(dialogNumRuns);
         if (!dialogNumRuns.isCanceled()) {
-            for (int row = 0; row < generateJobsTableModel.getRowCount(); row++) {
-                for (int col = 1; col < generateJobsTableModel.getColumnCount(); col++) {
-                    if (dialogNumRuns.isAll()
-                            || tblGenerateJobs.getColumnModel().getSelectionModel().isSelectedIndex(col)
-                            && tblGenerateJobs.isRowSelected(row)) {
+            for (int row = 0; row < table.getRowCount(); row++) {
+                for (int col = 1; col < table.getColumnCount(); col++) {
+                    if (dialogNumRuns.isAll() || table.isCellSelected(row, col)) {
                         generateJobsTableModel.setNumRuns(generateJobsTableModel.getInstance(tblGenerateJobs.convertRowIndexToModel(row)), generateJobsTableModel.getSolverConfiguration(tblGenerateJobs.convertColumnIndexToModel(col)), dialogNumRuns.getNumRuns());
                     }
                 }
             }
             generateJobsTableModel.fireTableDataChanged();
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnSetNumRunsActionPerformed
 
     private void btnChangeViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangeViewActionPerformed
         if (jScrollPane4.getViewport().getView() == solverConfigTablePanel) {
@@ -2205,13 +2203,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JButton btnSelectAllSolvers;
     private javax.swing.JButton btnSelectQueue;
     private javax.swing.JButton btnSelectedInstances;
+    private javax.swing.JButton btnSetNumRuns;
     private javax.swing.JButton btnSetPriority;
     private javax.swing.JButton btnUndoInstances;
     private javax.swing.JButton btnUndoSolverConfigurations;
     private javax.swing.JCheckBox chkGenerateSeeds;
     private javax.swing.JCheckBox chkJobsTimer;
     private javax.swing.JCheckBox chkLinkSeeds;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
