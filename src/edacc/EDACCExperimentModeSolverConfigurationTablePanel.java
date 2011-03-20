@@ -7,10 +7,20 @@ package edacc;
 
 import edacc.model.Solver;
 import edacc.model.SolverDAO;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -107,9 +117,55 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private class SolverConfigDialog extends JDialog {
+
+        private boolean apply;
+
+        public SolverConfigDialog(EDACCSolverConfigEntry entry) {
+            super();
+            JButton btnCancel = new JButton("Cancel");
+            JButton btnApply = new JButton("Apply");
+            apply = false;
+            btnCancel.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    SolverConfigDialog.this.setVisible(false);
+                }
+            });
+
+            btnApply.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    SolverConfigDialog.this.apply = true;
+                    SolverConfigDialog.this.setVisible(false);
+                }
+            });
+
+            JPanel bottom = new JPanel();
+            bottom.setLayout(new BoxLayout(bottom, BoxLayout.LINE_AXIS));
+            bottom.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+            bottom.add(Box.createHorizontalGlue());
+
+            bottom.add(btnCancel);
+
+            bottom.add(Box.createRigidArea(new Dimension(10, 0)));
+            bottom.add(btnApply);
+
+            Container contentPane = getContentPane();
+            contentPane.add(entry, BorderLayout.CENTER);
+            contentPane.add(bottom, BorderLayout.SOUTH);
+        }
+
+        public boolean userApplied() {
+            return apply;
+        }
+    }
+
     private void itemEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemEditActionPerformed
         if (table.getSelectedRow() != -1) {
-            JDialog dialog = new JDialog();
+
             EDACCSolverConfigEntry entry = tableModel.getEntry(table.convertRowIndexToModel(table.getSelectedRow()));
             try {
                 EDACCSolverConfigEntry copy;
@@ -120,11 +176,16 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
                 }
                 copy.assign(entry);
                 copy.removeButtons();
-                dialog.setContentPane(copy);
+
+
+                SolverConfigDialog dialog = new SolverConfigDialog(copy);
                 dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
                 dialog.setModal(true);
                 EDACCApp.getApplication().show(dialog);
-                entry.assign(copy);
+                if (dialog.userApplied()) {
+                    entry.assign(copy);
+                }
+                dialog.dispose();
             } catch (Exception e) {
                 // TODO: error
             }
@@ -137,7 +198,6 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
         }
         tableModel.update();
     }//GEN-LAST:event_itemRemoveActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem itemEdit;
     private javax.swing.JMenuItem itemRemove;
