@@ -170,6 +170,7 @@
     <Component class="javax.swing.JCheckBox" name="chkImport">
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="chkImport.text"/>
+        <Property name="enabled" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="chkImport" noResource="true"/>
       </Properties>
       <Events>

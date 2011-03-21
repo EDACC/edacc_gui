@@ -25,11 +25,6 @@ public class ExperimentResult extends BaseModel implements Serializable {
     private int InstanceId;
     private int runningTime;
 
-    private String solverOutputFilename;
-    private String launcherOutputFilename;
-    private String watcherOutputFilename;
-    private String verifierOutputFilename;
-
     private int solverExitCode;
     private int watcherExitCode;
     private int verifierExitCode;
@@ -54,11 +49,6 @@ public class ExperimentResult extends BaseModel implements Serializable {
         this.ExperimentId = ExperimentId;
         this.InstanceId = InstanceId;
         this.startTime = startTime;
-        String filename = "results/" + this.ExperimentId + "_" + this.SolverConfigId + "_" + this.InstanceId + "_R" + this.run + ".res";
-        this.solverOutputFilename = filename + ".solver";
-        this.launcherOutputFilename = filename + ".launcher";
-        this.watcherOutputFilename = filename + ".watcher";
-        this.verifierOutputFilename = filename + ".verifier";
     }
 
     @Override
@@ -100,7 +90,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         return ExperimentId;
     }
 
-    public void setExperimentId(int ExperimentId) {
+    protected void setExperimentId(int ExperimentId) {
         this.ExperimentId = ExperimentId;
         if (this.isSaved()) {
             this.setModified();
@@ -111,7 +101,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         return priority;
     }
 
-    public void setPriority(int priority) {
+    protected void setPriority(int priority) {
         this.priority = priority;
         if (this.isSaved()) {
             this.setModified();
@@ -122,7 +112,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         return InstanceId;
     }
 
-    public void setInstanceId(int InstanceId) {
+    protected void setInstanceId(int InstanceId) {
         this.InstanceId = InstanceId;
         if (this.isSaved()) {
             this.setModified();
@@ -133,7 +123,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         return SolverConfigId;
     }
 
-    public void setSolverConfigId(int SolverConfigId) {
+    protected void setSolverConfigId(int SolverConfigId) {
         this.SolverConfigId = SolverConfigId;
         if (this.isSaved()) {
             this.setModified();
@@ -152,7 +142,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         return run;
     }
 
-    public void setRun(int run) {
+    protected void setRun(int run) {
         this.run = run;
         if (this.isSaved()) {
             this.setModified();
@@ -163,7 +153,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         return seed;
     }
 
-    public void setSeed(int seed) {
+    protected void setSeed(int seed) {
         this.seed = seed;
         if (this.isSaved()) {
             this.setModified();
@@ -174,7 +164,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         return status;
     }
 
-    public void setStatus(int status) {
+    protected void setStatus(int status) {
         this.status = ExperimentResultStatus.getExperimentResultStatus(status);
         if (this.isSaved()) {
             this.setModified();
@@ -185,7 +175,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         return resultTime;
     }
 
-    public void setResultTime(float resultTime) {
+    protected void setResultTime(float resultTime) {
         this.resultTime = resultTime;
         if (this.isSaved()) {
             this.setModified();
@@ -196,7 +186,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         return runningTime;
     }
 
-    public void setRunningTime(int runningTime) {
+    protected void setRunningTime(int runningTime) {
         this.runningTime = runningTime;
     }
 
@@ -204,71 +194,40 @@ public class ExperimentResult extends BaseModel implements Serializable {
         return computeQueue;
     }
 
-    public void setComputeQueue(int computeQueue) {
+    protected void setComputeQueue(int computeQueue) {
         this.computeQueue = computeQueue;
     }
 
-    public String getLauncherOutputFilename() {
-        return launcherOutputFilename;
-    }
-
-    public void setLauncherOutputFilename(String launcherOutputFilename) {
-        this.launcherOutputFilename = launcherOutputFilename;
-    }
 
     public int getSolverExitCode() {
         return solverExitCode;
     }
 
-    public void setSolverExitCode(int solverExitCode) {
+    protected void setSolverExitCode(int solverExitCode) {
         this.solverExitCode = solverExitCode;
-    }
-
-    public String getSolverOutputFilename() {
-        return solverOutputFilename;
-    }
-
-    public void setSolverOutputFilename(String solverOutputFilename) {
-        this.solverOutputFilename = solverOutputFilename;
     }
 
     public int getVerifierExitCode() {
         return verifierExitCode;
     }
 
-    public void setVerifierExitCode(int verifierExitCode) {
+    protected void setVerifierExitCode(int verifierExitCode) {
         this.verifierExitCode = verifierExitCode;
-    }
-
-    public String getVerifierOutputFilename() {
-        return verifierOutputFilename;
-    }
-
-    public void setVerifierOutputFilename(String verifierOutputFilename) {
-        this.verifierOutputFilename = verifierOutputFilename;
     }
 
     public int getWatcherExitCode() {
         return watcherExitCode;
     }
 
-    public void setWatcherExitCode(int watcherExitCode) {
+    protected void setWatcherExitCode(int watcherExitCode) {
         this.watcherExitCode = watcherExitCode;
-    }
-
-    public String getWatcherOutputFilename() {
-        return watcherOutputFilename;
-    }
-
-    public void setWatcherOutputFilename(String watcherOutputFilename) {
-        this.watcherOutputFilename = watcherOutputFilename;
     }
 
     public ExperimentResultResultCode getResultCode() {
         return resultCode;
     }
 
-    public void setResultCode(int resultCode) {
+    protected void setResultCode(int resultCode) {
         this.resultCode = ExperimentResultResultCode.getExperimentResultResultCode(resultCode);
     }
 
@@ -276,7 +235,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         return propertyValues;
     }
 
-    public void setPropertyValues(HashMap<Integer, ExperimentResultHasProperty> propertyValues) {
+    protected void setPropertyValues(HashMap<Integer, ExperimentResultHasProperty> propertyValues) {
         this.propertyValues = propertyValues;
     }
 
@@ -284,7 +243,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         return datemodified;
     }
 
-    public void setDatemodified(Timestamp datemodified) {
+    protected void setDatemodified(Timestamp datemodified) {
         this.datemodified = datemodified;
     }
 
@@ -292,7 +251,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         return startTime;
     }
 
-    public void setStartTime(Timestamp startTime) {
+    protected void setStartTime(Timestamp startTime) {
         this.startTime = startTime;
         if (isSaved()) {
             setModified();

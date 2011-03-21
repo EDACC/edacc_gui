@@ -11,7 +11,7 @@ public class ExperimentTableModel extends AbstractTableModel {
     public static final int COL_DATE = 2;
     public static final int COL_NUMRUNS = 3;
     public static final int COL_DESCRIPTION = 4;
-    private String[] columns = {"ID", "Name", "Date", "Number of runs", "Description"};
+    private String[] columns = {"ID", "Name", "Date", "Number of jobs", "Description"};
     private ArrayList<Experiment> experiments;
 
     public ExperimentTableModel() {
@@ -59,7 +59,7 @@ public class ExperimentTableModel extends AbstractTableModel {
             case COL_DATE:
                 return experiments.get(rowIndex).getDate();
             case COL_NUMRUNS:
-                return experiments.get(rowIndex).getNumRuns();
+                return experiments.get(rowIndex).getNumJobs();
             case COL_DESCRIPTION:
                 return experiments.get(rowIndex).getDescription();
             default:

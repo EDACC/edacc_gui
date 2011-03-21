@@ -72,7 +72,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
         comboRun.addItem("all runs - average");
         comboRun.addItem("all runs - median");
         comboRun.addItem("all runs");
-        for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
+        for (Integer i = 0; i <= expController.getMaxRun(); i++) {
             comboRun.addItem(i);
         }
         for (Property sProp : expController.getResultProperties()) {
@@ -122,7 +122,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
             xlog = scaleSelector.isXScaleLog();
             ylog = scaleSelector.isYScaleLog();
         }
-        expController.updateExperimentResults();
+        expController.getExperimentResults().updateExperimentResults();
         infos = null;
         double ymax = 0.;
         double xmax = 0.;
@@ -134,7 +134,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
         int xNoProp = 0, yNoProp = 0;
         for (Instance instance : instances) {
             if (run == ALLRUNS) {
-                ArrayList<ExperimentResult> ysResults = expController.getResults(solverConfig.getId(), instance.getId());
+                ArrayList<ExperimentResult> ysResults = expController.getExperimentResults().getResults(solverConfig.getId(), instance.getId());
                 for (ExperimentResult yres : ysResults) {
                     Double xsValue = expController.getValue(instance, instanceProperty);
                     Double ysValue = expController.getValue(yres, solverProperty);
@@ -165,7 +165,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
                 }
             } else if (run == MEDIAN || run == AVERAGE) {
                 // get the x/y results and calculate the count of the not verified jobs
-                ArrayList<ExperimentResult> ysResults = expController.getResults(solverConfig.getId(), instance.getId());
+                ArrayList<ExperimentResult> ysResults = expController.getExperimentResults().getResults(solverConfig.getId(), instance.getId());
                 Double xsValue = expController.getValue(instance, instanceProperty);
                 Double ysValue;
                 if (run == MEDIAN) {
@@ -192,7 +192,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
                         + "</html>"));
             } else {
                 // get the x/y results, this is for a particular run
-                ExperimentResult ysResult = expController.getResult(solverConfig.getId(), instance.getId(), run);
+                ExperimentResult ysResult = expController.getExperimentResults().getResult(solverConfig.getId(), instance.getId(), run);
 
                 if (ysResult == null) {
                     yNoResult++;

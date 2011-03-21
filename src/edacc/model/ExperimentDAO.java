@@ -132,8 +132,6 @@ public class ExperimentDAO {
         i.setMemoryLimit(rs.getInt("memoryLimit"));
         i.setStackSizeLimit(rs.getInt("stackSizeLimit"));
         i.setOutputSizeLimit(rs.getInt("outputSizeLimit"));
-        
-        updateNumRuns(i);
         return i;
     }
 
@@ -216,35 +214,24 @@ public class ExperimentDAO {
         return solvers;
     }
 
-    /**
-     * Updates the numRuns property for an experiment.
-     * @param exp the experiment to be updated
-     */
-    public static void updateNumRuns(Experiment exp) {
-        try {
-            final String query = "SELECT MAX(run)+1 from ExperimentResults where Experiment_idExperiment=?";
-         //   final String query = "select rCount DIV (iCount*sCount) from (select count(*) AS sCount from (select idSolverConfig from SolverConfig WHERE Experiment_idExperiment=? GROUP BY idSolverConfig) AS solverConfigs) AS tblS JOIN (select count(*) AS rCount from ExperimentResults WHERE Experiment_idExperiment=?) AS tblR JOIN (select count(*) AS iCount from (select Instances_idInstance from ExperimentResults WHERE Experiment_idExperiment=? GROUP BY Instances_idInstance) AS instances) AS tblI";
-            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
-            ps.setInt(1, exp.getId());
-           // ps.setInt(2, exp.getId());
-          //  ps.setInt(3, exp.getId());
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                exp.setNumRuns(rs.getInt(1));
-            } else {
-                exp.setNumRuns(0);
-            }
-        } catch (SQLException ex) {
-            exp.setNumRuns(0);
-        }
-    }
-
     public static int getRunCountInExperimentForSolverConfigurationAndInstance(Experiment exp, Integer idSolverConfig, Integer idInstance) throws SQLException {
         final String query = "select count(idJob) from ExperimentResults WHERE Experiment_idExperiment = ? AND solverConfig_idSolverConfig = ? AND Instances_idInstance = ?";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.setInt(1, exp.getId());
         ps.setInt(2, idSolverConfig);
         ps.setInt(3, idInstance);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        } else {
+            return 0;
+        }
+    }
+
+    public static int getJobCount(Experiment experiment) throws SQLException {
+        final String query = "SELECT COUNT(idJob) FROM ExperimentResults WHERE Experiment_idExperiment = ?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, experiment.getId());
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
             return rs.getInt(1);

@@ -80,11 +80,11 @@ public class RTDPlot extends Plot {
             instance = (Instance) comboInstance.getSelectedItem();
             property = (Property) comboProperty.getSelectedItem();
         }
-        expController.updateExperimentResults();
+        expController.getExperimentResults().updateExperimentResults();
         title = "Property distribution comparison on " + instance + " (" + expController.getActiveExperiment().getName() + ")";
         infos = null;
-        ArrayList<ExperimentResult> results1 = expController.getResults(sc1.getId(), instance.getId());
-        ArrayList<ExperimentResult> results2 = expController.getResults(sc2.getId(), instance.getId());
+        ArrayList<ExperimentResult> results1 = expController.getExperimentResults().getResults(sc1.getId(), instance.getId());
+        ArrayList<ExperimentResult> results2 = expController.getExperimentResults().getResults(sc2.getId(), instance.getId());
 
         double max_x = 0;
         ArrayList<Double> resultsDouble1 = new ArrayList<Double>();

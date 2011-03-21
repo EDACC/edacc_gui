@@ -83,7 +83,7 @@ public class BoxPlot extends Plot {
             }
 
         }
-        expController.updateExperimentResults();
+        expController.getExperimentResults().updateExperimentResults();
         int k = 0;
         ArrayList<String> warnings = new ArrayList<String>();
         String[] names = new String[solverConfigs.size()];
@@ -91,7 +91,7 @@ public class BoxPlot extends Plot {
             int noProp = 0;
             ArrayList<ExperimentResult> results = new ArrayList<ExperimentResult>();
             for (Instance i : instances) {
-                results.addAll(expController.getResults(sc.getId(), i.getId()));
+                results.addAll(expController.getExperimentResults().getResults(sc.getId(), i.getId()));
             }
             ArrayList<Double> values = new ArrayList<Double>();
             for (ExperimentResult er : results) {

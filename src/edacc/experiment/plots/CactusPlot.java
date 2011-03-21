@@ -65,7 +65,7 @@ public class CactusPlot extends Plot {
         comboRun.addItem(AVERAGE_TEXT);
         comboRun.addItem(MEDIAN_TEXT);
         comboRun.addItem(ALLRUNS_TEXT);
-        for (Integer i = 0; i < expController.getActiveExperiment().getNumRuns(); i++) {
+        for (Integer i = 0; i <= expController.getMaxRun(); i++) {
             comboRun.addItem(i);
         }
         comboProperty.removeAllItems();
@@ -111,7 +111,7 @@ public class CactusPlot extends Plot {
                 selectedInstanceIds.add(i.getId());
             }
         }
-        expController.updateExperimentResults();
+        expController.getExperimentResults().updateExperimentResults();
         SolverInfos[] solver = new SolverInfos[solverConfigs.size()];
         double max_y = 0;
         int max_x = 0;
@@ -121,7 +121,7 @@ public class CactusPlot extends Plot {
             int k = 0;
             for (Integer instanceId : selectedInstanceIds) {
                 if (run == ALLRUNS) {
-                    ArrayList<ExperimentResult> tmp = expController.getResults(sc.getId(), instanceId, statusCodes);
+                    ArrayList<ExperimentResult> tmp = expController.getExperimentResults().getResults(sc.getId(), instanceId, statusCodes);
                     for (ExperimentResult er : tmp) {
                         Double value = expController.getValue(er, property, false);
                         if (value != null) {
@@ -129,7 +129,7 @@ public class CactusPlot extends Plot {
                         }
                     }
                 } else if (run == MEDIAN || run == AVERAGE) {
-                    ArrayList<ExperimentResult> results = expController.getResults(sc.getId(), instanceId, statusCodes);
+                    ArrayList<ExperimentResult> results = expController.getExperimentResults().getResults(sc.getId(), instanceId, statusCodes);
                     Double value;
                     if (run == MEDIAN) {
                         value = getMedian(results, property, false);
@@ -140,7 +140,7 @@ public class CactusPlot extends Plot {
                         resultValues.add(value);
                     }
                 } else {
-                    ExperimentResult res = expController.getResult(sc.getId(), instanceId, run);
+                    ExperimentResult res = expController.getExperimentResults().getResult(sc.getId(), instanceId, run);
                     if (res == null) {
                         continue;
                     }

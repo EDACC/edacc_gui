@@ -11,6 +11,7 @@ import edacc.experiment.AnalysisPanel;
 import edacc.experiment.ExperimentController;
 import edacc.experiment.ExperimentResultsBrowserTableModel;
 import edacc.experiment.ExperimentTableModel;
+import edacc.experiment.GenerateJobsTableModel;
 import edacc.experiment.InstanceTableModel;
 import edacc.experiment.SolverTableModel;
 import edacc.experiment.Util;
@@ -61,6 +62,8 @@ import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -82,11 +85,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public TableRowSorter<InstanceTableModel> sorter;
     public EDACCJobsFilter resultBrowserRowFilter;
     public DefaultTreeModel instanceClassTreeModel;
-    //  private EDACCExperimentModeVirtualExperimentSettings pnlVirtualExperimentSettings = new EDACCExperimentModeVirtualExperimentSettings();
     private EDACCInstanceFilter instanceFilter;
     private EDACCOutputViewer outputViewer;
     private EDACCExperimentModeJobsCellRenderer tableJobsStringRenderer;
     private ResultsBrowserTableRowSorter resultsBrowserTableRowSorter;
+    public GenerateJobsTableModel generateJobsTableModel;
+    private EDACCExperimentModeSolverConfigurationTablePanel solverConfigTablePanel;
     private AnalysisPanel analysePanel;
     private Timer jobsTimer = null;
     private Integer resultBrowserETA;
@@ -95,7 +99,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     /** Creates new form EDACCExperimentMode */
     public EDACCExperimentMode() {
-
         initComponents();
         expController = new ExperimentController(this, solverConfigPanel);
         /* -------------------------------- experiment tab -------------------------------- */
@@ -135,6 +138,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         });
         /* -------------------------------- end of experiment tab -------------------------------- */
         /* -------------------------------- solver tab -------------------------------- */
+        solverConfigTablePanel = new EDACCExperimentModeSolverConfigurationTablePanel(solverConfigPanel);
         solTableModel = new SolverTableModel();
         tableSolvers.setModel(solTableModel);
         solverConfigPanel.setParent(this);
@@ -166,7 +170,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jTreeInstanceClass.setShowsRootHandles(true);
         /* -------------------------------- end of instances tab -------------------------------- */
         /* -------------------------------- generate jobs tab -------------------------------- */
+        generateJobsTableModel = new GenerateJobsTableModel(expController);
+        tblGenerateJobs.setModel(generateJobsTableModel);
+        generateJobsTableModel.addTableModelListener(new TableModelListener() {
 
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                setGenerateJobsTitle();
+            }
+        });
         /* -------------------------------- end of generate jobs tab -------------------------------- */
         /* -------------------------------- jobs browser tab -------------------------------- */
         jobsTableModel = new ExperimentResultsBrowserTableModel();
@@ -321,6 +333,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         expController.unloadExperiment();
         reinitializeExperiments();
         reinitializeInstances();
+        reinitializeSolvers();
         reinitializeJobBrowser();
     }
 
@@ -335,6 +348,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             jTreeInstanceClass.collapseRow(i);
         }
         lblFilterStatus.setText("");
+    }
+
+    public void reinitializeSolvers() {
+        jScrollPane4.setViewportView(solverConfigPanel);
     }
 
     public void reinitializeJobBrowser() {
@@ -388,12 +405,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }
 
     public void enableEditExperiment(Integer CPUTimeLimit, Integer wallClockTimeLimit, Integer memoryLimit, Integer stackSizeLimit, Integer outputSizeLimit, Integer maxSeed, boolean generateSeeds, boolean linkSeeds) {
-        /* try {
-        javax.swing.GroupLayout layout = (javax.swing.GroupLayout) panelManageExperiment.getLayout();
-        layout.replace(pnlVirtualExperimentSettings, pnlEditExperiment);
-        } catch (java.lang.IllegalArgumentException e) {
-        // happens if we have already the edit experiment settings panel
-        }*/
         pnlEditExperiment.setEnabled(true);
         txtMemoryLimit.setText(memoryLimit.toString());
         txtMemoryLimit.setEnabled(true);
@@ -415,14 +426,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnEditExperimentUndo.setEnabled(true);
     }
 
-    /*public void enableVirtualExperiment() {
-    try {
-    javax.swing.GroupLayout layout = (javax.swing.GroupLayout) panelManageExperiment.getLayout();
-    layout.replace(pnlEditExperiment, pnlVirtualExperimentSettings);
-    } catch (java.lang.IllegalArgumentException e) {
-    // happens if we have already the virtual experiment settings panel
-    }
-    }*/
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -471,6 +474,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnReverseSolverSelection = new javax.swing.JButton();
         btnChooseSolvers = new javax.swing.JButton();
         btnUndoSolverConfigurations = new javax.swing.JButton();
+        btnChangeView = new javax.swing.JButton();
         panelChooseInstances = new javax.swing.JPanel();
         jSplitPane2 = new javax.swing.JSplitPane();
         jPanel4 = new javax.swing.JPanel();
@@ -490,13 +494,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         lblFilterStatus = new javax.swing.JLabel();
         panelExperimentParams = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        txtNumRuns = new javax.swing.JTextField();
-        btnGenerateJobs = new javax.swing.JButton();
-        lblNumJobs = new javax.swing.JLabel();
-        lblCurNumRuns = new javax.swing.JLabel();
-        btnGeneratePackage = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblGenerateJobs = new MultipleCellSelectionTable();
+        jPanel6 = new javax.swing.JPanel();
         btnSelectQueue = new javax.swing.JButton();
+        btnGeneratePackage = new javax.swing.JButton();
+        btnGenerateJobs = new javax.swing.JButton();
+        btnSetNumRuns = new javax.swing.JButton();
         panelJobBrowser = new javax.swing.JPanel();
         jScrollPane6 = new javax.swing.JScrollPane();
         tableJobs = tableJobs = new JTable() {
@@ -793,9 +797,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addComponent(btnEditExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnDiscardExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnLoadExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(14, 14, 14))
         );
 
         jPanel7Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnCreateExperiment, btnDiscardExperiment, btnLoadExperiment, btnRemoveExperiment});
@@ -803,14 +807,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnLoadExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnDiscardExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnEditExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnRemoveExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnCreateExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(13, Short.MAX_VALUE))
+                    .addComponent(btnCreateExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnLoadExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         javax.swing.GroupLayout panelManageExperimentLayout = new javax.swing.GroupLayout(panelManageExperiment);
@@ -827,12 +830,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         );
         panelManageExperimentLayout.setVerticalGroup(
             panelManageExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelManageExperimentLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManageExperimentLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32)
+                .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlEditExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -915,12 +918,22 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnChooseSolvers.setText(resourceMap.getString("btnChooseSolvers.text")); // NOI18N
         btnChooseSolvers.setToolTipText(resourceMap.getString("btnChooseSolvers.toolTipText")); // NOI18N
         btnChooseSolvers.setName("btnChooseSolvers"); // NOI18N
+        btnChooseSolvers.setPreferredSize(new java.awt.Dimension(109, 25));
 
         btnUndoSolverConfigurations.setAction(actionMap.get("btnUndoSolverConfigurations")); // NOI18N
         btnUndoSolverConfigurations.setText(resourceMap.getString("btnUndoSolverConfigurations.text")); // NOI18N
         btnUndoSolverConfigurations.setToolTipText(resourceMap.getString("btnUndoSolverConfigurations.toolTipText")); // NOI18N
         btnUndoSolverConfigurations.setName("btnUndoSolverConfigurations"); // NOI18N
         btnUndoSolverConfigurations.setPreferredSize(new java.awt.Dimension(109, 25));
+
+        btnChangeView.setText(resourceMap.getString("btnChangeView.text")); // NOI18N
+        btnChangeView.setName("btnChangeView"); // NOI18N
+        btnChangeView.setPreferredSize(new java.awt.Dimension(109, 25));
+        btnChangeView.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnChangeViewActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelChooseSolverLayout = new javax.swing.GroupLayout(panelChooseSolver);
         panelChooseSolver.setLayout(panelChooseSolverLayout);
@@ -937,8 +950,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnReverseSolverSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnChooseSolvers)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 492, Short.MAX_VALUE)
+                        .addComponent(btnChooseSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 337, Short.MAX_VALUE)
+                        .addComponent(btnChangeView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnUndoSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSaveSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -955,8 +970,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     .addComponent(btnDeselectAllSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnReverseSolverSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSaveSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnChooseSolvers)
-                    .addComponent(btnUndoSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnChooseSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnUndoSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnChangeView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -1165,30 +1181,31 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         jPanel1.setName("jPanel1"); // NOI18N
 
-        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
-        jLabel1.setName("jLabel1"); // NOI18N
+        jScrollPane1.setName("jScrollPane1"); // NOI18N
 
-        txtNumRuns.setText(resourceMap.getString("txtNumRuns.text")); // NOI18N
-        txtNumRuns.setToolTipText(resourceMap.getString("txtNumRuns.toolTipText")); // NOI18N
-        txtNumRuns.setName("txtNumRuns"); // NOI18N
-        txtNumRuns.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtNumRunsKeyReleased(evt);
+        tblGenerateJobs.setAutoCreateRowSorter(true);
+        tblGenerateJobs.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
             }
-        });
+        ));
+        tblGenerateJobs.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        tblGenerateJobs.setAutoscrolls(false);
+        tblGenerateJobs.setDoubleBuffered(true);
+        tblGenerateJobs.setName("tblGenerateJobs"); // NOI18N
+        tblGenerateJobs.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        jScrollPane1.setViewportView(tblGenerateJobs);
 
-        btnGenerateJobs.setAction(actionMap.get("btnGenerateJobs")); // NOI18N
-        btnGenerateJobs.setText(resourceMap.getString("btnGenerateJobs.text")); // NOI18N
-        btnGenerateJobs.setToolTipText(resourceMap.getString("btnGenerateJobs.toolTipText")); // NOI18N
-        btnGenerateJobs.setName("btnGenerateJobs"); // NOI18N
-        btnGenerateJobs.setPreferredSize(new java.awt.Dimension(197, 25));
+        jPanel6.setName("jPanel6"); // NOI18N
 
-        lblNumJobs.setText(resourceMap.getString("lblNumJobs.text")); // NOI18N
-        lblNumJobs.setName("lblNumJobs"); // NOI18N
-
-        lblCurNumRuns.setText(resourceMap.getString("lblCurNumRuns.text")); // NOI18N
-        lblCurNumRuns.setToolTipText(resourceMap.getString("lblCurNumRuns.toolTipText")); // NOI18N
-        lblCurNumRuns.setName("lblCurNumRuns"); // NOI18N
+        btnSelectQueue.setAction(actionMap.get("btnSelectQueue")); // NOI18N
+        btnSelectQueue.setText(resourceMap.getString("btnSelectQueue.text")); // NOI18N
+        btnSelectQueue.setToolTipText(resourceMap.getString("btnSelectQueue.toolTipText")); // NOI18N
+        btnSelectQueue.setName("btnSelectQueue"); // NOI18N
+        btnSelectQueue.setPreferredSize(new java.awt.Dimension(155, 25));
 
         btnGeneratePackage.setText(resourceMap.getString("generatePackage.text")); // NOI18N
         btnGeneratePackage.setToolTipText(resourceMap.getString("generatePackage.toolTipText")); // NOI18N
@@ -1200,48 +1217,60 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         });
 
-        btnSelectQueue.setAction(actionMap.get("btnSelectQueue")); // NOI18N
-        btnSelectQueue.setText(resourceMap.getString("btnSelectQueue.text")); // NOI18N
-        btnSelectQueue.setToolTipText(resourceMap.getString("btnSelectQueue.toolTipText")); // NOI18N
-        btnSelectQueue.setName("btnSelectQueue"); // NOI18N
+        btnGenerateJobs.setAction(actionMap.get("btnGenerateJobs")); // NOI18N
+        btnGenerateJobs.setText(resourceMap.getString("btnGenerateJobs.text")); // NOI18N
+        btnGenerateJobs.setToolTipText(resourceMap.getString("btnGenerateJobs.toolTipText")); // NOI18N
+        btnGenerateJobs.setName("btnGenerateJobs"); // NOI18N
+        btnGenerateJobs.setPreferredSize(new java.awt.Dimension(155, 25));
+
+        btnSetNumRuns.setText(resourceMap.getString("btnSetNumRuns.text")); // NOI18N
+        btnSetNumRuns.setName("btnSetNumRuns"); // NOI18N
+        btnSetNumRuns.setPreferredSize(new java.awt.Dimension(155, 25));
+        btnSetNumRuns.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSetNumRunsActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addComponent(btnSelectQueue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnGeneratePackage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnSetNumRuns, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 530, Short.MAX_VALUE)
+                .addComponent(btnGenerateJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSelectQueue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnGenerateJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnGeneratePackage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSetNumRuns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(btnSelectQueue, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnGenerateJobs, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-                    .addComponent(btnGeneratePackage, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtNumRuns, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblCurNumRuns)
-                    .addComponent(lblNumJobs))
-                .addContainerGap(923, Short.MAX_VALUE))
+            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1150, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(txtNumRuns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblCurNumRuns))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSelectQueue)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnGeneratePackage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnGenerateJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblNumJobs, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(464, Short.MAX_VALUE))
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout panelExperimentParamsLayout = new javax.swing.GroupLayout(panelExperimentParams);
@@ -1482,12 +1511,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }
 
     public boolean generateJobsIsModified() {
-        int numRuns = 0;
-        try {
-            numRuns = Integer.parseInt(txtNumRuns.getText());
-        } catch (NumberFormatException _) {
-        }
-        return expController.experimentResultsIsModified(numRuns);
+
+        return expController.experimentResultsIsModified();
     }
 
     private void manageExperimentPaneStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_manageExperimentPaneStateChanged
@@ -1502,8 +1527,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             insTableModel.fireTableDataChanged();
         } else if (manageExperimentPane.getSelectedIndex() == 3) {
             // generate jobs tab
-            lblCurNumRuns.setText("currently: " + String.valueOf(expController.getActiveExperiment().getNumRuns()));
-            lblNumJobs.setText(String.valueOf(expController.getNumJobs()) + " jobs in the database");
             try {
                 if (GridQueuesController.getInstance().getChosenQueuesByExperiment(expController.getActiveExperiment()).isEmpty()) {
                     btnGeneratePackage.setEnabled(false);
@@ -1586,11 +1609,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
     }//GEN-LAST:event_manageExperimentPaneStateChanged
 
-    private void btnGeneratePackage(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGeneratePackage
-        EDACCGeneratePackageFileChooser packageFileChooser = new EDACCGeneratePackageFileChooser(EDACCApp.getApplication().getMainFrame(), true, expController);
-        packageFileChooser.setVisible(true);
-    }//GEN-LAST:event_btnGeneratePackage
-
     private void txtCPUTimeLimitKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCPUTimeLimitKeyReleased
         int ss = txtCPUTimeLimit.getSelectionStart();
         int se = txtCPUTimeLimit.getSelectionEnd();
@@ -1634,17 +1652,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private void chkLinkSeedsMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chkLinkSeedsMouseReleased
         setTitles();
     }//GEN-LAST:event_chkLinkSeedsMouseReleased
-
-    private void txtNumRunsKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNumRunsKeyReleased
-        int ss = txtNumRuns.getSelectionStart();
-        int se = txtNumRuns.getSelectionEnd();
-        int dot = txtNumRuns.getCaret().getDot();
-        txtNumRuns.setText(Util.getNumberText(txtNumRuns.getText()));
-        txtNumRuns.getCaret().setDot(dot);
-        txtNumRuns.setSelectionStart(ss);
-        txtNumRuns.setSelectionEnd(se);
-        setGenerateJobsTitle();
-    }//GEN-LAST:event_txtNumRunsKeyReleased
 
     private void chkJobsTimerMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chkJobsTimerMouseReleased
         if (chkJobsTimer.isSelected()) {
@@ -1745,6 +1752,37 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
     }//GEN-LAST:event_jTreeInstanceClassValueChanged
 
+    private void btnGeneratePackage(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGeneratePackage
+        EDACCGeneratePackageFileChooser packageFileChooser = new EDACCGeneratePackageFileChooser(EDACCApp.getApplication().getMainFrame(), true, expController);
+        packageFileChooser.setVisible(true);
+}//GEN-LAST:event_btnGeneratePackage
+
+    private void btnSetNumRunsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSetNumRunsActionPerformed
+        MultipleCellSelectionTable table = (MultipleCellSelectionTable) tblGenerateJobs;
+        EDACCExperimentModeNumRunsSetter dialogNumRuns = new EDACCExperimentModeNumRunsSetter(EDACCApp.getApplication().getMainFrame(), true, table.getSelectedCount() == 0);
+        dialogNumRuns.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+        EDACCApp.getApplication().show(dialogNumRuns);
+        if (!dialogNumRuns.isCanceled()) {
+            for (int row = 0; row < table.getRowCount(); row++) {
+                for (int col = 1; col < table.getColumnCount(); col++) {
+                    if (dialogNumRuns.isAll() || table.isCellSelected(row, col)) {
+                        generateJobsTableModel.setNumRuns(generateJobsTableModel.getInstance(tblGenerateJobs.convertRowIndexToModel(row)), generateJobsTableModel.getSolverConfiguration(tblGenerateJobs.convertColumnIndexToModel(col)), dialogNumRuns.getNumRuns());
+                    }
+                }
+            }
+            generateJobsTableModel.fireTableDataChanged();
+        }
+    }//GEN-LAST:event_btnSetNumRunsActionPerformed
+
+    private void btnChangeViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangeViewActionPerformed
+        if (jScrollPane4.getViewport().getView() == solverConfigTablePanel) {
+            jScrollPane4.setViewportView(solverConfigPanel);
+        } else {
+            solverConfigTablePanel.update();
+            jScrollPane4.setViewportView(solverConfigTablePanel);
+        }
+    }//GEN-LAST:event_btnChangeViewActionPerformed
+
     public void stopJobsTimer() {
         if (jobsTimer != null) {
             jobsTimer.cancel();
@@ -1764,15 +1802,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         manageExperimentPane.setEnabledAt(3, true);
         manageExperimentPane.setEnabledAt(4, true);
         manageExperimentPane.setEnabledAt(5, true);
-        /*   if (expController.getActiveExperiment() instanceof VirtualExperiment) {
-        enableVirtualExperiment();
 
-        } else {*/
         enableEditExperiment(expController.getActiveExperiment().getCPUTimeLimit(), expController.getActiveExperiment().getWallClockTimeLimit(),
                 expController.getActiveExperiment().getMemoryLimit(), expController.getActiveExperiment().getStackSizeLimit(),
                 expController.getActiveExperiment().getOutputSizeLimit(), expController.getActiveExperiment().getMaxSeed(),
                 expController.getActiveExperiment().isAutoGeneratedSeeds(), expController.getActiveExperiment().isLinkSeeds());
-        //    }
         setTitles();
         btnDiscardExperiment.setEnabled(true);
     }
@@ -1793,7 +1827,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }
 
     private void createDatabaseErrorMessage(SQLException e) {
-        javax.swing.JOptionPane.showMessageDialog(null, "There was an error while communicating with the database: " + e, "Connection error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        javax.swing.JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "There was an error while communicating with the database: " + e, "Connection error", javax.swing.JOptionPane.ERROR_MESSAGE);
     }
 
     @Action
@@ -1912,17 +1946,67 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         }
         solverConfigPanel.endUpdate();
+        if (jScrollPane4.getViewport().getView() == solverConfigTablePanel) {
+            solverConfigTablePanel.update();
+        }
         setTitles();
     }
 
     @Action
     public void btnSaveSolverConfigurations() {
-        Tasks.startTask("saveSolverConfigurations", new Class[]{Tasks.class}, new Object[]{null}, expController, this);
+        Tasks.startTask(new TaskRunnable() {
+
+            @Override
+            public void run(Tasks task) {
+                try {
+                    expController.saveSolverConfigurations(task);
+                } catch (final Exception e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            EDACCExperimentMode.this.onTaskFailed("", e);
+                        }
+                    });
+
+                } finally {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            setTitles();
+                            setGenerateJobsTitle();
+                        }
+                    });
+
+                }
+            }
+        });
     }
 
     @Action
     public void btnUndoSolverConfigurations() {
-        Tasks.startTask("undoSolverConfigurations", new Class[]{Tasks.class}, new Object[]{null}, expController, this);
+        Tasks.startTask(new TaskRunnable() {
+
+            @Override
+            public void run(Tasks task) {
+                try {
+                    expController.undoSolverConfigurations(task);
+                } catch (final SQLException e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            createDatabaseErrorMessage(e);
+                        }
+                    });
+                } finally {
+                    if (jScrollPane4.getViewport().getView() == solverConfigTablePanel) {
+                        solverConfigTablePanel.update();
+                    }
+                }
+            }
+        });
     }
 
     @Action
@@ -1979,16 +2063,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             return;
         }
         try {
-            int numRuns = Integer.parseInt(txtNumRuns.getText());
-            Tasks.startTask("generateJobs", new Class[]{int.class, edacc.model.Tasks.class}, new Object[]{numRuns, null}, expController, this);
-        } catch (NumberFormatException ex) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    javax.swing.JOptionPane.showMessageDialog(null, "Expected integers for number of runs, timeout and max seed", "invalid data", javax.swing.JOptionPane.ERROR_MESSAGE);
-                }
-            });
+            Tasks.startTask("generateJobs", new Class[]{edacc.model.Tasks.class}, new Object[]{null}, expController, this);
         } catch (final Exception ex) {
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -2085,6 +2160,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBrowserColumnSelection;
+    private javax.swing.JButton btnChangeView;
     private javax.swing.JButton btnChooseSolvers;
     private javax.swing.JButton btnComputeResultProperties;
     private javax.swing.JButton btnCreateExperiment;
@@ -2111,13 +2187,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JButton btnSelectAllSolvers;
     private javax.swing.JButton btnSelectQueue;
     private javax.swing.JButton btnSelectedInstances;
+    private javax.swing.JButton btnSetNumRuns;
     private javax.swing.JButton btnSetPriority;
     private javax.swing.JButton btnUndoInstances;
     private javax.swing.JButton btnUndoSolverConfigurations;
     private javax.swing.JCheckBox chkGenerateSeeds;
     private javax.swing.JCheckBox chkJobsTimer;
     private javax.swing.JCheckBox chkLinkSeeds;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -2130,7 +2206,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
@@ -2138,11 +2216,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JTree jTreeInstanceClass;
-    private javax.swing.JLabel lblCurNumRuns;
     private javax.swing.JLabel lblETA;
     private javax.swing.JLabel lblFilterStatus;
     private javax.swing.JLabel lblJobsFilterStatus;
-    private javax.swing.JLabel lblNumJobs;
     private javax.swing.JTabbedPane manageExperimentPane;
     private javax.swing.JScrollPane panelAnalysis;
     private javax.swing.JPanel panelChooseInstances;
@@ -2156,11 +2232,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JTable tableInstances;
     public javax.swing.JTable tableJobs;
     private javax.swing.JTable tableSolvers;
+    public javax.swing.JTable tblGenerateJobs;
     private javax.swing.JTextField txtCPUTimeLimit;
     private javax.swing.JTextField txtJobsTimer;
     private javax.swing.JTextField txtMaxSeeds;
     private javax.swing.JTextField txtMemoryLimit;
-    private javax.swing.JTextField txtNumRuns;
     private javax.swing.JTextField txtOutputSizeLimit;
     private javax.swing.JTextField txtStackSizeLimit;
     private javax.swing.JTextField txtWallClockTimeLimit;
@@ -2170,15 +2246,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public void onTaskSuccessful(String methodName, Object result) {
         if ("generateJobs".equals(methodName)) {
             int added_experiments = (Integer) result;
-            lblNumJobs.setText(String.valueOf(expController.getNumJobs()) + " jobs in the database");
-            lblCurNumRuns.setText("currently: " + String.valueOf(expController.getActiveExperiment().getNumRuns()));
             javax.swing.JOptionPane.showMessageDialog(null, "Added " + added_experiments + " new " + (added_experiments == 1 ? "job" : "jobs") + ".", "Jobs added", javax.swing.JOptionPane.INFORMATION_MESSAGE);
             setGenerateJobsTitle();
         } else if ("loadExperiment".equals(methodName)) {
-            txtNumRuns.setText("" + expController.getActiveExperiment().getNumRuns());
             setTitles();
             setGenerateJobsTitle();
-        } else if ("saveSolverConfigurations".equals(methodName) || "saveExperimentHasInstances".equals(methodName)) {
+        } else if ("saveExperimentHasInstances".equals(methodName)) {
             setTitles();
             setGenerateJobsTitle();
         } else if ("loadJobs".equals(methodName)) {
@@ -2460,63 +2533,94 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         }
     }
-}
 
-class ResultsBrowserTableRowSorter extends TableRowSorter<ExperimentResultsBrowserTableModel> {
+    class ResultsBrowserTableRowSorter extends TableRowSorter<AbstractTableModel> {
 
-    ResultsBrowserTableRowSorter(ExperimentResultsBrowserTableModel jobsTableModel) {
-        super(jobsTableModel);
-    }
-
-    @Override
-    public void setModel(ExperimentResultsBrowserTableModel model) {
-        super.setModel(model);
-        setModelWrapper(new ExperimentResultsBrowserModelWrapper<ExperimentResultsBrowserTableModel>(getModelWrapper()));
-    }
-
-    @Override
-    public void toggleSortOrder(int column) {
-        synchronized (getModel()) {
-            super.toggleSortOrder(column);
-        }
-    }
-
-    class ExperimentResultsBrowserModelWrapper<M extends TableModel> extends DefaultRowSorter.ModelWrapper<M, Integer> {
-
-        private DefaultRowSorter.ModelWrapper<M, Integer> delegate;
-
-        public ExperimentResultsBrowserModelWrapper(DefaultRowSorter.ModelWrapper<M, Integer> delegate) {
-            this.delegate = delegate;
+        ResultsBrowserTableRowSorter(ExperimentResultsBrowserTableModel jobsTableModel) {
+            super(jobsTableModel);
         }
 
         @Override
-        public M getModel() {
-            return delegate.getModel();
+        public void setModel(AbstractTableModel model) {
+            super.setModel(new DefaultTableModel() {
+
+                @Override
+                public int getRowCount() {
+                    return jobsTableModel.getRowCount();
+                }
+
+                @Override
+                public Object getValueAt(int row, int column) {
+                    return jobsTableModel.getValueAt(row, column);
+                }
+
+                @Override
+                public Class<?> getColumnClass(int columnIndex) {
+                    int col = jobsTableModel.getIndexForColumn(columnIndex);
+                    if (col == ExperimentResultsBrowserTableModel.COL_RUNTIME) {
+                        return Integer.class;
+                    }
+                    return jobsTableModel.getColumnClass(columnIndex);
+                }
+
+                @Override
+                public int getColumnCount() {
+                    return jobsTableModel.getColumnCount();
+                }
+            });
+            setModelWrapper(new ExperimentResultsBrowserModelWrapper<AbstractTableModel>(getModelWrapper()));
         }
 
         @Override
-        public int getColumnCount() {
-            return delegate.getColumnCount();
-        }
-
-        @Override
-        public int getRowCount() {
-            return delegate.getRowCount();
-        }
-
-        @Override
-        public Object getValueAt(int row, int column) {
-            ExperimentResultsBrowserTableModel model = ((ExperimentResultsBrowserTableModel) this.getModel());
-            int col = model.getIndexForColumn(column);
-            if (col == ExperimentResultsBrowserTableModel.COL_STATUS) {
-                return "" + (char) (model.getStatus(row).getValue() + 68);
+        public void toggleSortOrder(int column) {
+            synchronized (getModel()) {
+                super.toggleSortOrder(column);
             }
-            return model.getValueAt(row, column);
         }
 
-        @Override
-        public Integer getIdentifier(int row) {
-            return delegate.getIdentifier(row);
+        class ExperimentResultsBrowserModelWrapper<M extends TableModel> extends DefaultRowSorter.ModelWrapper<M, Integer> {
+
+            private DefaultRowSorter.ModelWrapper<M, Integer> delegate;
+
+            public ExperimentResultsBrowserModelWrapper(DefaultRowSorter.ModelWrapper<M, Integer> delegate) {
+                this.delegate = delegate;
+            }
+
+            @Override
+            public M getModel() {
+                return delegate.getModel();
+            }
+
+            @Override
+            public int getColumnCount() {
+                return delegate.getColumnCount();
+            }
+
+            @Override
+            public int getRowCount() {
+                return delegate.getRowCount();
+            }
+
+            @Override
+            public Object getValueAt(int row, int column) {
+                ExperimentResultsBrowserTableModel model = jobsTableModel;
+                int col = model.getIndexForColumn(column);
+                if (col == ExperimentResultsBrowserTableModel.COL_STATUS) {
+                    return "" + (char) (model.getStatus(row).getValue() + 68);
+                } else if (col == ExperimentResultsBrowserTableModel.COL_RUNTIME) {
+                    if (model.getExperimentResult(row).getStatus().equals(ExperimentResultStatus.RUNNING)) {
+                        return model.getExperimentResult(row).getRunningTime();
+                    } else {
+                        return -1;
+                    }
+                }
+                return model.getValueAt(row, column);
+            }
+
+            @Override
+            public Integer getIdentifier(int row) {
+                return delegate.getIdentifier(row);
+            }
         }
     }
 }

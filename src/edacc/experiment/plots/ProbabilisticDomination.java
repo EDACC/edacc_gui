@@ -134,7 +134,7 @@ public class ProbabilisticDomination extends Plot {
                 ArrayList<Instance> crossovers = new ArrayList<Instance>();
                 task.setStatus("Loading data from database");
                 try {
-                    probDom.expController.updateExperimentResults();
+                    probDom.expController.getExperimentResults().updateExperimentResults();
                 } catch (Exception e) {
                     // TODO: error
                     return;
@@ -197,8 +197,8 @@ public class ProbabilisticDomination extends Plot {
     }
 
     public int probabilisticDominates(Instance instance, SolverConfiguration sc1, SolverConfiguration sc2, Property prop) throws REngineInitializationException {
-        ArrayList<ExperimentResult> results1 = expController.getResults(sc1.getId(), instance.getId());
-        ArrayList<ExperimentResult> results2 = expController.getResults(sc2.getId(), instance.getId());
+        ArrayList<ExperimentResult> results1 = expController.getExperimentResults().getResults(sc1.getId(), instance.getId());
+        ArrayList<ExperimentResult> results2 = expController.getExperimentResults().getResults(sc2.getId(), instance.getId());
         ArrayList<Double> resultsDouble1 = new ArrayList<Double>();
         ArrayList<Double> resultsDouble2 = new ArrayList<Double>();
         for (ExperimentResult res : results1) {

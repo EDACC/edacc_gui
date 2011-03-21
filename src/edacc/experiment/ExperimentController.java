@@ -15,6 +15,7 @@ import edacc.model.ExperimentHasInstance;
 import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
+import edacc.model.ExperimentResultDAO.IdValue;
 import edacc.model.ExperimentResultHasProperty;
 import edacc.model.ExperimentResultNotInDBException;
 import edacc.model.ExperimentResultResultCode;
@@ -28,8 +29,6 @@ import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasProperty;
 import edacc.model.InstanceNotInDBException;
 import edacc.model.NoConnectionToDBException;
-import edacc.model.ParameterInstance;
-import edacc.model.ParameterInstanceDAO;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
 import edacc.model.Solver;
@@ -74,11 +73,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 /**
  * Experiment design more controller class, handles requests by the GUI
  * for creating, removing, loading, etc. experiments.
- * Provides caching for experiment results. Use the higher level methods to get
- * the experiment results. Those methods are synchronized and therefore can be
- * used in threads.
- * updateExperimentResults() will update the local cache for the current experiment
- * and should be called first.
  * @author daniel, simon
  */
 public class ExperimentController {
@@ -89,11 +83,7 @@ public class ExperimentController {
     private ArrayList<Experiment> experiments;
     private static RandomNumberGenerator rnd = new JavaRandom();
     // caching experiments
-    // use of resultMap must be synchronized
-    private HashMap<ResultIdentifier, ExperimentResult> resultMap;
-    private Timestamp lastUpdated;
-    private Experiment experiment;
-    // end of caching experiment results
+    private ExperimentResultCache experimentResultCache;
     public static Property PROP_CPUTIME;
 
     /**
@@ -137,7 +127,8 @@ public class ExperimentController {
      * @param task
      * @throws SQLException
      */
-    public void loadExperiment(Experiment exp, Tasks task) throws SQLException {
+    public void loadExperiment(Experiment exp, Tasks task) throws SQLException, Exception {
+        main.reinitializeSolvers();
         activeExperiment = exp;
         main.solverConfigPanel.beginUpdate();
         solverConfigPanel.removeAll();
@@ -147,21 +138,28 @@ public class ExperimentController {
         Vector<ExperimentHasInstance> ehi = new Vector<ExperimentHasInstance>();
         task.setStatus("Loading solvers..");
         vs.addAll(SolverDAO.getAll());
-        task.setTaskProgress(.33f);
+        main.solTableModel.setSolvers(vs);
+        task.setTaskProgress(.25f);
         task.setStatus("Loading solver configurations..");
         vss.addAll(SolverConfigurationDAO.getSolverConfigurationByExperimentId(exp.getId()));
-        task.setTaskProgress(.66f);
-        task.setStatus("Loading instances..");
-        // select instances for the experiment
-        ehi.addAll(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
-        main.solTableModel.setSolvers(vs);
         for (int i = 0; i < vss.size(); i++) {
             main.solverConfigPanel.addSolverConfiguration(vss.get(i));
         }
-        main.insTableModel.setExperimentHasInstances(ehi);
         main.solverConfigPanel.endUpdate();
-        task.setStatus("Finalizing");
-        ExperimentDAO.updateNumRuns(exp);
+        task.setTaskProgress(.5f);
+        task.setStatus("Loading instances..");
+        // select instances for the experiment
+        ehi.addAll(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
+        main.insTableModel.setExperimentHasInstances(ehi);
+
+        task.setTaskProgress(.75f);
+        task.setStatus("Loading experiment results..");
+        experimentResultCache = new ExperimentResultCache(activeExperiment);
+        experimentResultCache.updateExperimentResults();
+
+        main.generateJobsTableModel.updateNumRuns();
+        Util.updateTableColumnWidth(main.tblGenerateJobs);
+
         main.afterExperimentLoaded();
     }
 
@@ -179,6 +177,10 @@ public class ExperimentController {
         initialize();
     }
 
+    public ExperimentResultCache getExperimentResults() {
+        return experimentResultCache;
+    }
+
     /**
      * returns a reference to the currently loaded experiment or null, if none
      * @return active experiment reference
@@ -193,6 +195,7 @@ public class ExperimentController {
      */
     public void unloadExperiment() {
         activeExperiment = null;
+        experimentResultCache = null;
         main.afterExperimentUnloaded();
     }
 
@@ -269,6 +272,7 @@ public class ExperimentController {
             } else {
                 task.setStatus("Deleting jobs..");
                 ExperimentResultDAO.deleteExperimentResults(deletedJobs);
+                activeExperiment.invalidateNumJobs();
             }
         }
         task.setStatus("Saving solver configurations..");
@@ -300,6 +304,8 @@ public class ExperimentController {
             }
         }
         SolverConfigurationDAO.saveAll();
+        main.generateJobsTableModel.updateNumRuns();
+        Util.updateTableColumnWidth(main.tblGenerateJobs);
         if (invalidSeedGroup) {
             SwingUtilities.invokeAndWait(new Runnable() {
 
@@ -365,6 +371,7 @@ public class ExperimentController {
             } else {
                 task.setStatus("Deleting jobs..");
                 ExperimentResultDAO.deleteExperimentResults(deletedJobs);
+                activeExperiment.invalidateNumJobs();
             }
         }
         task.setStatus("Saving instances..");
@@ -380,6 +387,8 @@ public class ExperimentController {
             ExperimentHasInstanceDAO.removeExperimentHasInstance(ehi);
         }
         main.insTableModel.setExperimentHasInstances(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
+        main.generateJobsTableModel.updateNumRuns();
+        Util.updateTableColumnWidth(main.tblGenerateJobs);
     }
 
     /**
@@ -393,14 +402,13 @@ public class ExperimentController {
 
     /**
      * generates the ExperimentResults (jobs) in the database for the currently active experiment
-     * This is the cartesian product of the set of solver configs and the set of the selected instances
      * Doesn't overwrite existing jobs
      * @throws SQLException
      * @param numRuns
      * @return number of jobs added to the experiment results table
      * @throws SQLException
      */
-    public synchronized int generateJobs(int numRuns, final Tasks task) throws SQLException, TaskCancelledException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
+    public synchronized int generateJobs(final Tasks task) throws SQLException, TaskCancelledException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
         PropertyChangeListener cancelExperimentResultDAOStatementListener = new PropertyChangeListener() {
 
             @Override
@@ -416,7 +424,7 @@ public class ExperimentController {
 
         task.setOperationName("Generating jobs for experiment " + activeExperiment.getName());
         task.setStatus("Loading data from database");
-        updateExperimentResults();
+        experimentResultCache.updateExperimentResults();
         // get instances of this experiment
         LinkedList<Instance> listInstances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
 
@@ -427,26 +435,42 @@ public class ExperimentController {
         HashMap<SeedGroup, Integer> linked_seeds = new HashMap<SeedGroup, Integer>();
         ArrayList<ExperimentResult> experiment_results = new ArrayList<ExperimentResult>();
 
-        int elements = listInstances.size() * vsc.size() * numRuns;
-        ExperimentDAO.updateNumRuns(activeExperiment);
-        if (numRuns < activeExperiment.getNumRuns()) {
-            // We have to delete jobs
-            int runsToDelete = activeExperiment.getNumRuns() - numRuns;
-            task.setStatus("Preparing..");
-            ArrayList<Integer> runs = getAllRuns();
-            ArrayList<Integer> deleteRuns = new ArrayList<Integer>();
-            Random random = new Random();
-            for (int i = 0; i < runsToDelete; i++) {
-                if (runs.isEmpty()) {
-                    break;
+        ArrayList<ExperimentResult> deleteJobs = new ArrayList<ExperimentResult>();
+        ArrayList<IdValue<Integer>> updateJobs = new ArrayList<IdValue<Integer>>();
+        task.setStatus("Preparing..");
+        int elements = 0; // # jobs when finished
+        for (Instance i : listInstances) {
+            for (SolverConfiguration sc : vsc) {
+                int numRuns = main.generateJobsTableModel.getNumRuns(i, sc);
+                elements += numRuns;
+                int currentNumRuns = experimentResultCache.getResults(sc.getId(), i.getId()).size();
+                if (currentNumRuns > numRuns) {
+                    // we have to delete jobs
+                    ArrayList<Integer> runs = new ArrayList<Integer>();
+                    for (int run = 0; run < currentNumRuns; run++) {
+                        runs.add(run);
+                    }
+                    int runsToDelete = currentNumRuns - numRuns;
+                    Random random = new Random();
+                    for (int k = 0; k < runsToDelete; k++) {
+                        if (runs.isEmpty()) {
+                            break;
+                        }
+                        int index = random.nextInt(runs.size());
+                        deleteJobs.add(experimentResultCache.getResult(sc.getId(), i.getId(), runs.get(index)));
+                        runs.remove(index);
+                    }
+
+                    for (int k = 0; k < runs.size(); k++) {
+                        updateJobs.add(new IdValue<Integer>(experimentResultCache.getResult(sc.getId(), i.getId(), runs.get(k)).getId(), k));
+                    }
                 }
-                int index = random.nextInt(runs.size());
-                deleteRuns.add(runs.get(index));
-                runs.remove(index);
             }
-            ArrayList<ExperimentResult> deletedJobs = new ArrayList<ExperimentResult>();
-            deletedJobs.addAll(getAllByRun(deleteRuns));
-            String msg = "The number of runs specified is less than the number of runs in this experiment. There are " + deletedJobs.size() + " jobs which would be deleted. Do you want to continue?";
+        }
+
+        if (!deleteJobs.isEmpty()) {
+            // We have to delete jobs
+            String msg = "The number of runs specified is less than the number of runs in this experiment. There are " + deleteJobs.size() + " jobs which would be deleted. Do you want to continue?";
             int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), msg, "Jobs would be deleted", javax.swing.JOptionPane.YES_NO_OPTION);
             Tasks.getTaskView().setCancelable(true);
             task.setTaskProgress(0.f);
@@ -457,27 +481,10 @@ public class ExperimentController {
                 task.addPropertyChangeListener(cancelExperimentResultDAOStatementListener);
                 try {
                     ExperimentResultDAO.setAutoCommit(false);
-                    ExperimentResultDAO.deleteExperimentResults(deletedJobs);
+                    ExperimentResultDAO.deleteExperimentResults(deleteJobs);
                     task.setStatus("Updating existing jobs..");
-                    ArrayList<ExperimentResult> updateJobs = new ArrayList<ExperimentResult>();
-                    for (int i = 0; i < runs.size(); i++) {
-                        if (task.isCancelled()) {
-                            throw new TaskCancelledException();
-                        }
-
-                        ArrayList<ExperimentResult> tmp = this.getAllByRun(runs.get(i));
-                        for (ExperimentResult er : tmp) {
-                            er.setRun(i);
-                        }
-                        updateJobs.addAll(tmp);
-                        task.setTaskProgress((float) (i + 1) / (runs.size()));
-                    }
-                    task.setTaskProgress(0.f);
-
-
                     ExperimentResultDAO.batchUpdateRun(updateJobs);
                 } catch (Exception ex) {
-                    System.out.println("ROLLBACK!");
                     DatabaseConnector.getInstance().getConn().rollback();
                     if (ex.getMessage().contains("cancelled")) {
                         throw new TaskCancelledException();
@@ -491,25 +498,28 @@ public class ExperimentController {
                     ExperimentResultDAO.setAutoCommit(true);
                 }
                 task.removePropertyChangeListener(cancelExperimentResultDAOStatementListener);
-                ExperimentDAO.updateNumRuns(activeExperiment);
             }
-            Tasks.getTaskView().setCancelable(true);
         }
+
+        Tasks.getTaskView().setCancelable(false);
+        task.setStatus("Updating local cache..");
+        experimentResultCache.updateExperimentResults();
+        Tasks.getTaskView().setCancelable(true);
+
+        task.setStatus("Preparing job generation");
 
         if (activeExperiment.isAutoGeneratedSeeds() && activeExperiment.isLinkSeeds()) {
             // first pass over already existing jobs to accumulate existing linked seeds
             for (Instance i : listInstances) {
                 for (SolverConfiguration c : vsc) {
-                    for (int run = 0; run < numRuns; ++run) {
-                        task.setStatus("Preparing job generation");
-                        if (resultMap.containsKey(new ResultIdentifier(c.getId(), i.getId(), run))) {
-                            // use the already existing jobs to populate the seed group hash table so jobs of newly added solver configs use
-                            // the same seeds as already existing jobs
-                            int seed = getResult(c.getId(), i.getId(), run).getSeed();
-                            SeedGroup sg = new SeedGroup(c.getSeed_group(), i.getId(), run);
-                            if (!linked_seeds.containsKey(sg)) {
-                                linked_seeds.put(sg, new Integer(seed));
-                            }
+                    ArrayList<ExperimentResult> jobs = experimentResultCache.getResults(c.getId(), i.getId());
+                    for (ExperimentResult job : jobs) {
+                        // use the already existing jobs to populate the seed group hash table so jobs of newly added solver configs use
+                        // the same seeds as already existing jobs
+                        int seed = job.getSeed();
+                        SeedGroup sg = new SeedGroup(c.getSeed_group(), i.getId(), job.getRun());
+                        if (!linked_seeds.containsKey(sg)) {
+                            linked_seeds.put(sg, new Integer(seed));
                         }
                     }
                 }
@@ -521,17 +531,17 @@ public class ExperimentController {
 
 
         int done = 1;
-        // cartesian product
+
         for (Instance i : listInstances) {
             for (SolverConfiguration c : vsc) {
-                for (int run = 0; run < numRuns; ++run) {
+                for (int run = 0; run < main.generateJobsTableModel.getNumRuns(i, c); ++run) {
                     task.setTaskProgress((float) done / (float) elements);
                     if (task.isCancelled()) {
                         throw new TaskCancelledException();
                     }
                     task.setStatus("Adding job " + done + " of " + elements);
                     // check if job already exists
-                    if (!resultMap.containsKey(new ResultIdentifier(c.getId(), i.getId(), run))) {
+                    if (!experimentResultCache.contains(c.getId(), i.getId(), run)) {
                         if (activeExperiment.isAutoGeneratedSeeds() && activeExperiment.isLinkSeeds()) {
                             Integer seed = linked_seeds.get(new SeedGroup(c.getSeed_group(), i.getId(), run));
                             if (seed != null) {
@@ -565,8 +575,18 @@ public class ExperimentController {
             throw ex;
         }
         task.removePropertyChangeListener(cancelExperimentResultDAOStatementListener);
-        ExperimentDAO.updateNumRuns(activeExperiment);
+        experimentResultCache.updateExperimentResults();
+        activeExperiment.invalidateNumJobs();
+        main.generateJobsTableModel.updateNumRuns();
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                Util.updateTableColumnWidth(main.tblGenerateJobs);
+            }
+        });
         return experiments_added;
+
     }
 
     /**
@@ -601,12 +621,12 @@ public class ExperimentController {
     }
 
     /**
-     * returns the number of jobs in the database for the given experiment
+     * returns the number maximum run of the jobs in the database for the given experiment
      * @return the number of jobs in the db
      */
-    public int getNumJobs() {
+    public int getMaxRun() {
         try {
-            return ExperimentResultDAO.getCountByExperimentId(activeExperiment.getId());
+            return ExperimentResultDAO.getMaximumRun(activeExperiment);
         } catch (Exception e) {
             return 0;
         }
@@ -617,43 +637,60 @@ public class ExperimentController {
      */
     public synchronized void loadJobs() {
         try {
-            updateExperimentResults();
+            experimentResultCache.updateExperimentResults();
             final ExperimentResultsBrowserTableModel sync = main.jobsTableModel;
             synchronized (sync) {
+
                 ArrayList<ExperimentResult> results = main.jobsTableModel.getJobs();
+                boolean[] updateRows = null;
                 if (results != null) {
-                    if (results.size() != resultMap.size()) {
+                    updateRows = new boolean[results.size()];
+                    if (results.size() != experimentResultCache.size()) {
                         results = null;
                     } else {
                         for (int i = 0; i < results.size(); i++) {
                             ExperimentResult er = results.get(i);
-                            ExperimentResult tmp = resultMap.get(new ResultIdentifier(er.getSolverConfigId(), er.getInstanceId(), er.getRun()));
+                            ExperimentResult tmp = experimentResultCache.getResult(er.getSolverConfigId(), er.getInstanceId(), er.getRun());
                             if (tmp == null) {
                                 results = null;
                                 break;
                             } else if (!er.getDatemodified().equals(tmp.getDatemodified())) {
                                 results.set(i, tmp);
-                                main.jobsTableModel.fireTableRowsUpdated(i, i);
+                                updateRows[i] = true;
                             }
                         }
-                        if (results != null && results.size() != resultMap.size()) {
+                        if (results != null && results.size() != experimentResultCache.size()) {
                             results = null;
                         }
                     }
                 }
                 if (results == null) {
                     results = new ArrayList<ExperimentResult>();
-                    results.addAll(resultMap.values());
+                    results.addAll(experimentResultCache.values());
                     main.jobsTableModel.setJobs(results);
                     main.resultBrowserRowFilter.updateFilterTypes();
                     main.jobsTableModel.fireTableDataChanged();
                 } else {
                     // repaint the table: updates the currently visible rectangle, otherwise there might be duplicates of rows.
                     // this has to be done in the EDT.
+                    final boolean[] urows = updateRows;
                     SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
                         public void run() {
+                            int beg = -1;
+                            for (int i = 0; i < urows.length; i++) {
+                                if (urows[i]) {
+                                    if (beg == -1) {
+                                        beg = i;
+                                    }
+                                } else {
+                                    if (beg != -1) {
+                                        main.jobsTableModel.fireTableRowsUpdated(beg, i);
+                                        beg = -1;
+                                    }
+                                }
+                            }
                             main.tableJobs.invalidate();
                             main.tableJobs.revalidate();
                             main.tableJobs.repaint();
@@ -666,7 +703,6 @@ public class ExperimentController {
                     public void run() {
                         main.updateJobsFilterStatus();
                     }
-
                 });
             }
         } catch (Exception e) {
@@ -1129,15 +1165,14 @@ public class ExperimentController {
      */
     public void setPriority(int priority) throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
         ArrayList<ExperimentResult> jobs = main.jobsTableModel.getJobs();
-        ArrayList<ExperimentResult> updatedJobs = new ArrayList<ExperimentResult>();
+        ArrayList<IdValue<Integer>> values = new ArrayList<IdValue<Integer>>();
         for (int i = 0; i < main.tableJobs.getRowCount(); i++) {
             int vis = main.getTableJobs().convertRowIndexToModel(i);
             if (jobs.get(vis).getPriority() != priority) {
-                jobs.get(vis).setPriority(priority);
-                updatedJobs.add(jobs.get(vis));
+                values.add(new IdValue<Integer>(jobs.get(vis).getId(), priority));
             }
         }
-        ExperimentResultDAO.batchUpdatePriority(updatedJobs);
+        ExperimentResultDAO.batchUpdatePriority(values);
         this.loadJobs();
     }
 
@@ -1194,138 +1229,134 @@ public class ExperimentController {
      * @throws Exception
      */
     public void importDataFromSolverConfigurations(Tasks task, ArrayList<Integer> solverConfigIds, ArrayList<Boolean> duplicate) throws SQLException, Exception {
-        if (solverConfigIds.size() != duplicate.size()) {
-            throw new IllegalArgumentException("solverConfigIds.size() != duplicate.size()");
+        /*  if (solverConfigIds.size() != duplicate.size()) {
+        throw new IllegalArgumentException("solverConfigIds.size() != duplicate.size()");
         }
         final boolean autocommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         DatabaseConnector.getInstance().getConn().setAutoCommit(false);
         try {
-            HashSet<Integer> experimentIds = new HashSet<Integer>();
-            for (int scId : solverConfigIds) {
-                experimentIds.add(SolverConfigurationDAO.getSolverConfigurationById(scId).getExperiment_id());
-            }
-            boolean first = true;
-            boolean useNotFinishedJobs = true;
-            for (int expId : experimentIds) {
-                Experiment exp = ExperimentDAO.getById(expId);
-                if (first) {
-                    first = false;
-                    activeExperiment.setAutoGeneratedSeeds(exp.isAutoGeneratedSeeds());
-                    activeExperiment.setCPUTimeLimit(exp.getCPUTimeLimit());
-                    activeExperiment.setLinkSeeds(exp.isLinkSeeds());
-                    activeExperiment.setMaxSeed(exp.getMaxSeed());
-                    activeExperiment.setMemoryLimit(exp.getMemoryLimit());
-                    activeExperiment.setOutputSizeLimit(exp.getOutputSizeLimit());
-                    activeExperiment.setStackSizeLimit(exp.getStackSizeLimit());
-                    activeExperiment.setWallClockTimeLimit(exp.getWallClockTimeLimit());
-                } else {
-                    activeExperiment.setAutoGeneratedSeeds(activeExperiment.isAutoGeneratedSeeds() | exp.isAutoGeneratedSeeds());
-                    activeExperiment.setLinkSeeds(activeExperiment.isLinkSeeds() | exp.isLinkSeeds());
-                    if (activeExperiment.getMaxSeed() < exp.getMaxSeed()) {
-                        activeExperiment.setMaxSeed(exp.getMaxSeed());
-                    }
-                    if (activeExperiment.getCPUTimeLimit() != exp.getCPUTimeLimit()) {
-                        useNotFinishedJobs = false;
-                        if (activeExperiment.getCPUTimeLimit() < exp.getCPUTimeLimit() && activeExperiment.getCPUTimeLimit() != -1) {
-                            activeExperiment.setCPUTimeLimit(exp.getCPUTimeLimit());
-                        }
-                    }
-                    if (activeExperiment.getMemoryLimit() != exp.getMemoryLimit()) {
-                        useNotFinishedJobs = false;
-                        if (activeExperiment.getMemoryLimit() < exp.getMemoryLimit() && activeExperiment.getMemoryLimit() != -1) {
-                            activeExperiment.setMemoryLimit(exp.getMemoryLimit());
-                        }
-                    }
-                    if (activeExperiment.getOutputSizeLimit() != exp.getOutputSizeLimit()) {
-                        useNotFinishedJobs = false;
-                        if (activeExperiment.getOutputSizeLimit() < exp.getOutputSizeLimit() && activeExperiment.getOutputSizeLimit() != -1) {
-                            activeExperiment.setOutputSizeLimit(exp.getOutputSizeLimit());
-                        }
-                    }
-                    if (activeExperiment.getStackSizeLimit() != exp.getStackSizeLimit()) {
-                        useNotFinishedJobs = false;
-                        if (activeExperiment.getStackSizeLimit() < exp.getStackSizeLimit() && activeExperiment.getStackSizeLimit() != -1) {
-                            activeExperiment.setStackSizeLimit(exp.getStackSizeLimit());
-                        }
-                    }
-                    if (activeExperiment.getWallClockTimeLimit() != exp.getWallClockTimeLimit()) {
-                        useNotFinishedJobs = false;
-                        if (activeExperiment.getWallClockTimeLimit() < exp.getWallClockTimeLimit() && activeExperiment.getWallClockTimeLimit() != -1) {
-                            activeExperiment.setWallClockTimeLimit(exp.getWallClockTimeLimit());
-                        }
-                    }
-                }
-            }
-
-            boolean haveToDuplicate = false;
-            //activeExperiment.setAutoGeneratedSeeds(true);
-            int numRuns = 0;
-            ArrayList<Integer> newIds = new ArrayList<Integer>();
-            for (int i = 0; i < solverConfigIds.size(); i++) {
-                haveToDuplicate |= duplicate.get(i);
-                int scId = solverConfigIds.get(i);
-                SolverConfiguration sc = SolverConfigurationDAO.getSolverConfigurationById(scId);
-                /*   if (sc.getName() == null) {
-                SolverConfigurationDAO.updateName(sc);
-                }*/
-                task.setOperationName("Processing data from solver configuration " + sc.getName() + " (" + (i + 1) + " / " + solverConfigIds.size() + "):");
-                task.setTaskProgress((float) (i + 1) / solverConfigIds.size());
-                RunCountSCId tmp = this.importDataFromSolverConfiguration(task, sc, useNotFinishedJobs);
-                if (tmp.runcount > numRuns) {
-                    numRuns = tmp.runcount;
-                }
-                newIds.add(tmp.scid);
-            }
-            if (haveToDuplicate) {
-                task.setStatus("Duplicating results..");
-                LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
-                updateExperimentResults();
-                Random random = new Random();
-                ArrayList<ExperimentResult> newResults = new ArrayList<ExperimentResult>();
-                ArrayList<ExperimentResult> oldResults = new ArrayList<ExperimentResult>();
-                for (int k = 0; k < solverConfigIds.size(); k++) {
-                    for (Instance instance : instances) {
-                        if (task.isCancelled()) {
-                            throw new TaskCancelledException();
-                        }
-                        if (duplicate.get(k)) {
-                            int runCount = this.getResults(newIds.get(k), instance.getId()).size();
-                            // int runCount = ExperimentDAO.getRunCountInExperimentForSolverConfigurationAndInstance(activeExperiment, newIds.get(k), instance.getId());
-                            ArrayList<ExperimentResult> results = getResults(newIds.get(k), instance.getId());
-                            if (results.size() > 0) {
-                                for (int t = runCount; t < numRuns; t++) {
-                                    ExperimentResult er = results.get(random.nextInt(results.size()));
-                                    newResults.add(ExperimentResultDAO.createExperimentResult(t, er.getPriority(), er.getComputeQueue(), er.getStatus().getValue(), er.getSeed(), er.getResultCode(), er.getResultTime(), er.getSolverConfigId(), activeExperiment.getId(), er.getInstanceId(), er.getStartTime()));
-                                    oldResults.add(er);
-                                }
-                            }
-                        }
-                    }
-                }
-                if (newResults.size() > 0) {
-                    task.setStatus("Saving results..");
-                    ExperimentResultDAO.batchSave(newResults);
-                    if (task.isCancelled()) {
-                        throw new TaskCancelledException();
-                    }
-                    task.setStatus("Saving outputs..");
-                    ExperimentResultDAO.batchCopyOutputs(oldResults, newResults);
-                }
-                if (task.isCancelled()) {
-                    throw new TaskCancelledException();
-                }
-            }
-            generateJobs(numRuns, task);
-            task.setStatus("Finalizing..");
-            ExperimentDAO.save(activeExperiment);
-            ExperimentDAO.updateNumRuns(activeExperiment);
-            updateExperimentResults();
-        } catch (Exception e) {
-            DatabaseConnector.getInstance().getConn().rollback();
-            throw e;
-        } finally {
-            DatabaseConnector.getInstance().getConn().setAutoCommit(autocommit);
+        HashSet<Integer> experimentIds = new HashSet<Integer>();
+        for (int scId : solverConfigIds) {
+        experimentIds.add(SolverConfigurationDAO.getSolverConfigurationById(scId).getExperiment_id());
         }
+        boolean first = true;
+        boolean useNotFinishedJobs = true;
+        for (int expId : experimentIds) {
+        Experiment exp = ExperimentDAO.getById(expId);
+        if (first) {
+        first = false;
+        activeExperiment.setAutoGeneratedSeeds(exp.isAutoGeneratedSeeds());
+        activeExperiment.setCPUTimeLimit(exp.getCPUTimeLimit());
+        activeExperiment.setLinkSeeds(exp.isLinkSeeds());
+        activeExperiment.setMaxSeed(exp.getMaxSeed());
+        activeExperiment.setMemoryLimit(exp.getMemoryLimit());
+        activeExperiment.setOutputSizeLimit(exp.getOutputSizeLimit());
+        activeExperiment.setStackSizeLimit(exp.getStackSizeLimit());
+        activeExperiment.setWallClockTimeLimit(exp.getWallClockTimeLimit());
+        } else {
+        activeExperiment.setAutoGeneratedSeeds(activeExperiment.isAutoGeneratedSeeds() | exp.isAutoGeneratedSeeds());
+        activeExperiment.setLinkSeeds(activeExperiment.isLinkSeeds() | exp.isLinkSeeds());
+        if (activeExperiment.getMaxSeed() < exp.getMaxSeed()) {
+        activeExperiment.setMaxSeed(exp.getMaxSeed());
+        }
+        if (activeExperiment.getCPUTimeLimit() != exp.getCPUTimeLimit()) {
+        useNotFinishedJobs = false;
+        if (activeExperiment.getCPUTimeLimit() < exp.getCPUTimeLimit() && activeExperiment.getCPUTimeLimit() != -1) {
+        activeExperiment.setCPUTimeLimit(exp.getCPUTimeLimit());
+        }
+        }
+        if (activeExperiment.getMemoryLimit() != exp.getMemoryLimit()) {
+        useNotFinishedJobs = false;
+        if (activeExperiment.getMemoryLimit() < exp.getMemoryLimit() && activeExperiment.getMemoryLimit() != -1) {
+        activeExperiment.setMemoryLimit(exp.getMemoryLimit());
+        }
+        }
+        if (activeExperiment.getOutputSizeLimit() != exp.getOutputSizeLimit()) {
+        useNotFinishedJobs = false;
+        if (activeExperiment.getOutputSizeLimit() < exp.getOutputSizeLimit() && activeExperiment.getOutputSizeLimit() != -1) {
+        activeExperiment.setOutputSizeLimit(exp.getOutputSizeLimit());
+        }
+        }
+        if (activeExperiment.getStackSizeLimit() != exp.getStackSizeLimit()) {
+        useNotFinishedJobs = false;
+        if (activeExperiment.getStackSizeLimit() < exp.getStackSizeLimit() && activeExperiment.getStackSizeLimit() != -1) {
+        activeExperiment.setStackSizeLimit(exp.getStackSizeLimit());
+        }
+        }
+        if (activeExperiment.getWallClockTimeLimit() != exp.getWallClockTimeLimit()) {
+        useNotFinishedJobs = false;
+        if (activeExperiment.getWallClockTimeLimit() < exp.getWallClockTimeLimit() && activeExperiment.getWallClockTimeLimit() != -1) {
+        activeExperiment.setWallClockTimeLimit(exp.getWallClockTimeLimit());
+        }
+        }
+        }
+        }
+
+        boolean haveToDuplicate = false;
+        //activeExperiment.setAutoGeneratedSeeds(true);
+        int numRuns = 0;
+        ArrayList<Integer> newIds = new ArrayList<Integer>();
+        for (int i = 0; i < solverConfigIds.size(); i++) {
+        haveToDuplicate |= duplicate.get(i);
+        int scId = solverConfigIds.get(i);
+        SolverConfiguration sc = SolverConfigurationDAO.getSolverConfigurationById(scId);
+        task.setOperationName("Processing data from solver configuration " + sc.getName() + " (" + (i + 1) + " / " + solverConfigIds.size() + "):");
+        task.setTaskProgress((float) (i + 1) / solverConfigIds.size());
+        RunCountSCId tmp = this.importDataFromSolverConfiguration(task, sc, useNotFinishedJobs);
+        if (tmp.runcount > numRuns) {
+        numRuns = tmp.runcount;
+        }
+        newIds.add(tmp.scid);
+        }
+        if (haveToDuplicate) {
+        task.setStatus("Duplicating results..");
+        LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
+        updateExperimentResults();
+        Random random = new Random();
+        ArrayList<ExperimentResult> newResults = new ArrayList<ExperimentResult>();
+        ArrayList<ExperimentResult> oldResults = new ArrayList<ExperimentResult>();
+        for (int k = 0; k < solverConfigIds.size(); k++) {
+        for (Instance instance : instances) {
+        if (task.isCancelled()) {
+        throw new TaskCancelledException();
+        }
+        if (duplicate.get(k)) {
+        int runCount = this.getResults(newIds.get(k), instance.getId()).size();
+        // int runCount = ExperimentDAO.getRunCountInExperimentForSolverConfigurationAndInstance(activeExperiment, newIds.get(k), instance.getId());
+        ArrayList<ExperimentResult> results = getResults(newIds.get(k), instance.getId());
+        if (results.size() > 0) {
+        for (int t = runCount; t < numRuns; t++) {
+        ExperimentResult er = results.get(random.nextInt(results.size()));
+        newResults.add(ExperimentResultDAO.createExperimentResult(t, er.getPriority(), er.getComputeQueue(), er.getStatus().getValue(), er.getSeed(), er.getResultCode(), er.getResultTime(), er.getSolverConfigId(), activeExperiment.getId(), er.getInstanceId(), er.getStartTime()));
+        oldResults.add(er);
+        }
+        }
+        }
+        }
+        }
+        if (newResults.size() > 0) {
+        task.setStatus("Saving results..");
+        ExperimentResultDAO.batchSave(newResults);
+        if (task.isCancelled()) {
+        throw new TaskCancelledException();
+        }
+        task.setStatus("Saving outputs..");
+        ExperimentResultDAO.batchCopyOutputs(oldResults, newResults);
+        }
+        if (task.isCancelled()) {
+        throw new TaskCancelledException();
+        }
+        }
+        generateJobs(numRuns, task);
+        task.setStatus("Finalizing..");
+        ExperimentDAO.save(activeExperiment);
+        updateExperimentResults();
+        } catch (Exception e) {
+        DatabaseConnector.getInstance().getConn().rollback();
+        throw e;
+        } finally {
+        DatabaseConnector.getInstance().getConn().setAutoCommit(autocommit);
+        }*/
     }
 
     private class RunCountSCId {
@@ -1340,116 +1371,117 @@ public class ExperimentController {
     }
 
     private RunCountSCId importDataFromSolverConfiguration(Tasks task, SolverConfiguration solverConfig, boolean useNotFinishedJobs) throws SQLException, Exception {
-
-        Tasks.getTaskView().setCancelable(true);
+        // TODO: implement
+        return null;
+        /*  Tasks.getTaskView().setCancelable(true);
         final boolean autocommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         DatabaseConnector.getInstance().getConn().setAutoCommit(false);
         try {
-            task.setStatus("Loading data..");
-            Vector<ExperimentHasInstance> ehi = ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId());
-            HashSet<Integer> instanceIds = new HashSet<Integer>();
-            for (ExperimentHasInstance e : ehi) {
-                instanceIds.add(e.getInstances_id());
-            }
-            Vector<ExperimentHasInstance> ehi_toAdd = ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(solverConfig.getExperiment_id());
-            task.setStatus("Saving instances..");
-            for (ExperimentHasInstance e : ehi_toAdd) {
-                if (task.isCancelled()) {
-                    throw new TaskCancelledException();
-                }
-                if (!instanceIds.contains(e.getInstances_id())) {
-                    ExperimentHasInstanceDAO.createExperimentHasInstance(activeExperiment.getId(), e.getInstances_id());
-                }
-            }
-
-            task.setStatus("Saving solver configuration..");
-            ArrayList<SolverConfiguration> solverConfigs = SolverConfigurationDAO.getSolverConfigurationByExperimentId(activeExperiment.getId());
-            Integer equalId = null;
-            for (SolverConfiguration sc : solverConfigs) {
-                if (task.isCancelled()) {
-                    throw new TaskCancelledException();
-                }
-                boolean equal = true;
-                if (sc.getSolver_id() == solverConfig.getSolver_id()) {
-                    ArrayList<ParameterInstance> paramInstances = ParameterInstanceDAO.getBySolverConfigId(sc.getId());
-                    for (ParameterInstance paramInstanceToAdd : ParameterInstanceDAO.getBySolverConfigId(solverConfig.getId())) {
-                        boolean found = false;
-                        for (ParameterInstance paramInstance : paramInstances) {
-                            if (paramInstance.getParameter_id() == paramInstanceToAdd.getParameter_id()
-                                    && (paramInstance.getValue() == null && paramInstanceToAdd.getValue() == null || paramInstance.getValue().equals(paramInstanceToAdd.getValue()))) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            equal = false;
-                            break;
-                        }
-                    }
-                } else {
-                    equal = false;
-                }
-                if (equal) {
-                    equalId = sc.getId();
-                    break;
-                }
-            }
-            int newId;
-            if (equalId == null) {
-                // didn't find solver config -> add one
-                SolverConfiguration newSc = SolverConfigurationDAO.createSolverConfiguration(solverConfig.getSolver_id(), activeExperiment.getId(), 0, solverConfig.getName(), SolverConfigurationDAO.getSolverConfigurationCount(activeExperiment.getId(), solverConfig.getSolver_id()));
-                SolverConfigurationDAO.saveAll();
-                for (ParameterInstance pi : ParameterInstanceDAO.getBySolverConfigId(solverConfig.getId())) {
-                    ParameterInstanceDAO.createParameterInstance(pi.getParameter_id(), newSc.getId(), pi.getValue());
-                }
-                // now an id is assigned to newSc
-                newId = newSc.getId();
-            } else {
-                // found solver config -> map id
-                newId = equalId;
-            }
-
-            // At this point: we have the union of all instances and the union of all solver configs saved in the db
-
-            task.setStatus("Saving results..");
-            LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(solverConfig.getExperiment_id());
-
-            ArrayList<ExperimentResult> results = ExperimentResultDAO.getAllByExperimentId(solverConfig.getExperiment_id());
-            ArrayList<ExperimentResult> newResults = new ArrayList<ExperimentResult>();
-            ArrayList<ExperimentResult> oldResults = new ArrayList<ExperimentResult>();
-            int numRuns = activeExperiment.getNumRuns();
-            this.updateExperimentResults();
-            for (Instance i : instances) {
-                if (task.isCancelled()) {
-                    throw new TaskCancelledException();
-                }
-                int runCount = ExperimentDAO.getRunCountInExperimentForSolverConfigurationAndInstance(activeExperiment, newId, i.getId());
-                for (ExperimentResult er : results) {
-                    if (er.getSolverConfigId() == solverConfig.getId() && er.getInstanceId() == i.getId() && (useNotFinishedJobs || er.getStatus() == ExperimentResultStatus.SUCCESSFUL)) {
-                        newResults.add(ExperimentResultDAO.createExperimentResult(runCount++, er.getPriority(), er.getComputeQueue(), er.getStatus().getValue(), er.getSeed(), er.getResultCode(), er.getResultTime(), newId, activeExperiment.getId(), er.getInstanceId(), er.getStartTime()));
-                        oldResults.add(er);
-                    }
-                }
-                if (runCount > numRuns) {
-                    numRuns = runCount;
-                }
-            }
-            ExperimentResultDAO.batchSave(newResults);
-            if (task.isCancelled()) {
-                throw new TaskCancelledException();
-            }
-            task.setStatus("Saving outputs..");
-            ExperimentResultDAO.batchCopyOutputs(oldResults, newResults);
-            if (task.isCancelled()) {
-                throw new TaskCancelledException();
-            }
-            return new RunCountSCId(numRuns, newId);
-        } catch (Exception e) {
-            DatabaseConnector.getInstance().getConn().rollback();
-            throw e;
-        } finally {
-            DatabaseConnector.getInstance().getConn().setAutoCommit(autocommit);
+        task.setStatus("Loading data..");
+        Vector<ExperimentHasInstance> ehi = ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId());
+        HashSet<Integer> instanceIds = new HashSet<Integer>();
+        for (ExperimentHasInstance e : ehi) {
+        instanceIds.add(e.getInstances_id());
         }
+        Vector<ExperimentHasInstance> ehi_toAdd = ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(solverConfig.getExperiment_id());
+        task.setStatus("Saving instances..");
+        for (ExperimentHasInstance e : ehi_toAdd) {
+        if (task.isCancelled()) {
+        throw new TaskCancelledException();
+        }
+        if (!instanceIds.contains(e.getInstances_id())) {
+        ExperimentHasInstanceDAO.createExperimentHasInstance(activeExperiment.getId(), e.getInstances_id());
+        }
+        }
+
+        task.setStatus("Saving solver configuration..");
+        ArrayList<SolverConfiguration> solverConfigs = SolverConfigurationDAO.getSolverConfigurationByExperimentId(activeExperiment.getId());
+        Integer equalId = null;
+        for (SolverConfiguration sc : solverConfigs) {
+        if (task.isCancelled()) {
+        throw new TaskCancelledException();
+        }
+        boolean equal = true;
+        if (sc.getSolver_id() == solverConfig.getSolver_id()) {
+        ArrayList<ParameterInstance> paramInstances = ParameterInstanceDAO.getBySolverConfigId(sc.getId());
+        for (ParameterInstance paramInstanceToAdd : ParameterInstanceDAO.getBySolverConfigId(solverConfig.getId())) {
+        boolean found = false;
+        for (ParameterInstance paramInstance : paramInstances) {
+        if (paramInstance.getParameter_id() == paramInstanceToAdd.getParameter_id()
+        && (paramInstance.getValue() == null && paramInstanceToAdd.getValue() == null || paramInstance.getValue().equals(paramInstanceToAdd.getValue()))) {
+        found = true;
+        break;
+        }
+        }
+        if (!found) {
+        equal = false;
+        break;
+        }
+        }
+        } else {
+        equal = false;
+        }
+        if (equal) {
+        equalId = sc.getId();
+        break;
+        }
+        }
+        int newId;
+        if (equalId == null) {
+        // didn't find solver config -> add one
+        SolverConfiguration newSc = SolverConfigurationDAO.createSolverConfiguration(solverConfig.getSolver_id(), activeExperiment.getId(), 0, solverConfig.getName(), SolverConfigurationDAO.getSolverConfigurationCount(activeExperiment.getId(), solverConfig.getSolver_id()));
+        SolverConfigurationDAO.saveAll();
+        for (ParameterInstance pi : ParameterInstanceDAO.getBySolverConfigId(solverConfig.getId())) {
+        ParameterInstanceDAO.createParameterInstance(pi.getParameter_id(), newSc.getId(), pi.getValue());
+        }
+        // now an id is assigned to newSc
+        newId = newSc.getId();
+        } else {
+        // found solver config -> map id
+        newId = equalId;
+        }
+
+        // At this point: we have the union of all instances and the union of all solver configs saved in the db
+
+        task.setStatus("Saving results..");
+        LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(solverConfig.getExperiment_id());
+
+        ArrayList<ExperimentResult> results = ExperimentResultDAO.getAllByExperimentId(solverConfig.getExperiment_id());
+        ArrayList<ExperimentResult> newResults = new ArrayList<ExperimentResult>();
+        ArrayList<ExperimentResult> oldResults = new ArrayList<ExperimentResult>();
+        int numRuns = activeExperiment.getNumRuns();
+        this.updateExperimentResults();
+        for (Instance i : instances) {
+        if (task.isCancelled()) {
+        throw new TaskCancelledException();
+        }
+        int runCount = ExperimentDAO.getRunCountInExperimentForSolverConfigurationAndInstance(activeExperiment, newId, i.getId());
+        for (ExperimentResult er : results) {
+        if (er.getSolverConfigId() == solverConfig.getId() && er.getInstanceId() == i.getId() && (useNotFinishedJobs || er.getStatus() == ExperimentResultStatus.SUCCESSFUL)) {
+        newResults.add(ExperimentResultDAO.createExperimentResult(runCount++, er.getPriority(), er.getComputeQueue(), er.getStatus().getValue(), er.getSeed(), er.getResultCode(), er.getResultTime(), newId, activeExperiment.getId(), er.getInstanceId(), er.getStartTime()));
+        oldResults.add(er);
+        }
+        }
+        if (runCount > numRuns) {
+        numRuns = runCount;
+        }
+        }
+        ExperimentResultDAO.batchSave(newResults);
+        if (task.isCancelled()) {
+        throw new TaskCancelledException();
+        }
+        task.setStatus("Saving outputs..");
+        ExperimentResultDAO.batchCopyOutputs(oldResults, newResults);
+        if (task.isCancelled()) {
+        throw new TaskCancelledException();
+        }
+        return new RunCountSCId(numRuns, newId);
+        } catch (Exception e) {
+        DatabaseConnector.getInstance().getConn().rollback();
+        throw e;
+        } finally {
+        DatabaseConnector.getInstance().getConn().setAutoCommit(autocommit);
+        }*/
     }
 
     /**
@@ -1457,188 +1489,21 @@ public class ExperimentController {
      * @param numRuns
      * @return true, iff some data is modified
      */
-    public boolean experimentResultsIsModified(int numRuns) {
+    public boolean experimentResultsIsModified() {
         try {
-            if (numRuns != activeExperiment.getNumRuns()) {
-                return true;
-            }
-            ArrayList<Integer> solverConfigIds = ExperimentResultDAO.getAllSolverConfigIdsByExperimentId(activeExperiment.getId());
-            if (solverConfigIds.isEmpty()) {
-                return false;
-            }
-            ArrayList<Integer> instanceIds = ExperimentResultDAO.getAllInstanceIdsByExperimentId(activeExperiment.getId());
-            if (!SolverConfigurationDAO.getAllSolverConfigIdsByExperimentId(activeExperiment.getId()).equals(solverConfigIds)) {
-                return true;
-            }
-            if (!ExperimentHasInstanceDAO.getAllInstanceIdsByExperimentId(activeExperiment.getId()).equals(instanceIds)) {
-                return true;
-            }
-        } catch (SQLException _) {
-        }
-        return false;
-    }
-
-    /**
-     * Returns all experiment results with any run in the given list for the active experiment.
-     * updateExperimentResults() should be called first.
-     * @param runs
-     * @return arraylist of experiment results
-     */
-    public synchronized ArrayList<ExperimentResult> getAllByRun(ArrayList<Integer> runs) {
-        HashSet<Integer> set = new HashSet<Integer>();
-        set.addAll(runs);
-        ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
-        for (ExperimentResult er : resultMap.values()) {
-            if (set.contains(er.getRun())) {
-                res.add(er);
-            }
-        }
-        return res;
-    }
-
-    /**
-     * Returns all experiment results with the specified run for the active experiment.
-     * updateExperimentResults() should be called first.
-     * @param runs
-     * @return arraylist of experiment results
-     */
-    public synchronized ArrayList<ExperimentResult> getAllByRun(Integer run) {
-        ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
-        for (ExperimentResult er : resultMap.values()) {
-            if (er.getRun() == run) {
-                res.add(er);
-            }
-        }
-        return res;
-    }
-
-    /**
-     * Returns all disjunct runs in an array list.
-     * This array list should contain all integers between 0 and numRuns-1 inclusive.
-     * updateExperimentResults() should be called first.
-     * @return an array list of all runs
-     * @throws SQLException
-     * @throws IOException
-     * @throws PropertyTypeNotExistException
-     * @throws NoConnectionToDBException
-     * @throws PropertyNotInDBException
-     * @throws ComputationMethodDoesNotExistException
-     */
-    public synchronized ArrayList<Integer> getAllRuns() throws SQLException, IOException, PropertyTypeNotExistException, NoConnectionToDBException, PropertyNotInDBException, ComputationMethodDoesNotExistException {
-        // then look for all disjunct runs and return them in an array list
-        HashSet<Integer> runs = new HashSet<Integer>();
-        for (ExperimentResult er : resultMap.values()) {
-            runs.add(er.getRun());
-        }
-        ArrayList<Integer> res = new ArrayList<Integer>();
-        res.addAll(runs);
-        return res;
-    }
-
-    /**
-     * Updates the experiment result cache. The resultMap is then synchronized with the database
-     * @throws SQLException
-     * @throws IOException
-     * @throws PropertyTypeNotExistException
-     * @throws PropertyNotInDBException
-     * @throws NoConnectionToDBException
-     * @throws ComputationMethodDoesNotExistException
-     */
-    public synchronized void updateExperimentResults() throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
-        if (activeExperiment == null) {
-            experiment = null;
-            resultMap = null;
-            return;
-        }
-        if (experiment != activeExperiment) {
-            resultMap = null;
-            lastUpdated = new Timestamp(0);
-        }
-        Timestamp ts = ExperimentResultDAO.getLastModifiedByExperimentId(getActiveExperiment().getId());
-        ArrayList<ExperimentResult> modified = ExperimentResultDAO.getAllModifiedByExperimentId(activeExperiment.getId(), lastUpdated);
-        if (resultMap == null) {
-            resultMap = new HashMap<ResultIdentifier, ExperimentResult>();
-        }
-        for (ExperimentResult result : modified) {
-            ResultIdentifier key = new ResultIdentifier(result.getSolverConfigId(), result.getInstanceId(), result.getRun());
-            if (resultMap.containsKey(key)) {
-                resultMap.remove(key);
-            }
-            resultMap.put(key, result);
-        }
-        int count = ExperimentResultDAO.getCountByExperimentId(getActiveExperiment().getId());
-        if (count != resultMap.size()) {
-            // full update
-            resultMap.clear();
-            ArrayList<ExperimentResult> experimentResults = ExperimentResultDAO.getAllByExperimentId(getActiveExperiment().getId());
-            for (ExperimentResult result : experimentResults) {
-                resultMap.put(new ResultIdentifier(result.getSolverConfigId(), result.getInstanceId(), result.getRun()), result);
-            }
-        }
-        lastUpdated = ts;
-        experiment = activeExperiment;
-    }
-
-    /**
-     * Returns a Vector of all ExperimentResults in the current experiment with the solverConfig id and instance id specified
-     * @param solverConfigId the solverConfig id of the ExperimentResults
-     * @param instanceId the instance id of the ExperimentResults
-     * @return returns an empty vector if there are no such ExperimentResults
-     */
-    public ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId) {
-        return getResults(solverConfigId, instanceId, null);
-    }
-
-    /**
-     * Returns a Vector of all ExperimentResults in the current experiment with the solverConfig id and instance id specified
-     * @param solverConfigId the solverConfig id of the ExperimentResults
-     * @param instanceId the instance id of the ExperimentResults
-     * @return returns an empty vector if there are no such ExperimentResults
-     */
-    public ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId, ExperimentResultStatus[] status) {
-        ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
-        for (int i = 0; i < experiment.getNumRuns(); i++) {
-            ExperimentResult result = getResult(solverConfigId, instanceId, i, status);
-            if (result != null) {
-                res.add(result);
-            }
-        }
-        return res;
-    }
-
-    /**
-     * Returns an ExperimentResult identified by solverConfig id, instance id and run for the current experiment.
-     * @param solverConfigId the solverConfig id for the ExperimentResult
-     * @param instanceId the instance id for the ExperimentResult
-     * @param run the run
-     * @return returns null if there is no such ExperimentResult
-     */
-    public ExperimentResult getResult(int solverConfigId, int instanceId, int run) {
-        return getResult(solverConfigId, instanceId, run, null);
-    }
-
-    /**
-     * Returns an ExperimentResult identified by solverConfig id, instance id and run for the current experiment.
-     * @param solverConfigId the solverConfig id for the ExperimentResult
-     * @param instanceId the instance id for the ExperimentResult
-     * @param run the run
-     * @return returns null if there is no such ExperimentResult
-     */
-    public synchronized ExperimentResult getResult(int solverConfigId, int instanceId, int run, ExperimentResultStatus[] status) {
-        ExperimentResult res = resultMap.get(new ResultIdentifier(solverConfigId, instanceId, run));
-        if (status != null) {
-            boolean found = false;
-            for (ExperimentResultStatus s : status) {
-                if (res.getStatus().equals(s)) {
-                    found = true;
-                    break;
+            experimentResultCache.updateExperimentResults();
+            ArrayList<SolverConfiguration> solverConfigs = SolverConfigurationDAO.getSolverConfigurationByExperimentId(activeExperiment.getId());
+            LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
+            for (SolverConfiguration sc : solverConfigs) {
+                for (Instance i : instances) {
+                    if (main.generateJobsTableModel.getNumRuns(i, sc) != experimentResultCache.getResults(sc.getId(), i.getId()).size()) {
+                        return true;
+                    }
                 }
             }
-            if (!found) {
-                return null;
-            }
+        } catch (Exception _) {
         }
-        return res;
+        return false;
     }
 
     /**
@@ -1692,7 +1557,7 @@ public class ExperimentController {
         if (property == PROP_CPUTIME) {
             if (!String.valueOf(result.getResultCode().getValue()).startsWith("1")) {
                 if (useTimeOutForCPUProp) {
-                return new Double(experiment.getCPUTimeLimit());
+                    return new Double(activeExperiment.getCPUTimeLimit());
                 } else {
                     return null;
                 }
@@ -1777,51 +1642,5 @@ public class ExperimentController {
         ArrayList<Property> res = new ArrayList<Property>();
         res.addAll(PropertyDAO.getAllInstanceProperties());
         return res;
-    }
-
-    /**
-     * Used to identify an experiment result in the local cache.
-     */
-    class ResultIdentifier {
-
-        int solverConfigId;
-        int instanceId;
-        int run;
-
-        public ResultIdentifier(int solverConfigId, int instanceId, int run) {
-            this.solverConfigId = solverConfigId;
-            this.instanceId = instanceId;
-            this.run = run;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final ResultIdentifier other = (ResultIdentifier) obj;
-            if (this.solverConfigId != other.solverConfigId) {
-                return false;
-            }
-            if (this.instanceId != other.instanceId) {
-                return false;
-            }
-            if (this.run != other.run) {
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 3;
-            hash = 53 * hash + this.solverConfigId;
-            hash = 53 * hash + this.instanceId;
-            hash = 53 * hash + this.run;
-            return hash;
-        }
     }
 }
