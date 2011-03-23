@@ -51,10 +51,7 @@ public class RecursiveFileScanner {
                 catch ( IOException e ){
                   throw new IOException();
                 }
-                if (files.isEmpty()) {
-                    InstanceException instancExcep = new InstanceException();               
-                    throw instancExcep;
-                }
                 return files;
 	}
+        
 }
