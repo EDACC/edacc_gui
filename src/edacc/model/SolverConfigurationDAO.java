@@ -20,7 +20,7 @@ public class SolverConfigurationDAO {
     private static final String deleteQuery = "DELETE FROM " + table + " WHERE idSolverConfig=?";
     private static final String insertQuery = "INSERT INTO " + table + " (Solver_IdSolver, Experiment_IdExperiment, seed_group, name, idx) VALUES (?,?,?,?,?)";
     private static final String updateQuery = "UPDATE " + table + " SET seed_group=?, name=?, idx=? WHERE idSolverConfig=?";
-    private static final ObjectCache<SolverConfiguration> cache = new ObjectCache<SolverConfiguration>();
+    public static ObjectCache<SolverConfiguration> cache = new ObjectCache<SolverConfiguration>();
 
     private static SolverConfiguration getSolverConfigurationFromResultset(ResultSet rs) throws SQLException {
         SolverConfiguration i = new SolverConfiguration();

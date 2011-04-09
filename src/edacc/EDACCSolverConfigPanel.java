@@ -133,14 +133,17 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
      * @throws SQLException
      */
     public void addSolverConfiguration(SolverConfiguration solverConfiguration) throws SQLException {
+        addSolverConfiguration(solverConfiguration, true);
+    }
+
+    public void addSolverConfiguration(SolverConfiguration solverConfiguration, boolean useSolverConfiguration) throws SQLException {
         for (int i = 0; i < this.getComponentCount(); i++) {
             if (((EDACCSolverConfigPanelSolver) this.getComponent(i)).getSolver().getId() == solverConfiguration.getSolver_id()) {
-                ((EDACCSolverConfigPanelSolver) this.getComponent(i)).addSolverConfiguration(solverConfiguration);
+                ((EDACCSolverConfigPanelSolver) this.getComponent(i)).addSolverConfiguration(solverConfiguration, useSolverConfiguration);
                 return;
             }
         }
-
-        EDACCSolverConfigPanelSolver entry = new EDACCSolverConfigPanelSolver(solverConfiguration, this);
+        EDACCSolverConfigPanelSolver entry = new EDACCSolverConfigPanelSolver(solverConfiguration, this, useSolverConfiguration);
         this.add(entry, getIndex(solverConfiguration.getSolver_id()));
         parent.solTableModel.setSolverSelected(solverConfiguration.getSolver_id(), true);
         setGridBagConstraints();
@@ -262,7 +265,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
         ArrayList<EDACCSolverConfigPanelSolver> res = new ArrayList<EDACCSolverConfigPanelSolver>();
         for (Component c : this.getComponents()) {
             if (c instanceof EDACCSolverConfigPanelSolver) {
-                res.add((EDACCSolverConfigPanelSolver)c);
+                res.add((EDACCSolverConfigPanelSolver) c);
             }
         }
         return res;
