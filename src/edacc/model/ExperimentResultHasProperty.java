@@ -64,6 +64,10 @@ public class ExperimentResultHasProperty extends BaseModel implements IntegerPKM
                 Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ExpResultHasSolvPropertyNotInDBException ex) {
                 Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (StatusCodeNotInDBException ex) {
+                Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ResultCodeNotInDBException ex) {
+                Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         return expResult;

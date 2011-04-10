@@ -35,7 +35,7 @@ public class EDACCExperimentModeJobsCellRenderer extends DefaultTableCellRendere
         final Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
 
         row = table.convertRowIndexToModel(row);
-        Integer status = ((ExperimentResultsBrowserTableModel) table.getModel()).getStatus(row).getValue();
+        Integer status = ((ExperimentResultsBrowserTableModel) table.getModel()).getStatus(row).getStatusCode();
         if (status == null) {
             return null;
         }

@@ -2,7 +2,7 @@ package edacc.experiment.plots;
 
 import edacc.experiment.ExperimentController;
 import edacc.model.ExperimentResult;
-import edacc.model.ExperimentResultStatus;
+import edacc.model.StatusCode;
 import edacc.model.Instance;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverDAO;
@@ -25,7 +25,7 @@ class SolverInfos {
  * @author simon
  */
 public class CactusPlot extends Plot {
-    private static final ExperimentResultStatus[] statusCodes = new ExperimentResultStatus[] { ExperimentResultStatus.SUCCESSFUL };
+    private static final StatusCode[] statusCodes = new StatusCode[] { StatusCode.SUCCESSFUL };
     private static JComboBox comboRun, comboProperty;
     private static InstanceSelector instanceSelector;
     private static SolverConfigurationSelector solverConfigurationSelector;

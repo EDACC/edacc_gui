@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import javax.swing.table.AbstractTableModel;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultHasProperty;
-import edacc.model.ExperimentResultStatus;
+import edacc.model.StatusCode;
 import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
 import edacc.model.Instance;
@@ -166,7 +166,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
      * @param row
      * @return the status
      */
-    public ExperimentResultStatus getStatus(int row) {
+    public StatusCode getStatus(int row) {
         if (row < 0 || row >= getRowCount()) {
             return null;
         }
@@ -367,7 +367,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             case COL_STATUS:
                 return j.getStatus().toString();
             case COL_RUNTIME:
-                if (j.getStatus() == ExperimentResultStatus.RUNNING) {
+                if (j.getStatus() == StatusCode.RUNNING) {
                     int hours = j.getRunningTime() / 3600;
                     int minutes = (j.getRunningTime() / 60) % 60;
                     int seconds = j.getRunningTime() % 60;
@@ -470,9 +470,9 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     /**
      * Returns all disjunct status codes which are currently in that model
      */
-    public ArrayList<ExperimentResultStatus> getStatusEnums() {
-        ArrayList<ExperimentResultStatus> res = new ArrayList<ExperimentResultStatus>();
-        HashSet<ExperimentResultStatus> tmp = new HashSet<ExperimentResultStatus>();
+    public ArrayList<StatusCode> getStatusEnums() {
+        ArrayList<StatusCode> res = new ArrayList<StatusCode>();
+        HashSet<StatusCode> tmp = new HashSet<StatusCode>();
         for (int i = 0; i
                 < getRowCount(); i++) {
             if (!tmp.contains(getStatus(i))) {
@@ -507,7 +507,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         return jobs == null ? 0 : jobs.size();
     }
 
-    public int getJobsCount(ExperimentResultStatus status) {
+    public int getJobsCount(StatusCode status) {
         if (jobs == null) {
             return 0;
         }

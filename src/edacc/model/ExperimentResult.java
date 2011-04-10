@@ -16,8 +16,8 @@ public class ExperimentResult extends BaseModel implements Serializable {
     private int run;
     private int priority;
     
-    private ExperimentResultStatus status;
-    protected ExperimentResultResultCode resultCode;
+    private StatusCode status;
+    protected ResultCode resultCode;
     private int seed;
     private float resultTime;
     private int SolverConfigId;
@@ -31,17 +31,23 @@ public class ExperimentResult extends BaseModel implements Serializable {
 
     private int computeQueue;
     private Timestamp startTime;
-    
+
+    private int CPUTimeLimit;
+    private int memoryLimit;
+    private int wallClockTimeLimit;
+    private int stackSizeLimit;
+    private int outputSizeLimit;
+
     private transient HashMap<Integer, ExperimentResultHasProperty> propertyValues;
     private Timestamp datemodified;
     protected ExperimentResult() {
     }
 
-    protected ExperimentResult(int run, int priority, int computeQueue, int status, int seed, ExperimentResultResultCode resultCode, float resultTime, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime) {
+    protected ExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float resultTime, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimit) {
         this.run = run;
         this.priority = priority;
         this.computeQueue = computeQueue;
-        this.status = ExperimentResultStatus.getExperimentResultStatus(status);
+        this.status = status;
         this.seed = seed;
         this.resultCode = resultCode;
         this.resultTime = resultTime;
@@ -49,6 +55,11 @@ public class ExperimentResult extends BaseModel implements Serializable {
         this.ExperimentId = ExperimentId;
         this.InstanceId = InstanceId;
         this.startTime = startTime;
+        this.CPUTimeLimit = cpuTimeLimit;
+        this.memoryLimit = memoryLimit;
+        this.wallClockTimeLimit = wallClockTimeLimit;
+        this.stackSizeLimit = stackSizeLimit;
+        this.outputSizeLimit = outputSizeLimit;
     }
 
     @Override
@@ -160,12 +171,12 @@ public class ExperimentResult extends BaseModel implements Serializable {
         }
     }
 
-    public ExperimentResultStatus getStatus() {
+    public StatusCode getStatus() {
         return status;
     }
 
-    protected void setStatus(int status) {
-        this.status = ExperimentResultStatus.getExperimentResultStatus(status);
+    protected void setStatus(StatusCode status) {
+        this.status = status;
         if (this.isSaved()) {
             this.setModified();
         }
@@ -223,12 +234,12 @@ public class ExperimentResult extends BaseModel implements Serializable {
         this.watcherExitCode = watcherExitCode;
     }
 
-    public ExperimentResultResultCode getResultCode() {
+    public ResultCode getResultCode() {
         return resultCode;
     }
 
-    protected void setResultCode(int resultCode) {
-        this.resultCode = ExperimentResultResultCode.getExperimentResultResultCode(resultCode);
+    protected void setResultCode(ResultCode resultCode) {
+        this.resultCode = resultCode;
     }
 
     public HashMap<Integer, ExperimentResultHasProperty> getPropertyValues() {
@@ -255,6 +266,61 @@ public class ExperimentResult extends BaseModel implements Serializable {
         this.startTime = startTime;
         if (isSaved()) {
             setModified();
+        }
+    }
+
+    public int getCPUTimeLimit() {
+        return CPUTimeLimit;
+    }
+
+    public void setCPUTimeLimit(int CPUTimeLimit) {
+        this.CPUTimeLimit = CPUTimeLimit;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public int getMemoryLimit() {
+        return memoryLimit;
+    }
+
+    public void setMemoryLimit(int memoryLimit) {
+        this.memoryLimit = memoryLimit;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public int getOutputSizeLimit() {
+        return outputSizeLimit;
+    }
+
+    public void setOutputSizeLimit(int outputSizeLimit) {
+        this.outputSizeLimit = outputSizeLimit;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public int getStackSizeLimit() {
+        return stackSizeLimit;
+    }
+
+    public void setStackSizeLimit(int stackSizeLimit) {
+        this.stackSizeLimit = stackSizeLimit;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public int getWallClockTimeLimit() {
+        return wallClockTimeLimit;
+    }
+
+    public void setWallClockTimeLimit(int wallClockTimeLimit) {
+        this.wallClockTimeLimit = wallClockTimeLimit;
+        if (this.isSaved()) {
+            this.setModified();
         }
     }
 }

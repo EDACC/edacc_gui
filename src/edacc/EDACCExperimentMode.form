@@ -30,7 +30,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageExperimentPane" pref="614" max="32767" attributes="0"/>
+              <Component id="manageExperimentPane" pref="527" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -75,8 +75,8 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="scrollPaneExperimentsTable" alignment="1" pref="1130" max="32767" attributes="2"/>
-                          <Component id="jPanel7" alignment="0" pref="1130" max="32767" attributes="2"/>
                           <Component id="pnlEditExperiment" alignment="0" pref="1130" max="32767" attributes="2"/>
+                          <Component id="jPanel7" alignment="0" pref="1130" max="32767" attributes="2"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -86,11 +86,11 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="scrollPaneExperimentsTable" pref="248" max="32767" attributes="0"/>
+                      <Component id="scrollPaneExperimentsTable" pref="236" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jPanel7" min="-2" pref="36" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="pnlEditExperiment" min="-2" pref="268" max="-2" attributes="1"/>
+                      <Component id="pnlEditExperiment" min="-2" pref="193" max="-2" attributes="1"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -151,30 +151,37 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="1" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
+                      <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jLabel8" alignment="1" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel7" alignment="1" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel6" alignment="1" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel3" alignment="1" pref="176" max="32767" attributes="1"/>
-                              <Component id="jLabel4" alignment="1" min="-2" max="-2" attributes="1"/>
-                              <Component id="jLabel2" alignment="0" pref="176" max="32767" attributes="1"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkGenerateSeeds" pref="918" max="32767" attributes="1"/>
-                              <Component id="chkLinkSeeds" pref="918" max="32767" attributes="1"/>
-                              <Component id="txtMemoryLimit" alignment="1" pref="918" max="32767" attributes="2"/>
-                              <Component id="txtMaxSeeds" alignment="0" pref="918" max="32767" attributes="0"/>
-                              <Component id="txtWallClockTimeLimit" alignment="0" pref="918" max="32767" attributes="0"/>
-                              <Component id="txtStackSizeLimit" alignment="0" pref="918" max="32767" attributes="0"/>
-                              <Component id="txtOutputSizeLimit" alignment="0" pref="918" max="32767" attributes="0"/>
-                              <Component id="txtCPUTimeLimit" alignment="0" pref="918" max="32767" attributes="2"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="1" attributes="0">
+                                      <Group type="102" attributes="0">
+                                          <EmptySpace min="-2" pref="150" max="-2" attributes="0"/>
+                                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Group type="102" attributes="0">
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="jLabel3" pref="178" max="32767" attributes="1"/>
+                                      </Group>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" alignment="1" attributes="0">
+                                          <Component id="btnEditExperimentUndo" linkSize="2" min="-2" pref="91" max="-2" attributes="0"/>
+                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <Component id="btnEditExperimentSave" linkSize="2" min="-2" pref="76" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Component id="txtPriority" alignment="0" pref="916" max="32767" attributes="0"/>
+                                      <Component id="txtMaxSeeds" alignment="0" pref="916" max="32767" attributes="0"/>
+                                  </Group>
+                              </Group>
                               <Group type="102" alignment="1" attributes="0">
-                                  <Component id="btnEditExperimentUndo" linkSize="2" min="-2" pref="91" max="-2" attributes="0"/>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Component id="btnEditExperimentSave" linkSize="2" min="-2" pref="76" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="191" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkGenerateSeeds" alignment="1" pref="917" max="32767" attributes="1"/>
+                                      <Component id="chkLinkSeeds" alignment="1" pref="917" max="32767" attributes="1"/>
+                                      <Component id="chkActive" alignment="0" pref="917" max="32767" attributes="0"/>
+                                  </Group>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -184,40 +191,23 @@
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtCPUTimeLimit" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="2" attributes="0">
-                              <Component id="jLabel4" alignment="2" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtMemoryLimit" alignment="2" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="txtWallClockTimeLimit" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="txtStackSizeLimit" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="txtOutputSizeLimit" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtPriority" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="txtMaxSeeds" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkGenerateSeeds" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkLinkSeeds" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkActive" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="btnEditExperimentSave" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="btnEditExperimentUndo" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -228,40 +218,6 @@
                 </DimensionLayout>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jLabel2">
-                  <Properties>
-                    <Property name="horizontalAlignment" type="int" value="11"/>
-                    <Property name="text" type="java.lang.String" resourceKey="jLabel2.text"/>
-                    <Property name="name" type="java.lang.String" value="jLabel2" noResource="true"/>
-                  </Properties>
-                </Component>
-                <Component class="javax.swing.JTextField" name="txtCPUTimeLimit">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="txtCPUTimeLimit.text"/>
-                    <Property name="toolTipText" type="java.lang.String" resourceKey="txtCPUTimeLimit.toolTipText"/>
-                    <Property name="name" type="java.lang.String" value="txtCPUTimeLimit" noResource="true"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtCPUTimeLimitKeyReleased"/>
-                  </Events>
-                </Component>
-                <Component class="javax.swing.JTextField" name="txtMemoryLimit">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="txtMemoryLimit.text"/>
-                    <Property name="toolTipText" type="java.lang.String" resourceKey="txtMemoryLimit.toolTipText"/>
-                    <Property name="name" type="java.lang.String" value="txtMemoryLimit" noResource="true"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtMemoryLimitKeyReleased"/>
-                  </Events>
-                </Component>
-                <Component class="javax.swing.JLabel" name="jLabel4">
-                  <Properties>
-                    <Property name="horizontalAlignment" type="int" value="11"/>
-                    <Property name="text" type="java.lang.String" resourceKey="jLabel4.text"/>
-                    <Property name="name" type="java.lang.String" value="jLabel4" noResource="true"/>
-                  </Properties>
-                </Component>
                 <Component class="javax.swing.JCheckBox" name="chkGenerateSeeds">
                   <Properties>
                     <Property name="toolTipText" type="java.lang.String" resourceKey="chkGenerateSeeds.toolTipText"/>
@@ -288,16 +244,6 @@
                     <Property name="text" type="java.lang.String" resourceKey="jLabel3.text"/>
                     <Property name="name" type="java.lang.String" value="jLabel3" noResource="true"/>
                   </Properties>
-                </Component>
-                <Component class="javax.swing.JTextField" name="txtMaxSeeds">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="txtMaxSeeds.text"/>
-                    <Property name="toolTipText" type="java.lang.String" resourceKey="txtMaxSeeds.toolTipText"/>
-                    <Property name="name" type="java.lang.String" value="txtMaxSeeds" noResource="true"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtMaxSeedsKeyReleased"/>
-                  </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnEditExperimentSave">
                   <Properties>
@@ -337,48 +283,32 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JTextField" name="txtOutputSizeLimit">
+                <Component class="javax.swing.JLabel" name="jLabel1">
                   <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="txtOutputSizeLimit.text"/>
-                    <Property name="name" type="java.lang.String" value="txtOutputSizeLimit" noResource="true"/>
+                    <Property name="text" type="java.lang.String" resourceKey="jLabel1.text"/>
+                    <Property name="name" type="java.lang.String" value="jLabel1" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JTextField" name="txtPriority">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="txtPriority.text"/>
+                    <Property name="name" type="java.lang.String" value="txtPriority" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JTextField" name="txtMaxSeeds">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="txtMaxSeeds.text"/>
+                    <Property name="toolTipText" type="java.lang.String" resourceKey="txtMaxSeeds.toolTipText"/>
+                    <Property name="name" type="java.lang.String" value="txtMaxSeeds" noResource="true"/>
                   </Properties>
                   <Events>
-                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtOutputSizeLimitKeyReleased"/>
+                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtMaxSeedsKeyReleased"/>
                   </Events>
                 </Component>
-                <Component class="javax.swing.JTextField" name="txtStackSizeLimit">
+                <Component class="javax.swing.JCheckBox" name="chkActive">
                   <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="txtStackSizeLimit.text"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtStackSizeLimitKeyReleased"/>
-                  </Events>
-                </Component>
-                <Component class="javax.swing.JTextField" name="txtWallClockTimeLimit">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="txtWallClockTimeLimit.text"/>
-                    <Property name="name" type="java.lang.String" value="txtWallClockTimeLimit" noResource="true"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtWallClockTimeLimitKeyReleased"/>
-                  </Events>
-                </Component>
-                <Component class="javax.swing.JLabel" name="jLabel6">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="jLabel6.text"/>
-                    <Property name="name" type="java.lang.String" value="jLabel6" noResource="true"/>
-                  </Properties>
-                </Component>
-                <Component class="javax.swing.JLabel" name="jLabel7">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="jLabel7.text"/>
-                    <Property name="name" type="java.lang.String" value="jLabel7" noResource="true"/>
-                  </Properties>
-                </Component>
-                <Component class="javax.swing.JLabel" name="jLabel8">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="jLabel8.text"/>
-                    <Property name="name" type="java.lang.String" value="jLabel8" noResource="true"/>
+                    <Property name="text" type="java.lang.String" resourceKey="chkActive.text"/>
+                    <Property name="name" type="java.lang.String" value="chkActive" noResource="true"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -551,7 +481,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane1" pref="533" max="32767" attributes="0"/>
+                      <Component id="jSplitPane1" pref="446" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="btnSelectAllSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -601,7 +531,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jScrollPane3" alignment="0" pref="531" max="32767" attributes="0"/>
+                          <Component id="jScrollPane3" alignment="0" pref="444" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -777,7 +707,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jSplitPane2" alignment="0" pref="586" max="32767" attributes="0"/>
+                  <Component id="jSplitPane2" alignment="0" pref="499" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -821,9 +751,9 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="557" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="470" max="32767" attributes="0"/>
                           <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
-                              <Component id="jTreeInstanceClass" alignment="0" pref="557" max="32767" attributes="0"/>
+                              <Component id="jTreeInstanceClass" alignment="0" pref="470" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -877,7 +807,7 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Component id="lblFilterStatus" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jScrollPane2" pref="472" max="32767" attributes="0"/>
+                              <Component id="jScrollPane2" pref="385" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jPanel5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -1146,7 +1076,7 @@
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
-                          <Component id="jScrollPane1" pref="533" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" pref="446" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jPanel6" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -1335,7 +1265,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="lblJobsFilterStatus" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane6" pref="502" max="32767" attributes="0"/>
+                      <Component id="jScrollPane6" pref="415" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="lblETA" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
