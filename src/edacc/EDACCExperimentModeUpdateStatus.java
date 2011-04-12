@@ -6,7 +6,8 @@
 package edacc;
 
 import edacc.experiment.ExperimentController;
-import edacc.model.ExperimentResultStatus;
+import edacc.model.StatusCode;
+import edacc.model.StatusCodeDAO;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
 import java.sql.SQLException;
@@ -26,7 +27,7 @@ public class EDACCExperimentModeUpdateStatus extends javax.swing.JDialog {
         initComponents();
         this.expController = expController;
         comboStatus.removeAllItems();
-        for (ExperimentResultStatus status : ExperimentResultStatus.constants) {
+        for (StatusCode status : StatusCode.CONST) {
             comboStatus.addItem(status);
         }
         comboStatus.addItem("custom");
@@ -114,8 +115,8 @@ public class EDACCExperimentModeUpdateStatus extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void comboStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboStatusActionPerformed
-        if (comboStatus.getSelectedItem() instanceof ExperimentResultStatus) {
-            txtStatus.setText("" + ((ExperimentResultStatus) comboStatus.getSelectedItem()).getValue());
+        if (comboStatus.getSelectedItem() instanceof StatusCode) {
+            txtStatus.setText("" + ((StatusCode) comboStatus.getSelectedItem()).getStatusCode());
             txtStatus.setEnabled(false);
         } else {
             txtStatus.setEnabled(true);
@@ -124,20 +125,20 @@ public class EDACCExperimentModeUpdateStatus extends javax.swing.JDialog {
 
     @Action
     public void btnApply() {
-        ExperimentResultStatus status = null;
-        if (comboStatus.getSelectedItem() instanceof ExperimentResultStatus) {
-            status = (ExperimentResultStatus) comboStatus.getSelectedItem();
+        StatusCode status = null;
+        if (comboStatus.getSelectedItem() instanceof StatusCode) {
+            status = (StatusCode) comboStatus.getSelectedItem();
         } else {
             try {
-                status = ExperimentResultStatus.getExperimentResultStatus(Integer.parseInt(txtStatus.getText()));
-            } catch (NumberFormatException e) {
+                status = StatusCodeDAO.getByStatusCode(Integer.parseInt(txtStatus.getText()));
+            } catch (Exception e) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Invalid status code.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
                 return;
             }
         }
         int userInput = javax.swing.JOptionPane.showConfirmDialog(this, "Do you really want to update the status of the currently visible jobs?", "Status Update", javax.swing.JOptionPane.YES_NO_OPTION);
         if (userInput == javax.swing.JOptionPane.YES_OPTION) {
-            final ExperimentResultStatus fstatus = status;
+            final StatusCode fstatus = status;
             Tasks.startTask(new TaskRunnable() {
 
                 @Override

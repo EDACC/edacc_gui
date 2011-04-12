@@ -7,9 +7,11 @@ import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.ExperimentResultNotInDBException;
-import edacc.model.ExperimentResultStatus;
+import edacc.model.ResultCodeNotInDBException;
+import edacc.model.StatusCode;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.PropertyNotInDBException;
+import edacc.model.StatusCodeNotInDBException;
 import edacc.properties.PropertyTypeNotExistException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -55,7 +57,7 @@ public class ExperimentResultCache {
      * @throws NoConnectionToDBException
      * @throws ComputationMethodDoesNotExistException
      */
-    public synchronized void updateExperimentResults() throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
+    public synchronized void updateExperimentResults() throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         Timestamp ts = ExperimentResultDAO.getLastModifiedByExperimentId(experiment.getId());
         ArrayList<ExperimentResult> modified = ExperimentResultDAO.getAllModifiedByExperimentId(experiment.getId(), lastUpdated);
         if (resultMap == null) {
@@ -153,7 +155,7 @@ public class ExperimentResultCache {
      * @param instanceId the instance id of the ExperimentResults
      * @return returns an empty vector if there are no such ExperimentResults
      */
-    public ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId, ExperimentResultStatus[] status) {
+    public ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId, StatusCode[] status) {
         ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
         ExperimentResult result;
         int i = 0;
@@ -182,11 +184,11 @@ public class ExperimentResultCache {
      * @param run the run
      * @return returns null if there is no such ExperimentResult
      */
-    public synchronized ExperimentResult getResult(int solverConfigId, int instanceId, int run, ExperimentResultStatus[] status) {
+    public synchronized ExperimentResult getResult(int solverConfigId, int instanceId, int run, StatusCode[] status) {
         ExperimentResult res = resultMap.get(new ResultIdentifier(solverConfigId, instanceId, run));
         if (status != null) {
             boolean found = false;
-            for (ExperimentResultStatus s : status) {
+            for (StatusCode s : status) {
                 if (res.getStatus().equals(s)) {
                     found = true;
                     break;

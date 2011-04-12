@@ -22,17 +22,19 @@ public class ExperimentResultDAO {
 
     protected static PreparedStatement curSt = null;
     protected static final String table = "ExperimentResults";
+    protected static final String outputTable = "ExperimentResultsOutput";
     protected static final String insertQuery = "INSERT INTO " + table + " (SolverConfig_idSolverConfig, Experiment_idExperiment,"
             + "Instances_idInstance, run, status, seed, "
-            + "solverOutput, launcherOutput, watcherOutput, verifierOutput, startTime, priority, resultTime, computeQueue, resultCode) "
-            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            + "startTime, priority, resultTime, computeQueue, resultCode, CPUTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimit) "
+            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    protected static final String insertOutputsQuery = "INSERT INTO " + outputTable + " (ExperimentResults_idJob, solverOutput, launcherOutput, watcherOutput, verifierOutput, solverExitCode, watcherExitCode, verifierExitCode) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idJob=?";
     protected static final String selectQuery = "SELECT SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance, "
             + "idJob, run, seed, status, resultTime, resultCode, "
             + "solverExitCode, watcherExitCode, verifierExitCode, computeQueue, TIMESTAMPDIFF(SECOND, startTime, NOW()) AS runningTime, "
-            + "IF(status = " + ExperimentResultStatus.RUNNING.getValue() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) AS date_modified,"
-            + "priority, startTime "
-            + "FROM " + table + " ";
+            + "IF(status = " + StatusCode.RUNNING.getStatusCode() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) AS date_modified,"
+            + "priority, startTime, CPUTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimit "
+            + "FROM " + table + " LEFT JOIN ExperimentResultsOutput ON (idJob = ExperimentResults_idJob) ";
     protected static final String copyOutputQuery = "UPDATE ExperimentResults as dest, ExperimentResults as src "
             + "SET "
             + "dest.solverOutput = src.solverOutput, "
@@ -41,14 +43,14 @@ public class ExperimentResultDAO {
             + "dest.verifierOutput = src.verifierOutput "
             + "WHERE src.idJob = ? AND dest.idJob = ?";
 
-    public static ExperimentResult createExperimentResult(int run, int priority, int computeQueue, int status, int seed, ExperimentResultResultCode resultCode, float time, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime) throws SQLException {
-        ExperimentResult r = new ExperimentResult(run, priority, computeQueue, status, seed, resultCode, time, SolverConfigId, ExperimentId, InstanceId, startTime);
+    public static ExperimentResult createExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float time, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimit) throws SQLException {
+        ExperimentResult r = new ExperimentResult(run, priority, computeQueue, status, seed, resultCode, time, SolverConfigId, ExperimentId, InstanceId, startTime, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimit);
         r.setNew();
         return r;
     }
 
-    public static ExperimentResultEx createExperimentResult(int run, int priority, int computeQueue, int status, ExperimentResultResultCode resultCode, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
-        ExperimentResultEx r = new ExperimentResultEx(run, priority, computeQueue, status, resultCode, seed, time, SolverConfigId, ExperimentId, InstanceId, startTime, solverOutput, launcherOutput, watcherOutput, verifierOutput);
+    public static ExperimentResultEx createExperimentResult(int run, int priority, int computeQueue, StatusCode status, ResultCode resultCode, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimit, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
+        ExperimentResultEx r = new ExperimentResultEx(run, priority, computeQueue, status, resultCode, seed, time, SolverConfigId, ExperimentId, InstanceId, startTime, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimit, solverOutput, launcherOutput, watcherOutput, verifierOutput);
         r.setNew();
         return r;
     }
@@ -69,25 +71,20 @@ public class ExperimentResultDAO {
                 st.setInt(2, r.getExperimentId());
                 st.setInt(3, r.getInstanceId());
                 st.setInt(4, r.getRun());
-                st.setInt(5, r.getStatus().getValue());
+                st.setInt(5, r.getStatus().getStatusCode());
                 st.setInt(6, r.getSeed());
-                if (r instanceof ExperimentResultEx) {
-                    ExperimentResultEx rx = (ExperimentResultEx) r;
-                    st.setBytes(7, rx.getSolverOutput());
-                    st.setBytes(8, rx.getLauncherOutput());
-                    st.setBytes(9, rx.getWatcherOutput());
-                    st.setBytes(10, rx.getVerifierOutput());
-                } else {
-                    st.setNull(7, java.sql.Types.BLOB);
-                    st.setNull(8, java.sql.Types.BLOB);
-                    st.setNull(9, java.sql.Types.BLOB);
-                    st.setNull(10, java.sql.Types.BLOB);
-                }
-                st.setTimestamp(11, r.getStartTime());
-                st.setInt(12, r.getPriority());
-                st.setFloat(13, r.getResultTime());
-                st.setInt(14, r.getComputeQueue());
-                st.setInt(15, (r.getResultCode() == null) ? 0 : r.getResultCode().getValue());
+                st.setTimestamp(7, r.getStartTime());
+                st.setInt(8, r.getPriority());
+                st.setFloat(9, r.getResultTime());
+                st.setInt(10, r.getComputeQueue());
+                st.setInt(11, r.getResultCode().getResultCode());
+
+                st.setInt(12, r.getCPUTimeLimit());
+                st.setInt(13, r.getMemoryLimit());
+                st.setInt(14, r.getWallClockTimeLimit());
+                st.setInt(15, r.getStackSizeLimit());
+                st.setInt(16, r.getOutputSizeLimit());
+
                 st.addBatch();
             }
             st.executeBatch();
@@ -99,6 +96,29 @@ public class ExperimentResultDAO {
                 i++;
             }
             st.close();
+
+            st = DatabaseConnector.getInstance().getConn().prepareStatement(insertOutputsQuery);
+            curSt = st;
+            for (ExperimentResult r : v) {
+                st.setInt(1, r.getId());
+                if (r instanceof ExperimentResultEx) {
+                    ExperimentResultEx rx = (ExperimentResultEx) r;
+                    st.setBytes(2, rx.getSolverOutput());
+                    st.setBytes(3, rx.getLauncherOutput());
+                    st.setBytes(4, rx.getWatcherOutput());
+                    st.setBytes(5, rx.getVerifierOutput());
+                } else {
+                    st.setNull(2, java.sql.Types.BLOB);
+                    st.setNull(3, java.sql.Types.BLOB);
+                    st.setNull(4, java.sql.Types.BLOB);
+                    st.setNull(5, java.sql.Types.BLOB);
+                }
+                st.setNull(6, java.sql.Types.INTEGER);
+                st.setNull(7, java.sql.Types.INTEGER);
+                st.setNull(8, java.sql.Types.INTEGER);
+                st.addBatch();
+            }
+            st.executeBatch();
         } catch (SQLException e) {
             DatabaseConnector.getInstance().getConn().rollback();
             throw e;
@@ -147,32 +167,34 @@ public class ExperimentResultDAO {
      * @throws IllegalArgumentException if <code>from.size() != to.size()</code> or <code>from == null</code> or <code>to == null</code>
      */
     public static void batchCopyOutputs(ArrayList<ExperimentResult> from, ArrayList<ExperimentResult> to) throws NoConnectionToDBException, SQLException {
-        if (from.size() != to.size() || from == null || to == null) {
-            throw new IllegalArgumentException("from.size() != to.size()");
+        throw new IllegalArgumentException("not yet implemented.");
+        // TODO: update copy output query
+     /*   if (from.size() != to.size() || from == null || to == null) {
+        throw new IllegalArgumentException("from.size() != to.size()");
         }
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         try {
-            DatabaseConnector.getInstance().getConn().setAutoCommit(false);
-            final String query = copyOutputQuery;
-            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
-            curSt = st;
-            for (int i = 0; i < from.size(); i++) {
-                st.setInt(1, from.get(i).getId());
-                st.setInt(2, to.get(i).getId());
-                st.addBatch();
-            }
-
-            st.executeBatch();
-            st.close();
-        } catch (Throwable e) {
-            DatabaseConnector.getInstance().getConn().rollback();
-            if (e instanceof SQLException) {
-                throw (SQLException) e;
-            }
-        } finally {
-            curSt = null;
-            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+        DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+        final String query = copyOutputQuery;
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        curSt = st;
+        for (int i = 0; i < from.size(); i++) {
+        st.setInt(1, from.get(i).getId());
+        st.setInt(2, to.get(i).getId());
+        st.addBatch();
         }
+
+        st.executeBatch();
+        st.close();
+        } catch (Throwable e) {
+        DatabaseConnector.getInstance().getConn().rollback();
+        if (e instanceof SQLException) {
+        throw (SQLException) e;
+        }
+        } finally {
+        curSt = null;
+        DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+        }*/
     }
 
     /**
@@ -214,18 +236,18 @@ public class ExperimentResultDAO {
      * @param status
      * @throws SQLException
      */
-    public static void batchUpdateStatus(ArrayList<ExperimentResult> v, ExperimentResultStatus status) throws SQLException {
+    public static void batchUpdateStatus(ArrayList<ExperimentResult> v, StatusCode status) throws SQLException {
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         try {
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
 
-            String updateString = "status = " + status.getValue();
-            if (status == ExperimentResultStatus.NOTSTARTED) {
-                updateString += ",startTime=NULL, resultTime = NULL, resultCode = NULL, solverOutput = NULL, launcherOutput = NULL, "
+            String updateString = "status = " + status.getStatusCode();
+            if (status == StatusCode.NOT_STARTED) {
+                updateString += ",startTime=NULL, resultTime = NULL, resultCode = " + ResultCode.UNKNOWN.getResultCode() + " , solverOutput = NULL, launcherOutput = NULL, "
                         + "verifierOutput = NULL, watcherOutput = NULL, solverExitCode = NULL, watcherExitCode = NULL, "
                         + "verifierExitCode = NULL, computeQueue = NULL";
             }
-            final String query = "UPDATE " + table + " SET " + updateString + " WHERE idJob=?";
+            final String query = "UPDATE " + table + " LEFT JOIN " + outputTable + " ON (idJob = ExperimentResults_idJob) SET " + updateString + " WHERE idJob=?";
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
             curSt = st;
             for (ExperimentResult r : v) {
@@ -279,7 +301,7 @@ public class ExperimentResultDAO {
         }
     }
 
-    private static ExperimentResult getExperimentResultFromResultSet(ResultSet rs) throws SQLException {
+    private static ExperimentResult getExperimentResultFromResultSet(ResultSet rs) throws SQLException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         ExperimentResult r = new ExperimentResult();
         r.setSolverConfigId(rs.getInt("SolverConfig_idSolverConfig"));
         r.setInstanceId(rs.getInt("Instances_idInstance"));
@@ -287,13 +309,9 @@ public class ExperimentResultDAO {
         r.setId(rs.getInt("idJob"));
         r.setRun(rs.getInt("run"));
         r.setSeed(rs.getInt("seed"));
-        r.setStatus(rs.getInt("status"));
+        r.setStatus(StatusCodeDAO.getByStatusCode(rs.getInt("status")));
         r.setResultTime(rs.getFloat("resultTime"));
-        Integer resultCode = rs.getInt("resultCode");
-        if (resultCode == null) {
-            resultCode = -1;
-        }
-        r.setResultCode(resultCode);
+        r.setResultCode(ResultCodeDAO.getByResultCode(rs.getInt("resultCode")));
         r.setSolverExitCode(rs.getInt("solverExitCode"));
         r.setWatcherExitCode(rs.getInt("watcherExitCode"));
         r.setVerifierExitCode(rs.getInt("verifierExitCode"));
@@ -301,8 +319,14 @@ public class ExperimentResultDAO {
         r.setPriority(rs.getInt("priority"));
         r.setStartTime(rs.getTimestamp("startTime"));
 
+        r.setCPUTimeLimit(rs.getInt("CPUTimeLimit"));
+        r.setMemoryLimit(rs.getInt("memoryLimit"));
+        r.setWallClockTimeLimit(rs.getInt("wallClockTimeLimit"));
+        r.setStackSizeLimit(rs.getInt("stackSizeLimit"));
+        r.setOutputSizeLimit(rs.getInt("outputSizeLimit"));
+
         r.setDatemodified(rs.getTimestamp("date_modified"));
-        if (r.getStatus() == ExperimentResultStatus.RUNNING) {
+        if (r.getStatus() == StatusCode.RUNNING) {
             r.setRunningTime(rs.getInt("runningTime"));
         } else {
             r.setRunningTime(0);
@@ -383,11 +407,11 @@ public class ExperimentResultDAO {
      * @throws PropertyNotInDBException
      * @throws PropertyTypeNotExistException
      */
-    public static ArrayList<ExperimentResult> getAllModifiedByExperimentId(int id, Timestamp modified) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
+    public static ArrayList<ExperimentResult> getAllModifiedByExperimentId(int id, Timestamp modified) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         ArrayList<ExperimentResult> v = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery
-                + "WHERE Experiment_idExperiment=? AND IF(status = " + ExperimentResultStatus.RUNNING.getValue() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) >= ?;");
+                + "WHERE Experiment_idExperiment=? AND IF(status = " + StatusCode.RUNNING.getStatusCode() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) >= ?;");
         st.setInt(1, id);
         st.setTimestamp(2, modified);
         ResultSet rs = st.executeQuery();
@@ -408,7 +432,7 @@ public class ExperimentResultDAO {
      * @return ExperimentResults vector
      * @throws SQLException
      */
-    public static ArrayList<ExperimentResult> getAllByExperimentId(int id) throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
+    public static ArrayList<ExperimentResult> getAllByExperimentId(int id) throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         ArrayList<ExperimentResult> v = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery
@@ -439,7 +463,7 @@ public class ExperimentResultDAO {
         }
         constTable = constTable.substring(0, constTable.length() - 1) + ")";
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        ResultSet rs = st.executeQuery("SELECT idJob, startTime, solverOutput, launcherOutput, watcherOutput, verifierOutput FROM " + table + " WHERE idJob IN " + constTable);
+        ResultSet rs = st.executeQuery("SELECT idJob, startTime, solverOutput, launcherOutput, watcherOutput, verifierOutput FROM " + table + " JOIN " + outputTable + " ON (idJob = ExperimentResults_idJob) WHERE idJob IN " + constTable);
         while (rs.next()) {
             Timestamp startTime = null;
             try {
@@ -448,10 +472,15 @@ public class ExperimentResultDAO {
                 // fails if the db DateTime objekt could not be converted to a Timestamp (illegal date.)
             }
             ExperimentResult er = resultMap.get(rs.getInt(1));
-            ExperimentResultEx erx = createExperimentResult(er.getRun(), er.getPriority(), er.getComputeQueue(), er.getStatus().getValue(),
+            ExperimentResultEx erx = createExperimentResult(er.getRun(), er.getPriority(), er.getComputeQueue(), er.getStatus(),
                     er.getResultCode(), er.getSeed(), er.getResultTime(), er.getSolverConfigId(), er.getExperimentId(),
                     er.getInstanceId(),
                     startTime,
+                    er.getCPUTimeLimit(),
+                    er.getMemoryLimit(),
+                    er.getWallClockTimeLimit(),
+                    er.getStackSizeLimit(),
+                    er.getOutputSizeLimit(),
                     rs.getBytes(3),
                     rs.getBytes(4),
                     rs.getBytes(5),
@@ -543,7 +572,7 @@ public class ExperimentResultDAO {
      * @throws PropertyTypeNotExistException
      * @throws IOException
      */
-    public static ArrayList<ExperimentResult> getAllByExperimentIdAndRun(int eid, int run) throws SQLException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
+    public static ArrayList<ExperimentResult> getAllByExperimentIdAndRun(int eid, int run) throws SQLException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery + "WHERE Experiment_idExperiment=? AND run=?;");
@@ -568,7 +597,7 @@ public class ExperimentResultDAO {
      * @throws PropertyTypeNotExistException
      * @throws IOException
      */
-    public static ArrayList<ExperimentResult> getAllBySolverConfiguration(SolverConfiguration sc) throws SQLException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
+    public static ArrayList<ExperimentResult> getAllBySolverConfiguration(SolverConfiguration sc) throws SQLException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery + "WHERE Experiment_idExperiment=? AND SolverConfig_idSolverConfig=?;");
@@ -593,7 +622,7 @@ public class ExperimentResultDAO {
      * @throws PropertyTypeNotExistException
      * @throws IOException
      */
-    public static ArrayList<ExperimentResult> getAllByExperimentHasInstance(ExperimentHasInstance ehi) throws SQLException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
+    public static ArrayList<ExperimentResult> getAllByExperimentHasInstance(ExperimentHasInstance ehi) throws SQLException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery + "WHERE Experiment_idExperiment=? AND Instances_idInstance=?;");
@@ -636,7 +665,7 @@ public class ExperimentResultDAO {
      * @throws ExperimentResultNotInDBException
      * @author rretz
      */
-    public static ExperimentResult getById(int id) throws NoConnectionToDBException, SQLException, ExperimentResultNotInDBException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException {
+    public static ExperimentResult getById(int id) throws NoConnectionToDBException, SQLException, ExperimentResultNotInDBException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery
                 + "WHERE idJob=?;");
@@ -660,7 +689,7 @@ public class ExperimentResultDAO {
      * @throws ExperimentResultNotInDBException
      * @author rretz
      */
-    public static ExperimentResult getByIdWithoutAssign(int id) throws NoConnectionToDBException, SQLException, ExperimentResultNotInDBException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException {
+    public static ExperimentResult getByIdWithoutAssign(int id) throws NoConnectionToDBException, SQLException, ExperimentResultNotInDBException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery
                 + "WHERE idJob=?;");
@@ -679,8 +708,8 @@ public class ExperimentResultDAO {
     public static Blob getLauncherOutput(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, ExperimentResultNotInDBException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT lancherOutput "
-                + "FROM " + table + " "
-                + "WHERE idJob=?;");
+                + "FROM " + outputTable + " "
+                + "WHERE ExperimentResults_idJob=?;");
         ps.setInt(1, expRes.getId());
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
@@ -690,15 +719,15 @@ public class ExperimentResultDAO {
                 ps.close();
             }
         } else {
-            throw new ExperimentResultNotInDBException();
+            return null;
         }
     }
 
     public static Blob getSolverOutput(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, ExperimentResultNotInDBException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT solverOutput "
-                + "FROM " + table + " "
-                + "WHERE idJob=?;");
+                + "FROM " + outputTable + " "
+                + "WHERE ExperimentResults_idJob=?;");
         ps.setInt(1, expRes.getId());
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
@@ -708,15 +737,15 @@ public class ExperimentResultDAO {
                 ps.close();
             }
         } else {
-            throw new ExperimentResultNotInDBException();
+            return null;
         }
     }
 
     public static Blob getVerifierOutput(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, ExperimentResultNotInDBException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT verifierOutput "
-                + "FROM " + table + " "
-                + "WHERE idJob=?;");
+                + "FROM " + outputTable + " "
+                + "WHERE ExperimentResults_idJob=?;");
         ps.setInt(1, expRes.getId());
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
@@ -726,15 +755,15 @@ public class ExperimentResultDAO {
                 ps.close();
             }
         } else {
-            throw new ExperimentResultNotInDBException();
+            return null;
         }
     }
 
     public static Blob getWatcherOutput(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, ExperimentResultNotInDBException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT watcherOutput "
-                + "FROM " + table + " "
-                + "WHERE idJob=?;");
+                + "FROM " + outputTable + " "
+                + "WHERE ExperimentResults_idJob=?;");
         ps.setInt(1, expRes.getId());
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
@@ -742,7 +771,7 @@ public class ExperimentResultDAO {
             ps.close();
             return blob;
         } else {
-            throw new ExperimentResultNotInDBException();
+            return null;
         }
     }
 
@@ -892,8 +921,8 @@ public class ExperimentResultDAO {
 
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT " + col + " "
-                + "FROM " + table + " "
-                + "WHERE idJob=?;");
+                + "FROM " + outputTable + " "
+                + "WHERE ExperimentResults_idJob=?;");
         ps.setInt(1, er.getId());
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
@@ -942,7 +971,7 @@ public class ExperimentResultDAO {
         }
     }
 
-    public static ArrayList<ExperimentResult> getAllByInstanceId(int id) throws NoConnectionToDBException, SQLException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
+    public static ArrayList<ExperimentResult> getAllByInstanceId(int id) throws NoConnectionToDBException, SQLException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         ArrayList<ExperimentResult> v = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery

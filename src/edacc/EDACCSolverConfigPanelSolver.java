@@ -54,10 +54,10 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
         doRepaint();
     }
 
-    public EDACCSolverConfigPanelSolver(SolverConfiguration solverConfiguration, EDACCSolverConfigPanel parent) throws SQLException {
+    public EDACCSolverConfigPanelSolver(SolverConfiguration solverConfiguration, EDACCSolverConfigPanel parent, boolean useSolverConfiguration) throws SQLException {
         this(SolverDAO.getById(solverConfiguration.getSolver_id()));
         this.parent = parent;
-        addSolverConfiguration(solverConfiguration);
+        addSolverConfiguration(solverConfiguration, useSolverConfiguration);
     }
 
     private void setGridBagConstraints() {
@@ -83,8 +83,22 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
      * @throws SQLException
      */
     public void addSolverConfiguration(SolverConfiguration solverConfiguration) throws SQLException {
+        addSolverConfiguration(solverConfiguration, true);
+    }
+
+    /**
+     * Generates a new EDACCSolverConfigEntry for a solver configuration.
+     * @param solverConfiguration
+     * @param useSolverConfiguration will create a new solver configuration when saving this entry if the flag is false
+     * @throws SQLException
+     */
+    public void addSolverConfiguration(SolverConfiguration solverConfiguration, boolean useSolverConfiguration) throws SQLException {
         EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solverConfiguration);
         entry.setParent(this);
+        if (!useSolverConfiguration) {
+            entry.solver = SolverDAO.getById(entry.solverConfiguration.getSolver_id());
+            entry.solverConfiguration = null;
+        }
         this.add(entry, getIndex(solverConfiguration.getSolver_id()));
         parent.getSolTableModel().setSolverSelected(solverConfiguration.getSolver_id(), true);
         setGridBagConstraints();

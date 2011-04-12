@@ -44,8 +44,8 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
 
     private SolverConfigEntryTableModel solverConfigEntryTableModel;
     private TitledBorder border;
-    private SolverConfiguration solverConfiguration;
-    private Solver solver;
+    protected SolverConfiguration solverConfiguration;
+    protected Solver solver;
     private EDACCSolverConfigPanelSolver parent;
     private boolean updateTableColumnWidth;
 
