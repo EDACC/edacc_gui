@@ -17,8 +17,6 @@ import edacc.model.InstanceClassDAO;
 import edacc.model.NoConnectionToDBException;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
@@ -55,7 +53,6 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroupAutomaticOrManuel = new javax.swing.ButtonGroup();
         jPanelButtons = new javax.swing.JPanel();
         jButtonOk = new javax.swing.JButton();
         jButtonCancel = new javax.swing.JButton();
@@ -66,7 +63,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         jTextFieldExtension = new javax.swing.JTextField();
         chkCompress = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        chkAutoClass = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAddNewInstanceSelectClassDialog.class);
@@ -146,8 +143,8 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
         jLabel1.setName("jLabel1"); // NOI18N
 
-        jCheckBox1.setText(resourceMap.getString("jCheckBox1.text")); // NOI18N
-        jCheckBox1.setName("jCheckBox1"); // NOI18N
+        chkAutoClass.setText(resourceMap.getString("chkAutoClass.text")); // NOI18N
+        chkAutoClass.setName("chkAutoClass"); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -156,7 +153,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox1)
+                    .addComponent(chkAutoClass)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -172,7 +169,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jCheckBox1)
+                .addComponent(chkAutoClass)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -216,29 +213,21 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
         this.input = new InstanceClass();
         this.fileExtension = jTextFieldExtension.getText();
-        if(buttonGroupAutomaticOrManuel.getSelection() == null){
-            JOptionPane.showMessageDialog(this,
-                    "Please choose if the new instance class is a source class or a user class." ,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-       }else {
-          if(jRadioButtonAutomatic.isSelected()){
-            this.input.setName("");
+        
+        if(jTreeSourceClass.getSelectionPath() != null){
+            this.input = (InstanceClass) ((DefaultMutableTreeNode)jTreeSourceClass.getSelectionPath().getLastPathComponent()).getUserObject();
             this.setVisible(false);
-          }else{
-            if(jTreeSourceClass.getSelectionPath() == null){
-                JOptionPane.showMessageDialog(this,
-                    "Please select one of the instance source classes from the tree or select \"Automatic instance class generation\"." ,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+        }else{
+            if(!chkAutoClass.isSelected()){
+              JOptionPane.showMessageDialog(this.rootPane,
+                "Select a instance class or choose automatic class generation.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
             }else{
-                this.input = (InstanceClass) ((DefaultMutableTreeNode)jTreeSourceClass.getSelectionPath().getLastPathComponent()).getUserObject();
+                this.input.setName("");
                 this.setVisible(false);
             }
-
-          }
-       }
-        
+        }
     }//GEN-LAST:event_jButtonOkActionPerformed
     /**
      * Modifies the input object to null and close the jDialog.
@@ -279,11 +268,10 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroupAutomaticOrManuel;
+    private javax.swing.JCheckBox chkAutoClass;
     private javax.swing.JCheckBox chkCompress;
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonOk;
-    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabelExtension;
     private javax.swing.JPanel jPanel1;
@@ -310,10 +298,10 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         }
     }
 
-    public void setManualSelection() {
-        jRadioButtonChoose.setSelected(true);
-    }
 
+    public Boolean isAutoClass(){
+        return chkAutoClass.isSelected();
+    }
 
     public String getFileExtension(){
         return fileExtension;

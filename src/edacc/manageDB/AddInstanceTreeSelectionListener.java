@@ -22,7 +22,7 @@ public class AddInstanceTreeSelectionListener implements TreeSelectionListener{
 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
-        main.setManualSelection();
     }
+
 
 }
