@@ -1208,8 +1208,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             Boolean compress = this.addInstanceDialog.isCompress();
             InstanceClass input = this.addInstanceDialog.getInput();
             String fileExtension = this.addInstanceDialog.getFileExtension();
+            Boolean autoClass = this.addInstanceDialog.isAutoClass();
 
-            //if the user doesn't cancel the dialog above, the fileChooser is shown.
+            //If the user doesn't cancel the dialog above, the fileChooser is shown.
             if (input != null) {
                 if(fileExtension.isEmpty()){
                       
@@ -1229,7 +1230,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
                 File ret = jFileChooserManageDBInstance.getSelectedFile();
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    Tasks.startTask("addInstances", new Class[]{edacc.model.InstanceClass.class, java.io.File.class, edacc.model.Tasks.class, String.class, Boolean.class}, new Object[]{input, ret, null, fileExtension, compress}, manageDBInstances, EDACCManageDBMode.this);
+                    Tasks.startTask("addInstances", new Class[]{edacc.model.InstanceClass.class, java.io.File.class, edacc.model.Tasks.class, String.class, Boolean.class, Boolean.class}, new Object[]{input, ret, null, fileExtension, compress, autoClass}, manageDBInstances, EDACCManageDBMode.this);
                 }
             }
             input = null;
