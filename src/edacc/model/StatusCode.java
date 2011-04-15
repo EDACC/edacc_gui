@@ -15,7 +15,7 @@ public class StatusCode extends BaseModel implements Serializable {
     public static final StatusCode VERIFIERCRASH = new StatusCode(-2, "verifier crash");
     public static final StatusCode NOT_STARTED = new StatusCode(-1, "not started");
     public static final StatusCode RUNNING = new StatusCode(0, "running");
-    public static final StatusCode SUCCESSFUL = new StatusCode(1, "successful");
+    public static final StatusCode SUCCESSFUL = new StatusCode(1, "finished");
 
     // these values will be saved by the DAO automatically on initialization if they don't exist in the database
     public static final StatusCode[] CONST = {LAUNCHERCRASH, WATCHERCRASH, SOLVERCRASH, VERIFIERCRASH, NOT_STARTED, RUNNING, SUCCESSFUL};

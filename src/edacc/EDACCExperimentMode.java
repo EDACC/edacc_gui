@@ -2274,11 +2274,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             boolean linkSeeds = chkLinkSeeds.isSelected();
             int maxSeed = Integer.parseInt(txtMaxSeeds.getText());
             int selectedExperiment = tableExperiments.getSelectedRow();
-            expController.saveExperimentParameters(maxSeed, generateSeeds, linkSeeds);
+            boolean active = chkActive.isSelected();
+            int priority = Integer.parseInt(txtPriority.getText());
+            expController.saveExperimentParameters(maxSeed, generateSeeds, linkSeeds, active, priority);
             setTitles();
             tableExperiments.getSelectionModel().setSelectionInterval(selectedExperiment, selectedExperiment);
         } catch (NumberFormatException ex) {
-            javax.swing.JOptionPane.showMessageDialog(null, "Expected integers for seed and limits.", "Invalid data", javax.swing.JOptionPane.ERROR_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(null, "Expected integers for seed and priority.", "Invalid data", javax.swing.JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
             createDatabaseErrorMessage(ex);
         } catch (Exception e) {
