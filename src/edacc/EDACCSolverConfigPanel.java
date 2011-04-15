@@ -173,7 +173,6 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
         for (int i = 0; i < this.getComponentCount(); i++) {
             if (((EDACCSolverConfigPanelSolver) this.getComponent(i)).getSolver().getId() == solver.getId()) {
                 ((EDACCSolverConfigPanelSolver) this.getComponent(i)).removeAll();
-                this.remove(this.getComponent(i));
                 doRepaint();
                 return;
             }
