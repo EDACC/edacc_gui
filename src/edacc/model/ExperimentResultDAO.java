@@ -33,7 +33,7 @@ public class ExperimentResultDAO {
             + "idJob, run, seed, status, resultTime, resultCode, "
             + "solverExitCode, watcherExitCode, verifierExitCode, computeQueue, TIMESTAMPDIFF(SECOND, startTime, NOW()) AS runningTime, "
             + "IF(status = " + StatusCode.RUNNING.getStatusCode() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) AS date_modified,"
-            + "priority, startTime, CPUTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimit "
+            + "priority, startTime, CPUTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimit, computeNode, computeNodeIP "
             + "FROM " + table + " LEFT JOIN ExperimentResultsOutput ON (idJob = ExperimentResults_idJob) ";
     protected static final String copyOutputQuery = "UPDATE ExperimentResults as dest, ExperimentResults as src "
             + "SET "
@@ -324,6 +324,9 @@ public class ExperimentResultDAO {
         r.setWallClockTimeLimit(rs.getInt("wallClockTimeLimit"));
         r.setStackSizeLimit(rs.getInt("stackSizeLimit"));
         r.setOutputSizeLimit(rs.getInt("outputSizeLimit"));
+
+        r.setComputeNode(rs.getString("computeNode"));
+        r.setComputeNodeIP(rs.getString("computeNodeIP"));
 
         r.setDatemodified(rs.getTimestamp("date_modified"));
         if (r.getStatus() == StatusCode.RUNNING) {

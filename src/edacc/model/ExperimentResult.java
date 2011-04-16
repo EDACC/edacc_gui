@@ -38,6 +38,9 @@ public class ExperimentResult extends BaseModel implements Serializable {
     private int stackSizeLimit;
     private int outputSizeLimit;
 
+    private String computeNode;
+    private String computeNodeIP;
+
     private transient HashMap<Integer, ExperimentResultHasProperty> propertyValues;
     private Timestamp datemodified;
     protected ExperimentResult() {
@@ -322,5 +325,21 @@ public class ExperimentResult extends BaseModel implements Serializable {
         if (this.isSaved()) {
             this.setModified();
         }
+    }
+
+    public String getComputeNode() {
+        return computeNode;
+    }
+
+    protected void setComputeNode(String computeNode) {
+        this.computeNode = computeNode;
+    }
+
+    public String getComputeNodeIP() {
+        return computeNodeIP;
+    }
+
+    protected void setComputeNodeIP(String computeNodeIP) {
+        this.computeNodeIP = computeNodeIP;
     }
 }
