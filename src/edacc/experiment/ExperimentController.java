@@ -59,7 +59,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -739,7 +738,7 @@ public class ExperimentController {
     /**
      * Generates a ZIP archive with the necessary files for the grid.
      */
-    public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException, InstanceNotInDBException {
+    public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException, InstanceNotInDBException, TaskCancelledException {
         boolean foundSolverWithSameName = false;
         File tmpDir = new File("tmp");
         tmpDir.mkdir();
@@ -832,9 +831,11 @@ public class ExperimentController {
 
                 // add PBS script
                 File f = GridQueueDAO.getPBS(queue);
-                entry = new ZipEntry("start_client.pbs");
-                addFileToZIP(f, entry, zos);
 
+                if (f.exists()) {
+                    entry = new ZipEntry("start_client.pbs");
+                    addFileToZIP(f, entry, zos);
+                }
                 // add configuration File
                 addConfigurationFile(zos, activeExperiment, queue);
 
@@ -854,6 +855,10 @@ public class ExperimentController {
 
             // delete tmp directory
             deleteDirectory(new File("tmp"));
+
+            if (task.isCancelled()) {
+                throw new TaskCancelledException("Cancelled");
+            }
         }
         if (foundSolverWithSameName) {
             javax.swing.JOptionPane.showMessageDialog(null, "The resulting package file contains solvers with same names.", "Information", javax.swing.JOptionPane.INFORMATION_MESSAGE);

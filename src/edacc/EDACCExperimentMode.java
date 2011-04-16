@@ -2040,6 +2040,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 count++;
                 avgTime += er.getResultTime();
             } else if (er.getStatus().equals(StatusCode.RUNNING) && er.getRunningTime() > 0) {
+                avgTime += er.getCPUTimeLimit(); // worst case
+                count++;
                 curRunningTime += er.getRunningTime();
             }
         }
