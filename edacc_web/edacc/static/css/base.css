@@ -13,28 +13,22 @@ img {
 }
 
 a:link {
+    color: #5b80b2;
     text-decoration: none;
 }
 
 a:visited {
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-a:active {
-    text-decoration: none;
-}
-
-a:link, a:visited {
     color: #5b80b2;
     text-decoration: none;
 }
 
 a:hover {
+    text-decoration: none;
     color: #036;
+}
+
+a:active {
+    text-decoration: none;
 }
 
 #header {
@@ -53,10 +47,6 @@ a:hover {
     color: black;
 }
 
-#navigation a:hover {
-    text-decoration: underline;
-}
-
 #content {
     margin-left: 3px;
     min-height: 500px;
@@ -64,9 +54,9 @@ a:hover {
 }
 
 #footer {
-    padding: 3px;
+    margin-top: 5px;
     border-top: 1px solid #ccc;
-    clear:both;
+    clear: both;
 }
 
 #title {
@@ -154,7 +144,7 @@ form td, th {
     font-size: 12px;
     line-height: 13px;
     border-bottom: 1px solid #eee;
-    vertical-align: top;
+    vertical-align: middle;
     padding-top: 3px;
     padding-bottom: 3px;
 }
@@ -309,4 +299,123 @@ code, pre {
 	padding:2px;
 	display:none;
 	color:#fff;
-	}
+}
+
+#table_results {
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+    font-size: 9pt;
+}
+
+#table_results tbody td {
+    padding: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#table_results thead th {
+    padding: 3px 18px 3px 10px;
+    background-color: #e6EEFF;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+#table_results tr.odd {
+    background-color: #f5f5f5;
+}
+
+#table_results tr.even {
+    background-color: #fff;
+}
+
+#table_results td, th {
+    border-width: 1px;
+    border-style: solid;
+    border-color: black;
+    vertical-align: middle;
+    text-align:
+}
+
+.sorting_asc {
+    background: url('/static/img/tablesorter/desc.gif') no-repeat center right;
+}
+
+.sorting_desc {
+    background: url('/static/img/tablesorter/asc.gif') no-repeat center right;
+}
+
+.sorting {
+    background: url('/static/img/tablesorter/bg.gif') no-repeat center right;
+}
+
+.sorting_asc_disabled {
+    background: url('/static/img/datatable/sort_asc_disabled.png') no-repeat center right;
+}
+
+.sorting_desc_disabled {
+    background: url('/static/img/datatable/sort_desc_disabled.png') no-repeat center right;
+}
+
+#table_instances {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+}
+
+#table_instances td {
+    padding: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#table_instances thead th {
+    padding: 3px 18px 3px 10px;
+    background-color: #e6EEFF;
+    cursor: pointer;
+}
+
+#table_instances tr.odd {
+    background-color: #f5f5f5;
+}
+
+#table_instances tr.even {
+    background-color: #fff;
+}
+
+#table_instances td, th {
+    border-width: 1px;
+    border-style: solid;
+    border-color: black;
+}
+
+#table_solver_configs {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+}
+
+#table_solver_configs td {
+    padding: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#table_solver_configs thead th {
+    padding: 3px 18px 3px 10px;
+    background-color: #e6EEFF;
+    cursor: pointer;
+}
+
+#table_solver_configs tr.odd {
+    background-color: #f5f5f5;
+}
+
+#table_solver_configs tr.even {
+    background-color: #fff;
+}
+
+#table_solver_configs td, th {
+    border-width: 1px;
+    border-style: solid;
+    border-color: black;
+}

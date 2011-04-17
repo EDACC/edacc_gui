@@ -6,8 +6,20 @@
         <link rel="icon" href="{{url_for('static', filename='img/edacc.png')}}" type="image/png" />
 	    <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 	    <meta name="description" content="EDACC is an advanced platform for the design, administration and analysis of experiments with algorithms on arbitrary computing systems ranging from multi core PC's to cluster or large scale grids." />
-	    <meta http-equiv="cache-control" content="no-cache" />
-	    <meta http-equiv="content-language" content="en" />
+	    {% if g.PIWIK_URL %}
+	    <!-- Piwik -->
+	    <script type="text/javascript">
+	    var pkBaseURL = (("https:" == document.location.protocol) ? "https://{{g.PIWIK_URL}}" : "http://{{g.PIWIK_URL}}");
+	    document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+	    </script><script type="text/javascript">
+	    try {
+	    var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+	    piwikTracker.trackPageView();
+	    piwikTracker.enableLinkTracking();
+	    } catch( err ) {}
+	    </script>
+	    <!-- End Piwik Tag -->
+	    {% endif %}
     </head>
     <body>
         <img style="margin-right:10px" alt="EDACC Logo" src="{{url_for('static', filename='img/edacc.png')}}"/><span id="title">EDACC Web Frontend</span>
@@ -20,7 +32,9 @@
         <h3>This instance is serving the following databases:</h3>
         <ul>
         {% for db in databases %}
+        {%if not db.hidden %}
             <li><a href="{{url_for('frontend.experiments_index', database=db.database)}}">{{db}}</a>{% if db.is_competition() %} (Competition){% endif %}</li>
+        {%endif%}
         {% endfor %}
         </ul>
 

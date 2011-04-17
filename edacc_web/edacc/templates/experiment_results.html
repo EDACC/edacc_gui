@@ -25,6 +25,9 @@
         {% if experiment.get_num_runs(db) > 1 %}
         In this table multiple runs of a solver on an instance are grouped in one cell and the <strong>median, minimum, maximum and average</strong> CPU time over all runs are calculated. Click on Show to access a list of the individual runs.
         {% endif %}
+        <form method="get" action="{{ url_for('frontend.experiment_results', database=database, experiment_id=experiment.idExperiment) }}">
+            <input type="submit" name="csv" value="Export CSV"/>
+        </form>
     </div>
     <table id="results" class="tablesorter" style="width: auto;">
         <thead>
@@ -62,7 +65,7 @@
                         {% for jobs in row.times %}
                             <td style="text-align: center; background-color: {{jobs.first_job.resultCode|job_result_code_color}};">
                                 <a style="color: black;" href="{{ url_for('frontend.experiment_result', database=database, experiment_id=experiment.idExperiment, result_id=jobs.first_job.idJob) }}">{{jobs.first_job.get_time()|result_time}}</a><br/>
-                                {{jobs.first_job.resultCode|result_code}}
+                                {{jobs.first_job.result_code.description}}
                             </td>
                         {% endfor %}
                     </tr>

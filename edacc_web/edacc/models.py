@@ -11,7 +11,7 @@
     :license: MIT, see LICENSE for details.
 """
 
-import pylzma, struct
+import base64
 
 from sqlalchemy import create_engine, MetaData, func
 from sqlalchemy.engine.url import URL
@@ -25,11 +25,12 @@ from edacc.constants import *
 
 class EDACCDatabase(object):
     """ Encapsulates a single EDACC database connection. """
-    def __init__(self, username, password, database, label):
+    def __init__(self, username, password, database, label, hidden=False):
         self.database = database
         self.username = username
         self.password = password
         self.label = label
+        self.hidden = hidden
 
         url = URL(drivername=config.DATABASE_DRIVER, username=username,
                   password=password, host=config.DATABASE_HOST,
@@ -59,7 +60,7 @@ class EDACCDatabase(object):
                     return 0
                 else:
                     return same_solvers.index(self) + 1
-            
+
             def get_name(self):
                 """ Returns the name of the solver configuration. """
                 if hasattr(self, 'name'):
@@ -126,7 +127,7 @@ class EDACCDatabase(object):
 
             def set_instance(self, uncompressed_instance):
                 """ Compresses the instance and sets the instance blob attribute """
-                self.instance = pylzma.compress(uncompressed_instance)
+                self.instance = "LZMA" + utils.lzma_compress(uncompressed_instance)
 
 
         class Experiment(object):
@@ -145,8 +146,17 @@ class EDACCDatabase(object):
                 return num_results / num_solver_configs / num_instances
 
             def get_solved_instances(self, db):
+                """ Returns the instances of the experiment that any solver
+                solved in any of its runs
+                """
+                instance_ids = [i[0] for i in db.session.query(db.ExperimentResult.Instances_idInstance) \
+                            .filter_by(experiment=self).filter(db.ExperimentResult.resultCode.like('1%')) \
+                            .filter_by(status=1).distinct().all()]
+                return db.session.query(db.Instance).filter(db.Instance.idInstance.in_(instance_ids)).all()
+
+            def get_fully_solved_instances(self, db):
                 """ Returns the instances of the experiment that all solvers
-                solved in every run
+                solved in all of their runs
                 """
                 numInstances = db.session.query(db.Instance) \
                         .filter(db.Instance.experiments.contains(self)).distinct().count()
@@ -184,6 +194,16 @@ class EDACCDatabase(object):
                 return db.session.query(db.Instance) \
                         .filter(db.Instance.experiments.contains(self)).distinct().count()
 
+            def get_total_instance_blob_size(self, db):
+                table = db.metadata.tables['Instances']
+                c_instance = table.c['instance']
+                c_id = table.c['idInstance']
+                instance_ids = [i.idInstance for i in self.get_instances(db)]
+                instance_sizes = db.session.connection().execute(select([func.length(c_instance)],
+                              c_id.in_(instance_ids)).select_from(table)).fetchall()
+                total_size = sum(i[0] for i in instance_sizes or [(0)])
+                return total_size
+
         class ExperimentResult(object):
             """ Maps the ExperimentResult table. Provides a function
                 to obtain a result property of a job.
@@ -201,7 +221,7 @@ class EDACCDatabase(object):
                 if self.status == STATUS_FINISHED \
                         or self.status in STATUS_EXCEEDED_LIMITS :
                     if not str(self.resultCode).startswith('1'):
-                        return self.experiment.CPUTimeLimit
+                        return self.CPUTimeLimit
                     else:
                         return self.resultTime
 
@@ -225,6 +245,26 @@ class EDACCDatabase(object):
                         return pv.get_value()
                     except:
                         return None
+
+            def to_json(self):
+                return {
+                    'idJob': self.idJob,
+                    'Experiment_idExperiment': self.Experiment_idExperiment,
+                    'Instances_idInstance': self.Instances_idInstance,
+                    'run': self.run,
+                    'resultCode': self.resultCode,
+                    'resultTime': self.resultTime,
+                    'status': self.status,
+                    'seed': self.seed,
+                    'startTime': str(self.startTime),
+                    'computeQueue': self.computeQueue,
+                    'solverExitCode': self.output.solverExitCode,
+                    'watcherExitCode': self.output.watcherExitCode,
+                    'verifierExitCode': self.output.verifierExitCode,
+                    'priority': self.priority,
+                }
+
+        class ExperimentResultOutput(object): pass
 
         class InstanceClass(object):
             def __str__(self):
@@ -303,6 +343,8 @@ class EDACCDatabase(object):
                 except ValueError:
                     return None
 
+        class ResultCodes(object): pass
+        class StatusCodes(object): pass
 
         self.Solver = Solver
         self.SolverConfiguration = SolverConfiguration
@@ -311,8 +353,11 @@ class EDACCDatabase(object):
         self.Instance = Instance
         self.Experiment = Experiment
         self.ExperimentResult = ExperimentResult
+        self.ExperimentResultOutput = ExperimentResultOutput
         self.InstanceClass = InstanceClass
         self.GridQueue = GridQueue
+        self.ResultCodes = ResultCodes
+        self.StatusCodes = StatusCodes
 
         self.User = User
         self.DBConfiguration = DBConfiguration
@@ -373,19 +418,12 @@ class EDACCDatabase(object):
                 'results': relation(ExperimentResult)
             }
         )
+        mapper(StatusCodes, metadata.tables['StatusCodes'])
+        mapper(ResultCodes, metadata.tables['ResultCodes'])
+        mapper(ExperimentResultOutput, metadata.tables['ExperimentResultsOutput'])
         mapper(ExperimentResult, metadata.tables['ExperimentResults'],
             properties = {
-                'solverOutput': deferred(metadata.tables['ExperimentResults'].c.solverOutput),
-                'launcherOutput': deferred(metadata.tables['ExperimentResults'].c.launcherOutput),
-                'watcherOutput': deferred(metadata.tables['ExperimentResults'].c.watcherOutput),
-                'verifierOutput': deferred(metadata.tables['ExperimentResults'].c.verifierOutput),
-                'solverOutputFN': deferred(metadata.tables['ExperimentResults'].c.solverOutputFN),
-                'launcherOutputFN': deferred(metadata.tables['ExperimentResults'].c.launcherOutputFN),
-                'watcherOutputFN': deferred(metadata.tables['ExperimentResults'].c.watcherOutputFN),
-                'verifierOutputFN': deferred(metadata.tables['ExperimentResults'].c.verifierOutputFN),
-                'solverExitCode': deferred(metadata.tables['ExperimentResults'].c.solverExitCode),
-                'watcherExitCode': deferred(metadata.tables['ExperimentResults'].c.watcherExitCode),
-                'verifierExitCode': deferred(metadata.tables['ExperimentResults'].c.verifierExitCode),
+                'output': relation(ExperimentResultOutput, backref='result', uselist=False),
                 'date_modified': deferred(metadata.tables['ExperimentResults'].c.date_modified),
                 'seed': deferred(metadata.tables['ExperimentResults'].c.seed),
                 'computeQueue': deferred(metadata.tables['ExperimentResults'].c.computeQueue),
@@ -393,6 +431,8 @@ class EDACCDatabase(object):
                 'properties': relationship(ExperimentResultProperty, backref='experiment_result'),
                 'experiment': relation(Experiment, backref='experiment_results'),
                 'instance': relation(Instance, backref='results'),
+                'status_code': relation(StatusCodes, uselist=False),
+                'result_code': relation(ResultCodes, uselist=False),
             }
         )
 
@@ -437,7 +477,7 @@ class EDACCDatabase(object):
             dbConfig.competitionPhase = None
             self.session.add(dbConfig)
             self.session.commit()
-            
+
         self.db_is_competition = self.session.query(self.DBConfiguration).get(0).competition
         if not self.db_is_competition:
             self.db_competition_phase = None
@@ -506,8 +546,9 @@ def get_databases():
     return databases
 
 
-def add_database(username, password, database, label):
-    databases[database] = EDACCDatabase(username, password, database, label)
+def add_database(username, password, database, label, hidden=False):
+    databases[database] = EDACCDatabase(username, password, database, label, hidden)
+    return databases[database]
 
 
 def remove_database(database):

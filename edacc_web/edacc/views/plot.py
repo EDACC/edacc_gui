@@ -15,6 +15,10 @@ import os
 import numpy
 import StringIO
 import csv
+import random
+random.seed()
+
+from sqlalchemy import or_, not_
 
 from flask import Module, render_template as render
 from flask import Response, abort, request, g
@@ -112,12 +116,12 @@ def scatter_2solver_1property(database, experiment_id):
 
     s1 = int(request.args['solver_config1'])
     s2 = int(request.args['solver_config2'])
-    
+
     instances = [db.session.query(db.Instance).filter(db.Instance.idInstance.in_(map(int, request.args.getlist('i')))).all()]
     instance_groups_count = int(request.args.get('instance_groups_count', 1))
     for i in xrange(1, instance_groups_count):
         instances.append(db.session.query(db.Instance).filter(db.Instance.idInstance.in_(map(int, request.args.getlist('i'+str(i))))).all())
-        
+
     run = request.args['run']
     xscale = request.args['xscale']
     yscale = request.args['yscale']
@@ -406,7 +410,7 @@ def scatter_1solver_result_vs_result_property(database, experiment_id):
         solver_prop2 = db.session.query(db.Property).get(int(result_property2))
 
     solver_config = db.session.query(db.SolverConfiguration).get(solver_config) or abort(404)
-    
+
     points = []
     for instance_group in instances:
         points.append( scatter_1solver_result_vs_result_property_plot(db, exp, solver_config, instance_group, result_property1, result_property2, run))
@@ -490,7 +494,9 @@ def cactus_plot(database, experiment_id):
     instance_groups_count = int(request.args.get('instance_groups_count', 0))
     use_colors_for = request.args.get('use_colors_for', 'solvers')
     colored_instance_groups = (use_colors_for == 'instance_groups')
-    log_y = request.args.has_key('log_y')
+    log_property = request.args.has_key('log_property')
+    flip_axes = request.args.has_key('flip_axes')
+    run = request.args.get('run', 'all')
 
     results = db.session.query(db.ExperimentResult)
     results.enable_eagerloads(True).options(joinedload(db.ExperimentResult.solver_configuration))
@@ -508,17 +514,62 @@ def cactus_plot(database, experiment_id):
 
     solvers = []
 
+    random_run = random.randint(0, exp.get_num_runs(db) - 1)
+
     for instance_group in xrange(instance_groups_count):
         for sc in solver_configs:
             s = {'xs': [], 'ys': [], 'name': sc.get_name(), 'instance_group': instance_group}
-            sc_res = results.filter_by(solver_configuration=sc, status=1).filter(db.ExperimentResult.resultCode.like('1%')).all()
-            sc_res = sorted(sc_res, key=lambda r: r.get_property_value(result_property, db))
+            sc_res = results.filter_by(solver_configuration=sc, status=1).filter(db.ExperimentResult.resultCode.like('1%')) \
+                             .filter(db.ExperimentResult.Instances_idInstance.in_(instances[instance_group]))
+            if run == 'all':
+                sc_results = filter(lambda j: j is not None, [r.get_property_value(result_property, db) for r in sc_res.all()])
+            elif run in ('average', 'median'):
+                sc_results = []
+                for id in instances[instance_group]:
+                    res = sc_res.filter(db.ExperimentResult.Instances_idInstance==id).all()
+                    res = [r.get_property_value(result_property, db) for r in res]
+                    res = filter(lambda r: r is not None, res)
+                    if len(res) > 0:
+                        if run == 'average':
+                            sc_results.append(numpy.average(res))
+                        elif run == 'median':
+                            sc_results.append(numpy.median(res or [0]))
+            elif run == 'random':
+                sc_results = [r.get_property_value(result_property, db) for r in sc_res.filter_by(run=random_run).all()]
+                sc_results = filter(lambda r: r is not None, sc_results)
+            elif run == 'penalized_average':
+                sc_results = []
+                for id in instances[instance_group]:
+                    res = sc_res.filter(db.ExperimentResult.Instances_idInstance==id).all()
+                    res = [r.get_property_value(result_property, db) for r in res]
+                    num_penalized = results.filter_by(solver_configuration=sc) \
+                                        .filter(db.ExperimentResult.Instances_idInstance==id) \
+                                        .filter(or_(db.ExperimentResult.status!=1,
+                                                    not_(db.ExperimentResult.resultCode.like('1%')))).count()
+                    if result_property == 'cputime':
+                        penalized_time = sum([j.CPUTimeLimit * 10.0 for j in res if not str(res.resultCode).startswith('1')])
+                    else:
+                        penalized_time = 0
+                    penalized_avg = (sum(res) + penalized_time) / (num_penalized + len(res))
+                    sc_results.append(penalized_avg)
+            else:
+                run_number = int(run)
+                res = sc_res.filter_by(run=run_number).all()
+                res = [r.get_property_value(result_property, db) for r in res]
+                sc_results = filter(lambda r: r is not None, res)
+
+            sc_results = sorted(sc_results)
+            if not log_property:
+                s['ys'].append(0)
+                s['xs'].append(0)
+
+            # sc_results = (y_1, y_2, ..., y_n) : y_1 <= y_2 <= ... <= y_n
+            # s = {(x, y) \in R² : y = sc_results[x], x = 1, ..., n }
             i = 1
-            for r in sc_res:
-                if r.Instances_idInstance in instances[instance_group]:
-                    s['ys'].append(r.get_property_value(result_property, db))
-                    s['xs'].append(i)
-                    i += 1
+            for r in sc_results:
+                s['ys'].append(r)
+                s['xs'].append(i)
+                i += 1
             solvers.append(s)
 
     min_y = min([min(s['xs'] or [0.1]) for s in solvers] or [0.1])
@@ -547,7 +598,7 @@ def cactus_plot(database, experiment_id):
         return Response(response=csv_response.read(), headers=headers)
     elif request.args.has_key('pdf'):
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'cactus.pdf'
-        plots.cactus(solvers, instance_groups_count, colored_instance_groups, max_x, max_y, min_y, log_y, ylabel, title, filename, format='pdf')
+        plots.cactus(solvers, instance_groups_count, colored_instance_groups, max_x, max_y, min_y, log_property, flip_axes, ylabel, title, filename, format='pdf')
         headers = Headers()
         headers.add('Content-Disposition', 'attachment', filename=secure_filename(exp.name + '_cactus.pdf'))
         response = Response(response=open(filename, 'rb').read(), mimetype='application/pdf', headers=headers)
@@ -555,15 +606,23 @@ def cactus_plot(database, experiment_id):
         return response
     elif request.args.has_key('eps'):
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'cactus.eps'
-        plots.cactus(solvers, instance_groups_count, colored_instance_groups, max_x, max_y, min_y, log_y, ylabel, title, filename, format='eps')
+        plots.cactus(solvers, instance_groups_count, colored_instance_groups, max_x, max_y, min_y, log_property, flip_axes, ylabel, title, filename, format='eps')
         headers = Headers()
         headers.add('Content-Disposition', 'attachment', filename=secure_filename(exp.name + '_cactus.eps'))
         response = Response(response=open(filename, 'rb').read(), mimetype='application/eps', headers=headers)
         os.remove(filename)
         return response
+    elif request.args.has_key('rscript'):
+        filename = os.path.join(config.TEMP_DIR, g.unique_id) + '.txt'
+        plots.cactus(solvers, instance_groups_count, colored_instance_groups, max_x, max_y, min_y, log_property, flip_axes, ylabel, title, filename, format='rscript')
+        headers = Headers()
+        headers.add('Content-Disposition', 'attachment', filename=secure_filename(exp.name + '_cactus.txt'))
+        response = Response(response=open(filename, 'rb').read(), mimetype='text/plain', headers=headers)
+        os.remove(filename)
+        return response
     else:
         filename = os.path.join(config.TEMP_DIR, g.unique_id) + 'cactus.png'
-        plots.cactus(solvers, instance_groups_count, colored_instance_groups, max_x, max_y, min_y, log_y, ylabel, title, filename)
+        plots.cactus(solvers, instance_groups_count, colored_instance_groups, max_x, max_y, min_y, log_property, flip_axes, ylabel, title, filename)
         response = Response(response=open(filename, 'rb').read(), mimetype='image/png')
         os.remove(filename)
         return response

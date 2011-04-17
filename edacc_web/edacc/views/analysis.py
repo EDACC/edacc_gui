@@ -11,11 +11,14 @@
 
 import math
 import numpy
+import StringIO
+import csv
 import scipy
 
 from flask import Module
 from flask import render_template as render
-from flask import abort, request, jsonify
+from flask import abort, request, jsonify, Response
+from werkzeug import Headers, secure_filename
 
 from edacc import models, forms, ranking, statistics
 from edacc.views.helpers import require_phase, require_login
@@ -44,68 +47,44 @@ def solver_ranking(database, experiment_id):
 
     form = forms.RankingForm(request.args)
     form.i.query = sorted(experiment.get_instances(db), key=lambda i: i.name) or EmptyQuery()
-    #GET_data = "&".join(['='.join(list(t)) for t in request.args.items(multi=True)])
 
     if form.i.data:
-        instance_ids = [i.idInstance for i in form.i.data]
+        #ranked_solvers = ranking.avg_point_biserial_correlation_ranking(db, experiment, form.i.data)
+        ranked_solvers = ranking.number_of_solved_instances_ranking(db, experiment, form.i.data)
+        ranking_data = ranking.get_ranking_data(db, experiment, ranked_solvers, form.i.data,
+                                                form.penalized_average_runtime.data, form.calculate_average_dev.data)
 
-        num_runs = experiment.get_num_runs(db)
-        num_runs_per_solver = num_runs * len(instance_ids)
+        if 'csv' in request.args:
+            csv_response = StringIO.StringIO()
+            csv_writer = csv.writer(csv_response)
+            head = ['#', 'Solver', '# of successful runs', '% of all runs', '% of VBS runs',
+                                 'cumulated CPU time', 'avg. CPU time per successful run']
+            
+            if form.calculate_average_dev.data: head.append('avg. deviation of successful runs')
+            if form.penalized_average_runtime.data: head.append('penalized avg. runtime')
+            csv_writer.writerow(head)
 
-        vbs_num_solved = 0
-        vbs_cumulated_cpu = 0
-        from sqlalchemy import func
-        best_instance_runtimes = db.session.query(func.min(db.ExperimentResult.resultTime)).filter_by(experiment=experiment) \
-            .filter(db.ExperimentResult.resultCode.like('1%')) \
-            .filter(db.ExperimentResult.Instances_idInstance.in_(instance_ids)) \
-            .group_by(db.ExperimentResult.Instances_idInstance).all()
+            rnk = 0
+            for row in ranking_data:
+                write_row = [rnk, row[0], row[1], round(row[2] * 100, 2), round(row[3] * 100, 2)] + map(lambda x: round(x, 2), row[4:6])
+                if form.calculate_average_dev.data: write_row.append(round(row[6], 2))
+                if form.penalized_average_runtime.data: write_row.append(round(row[7], 2))
+                csv_writer.writerow(write_row)
+                rnk += 1
 
-        vbs_num_solved = len(best_instance_runtimes) * num_runs
-        vbs_cumulated_cpu = sum(r[0] for r in best_instance_runtimes) * num_runs
-
-        #ranked_solvers = ranking.avg_point_biserial_correlation_ranking(db, experiment, instance_ids)
-        ranked_solvers = ranking.number_of_solved_instances_ranking(db, experiment, instance_ids)
-
-        data = [('Virtual Best Solver (VBS)',           # name of the solver
-                 vbs_num_solved,                        # number of successful runs
-                 0.0 if num_runs_per_solver == 0 else vbs_num_solved / float(num_runs_per_solver) ,  # % of all runs
-                 1.0,                                   # % of vbs runs
-                 vbs_cumulated_cpu,                     # cumulated CPU time
-                 (0.0 if vbs_num_solved == 0 else vbs_cumulated_cpu / vbs_num_solved),    # average CPU time per successful run
-                 0.0
-                 )]
-
-        for solver in ranked_solvers:
-            successful_runs = db.session.query(db.ExperimentResult.resultTime).filter(db.ExperimentResult.resultCode.like('1%')) \
-                                        .filter(db.ExperimentResult.Instances_idInstance.in_(instance_ids)) \
-                                        .filter_by(experiment=experiment, solver_configuration=solver, status=1).all()
-
-            avg_stddev_runtime = 0.0
-            if form.calculate_average_dev.data == True:
-                for instance in form.i.data:
-                    instance_runtimes = db.session.query(db.ExperimentResult.resultTime).filter(db.ExperimentResult.resultCode.like('1%')) \
-                                                .filter_by(instance=instance) \
-                                                .filter_by(experiment=experiment, solver_configuration=solver, status=1).all()
-                    avg_stddev_runtime += scipy.std([j[0] for j in instance_runtimes])
-                avg_stddev_runtime /= float(len(form.i.data))
-
-            num_successful_runs = len(successful_runs)
-            data.append((
-                solver,
-                num_successful_runs,
-                0 if num_runs_per_solver == 0 else num_successful_runs / float(num_runs_per_solver),
-                0 if vbs_num_solved == 0 else num_successful_runs / float(vbs_num_solved),
-                sum(j[0] for j in successful_runs),
-                numpy.average([j[0] for j in successful_runs] or 0),
-                avg_stddev_runtime
-            ))
+            csv_response.seek(0)
+            headers = Headers()
+            headers.add('Content-Type', 'text/csv')
+            headers.add('Content-Disposition', 'attachment',
+                        filename=secure_filename(experiment.name + "_ranking.csv"))
+            return Response(response=csv_response.read(), headers=headers)
 
         return render('/analysis/ranking.html', database=database, db=db,
                       experiment=experiment, ranked_solvers=ranked_solvers,
-                      data=data, form=form)
+                      data=ranking_data, form=form, instance_properties=db.get_instance_properties())
 
     return render('/analysis/ranking.html', database=database, db=db,
-              experiment=experiment, form=form)
+              experiment=experiment, form=form, instance_properties=db.get_instance_properties())
 
 
 @analysis.route('/<database>/experiment/<int:experiment_id>/cactus/')
@@ -128,7 +107,13 @@ def cactus_plot(database, experiment_id):
     result_properties = zip([p.idProperty for p in result_properties], [p.name for p in result_properties])
     form.result_property.choices = [('cputime', 'CPU Time')] + result_properties
     form.sc.query = experiment.solver_configurations or EmptyQuery()
-
+    numRuns = experiment.get_num_runs(db)
+    form.run.choices = [('all', 'All runs'),
+                        ('average', 'All runs - average'),
+                        ('penalized_average', 'All runs - penalized average runtime'),
+                        ('median', 'All runs - median'),
+                        ('random', 'Random run')] + zip(range(numRuns), ["#" + str(i) for i in range(numRuns)])
+                        
     GET_data = "&".join(['='.join(list(t)) for t in request.args.items(multi=True)])
 
     return render('/analysis/solved_instances.html', database=database,

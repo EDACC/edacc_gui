@@ -1,4 +1,6 @@
-
+{% extends "admin/adminbase.html" %}
+{% block title %}Administration{% endblock %}
+{% block content %}
     <h2>Add Database</h2>
     <a href="{{url_for('admin.databases')}}">Back</a>
 
@@ -20,7 +22,12 @@
                 <td>Password:</td>
                 <td><input type="text" name="password" /></td>
             </tr>
+            <tr>
+                <td>Hidden:</td>
+                <td><input type="checkbox" name="hidden" /></td>
+            </tr>
             <td colspan="2"><input type="submit" value="Add" /></td>
         </table>
     </form>
     {% if error %}{{error}}{% endif %}
+{% endblock %}

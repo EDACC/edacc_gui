@@ -12,14 +12,21 @@
 
 import csv
 import datetime
-import json
+try:
+    import simplejson as json
+except ImportError:
+    import json
 import numpy
 import StringIO
+import tempfile
+import tarfile
+import time
 
 from flask import Module
 from flask import render_template as render
 from flask import Response, abort, g, request, redirect, url_for
 from werkzeug import Headers, secure_filename
+from werkzeug.wsgi import wrap_file
 
 from edacc import utils, models
 from sqlalchemy.orm import joinedload, joinedload_all
@@ -153,6 +160,38 @@ def experiment_instances(database, experiment_id):
                   instance_properties=db.get_instance_properties())
 
 
+@frontend.route('/<database>/experiment/<int:experiment_id>/download-instances')
+@require_phase(phases=(6,7))
+@require_login
+def download_instances(database, experiment_id):
+    """ Lets users download all instances of the experiment as tarball. TODO: improve memory usage """
+    db = models.get_database(database) or abort(404)
+    experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
+
+    instances = experiment.get_instances(db)
+    
+    tmp_file = tempfile.TemporaryFile("w+b")
+    tar_file = tarfile.open(mode='w', fileobj=tmp_file)
+    for instance in instances:
+        instance_blob = instance.get_instance(db)
+        instance_tar_info = tarfile.TarInfo(name=instance.name)
+        instance_tar_info.size = len(instance_blob)
+        instance_tar_info.type = tarfile.REGTYPE
+        instance_tar_info.mtime = time.mktime(datetime.datetime.now().timetuple())
+        tar_file.addfile(instance_tar_info, fileobj=StringIO.StringIO(instance_blob))
+    tar_file.close()
+    
+    file_size = tmp_file.tell()
+    tmp_file.seek(0)
+
+    headers = Headers()
+    headers.add('Content-Type', 'application/x-tar')
+    headers.add('Content-Length', file_size)
+    headers.add('Content-Disposition', 'attachment',
+                filename=(secure_filename(experiment.name + "_instances.tar")))
+    return Response(tmp_file, headers=headers, direct_passthrough=True)
+
+
 @frontend.route('/<database>/experiment/<int:experiment_id>/results/')
 @require_phase(phases=OWN_RESULTS.union(ALL_RESULTS))
 @require_login
@@ -162,7 +201,8 @@ def experiment_results(database, experiment_id):
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
 
     instances = experiment.instances
-    solver_configs = db.session.query(db.SolverConfiguration).options(joinedload_all('solver')).filter_by(experiment=experiment).all()
+    solver_configs = db.session.query(db.SolverConfiguration).options(joinedload_all('solver'))\
+                                        .filter_by(experiment=experiment).all()
 
     # if competition db, show only own solvers unless phase is 6 or 7
     if not is_admin() and db.is_competition() and db.competition_phase() in OWN_RESULTS:
@@ -192,7 +232,7 @@ def experiment_results(database, experiment_id):
             jobs = rs[idSolverConfig]
 
             completed = len(filter(lambda j: j.status not in STATUS_PROCESSING, jobs))
-            runtimes = [j.get_time() for j in jobs]
+            runtimes = [j.get_time() or j.CPUTimeLimit for j in jobs]
             runtimes = filter(lambda r: r is not None, runtimes)
             runtimes = runtimes or [0]
             time_max = max(runtimes)
@@ -205,10 +245,43 @@ def experiment_results(database, experiment_id):
                         'var_coeff': numpy.std(runtimes) / numpy.average(runtimes),
                         'completed': completed,
                         'total': len(jobs),
-                        'first_job': (None if len(jobs) == 0 else jobs[0]), # needed for alternative presentation if there's only 1 run
+                        # needed for alternative presentation if there's only 1 run:
+                        'first_job': (None if len(jobs) == 0 else jobs[0]),
                         'solver_config': solver_config
                         })
         results.append({'instance': instances_dict[idInstance], 'times': row})
+
+    if request.args.has_key('csv'):
+        csv_response = StringIO.StringIO()
+        csv_writer = csv.writer(csv_response)
+
+        if experiment.get_num_runs(db) > 1:
+            head = ['Instance']
+            for sc in solver_configs_dict.values():
+                head += [str(sc), '', '', '', '', '']
+            csv_writer.writerow(head)
+            csv_writer.writerow([''] + ['median', 'min.', 'max.', 'avg.', 'stddev', 'var coeff.'] * len(solver_configs_dict))
+        else:
+            csv_writer.writerow(['Instance'] + map(str, solver_configs_dict.values()))
+            
+        for row in results:
+            write_row = [row['instance'].name]
+            for sc_results in row['times']:
+                if sc_results['total'] == 1:
+                    write_row.append(sc_results['first_job'].resultTime)
+                else:
+                    write_row += map(lambda x: round(x, 2), [
+                                sc_results['time_median'], sc_results['time_min'], sc_results['time_max'],
+                                sc_results['time_avg'], sc_results['time_stddev'], sc_results['var_coeff']
+                        ])
+            csv_writer.writerow(write_row)
+
+        csv_response.seek(0)
+        headers = Headers()
+        headers.add('Content-Type', 'text/csv')
+        headers.add('Content-Disposition', 'attachment',
+                    filename=secure_filename(experiment.name + "_results.csv"))
+        return Response(response=csv_response.read(), headers=headers)
 
     return render('experiment_results.html', experiment=experiment,
                     instances=instances, solver_configs=solver_configs,
@@ -223,6 +296,8 @@ def experiment_results_by_solver(database, experiment_id):
     """ Show the results of the experiment by solver configuration """
     db = models.get_database(database) or abort(404)
     experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
+
+    num_runs = experiment.get_num_runs(db)
 
     solver_configs = experiment.solver_configurations
 
@@ -240,25 +315,53 @@ def experiment_results_by_solver(database, experiment_id):
                                     database=database, experiment_id=experiment.idExperiment,
                                     solver_configuration_id=solver_config.idSolverConfig))
 
-        runs_by_instance = {}
         ers = db.session.query(db.ExperimentResult).options(joinedload('instance')) \
                                 .filter_by(experiment=experiment,
                                     solver_configuration=solver_config) \
                                 .order_by('Instances_idInstance', 'run').all()
+
+        par10_by_instance = {} # penalized average runtime (timeput * 10 for unsuccessful runs) by instance
+        runs_by_instance = {}
         for r in ers:
             if not r.instance in runs_by_instance:
                 runs_by_instance[r.instance] = [r]
             else:
                 runs_by_instance[r.instance].append(r)
 
+        for instance in runs_by_instance.keys():
+            total_time, count = 0.0, 0
+            for run in runs_by_instance[instance]:
+                count += 1
+                if run.status != 1 or not str(run.resultCode).startswith('1'):
+                    total_time += run.CPUTimeLimit * 10
+                else:
+                    total_time += run.resultTime
+
+            par10_by_instance[instance.idInstance] = total_time / count if count != 0 else 0
+
         results = sorted(runs_by_instance.items(), key=lambda i: i[0].idInstance)
 
         if 'csv' in request.args:
             csv_response = StringIO.StringIO()
             csv_writer = csv.writer(csv_response)
-            csv_writer.writerow(['Instance', 'Runs'])
+            csv_writer.writerow(['Instance'] + ['Run'] * num_runs + ['penalized avg. runtime'])
+            results = [[res[0].name] + [r.get_time() for r in res[1]] +
+                       [round(par10_by_instance[res[0].idInstance], 2)] for res in results]
+            
+            if request.args.get('sort_by_instance_name', None):
+                sort_dir = request.args.get('sort_by_instance_name_dir', 'asc')
+                results.sort(key=lambda r: r[0], reverse=sort_dir=='desc')
+
+            if request.args.get('sort_by_par10', None):
+                sort_dir = request.args.get('sort_by_par10_dir', 'asc')
+                results.sort(key=lambda r: r[num_runs+1], reverse=sort_dir=='desc')
+
+            search = request.args.get('search', "")
+            if search:
+                results = filter(lambda r: search in r[0], results)
+                
             for res in results:
-                csv_writer.writerow([res[0].name] + [r.get_time() for r in res[1]])
+                csv_writer.writerow(res)
             csv_response.seek(0)
 
             headers = Headers()
@@ -267,9 +370,13 @@ def experiment_results_by_solver(database, experiment_id):
                         filename=(experiment.name + "_results_by_solver_%s.csv" % (str(solver_config),)))
             return Response(response=csv_response.read(), headers=headers)
 
+        return render('experiment_results_by_solver.html', db=db, database=database,
+                  solver_configs=solver_configs, experiment=experiment,
+                  form=form, results=results, par10_by_instance=par10_by_instance, num_runs=num_runs)
+
     return render('experiment_results_by_solver.html', db=db, database=database,
                   solver_configs=solver_configs, experiment=experiment,
-                  form=form, results=results)
+                  form=form, results=results, num_runs=num_runs)
 
 
 @frontend.route('/<database>/experiment/<int:experiment_id>/results-by-instance')
@@ -302,22 +409,33 @@ def experiment_results_by_instance(database, experiment_id):
                                    instance=instance,
                                    solver_configuration=sc).all()
 
-            mean, median = None, None
+            mean, median, par10 = 0.0, 0.0, 0.0
             if len(runs) > 0:
                 runtimes = [j.get_time() for j in runs]
                 runtimes = filter(lambda t: t is not None, runtimes)
+                count = 0
+                for j in runs:
+                    if j.get_time() is not None:
+                        count += 1
+                        if not str(j.resultCode).startswith('1') or j.status != 1:
+                            par10 += j.CPUTimeLimit * 10
+                        else:
+                            par10 += j.get_time()
+                if count > 0:
+                    par10 /= count
                 mean = numpy.average(runtimes)
                 median = numpy.median(runtimes)
 
-            results.append((sc, runs, mean, median))
+
+            results.append((sc, runs, mean, median, par10))
 
         if 'csv' in request.args:
             csv_response = StringIO.StringIO()
             csv_writer = csv.writer(csv_response)
             num_runs = experiment.get_num_runs(db)
-            csv_writer.writerow(['Solver'] + ['Run %d' % r for r in xrange(num_runs)] + ['Mean', 'Median'])
+            csv_writer.writerow(['Solver'] + ['Run %d' % r for r in xrange(num_runs)] + ['Mean', 'Median', 'penalized avg. runtime'])
             for res in results:
-                csv_writer.writerow([str(res[0])] + [r.get_time() for r in res[1]] + [res[2], res[3]])
+                csv_writer.writerow([str(res[0])] + [r.get_time() for r in res[1]] + [res[2], res[3], res[4]])
             csv_response.seek(0)
 
             headers = Headers()
@@ -367,10 +485,10 @@ def experiment_stats_ajax(database, experiment_id):
             .filter_by(experiment=experiment, status=STATUS_RUNNING) \
             .filter(db.ExperimentResult.priority>=0).count()
     num_jobs_finished = db.session.query(db.ExperimentResult) \
-            .filter_by(experiment=experiment).filter(db.ExperimentResult.status.in_([STATUS_FINISHED] + list(STATUS_EXCEEDED_LIMITS))) \
+            .filter_by(experiment=experiment).filter(db.ExperimentResult.status.in_([STATUS_FINISHED] +list(STATUS_EXCEEDED_LIMITS))) \
             .filter(db.ExperimentResult.priority>=0).count()
     num_jobs_error = db.session.query(db.ExperimentResult) \
-            .filter_by(experiment=experiment).filter(db.ExperimentResult.status.in_(list(STATUS_ERRORS))) \
+            .filter_by(experiment=experiment).filter(db.ExperimentResult.status<=-2) \
             .filter(db.ExperimentResult.priority>=0).count()
 
     avg_time = db.session.query(func.avg(db.ExperimentResult.resultTime)) \
@@ -421,11 +539,17 @@ def experiment_progress_ajax(database, experiment_id):
     # that column is hidden in the jquery table
     columns = ["ExperimentResults.idJob", "SolverConfig.idSolverConfig", "Instances.name",
                "ExperimentResults.run", "ExperimentResults.resultTime", "ExperimentResults.seed",
-               "ExperimentResults.status", "ExperimentResults.resultCode", ""] + \
+               "StatusCodes.description", "ResultCodes.description", "ExperimentResults.status",
+               "ExperimentResults.CPUTimeLimit", "ExperimentResults.wallClockTimeLimit",
+               "ExperimentResults.memoryLimit",
+               "ExperimentResults.stackSizeLimit", "ExperimentResults.outputSizeLimit",
+               "ExperimentResults.computeNode", "ExperimentResults.computeNodeIP",
+               "ExperimentResults.priority", "gridQueue.name"] + \
               ["`"+prop.name+"_value`.value" for prop in result_properties]
 
     # build the query part for the result properties that should be included
-    prop_columns = ','.join(["CASE WHEN `"+prop.name+"_value`.value IS NULL THEN 'not yet calculated' ELSE `"+prop.name+"_value`.value END" for prop in result_properties])
+    prop_columns = ','.join(["CASE WHEN `"+prop.name+"_value`.value IS NULL THEN 'not yet calculated' ELSE `"+
+                             prop.name+"_value`.value END" for prop in result_properties])
     prop_joins = ""
     for prop in result_properties:
         prop_joins += """LEFT JOIN ExperimentResult_has_Property as `%s_hasP` ON
@@ -441,11 +565,14 @@ def experiment_progress_ajax(database, experiment_id):
     if request.args.has_key('sSearch') and request.args.get('sSearch') != '':
         where_clause += "(ExperimentResults.idJob LIKE %s OR "
         where_clause += "Instances.name LIKE %s OR "
+        where_clause += "ResultCodes.description LIKE %s OR "
+        where_clause += "StatusCodes.description LIKE %s OR "
         where_clause += "ExperimentResults.run LIKE %s OR "
         where_clause += "ExperimentResults.resultTime LIKE %s OR "
         where_clause += "ExperimentResults.seed LIKE %s OR "
-        where_clause += "ExperimentResults.status LIKE %s OR "
-        where_clause += "ExperimentResults.resultCode LIKE %s OR "
+        where_clause += "ExperimentResults.computeNode LIKE %s OR "
+        where_clause += "ExperimentResults.computeNodeIP LIKE %s OR "
+        where_clause += "gridQueue.name LIKE %s OR "
         where_clause += "SolverConfig.name LIKE %s OR "
         where_clause += """
                     CASE ExperimentResults.status
@@ -455,7 +582,7 @@ def experiment_progress_ajax(database, experiment_id):
                     CASE ExperimentResults.resultCode
                         """ + '\n'.join(["WHEN %d THEN '%s'" % (k, v) for k, v in JOB_RESULT_CODE.iteritems()]) + """
                     END LIKE %s) """
-        params += ['%' + request.args.get('sSearch') + '%'] * 10 # 10 conditions
+        params += ['%' + request.args.get('sSearch') + '%'] * 13 # 13 conditions
 
     if where_clause != "": where_clause += " AND "
     where_clause += "ExperimentResults.Experiment_idExperiment = %s "
@@ -482,12 +609,19 @@ def experiment_progress_ajax(database, experiment_id):
                        SolverConfig.idSolverConfig, Instances.name,
                        ExperimentResults.run, ExperimentResults.resultTime,
                        ExperimentResults.seed, ExperimentResults.status,
-                       ExperimentResults.resultCode,
-                       TIMESTAMPDIFF(SECOND, ExperimentResults.startTime, NOW()) AS runningTime
+                       StatusCodes.description, ResultCodes.description,
+                       TIMESTAMPDIFF(SECOND, ExperimentResults.startTime, NOW()) AS runningTime,
+                       ExperimentResults.CPUTimeLimit, ExperimentResults.wallClockTimeLimit, ExperimentResults.memoryLimit,
+                       ExperimentResults.stackSizeLimit, ExperimentResults.outputSizeLimit,
+                       ExperimentResults.computeNode, ExperimentResults.computeNodeIP, ExperimentResults.priority,
+                       gridQueue.name
                        """ + (',' if prop_columns else '') + prop_columns + """
                  FROM ExperimentResults
+                    LEFT JOIN ResultCodes ON ExperimentResults.resultCode=ResultCodes.resultCode
+                    LEFT JOIN StatusCodes ON ExperimentResults.status=StatusCodes.statusCode
                     LEFT JOIN SolverConfig ON ExperimentResults.SolverConfig_idSolverConfig = SolverConfig.idSolverConfig
                     LEFT JOIN Instances ON ExperimentResults.Instances_idInstance = Instances.idInstance
+                    LEFT JOIN gridQueue ON gridQueue.idgridQueue=ExperimentResults.computeQueue
                     """+prop_joins+"""
                  WHERE """ + where_clause + " " + order + " " + limit, tuple(params))
 
@@ -511,24 +645,29 @@ def experiment_progress_ajax(database, experiment_id):
 
     aaData = []
     for job in jobs:
-        status = utils.job_status(job[6])
-        if job[6] == STATUS_RUNNING:
+        status = job[7]
+        if status == 'running':
             try:
-                seconds_running = int(job[8])
+                seconds_running = int(job[9])
             except:
                 seconds_running = 0
             status += ' (' + str(datetime.timedelta(seconds=seconds_running)) + ')'
+
         aaData.append([job.idJob, solver_config_names[job[1]], job[2], job[3],
-                job[4], job[5], status, utils.result_code(job[7]), str(job[6])] \
-                + [job[i] for i in xrange(9, 9+len(result_properties))]
+                job[4], job[5], status, job[8], job[6], \
+                job[10], job[11], job[12], job[13], job[14], job[15], job[16], job[17], job[18] ] \
+                + [job[i] for i in xrange(19, 19+len(result_properties))]
             )
 
     if request.args.has_key('csv'):
         csv_response = StringIO.StringIO()
         csv_writer = csv.writer(csv_response)
-        csv_writer.writerow(['id', 'Solver', 'Instance', 'Run', 'Time', 'Seed', 'Status', 'Result'] + [p.name for p in result_properties])
+        csv_writer.writerow(['id', 'Solver', 'Instance', 'Run', 'Time', 'Seed', 'status code', 'Status'] +
+                            ['Result', 'running time', 'CPUTimeLimit', 'wallClockTimeLimit', 'memoryLimit'] +
+                            ['stackSizeLimit', 'outputSizeLimit', 'computeNode', 'computeNodeIP', 'priority', 'computeQueue ID'] +
+                            [p.name for p in result_properties])
         for d in aaData:
-            csv_writer.writerow(d[0:8] + d[9:])
+            csv_writer.writerow(d[0:19] + d[19:])
         csv_response.seek(0)
         headers = Headers()
         headers.add('Content-Type', 'text/csv')
@@ -651,10 +790,10 @@ def experiment_result(database, experiment_id, result_id):
     if not is_admin() and db.is_competition() and db.competition_phase() in OWN_RESULTS:
         if result.solver_configuration.solver.user != g.User: abort(401)
 
-    solverOutput = result.solverOutput
-    launcherOutput = result.launcherOutput
-    watcherOutput = result.watcherOutput
-    verifierOutput = result.verifierOutput
+    solverOutput = result.output.solverOutput
+    launcherOutput = result.output.launcherOutput
+    watcherOutput = result.output.watcherOutput
+    verifierOutput = result.output.verifierOutput
 
     solverOutput_text = utils.formatOutputFile(solverOutput)
     launcherOutput_text = utils.formatOutputFile(launcherOutput)
@@ -679,6 +818,18 @@ def unsolved_instances(database, experiment_id):
     return render('unsolved_instances.html', database=database, db=db, experiment=experiment,
                   unsolved_instances=unsolved_instances, instance_properties=db.get_instance_properties())
 
+@frontend.route('/<database>/experiment/<int:experiment_id>/solved-instances/')
+@require_phase(phases=[5,6,7])
+@require_login
+def solved_instances(database, experiment_id):
+    db = models.get_database(database) or abort(404)
+    experiment = db.session.query(db.Experiment).get(experiment_id) or abort(404)
+
+    solved_instances = experiment.get_solved_instances(db)
+
+    return render('solved_instances.html', database=database, db=db, experiment=experiment,
+                  solved_instances=solved_instances, instance_properties=db.get_instance_properties())
+
 
 @frontend.route('/<database>/experiment/<int:experiment_id>/result/<int:result_id>/download-solver-output')
 @require_phase(phases=OWN_RESULTS.union(ALL_RESULTS))
@@ -695,7 +846,7 @@ def solver_output_download(database, experiment_id, result_id):
     headers.add('Content-Type', 'text/plain')
     headers.add('Content-Disposition', 'attachment', filename="result.txt")
 
-    return Response(response=result.solverOutput, headers=headers)
+    return Response(response=result.output.solverOutput, headers=headers)
 
 
 @frontend.route('/<database>/experiment/<int:experiment_id>/result/<int:result_id>/download-launcher-output')
@@ -713,7 +864,7 @@ def launcher_output_download(database, experiment_id, result_id):
     headers.add('Content-Type', 'text/plain')
     headers.add('Content-Disposition', 'attachment', filename="result.txt")
 
-    return Response(response=result.launcherOutput, headers=headers)
+    return Response(response=result.output.launcherOutput, headers=headers)
 
 
 @frontend.route('/<database>/experiment/<int:experiment_id>/result/<int:result_id>/download-watcher-output')
@@ -731,7 +882,7 @@ def watcher_output_download(database, experiment_id, result_id):
     headers.add('Content-Type', 'text/plain')
     headers.add('Content-Disposition', 'attachment', filename="result.txt")
 
-    return Response(response=result.watcherOutput, headers=headers)
+    return Response(response=result.output.watcherOutput, headers=headers)
 
 
 @frontend.route('/<database>/experiment/<int:experiment_id>/result/<int:result_id>/download-verifier-output')
@@ -749,4 +900,4 @@ def verifier_output_download(database, experiment_id, result_id):
     headers.add('Content-Type', 'text/plain')
     headers.add('Content-Disposition', 'attachment', filename="result.txt")
 
-    return Response(response=result.verifierOutput, headers=headers)
+    return Response(response=result.output.verifierOutput, headers=headers)

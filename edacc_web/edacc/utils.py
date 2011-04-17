@@ -28,20 +28,6 @@ def download_size(value):
     elif value < 1024*1024: return "%.1f kB" % (value / 1024.0)
     else: return "%.1f MB" % (value / 1024.0 / 1024.0)
 
-def job_status(value):
-    """ Translates an integer job status to its string representation """
-    if value not in JOB_STATUS:
-        return "unknown status"
-    else:
-        return JOB_STATUS[value]
-
-def result_code(value):
-    """ Translates an integer result code to its string representation """
-    if value not in JOB_RESULT_CODE:
-        return "unknown code"
-    else:
-        return JOB_RESULT_CODE[value]
-
 def job_status_color(value):
     """ Returns an HTML conform color string for the job status """
     if value not in JOB_STATUS:
@@ -62,9 +48,13 @@ def parameter_string(solver_config):
     args = []
     for p in parameters:
         args.append(p.parameter.prefix or "")
+        if p.parameter.name == 'seed':
+            args.append("<seed>")
+        if p.parameter.name == 'instance':
+            args.append("<instance>")
         if p.parameter.hasValue:
             if p.value == "": # if value not set, use default value from parameters table
-                args.append(p.parameter.value or "")
+                args.append(p.parameter.defaultValue or "")
             else:
                 args.append(p.value or "")
     return " ".join(args)
