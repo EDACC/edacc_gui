@@ -6,3 +6,4 @@ build
 *.o
 main.sess
 dist/
+*.mwb.bak
