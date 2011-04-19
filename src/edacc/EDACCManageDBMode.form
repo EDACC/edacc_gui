@@ -14,6 +14,102 @@
         <Property name="name" type="java.lang.String" value="jFileChooserManageDBExportInstance" noResource="true"/>
       </Properties>
     </Component>
+    <Container class="javax.swing.JPopupMenu" name="jPMInstanceTable">
+      <Properties>
+        <Property name="borderPainted" type="boolean" value="false"/>
+        <Property name="componentPopupMenu" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="jPMInstanceTable"/>
+        </Property>
+        <Property name="label" type="java.lang.String" resourceKey="jPMInstanceTable.label"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[10, 10]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[10, 10]"/>
+        </Property>
+        <Property name="name" type="java.lang.String" value="jPMInstanceTable" noResource="true"/>
+      </Properties>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
+        <Property name="useNullLayout" type="boolean" value="true"/>
+      </Layout>
+      <SubComponents>
+        <MenuItem class="javax.swing.JMenuItem" name="jMIAddInstance">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jMIAddInstance.text"/>
+            <Property name="name" type="java.lang.String" value="jMIAddInstance" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIAddInstanceActionPerformed"/>
+          </Events>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="jMIRemoveInstance">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jMIRemoveInstance.text"/>
+            <Property name="name" type="java.lang.String" value="jMIRemoveInstance" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIRemoveInstanceActionPerformed"/>
+          </Events>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="jMIExportInstance">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jMIExportInstance.text"/>
+            <Property name="name" type="java.lang.String" value="jMIExportInstance" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIExportInstanceActionPerformed"/>
+          </Events>
+        </MenuItem>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JPopupMenu" name="jPMInstanceTreeInstanceClass">
+      <Properties>
+        <Property name="name" type="java.lang.String" value="jPMInstanceTreeInstanceClass" noResource="true"/>
+      </Properties>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
+        <Property name="useNullLayout" type="boolean" value="true"/>
+      </Layout>
+      <SubComponents>
+        <MenuItem class="javax.swing.JMenuItem" name="jMINewInstanceClass">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jMINewInstanceClass.text"/>
+            <Property name="name" type="java.lang.String" value="jMINewInstanceClass" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMINewInstanceClassActionPerformed"/>
+          </Events>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="jMIEditInstanceClass">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jMIEditInstanceClass.text"/>
+            <Property name="name" type="java.lang.String" value="jMIEditInstanceClass" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIEditInstanceClassActionPerformed"/>
+          </Events>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="jMIRemoveInstanceClass">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jMIRemoveInstanceClass.text"/>
+            <Property name="name" type="java.lang.String" value="jMIRemoveInstanceClass" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIRemoveInstanceClassActionPerformed"/>
+          </Events>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="jMIExportInstanceClass">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jMIExportInstanceClass.text"/>
+            <Property name="name" type="java.lang.String" value="jMIExportInstanceClass" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMIExportInstanceClassActionPerformed"/>
+          </Events>
+        </MenuItem>
+      </SubComponents>
+    </Container>
   </NonVisualComponents>
   <Properties>
     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">

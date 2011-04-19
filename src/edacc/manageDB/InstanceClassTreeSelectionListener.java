@@ -24,7 +24,6 @@ public class InstanceClassTreeSelectionListener implements TreeSelectionListener
 
     @Override
     public void valueChanged(TreeSelectionEvent e) {
-        if(tree.getSelectionCount() != 0){
             if(tree.getSelectionCount() == 1){
                 controller.showInstanceClassButtons(true);
             }
@@ -32,7 +31,6 @@ public class InstanceClassTreeSelectionListener implements TreeSelectionListener
                 controller.showInstanceClassButtons(false);
             }
             controller.changeInstanceTable();
-        }
     }
 
 }
