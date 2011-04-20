@@ -31,7 +31,7 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
         this.values = new String[parameters.size()];
         for (int i = 0; i < parameters.size(); i++) {
             this.parameters[i] = parameters.get(i);
-            this.values[i] = parameters.get(i).getValue();
+            this.values[i] = parameters.get(i).getValue() == null ? "" : parameters.get(i).getValue();
             this.selected[i] = false;
             this.parameterInstances[i] = null;
         }

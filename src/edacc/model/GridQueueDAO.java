@@ -104,17 +104,17 @@ public class GridQueueDAO {
     }
 
     public static void remove(GridQueue q) throws NoConnectionToDBException, SQLException {
-        if (q.isNew())
+        if (q.isNew()) {
             return;
+        }
         final String deleteQuery = "DELETE FROM " + table
-                    + " WHERE idgridQueue=?";
+                + " WHERE idgridQueue=?";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
         ps.setInt(1, q.getId());
         ps.executeUpdate();
         cache.remove(q);
         q.setDeleted();
     }
-
 
     /**
      * retrieves a grid queue from the database
@@ -149,7 +149,7 @@ public class GridQueueDAO {
             st.close();
             return q;
 
-        } 
+        }
         rs.close();
         st.close();
         return null;
@@ -254,9 +254,11 @@ public class GridQueueDAO {
      * queue with the same name exists.
      */
     public static GridQueue queueWithSameNameExistsInCache(String name) {
-        for (GridQueue q : cache.values())
-            if (q.getName().equals(name))
+        for (GridQueue q : cache.values()) {
+            if (q.getName().equals(name)) {
                 return q;
+            }
+        }
         return null;
     }
 
@@ -274,14 +276,18 @@ public class GridQueueDAO {
         ps.setInt(1, q.getId());
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
-            FileOutputStream out = new FileOutputStream(f);
+            f.delete();
             InputStream in = rs.getBinaryStream("genericPBSScript");
-            int data;
-            while ((data = in.read()) > -1) {
-                out.write(data);
+            if (in != null) {
+                FileOutputStream out = new FileOutputStream(f);
+                int data;
+                while ((data = in.read()) > -1) {
+                    out.write(data);
+                }
+                out.close();
+                in.close();
             }
-            out.close();
-            in.close();
+
         }
         rs.close();
         ps.close();

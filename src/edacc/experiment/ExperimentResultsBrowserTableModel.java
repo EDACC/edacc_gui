@@ -38,26 +38,33 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public static final int COL_ID = 0;
     public static final int COL_PRIORITY = 1;
     public static final int COL_COMPUTEQUEUE = 2;
-    public static final int COL_SOLVER = 3;
-    public static final int COL_SOLVERCONFIGURATION = 4;
-    public static final int COL_PARAMETERS = 5;
-    public static final int COL_INSTANCE = 6;
-    public static final int COL_RUN = 7;
-    public static final int COL_TIME = 8;
-    public static final int COL_SEED = 9;
-    public static final int COL_STATUS = 10;
-    public static final int COL_RUNTIME = 11;
-    public static final int COL_RESULTCODE = 12;
-    public static final int COL_SOLVER_OUTPUT = 13;
-    public static final int COL_LAUNCHER_OUTPUT = 14;
-    public static final int COL_WATCHER_OUTPUT = 15;
-    public static final int COL_VERIFIER_OUTPUT = 16;
-    public static final int COL_PROPERTY = 17;
+    public static final int COL_COMPUTENODE = 3;
+    public static final int COL_COMPUTENODEIP = 4;
+    public static final int COL_SOLVER = 5;
+    public static final int COL_SOLVERCONFIGURATION = 6;
+    public static final int COL_PARAMETERS = 7;
+    public static final int COL_INSTANCE = 8;
+    public static final int COL_RUN = 9;
+    public static final int COL_TIME = 10;
+    public static final int COL_SEED = 11;
+    public static final int COL_STATUS = 12;
+    public static final int COL_RUNTIME = 13;
+    public static final int COL_RESULTCODE = 14;
+    public static final int COL_CPUTIMELIMIT = 15;
+    public static final int COL_WALLCLOCKLIMIT = 16;
+    public static final int COL_MEMORYLIMIT = 17;
+    public static final int COL_STACKSIZELIMIT = 18;
+    public static final int COL_OUTPUTSIZELIMIT = 19;
+    public static final int COL_SOLVER_OUTPUT = 20;
+    public static final int COL_LAUNCHER_OUTPUT = 21;
+    public static final int COL_WATCHER_OUTPUT = 22;
+    public static final int COL_VERIFIER_OUTPUT = 23;
+    public static final int COL_PROPERTY = 24;
     private ArrayList<ExperimentResult> jobs;
     // the constant columns
-    private String[] CONST_COLUMNS = {"ID", "Priority", "Compute Queue", "Solver", "Solver Configuration", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Run time", "Result Code", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
+    private String[] CONST_COLUMNS = {"ID", "Priority", "Compute Queue", "Compute Node", "Compute Node IP", "Solver", "Solver Configuration", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Run time", "Result Code", "CPU Time Limit", "Wall Clock Time Limit", "Memory Limit", "Stack Size Limit", "Output Size Limit", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
     // the visibility of each column
-    private boolean[] CONST_VISIBLE = {false, false, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false};
+    private boolean[] CONST_VISIBLE = {false, false, true, false, false, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false};
     private String[] columns;
     private ArrayList<Property> properties;
     private boolean[] visible;
@@ -339,6 +346,10 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             case COL_COMPUTEQUEUE:
                 GridQueue q = gridQueues.get(j.getComputeQueue());
                 return q == null ? "none" : q.getName();
+            case COL_COMPUTENODE:
+                return j.getComputeNode() == null ? "none" : j.getComputeNode();
+            case COL_COMPUTENODEIP:
+                return j.getComputeNodeIP() == null ? "none" : j.getComputeNodeIP();
             case COL_SOLVER:
                 Solver solver = getSolver(rowIndex);
                 return solver == null ? "" : solver.getName();
@@ -376,6 +387,16 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 return null;
             case COL_RESULTCODE:
                 return j.getResultCode().toString();
+            case COL_CPUTIMELIMIT:
+                return j.getCPUTimeLimit();
+            case COL_WALLCLOCKLIMIT:
+                return j.getWallClockTimeLimit();
+            case COL_MEMORYLIMIT:
+                return j.getMemoryLimit();
+            case COL_STACKSIZELIMIT:
+                return j.getStackSizeLimit();
+            case COL_OUTPUTSIZELIMIT:
+                return j.getOutputSizeLimit();
             case COL_SOLVER_OUTPUT:
                 return "view";
             case COL_LAUNCHER_OUTPUT:

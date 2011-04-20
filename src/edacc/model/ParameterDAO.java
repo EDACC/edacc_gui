@@ -25,7 +25,7 @@ public class ParameterDAO {
             return; 
         if (parameter.isSaved()) return;
         if (parameter.isNew()) {
-            final String insertQuery = "INSERT INTO Parameters (name, prefix, value, hasValue, Parameters.order, Solver_idSolver) VALUES (?, ?, ?, ?, ?, ?)";
+            final String insertQuery = "INSERT INTO Parameters (name, prefix, defaultValue, hasValue, Parameters.order, Solver_idSolver) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setString(1, parameter.getName());
             if (parameter.getPrefix() == null || parameter.getPrefix().equals(""))
@@ -44,7 +44,7 @@ public class ParameterDAO {
             parameter.setSaved();
         }
         else if (parameter.isModified()) {
-            final String updateQuery = "UPDATE Parameters SET name=?, prefix=?, value=?, hasValue=?, Parameters.order=?, Solver_idSolver=? WHERE idParameter=?";
+            final String updateQuery = "UPDATE Parameters SET name=?, prefix=?, defaultValue=?, hasValue=?, Parameters.order=?, Solver_idSolver=? WHERE idParameter=?";
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
             ps.setString(1, parameter.getName());
             if (parameter.getPrefix() == null || parameter.getPrefix().equals(""))
@@ -68,7 +68,7 @@ public class ParameterDAO {
         i.setName(rs.getString("name"));
         i.setOrder(rs.getInt("order"));
         i.setPrefix(rs.getString("prefix"));
-        i.setValue(rs.getString("value"));
+        i.setValue(rs.getString("defaultValue"));
         i.setHasValue(rs.getBoolean("hasValue"));
         return i;
     }

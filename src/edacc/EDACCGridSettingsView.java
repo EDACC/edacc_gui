@@ -74,7 +74,6 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         btnOk = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
-        pbsScriptMessage = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCGridSettingsView.class);
@@ -269,29 +268,21 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         btnCancel.setToolTipText(resourceMap.getString("btnCancel.toolTipText")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
 
-        pbsScriptMessage.setForeground(resourceMap.getColor("pbsScriptMessage.foreground")); // NOI18N
-        pbsScriptMessage.setText(resourceMap.getString("pbsScriptMessage.text")); // NOI18N
-        pbsScriptMessage.setName("pbsScriptMessage"); // NOI18N
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(btnCancel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 118, Short.MAX_VALUE)
-                        .addComponent(btnOk))
-                    .addComponent(pbsScriptMessage))
+                .addContainerGap()
+                .addComponent(btnCancel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 125, Short.MAX_VALUE)
+                .addComponent(btnOk)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addComponent(pbsScriptMessage)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCancel)
                     .addComponent(btnOk)))
@@ -304,7 +295,6 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(lblLocation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -326,7 +316,8 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
                             .addComponent(txtMaxJobsInQueue, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
                             .addComponent(btnAdd, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
-                            .addComponent(txtName, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE))))
+                            .addComponent(txtName, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -366,7 +357,7 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblDescription)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblPBSScript)
@@ -542,11 +533,7 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
             error = true;
         }
 
-        // Show PBS script error message if no pbs script has been specified
-        boolean pbsError = mode == DialogMode.Create && !GridQueuesController.getInstance().hasTmpPBSScript();
-        pbsScriptMessage.setVisible(pbsError);
-
-        btnOk.setEnabled(!error && !pbsError);
+        btnOk.setEnabled(!error);
     }
 
     /**
@@ -587,7 +574,6 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
     private javax.swing.JLabel lblNumNodes;
     private javax.swing.JLabel lblPBSScript;
     private javax.swing.JLabel lblWallTime;
-    private javax.swing.JLabel pbsScriptMessage;
     private javax.swing.JTextArea taDescription;
     private javax.swing.JTextField txtAvailNodes;
     private javax.swing.JTextField txtLocation;

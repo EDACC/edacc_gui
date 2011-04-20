@@ -107,7 +107,7 @@ public class ManageDBInstances implements Observer {
      * Will open a jFilechooser to select a file or directory to add all containing
      * instance files into the "instance table" of the MangeDBMode.
      */
-    public void addInstances(InstanceClass input, File ret, Tasks task, String fileExtension, Boolean compress) throws InstanceException {
+    public void addInstances(InstanceClass input, File ret, Tasks task, String fileExtension, Boolean compress, Boolean autoClass) throws InstanceException {
         try {
 
             RecursiveFileScanner InstanceScanner = new RecursiveFileScanner(fileExtension);
@@ -119,7 +119,14 @@ public class ManageDBInstances implements Observer {
                 main.instanceTableModel.addInstances(instances);
                 loadInstanceClasses();
             } else {
-                Vector<Instance> instances = buildInstancesGivenClass(instanceFiles, (InstanceClass) input, task, compress);
+                Vector<Instance> instances;
+                if(autoClass){
+                    instances  = buildInstancesGivenClassAutogenerate(instanceFiles, (InstanceClass) input, ret, task, compress);
+                }else{
+                    instances = buildInstancesGivenClass(instanceFiles, (InstanceClass) input, task, compress);
+                }
+
+               
                 main.instanceTableModel.addInstances(instances);
                 loadInstanceClasses();
             }
@@ -397,6 +404,7 @@ public class ManageDBInstances implements Observer {
             task.setStatus("Added " + i + " instances of " + instanceFiles.size());
         }
 
+
         String instanceErrs = instanceErrors.toString();
         if (!errorsAdd.isEmpty()) {
             FileNameTableModel tmp = new FileNameTableModel();
@@ -455,6 +463,70 @@ public class ManageDBInstances implements Observer {
                     InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
                     String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, instanceFiles.get(i).getParent().length());
                     String[] possibleInstanceClasses = rawPath.split("\\\\|/");                                     
+                    if (possibleInstanceClasses.length != 1) {
+                        instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes, 0);
+                    } else {
+                        instanceClass = (InstanceClass) ((DefaultMutableTreeNode) nodes.getRoot()).getUserObject();
+                    }
+                    Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, md5, instanceClass);
+                    instances.add(temp);
+                    InstanceDAO.save(temp, compressBinary);
+                } catch (InstanceException e) {
+                    errorsAdd.add(instanceFiles.get(i).getAbsolutePath());
+                }
+
+            } catch (InstanceAlreadyInDBException ex) {
+                errorsDB.add(instanceFiles.get(i).getAbsolutePath());
+            }
+            task.setTaskProgress((float) i / (float) instanceFiles.size());
+            task.setStatus("Added " + i + " instances of " + instanceFiles.size());
+        }
+
+        if (!errorsAdd.isEmpty()) {
+            FileNameTableModel tmp = new FileNameTableModel();
+            tmp.setAll(errorsAdd);
+            EDACCExtendedWarning.showMessageDialog(
+                    EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
+                    "By adding the following instances an error occured.",
+                    new JTable(tmp));
+        }
+
+        if (!errorsDB.isEmpty()) {
+            FileNameTableModel tmp = new FileNameTableModel();
+            tmp.setAll(errorsDB);
+            EDACCExtendedWarning.showMessageDialog(
+                    EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
+                    "The following instances are already in the database. (Equal name or md5 hash)",
+                    new JTable(tmp));
+        }
+        return instances;
+
+    }
+
+       public Vector<Instance> buildInstancesGivenClassAutogenerate(Vector<File> instanceFiles, InstanceClass input, File ret, Tasks task, boolean compressBinary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException, InstanceClassAlreadyInDBException, InstanceException {
+
+        if(instanceFiles.isEmpty()){
+            throw new InstanceException();
+        }
+
+        Vector<Instance> instances = new Vector<Instance>();
+        Vector<String> errorsDB = new Vector<String>();
+        Vector<String> errorsAdd = new Vector<String>();
+        InstanceClass instanceClass;
+        task.setTaskProgress((float) 0 / (float) instanceFiles.size());
+
+        //Creates all InstanceClasses in the directory and structures them as a tree. The given InstanceClass is the root of this tree.
+        DefaultMutableTreeNode nodes = InstanceClassDAO.createInstanceClassFromDirectory(ret, input);
+
+        //Create the instances and assigne them to their InstanceClass
+        for (int i = 0; i < instanceFiles.size(); i++) {
+            try {
+                String md5 = calculateMD5(instanceFiles.get(i));
+                try {
+                    //Get all InstanceClasses of the Instance and assigne it to the corresponding InstanceClass
+                    InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
+                    String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, instanceFiles.get(i).getParent().length());
+                    String[] possibleInstanceClasses = rawPath.split("\\\\|/");
                     if (possibleInstanceClasses.length != 1) {
                         instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes, 0);
                     } else {
