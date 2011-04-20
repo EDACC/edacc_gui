@@ -2011,11 +2011,24 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Action
     public void btnBrowserColumnSelection() {
-        List sortKeys = tableJobs.getRowSorter().getSortKeys();
+        List<SortKey> sortKeys = (List<SortKey>) tableJobs.getRowSorter().getSortKeys();
+        List<String> columnNames = new ArrayList<String>();
+        for (SortKey sk : sortKeys) {
+            columnNames.add(tableJobs.getColumnName(tableJobs.convertColumnIndexToView(sk.getColumn())));
+        }
         EDACCResultsBrowserColumnSelection dialog = new EDACCResultsBrowserColumnSelection(EDACCApp.getApplication().getMainFrame(), true, jobsTableModel);
         dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         dialog.setVisible(true);
-        tableJobs.getRowSorter().setSortKeys(sortKeys);
+        List<SortKey> newSortKeys = new ArrayList<SortKey>();
+        for (int k = 0; k < columnNames.size(); k++) {
+            String col = columnNames.get(k);
+            for (int i = 0; i < tableJobs.getColumnCount(); i++) {
+                if (tableJobs.getColumnName(i).equals(col)) {
+                    newSortKeys.add(new SortKey(tableJobs.convertColumnIndexToModel(i), sortKeys.get(k).getSortOrder()));
+                }
+            }
+        }
+        tableJobs.getRowSorter().setSortKeys(newSortKeys);
         Util.updateTableColumnWidth(tableJobs);
     }
 
@@ -2028,6 +2041,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         int jobsSuccessful = jobsTableModel.getJobsCount(StatusCode.SUCCESSFUL);
         int jobsWaiting = jobsTableModel.getJobsCount(StatusCode.NOT_STARTED);
         int jobsRunning = jobsTableModel.getJobsCount(StatusCode.RUNNING);
+
+        int jobsCrashed = jobsTableModel.getJobsCount(StatusCode.LAUNCHERCRASH)
+                + jobsTableModel.getJobsCount(StatusCode.SOLVERCRASH)
+                + jobsTableModel.getJobsCount(StatusCode.VERIFIERCRASH)
+                + jobsTableModel.getJobsCount(StatusCode.WATCHERCRASH);
+
         int jobsNotSuccessful = jobsCount - jobsSuccessful - jobsWaiting - jobsRunning;
         double percentage = (double) (jobsSuccessful + jobsNotSuccessful) / jobsCount;
         percentage = Math.round(percentage * 100 * 100) / 100.;
@@ -2068,10 +2087,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             ETA = "" + days + "d " + (hours < 10 ? "0" + hours : "" + hours) + "h " + (minutes < 10 ? "0" + minutes : "" + minutes) + "m " + (seconds < 10 ? "0" + seconds : "" + seconds) + "s";
         }
         String text = "" + (jobsSuccessful + jobsNotSuccessful) + " (" + jobsNotSuccessful + ") / " + jobsCount + " jobs (" + percentage + "%) finished. " + jobsRunning + " jobs are running.";
+        String tooltip = "<html>Crashed: " + jobsCrashed + "<br/>Waiting: " + jobsWaiting + "</html>";
         if (ETA != null) {
             text += " ETA: " + ETA;
         }
         lblETA.setText(text);
+        lblETA.setToolTipText(tooltip);
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBrowserColumnSelection;

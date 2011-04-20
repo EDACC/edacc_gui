@@ -710,7 +710,7 @@ public class ExperimentResultDAO {
 
     public static Blob getLauncherOutput(ExperimentResult expRes) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, ExperimentResultNotInDBException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT lancherOutput "
+                "SELECT launcherOutput "
                 + "FROM " + outputTable + " "
                 + "WHERE ExperimentResults_idJob=?;");
         ps.setInt(1, expRes.getId());
