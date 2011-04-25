@@ -54,7 +54,6 @@ public class InstanceDAO {
         i.setMd5(rs.getString("md5"));
         i.setName(rs.getString("name"));
         Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
-        i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
         i.setPropertyValues(new HashMap<Integer, InstanceHasProperty>());
         for (int prop = 0; prop < props.size(); prop++) {
             i.getPropertyValues().put(props.get(prop).getId(), new InstanceHasProperty(i, props.get(prop), rs.getString("tbl_" + prop + ".value")));
@@ -74,7 +73,7 @@ public class InstanceDAO {
      * @throws FileNotFoundException
      * @throws InstanceAlreadyInDBException
      */
-    public static Instance createInstance(File file, String name, String md5, InstanceClass instanceClass) throws SQLException, FileNotFoundException,
+    public static Instance createInstance(File file, String name, String md5) throws SQLException, FileNotFoundException,
             InstanceAlreadyInDBException {
         PreparedStatement ps;
         final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ?";
@@ -88,7 +87,6 @@ public class InstanceDAO {
         i.setFile(file);
         i.setName(name);
         i.setMd5(md5);
-        i.setInstanceClass(instanceClass);
         rs.close();
         ps.close();
         return i;
@@ -107,8 +105,7 @@ public class InstanceDAO {
         Instance i = new Instance();
         i.setName(name);
         i.setMd5(md5);
-        i.setInstanceClass(instanceClass);
-        save(i, formula);
+        save(i, formula, instanceClass);
         rs.close();
         ps.close();
         return i;
@@ -128,24 +125,26 @@ public class InstanceDAO {
 
     }
 
-    private static void save(Instance instance, String formula) {
+    /**
+     *
+     * @param instance
+     * @param formula
+     * @param instanceClass The instance class object, the instance is related to.
+     */
+    private static void save(Instance instance, String formula, InstanceClass instanceClass) {
         if (instance.isNew()) {
             try {
+                // Add Instance to InstanceClass
+                InstanceHasInstanceClassDAO.createInstanceHasInstance(instance, instanceClass);
                 // insert query, set ID!
                 // TODO insert instance blob
                 // insert instance into db
                 PreparedStatement ps;
-                final String insertQuery = "INSERT INTO " + table + " (name, md5, instanceClass_idinstanceClass, instance) "
+                final String insertQuery = "INSERT INTO " + table + " (name, md5, instance) "
                         + "VALUES (?, ?, ?, ?)";
                 ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
                 ps.setString(1, instance.getName());
                 ps.setString(2, instance.getMd5());
-                if (instance.getInstanceClass() != null) {
-                    ps.setInt(3, instance.getInstanceClass().getInstanceClassID());
-                } else {
-                    ps.setNull(3, Types.INTEGER);
-                }
-
                 if (!formula.isEmpty()) {
                     ByteArrayInputStream input = new ByteArrayInputStream(formula.getBytes());
                     //output = new File(instance.getFile().getName());
@@ -169,6 +168,7 @@ public class InstanceDAO {
                 ps.close();
                 instance.setSaved();
 
+
                 //                output.delete();
                 //input.delete();
             } catch (Exception ex) {
@@ -180,27 +180,25 @@ public class InstanceDAO {
     /**
      * persists an instance object in the database
      * @param instance The instance object to persist
+     * @param instanceClass The instance class object, the instance is related to.
      * @throws SQLException if an SQL error occurs while saving the instance.
      * @throws FileNotFoundException if the file of the instance couldn't be found.
      */
-    public static void save(Instance instance, boolean compressBinary) throws SQLException, FileNotFoundException, IOException {
+    public static void save(Instance instance, boolean compressBinary, InstanceClass instanceClass) throws SQLException, FileNotFoundException, IOException {
         PreparedStatement ps;
         if (instance.isNew()) {
             try {
+                // Add instance to the given InstanceClass
+                InstanceHasInstanceClassDAO.createInstanceHasInstance(instance, instanceClass);
+                
                 // insert query, set ID!
                 // TODO insert instance blob
                 // insert instance into db
-                final String insertQuery = "INSERT INTO " + table + " (name, md5, instanceClass_idinstanceClass, instance) "
-                        + "VALUES (?, ?, ?, ?)";
+                final String insertQuery = "INSERT INTO " + table + " (name, md5, instance) "
+                        + "VALUES (?, ?, ?)";
                 ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
                 ps.setString(1, instance.getName());
                 ps.setString(2, instance.getMd5());
-                if (instance.getInstanceClass() != null) {
-                    ps.setInt(3, instance.getInstanceClass().getInstanceClassID());
-                } else {
-                    ps.setNull(3, Types.INTEGER);
-                }
-
                 File input = null;
                 //      File output = null;
                 FileInputStream fInStream = null;
@@ -242,17 +240,12 @@ public class InstanceDAO {
             }
         } else if (instance.isModified()) {
             // update query
-            final String updateQuery = "UPDATE " + table + " SET name=?, md5=?, instanceClass_idinstanceClass=? "
+            final String updateQuery = "UPDATE " + table + " SET name=?, md5=? "
                     + "WHERE idInstance=?";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
             ps.setString(1, instance.getName());
             ps.setString(2, instance.getMd5());
-            if (instance.getInstanceClass() != null) {
-                ps.setInt(3, instance.getInstanceClass().getInstanceClassID());
-            } else {
-                ps.setNull(3, Types.INTEGER);
-            }
-            ps.setInt(4, instance.getId());
+            ps.setInt(3, instance.getId());
             ps.executeUpdate();
 
         } else {
@@ -282,8 +275,6 @@ public class InstanceDAO {
             i.setMd5(rs.getString("md5"));
             i.setName(rs.getString("name"));
             Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
-            i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
-
             ArrayList<Instance> tmp = new ArrayList<Instance>();
             tmp.add(i);
             InstanceHasPropertyDAO.assign(tmp);
@@ -400,7 +391,7 @@ public class InstanceDAO {
     public static LinkedList<Instance> getAllByInstanceClasses(Vector<InstanceClass> allChoosen) throws NoConnectionToDBException, SQLException {
         if (!allChoosen.isEmpty()) {
             String query = "SELECT i.idInstance, i.md5, i.name,"
-                    + " i.instanceClass_idinstanceClass FROM " + table + " as i "
+                    + " FROM " + table + " as i "
                     + " LEFT JOIN Instances_has_instanceClass as ii ON i.idInstance = ii.Instances_idInstance "
                     + " WHERE i.instanceClass_idinstanceClass = " + allChoosen.get(0).getInstanceClassID()
                     + " OR ii.instanceClass_idinstanceClass = " + allChoosen.get(0).getInstanceClassID();
@@ -424,7 +415,6 @@ public class InstanceDAO {
                 i.setMd5(rs.getString("i.md5"));
                 i.setName(rs.getString("i.name"));
                 Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
-                i.setInstanceClass(InstanceClassDAO.getById(idInstanceClass));
                 i.setSaved();
                 cache.cache(i);
                 res.add(i);
@@ -514,5 +504,26 @@ public class InstanceDAO {
             res.put(new Integer(rs.getInt("idInstance")), rs.getString("name"));
         }
         return res;
+    }
+
+    /**
+     * Deletes the given instance objects from the database and the cache. Sets their PersistenceState
+     * to deleted.
+     * @param lastRelated
+     * @throws SQLException
+     */
+    static void deleteAll(Vector<Instance> lastRelated) throws SQLException {
+        if(lastRelated.isEmpty())
+            return;
+        String query = "DELETE FROM Instances WHERE idInstance=" + lastRelated.get(0).getId();
+        for(int i = 1; i < lastRelated.size(); i++){
+            query += " OR idInstance=" + lastRelated.get(i).getId();
+        }
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.executeUpdate();
+        for(int i = 0; i < lastRelated.size(); i++){
+            cache.remove(lastRelated.get(i));
+            lastRelated.get(i).setDeleted();
+        }
     }
 }

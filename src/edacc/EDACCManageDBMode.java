@@ -14,6 +14,7 @@ import edacc.events.TaskEvents;
 import edacc.manageDB.*;
 import edacc.manageDB.InstanceParser.InstanceException;
 import edacc.model.Instance;
+import edacc.model.InstanceIsInExperimentException;
 import edacc.model.InstanceNotInDBException;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceSourceClassHasInstance;
@@ -38,8 +39,6 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JMenuItem;
 import javax.swing.table.*;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -1288,7 +1287,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         try {
             if (addInstanceDialog == null) {
                 JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-                this.addInstanceDialog = new EDACCAddNewInstanceSelectClassDialog(mainFrame, true);
+                this.addInstanceDialog = new EDACCAddNewInstanceSelectClassDialog(mainFrame, true, instanceClassTreeModel);
                 this.addInstanceDialog.setLocationRelativeTo(mainFrame);
             } 
             addInstanceDialog.refresh();
@@ -1711,7 +1710,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 JOptionPane.WARNING_MESSAGE);
           } else{
                 try {
-                    manageDBInstances.RemoveInstanceClass((DefaultMutableTreeNode)jTreeInstanceClass.getSelectionPath().getLastPathComponent());
+                    manageDBInstances.RemoveInstanceClass((DefaultMutableTreeNode) jTreeInstanceClass.getSelectionPath().getLastPathComponent());
+                    //instanceClassTableModel.fireTableDataChanged();                 ;
+                } catch (InstanceIsInExperimentException ex) {
+                    Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
                     //instanceClassTableModel.fireTableDataChanged();                 ;
                 } catch (NoConnectionToDBException ex) {
                     Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);

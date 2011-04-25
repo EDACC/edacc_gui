@@ -15,7 +15,6 @@ public class InstanceClass extends BaseModel implements IntegerPKModel {
     private int parentId;
     private String name;
     private String description;
-    private boolean source;
 
     public String getDescription() {
         return description;
@@ -57,17 +56,6 @@ public class InstanceClass extends BaseModel implements IntegerPKModel {
 
     public void setName(String name) {
         this.name = name;
-        if (this.isSaved()) {
-            this.setModified();
-        }
-    }
-
-    public boolean isSource() {
-        return source;
-    }
-
-    public void setSource(boolean source) {
-        this.source = source;
         if (this.isSaved()) {
             this.setModified();
         }

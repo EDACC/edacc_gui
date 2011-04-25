@@ -48,8 +48,9 @@ public class InstanceTableModelRowFilter extends RowFilter<Object, Object> {
     public boolean include(Entry entry) {
         if (entry == null) return false;
 
-        return include((String)entry.getValue(0), ((InstanceTableModel)entry.getModel()).getInstanceAt((Integer)entry.getIdentifier()).getInstanceClass().getId());
-    }
+        //return include((String)entry.getValue(0), ((InstanceTableModel)entry.getModel()).getInstanceAt((Integer)entry.getIdentifier()).getInstanceClass().getId());
+        return true;
+     }
 
 
     public boolean include(String instance_name, Integer instanceClassId) {

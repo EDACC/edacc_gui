@@ -41,8 +41,6 @@ public class InstanceHasInstanceClass extends BaseModel {
      * @throws InstanceClassMustNotBeSourceException if the given instance class is a source instance class.
      */
     public void setInstanceClass(InstanceClass instanceClass) throws InstanceClassMustNotBeSourceException {
-        if (instanceClass.isSource())
-            throw new InstanceClassMustNotBeSourceException();
         this.instanceClass = instanceClass;
     }
 }

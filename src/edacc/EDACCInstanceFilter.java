@@ -34,7 +34,8 @@ public class EDACCInstanceFilter extends EDACCFilter {
 
     @Override
     public boolean include(Entry<? extends Object, ? extends Object> entry) {
-        int instanceClassId = model.getInstanceAt((Integer) entry.getIdentifier()).getInstanceClass().getId();
+        //int instanceClassId = model.getInstanceAt((Integer) entry.getIdentifier()).getInstanceClass().getId();
+        int instanceClassId = -10;
         if (filterInstanceClasses && !instanceClassIds.contains(instanceClassId)) {
             return false;
         }

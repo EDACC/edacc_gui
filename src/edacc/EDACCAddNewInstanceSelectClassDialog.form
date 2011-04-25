@@ -169,9 +169,9 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
           <SubComponents>
-            <Component class="javax.swing.JTree" name="jTreeSourceClass">
+            <Component class="javax.swing.JTree" name="jTreeClass">
               <Properties>
-                <Property name="name" type="java.lang.String" value="jTreeSourceClass" noResource="true"/>
+                <Property name="name" type="java.lang.String" value="jTreeClass" noResource="true"/>
               </Properties>
             </Component>
           </SubComponents>

@@ -51,27 +51,6 @@ public class Instance extends BaseModel implements IntegerPKModel {
         this.file = file;
     }
 
-    /**
-     *
-     * @return the source instance class of an instance.
-     * @see InstanceHasInstanceClass for user defined instance classes.
-     */
-    public InstanceClass getInstanceClass() {
-        return instanceClass;
-    }
-
-    /**
-     * Sets the source instance class of an instance. The instance class set here must be a source instance class!
-     * @param instanceClass the source instance class of an instance.
-     * @see InstanceHasInstanceClass for user defined instance classes.
-     * @throws InstanceClassMustBeSourceException if the given instance class ist not a source instance.
-     */
-    public void setInstanceClass(InstanceClass instanceClass) throws InstanceClassMustBeSourceException {
-        if (!instanceClass.isSource())
-            throw new InstanceClassMustBeSourceException();
-        this.instanceClass = instanceClass;
-    }
-
     public HashMap<Integer, InstanceHasProperty> getPropertyValues() {
         return propertyValues;
     }
@@ -89,13 +68,5 @@ public class Instance extends BaseModel implements IntegerPKModel {
     private String name;
     private String md5;
     private File file;
-
-
-    /**
-     * The source instance class of the instance.
-     * @see InstanceHasInstanceClass for user defined instance classes.
-     */
-    private InstanceClass instanceClass;
-
     private HashMap<Integer, InstanceHasProperty> propertyValues;
 }

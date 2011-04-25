@@ -11,14 +11,13 @@
 
 package edacc;
 
-import edacc.manageDB.AddInstanceToInstanceSourceClassTreeSelectionListener;
-import edacc.manageDB.AddInstanceToInstanceUserClassTreeSelectionListener;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassDAO;
 import edacc.model.NoConnectionToDBException;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
 /**
@@ -31,19 +30,10 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
     public EDACCAddInstanceToInstanceClass(java.awt.Frame parent, boolean modal) throws NoConnectionToDBException, SQLException {
         super(parent, modal);
         initComponents();
-        //Initiate the instance source class tree
-        jTreeSourceClass.setModel(InstanceClassDAO.getSourceAsTree());
-        jTreeSourceClass.setRootVisible(false);
-        jTreeSourceClass.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        jTreeSourceClass.addTreeSelectionListener(new AddInstanceToInstanceSourceClassTreeSelectionListener(this));
-        jTreeSourceClass.setRootVisible(false);
-        //Initiate the instance source class table
-
-        jTreeUserClass.setModel(InstanceClassDAO.getUserClassAsTree());
-        jTreeUserClass.setRootVisible(false);
-        jTreeUserClass.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        jTreeUserClass.addTreeSelectionListener(new AddInstanceToInstanceUserClassTreeSelectionListener(this));
-        jTreeUserClass.setRootVisible(false);
+        jTreeClass.setModel(new DefaultTreeModel(InstanceClassDAO.getAllAsTreeFast()));
+        jTreeClass.setRootVisible(false);
+        jTreeClass.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);     
+        jTreeClass.setRootVisible(false);
     }
 
     public InstanceClass getInput(){
@@ -60,15 +50,11 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
     private void initComponents() {
 
         buttonGroupSourceOrUser = new javax.swing.ButtonGroup();
-        jRadioButtonSourceClass = new javax.swing.JRadioButton();
-        jRadioButtonUserClass = new javax.swing.JRadioButton();
         jPanelButton = new javax.swing.JPanel();
         jButtonCancel = new javax.swing.JButton();
         jButtonOk = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTreeSourceClass = new javax.swing.JTree();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTreeUserClass = new javax.swing.JTree();
+        jTreeClass = new javax.swing.JTree();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAddInstanceToInstanceClass.class);
@@ -81,16 +67,6 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
                 formWindowActivated(evt);
             }
         });
-
-        buttonGroupSourceOrUser.add(jRadioButtonSourceClass);
-        jRadioButtonSourceClass.setText(resourceMap.getString("jRadioButtonSourceClass.text")); // NOI18N
-        jRadioButtonSourceClass.setToolTipText(resourceMap.getString("jRadioButtonSourceClass.toolTipText")); // NOI18N
-        jRadioButtonSourceClass.setName("jRadioButtonSourceClass"); // NOI18N
-
-        buttonGroupSourceOrUser.add(jRadioButtonUserClass);
-        jRadioButtonUserClass.setText(resourceMap.getString("jRadioButtonUserClass.text")); // NOI18N
-        jRadioButtonUserClass.setToolTipText(resourceMap.getString("jRadioButtonUserClass.toolTipText")); // NOI18N
-        jRadioButtonUserClass.setName("jRadioButtonUserClass"); // NOI18N
 
         jPanelButton.setName("jPanelButton"); // NOI18N
 
@@ -133,27 +109,19 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
                     .addComponent(jButtonOk)))
         );
 
-        jScrollPane1.setName("jScrollPane1"); // NOI18N
-
-        jTreeSourceClass.setName("jTreeSourceClass"); // NOI18N
-        jScrollPane1.setViewportView(jTreeSourceClass);
-
         jScrollPane2.setName("jScrollPane2"); // NOI18N
 
-        jTreeUserClass.setName("jTreeUserClass"); // NOI18N
-        jScrollPane2.setViewportView(jTreeUserClass);
+        jTreeClass.setName("jTreeClass"); // NOI18N
+        jScrollPane2.setViewportView(jTreeClass);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
-                    .addComponent(jRadioButtonUserClass, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
-                    .addComponent(jRadioButtonSourceClass, javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
                     .addComponent(jPanelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -161,14 +129,8 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jRadioButtonSourceClass)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jRadioButtonUserClass)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanelButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -178,34 +140,14 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
 
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
         input = new InstanceClass();
-        if(buttonGroupSourceOrUser.getSelection() == null){
-            JOptionPane.showMessageDialog(this,
-                    "Please choose if the instance source class has to be changed or a new " +
-                    "instance user class has to be added." ,
+        if(jTreeClass.getSelectionCount() != 0){
+             JOptionPane.showMessageDialog(this,
+                    "Select a instance class",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }else{
-            if(jRadioButtonSourceClass.isSelected()){
-                if(jTreeSourceClass.getSelectionCount() == 0){
-                    JOptionPane.showMessageDialog(this,
-                    "Please select one of the instance source classes from the tree",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-                }else{
-                    input = (InstanceClass) ((DefaultMutableTreeNode)jTreeSourceClass.getSelectionPath().getLastPathComponent()).getUserObject();
-                    this.setVisible(false);
-                }
-            }else{
-                if(jTreeUserClass.getSelectionCount() == 0){
-                    JOptionPane.showMessageDialog(this,
-                    "Please select one of the instance user classes from the table",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-                }else{
-                    input = (InstanceClass) ((DefaultMutableTreeNode)jTreeUserClass.getSelectionPath().getLastPathComponent()).getUserObject();
-                    this.setVisible(false);
-                }
-            }
+            input = (InstanceClass) ((DefaultMutableTreeNode)jTreeClass.getSelectionPath().getLastPathComponent()).getUserObject();
+            this.setVisible(false);
         }
     }//GEN-LAST:event_jButtonOkActionPerformed
 
@@ -216,8 +158,7 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         try {
-            jTreeSourceClass.setModel(InstanceClassDAO.getSourceAsTree());
-            jTreeUserClass.setModel(InstanceClassDAO.getUserClassAsTree());
+            jTreeClass.setModel(new DefaultTreeModel(InstanceClassDAO.getAllAsTree()));
          } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this.rootPane,
                     ex.getMessage(),
@@ -246,20 +187,8 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonOk;
     private javax.swing.JPanel jPanelButton;
-    private javax.swing.JRadioButton jRadioButtonSourceClass;
-    private javax.swing.JRadioButton jRadioButtonUserClass;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTree jTreeSourceClass;
-    private javax.swing.JTree jTreeUserClass;
+    private javax.swing.JTree jTreeClass;
     // End of variables declaration//GEN-END:variables
-
-    public void selectUserClass() {
-        jRadioButtonUserClass.setSelected(true);
-    }
-
-    public void selectSourceClass() {
-        jRadioButtonSourceClass.setSelected(true);
-    }
 
 }

@@ -51,7 +51,7 @@ public class instanceGeneratorUnifKCNFController {
             if (genClass) {
                 className = "v" + i;
                 task.setStatus("Generating class: "+ className);
-                ic = InstanceClassDAO.createInstanceClass(className, "Automated generated Class by unif-KSAT Generator", parent, true);
+                ic = InstanceClassDAO.createInstanceClass(className, "Automated generated Class by unif-KSAT Generator", parent);
             } else{
                 ic=parent;
                 className="";

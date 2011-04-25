@@ -32,15 +32,15 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     private String fileExtension;
 
     /** Creates new form EDACCAddNewInstanceSelectClassDialog */
-    public EDACCAddNewInstanceSelectClassDialog(java.awt.Frame parent, boolean modal) throws NoConnectionToDBException, SQLException {
+    public EDACCAddNewInstanceSelectClassDialog(java.awt.Frame parent, boolean modal, DefaultTreeModel treeModel) throws NoConnectionToDBException, SQLException {
         super(parent, modal);
         initComponents();
         //Filling the tree with all instance source class
-        treeModel = InstanceClassDAO.getSourceAsTree();
-        jTreeSourceClass.setModel(treeModel);
-        jTreeSourceClass.setRootVisible(false);
-        jTreeSourceClass.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        jTreeSourceClass.addTreeSelectionListener(new AddInstanceTreeSelectionListener(this));
+        this.treeModel = treeModel;
+        jTreeClass.setModel(treeModel);
+        jTreeClass.setRootVisible(false);
+        jTreeClass.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        jTreeClass.addTreeSelectionListener(new AddInstanceTreeSelectionListener(this));
 
     }
 
@@ -58,7 +58,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         jButtonCancel = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTreeSourceClass = new javax.swing.JTree();
+        jTreeClass = new javax.swing.JTree();
         jLabelExtension = new javax.swing.JLabel();
         jTextFieldExtension = new javax.swing.JTextField();
         chkCompress = new javax.swing.JCheckBox();
@@ -122,8 +122,8 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
 
         jScrollPane1.setName("jScrollPane1"); // NOI18N
 
-        jTreeSourceClass.setName("jTreeSourceClass"); // NOI18N
-        jScrollPane1.setViewportView(jTreeSourceClass);
+        jTreeClass.setName("jTreeClass"); // NOI18N
+        jScrollPane1.setViewportView(jTreeClass);
 
         jLabelExtension.setText(resourceMap.getString("jLabelExtension.text")); // NOI18N
         jLabelExtension.setName("jLabelExtension"); // NOI18N
@@ -214,8 +214,8 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         this.input = new InstanceClass();
         this.fileExtension = jTextFieldExtension.getText();
         
-        if(jTreeSourceClass.getSelectionPath() != null){
-            this.input = (InstanceClass) ((DefaultMutableTreeNode)jTreeSourceClass.getSelectionPath().getLastPathComponent()).getUserObject();
+        if(jTreeClass.getSelectionPath() != null){
+            this.input = (InstanceClass) ((DefaultMutableTreeNode)jTreeClass.getSelectionPath().getLastPathComponent()).getUserObject();
             this.setVisible(false);
         }else{
             if(!chkAutoClass.isSelected()){
@@ -240,8 +240,8 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         try {
-            treeModel = InstanceClassDAO.getSourceAsTree();
-            jTreeSourceClass.setModel(treeModel);
+            treeModel = new DefaultTreeModel(InstanceClassDAO.getAllAsTree());
+            jTreeClass.setModel(treeModel);
         } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this.rootPane,
                     ex.getMessage(),
@@ -260,7 +260,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jTextFieldExtensionActionPerformed
 
     private void jRadioButtonAutomaticActionPerformed(java.awt.event.ActionEvent evt) {                                                      
-       jTreeSourceClass.setSelectionPath(null);
+       jTreeClass.setSelectionPath(null);
     }                                                     
 
     public InstanceClass getInput(){
@@ -278,13 +278,13 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanelButtons;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextFieldExtension;
-    private javax.swing.JTree jTreeSourceClass;
+    private javax.swing.JTree jTreeClass;
     // End of variables declaration//GEN-END:variables
 
     public void refresh() {
          try {
-            treeModel = InstanceClassDAO.getSourceAsTree();
-            jTreeSourceClass.setModel(treeModel);
+            treeModel = new DefaultTreeModel(InstanceClassDAO.getAllAsTree());
+            jTreeClass.setModel(treeModel);
         } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this.rootPane,
                     ex.getMessage(),
