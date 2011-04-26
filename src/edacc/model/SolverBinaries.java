@@ -21,7 +21,7 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
     /**
      * The id of the associated Solver.
      */
-    private int idSolver;
+    private final int idSolver;
 
     /**
      * The name of the binary.
@@ -62,6 +62,10 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
      * The path to the main binary file.
      */
     private String runPath;
+
+    public SolverBinaries(Solver s) {
+        this.idSolver = s.getId();
+    }
 
     /**
      * @return the idSolverBinary
