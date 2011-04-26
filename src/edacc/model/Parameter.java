@@ -7,6 +7,8 @@ public class Parameter extends BaseModel implements IntegerPKModel {
     private String value;
     private int order;
     private boolean hasValue;
+    private boolean mandatory;
+    private boolean space;
 
     public Parameter() {
         super();
@@ -72,5 +74,33 @@ public class Parameter extends BaseModel implements IntegerPKModel {
 
     public void setHasValue(boolean hasValue) {
         this.hasValue = hasValue;
+    }
+
+    /**
+     * @return the mandatory
+     */
+    public boolean isMandatory() {
+        return mandatory;
+    }
+
+    /**
+     * @param mandatory the mandatory to set
+     */
+    public void setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
+    }
+
+    /**
+     * @return the space
+     */
+    public boolean getSpace() {
+        return space;
+    }
+
+    /**
+     * @param space the space to set
+     */
+    public void setSpace(boolean space) {
+        this.space = space;
     }
 }
