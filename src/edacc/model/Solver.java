@@ -127,12 +127,12 @@ public class Solver extends BaseModel implements IntegerPKModel {
         return true;
     }
 
-    @Override
+ /*   @Override
     public int hashCode() {
         int hash = 3;
         hash = 29 * hash + (this.md5 != null ? this.md5.hashCode() : 0);
         return hash;
-    }
+    }*/
 
     @Override
     public String toString() {

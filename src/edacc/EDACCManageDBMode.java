@@ -108,17 +108,17 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             }
         });*/
 
-        // initialize solver table
-        solverTableModel = new SolverTableModel();
-        manageDBSolvers = new ManageDBSolvers(this, solverTableModel);
-        tableSolver.setModel(solverTableModel);
-        tableSolver.setRowSorter(new TableRowSorter<SolverTableModel>(solverTableModel));
-
         // initialize parameter table
         parameterTableModel = new ParameterTableModel();
         manageDBParameters = new ManageDBParameters(this, parameterTableModel);
         tableParameters.setModel(parameterTableModel);
         tableParameters.setRowSorter(new TableRowSorter<ParameterTableModel>(parameterTableModel));
+
+        // initialize solver table
+        solverTableModel = new SolverTableModel();
+        manageDBSolvers = new ManageDBSolvers(this, solverTableModel, manageDBParameters);
+        tableSolver.setModel(solverTableModel);
+        tableSolver.setRowSorter(new TableRowSorter<SolverTableModel>(solverTableModel));
 
         tableSolver.getSelectionModel().addListSelectionListener(new SolverTableSelectionListener(tableSolver, manageDBSolvers));
         tableParameters.getSelectionModel().addListSelectionListener(new ParameterTableSelectionListener(tableParameters, manageDBParameters));
