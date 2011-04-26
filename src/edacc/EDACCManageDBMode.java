@@ -1968,12 +1968,16 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             tfParametersOrder.setText(Integer.toString(currentParameter.getOrder()));
             tfParametersPrefix.setText(currentParameter.getPrefix());
             chkHasNoValue.setSelected(!currentParameter.getHasValue());
+            chkMandatory.setSelected(currentParameter.isMandatory());
+            chkSpace.setSelected(currentParameter.getSpace());
             tfParametersName.getInputVerifier().shouldYieldFocus(tfParametersName);
         } else {
             tfParametersName.setText("");
             tfParametersOrder.setText("");
             tfParametersPrefix.setText("");
             chkHasNoValue.setSelected(false);
+            chkMandatory.setSelected(false);
+            chkSpace.setSelected(false);
             showInvalidParameterNameError(false);
             showInvalidParameterNameError(false);
         }
@@ -1981,6 +1985,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         tfParametersPrefix.setEnabled(enabled);
         tfParametersOrder.setEnabled(enabled);
         chkHasNoValue.setEnabled(enabled);
+        chkMandatory.setEnabled(enabled);
+        chkSpace.setEnabled(enabled);
     }
 
     @Action

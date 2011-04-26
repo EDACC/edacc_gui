@@ -89,9 +89,9 @@ public class ParameterTableModel extends AbstractTableModel{
             case HASVALUE:
                 return p.getHasValue()?"":"\u2713";//p.getHasValue();
             case MANDATORY:
-                return p.isMandatory()?"":"\u2713";
+                return !p.isMandatory()?"":"\u2713";
             case SPACE:
-                return p.getSpace()?"":"\u2713";
+                return !p.getSpace()?"":"\u2713";
         }
         return null;
     }
