@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -27,7 +28,7 @@ public class SolverBinariesDAO {
             return;
         }
 
-        PreparedStatement ps;
+        PreparedStatement ps = null;
 
         if (s.isNew()) {
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(INSERT_QUERY, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -45,6 +46,14 @@ public class SolverBinariesDAO {
             
         } else if (s.isDeleted()) {
             
+        }
+        ps.executeUpdate();
+        if (s.isNew()) {
+            // set id
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                s.setIdSolverBinary(rs.getInt(1));
+            }
         }
     }
 }
