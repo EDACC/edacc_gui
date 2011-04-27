@@ -45,7 +45,8 @@ public class GenerateJobsTableModel extends DefaultTableModel {
         }
         for (SolverConfiguration sc : solverConfigs) {
             for (Instance i : instances) {
-                setNumRuns(i, sc, expController.getExperimentResults().getResults(sc.getId(), i.getId()).size());
+              //  setNumRuns(i, sc, expController.getExperimentResults().getResults(sc.getId(), i.getId()).size());
+                setNumRuns(i, sc, expController.getExperimentResults().getNumRuns(sc.getId(), i.getId()));
             }
         }
         this.fireTableStructureChanged();

@@ -20,9 +20,11 @@ public class ParameterTableModel extends AbstractTableModel{
     private final int NAME = 1;
     private final int PREFIX = 2;
     private final int HASVALUE = 3;
+    private final int MANDATORY = 4;
+    private final int SPACE = 5;
     private Solver currentSolver;
 
-    private String[] colums = {"Order", "Name", "Prefix", "Boolean"};
+    private String[] colums = {"Order", "Name", "Prefix", "Boolean", "Mandatory", "Space"};
     private HashMap<Solver, Vector<Parameter>> parameters;
 
     public ParameterTableModel(){
@@ -86,6 +88,10 @@ public class ParameterTableModel extends AbstractTableModel{
                 return p.getPrefix();
             case HASVALUE:
                 return p.getHasValue()?"":"\u2713";//p.getHasValue();
+            case MANDATORY:
+                return !p.isMandatory()?"":"\u2713";
+            case SPACE:
+                return !p.getSpace()?"":"\u2713";
         }
         return null;
     }

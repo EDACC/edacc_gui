@@ -29,10 +29,12 @@ public class ManageDBSolvers implements Observer {
     private EDACCManageDBMode gui;
     private SolverTableModel solverTableModel;
     private Solver currentSolver;
+    private ManageDBParameters manageDBParameters;
 
-    public ManageDBSolvers(EDACCManageDBMode gui, SolverTableModel solverTableModel) {
+    public ManageDBSolvers(EDACCManageDBMode gui, SolverTableModel solverTableModel, ManageDBParameters manageDBParameters) {
         this.gui = gui;
         this.solverTableModel = solverTableModel;
+        this.manageDBParameters = manageDBParameters;
         DatabaseConnector.getInstance().addObserver(this);
     }
 
@@ -76,8 +78,10 @@ public class ManageDBSolvers implements Observer {
     }
 
     public void newSolver() {
-        solverTableModel.addSolver(new Solver());
+        Solver s = new Solver();
+        solverTableModel.addSolver(s);
         solverTableModel.fireTableDataChanged();
+        manageDBParameters.addDefaultParameters(s);
     }
 
     /**

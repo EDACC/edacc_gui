@@ -92,6 +92,19 @@ public class ManageDBParameters implements Observer {
     }
 
     /**
+     * Adds the default parameter "instance" for Solver s.
+     * In future, this method will maybe add some more default parameters, each
+     * solver should have.
+     * @param s
+     */
+    public void addDefaultParameters(Solver s) {
+        Parameter p = new Parameter();
+        p.setName("instance");
+        p.setPrefix("--instance");
+        parameterTableModel.addParameter(s, p);
+    }
+
+    /**
      * Checks, if a parameter with the given name already exists for the
      * current solver. Won't check the DB for performance reasons!
      * @param name

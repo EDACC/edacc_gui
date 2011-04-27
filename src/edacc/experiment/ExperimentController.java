@@ -1543,7 +1543,7 @@ public class ExperimentController {
             LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
             for (SolverConfiguration sc : solverConfigs) {
                 for (Instance i : instances) {
-                    if (main.generateJobsTableModel.getNumRuns(i, sc) != experimentResultCache.getResults(sc.getId(), i.getId()).size()) {
+                    if (main.generateJobsTableModel.getNumRuns(i, sc) != experimentResultCache.getNumRuns(sc.getId(), i.getId())) {
                         return true;
                     }
                 }
