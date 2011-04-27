@@ -323,7 +323,8 @@ public class ManageDBInstances implements Observer {
                 "Do you really won't to remove the listed instance classes?",
                 new JTable(tableModel))
                 == EDACCExtendedWarning.RET_OK_OPTION) {
-            if (InstanceClassDAO.checkIfEmpty(toRemove)) {
+            Vector<Instance> lastRelated = InstanceClassDAO.checkIfEmpty(toRemove);
+            if (toRemove.isEmpty()) {
                 Vector<InstanceClass> errors = new Vector<InstanceClass>();
                 for (int i = 0; i < toRemove.size(); i++) {
                     try {
@@ -882,6 +883,8 @@ public class ManageDBInstances implements Observer {
         ((InstanceTableModel) tableInstances.getModel()).clearTable();
         TreePath[] selected = main.getInstanceClassTree().getSelectionPaths();
         Vector<InstanceClass> choosen = new Vector<InstanceClass>();
+        if(selected == null)
+            return;
         for (int i = 0; i < selected.length; i++) {
             choosen.addAll(getAllToEnd((DefaultMutableTreeNode) (selected[i].getLastPathComponent())));
             /*  DefaultMutableTreeNode[] nodes = getPath()

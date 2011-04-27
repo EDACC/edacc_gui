@@ -70,7 +70,7 @@ public class InstanceClassDAO {
     public static void delete(InstanceClass i) throws NoConnectionToDBException, SQLException, InstanceSourceClassHasInstance, InstanceIsInExperimentException {
         PreparedStatement ps;
         // Check if the InstanceClass i is the last class of an instance, if true, delete all these instances.
-        Vector<Instance> lastRelated = getLastRelatedInstanceClasses(i);
+        Vector<Instance> lastRelated = InstanceDAO.getLastRelatedInstances(i);
         if(!lastRelated.isEmpty()){
             InstanceDAO.deleteAll(lastRelated);
         }
@@ -287,17 +287,19 @@ public class InstanceClassDAO {
         return root;
     }
 
-    public static boolean checkIfEmpty(Vector<InstanceClass> toRemove) throws SQLException {
+    /**
+     * If the returned vector is empty, the instance classes can be removed.
+     * @param toRemove The instance classes to remove
+     * @return Vector<Instance> which one of the classes to remove are the last related class.
+     * @throws SQLException
+     */
+    public static Vector<Instance> checkIfEmpty(Vector<InstanceClass> toRemove) throws SQLException {
         PreparedStatement ps;
+        Vector<Instance> lastRelated = new Vector<Instance>();
         for (int i = 0; i < toRemove.size(); i++) {
-                ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT name FROM Instances WHERE instanceClass_idinstanceClass = ?");
-                ps.setInt(1, toRemove.get(i).getInstanceClassID());
-                ResultSet rs = ps.executeQuery();
-                if (rs.next()) {
-                    return false;
-                }
+               lastRelated.addAll(InstanceDAO.getLastRelatedInstances(toRemove.get(i)));
         }
-        return true;
+        return lastRelated;
     }
 
  
@@ -385,7 +387,5 @@ public class InstanceClassDAO {
             return null;
     }
 
-    private static Vector<Instance> getLastRelatedInstanceClasses(InstanceClass i) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+
 }

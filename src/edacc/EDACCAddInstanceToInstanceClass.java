@@ -140,7 +140,7 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
 
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
         input = new InstanceClass();
-        if(jTreeClass.getSelectionCount() != 0){
+        if(jTreeClass.getSelectionCount() != 1){
              JOptionPane.showMessageDialog(this,
                     "Select a instance class",
                     "Error",

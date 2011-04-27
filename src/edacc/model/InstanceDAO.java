@@ -187,10 +187,7 @@ public class InstanceDAO {
     public static void save(Instance instance, boolean compressBinary, InstanceClass instanceClass) throws SQLException, FileNotFoundException, IOException {
         PreparedStatement ps;
         if (instance.isNew()) {
-            try {
-                // Add instance to the given InstanceClass
-                InstanceHasInstanceClassDAO.createInstanceHasInstance(instance, instanceClass);
-                
+            try {               
                 // insert query, set ID!
                 // TODO insert instance blob
                 // insert instance into db
@@ -212,13 +209,13 @@ public class InstanceDAO {
                         TaskICodeProgress progress = new TaskICodeProgress(input.length(), "Compressing " + input.getName());
                         Util.sevenZipEncode(fInStream, b.setBinaryStream(1), input.length(), progress);
                         progress.finished();
-                        ps.setBlob(4, b);
+                        ps.setBlob(3, b);
                     } else {
                         ps.setBinaryStream(4, fInStream);
                     }
 
                 } else {
-                    ps.setNull(4, Types.BLOB);
+                    ps.setNull(3, Types.BLOB);
                 }
                 ps.executeUpdate();
 
@@ -233,6 +230,9 @@ public class InstanceDAO {
                 instance.setSaved();
 
                 fInStream.close();
+
+                // Add instance to the given InstanceClass
+                InstanceHasInstanceClassDAO.createInstanceHasInstance(instance, instanceClass);
                 //                output.delete();
                 //input.delete();
             } catch (Exception ex) {
@@ -390,14 +390,12 @@ public class InstanceDAO {
      */
     public static LinkedList<Instance> getAllByInstanceClasses(Vector<InstanceClass> allChoosen) throws NoConnectionToDBException, SQLException {
         if (!allChoosen.isEmpty()) {
-            String query = "SELECT i.idInstance, i.md5, i.name,"
+            String query = "SELECT i.idInstance, i.md5, i.name"
                     + " FROM " + table + " as i "
                     + " LEFT JOIN Instances_has_instanceClass as ii ON i.idInstance = ii.Instances_idInstance "
-                    + " WHERE i.instanceClass_idinstanceClass = " + allChoosen.get(0).getInstanceClassID()
-                    + " OR ii.instanceClass_idinstanceClass = " + allChoosen.get(0).getInstanceClassID();
+                    + " WHERE ii.instanceClass_idinstanceClass = " + allChoosen.get(0).getInstanceClassID();
             for (int i = 1; i < allChoosen.size(); i++) {
-                query += " OR i.instanceClass_idinstanceClass = " + allChoosen.get(i).getInstanceClassID()
-                        + " OR ii.instanceClass_idinstanceClass = " + allChoosen.get(i).getInstanceClassID();
+                query += " OR ii.instanceClass_idinstanceClass = " + allChoosen.get(i).getInstanceClassID();
             }
             Statement st = DatabaseConnector.getInstance().getConn().createStatement();
             ResultSet rs = st.executeQuery(query);
@@ -414,7 +412,6 @@ public class InstanceDAO {
                 i.setId(rs.getInt("i.idInstance"));
                 i.setMd5(rs.getString("i.md5"));
                 i.setName(rs.getString("i.name"));
-                Integer idInstanceClass = rs.getInt("i.instanceClass_idinstanceClass");
                 i.setSaved();
                 cache.cache(i);
                 res.add(i);
@@ -525,5 +522,28 @@ public class InstanceDAO {
             cache.remove(lastRelated.get(i));
             lastRelated.get(i).setDeleted();
         }
+    }
+
+    /**
+     * 
+     * @param i
+     * @return
+     * @throws SQLException
+     */
+    public static Vector<Instance> getLastRelatedInstances(InstanceClass i) throws SQLException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT COUNT(Instances_idInstance) AS sum, Instances_idInstance " +
+                "FROM instances_has_instanceclass as ihi " +
+                "WHERE  instanceClass_idinstanceClass =? " +
+                "GROUP BY Instances_idInstance " +
+                "HAVING sum =1");
+        ps.setInt(1, i.getId());
+        ResultSet rs = ps.executeQuery();
+        Vector<Instance> lastRelated = new Vector<Instance>();
+        while(rs.next()){
+            lastRelated.add(InstanceDAO.getById(rs.getInt("Instances_idInstance")));
+        }
+
+        return lastRelated;
     }
 }

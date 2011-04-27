@@ -76,7 +76,6 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        SourceOrUserClass = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jButtonCancel = new javax.swing.JButton();
         jButtonCreate = new javax.swing.JButton();
@@ -277,12 +276,7 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
         JOptionPane.showMessageDialog(this,
                     "Please enter a instace class name." ,
                     "Error",
-                    JOptionPane.ERROR_MESSAGE);
-       }else if(SourceOrUserClass.getSelection() == null){
-        JOptionPane.showMessageDialog(this,
-                    "Please choos if the new instance class is a source class oder a user class." ,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);       
        }else{
            
                 try {
@@ -367,7 +361,6 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup SourceOrUserClass;
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonCreate;
     private javax.swing.JButton jButtonEdit;
