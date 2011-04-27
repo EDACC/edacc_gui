@@ -298,7 +298,7 @@ public class InstanceDAO {
         // TODO: fix!
         Vector<Property> props = PropertyDAO.getAllInstanceProperties();
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        ResultSet rs = st.executeQuery("SELECT i.idInstance, i.md5, i.name, i.instanceClass_idinstanceClass" + getPropertySelect(props)
+        ResultSet rs = st.executeQuery("SELECT i.idInstance, i.md5, i.name" + getPropertySelect(props)
                 + "FROM " + table + " AS i " + getPropertyFrom(props));
         LinkedList<Instance> res = new LinkedList<Instance>();
         while (rs.next()) {
@@ -532,11 +532,10 @@ public class InstanceDAO {
      */
     public static Vector<Instance> getLastRelatedInstances(InstanceClass i) throws SQLException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT COUNT(Instances_idInstance) AS sum, Instances_idInstance " +
+                "SELECT COUNT(Instances_idInstance) AS sum, Instances_idInstance, instanceClass_idinstanceClass " +
                 "FROM instances_has_instanceclass as ihi " +
-                "WHERE  instanceClass_idinstanceClass =? " +
                 "GROUP BY Instances_idInstance " +
-                "HAVING sum =1");
+                "HAVING sum =1 AND instanceClass_idinstanceClass =?");
         ps.setInt(1, i.getId());
         ResultSet rs = ps.executeQuery();
         Vector<Instance> lastRelated = new Vector<Instance>();

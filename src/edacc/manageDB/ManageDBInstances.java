@@ -11,8 +11,12 @@ import edacc.EDACCExtendedWarning;
 import edacc.EDACCManageDBInstanceFilter;
 import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
+import edacc.experiment.ExperimentTableModel;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
+import edacc.model.Experiment;
+import edacc.model.ExperimentDAO;
+import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.InstanceClassAlreadyInDBException;
 import edacc.model.InstanceNotInDBException;
 import edacc.model.Instance;
@@ -324,7 +328,11 @@ public class ManageDBInstances implements Observer {
                 new JTable(tableModel))
                 == EDACCExtendedWarning.RET_OK_OPTION) {
             Vector<Instance> lastRelated = InstanceClassDAO.checkIfEmpty(toRemove);
-            if (toRemove.isEmpty()) {
+
+            /* Are the instances, related to the classes to remove, related to other class? If not, ask if the instances have to be deleted
+             * else delte the classes
+            */
+            if (lastRelated.isEmpty()) {
                 Vector<InstanceClass> errors = new Vector<InstanceClass>();
                 for (int i = 0; i < toRemove.size(); i++) {
                     try {
@@ -343,13 +351,40 @@ public class ManageDBInstances implements Observer {
                             new JTable(tableModel));
                 }
             } else {
-                EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS,
-                        EDACCApp.getApplication().getMainFrame(),
-                        "A Problem occured by removing the following instance classes.  \n "
-                        + "The selected instance class or one of his Childrens are an source class \n "
-                        + "and is not Empty. Please remove all Instances from the source class before \n "
-                        + "before deleting them.",
-                        new JTable(tableModel));
+                // List the Experiments to which the instances, which are dangered related to and ask to remove these isntances.
+                ExperimentTableModel expTableModel = new ExperimentTableModel();
+                expTableModel.setExperiments(ExperimentHasInstanceDAO.getAllExperimentsByInstances(lastRelated));
+                if (EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
+                EDACCApp.getApplication().getMainFrame(),
+                "If you remove the instance classes, instances used in den following experiments will be deleted too. \n" +
+                        "Do you really want to remove the selected instance classes?",
+                new JTable(expTableModel))
+                == EDACCExtendedWarning.RET_OK_OPTION){
+
+                    //Delete the related instances and instance classes
+                    for(int i = 0; i < lastRelated.size(); i++){
+                        InstanceDAO.delete(lastRelated.get(i));
+                    }
+                    Vector<InstanceClass> errors = new Vector<InstanceClass>();
+                    for (int i = 0; i < toRemove.size(); i++) {
+                        try {
+                            InstanceClassDAO.delete(toRemove.get(i));
+                        } catch (InstanceSourceClassHasInstance ex) {
+                            errors.add(toRemove.get(i));
+                        }
+                    }
+                    loadInstanceClasses();
+                    if (!errors.isEmpty()) {
+                        tableModel = new AddInstanceInstanceClassTableModel();
+                        tableModel.addClasses(errors);
+                        EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS,
+                                EDACCApp.getApplication().getMainFrame(),
+                                "A Problem occured by removing the following instance classes.  \n ",
+                                new JTable(tableModel));
+                    }
+                    
+                }
+                return;
             }
         }
     }

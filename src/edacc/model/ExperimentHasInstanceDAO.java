@@ -111,8 +111,30 @@ public class ExperimentHasInstanceDAO {
         while (rs.next()) {
             res.add(rs.getInt(1));
         }
-
         return res;
+    }
+
+    /**
+     * Returns vector of Experiments Objects, which are related to the given instances.
+     * @param instances The instance objects
+     * @return Vector of experiments
+     * @throws SQLException
+     */
+    public static ArrayList<Experiment> getAllExperimentsByInstances(Vector<Instance> instances) throws SQLException {
+        String query = "SELECT Experiment_idExperiment " +
+                "FROM " + table + " " +
+                "WHERE Instances_idInstance=" + instances.firstElement().getId() + " ";
+        for(int i = 1; i < instances.size(); i++){
+            query += " OR Instances_idInstance=" + instances.firstElement().getId() + " ";
+        }
+        query += " GROUP BY Experiment_idExperiment ORDER BY Experiment_idExperiment;";
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ResultSet rs = st.executeQuery();
+        ArrayList<Experiment> exp = new ArrayList<Experiment>();
+        while (rs.next()) {
+            exp.add(ExperimentDAO.getById(rs.getInt("Experiment_idExperiment")));
+        }
+        return exp;
     }
 
 }
