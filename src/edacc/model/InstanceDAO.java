@@ -211,7 +211,7 @@ public class InstanceDAO {
                         progress.finished();
                         ps.setBlob(3, b);
                     } else {
-                        ps.setBinaryStream(4, fInStream);
+                        ps.setBinaryStream(3, fInStream);
                     }
 
                 } else {
