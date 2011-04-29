@@ -29,17 +29,17 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
     private String binaryName;
 
     /**
-     * The zip archive containing the binaries.
+     * The binary files which will be persisted in the db as zip archive.
      * This is always a reference to the real file system. If the object is NEW
-     * and binaryArchive is NULL, then no binary has been chosen yet by the user.
-     * If the object is SAVED and the binaryArchive is NULL, it hasn't been loaded
+     * and binaryFiles is NULL, then no binary has been chosen yet by the user.
+     * If the object is SAVED and the binaryFiles is NULL, it hasn't been loaded
      * from the db yet. Use the SolverBinariesDAO to do this.
-     * If the object is MODIFIED and the binaryArchive is NULL, there were no changes
-     * concerning the binaryArchive. It is not necessary to save it again. If a value is set,
+     * If the object is MODIFIED and binarFiles is NULL, there were no changes
+     * concerning the binaryFiles. It is not necessary to save it again. If a value is set,
      * it should be persisted to the db by updating the field.
      * The save method in the SolverBinariesDAO will handle the described procedure.
      */
-    private File binaryArchive;
+    private File[] binaryFiles;
 
     /**
      * The md5 sum of the archive.
@@ -65,6 +65,7 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
 
     public SolverBinaries(Solver s) {
         this.idSolver = s.getId();
+        this.setNew();
     }
 
     /**
@@ -159,17 +160,17 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
     }
 
     /**
-     * @return the binaryArchive
+     * @return the binaryFiles
      */
-    public File getBinaryArchive() {
-        return binaryArchive;
+    public File[] getBinaryFiles() {
+        return binaryFiles;
     }
 
     /**
-     * @param binaryArchive the binaryArchive to set
+     * @param binaryFiles the binaryFiles to set
      */
-    public void setBinaryArchive(File binaryArchive) {
-        this.binaryArchive = binaryArchive;
+    public void setBinaryArchive(File[] binaryFiles) {
+        this.binaryFiles = binaryFiles;
     }
 
     @Override

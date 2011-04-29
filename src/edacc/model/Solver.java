@@ -6,27 +6,13 @@ import java.io.File;
 public class Solver extends BaseModel implements IntegerPKModel {
     private int id;
     private String name;
-    private String binaryName;
-    private File binaryFile;
     private String description;
-    private String md5;
     private File[] codeFile;
     private String authors;
     private String version;
     
     public Solver() {
         this.setNew();
-    }
-
-    public String getBinaryName() {
-        return binaryName;
-    }
-
-    public void setBinaryName(String binaryName) {
-        this.binaryName = binaryName;
-        if (this.isSaved()) {
-            this.setModified();
-        }
     }
 
     public String getDescription() {
@@ -71,17 +57,6 @@ public class Solver extends BaseModel implements IntegerPKModel {
         this.id = id;
     }
 
-    public String getMd5() {
-        return md5;
-    }
-
-    public void setMd5(String md5) {
-        this.md5 = md5;
-        if (this.isSaved()) {
-            this.setModified();
-        }
-    }
-
     public String getName() {
         return name;
     }
@@ -90,17 +65,6 @@ public class Solver extends BaseModel implements IntegerPKModel {
         this.name = name;
     }
     
-    protected File getBinaryFile() {
-        return binaryFile;
-    }
-
-    public void setBinaryFile(File binaryFile) {
-        this.binaryFile = binaryFile;
-        if (this.isSaved()) {
-            this.setModified();
-        }
-    }
-
     protected File[] getCodeFile() {
         return codeFile;
     }
@@ -121,10 +85,15 @@ public class Solver extends BaseModel implements IntegerPKModel {
             return false;
         }
         final Solver other = (Solver) obj;
-        if ((this.md5 == null) ? (other.md5 != null) : !this.md5.equals(other.md5)) {
-            return false;
-        }
-        return true;
+        return this.getName().equals(other.getName()) && this.getVersion().equals(other.getVersion());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 17 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 17 * hash + (this.version != null ? this.version.hashCode() : 0);
+        return hash;
     }
 
  /*   @Override

@@ -50,9 +50,9 @@ public class SolverTableModel extends AbstractTableModel {
             case NAME:
                 return s.getName();
             case BINNAME:
-                return s.getBinaryName();
+                return "";//s.getBinaryName();
             case MD5:
-                return s.getMd5();
+                return "";//s.getMd5();
             case DESCRIPTION:
                 return s.getDescription();
             case AUTHORS:

@@ -28,10 +28,9 @@ import java.util.HashMap;
 public class SolverDAO {
 
     protected static final String table = "Solver";
-    protected static final String insertQuery = "INSERT INTO " + table + " (`name`, `binaryName`, `binary`, `description`, `md5`, `code`, `authors`, `version`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    protected static final String updateQueryBin = "UPDATE " + table + " SET `binaryName`=?, `binary`=? WHERE `idSolver`=?";
+    protected static final String insertQuery = "INSERT INTO " + table + " (`name`, `description`, `code`, `authors`, `version`) VALUES (?, ?, ?, ?, ?)";
     protected static final String updateQueryCode = "UPDATE " + table + " SET `code`=? WHERE `idSolver`=?";
-    protected static final String updateQuery = "UPDATE " + table + " SET `name`=?, `description`=?, `md5`=?, `authors`=?, `version`=? WHERE `idSolver`=?";
+    protected static final String updateQuery = "UPDATE " + table + " SET `name`=?, `description`=?, `authors`=?, `version`=? WHERE `idSolver`=?";
     protected static final String removeQuery = "DELETE FROM " + table + " WHERE idSolver=?";
     private static final ObjectCache<Solver> cache = new ObjectCache<Solver>();
 
@@ -48,31 +47,28 @@ public class SolverDAO {
         // new solvers without binary aren't allowed
         if (solver.isNew() && solver.getName().isEmpty())
             throw new NoSolverNameSpecifiedException();
-        if (solver.isNew() && solver.getBinaryFile() == null)
+        if (solver.isNew() && !SolverBinariesModel.getInstance().solverHasBinary(solver))
             throw new NoSolverBinarySpecifiedException();
 
         PreparedStatement ps;
 
         // check for duplicates by MD5 sum
-        boolean alreadyInDB = solverAlreadyInDB(solver) != null;
+        //boolean alreadyInDB = solverAlreadyInDB(solver) != null;
 
         // insert  into db
-        if (solver.isNew() && !alreadyInDB) {
+        if (solver.isNew()) {// && !alreadyInDB) {
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setString(1, solver.getName());
-            ps.setString(2, solver.getBinaryName());
-            ps.setBinaryStream(3, new FileInputStream(solver.getBinaryFile()));
-            ps.setString(4, solver.getDescription());
-            ps.setString(5, solver.getMd5());
+            ps.setString(2, solver.getDescription());
             if (solver.getCodeFile() != null && solver.getCodeFile().length > 0) {
                 // zip up directory
                 ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(solver.getCodeFile());
-                ps.setBinaryStream(6, new ByteArrayInputStream(zipped.toByteArray()));
+                ps.setBinaryStream(3, new ByteArrayInputStream(zipped.toByteArray()));
             }
             else
-                ps.setNull(6, Types.BLOB);
-            ps.setString(7, solver.getAuthors());
-            ps.setString(8, solver.getVersion());
+                ps.setNull(3, Types.BLOB);
+            ps.setString(4, solver.getAuthors());
+            ps.setString(5, solver.getVersion());
             ps.executeUpdate();
         } else {
             // if solver already in DB, then update it
@@ -80,20 +76,11 @@ public class SolverDAO {
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
             ps.setString(1, solver.getName());
             ps.setString(2, solver.getDescription());
-            ps.setString(3, solver.getMd5());
-            ps.setString(4, solver.getAuthors());
-            ps.setString(5, solver.getVersion());
-            ps.setInt(6, solver.getId());
+            ps.setString(3, solver.getAuthors());
+            ps.setString(4, solver.getVersion());
+            ps.setInt(5, solver.getId());
             ps.executeUpdate();
-            // then update the solver binary if necessary
-            if (solver.getBinaryFile() != null) { // if binary is null, don't update the solver binary
-                ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQueryBin);
-                ps.setString(1, solver.getBinaryName());
-                ps.setBinaryStream(2, new FileInputStream(solver.getBinaryFile()));
-                ps.setInt(3, solver.getId());
-                ps.executeUpdate();
-            }
-
+           
             // update the code if necessary
             if (solver.getCodeFile() != null) { // if code is null, don't update the code (at the moment code can't be deleted)
                 ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQueryCode);
@@ -106,15 +93,19 @@ public class SolverDAO {
         }
 
         // set id if solver is new (id is assigned by the db automatically)
-        if (solver.isNew() && !alreadyInDB) {
+        if (solver.isNew()) {// && !alreadyInDB) {
             // set id
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
                 solver.setId(rs.getInt(1));
             }
-        } else if (alreadyInDB) {
+        }/* else if (alreadyInDB) {
             solver.setId(solverAlreadyInDB(solver).getId());
-        }
+        }*/
+
+        // save SolverBinaries
+        for (SolverBinaries b : SolverBinariesModel.getInstance().getBinariesForSolver(solver))
+            SolverBinariesDAO.save(b);
 
         cache.cache(solver);
         solver.setSaved();
@@ -158,9 +149,7 @@ public class SolverDAO {
         Solver i = new Solver();
         i.setId(rs.getInt("idSolver"));
         i.setName(rs.getString("name"));
-        i.setBinaryName(rs.getString("binaryName"));
         i.setDescription(rs.getString("description"));
-        i.setMd5(rs.getString("md5"));
         i.setAuthor(rs.getString("authors"));
         i.setVersion(rs.getString("version"));
         return i;
@@ -196,7 +185,7 @@ public class SolverDAO {
      */
     public static LinkedList<Solver> getAll() throws SQLException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        ResultSet rs = st.executeQuery("SELECT idSolver, name, binaryName, description, md5, authors, version FROM " + table);
+        ResultSet rs = st.executeQuery("SELECT idSolver, name, description, authors, version FROM " + table);
         LinkedList<Solver> res = new LinkedList<Solver>();
         while (rs.next()) {
             Solver c = cache.getCached(rs.getInt("idSolver"));
@@ -221,7 +210,7 @@ public class SolverDAO {
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    public static Solver solverAlreadyInDB(Solver s) throws NoConnectionToDBException, SQLException {
+   /* public static Solver solverAlreadyInDB(Solver s) throws NoConnectionToDBException, SQLException {
         PreparedStatement ps;
         final String Query = "SELECT idSolver, name, binaryName, description, md5, authors, version FROM " + table + " WHERE md5 = ?";
         ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
@@ -241,7 +230,7 @@ public class SolverDAO {
             }
         }
         return null;
-    }
+    }*/
 
     private static boolean isInExperiment(Solver solver) throws NoConnectionToDBException, SQLException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
@@ -257,7 +246,7 @@ public class SolverDAO {
      * @param f the file where the binary shall be stored
      * @return
      */
-    public static void getBinaryFileOfSolver(Solver s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+  /*  public static void getBinaryFileOfSolver(Solver s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `binary` FROM " + table + " WHERE idSolver=?");
         ps.setInt(1, s.getId());
         ResultSet rs = ps.executeQuery();
@@ -272,7 +261,7 @@ public class SolverDAO {
             out.close();
             in.close();
         }
-    }
+    }*/
 
     /**
      * Copies the binary file of a solver to a temporary location on the file system
@@ -284,13 +273,13 @@ public class SolverDAO {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public static File getBinaryFileOfSolver(Solver s) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
+  /*  public static File getBinaryFileOfSolver(Solver s) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
         File f = new File("tmp" + System.getProperty("file.separator") + s.getBinaryName());
         // create missing direcotries
         f.getParentFile().mkdirs();
         getBinaryFileOfSolver(s, f);
         return f;
-    }
+    }*/
 
     /**
      * Exports the code of the solver s to the directory specified by f
