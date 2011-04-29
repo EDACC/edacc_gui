@@ -115,9 +115,9 @@ public class SolverTableModel extends AbstractTableModel {
             case 1:
                 return solvers.get(rowIndex).getVersion();
             case 2:
-                return solvers.get(rowIndex).getBinaryName();
+                return "";//solvers.get(rowIndex).getBinaryName();
             case 3:
-                return solvers.get(rowIndex).getMd5();
+                return "";//solvers.get(rowIndex).getMd5();
             case 4:
                 return solvers.get(rowIndex).getDescription();
             case 5:

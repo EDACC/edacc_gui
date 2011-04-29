@@ -777,7 +777,7 @@ public class ExperimentController {
             int done = 0;
 
 
-            HashSet<String> tmp = new HashSet<String>();
+           /* TODO !!!! HashSet<String> tmp = new HashSet<String>();
             HashSet<String> solvernameMap = new HashSet<String>();
             for (Solver s : solvers) {
                 if (tmp.contains(s.getBinaryName() + "_" + s.getVersion())) {
@@ -786,7 +786,7 @@ public class ExperimentController {
                 } else {
                     tmp.add(s.getBinaryName() + "_" + s.getVersion());
                 }
-            }
+            }*/
 
             if (!task.isCancelled() && exportSolvers) {
                 // add solvers to zip file
@@ -798,7 +798,7 @@ public class ExperimentController {
                         break;
                     }
                     task.setStatus("Writing solver " + done + " of " + solvers.size());
-                    File bin = SolverDAO.getBinaryFileOfSolver(s);
+              /* TODO     File bin = SolverDAO.getBinaryFileOfSolver(s);
                     String filename;
                     if (solvernameMap.contains(s.getBinaryName())) {
                         filename = s.getBinaryName() + "_" + s.getVersion() + "_" + s.getMd5().substring(0, 3);
@@ -806,7 +806,7 @@ public class ExperimentController {
                         filename = s.getBinaryName() + "_" + s.getVersion();
                     }
                     entry = new ZipEntry("solvers" + System.getProperty("file.separator") + filename);
-                    addFileToZIP(bin, entry, zos);
+                    addFileToZIP(bin, entry, zos);*/
                 }
             }
 
