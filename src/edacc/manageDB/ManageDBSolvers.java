@@ -10,8 +10,12 @@ import edacc.EDACCManageDBMode;
 import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Solver;
+import edacc.model.SolverBinaries;
+import edacc.model.SolverBinariesModel;
 import edacc.model.SolverDAO;
 import edacc.model.SolverNotInDBException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Observable;
 import java.util.Observer;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  *
@@ -96,19 +101,22 @@ public class ManageDBSolvers implements Observer {
         gui.showSolverDetails(currentSolver);
     }
 
-    public void addSolverBinary(File binary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException, SolverAlreadyInDBException {
-        if (!binary.exists()) {
-            throw new FileNotFoundException("Couldn't find file \"" + binary.getName() + "\".");
-        }
-        currentSolver.setBinaryFile(binary);
-        currentSolver.setBinaryName(binary.getName());
-        currentSolver.setMd5(Util.calculateMD5(binary));
-        if (SolverDAO.solverAlreadyInDB(currentSolver) != null) {
+    public void addSolverBinary(File[] binary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException, SolverAlreadyInDBException {
+        if (binary.length == 0)
+            return;
+        SolverBinaries b = new SolverBinaries(currentSolver);
+        b.setBinaryArchive(binary);
+        b.setBinaryName(binary[0].getName()); // TODO ändern
+        // TODO beim SPeichern wird momentan ein zweites Mal gezippt -> zwischenspeichern vom Stream!!
+        ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(binary);
+        b.setMd5(Util.calculateMD5(new ByteArrayInputStream(zipped.toByteArray())));
+        SolverBinariesModel.getInstance().addSolverBinariesForSolver(currentSolver, b);
+        /*if (SolverDAO.solverAlreadyInDB(currentSolver) != null) {
             currentSolver.setBinaryFile(null);
             currentSolver.setBinaryName(null);
             currentSolver.setMd5(null);
             throw new SolverAlreadyInDBException();
-        }
+        }*/
     }
 
     public void addSolverCode(File[] code) throws FileNotFoundException {
@@ -152,14 +160,15 @@ public class ManageDBSolvers implements Observer {
      * the binaryName field of the solver will be used as filename.
      */
     public void exportSolver(Solver s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException, MD5CheckFailedException {
-        if (f.isDirectory()) {
+       throw new NotImplementedException();
+        /* TODO Implement if (f.isDirectory()) {
             f = new File(f.getAbsolutePath() + System.getProperty("file.separator") + s.getBinaryName());
         }
         SolverDAO.getBinaryFileOfSolver(s, f);
         String md5File = Util.calculateMD5(f);
         if (!md5File.equals(s.getMd5())) {
             throw new MD5CheckFailedException("The exported solver binary of solver \"" + s.getName() + "\" seems to be corrupt!");
-        }
+        }*/
     }
 
     /** Exports the code of a solver.
