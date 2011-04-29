@@ -53,7 +53,6 @@ public class InstanceDAO {
         i.setId(rs.getInt("idInstance"));
         i.setMd5(rs.getString("md5"));
         i.setName(rs.getString("name"));
-        Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
         i.setPropertyValues(new HashMap<Integer, InstanceHasProperty>());
         for (int prop = 0; prop < props.size(); prop++) {
             i.getPropertyValues().put(props.get(prop).getId(), new InstanceHasProperty(i, props.get(prop), rs.getString("tbl_" + prop + ".value")));
@@ -320,7 +319,7 @@ public class InstanceDAO {
         // TODO: fix!
         Vector<Property> props = new Vector<Property>();//InstancePropertyManager.getInstance().getAll();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT DISTINCT i.idInstance, i.md5, i.name, i.instanceClass_idinstanceClass" + getPropertySelect(props)
+                "SELECT DISTINCT i.idInstance, i.md5, i.name" + getPropertySelect(props)
                 + "FROM " + table + " as i JOIN Experiment_has_Instances as ei ON "
                 + "i.idInstance = ei.Instances_idInstance " + getPropertyFrom(props) + " WHERE ei.Experiment_idExperiment = ?");
         st.setInt(1, id);
