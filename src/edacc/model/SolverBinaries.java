@@ -64,7 +64,11 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
     private String runPath;
 
     public SolverBinaries(Solver s) {
-        this.idSolver = s.getId();
+        this (s.getId());
+    }
+
+    public SolverBinaries(int idSolver) {
+        this.idSolver = idSolver;
         this.setNew();
     }
 
@@ -78,7 +82,7 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
     /**
      * @param idSolverBinary the idSolverBinary to set
      */
-    public void setIdSolverBinary(int idSolverBinary) {
+    protected void setIdSolverBinary(int idSolverBinary) {
         this.idSolverBinary = idSolverBinary;
     }
 

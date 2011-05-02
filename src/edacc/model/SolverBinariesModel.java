@@ -5,6 +5,7 @@
 
 package edacc.model;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -17,11 +18,16 @@ public class SolverBinariesModel {
     private static SolverBinariesModel instance;
     private HashMap<Solver, LinkedList<SolverBinaries>> binaries;
 
-    public SolverBinariesModel() {
+    public SolverBinariesModel() throws SQLException {
         this.binaries = new HashMap<Solver, LinkedList<SolverBinaries>>();
+        // Load all Binaries from DB
+        LinkedList<Solver> solvers = SolverDAO.getAll();
+        for (Solver s : solvers) {
+            binaries.put(s, new LinkedList<SolverBinaries>(SolverBinariesDAO.getBinariesOfSolver(s)));
+        }
     }
 
-    public static SolverBinariesModel getInstance() {
+    public static SolverBinariesModel getInstance() throws SQLException {
         if (instance == null)
             instance = new SolverBinariesModel();
         return instance;
