@@ -113,7 +113,7 @@ public class EDACCResultsBrowserColumnSelection extends javax.swing.JDialog {
         pnlBasicColumns.setLayout(pnlBasicColumnsLayout);
         pnlBasicColumnsLayout.setHorizontalGroup(
             pnlBasicColumnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 318, Short.MAX_VALUE)
+            .addGap(0, 297, Short.MAX_VALUE)
         );
         pnlBasicColumnsLayout.setVerticalGroup(
             pnlBasicColumnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -135,7 +135,7 @@ public class EDACCResultsBrowserColumnSelection extends javax.swing.JDialog {
         pnlResultPropertyColumns.setLayout(pnlResultPropertyColumnsLayout);
         pnlResultPropertyColumnsLayout.setHorizontalGroup(
             pnlResultPropertyColumnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 318, Short.MAX_VALUE)
+            .addGap(0, 297, Short.MAX_VALUE)
         );
         pnlResultPropertyColumnsLayout.setVerticalGroup(
             pnlResultPropertyColumnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -157,11 +157,11 @@ public class EDACCResultsBrowserColumnSelection extends javax.swing.JDialog {
         pnlInstancePropertyColumns.setLayout(pnlInstancePropertyColumnsLayout);
         pnlInstancePropertyColumnsLayout.setHorizontalGroup(
             pnlInstancePropertyColumnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 318, Short.MAX_VALUE)
+            .addGap(0, 297, Short.MAX_VALUE)
         );
         pnlInstancePropertyColumnsLayout.setVerticalGroup(
             pnlInstancePropertyColumnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 210, Short.MAX_VALUE)
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();

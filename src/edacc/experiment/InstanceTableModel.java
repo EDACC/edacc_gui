@@ -10,6 +10,7 @@ import edacc.model.PropertyDAO;
 import edacc.satinstances.ConvertException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.Icon;
 import javax.swing.table.AbstractTableModel;
 import java.util.Vector;
 
@@ -25,6 +26,10 @@ public class InstanceTableModel extends AbstractTableModel {
     public static int COL_PROP = 2;
     private static final String[] columns_competition = {"Name", "Benchmark Type", "selected"};
     private static final String[] columns_noCompetition = {"Name", "selected"};
+
+    public static Icon[] getAllColumnNames() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
     private String[] columns = columns_noCompetition;
     ArrayList<Property> properties;
     protected ArrayList<Instance> instances;
@@ -263,5 +268,9 @@ public class InstanceTableModel extends AbstractTableModel {
                 return null;
             }
         }
+    }
+
+    public boolean[] getColumnVisibility() {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }
