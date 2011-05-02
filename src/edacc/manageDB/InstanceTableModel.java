@@ -2,10 +2,17 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package edacc.manageDB;
 
 import edacc.model.Instance;
+import edacc.model.InstanceDAO;
+import edacc.model.InstanceHasProperty;
+import edacc.model.InstanceHasPropertyDAO;
+import edacc.model.Property;
+import edacc.model.PropertyDAO;
+import edacc.model.PropertyType;
+import edacc.satinstances.ConvertException;
+import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 
@@ -13,16 +20,34 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author rretz
  */
-public class InstanceTableModel extends AbstractTableModel{
-    private String[] columns = {"Name", "MD5"};
+public class InstanceTableModel extends AbstractTableModel {
+
+    public static final int COL_PROPERTY = 2;
+    private boolean[] visible;
+    private ArrayList<Property> properties;
+    private String[] CONST_COLUMNS = {"Name", "MD5"};
+    private boolean[] CONST_VISIBLE = {true, true};
+    private static String[] columns;
     protected Vector<Instance> instances;
 
-    public InstanceTableModel(){
-        this.instances = new Vector<Instance>();
+    public static String[] getAllColumnNames() {
+        return columns;
     }
 
-    public boolean isEmpty(){
-        if(instances.isEmpty()) return true;
+    public InstanceTableModel() {
+        this.instances = new Vector<Instance>();
+        columns = new String[CONST_COLUMNS.length];
+        visible = new boolean[columns.length];
+        for (int i = 0; i < columns.length; i++) {
+            columns[i] = CONST_COLUMNS[i];
+            visible[i] = CONST_VISIBLE[i];
+        }
+    }
+
+    public boolean isEmpty() {
+        if (instances.isEmpty()) {
+            return true;
+        }
         return false;
     }
 
@@ -30,48 +55,58 @@ public class InstanceTableModel extends AbstractTableModel{
         return instances;
     }
 
-    public void addInstances(Vector<Instance> instances){
-        for(int i = 0; i < instances.size(); i++){
+    public void addInstances(Vector<Instance> instances) {
+        for (int i = 0; i < instances.size(); i++) {
             addInstance(instances.get(i));
         }
     }
 
-    private void addInstance(Instance in){
-        if(!instances.contains(in))
+    private void addInstance(Instance in) {
+        if (!instances.contains(in)) {
             instances.add(in);
+        }
     }
 
-    public void clearTable(){
+    public void clearTable() {
         instances.removeAllElements();
     }
 
-    public void remove(Instance instance){
+    public void remove(Instance instance) {
         instances.remove(instance);
     }
 
-    public void removeInstances(Vector<Instance> instances){
+    public void removeInstances(Vector<Instance> instances) {
         this.instances.removeAll(instances);
     }
 
+    @Override
     public int getRowCount() {
         return instances.size();
     }
 
+    @Override
     public int getColumnCount() {
-        return columns.length;
+        int res = 0;
+        for (int i = 0; i < visible.length; i++) {
+            if (visible[i]) {
+                res++;
+            }
+        }
+        return res;
     }
 
-      @Override
+    @Override
     public String getColumnName(int col) {
         return columns[col];
     }
 
     @Override
     public Class getColumnClass(int col) {
-        if (this.getRowCount() == 0)
+        if (this.getRowCount() == 0) {
             return this.getClass();
-        else
+        } else {
             return getValueAt(0, col).getClass();
+        }
     }
 
     /**
@@ -80,18 +115,107 @@ public class InstanceTableModel extends AbstractTableModel{
      * @param columnIndex 
      * @return the Object from the choosen cell; return == "" when columnIndex is out of columnRange
      */
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-         switch (columnIndex) {
+                if (columnIndex != -1) {
+            columnIndex = getIndexForColumn(columnIndex);
+        }
+
+        switch (columnIndex) {
             case 0:
                 return instances.get(rowIndex).getName();
             case 1:
                 return instances.get(rowIndex).getMd5();
             default:
-                return "";
+                int propertyIdx = columnIndex - COL_PROPERTY;
+                Property prop = properties.get(propertyIdx);
+                if (prop.getType().equals(PropertyType.InstanceProperty)) {
+                    InstanceHasProperty ihp = null;
+                    try {
+                        ihp = InstanceHasPropertyDAO.getByInstanceAndProperty(instances.get(rowIndex), prop);
+                    } catch (Exception e) {
+                    }
+                    if (ihp == null) {
+                        return null;
+                    } else {
+                        try {
+                            return prop.getPropertyValueType().getJavaTypeRepresentation(ihp.getValue());
+                        } catch (ConvertException ex) {
+                            return "";
+                        }
+                    }
+                } else {
+                    return "";
+                }
         }
     }
 
-    public Instance getInstance(int rowIndex){
+    public Instance getInstance(int rowIndex) {
         return instances.elementAt(rowIndex);
+    }
+
+    public boolean[] getColumnVisibility() {
+        return visible;
+    }
+
+    public void setColumnVisibility(boolean[] visibility, boolean updateTable) {
+        if (columns.length != visible.length) {
+            return;
+        }
+        this.visible = visibility;
+        if (updateTable) {
+            this.fireTableStructureChanged();
+        }
+    }
+
+    public void updateProperties() {
+        ArrayList<Property> tmp = new ArrayList<Property>();
+        try {
+            tmp.addAll(PropertyDAO.getAllInstanceProperties());
+        } catch (Exception e) {
+            if (edacc.ErrorLogger.DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        if (!tmp.equals(properties)) {
+            properties = tmp;
+
+            for (int i = properties.size() - 1; i >= 0; i--) {
+                if (properties.get(i).isMultiple()) {
+                    properties.remove(i);
+                }
+            }
+            columns = java.util.Arrays.copyOf(columns, CONST_COLUMNS.length + properties.size());
+            visible = java.util.Arrays.copyOf(visible, CONST_VISIBLE.length + properties.size());
+            int j = 0;
+            for (int i = CONST_COLUMNS.length; i < columns.length; i++) {
+                columns[i] = properties.get(j).getName();
+                j++;
+            }
+            this.resetColumnVisibility();
+            this.fireTableStructureChanged();
+        }
+
+
+    }
+
+    public void resetColumnVisibility() {
+        System.arraycopy(CONST_VISIBLE, 0, visible, 0, CONST_VISIBLE.length);
+        for (int i = CONST_VISIBLE.length; i < visible.length; i++) {
+            visible[i] = false;
+        }
+        fireTableStructureChanged();
+    }
+
+    private int getIndexForColumn(int columnIndex) {
+         for (int i = 0; i < visible.length; i++) {
+            if (visible[i]) {
+                columnIndex--;
+            }
+            if (columnIndex == -1) {
+                return i;
+            }
+        }
+        return 0;
     }
 }
