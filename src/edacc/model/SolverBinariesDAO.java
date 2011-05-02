@@ -98,4 +98,45 @@ public class SolverBinariesDAO {
         rs.close();
         return res;
     }
+
+    public static Vector<SolverBinaries> getAll() throws SQLException {
+        final String query = "SELECT * FROM " + TABLE;
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ResultSet rs = ps.executeQuery();
+        Vector<SolverBinaries> res = new Vector<SolverBinaries>();
+        while (rs.next()) {
+            SolverBinaries c = cache.getCached(rs.getInt("idSolverBinary"));
+            if (c != null)
+                res.add(c);
+            else {
+                SolverBinaries b = getSolverBinaryFromResultSet(rs);
+                cache.cache(b);
+                res.add(b);
+                b.setSaved();
+            }
+        }
+        rs.close();
+        return res;
+    }
+
+    public static SolverBinaries getById(int id) throws SQLException {
+        final String query = "SELECT * FROM " + TABLE + " WHERE idSolverBinary=?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        SolverBinaries res = null;
+        if (rs.next()) {
+            SolverBinaries c = cache.getCached(rs.getInt("idSolverBinary"));
+            if (c != null)
+                res = c;
+            else {
+                SolverBinaries b = getSolverBinaryFromResultSet(rs);
+                cache.cache(b);
+                res = b;
+                b.setSaved();
+            }
+        }
+        rs.close();
+        return res;
+    }
 }
