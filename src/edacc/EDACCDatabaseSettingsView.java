@@ -136,11 +136,6 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         txtDatabase.setText(resourceMap.getString("txtDatabase.text")); // NOI18N
         txtDatabase.setToolTipText(resourceMap.getString("txtDatabase.toolTipText")); // NOI18N
         txtDatabase.setName("txtDatabase"); // NOI18N
-        txtDatabase.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtDatabaseActionPerformed(evt);
-            }
-        });
         txtDatabase.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtDatabaseKeyPressed(evt);
@@ -432,10 +427,6 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         }
 
     }//GEN-LAST:event_btnCancelKeyPressed
-
-    private void txtDatabaseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDatabaseActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtDatabaseActionPerformed
 
     private void txtMaxConnectionsKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMaxConnectionsKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) // connect to DB

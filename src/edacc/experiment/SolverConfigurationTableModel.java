@@ -1,7 +1,5 @@
 package edacc.experiment;
 
-import edacc.model.Parameter;
-import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstance;
 import edacc.model.ParameterInstanceDAO;
 import edacc.model.SolverConfiguration;
@@ -9,8 +7,6 @@ import edacc.model.SolverDAO;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -73,7 +69,7 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
                 return selected[rowIndex];
             case COL_SOLVER:
                 try {
-                    return SolverDAO.getById(solverConfigurations.get(rowIndex).getSolver_id()).getName();
+                    return SolverDAO.getById(solverConfigurations.get(rowIndex).getSolverBinary().getIdSolver()).getName();
                 } catch (SQLException ex) {
                     return "-";
                 }
@@ -87,7 +83,7 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        if (solverConfigurations == null || solverConfigurations.size() == 0) {
+        if (solverConfigurations == null || solverConfigurations.isEmpty()) {
             return String.class;
         } else {
             return getValueAt(0, columnIndex).getClass();

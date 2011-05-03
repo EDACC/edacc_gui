@@ -9,7 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.Vector;
 
 /**
@@ -122,7 +124,7 @@ public class InstanceHasInstanceClassDAO {
 
      private static Vector<InstanceHasInstanceClass> getInstanceHasInstanceClassByInstanceId(int id) throws SQLException, InstanceClassMustBeSourceException {
         Vector<InstanceHasInstanceClass> res = new Vector<InstanceHasInstanceClass>();
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE instanceClass_idinstanceClass=?");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Instances_idInstance=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
@@ -217,5 +219,18 @@ public class InstanceHasInstanceClassDAO {
                 instanceClasses.add(InstanceClassDAO.getById(rsUser.getInt("instanceClass_idinstanceClass")));
         }
         return instanceClasses;
+    }
+     
+     
+    public static void fillInstanceClassIds(HashMap<Instance, LinkedList<Integer>> instanceClassIds) throws SQLException {
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM " + table);
+        while (rs.next()) {
+            InstanceHasInstanceClass i = getInstanceHasInstanceClassFromResultset(rs);
+            LinkedList<Integer> classes = instanceClassIds.get(i.getInstance());
+            if (classes != null) {
+                classes.add(i.getInstanceClass().getId());
+            }
+        }
     }
 }

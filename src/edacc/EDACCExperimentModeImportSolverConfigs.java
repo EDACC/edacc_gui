@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * EDACCExperimentModeImportSolverConfigs.java
  *
  * Created on 05.04.2011, 15:56:17
@@ -18,8 +13,6 @@ import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 

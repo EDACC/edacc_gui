@@ -43,6 +43,7 @@ public class PlotPanel extends JPanel {
         pointInformations = new ArrayList<PointInformation>();
         gdc = new GDCanvas(0, 0) {
 
+            @Override
             public void paint(final Graphics g) {
                 // this fixes a bug with the plot
                 Rectangle rect = g.getClipBounds();

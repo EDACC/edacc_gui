@@ -32,7 +32,11 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
         for (int i = 0; i < parameters.size(); i++) {
             this.parameters[i] = parameters.get(i);
             this.values[i] = parameters.get(i).getValue() == null ? "" : parameters.get(i).getValue();
-            this.selected[i] = false;
+            if (parameters.get(i).isMandatory()) {
+                this.selected[i] = true;
+            } else {
+                this.selected[i] = false;
+            }
             this.parameterInstances[i] = null;
         }
         this.fireTableDataChanged();
@@ -109,7 +113,7 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
     @Override
     public boolean isCellEditable(int row, int col) {
         if (col == 0) {
-            return true;
+            return !parameters[row].isMandatory();
         }
         if (col == 3 && parameters[row].getHasValue()) {
             return selected[row];

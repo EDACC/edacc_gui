@@ -1,12 +1,14 @@
 package edacc.model;
 
 public class SolverConfiguration extends BaseModel implements IntegerPKModel {
-    private int solver_id;
+
+    private SolverBinaries solverBinary;
     private int experiment_id;
     private int id;
     private int seed_group;
     private int idx;
     private String name;
+
     public int getSeed_group() {
         return seed_group;
     }
@@ -38,17 +40,17 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
         this.id = id;
     }
 
-    public int getSolver_id() {
-        return solver_id;
+    public SolverBinaries getSolverBinary() {
+        return solverBinary;
     }
 
-    public void setSolver_id(int solver_id) {
-        this.solver_id = solver_id;
+    public void setSolverBinary(SolverBinaries solverBinary) {
+        this.solverBinary = solverBinary;
         if (this.isSaved()) {
             this.setModified();
         }
     }
-
+    
     public String getName() {
         return name;
     }
@@ -71,12 +73,8 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
         this.idx = idx;
     }
 
-
-
     @Override
     public String toString() {
         return name;
     }
-
-
 }

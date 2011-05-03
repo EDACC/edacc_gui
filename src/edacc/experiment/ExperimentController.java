@@ -63,7 +63,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
@@ -297,7 +296,8 @@ public class ExperimentController {
                     invalidSeedGroup = true;
                 }
                 if (entry.getSolverConfiguration() == null) {
-                    entry.setSolverConfiguration(SolverConfigurationDAO.createSolverConfiguration(entry.getSolverId(), activeExperiment.getId(), seed_group, entry.getTitle(), idx));
+                    // TODO: what if there are no solver binaries?!!
+                    entry.setSolverConfiguration(SolverConfigurationDAO.createSolverConfiguration(entry.getSolverBinary(), activeExperiment.getId(), seed_group, entry.getTitle(), idx));
                 } else {
                     entry.getSolverConfiguration().setName(entry.getTitle());
                     entry.getSolverConfiguration().setSeed_group(seed_group);

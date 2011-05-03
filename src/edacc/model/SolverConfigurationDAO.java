@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edacc.model;
 
 import java.sql.PreparedStatement;
@@ -18,14 +14,14 @@ public class SolverConfigurationDAO {
 
     private static final String table = "SolverConfig";
     private static final String deleteQuery = "DELETE FROM " + table + " WHERE idSolverConfig=?";
-    private static final String insertQuery = "INSERT INTO " + table + " (Solver_IdSolver, Experiment_IdExperiment, seed_group, name, idx) VALUES (?,?,?,?,?)";
+    private static final String insertQuery = "INSERT INTO " + table + " (SolverBinaries_IdSolverBinaries, Experiment_IdExperiment, seed_group, name, idx) VALUES (?,?,?,?,?)";
     private static final String updateQuery = "UPDATE " + table + " SET seed_group=?, name=?, idx=? WHERE idSolverConfig=?";
     public static ObjectCache<SolverConfiguration> cache = new ObjectCache<SolverConfiguration>();
 
     private static SolverConfiguration getSolverConfigurationFromResultset(ResultSet rs) throws SQLException {
         SolverConfiguration i = new SolverConfiguration();
         i.setExperiment_id(rs.getInt("Experiment_idExperiment"));
-        i.setSolver_id(rs.getInt("Solver_IdSolver"));
+        // TODO: set solver binary
         i.setId(rs.getInt("IdSolverConfig"));
         i.setSeed_group(rs.getInt("seed_group"));
         i.setName(rs.getString("name"));
@@ -41,7 +37,7 @@ public class SolverConfigurationDAO {
             st.executeUpdate();
         } else if (i.isNew()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
-            st.setInt(1, i.getSolver_id());
+            st.setInt(1, i.getSolverBinary().getId());
             st.setInt(2, i.getExperiment_id());
             st.setInt(3, i.getSeed_group());
             st.setString(4, i.getName());
@@ -76,9 +72,9 @@ public class SolverConfigurationDAO {
         solverConfig.setDeleted();
     }
 
-    public static SolverConfiguration createSolverConfiguration(int solverId, int experimentId, int seed_group, String name, int idx) throws SQLException {
+    public static SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int experimentId, int seed_group, String name, int idx) throws SQLException {
         SolverConfiguration i = new SolverConfiguration();
-        i.setSolver_id(solverId);
+        i.setSolverBinary(solverBinary);
         i.setExperiment_id(experimentId);
         i.setSeed_group(seed_group);
         i.setName(name);
@@ -90,7 +86,8 @@ public class SolverConfigurationDAO {
 
     public static ArrayList<SolverConfiguration> getSolverConfigurationByExperimentId(int experimentId) throws SQLException {
         ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Experiment_IdExperiment=? ORDER BY Solver_IdSolver,idx");
+        // TODO: was ordered by solver id, has it to be ordered by solver id?
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Experiment_IdExperiment=? ORDER BY idx");
         st.setInt(1, experimentId);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
@@ -126,18 +123,6 @@ public class SolverConfigurationDAO {
         }
         rs.close();
         return null;
-    }
-
-    public static int getSolverConfigurationCount(int expId, int solverId) throws NoConnectionToDBException, SQLException {
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT count(*) FROM " + table + " WHERE Experiment_idExperiment=? AND Solver_idSolver=?");
-        st.setInt(1, expId);
-        st.setInt(2, solverId);
-        ResultSet rs = st.executeQuery();
-        if (rs.next()) {
-            return rs.getInt(1);
-        } else {
-            return 0;
-        }
     }
 
     /**

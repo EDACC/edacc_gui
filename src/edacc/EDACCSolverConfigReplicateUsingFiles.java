@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * EDACCSolverConfigReplicateUsingFile.java
  *
  * Created on 16.02.2011, 12:25:58

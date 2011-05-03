@@ -4,12 +4,17 @@ import edacc.model.DatabaseConnector;
 import edacc.model.ExperimentHasInstance;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
+import edacc.model.InstanceHasInstanceClassDAO;
 import edacc.model.InstanceHasProperty;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
 import edacc.satinstances.ConvertException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Icon;
 import javax.swing.table.AbstractTableModel;
 import java.util.Vector;
@@ -37,6 +42,7 @@ public class InstanceTableModel extends AbstractTableModel {
     protected HashMap<Integer, ExperimentHasInstance> selectedInstances;
     protected Vector<ExperimentHasInstance> savedExperimentInstances;
     protected String[] benchmarkTypes;
+    protected HashMap<Instance, LinkedList<Integer>> instanceClassIds;
 
     public void setInstances(ArrayList<Instance> instances) {
         boolean isCompetition;
@@ -75,7 +81,23 @@ public class InstanceTableModel extends AbstractTableModel {
             }
 
         }
+        
+        instanceClassIds = new HashMap<Instance, LinkedList<Integer>>();
+        for (Instance i : instances) {
+            instanceClassIds.put(i, new LinkedList<Integer>());
+        }
+        try {
+            InstanceHasInstanceClassDAO.fillInstanceClassIds(instanceClassIds);
+        } catch (SQLException ex) {
+            // TODO: error
+        }
+        
         this.fireTableStructureChanged();
+    }
+    
+    public LinkedList<Integer> getInstanceClassIdsForRow(int rowIndex) {
+        LinkedList<Integer> res = instanceClassIds.get(instances.get(rowIndex));
+        return res == null ? new LinkedList<Integer>() : res;
     }
 
     private void updateProperties() {

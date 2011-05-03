@@ -2,6 +2,7 @@ package edacc;
 
 import edacc.experiment.InstanceTableModel;
 import java.util.HashSet;
+import java.util.LinkedList;
 import javax.swing.JTable;
 import javax.swing.RowFilter.Entry;
 
@@ -34,11 +35,16 @@ public class EDACCInstanceFilter extends EDACCFilter {
 
     @Override
     public boolean include(Entry<? extends Object, ? extends Object> entry) {
-      /*  int instanceClassId = model.getInstanceAt((Integer) entry.getIdentifier()).getInstanceClass().getId();
-        int instanceClassId = -10;
-        if (filterInstanceClasses && !instanceClassIds.contains(instanceClassId)) {
-            return false;
-        }*/
+        LinkedList<Integer> classIds = model.getInstanceClassIdsForRow((Integer) entry.getIdentifier());
+        if (filterInstanceClasses) {
+            boolean res = false;
+            for (Integer id : classIds) {
+                if (instanceClassIds.contains(id)) {
+                    res = true;
+                }
+            }
+            if (!res) return false;
+        }
         return super.include(entry);
     }
 

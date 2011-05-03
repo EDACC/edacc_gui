@@ -30,6 +30,7 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
     private Plot plot;
 
     /** Creates new form AnalysisBottomPanel */
+    @SuppressWarnings("LeakingThisInConstructor")
     public AnalysisBottomPanel(AnalysisPanel analysisPanel) {
         initComponents();
         this.analysisPanel = analysisPanel;
@@ -185,7 +186,6 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
 
     @Override
     public void onTaskFailed(String methodName, Throwable e) {
-        e.printStackTrace();
         if ("plot".equals(methodName)) {
             if (e instanceof DependencyException) {
                 javax.swing.JOptionPane.showMessageDialog(EDACCPlotTabView.getMainTabView(), e.getMessage(), "Invalid input", javax.swing.JOptionPane.ERROR_MESSAGE);

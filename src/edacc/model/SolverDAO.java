@@ -113,7 +113,6 @@ public class SolverDAO {
 
     /**
      * Removes a solver from DB and cache. It also ensures that all parameters of a solver are deleted.
-     * TODO delete SolverCOnfigs??
      * @param solver the solver to remove.
      * @throws SQLException if an error occurs while executing the SQL query.
      * @throws SolverIsInExperimentException if the solver is used in an experiment. In this case you have to remove the experiment first.
