@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
@@ -30,35 +30,36 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jScrollPane2" alignment="0" pref="432" max="32767" attributes="0"/>
+                  <Component id="jPanel1" alignment="1" max="32767" attributes="1"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="lblLocation" alignment="0" max="32767" attributes="1"/>
-                          <Component id="lblName" alignment="0" max="32767" attributes="1"/>
-                          <Component id="lblNumNodes" alignment="0" max="32767" attributes="1"/>
-                          <Component id="lblNumCPUs" alignment="0" max="32767" attributes="1"/>
-                          <Component id="lblWallTime" alignment="0" max="32767" attributes="1"/>
-                          <Component id="lblAvailNodes" alignment="0" max="32767" attributes="1"/>
-                          <Component id="lblMaxJobsInQueue" alignment="0" max="32767" attributes="1"/>
-                          <Component id="lblDescription" alignment="0" max="32767" attributes="1"/>
-                          <Component id="lblPBSScript" alignment="0" max="32767" attributes="1"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="txtLocation" alignment="0" pref="194" max="32767" attributes="1"/>
-                          <Component id="txtNumNodes" alignment="0" pref="194" max="32767" attributes="1"/>
-                          <Component id="txtNumCPUs" alignment="0" pref="194" max="32767" attributes="1"/>
-                          <Component id="txtWalltime" alignment="0" pref="194" max="32767" attributes="1"/>
-                          <Component id="txtAvailNodes" alignment="0" pref="194" max="32767" attributes="1"/>
-                          <Component id="txtMaxJobsInQueue" alignment="0" pref="194" max="32767" attributes="1"/>
-                          <Component id="btnAdd" alignment="1" min="-2" max="-2" attributes="1"/>
-                          <Component id="jScrollPane1" alignment="0" pref="194" max="32767" attributes="1"/>
-                          <Component id="txtName" alignment="0" pref="194" max="32767" attributes="1"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="lblLocation" alignment="0" max="32767" attributes="1"/>
+                                  <Component id="lblName" alignment="0" max="32767" attributes="1"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <Component id="lblNumCPUs" pref="168" max="32767" attributes="1"/>
+                              <EmptySpace min="-2" pref="13" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="txtLocation" alignment="0" pref="251" max="32767" attributes="1"/>
+                          <Component id="txtName" alignment="0" pref="251" max="32767" attributes="1"/>
+                          <Component id="txtNumCPUs" alignment="1" pref="251" max="32767" attributes="1"/>
                       </Group>
                   </Group>
-                  <Component id="jPanel1" alignment="1" max="32767" attributes="1"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="lblDescription" pref="163" max="32767" attributes="1"/>
+                      <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                      <Component id="jScrollPane1" pref="251" max="32767" attributes="1"/>
+                  </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -77,47 +78,19 @@
                   <Component id="txtLocation" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblLocation" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="txtNumNodes" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblNumNodes" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="txtNumCPUs" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblNumCPUs" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtNumCPUs" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
-                      <Component id="lblWallTime" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="txtWalltime" min="-2" max="-2" attributes="0"/>
-                  </Group>
-              </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="txtAvailNodes" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblAvailNodes" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="txtMaxJobsInQueue" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblMaxJobsInQueue" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="lblDescription" min="-2" max="-2" attributes="0"/>
-                  <Component id="jScrollPane1" pref="107" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" pref="137" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="lblPBSScript" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnAdd" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jScrollPane2" min="-2" pref="128" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -125,85 +98,6 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="lblNumNodes">
-      <Properties>
-        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="txtNumNodes"/>
-        </Property>
-        <Property name="text" type="java.lang.String" resourceKey="lblNumNodes.text"/>
-        <Property name="name" type="java.lang.String" value="lblNumNodes" noResource="true"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="lblWallTime">
-      <Properties>
-        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="txtWalltime"/>
-        </Property>
-        <Property name="text" type="java.lang.String" resourceKey="lblWallTime.text"/>
-        <Property name="name" type="java.lang.String" value="lblWallTime" noResource="true"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="txtNumNodes">
-      <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="txtNumNodes.text"/>
-        <Property name="toolTipText" type="java.lang.String" resourceKey="txtNumNodes.toolTipText"/>
-        <Property name="name" type="java.lang.String" value="txtNumNodes" noResource="true"/>
-      </Properties>
-      <Events>
-        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
-        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
-        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="keyReleased"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JTextField" name="txtWalltime">
-      <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="txtWalltime.text"/>
-        <Property name="toolTipText" type="java.lang.String" resourceKey="txtWalltime.toolTipText"/>
-        <Property name="name" type="java.lang.String" value="txtWalltime" noResource="true"/>
-      </Properties>
-      <Events>
-        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
-        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
-        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="keyReleased"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JLabel" name="lblMaxJobsInQueue">
-      <Properties>
-        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="txtMaxJobsInQueue"/>
-        </Property>
-        <Property name="text" type="java.lang.String" resourceKey="lblMaxJobsInQueue.text"/>
-        <Property name="name" type="java.lang.String" value="lblMaxJobsInQueue" noResource="true"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="txtMaxJobsInQueue">
-      <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="txtMaxJobsInQueue.text"/>
-        <Property name="toolTipText" type="java.lang.String" resourceKey="txtMaxJobsInQueue.toolTipText"/>
-        <Property name="name" type="java.lang.String" value="txtMaxJobsInQueue" noResource="true"/>
-      </Properties>
-      <Events>
-        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
-        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
-        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="keyReleased"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JLabel" name="lblPBSScript">
-      <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="lblPBSScript.text"/>
-        <Property name="name" type="java.lang.String" value="lblPBSScript" noResource="true"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JButton" name="btnAdd">
-      <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="btnPBSScript.text"/>
-        <Property name="toolTipText" type="java.lang.String" resourceKey="btnPBSScript.toolTipText"/>
-        <Property name="name" type="java.lang.String" value="btnPBSScript" noResource="true"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAdd"/>
-      </Events>
-    </Component>
     <Component class="javax.swing.JLabel" name="lblName">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
@@ -263,27 +157,6 @@
         <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="keyReleased"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblAvailNodes">
-      <Properties>
-        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="txtAvailNodes"/>
-        </Property>
-        <Property name="text" type="java.lang.String" resourceKey="lblAvailNodes.text"/>
-        <Property name="name" type="java.lang.String" value="lblAvailNodes" noResource="true"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="txtAvailNodes">
-      <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="txtAvailNodes.text"/>
-        <Property name="toolTipText" type="java.lang.String" resourceKey="txtAvailNodes.toolTipText"/>
-        <Property name="name" type="java.lang.String" value="txtAvailNodes" noResource="true"/>
-      </Properties>
-      <Events>
-        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
-        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="tcSelectOnFocus"/>
-        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="keyReleased"/>
-      </Events>
-    </Component>
     <Component class="javax.swing.JLabel" name="lblDescription">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
@@ -328,7 +201,7 @@
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnCancel" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="125" max="32767" attributes="0"/>
+                  <EmptySpace pref="267" max="32767" attributes="0"/>
                   <Component id="btnOk" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -365,6 +238,26 @@
             <Property name="text" type="java.lang.String" resourceKey="btnCancel.text"/>
             <Property name="toolTipText" type="java.lang.String" resourceKey="btnCancel.toolTipText"/>
             <Property name="name" type="java.lang.String" value="btnCancel" noResource="true"/>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JScrollPane" name="jScrollPane2">
+      <Properties>
+        <Property name="name" type="java.lang.String" value="jScrollPane2" noResource="true"/>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+      </AuxValues>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+      <SubComponents>
+        <Component class="javax.swing.JTable" name="tQueueProperties">
+          <Properties>
+            <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="tableModel" type="code"/>
+            </Property>
+            <Property name="name" type="java.lang.String" value="tQueueProperties" noResource="true"/>
           </Properties>
         </Component>
       </SubComponents>

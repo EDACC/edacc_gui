@@ -21,7 +21,6 @@ import java.util.Observable;
 public class GridQueuesController extends Observable {
 
     private static GridQueuesController instance;
-    private File tmpPBSScript;
 
     private GridQueuesController() {
     }
@@ -42,34 +41,7 @@ public class GridQueuesController extends Observable {
      * @throws Exception
      */
     public void createNewGridQueue(GridQueue q) throws SQLException, FileNotFoundException, Exception {
-        q.setGenericPBSScript(tmpPBSScript);
         GridQueueDAO.save(q);
-        tmpPBSScript = null;
-    }
-
-    /**
-     * Saves a given modified GridQueue to the Database and cache.
-     * In contrast to createNewGridQueue it throws no exception, if no pbs
-     * script is specified (see addPBSScript).
-     * @param q
-     * @throws SQLException
-     * @throws FileNotFoundException
-     */
-    public void saveEditedGridQueue(GridQueue q) throws SQLException, FileNotFoundException {
-        GridQueueDAO.save(q);
-        tmpPBSScript = null;
-    }
-
-    public void addPBSScript(File f) {
-        tmpPBSScript = f;
-    }
-
-    public boolean hasTmpPBSScript() {
-        return tmpPBSScript != null;
-    }
-
-    public void clearPBSScript() {
-        tmpPBSScript = null;
     }
 
     public ArrayList<GridQueue> getChosenQueuesByExperiment(Experiment exp) throws SQLException {

@@ -49,21 +49,16 @@ public class GridQueueDAO {
         PreparedStatement ps;
         if (q.isNew()) {
             // insert query, set ID!
-            final String insertQuery = "INSERT INTO " + table + " (name, location, numNodes, numCPUs, wallTime, availNodes, maxJobsQueue, description, genericPBSScript) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            final String insertQuery = "INSERT INTO " + table + " (name, location, numCPUs, description) "
+                    + "VALUES (?, ?, ?, ?)";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
-            if (q.getGenericPBSScript() != null) {
-                ps.setBinaryStream(9, new FileInputStream(q.getGenericPBSScript()));
-            } else {
-                ps.setNull(9, Types.BLOB);
-            }
         } else if (q.isModified()) {
             // update query
-            final String updateQuery = "UPDATE " + table + " SET name=?, location=?, numNodes=?, numCPUs=?, wallTime=?, availNodes=?, maxJobsQueue=?, description=? "
+            final String updateQuery = "UPDATE " + table + " SET name=?, location=?, numCPUs=?, description=? "
                     + "WHERE idgridQueue=?";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
 
-            ps.setInt(9, q.getId());
+            ps.setInt(5, q.getId());
 
         } else {
             return;
@@ -71,12 +66,8 @@ public class GridQueueDAO {
 
         ps.setString(1, q.getName());
         ps.setString(2, q.getLocation());
-        ps.setInt(3, q.getNumNodes());
-        ps.setInt(4, q.getNumCPUs());
-        ps.setInt(5, q.getWalltime());
-        ps.setInt(6, q.getAvailNodes());
-        ps.setInt(7, q.getMaxJobsQueue());
-        ps.setString(8, q.getDescription());
+        ps.setInt(3, q.getNumCPUs());
+        ps.setString(4, q.getDescription());
 
         ps.executeUpdate();
 
@@ -85,17 +76,6 @@ public class GridQueueDAO {
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
                 q.setId(rs.getInt(1));
-            }
-        }
-
-        // update PBS script if necessary
-        if (q.isModified()) {
-            if (q.getGenericPBSScript() != null) {
-                final String query = "UPDATE " + table + " SET genericPBSScript=? WHERE idgridQueue=?";
-                ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
-                ps.setBinaryStream(1, new FileInputStream(q.getGenericPBSScript()));
-                ps.setInt(2, q.getId());
-                ps.executeUpdate();
             }
         }
 
@@ -116,6 +96,27 @@ public class GridQueueDAO {
         q.setDeleted();
     }
 
+    private static GridQueue getGridQueueFromResultSet(ResultSet rs) throws SQLException {
+        GridQueue q = new GridQueue();
+        q.setId(rs.getInt("idgridQueue"));
+        q.setName(rs.getString("name"));
+        q.setDescription(rs.getString("description"));
+        q.setNumCPUs(rs.getInt("numCPUs"));
+        q.setCPUName(rs.getString("CPUName"));
+        q.setCacheSize(rs.getInt("cacheSize"));
+        q.setCpuflags(rs.getString("cpuflags"));
+        q.setCpuinfo(rs.getString("cpuinfo"));
+        q.setHyperthreading(rs.getBoolean("hyperthreading"));
+        q.setLocation(rs.getString("location"));
+        q.setMeminfo(rs.getString("meminfo"));
+        q.setMemory(rs.getLong("memory"));
+        q.setNumCores(rs.getInt("numCores"));
+        q.setNumThreads(rs.getInt("numThreads"));
+        q.setTurboboost(rs.getBoolean("turboboost"));
+
+        return q;
+    }
+
     /**
      * retrieves a grid queue from the database
      * @param id the id of the grid queue to be retrieved
@@ -131,24 +132,13 @@ public class GridQueueDAO {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idgridQueue=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
-        GridQueue q = new GridQueue();
         if (rs.next()) {
-            q.setId(rs.getInt("idgridQueue"));
-            q.setLocation(rs.getString("location"));
-            q.setNumNodes(rs.getInt("numNodes"));
-            q.setNumCPUs(rs.getInt("numCPUs"));
-            q.setWalltime(rs.getInt("walltime"));
-            q.setAvailNodes(rs.getInt("availNodes"));
-            q.setMaxJobsQueue(rs.getInt("maxJobsQueue"));
-            q.setDescription(rs.getString("description"));
-            q.setName(rs.getString("name"));
-
+            GridQueue q = getGridQueueFromResultSet(rs);
             q.setSaved();
             cache.cache(q);
             rs.close();
             st.close();
             return q;
-
         }
         rs.close();
         st.close();
@@ -165,16 +155,7 @@ public class GridQueueDAO {
             if (c != null) {
                 res.add(c);
             } else {
-                GridQueue q = new GridQueue();
-                q.setId(rs.getInt("idgridQueue"));
-                q.setName(rs.getString("name"));
-                q.setLocation(rs.getString("location"));
-                q.setNumNodes(rs.getInt("numNodes"));
-                q.setNumCPUs(rs.getInt("numCPUs"));
-                q.setWalltime(rs.getInt("walltime"));
-                q.setAvailNodes(rs.getInt("availNodes"));
-                q.setMaxJobsQueue(rs.getInt("maxJobsQueue"));
-                q.setDescription(rs.getString("description"));
+                GridQueue q = getGridQueueFromResultSet(rs);
                 q.setSaved();
                 cache.cache(q);
                 res.add(q);
@@ -197,16 +178,7 @@ public class GridQueueDAO {
             if (c != null) {
                 res.add(c);
             } else {
-                GridQueue q = new GridQueue();
-                q.setId(rs.getInt("idgridQueue"));
-                q.setName(rs.getString("name"));
-                q.setLocation(rs.getString("location"));
-                q.setNumNodes(rs.getInt("numNodes"));
-                q.setNumCPUs(rs.getInt("numCPUs"));
-                q.setWalltime(rs.getInt("walltime"));
-                q.setAvailNodes(rs.getInt("availNodes"));
-                q.setMaxJobsQueue(rs.getInt("maxJobsQueue"));
-                q.setDescription(rs.getString("description"));
+                GridQueue q = getGridQueueFromResultSet(rs);
 
                 q.setSaved();
                 cache.cache(q);
@@ -233,21 +205,6 @@ public class GridQueueDAO {
     }
 
     /**
-     * Copies the PBS Script of the specified queue to a temporary location.
-     * @param q
-     * @return the resulting file
-     * @throws NoConnectionToDBException
-     * @throws SQLException
-     * @throws FileNotFoundException
-     * @throws IOException
-     */
-    public static File getPBS(GridQueue q) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
-        File f = new File("tmp/start_client.pbs");
-        getPBS(q, f);
-        return f;
-    }
-
-    /**
      * Checks if another queue with the same name exists in the cache (not the DB!)
      * @param name
      * @return the first found queue with the same name or @{code null} if no
@@ -260,37 +217,6 @@ public class GridQueueDAO {
             }
         }
         return null;
-    }
-
-    /**
-     * Copies the PBS Script of the specified queue to a specified place on the filesystem.
-     * @param q
-     * @param f
-     * @throws NoConnectionToDBException
-     * @throws SQLException
-     * @throws FileNotFoundException
-     * @throws IOException
-     */
-    public static void getPBS(GridQueue q, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
-        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT `genericPBSScript` FROM " + table + " WHERE idgridQueue=?");
-        ps.setInt(1, q.getId());
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            f.delete();
-            InputStream in = rs.getBinaryStream("genericPBSScript");
-            if (in != null) {
-                FileOutputStream out = new FileOutputStream(f);
-                int data;
-                while ((data = in.read()) > -1) {
-                    out.write(data);
-                }
-                out.close();
-                in.close();
-            }
-
-        }
-        rs.close();
-        ps.close();
     }
 
     public static void clearCache() {

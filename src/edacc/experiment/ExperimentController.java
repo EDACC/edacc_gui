@@ -829,13 +829,6 @@ public class ExperimentController {
             if (!task.isCancelled()) {
                 task.setStatus("Writing client");
 
-                // add PBS script
-                File f = GridQueueDAO.getPBS(queue);
-
-                if (f.exists()) {
-                    entry = new ZipEntry("start_client.pbs");
-                    addFileToZIP(f, entry, zos);
-                }
                 // add configuration File
                 addConfigurationFile(zos, activeExperiment, queue);
 
@@ -970,7 +963,7 @@ public class ExperimentController {
                 + (hasSolvers ? "chmod u+rwx solvers/*\n" : "")
                 + (hasInstances ? "chmod a-rwx instances/*\n" : "")
                 + (hasInstances ? "chmod u+rw instances/*\n" : "")
-                + "for (( i = 0; i < " + q.getNumNodes() + "; i++ ))\n"
+                + "for (( i = 0; i < " + q.getNumCPUs() + "; i++ ))\n"
                 + "do\n"
                 + "    qsub start_client.pbs\n"
                 + "done\n";

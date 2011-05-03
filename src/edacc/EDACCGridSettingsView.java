@@ -5,6 +5,7 @@
  */
 package edacc;
 
+import edacc.gridqueues.GridPropertiesTableModel;
 import edacc.gridqueues.GridQueuesController;
 import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
@@ -25,19 +26,16 @@ import org.jdesktop.application.Action;
  */
 public class EDACCGridSettingsView extends javax.swing.JDialog {
 
-    private enum DialogMode {
-
-        Create, Edit
-    };
-    private DialogMode mode;
     private EDACCManageGridQueuesDialog manageGridQueuesDialog;
     private GridQueue currentQueue;
     private final Color BAD = new Color(255, 102, 102);
     private final Color GOOD = Color.white;
+    private final GridPropertiesTableModel tableModel;
 
     /** Creates new form EDACCGridSettingsView */
     public EDACCGridSettingsView(java.awt.Frame parent, boolean modal, EDACCManageGridQueuesDialog manageGridQueuesDialog) {
         super(parent, modal);
+        this.tableModel = new GridPropertiesTableModel(currentQueue);
         initComponents();
         this.manageGridQueuesDialog = manageGridQueuesDialog;
         setLocationRelativeTo(manageGridQueuesDialog);
@@ -52,28 +50,20 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lblNumNodes = new javax.swing.JLabel();
-        lblWallTime = new javax.swing.JLabel();
-        txtNumNodes = new javax.swing.JTextField();
-        txtWalltime = new javax.swing.JTextField();
-        lblMaxJobsInQueue = new javax.swing.JLabel();
-        txtMaxJobsInQueue = new javax.swing.JTextField();
-        lblPBSScript = new javax.swing.JLabel();
-        btnAdd = new javax.swing.JButton();
         lblName = new javax.swing.JLabel();
         lblLocation = new javax.swing.JLabel();
         txtName = new javax.swing.JTextField();
         txtLocation = new javax.swing.JTextField();
         lblNumCPUs = new javax.swing.JLabel();
         txtNumCPUs = new javax.swing.JTextField();
-        lblAvailNodes = new javax.swing.JLabel();
-        txtAvailNodes = new javax.swing.JTextField();
         lblDescription = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         taDescription = new javax.swing.JTextArea();
         jPanel1 = new javax.swing.JPanel();
         btnOk = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tQueueProperties = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCGridSettingsView.class);
@@ -81,81 +71,6 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         setMinimumSize(new java.awt.Dimension(330, 390));
         setModalExclusionType(java.awt.Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         setName("Form"); // NOI18N
-
-        lblNumNodes.setLabelFor(txtNumNodes);
-        lblNumNodes.setText(resourceMap.getString("lblNumNodes.text")); // NOI18N
-        lblNumNodes.setName("lblNumNodes"); // NOI18N
-
-        lblWallTime.setLabelFor(txtWalltime);
-        lblWallTime.setText(resourceMap.getString("lblWallTime.text")); // NOI18N
-        lblWallTime.setName("lblWallTime"); // NOI18N
-
-        txtNumNodes.setText(resourceMap.getString("txtNumNodes.text")); // NOI18N
-        txtNumNodes.setToolTipText(resourceMap.getString("txtNumNodes.toolTipText")); // NOI18N
-        txtNumNodes.setName("txtNumNodes"); // NOI18N
-        txtNumNodes.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                tcSelectOnFocus(evt);
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                tcSelectOnFocus(evt);
-            }
-        });
-        txtNumNodes.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                EDACCGridSettingsView.this.keyReleased(evt);
-            }
-        });
-
-        txtWalltime.setText(resourceMap.getString("txtWalltime.text")); // NOI18N
-        txtWalltime.setToolTipText(resourceMap.getString("txtWalltime.toolTipText")); // NOI18N
-        txtWalltime.setName("txtWalltime"); // NOI18N
-        txtWalltime.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                tcSelectOnFocus(evt);
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                tcSelectOnFocus(evt);
-            }
-        });
-        txtWalltime.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                EDACCGridSettingsView.this.keyReleased(evt);
-            }
-        });
-
-        lblMaxJobsInQueue.setLabelFor(txtMaxJobsInQueue);
-        lblMaxJobsInQueue.setText(resourceMap.getString("lblMaxJobsInQueue.text")); // NOI18N
-        lblMaxJobsInQueue.setName("lblMaxJobsInQueue"); // NOI18N
-
-        txtMaxJobsInQueue.setText(resourceMap.getString("txtMaxJobsInQueue.text")); // NOI18N
-        txtMaxJobsInQueue.setToolTipText(resourceMap.getString("txtMaxJobsInQueue.toolTipText")); // NOI18N
-        txtMaxJobsInQueue.setName("txtMaxJobsInQueue"); // NOI18N
-        txtMaxJobsInQueue.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                tcSelectOnFocus(evt);
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                tcSelectOnFocus(evt);
-            }
-        });
-        txtMaxJobsInQueue.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                EDACCGridSettingsView.this.keyReleased(evt);
-            }
-        });
-
-        lblPBSScript.setText(resourceMap.getString("lblPBSScript.text")); // NOI18N
-        lblPBSScript.setName("lblPBSScript"); // NOI18N
-
-        btnAdd.setText(resourceMap.getString("btnPBSScript.text")); // NOI18N
-        btnAdd.setToolTipText(resourceMap.getString("btnPBSScript.toolTipText")); // NOI18N
-        btnAdd.setName("btnPBSScript"); // NOI18N
-        btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAdd(evt);
-            }
-        });
 
         lblName.setLabelFor(txtName);
         lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
@@ -214,27 +129,6 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
             }
         });
 
-        lblAvailNodes.setLabelFor(txtAvailNodes);
-        lblAvailNodes.setText(resourceMap.getString("lblAvailNodes.text")); // NOI18N
-        lblAvailNodes.setName("lblAvailNodes"); // NOI18N
-
-        txtAvailNodes.setText(resourceMap.getString("txtAvailNodes.text")); // NOI18N
-        txtAvailNodes.setToolTipText(resourceMap.getString("txtAvailNodes.toolTipText")); // NOI18N
-        txtAvailNodes.setName("txtAvailNodes"); // NOI18N
-        txtAvailNodes.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                tcSelectOnFocus(evt);
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                tcSelectOnFocus(evt);
-            }
-        });
-        txtAvailNodes.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                EDACCGridSettingsView.this.keyReleased(evt);
-            }
-        });
-
         lblDescription.setLabelFor(taDescription);
         lblDescription.setText(resourceMap.getString("lblDescription.text")); // NOI18N
         lblDescription.setName("lblDescription"); // NOI18N
@@ -275,7 +169,7 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnCancel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 125, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 267, Short.MAX_VALUE)
                 .addComponent(btnOk)
                 .addContainerGap())
         );
@@ -288,6 +182,12 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
                     .addComponent(btnOk)))
         );
 
+        jScrollPane2.setName("jScrollPane2"); // NOI18N
+
+        tQueueProperties.setModel(tableModel);
+        tQueueProperties.setName("tQueueProperties"); // NOI18N
+        jScrollPane2.setViewportView(tQueueProperties);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -295,29 +195,26 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lblLocation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblNumNodes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblNumCPUs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblWallTime, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblAvailNodes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblMaxJobsInQueue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblDescription, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblPBSScript, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtLocation, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
-                            .addComponent(txtNumNodes, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
-                            .addComponent(txtNumCPUs, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
-                            .addComponent(txtWalltime, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
-                            .addComponent(txtAvailNodes, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
-                            .addComponent(txtMaxJobsInQueue, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
-                            .addComponent(btnAdd, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
-                            .addComponent(txtName, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(lblLocation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lblName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(18, 18, 18))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblNumCPUs, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+                                .addGap(13, 13, 13)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtLocation, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
+                            .addComponent(txtName, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
+                            .addComponent(txtNumCPUs, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblDescription, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -333,36 +230,15 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
                     .addComponent(lblLocation))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtNumNodes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblNumNodes))
+                    .addComponent(lblNumCPUs)
+                    .addComponent(txtNumCPUs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtNumCPUs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblNumCPUs))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(11, 11, 11)
-                        .addComponent(lblWallTime))
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtWalltime, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtAvailNodes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblAvailNodes))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtMaxJobsInQueue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblMaxJobsInQueue))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblDescription)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblPBSScript)
-                    .addComponent(btnAdd))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -370,17 +246,6 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
     private JFileChooser pbsFileChooser;
-    private void btnAdd(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdd
-        if (pbsFileChooser == null) {
-            pbsFileChooser = new JFileChooser();
-            pbsFileChooser.setMultiSelectionEnabled(false);
-        }
-        if (pbsFileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            GridQueuesController.getInstance().addPBSScript(pbsFileChooser.getSelectedFile());
-        }
-        checkInputs();
-    }//GEN-LAST:event_btnAdd
-
     private void keyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_keyReleased
         checkInputs();
     }//GEN-LAST:event_keyReleased
@@ -411,13 +276,13 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
      * @throws SQLException
      */
     public void loadSettings(GridQueue q) throws SQLException {
-        GridQueuesController.getInstance().clearPBSScript();
+        tableModel.setGridQueue(q);
         if (q != null) {
             currentQueue = q;
-            setDialogMode(DialogMode.Edit);
+            btnOk.setText("Save Queue");
         } else {
             currentQueue = new GridQueue();
-            setDialogMode(DialogMode.Create);
+            btnOk.setText("Create Queue");
         }
         showQueue(currentQueue);
     }
@@ -426,14 +291,11 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         if (q == null) {
             return;
         }
+        
         // if (q != null) {
         txtName.setText(q.getName());
         txtLocation.setText(q.getLocation());
-        txtNumNodes.setText(String.valueOf(q.getNumNodes()));
         txtNumCPUs.setText(String.valueOf(q.getNumCPUs()));
-        txtWalltime.setText(String.valueOf(q.getWalltime()));
-        txtAvailNodes.setText(String.valueOf(q.getAvailNodes()));
-        txtMaxJobsInQueue.setText(String.valueOf(q.getMaxJobsQueue()));
         taDescription.setText(q.getDescription());
         /*  } else {
         txtName.setText("");
@@ -455,27 +317,15 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         try {
             String name = txtName.getText();
             String location = txtLocation.getText();
-            int numNodes = Integer.parseInt(txtNumNodes.getText());
             int numCPUs = Integer.parseInt(txtNumCPUs.getText());
-            int walltime = Integer.parseInt(txtWalltime.getText());
-            int availNodes = Integer.parseInt(txtAvailNodes.getText());
-            int maxJobsInQueue = Integer.parseInt(txtMaxJobsInQueue.getText());
             String description = taDescription.getText();
 
             currentQueue.setName(name);
             currentQueue.setLocation(location);
-            currentQueue.setNumNodes(numNodes);
             currentQueue.setNumCPUs(numCPUs);
-            currentQueue.setWalltime(walltime);
-            currentQueue.setAvailNodes(availNodes);
-            currentQueue.setMaxJobsQueue(maxJobsInQueue);
             currentQueue.setDescription(description);
 
-            if (mode == DialogMode.Create) {
-                GridQueuesController.getInstance().createNewGridQueue(currentQueue);
-            } else {
-                GridQueuesController.getInstance().saveEditedGridQueue(currentQueue);
-            }
+            GridQueuesController.getInstance().createNewGridQueue(currentQueue);
             this.setVisible(false);
             manageGridQueuesDialog.refreshView();
         } catch (NoConnectionToDBException e) {
@@ -491,18 +341,8 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         }
     }
 
-    private void setDialogMode(DialogMode mode) {
-        this.mode = mode;
-        if (mode == DialogMode.Create) {
-            btnOk.setText("Create Queue");
-        } else {
-            btnOk.setText("Save Queue");
-        }
-    }
-
     @Action
     public void btnCancel() {
-        GridQueuesController.getInstance().addPBSScript(null);
         this.setVisible(false);
     }
 
@@ -516,23 +356,11 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         } else {
             txtName.setBackground(GOOD);
         }
-
-        if (!checkIntegerTextField(txtAvailNodes)) {
-            error = true;
-        }
-        if (!checkIntegerTextField(txtMaxJobsInQueue)) {
-            error = true;
-        }
+        
         if (!checkIntegerTextField(txtNumCPUs)) {
             error = true;
         }
-        if (!checkIntegerTextField(txtNumNodes)) {
-            error = true;
-        }
-        if (!checkIntegerTextField(txtWalltime)) {
-            error = true;
-        }
-
+        
         btnOk.setEnabled(!error);
     }
 
@@ -560,27 +388,19 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnOk;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel lblAvailNodes;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblDescription;
     private javax.swing.JLabel lblLocation;
-    private javax.swing.JLabel lblMaxJobsInQueue;
     private javax.swing.JLabel lblName;
     private javax.swing.JLabel lblNumCPUs;
-    private javax.swing.JLabel lblNumNodes;
-    private javax.swing.JLabel lblPBSScript;
-    private javax.swing.JLabel lblWallTime;
+    private javax.swing.JTable tQueueProperties;
     private javax.swing.JTextArea taDescription;
-    private javax.swing.JTextField txtAvailNodes;
     private javax.swing.JTextField txtLocation;
-    private javax.swing.JTextField txtMaxJobsInQueue;
     private javax.swing.JTextField txtName;
     private javax.swing.JTextField txtNumCPUs;
-    private javax.swing.JTextField txtNumNodes;
-    private javax.swing.JTextField txtWalltime;
     // End of variables declaration//GEN-END:variables
 }
