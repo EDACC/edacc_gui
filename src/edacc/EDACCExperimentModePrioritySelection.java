@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * EDACCExperimentModePrioritySelection.java
  *
  * Created on 08.12.2010, 20:01:12

@@ -131,7 +131,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public Solver getSolver(int row) {
         try {
             SolverConfiguration sc = SolverConfigurationDAO.getSolverConfigurationById(jobs.get(row).getSolverConfigId());
-            return SolverDAO.getById(sc.getSolver_id());
+            return SolverDAO.getById(sc.getSolverBinary().getIdSolver());
         } catch (Exception e) {
             return null;
         }

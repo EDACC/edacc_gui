@@ -123,7 +123,7 @@ public class QuadTree<T> {
         double dist = radius + 1;
         for (BucketObject<T> bObj : tmp) {
             Point2D p = bObj.point;
-            double tmpdist = p.distance(point); //Math.sqrt((p[0] - point[0]) * (p[0] - point[0]) + (p[1] - point[1]) * (p[1] - point[1]));
+            double tmpdist = p.distance(point);
             if (tmpdist < dist) {
                 dist = tmpdist;
                 res = bObj.obj;

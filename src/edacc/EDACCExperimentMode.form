@@ -743,30 +743,33 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="295" max="32767" attributes="0"/>
-                          <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
-                              <Component id="jTreeInstanceClass" alignment="0" pref="295" max="32767" attributes="0"/>
-                          </Group>
+                          <Component id="jScrollPane5" alignment="0" pref="295" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="470" max="32767" attributes="0"/>
-                          <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
-                              <Component id="jTreeInstanceClass" alignment="0" pref="470" max="32767" attributes="0"/>
-                          </Group>
+                          <Component id="jScrollPane5" alignment="0" pref="470" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JTree" name="jTreeInstanceClass">
+                    <Container class="javax.swing.JScrollPane" name="jScrollPane5">
                       <Properties>
-                        <Property name="name" type="java.lang.String" value="jTreeInstanceClass" noResource="true"/>
+                        <Property name="name" type="java.lang.String" value="jScrollPane5" noResource="true"/>
                       </Properties>
-                      <Events>
-                        <EventHandler event="valueChanged" listener="javax.swing.event.TreeSelectionListener" parameters="javax.swing.event.TreeSelectionEvent" handler="jTreeInstanceClassValueChanged"/>
-                      </Events>
-                    </Component>
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+                      <SubComponents>
+                        <Component class="javax.swing.JTree" name="jTreeInstanceClass">
+                          <Properties>
+                            <Property name="name" type="java.lang.String" value="jTreeInstanceClass" noResource="true"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="valueChanged" listener="javax.swing.event.TreeSelectionListener" parameters="javax.swing.event.TreeSelectionEvent" handler="jTreeInstanceClassValueChanged"/>
+                          </Events>
+                        </Component>
+                      </SubComponents>
+                    </Container>
                   </SubComponents>
                 </Container>
                 <Container class="javax.swing.JPanel" name="jPanel3">

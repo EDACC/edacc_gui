@@ -43,6 +43,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
     }
 
     /** Creates new form EDACCSolverConfigPanelSolver */
+    @SuppressWarnings("LeakingThisInConstructor")
     public EDACCSolverConfigPanelSolver(Solver solver, EDACCSolverConfigPanel parent) throws SQLException {
         this(solver);
         this.parent = parent;
@@ -55,7 +56,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
     }
 
     public EDACCSolverConfigPanelSolver(SolverConfiguration solverConfiguration, EDACCSolverConfigPanel parent, boolean useSolverConfiguration) throws SQLException {
-        this(SolverDAO.getById(solverConfiguration.getSolver_id()));
+        this(SolverDAO.getById(solverConfiguration.getSolverBinary().getIdSolver()));
         this.parent = parent;
         addSolverConfiguration(solverConfiguration, useSolverConfiguration);
     }
@@ -92,15 +93,15 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
      * @param useSolverConfiguration will create a new solver configuration when saving this entry if the flag is false
      * @throws SQLException
      */
-    public void addSolverConfiguration(SolverConfiguration solverConfiguration, boolean useSolverConfiguration) throws SQLException {
+    public final void addSolverConfiguration(SolverConfiguration solverConfiguration, boolean useSolverConfiguration) throws SQLException {
         EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solverConfiguration);
         entry.setParent(this);
         if (!useSolverConfiguration) {
-            entry.solver = SolverDAO.getById(entry.solverConfiguration.getSolver_id());
+            entry.solver = SolverDAO.getById(entry.solverConfiguration.getSolverBinary().getIdSolver());
             entry.solverConfiguration = null;
         }
-        this.add(entry, getIndex(solverConfiguration.getSolver_id()));
-        parent.getSolTableModel().setSolverSelected(solverConfiguration.getSolver_id(), true);
+        this.add(entry, getIndex(solverConfiguration.getSolverBinary().getIdSolver()));
+        parent.getSolTableModel().setSolverSelected(solverConfiguration.getSolverBinary().getIdSolver(), true);
         setGridBagConstraints();
         doRepaint();
     }

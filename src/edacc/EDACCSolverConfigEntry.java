@@ -11,9 +11,11 @@ import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstance;
 import edacc.model.ParameterInstanceDAO;
 import edacc.model.Solver;
+import edacc.model.SolverBinaries;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.io.BufferedReader;
@@ -23,12 +25,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -57,6 +59,13 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         ArrayList<Parameter> params = new ArrayList<Parameter>();
         params.addAll(ParameterDAO.getParameterFromSolverId(solverId));
         solverConfigEntryTableModel.setParameters(params);
+
+        // TODO: get solver binaries
+        ArrayList<SolverBinaries> solverBinaries = new ArrayList<SolverBinaries>();
+        for (SolverBinaries sb : solverBinaries) {
+            comboSolverBinaries.addItem(sb);
+        }
+
         solverConfigEntryTableModel.addTableModelListener(new TableModelListener() {
 
             @Override
@@ -79,8 +88,29 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             }
         };
 
+        DefaultTableCellRenderer booleanRenderer = new DefaultTableCellRenderer() {
+
+            protected JCheckBox checkBox;
+
+            {
+                checkBox = new JCheckBox();
+                checkBox.setHorizontalAlignment(SwingConstants.CENTER);
+                checkBox.setBackground(Color.white);
+            }
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                checkBox.setBackground(comp.getBackground());
+                checkBox.setEnabled(!solverConfigEntryTableModel.getParameters().get(row).isMandatory());
+                checkBox.setSelected((Boolean) value);
+                return checkBox;
+            }
+        };
+
         parameterTable.setDefaultRenderer(String.class, renderer);
         parameterTable.setDefaultRenderer(Integer.class, renderer);
+        parameterTable.setDefaultRenderer(Boolean.class, booleanRenderer);
         updateTableColumnWidth = true;
     }
 
@@ -91,11 +121,13 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
      * @throws SQLException
      */
     public EDACCSolverConfigEntry(SolverConfiguration solverConfiguration) throws SQLException {
-        this(solverConfiguration.getSolver_id());
+        this(solverConfiguration.getSolverBinary().getIdSolver());
         this.solverConfiguration = solverConfiguration;
+        
         solverConfigEntryTableModel.setParameterInstances(SolverConfigurationDAO.getSolverConfigurationParameters(solverConfiguration));
         txtSeedGroup.setText(String.valueOf(solverConfiguration.getSeed_group()));
         border.setTitle(solverConfiguration.getName());
+        comboSolverBinaries.setSelectedItem(solverConfiguration.getSolverBinary());
     }
 
     /**
@@ -108,6 +140,10 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         this(solver, num > 1 ? solver.getName() + " (" + num + ")" : solver.getName());
     }
 
+    public SolverBinaries getSolverBinary() {
+        return (SolverBinaries) comboSolverBinaries.getSelectedItem();
+    }
+
     public EDACCSolverConfigEntry(Solver solver, String name) throws SQLException {
         this(solver.getId());
         this.solver = solver;
@@ -116,11 +152,11 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
 
     @Override
     public void paint(Graphics g) {
-        super.paint(g);
         if (updateTableColumnWidth) {
             edacc.experiment.Util.updateTableColumnWidth(parameterTable);
             updateTableColumnWidth = false;
         }
+        super.paint(g);
     }
 
     public String getTitle() {
@@ -145,7 +181,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             return solver.getId();
         }
         if (solverConfiguration != null) {
-            return solverConfiguration.getSolver_id();
+            return solverConfiguration.getSolverBinary().getIdSolver();
         }
         return -1;
     }
@@ -223,6 +259,8 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         txtSeedGroup = new javax.swing.JTextField();
         btnEditName = new javax.swing.JButton();
         btnMassReplication = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        comboSolverBinaries = new javax.swing.JComboBox();
 
         setName("Form"); // NOI18N
 
@@ -279,6 +317,11 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             }
         });
 
+        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
+        jLabel1.setName("jLabel1"); // NOI18N
+
+        comboSolverBinaries.setName("comboSolverBinaries"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -286,7 +329,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnReplicate)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -295,17 +338,24 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                         .addComponent(txtSeedGroup, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnMassReplication)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 105, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 95, Short.MAX_VALUE)
                         .addComponent(btnEditName)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnRemove, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnRemove, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(comboSolverBinaries, 0, 460, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(comboSolverBinaries, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnReplicate)
@@ -428,16 +478,9 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                 }
             }
         }
-
     }//GEN-LAST:event_btnMassReplicationActionPerformed
     @Action
     public void btnReplicate() {
-
-
-
-
-
-
         try {
             parent.replicateEntry(this);
         } catch (SQLException ex) {
@@ -453,6 +496,8 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     private javax.swing.JButton btnMassReplication;
     private javax.swing.JButton btnRemove;
     private javax.swing.JButton btnReplicate;
+    private javax.swing.JComboBox comboSolverBinaries;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblSeedGroup;
     private javax.swing.JTable parameterTable;
@@ -492,7 +537,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             txtSeedGroup.setText("0");
         }
 
-        if (solverConfiguration == null || solverConfiguration.getSeed_group() != seedGroup || (idx != -1 && (!border.getTitle().equals(solverConfiguration.getName()) || solverConfiguration.getIdx() != idx))) {
+        if (solverConfiguration == null || solverConfiguration.getSeed_group() != seedGroup || (idx != -1 && (!border.getTitle().equals(solverConfiguration.getName()) || solverConfiguration.getIdx() != idx)) || solverConfiguration.getSolverBinary() != this.getSolverBinary()) {
             return true;
         }
         return solverConfigEntryTableModel.isModified();

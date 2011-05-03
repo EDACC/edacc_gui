@@ -156,6 +156,7 @@ public class Util {
      * @param text
      * @return the number text
      */
+    @SuppressWarnings("empty-statement")
     public static String getNumberText(String text) {
         String res = "";
         if (text.length() > 0) {

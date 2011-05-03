@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * EDACCExperimentModeGenerateJobs.java
  *
  * Created on 09.04.2011, 18:43:44

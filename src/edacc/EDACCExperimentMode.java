@@ -102,6 +102,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private boolean updateJobsTableColumnWidth = false;
 
     /** Creates new form EDACCExperimentMode */
+    @SuppressWarnings("LeakingThisInConstructor")
     public EDACCExperimentMode() {
         initComponents();
         expController = new ExperimentController(this, solverConfigPanel);
@@ -464,6 +465,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         panelChooseInstances = new javax.swing.JPanel();
         jSplitPane2 = new javax.swing.JSplitPane();
         jPanel4 = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
         jTreeInstanceClass = new javax.swing.JTree();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -629,17 +631,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                             .addGroup(pnlEditExperimentLayout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlEditExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pnlEditExperimentLayout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, 728, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlEditExperimentLayout.createSequentialGroup()
                                 .addComponent(btnEditExperimentUndo, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(btnEditExperimentSave, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(pnlEditExperimentLayout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pnlEditExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtPriority, javax.swing.GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
-                                    .addComponent(txtMaxSeeds, javax.swing.GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)))))
+                            .addComponent(txtPriority, javax.swing.GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
+                            .addComponent(txtMaxSeeds, javax.swing.GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlEditExperimentLayout.createSequentialGroup()
                         .addGap(191, 191, 191)
                         .addGroup(pnlEditExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -928,26 +927,25 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel4.border.title"))); // NOI18N
         jPanel4.setName("jPanel4"); // NOI18N
 
+        jScrollPane5.setName("jScrollPane5"); // NOI18N
+
         jTreeInstanceClass.setName("jTreeInstanceClass"); // NOI18N
         jTreeInstanceClass.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 jTreeInstanceClassValueChanged(evt);
             }
         });
+        jScrollPane5.setViewportView(jTreeInstanceClass);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 295, Short.MAX_VALUE)
-            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jTreeInstanceClass, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE))
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 470, Short.MAX_VALUE)
-            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jTreeInstanceClass, javax.swing.GroupLayout.DEFAULT_SIZE, 470, Short.MAX_VALUE))
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 470, Short.MAX_VALUE)
         );
 
         jSplitPane2.setLeftComponent(jPanel4);
@@ -1681,8 +1679,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     solverConfigPanel.addSolverConfiguration(sc, false);
                 }
             } catch (Exception e) {
-                // TODO: ERROR!
-                e.printStackTrace();
+                javax.swing.JOptionPane.showMessageDialog(null, "Could not import solver configurations: " + e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
         }
 
@@ -2146,6 +2143,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;

@@ -154,7 +154,7 @@ public class CactusPlot extends Plot {
             Collections.sort(resultValues);
 
             solver[i] = new SolverInfos();
-            solver[i].name = SolverDAO.getById(sc.getSolver_id()).getName();
+            solver[i].name = SolverDAO.getById(sc.getSolverBinary().getIdSolver()).getName();
             solver[i].xs = new int[resultValues.size() + 1];
             solver[i].ys = new double[resultValues.size() + 1];
 

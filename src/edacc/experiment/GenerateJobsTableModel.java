@@ -1,6 +1,5 @@
 package edacc.experiment;
 
-import edacc.model.Experiment;
 import edacc.model.Instance;
 import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.InstanceDAO;

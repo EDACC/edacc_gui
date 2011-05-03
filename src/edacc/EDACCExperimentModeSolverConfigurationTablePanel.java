@@ -224,7 +224,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
                         if (entry.getSolverConfiguration() != null) {
                             solverConfigNames.add(entry.getSolverConfiguration().getName());
 
-                            solver = SolverDAO.getById(entry.getSolverConfiguration().getSolver_id());
+                            solver = SolverDAO.getById(entry.getSolverConfiguration().getSolverBinary().getIdSolver());
                         } else {
                             solverConfigNames.add(entry.getTitle());
                             solver = SolverDAO.getById(entry.getSolverId());
