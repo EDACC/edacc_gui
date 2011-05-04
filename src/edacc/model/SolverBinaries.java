@@ -181,4 +181,11 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
     public int getId() {
         return getIdSolverBinary();
     }
+
+    @Override
+    public String toString() {
+        return version;
+    }
+    
+    
 }

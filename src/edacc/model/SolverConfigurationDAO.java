@@ -14,14 +14,14 @@ public class SolverConfigurationDAO {
 
     private static final String table = "SolverConfig";
     private static final String deleteQuery = "DELETE FROM " + table + " WHERE idSolverConfig=?";
-    private static final String insertQuery = "INSERT INTO " + table + " (SolverBinaries_IdSolverBinaries, Experiment_IdExperiment, seed_group, name, idx) VALUES (?,?,?,?,?)";
+    private static final String insertQuery = "INSERT INTO " + table + " (SolverBinaries_IdSolverBinary, Experiment_IdExperiment, seed_group, name, idx) VALUES (?,?,?,?,?)";
     private static final String updateQuery = "UPDATE " + table + " SET seed_group=?, name=?, idx=? WHERE idSolverConfig=?";
     public static ObjectCache<SolverConfiguration> cache = new ObjectCache<SolverConfiguration>();
 
     private static SolverConfiguration getSolverConfigurationFromResultset(ResultSet rs) throws SQLException {
         SolverConfiguration i = new SolverConfiguration();
         i.setExperiment_id(rs.getInt("Experiment_idExperiment"));
-        // TODO: set solver binary
+        i.setSolverBinary(SolverBinariesDAO.getById(rs.getInt("SolverBinaries_IdSolverBinary")));
         i.setId(rs.getInt("IdSolverConfig"));
         i.setSeed_group(rs.getInt("seed_group"));
         i.setName(rs.getString("name"));
@@ -72,7 +72,10 @@ public class SolverConfigurationDAO {
         solverConfig.setDeleted();
     }
 
-    public static SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int experimentId, int seed_group, String name, int idx) throws SQLException {
+    public static SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int experimentId, int seed_group, String name, int idx) throws SQLException, Exception {
+        if (solverBinary == null) {
+            throw new Exception("Solver binary missing.");
+        }
         SolverConfiguration i = new SolverConfiguration();
         i.setSolverBinary(solverBinary);
         i.setExperiment_id(experimentId);

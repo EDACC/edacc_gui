@@ -12,6 +12,7 @@ import edacc.model.ParameterInstance;
 import edacc.model.ParameterInstanceDAO;
 import edacc.model.Solver;
 import edacc.model.SolverBinaries;
+import edacc.model.SolverBinariesDAO;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
@@ -60,8 +61,8 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         params.addAll(ParameterDAO.getParameterFromSolverId(solverId));
         solverConfigEntryTableModel.setParameters(params);
 
-        // TODO: get solver binaries
         ArrayList<SolverBinaries> solverBinaries = new ArrayList<SolverBinaries>();
+        solverBinaries.addAll(SolverBinariesDAO.getBinariesOfSolver(SolverDAO.getById(solverId)));
         for (SolverBinaries sb : solverBinaries) {
             comboSolverBinaries.addItem(sb);
         }
