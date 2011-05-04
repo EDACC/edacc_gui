@@ -6,17 +6,19 @@ import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
 import java.sql.SQLException;
 
-
 public class ExperimentTableModel extends AbstractTableModel {
+
     public static final int COL_ID = 0;
     public static final int COL_NAME = 1;
     public static final int COL_DATE = 2;
     public static final int COL_NUMRUNS = 3;
     public static final int COL_DESCRIPTION = 4;
-    public static final int COL_PRIORITY = 5;
-    public static final int COL_ACTIVE = 6;
-    private String[] columns = {"ID", "Name", "Date", "Number of jobs", "Description", "Priority", "Active"};
+    public static final int COL_STATUS = 5;
+    public static final int COL_PRIORITY = 6;
+    public static final int COL_ACTIVE = 7;
+    private String[] columns = {"ID", "Name", "Date", "Number of jobs", "Description", "Status", "Priority", "Active"};
     private ArrayList<Experiment> experiments;
+    private String[] status;
 
     public ExperimentTableModel() {
         this.experiments = new ArrayList<Experiment>();
@@ -24,12 +26,13 @@ public class ExperimentTableModel extends AbstractTableModel {
 
     public void setExperiments(ArrayList<Experiment> experiments) {
         this.experiments = experiments;
+        status = new String[experiments.size()];
         this.fireTableDataChanged();
     }
 
     @Override
     public int getRowCount() {
-        return experiments==null?0:experiments.size();
+        return experiments == null ? 0 : experiments.size();
     }
 
     @Override
@@ -44,7 +47,7 @@ public class ExperimentTableModel extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int col) {
-        if (experiments==null || experiments.isEmpty()) {
+        if (experiments == null || experiments.isEmpty()) {
             return String.class;
         }
         return getValueAt(0, col).getClass();
@@ -52,7 +55,7 @@ public class ExperimentTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        if (rowIndex > experiments.size()-1) {
+        if (rowIndex > experiments.size() - 1) {
             return null;
         }
         switch (columnIndex) {
@@ -66,6 +69,8 @@ public class ExperimentTableModel extends AbstractTableModel {
                 return experiments.get(rowIndex).getNumJobs();
             case COL_DESCRIPTION:
                 return experiments.get(rowIndex).getDescription();
+            case COL_STATUS:
+                return status[rowIndex] == null ? "none" : status[rowIndex];
             case COL_PRIORITY:
                 return experiments.get(rowIndex).getPriority();
             case COL_ACTIVE:
@@ -84,8 +89,10 @@ public class ExperimentTableModel extends AbstractTableModel {
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         if (columnIndex == COL_ACTIVE) {
             experiments.get(rowIndex).setActive((Boolean) aValue);
+            this.fireTableCellUpdated(rowIndex, columnIndex);
         } else if (columnIndex == COL_PRIORITY) {
             experiments.get(rowIndex).setPriority((Integer) aValue);
+            this.fireTableCellUpdated(rowIndex, columnIndex);
         }
         try {
             ExperimentDAO.save(experiments.get(rowIndex));
@@ -93,8 +100,11 @@ public class ExperimentTableModel extends AbstractTableModel {
             // TODO: error
         }
     }
-    
-    
+
+    public void setStatusAt(int rowIndex, String s) {
+        status[rowIndex] = s;
+        this.fireTableCellUpdated(rowIndex, COL_STATUS);
+    }
 
     public Experiment getExperimentAt(int rowIndex) {
         return experiments.get(rowIndex);

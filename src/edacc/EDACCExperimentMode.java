@@ -11,6 +11,7 @@ import edacc.experiment.AnalysisPanel;
 import edacc.experiment.ExperimentController;
 import edacc.experiment.ExperimentResultsBrowserTableModel;
 import edacc.experiment.ExperimentTableModel;
+import edacc.experiment.ExperimentUpdateThread;
 import edacc.experiment.GenerateJobsTableModel;
 import edacc.experiment.InstanceTableModel;
 import edacc.experiment.SolverTableModel;
@@ -78,6 +79,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import org.jdesktop.application.Application;
+import org.jdesktop.application.ApplicationContext;
 
 /**
  *
@@ -107,6 +110,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private boolean updateJobsTableColumnWidth = false;
     private boolean tableExperimentsWasEditing = false;
 
+    private ExperimentUpdateThread experimentUpdateThread;
+    
     /** Creates new form EDACCExperimentMode */
     @SuppressWarnings("LeakingThisInConstructor")
     public EDACCExperimentMode() {
@@ -144,6 +149,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 btnLoadExperiment.setEnabled(mod);
             }
         });
+        
+        experimentUpdateThread = new ExperimentUpdateThread(expTableModel);
+        
         /* -------------------------------- end of experiment tab -------------------------------- */
         /* -------------------------------- solver tab -------------------------------- */
         solverConfigTablePanel = new EDACCExperimentModeSolverConfigurationTablePanel(solverConfigPanel);
@@ -338,6 +346,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }
 
     public void reinitializeGUI() {
+        if (experimentUpdateThread != null)
+            experimentUpdateThread.cancel(true);
         expController.unloadExperiment();
         reinitializeExperiments();
         reinitializeInstances();
@@ -379,6 +389,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnEditExperiment.setEnabled(false);
         btnLoadExperiment.setEnabled(false);
         expController.initialize();
+        if (experimentUpdateThread == null || experimentUpdateThread.isDone()) {
+            experimentUpdateThread = new ExperimentUpdateThread(expTableModel);
+        }
+        experimentUpdateThread.execute();
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
@@ -1425,7 +1439,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }
 
     private void manageExperimentPaneStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_manageExperimentPaneStateChanged
-        if (manageExperimentPane.getSelectedIndex() == 1) {
+        if (manageExperimentPane.getSelectedIndex() == 0) {
+            if (experimentUpdateThread != null) {
+                if (experimentUpdateThread.isDone()) {
+                    experimentUpdateThread = new ExperimentUpdateThread(expTableModel);
+                }
+                experimentUpdateThread.execute();
+            }
+        } if (manageExperimentPane.getSelectedIndex() == 1) {
             edacc.experiment.Util.updateTableColumnWidth(tableSolvers);
         } else if (manageExperimentPane.getSelectedIndex() == 2) {
             // instances tab
@@ -1515,6 +1536,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         if (manageExperimentPane.getSelectedIndex() != 4) {
             jobsTimerWasActive = jobsTimer != null;
             stopJobsTimer();
+        }
+        
+        if (experimentUpdateThread != null && manageExperimentPane.getSelectedIndex() != 0) {
+            experimentUpdateThread.cancel(true);
         }
     }//GEN-LAST:event_manageExperimentPaneStateChanged
 
@@ -2425,6 +2450,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             });
 
         }
+    }
+
+    public void deinitialize() {
+        reinitializeGUI();
     }
 
     class ResultsBrowserTableRowSorter extends TableRowSorter<AbstractTableModel> {

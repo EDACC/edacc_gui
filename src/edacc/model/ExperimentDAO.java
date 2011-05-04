@@ -237,4 +237,17 @@ public class ExperimentDAO {
     public static void clearCache() {
         cache.clear();
     }
+
+    public static int getJobCountForExperimentAndStatus(Experiment exp, StatusCode statusCode) throws SQLException {
+        final String query = "SELECT COUNT(idJob) FROM ExperimentResults WHERE Experiment_idExperiment = ? AND status = ?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, exp.getId());
+        ps.setInt(2, statusCode.getStatusCode());
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        } else {
+            return 0;
+        }
+    }
 }

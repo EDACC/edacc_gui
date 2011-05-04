@@ -483,7 +483,7 @@ public class EDACCView extends FrameView implements Observer {
                     return;
                 }
             }
-            experimentMode.expController.unloadExperiment();
+            experimentMode.deinitialize();
         }
 
         try {
