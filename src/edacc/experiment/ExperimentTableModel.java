@@ -3,6 +3,8 @@ package edacc.experiment;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import edacc.model.Experiment;
+import edacc.model.ExperimentDAO;
+import java.sql.SQLException;
 
 
 public class ExperimentTableModel extends AbstractTableModel {
@@ -11,7 +13,9 @@ public class ExperimentTableModel extends AbstractTableModel {
     public static final int COL_DATE = 2;
     public static final int COL_NUMRUNS = 3;
     public static final int COL_DESCRIPTION = 4;
-    private String[] columns = {"ID", "Name", "Date", "Number of jobs", "Description"};
+    public static final int COL_PRIORITY = 5;
+    public static final int COL_ACTIVE = 6;
+    private String[] columns = {"ID", "Name", "Date", "Number of jobs", "Description", "Priority", "Active"};
     private ArrayList<Experiment> experiments;
 
     public ExperimentTableModel() {
@@ -62,10 +66,35 @@ public class ExperimentTableModel extends AbstractTableModel {
                 return experiments.get(rowIndex).getNumJobs();
             case COL_DESCRIPTION:
                 return experiments.get(rowIndex).getDescription();
+            case COL_PRIORITY:
+                return experiments.get(rowIndex).getPriority();
+            case COL_ACTIVE:
+                return experiments.get(rowIndex).isActive();
             default:
                 return "";
         }
     }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return columnIndex == COL_ACTIVE || columnIndex == COL_PRIORITY;
+    }
+
+    @Override
+    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        if (columnIndex == COL_ACTIVE) {
+            experiments.get(rowIndex).setActive((Boolean) aValue);
+        } else if (columnIndex == COL_PRIORITY) {
+            experiments.get(rowIndex).setPriority((Integer) aValue);
+        }
+        try {
+            ExperimentDAO.save(experiments.get(rowIndex));
+        } catch (SQLException ex) {
+            // TODO: error
+        }
+    }
+    
+    
 
     public Experiment getExperimentAt(int rowIndex) {
         return experiments.get(rowIndex);
