@@ -26,7 +26,9 @@ public class ExperimentTableModel extends AbstractTableModel {
 
     public void setExperiments(ArrayList<Experiment> experiments) {
         this.experiments = experiments;
-        status = new String[experiments.size()];
+        if (experiments != null) {
+            status = new String[experiments.size()];
+        }
         this.fireTableDataChanged();
     }
 
