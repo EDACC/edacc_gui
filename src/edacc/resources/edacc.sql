@@ -2,6 +2,7 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
+
 -- -----------------------------------------------------
 -- Table `User`
 -- -----------------------------------------------------
@@ -16,7 +17,8 @@ CREATE  TABLE IF NOT EXISTS `User` (
   `postal_address` VARCHAR(255) NULL ,
   `affiliation` VARCHAR(255) NULL ,
   PRIMARY KEY (`idUser`) )
-ENGINE = InnoDB;
+ENGINE = InnoDB, 
+COMMENT = 'Stores user infos in a competition database' ;
 
 
 -- -----------------------------------------------------
@@ -26,25 +28,22 @@ DROP TABLE IF EXISTS `Solver` ;
 
 CREATE  TABLE IF NOT EXISTS `Solver` (
   `idSolver` INT NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(255) NOT NULL ,
-  `binaryName` VARCHAR(255) NOT NULL ,
-  `binary` LONGBLOB NOT NULL ,
-  `description` TEXT NULL  ,
-  `md5` VARCHAR(60) NOT NULL  ,
-  `code` LONGBLOB NULL  ,
-  `version` VARCHAR(255) NULL  ,
-  `authors` VARCHAR(255) NULL  ,
+  `name` VARCHAR(255) NOT NULL COMMENT 'The name of the Solver' ,
+  `description` TEXT NULL COMMENT 'Description of the solver.' ,
+  `code` LONGBLOB NULL COMMENT 'An archiv containing the code files of the solvers. ' ,
+  `version` VARCHAR(255) NULL COMMENT 'The version of the solver.' ,
+  `authors` VARCHAR(255) NULL COMMENT 'The author/s of the solver.' ,
   `User_idUser` INT NULL ,
   PRIMARY KEY (`idSolver`) ,
   UNIQUE INDEX `name` (`name` ASC, `version` ASC) ,
-  UNIQUE INDEX `md5` (`md5` ASC) ,
   INDEX `fk_Solver_User1` (`User_idUser` ASC) ,
   CONSTRAINT `fk_Solver_User1`
     FOREIGN KEY (`User_idUser` )
     REFERENCES `User` (`idUser` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB;
+ENGINE = InnoDB, 
+COMMENT = 'All relevent information for a solver.' ;
 
 
 -- -----------------------------------------------------
@@ -54,12 +53,14 @@ DROP TABLE IF EXISTS `Parameters` ;
 
 CREATE  TABLE IF NOT EXISTS `Parameters` (
   `idParameter` INT NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(255) NOT NULL ,
-  `prefix` VARCHAR(255) NULL  ,
-  `hasValue` TINYINT(1)  NOT NULL  ,
-  `value` VARCHAR(255) NULL  ,
-  `order` INT NOT NULL  ,
+  `name` VARCHAR(255) NOT NULL COMMENT 'User friendly description of the Parameter' ,
+  `prefix` VARCHAR(255) NULL COMMENT 'The prefix of the parmater as it is used in the command line of the binary.' ,
+  `hasValue` TINYINT(1)  NOT NULL COMMENT 'If the parameter has no value this column should be false. For example parameters like -h dont\'t need a value.' ,
+  `defaultValue` VARCHAR(4096) NULL COMMENT 'A predifined value of a parameter.' ,
+  `order` INT NOT NULL COMMENT 'Specifies the order for the parameters, if there exists one. Parameters with the same order represent a sort of order-class and within this class there exists no order. ' ,
   `Solver_idSolver` INT NOT NULL ,
+  `mandatory` TINYINT(1)  NULL ,
+  `space` TINYINT(1)  NULL ,
   PRIMARY KEY (`idParameter`) ,
   INDEX `fk_Parameters_Solver` (`Solver_idSolver` ASC) ,
   UNIQUE INDEX `uniqueprefix` (`Solver_idSolver` ASC, `prefix` ASC) ,
@@ -69,29 +70,8 @@ CREATE  TABLE IF NOT EXISTS `Parameters` (
     REFERENCES `Solver` (`idSolver` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `instanceClass`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `instanceClass` ;
-
-CREATE  TABLE IF NOT EXISTS `instanceClass` (
-  `idinstanceClass` INT NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(255) NULL COMMENT 'The name of the class. (Unique)' ,
-  `description` TEXT NULL COMMENT 'teh description should contain the source-url of the instances.\n' ,
-  `source` TINYINT(1)  NOT NULL COMMENT 'tells if the class is a source class. ' ,
-  `User_idUser` INT NULL ,
-  `parent` INT NULL ,
-  PRIMARY KEY (`idinstanceClass`) ,
-  INDEX `fk_instanceClass_User1` (`User_idUser` ASC) ,
-  CONSTRAINT `fk_instanceClass_User1`
-    FOREIGN KEY (`User_idUser` )
-    REFERENCES `User` (`idUser` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
+ENGINE = InnoDB, 
+COMMENT = 'Information abaout the parameters of a solver. ' ;
 
 
 -- -----------------------------------------------------
@@ -123,24 +103,17 @@ CREATE  TABLE IF NOT EXISTS `Instances` (
   `name` VARCHAR(255) NOT NULL COMMENT 'Name of the file containing the instance.' ,
   `instance` LONGBLOB NOT NULL COMMENT 'The instance itself.' ,
   `md5` VARCHAR(60) NOT NULL COMMENT 'The MD5-cheksum of the file.' ,
-  `instanceClass_idinstanceClass` INT NOT NULL COMMENT 'The source class of the instance. ' ,
   `BenchmarkType_idBenchmarkType` INT NULL ,
-  PRIMARY KEY (`idInstance`, `instanceClass_idinstanceClass`) ,
+  PRIMARY KEY (`idInstance`) ,
   UNIQUE INDEX `name` (`name` ASC) ,
-  INDEX `fk_Instances_instanceClass1` (`instanceClass_idinstanceClass` ASC) ,
   INDEX `fk_Instances_BenchmarkType1` (`BenchmarkType_idBenchmarkType` ASC) ,
-  CONSTRAINT `fk_Instances_instanceClass1`
-    FOREIGN KEY (`instanceClass_idinstanceClass` )
-    REFERENCES `instanceClass` (`idinstanceClass` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
   CONSTRAINT `fk_Instances_BenchmarkType1`
     FOREIGN KEY (`BenchmarkType_idBenchmarkType` )
     REFERENCES `BenchmarkType` (`idBenchmarkType` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-COMMENT = 'Contains information about the instances. ';
+ENGINE = InnoDB, 
+COMMENT = 'Contains information about the instances. ' ;
 
 
 -- -----------------------------------------------------
@@ -156,14 +129,12 @@ CREATE  TABLE IF NOT EXISTS `Experiment` (
   `maxSeed` BIGINT NULL COMMENT 'Maximum number for the seed generating process. ' ,
   `linkSeeds` TINYINT(1)  NULL ,
   `autoGeneratedSeeds` TINYINT(1)  NOT NULL COMMENT 'Specifies if seeds should be generated for the solvers. ' ,
-  `CPUTimeLimit` INT NULL COMMENT 'Maximum number of seconds a solver is allowed to run.\n' ,
-  `wallClockTimeLimit` INT NULL ,
-  `memoryLimit` INT NULL COMMENT 'maximum amount of memeory a solver is allowed to use' ,
-  `stackSizeLimit` INT NULL ,
-  `outputSizeLimit` INT NULL ,
+  `configurationExp` TINYINT(1)  NULL ,
+  `priority` INT NULL ,
+  `active` TINYINT(1)  NOT NULL COMMENT 'is the experiment activ? should the jobs be taken into consideration?' ,
   PRIMARY KEY (`idExperiment`) )
-ENGINE = InnoDB
-COMMENT = 'Properties of an experiment.';
+ENGINE = InnoDB, 
+COMMENT = 'Properties of an experiment.' ;
 
 
 -- -----------------------------------------------------
@@ -188,8 +159,32 @@ CREATE  TABLE IF NOT EXISTS `Experiment_has_Instances` (
     REFERENCES `Instances` (`idInstance` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-COMMENT = 'Specifies the instances used in an experiment.';
+ENGINE = InnoDB, 
+COMMENT = 'Specifies the instances used in an experiment.' ;
+
+
+-- -----------------------------------------------------
+-- Table `SolverBinaries`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `SolverBinaries` ;
+
+CREATE  TABLE IF NOT EXISTS `SolverBinaries` (
+  `idSolverBinary` INT NOT NULL AUTO_INCREMENT ,
+  `idSolver` INT NOT NULL ,
+  `binaryName` VARCHAR(255) NOT NULL ,
+  `binaryArchive` LONGBLOB NOT NULL ,
+  `md5` VARCHAR(255) NOT NULL ,
+  `version` VARCHAR(255) NULL ,
+  `runCommand` VARCHAR(255) NULL ,
+  `runPath` VARCHAR(255) NOT NULL ,
+  PRIMARY KEY (`idSolverBinary`) ,
+  INDEX `fk_SolverBinaries_1` (`idSolver` ASC) ,
+  CONSTRAINT `fk_SolverBinaries_1`
+    FOREIGN KEY (`idSolver` )
+    REFERENCES `Solver` (`idSolver` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -199,26 +194,108 @@ DROP TABLE IF EXISTS `SolverConfig` ;
 
 CREATE  TABLE IF NOT EXISTS `SolverConfig` (
   `idSolverConfig` INT NOT NULL AUTO_INCREMENT ,
-  `Solver_idSolver` INT NOT NULL ,
   `Experiment_idExperiment` INT NOT NULL ,
+  `SolverBinaries_idSolverBinary` INT NOT NULL ,
   `seed_group` INT NULL DEFAULT 0 ,
   `name` VARCHAR(255) NOT NULL ,
   `idx` INT NOT NULL ,
   PRIMARY KEY (`idSolverConfig`) ,
-  INDEX `fk_SolverConfig_Solver1` (`Solver_idSolver` ASC) ,
   INDEX `fk_SolverConfig_Experiment1` (`Experiment_idExperiment` ASC) ,
-  CONSTRAINT `fk_SolverConfig_Solver1`
-    FOREIGN KEY (`Solver_idSolver` )
-    REFERENCES `Solver` (`idSolver` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
+  INDEX `fk_SolverConfig_SolverBinaries1` (`SolverBinaries_idSolverBinary` ASC) ,
   CONSTRAINT `fk_SolverConfig_Experiment1`
     FOREIGN KEY (`Experiment_idExperiment` )
     REFERENCES `Experiment` (`idExperiment` )
     ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_SolverConfig_SolverBinaries1`
+    FOREIGN KEY (`SolverBinaries_idSolverBinary` )
+    REFERENCES `SolverBinaries` (`idSolverBinary` )
+    ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-COMMENT = 'Parameter configuration of a solvers of an experiment.';
+ENGINE = InnoDB, 
+COMMENT = 'Parameter configuration of a solvers of an experiment.' ;
+
+
+-- -----------------------------------------------------
+-- Table `ResultCodes`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ResultCodes` ;
+
+CREATE  TABLE IF NOT EXISTS `ResultCodes` (
+  `resultCode` INT NOT NULL ,
+  `description` VARCHAR(255) NOT NULL ,
+  PRIMARY KEY (`resultCode`) )
+ENGINE = InnoDB, 
+COMMENT = 'The codes of the verifier together with a description.\n' ;
+
+
+-- -----------------------------------------------------
+-- Table `StatusCodes`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `StatusCodes` ;
+
+CREATE  TABLE IF NOT EXISTS `StatusCodes` (
+  `statusCode` INT NOT NULL ,
+  `description` VARCHAR(255) NOT NULL ,
+  PRIMARY KEY (`statusCode`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `gridQueue`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `gridQueue` ;
+
+CREATE  TABLE IF NOT EXISTS `gridQueue` (
+  `idgridQueue` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(255) NOT NULL COMMENT 'The name of the queue.' ,
+  `location` VARCHAR(255) NULL COMMENT 'Location of the queue.' ,
+  `numCPUs` INT NOT NULL COMMENT 'Number of available CPUS per node/system.\n' ,
+  `description` TEXT NULL COMMENT 'Description of the queue.' ,
+  `numCores` INT NULL ,
+  `numThreads` INT NULL ,
+  `hyperthreading` TINYINT(1)  NULL ,
+  `turboboost` TINYINT(1)  NULL ,
+  `CPUName` VARCHAR(128) NULL ,
+  `cacheSize` INT NULL ,
+  `cpuflags` VARCHAR(1024) NULL ,
+  `memory` BIGINT NULL ,
+  `cpuinfo` VARCHAR(4096) NULL ,
+  `meminfo` VARCHAR(4096) NULL ,
+  PRIMARY KEY (`idgridQueue`) )
+ENGINE = InnoDB, 
+COMMENT = 'Contains the properties of a queue.' ;
+
+
+-- -----------------------------------------------------
+-- Table `Client`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Client` ;
+
+CREATE  TABLE IF NOT EXISTS `Client` (
+  `idClient` INT NOT NULL AUTO_INCREMENT ,
+  `numCores` INT NULL ,
+  `numThreads` INT NULL ,
+  `hyperthreading` TINYINT(1)  NULL ,
+  `turboboost` TINYINT(1)  NULL ,
+  `CPUName` VARCHAR(128) NULL ,
+  `cacheSize` INT NULL ,
+  `cpuflags` VARCHAR(1024) NULL ,
+  `memory` BIGINT NULL ,
+  `memoryFree` BIGINT NULL ,
+  `cpuinfo` VARCHAR(4096) NULL ,
+  `meminfo` VARCHAR(4096) NULL ,
+  `message` VARCHAR(255) NULL ,
+  `gridQueue_idgridQueue` INT NOT NULL ,
+  `lastReport` TIMESTAMP NULL ,
+  PRIMARY KEY (`idClient`) ,
+  INDEX `fk_Client_gridQueue1` (`gridQueue_idgridQueue` ASC) ,
+  CONSTRAINT `fk_Client_gridQueue1`
+    FOREIGN KEY (`gridQueue_idgridQueue` )
+    REFERENCES `gridQueue` (`idgridQueue` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -232,25 +309,22 @@ CREATE  TABLE IF NOT EXISTS `ExperimentResults` (
   `Instances_idInstance` INT NOT NULL ,
   `idJob` INT NOT NULL AUTO_INCREMENT ,
   `run` INT NOT NULL COMMENT 'The run of a (solver,instance) tupple.' ,
-  `priority` INT NULL COMMENT 'The priority of the job' ,
   `seed` INT NULL COMMENT 'The seed for the solver. ' ,
   `status` INT NOT NULL COMMENT 'status of the job\n-5: launcher crash\n-4: watcher crash\n-3: solver crash\n-2: verifier crash\n-1: not started \n0: running\n1: finished normaly by solver\n2x: terminated by limit x' ,
   `startTime` DATETIME NULL COMMENT 'The start-time of the job.' ,
   `resultTime` FLOAT NULL COMMENT 'The CPU-time the job needed to complete.' ,
-  `resultCode` INT NULL COMMENT '11: SAT\n10: UNSAT\n0: UNKNOWN\n-1: wrong answer\n-2: limit exceeded\n-21: cpu-time\n-22: wall clock-time\n-23: memory\n-24: stack-size\n-25: output-size\n-3xx: received signal:xx stands for the signal-code' ,
-  `solverOutput` LONGBLOB NULL COMMENT '[solverName]_[instanceName]_[solverConfigID]_[run].launcher.solver' ,
-  `launcherOutput` LONGBLOB NULL COMMENT '[solverName]_[instanceName]_[solverConfigID]_[run].launcher' ,
-  `watcherOutput` LONGBLOB NULL COMMENT '[solverName]_[instanceName]_[solverConfigID]_[run].watcher' ,
-  `verifierOutput` LONGBLOB NULL COMMENT '[solverName]_[instanceName]_[solverConfigID]_[run].verifier' ,
-  `solverOutputFN` TEXT NULL ,
-  `launcherOutputFN` TEXT NULL ,
-  `watcherOutputFN` TEXT NULL ,
-  `verifierOutputFN` TEXT NULL ,
-  `solverExitCode` INT NULL ,
-  `watcherExitCode` INT NULL ,
-  `verifierExitCode` INT NULL ,
+  `resultCode` INT NOT NULL COMMENT '11: SAT\n10: UNSAT\n0: UNKNOWN\n-1: wrong answer\n-2: limit exceeded\n-21: cpu-time\n-22: wall clock-time\n-23: memory\n-24: stack-size\n-25: output-size\n-3xx: received signal:xx stands for the signal-code' ,
   `computeQueue` INT NULL COMMENT 'ID of the queue where the results where computed.' ,
   `date_modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
+  `priority` INT NOT NULL DEFAULT 0 ,
+  `computeNode` VARCHAR(255) NULL ,
+  `computeNodeIP` VARCHAR(255) NULL ,
+  `CPUTimeLimit` INT NULL ,
+  `wallClockTimeLimit` INT NULL ,
+  `memoryLimit` INT NULL ,
+  `stackSizeLimit` INT NULL ,
+  `outputSizeLimit` INT NULL ,
+  `Client_idClient` INT NULL ,
   PRIMARY KEY (`idJob`) ,
   INDEX `fk_ExperimentResults_SolverConfig1` (`SolverConfig_idSolverConfig` ASC) ,
   INDEX `fk_ExperimentResults_Experiment1` (`Experiment_idExperiment` ASC) ,
@@ -258,6 +332,9 @@ CREATE  TABLE IF NOT EXISTS `ExperimentResults` (
   INDEX `status` (`status` ASC) ,
   INDEX `computeQueue` (`computeQueue` ASC) ,
   INDEX `priority` (`priority` ASC) ,
+  INDEX `fk_ExperimentResults_ResultCodes1` (`resultCode` ASC) ,
+  INDEX `fk_ExperimentResults_StatusCodes1` (`status` ASC) ,
+  INDEX `fk_ExperimentResults_Client1` (`Client_idClient` ASC) ,
   CONSTRAINT `fk_ExperimentResults_SolverConfig1`
     FOREIGN KEY (`SolverConfig_idSolverConfig` )
     REFERENCES `SolverConfig` (`idSolverConfig` )
@@ -272,9 +349,24 @@ CREATE  TABLE IF NOT EXISTS `ExperimentResults` (
     FOREIGN KEY (`Instances_idInstance` )
     REFERENCES `Instances` (`idInstance` )
     ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_ExperimentResults_ResultCodes1`
+    FOREIGN KEY (`resultCode` )
+    REFERENCES `ResultCodes` (`resultCode` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_ExperimentResults_StatusCodes1`
+    FOREIGN KEY (`status` )
+    REFERENCES `StatusCodes` (`statusCode` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_ExperimentResults_Client1`
+    FOREIGN KEY (`Client_idClient` )
+    REFERENCES `Client` (`idClient` )
+    ON DELETE SET NULL
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-COMMENT = 'Stores the jobs of an experiment and their properties.';
+ENGINE = InnoDB, 
+COMMENT = 'Stores the jobs of an experiment and their properties.' ;
 
 
 -- -----------------------------------------------------
@@ -285,7 +377,7 @@ DROP TABLE IF EXISTS `SolverConfig_has_Parameters` ;
 CREATE  TABLE IF NOT EXISTS `SolverConfig_has_Parameters` (
   `SolverConfig_idSolverConfig` INT NOT NULL ,
   `Parameters_idParameter` INT NOT NULL ,
-  `value` VARCHAR(255) NULL COMMENT 'The value of the parameter for this solver configuration. ' ,
+  `value` VARCHAR(4096) NULL COMMENT 'The value of the parameter for this solver configuration. ' ,
   PRIMARY KEY (`SolverConfig_idSolverConfig`, `Parameters_idParameter`) ,
   INDEX `fk_SolverConfig_has_Parameters_SolverConfig1` (`SolverConfig_idSolverConfig` ASC) ,
   INDEX `fk_SolverConfig_has_Parameters_Parameters1` (`Parameters_idParameter` ASC) ,
@@ -299,29 +391,8 @@ CREATE  TABLE IF NOT EXISTS `SolverConfig_has_Parameters` (
     REFERENCES `Parameters` (`idParameter` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-COMMENT = 'Parameters used for a certain configuration their value';
-
-
--- -----------------------------------------------------
--- Table `gridQueue`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `gridQueue` ;
-
-CREATE  TABLE IF NOT EXISTS `gridQueue` (
-  `idgridQueue` INT NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(255) NOT NULL COMMENT 'The name of the queue.' ,
-  `location` VARCHAR(255) NULL COMMENT 'Location of the queue.' ,
-  `numNodes` INT NULL COMMENT 'Number of computing nodes/computing systems.' ,
-  `numCPUs` INT NOT NULL COMMENT 'Number of available CPUS per node/system.\n' ,
-  `walltime` INT NOT NULL COMMENT 'Maximum allowed computing time for a job in hours.\n' ,
-  `availNodes` INT NOT NULL COMMENT 'Maximum number of nodes that can be assigned to a single user.' ,
-  `maxJobsQueue` INT NULL COMMENT 'Maximum number of nodes in the queue available to all users.' ,
-  `genericPBSScript` LONGBLOB NULL COMMENT 'A generic script to be submitted to the queue containg the calls of the client.' ,
-  `description` TEXT NULL COMMENT 'Description of the queue.' ,
-  PRIMARY KEY (`idgridQueue`) )
-ENGINE = InnoDB
-COMMENT = 'Contains the properties of a queue.';
+ENGINE = InnoDB, 
+COMMENT = 'Parameters used for a certain configuration their value' ;
 
 
 -- -----------------------------------------------------
@@ -345,8 +416,30 @@ CREATE  TABLE IF NOT EXISTS `Experiment_has_gridQueue` (
     REFERENCES `gridQueue` (`idgridQueue` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-COMMENT = 'Specifies the gridQueues used for an experiment.';
+ENGINE = InnoDB, 
+COMMENT = 'Specifies the gridQueues used for an experiment.' ;
+
+
+-- -----------------------------------------------------
+-- Table `instanceClass`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `instanceClass` ;
+
+CREATE  TABLE IF NOT EXISTS `instanceClass` (
+  `idinstanceClass` INT NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(255) NULL COMMENT 'The name of the class. (Unique)' ,
+  `description` TEXT NULL COMMENT 'teh description should contain the source-url of the instances.\n' ,
+  `User_idUser` INT NULL ,
+  `parent` INT NULL ,
+  PRIMARY KEY (`idinstanceClass`) ,
+  INDEX `fk_instanceClass_User1` (`User_idUser` ASC) ,
+  CONSTRAINT `fk_instanceClass_User1`
+    FOREIGN KEY (`User_idUser` )
+    REFERENCES `User` (`idUser` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB, 
+COMMENT = 'Enables to manage instances into classes.' ;
 
 
 -- -----------------------------------------------------
@@ -384,8 +477,8 @@ CREATE  TABLE IF NOT EXISTS `DBConfiguration` (
   `competition` TINYINT(1)  NOT NULL ,
   `competitionPhase` INT NULL ,
   PRIMARY KEY (`id`) )
-ENGINE = InnoDB
-COMMENT = 'Should only contain 1 row with id 0';
+ENGINE = InnoDB, 
+COMMENT = 'Should only contain 1 row with id 0' ;
 
 
 -- -----------------------------------------------------
@@ -562,20 +655,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `VerifierCodes`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `VerifierCodes` ;
-
-CREATE  TABLE IF NOT EXISTS `VerifierCodes` (
-  `idVerifierCodes` INT NOT NULL ,
-  `code` INT NULL ,
-  `description` TEXT NULL ,
-  PRIMARY KEY (`idVerifierCodes`) )
-ENGINE = InnoDB
-COMMENT = 'The codes of the verifier together with a description.\n';
-
-
--- -----------------------------------------------------
 -- Table `PropertyRegExp`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `PropertyRegExp` ;
@@ -593,9 +672,128 @@ CREATE  TABLE IF NOT EXISTS `PropertyRegExp` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+
 -- -----------------------------------------------------
--- Trigger `ExperimentResult_has_PropertyValueUpdateTrigger`
+-- Table `ExperimentResultsOutput`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `ExperimentResultsOutput` ;
+
+CREATE  TABLE IF NOT EXISTS `ExperimentResultsOutput` (
+  `ExperimentResults_idJob` INT NOT NULL ,
+  `solverOutput` MEDIUMBLOB NULL ,
+  `watcherOutput` LONGBLOB NULL ,
+  `launcherOutput` LONGBLOB NULL ,
+  `verifierOutput` LONGBLOB NULL ,
+  `solverExitCode` INT NULL ,
+  `watcherExitCode` INT NULL ,
+  `verifierExitCode` INT NULL ,
+  PRIMARY KEY (`ExperimentResults_idJob`) ,
+  INDEX `fk_ExperimentResultsOutput_ExperimentResults1` (`ExperimentResults_idJob` ASC) ,
+  CONSTRAINT `fk_ExperimentResultsOutput_ExperimentResults1`
+    FOREIGN KEY (`ExperimentResults_idJob` )
+    REFERENCES `ExperimentResults` (`idJob` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Experiment_has_Client`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Experiment_has_Client` ;
+
+CREATE  TABLE IF NOT EXISTS `Experiment_has_Client` (
+  `Experiment_idExperiment` INT NOT NULL ,
+  `Client_idClient` INT NOT NULL ,
+  `numCores` INT NULL ,
+  PRIMARY KEY (`Experiment_idExperiment`, `Client_idClient`) ,
+  INDEX `fk_Experiment_has_Client_Client1` (`Client_idClient` ASC) ,
+  CONSTRAINT `fk_Experiment_has_Client_Experiment1`
+    FOREIGN KEY (`Experiment_idExperiment` )
+    REFERENCES `Experiment` (`idExperiment` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Experiment_has_Client_Client1`
+    FOREIGN KEY (`Client_idClient` )
+    REFERENCES `Client` (`idClient` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `InstanceDownloads`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `InstanceDownloads` ;
+
+CREATE  TABLE IF NOT EXISTS `InstanceDownloads` (
+  `idInstance` INT NOT NULL ,
+  `filesystemID` INT NOT NULL ,
+  `lastReport` DATETIME NOT NULL ,
+  PRIMARY KEY (`idInstance`, `filesystemID`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `SolverDownloads`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `SolverDownloads` ;
+
+CREATE  TABLE IF NOT EXISTS `SolverDownloads` (
+  `idSolver` INT NOT NULL ,
+  `filesystemID` INT NOT NULL ,
+  `lastReport` DATETIME NOT NULL ,
+  PRIMARY KEY (`idSolver`, `filesystemID`) )
+ENGINE = InnoDB;
+
+INSERT INTO StatusCodes VALUES
+(-5, 'launcher crash'),
+(-4, 'watcher crash'),
+(-3, 'solver crash'),
+(-2, 'verifier crash'),
+(-1, 'not started'),
+(0, 'running'),
+(1, 'finished'),
+(21, 'time limit exceeded'),
+(-402, 'watcher SIGINT'),
+(-403, 'watcher SIGQUIT'),
+(-404, 'watcher SIGILL'),
+(-406, 'watcher SIGABRT'),
+(-408, 'watcher SIGFPE'),
+(-409, 'watcher SIGKILL'),
+(-411, 'watcher SIGSEGV'),
+(-413, 'watcher SIGPIPE'),
+(-414, 'watcher SIGALRM'),
+(-415, 'watcher SIGTERM'),
+(-410, 'watcher SIGUSR1'),
+(-416, 'watcher SIGUSR1'),
+(-430, 'watcher SIGUSR1'),
+(-412, 'watcher SIGUSR2'),
+(-417, 'watcher SIGUSR2'),
+(-431, 'watcher SIGUSR2');
+
+INSERT INTO ResultCodes VALUES
+(0, 'unknown'),
+(10, 'UNSAT'),
+(11, 'SAT'),
+(-21, 'time limit exceeded'),
+(-302, 'solver SIGINT'),
+(-303, 'solver SIGQUIT'),
+(-304, 'solver SIGILL'),
+(-306, 'solver SIGABRT'),
+(-308, 'solver SIGFPE'),
+(-309, 'solver SIGKILL'),
+(-311, 'solver SIGSEGV'),
+(-313, 'solver SIGPIPE'),
+(-314, 'solver SIGALRM'),
+(-315, 'solver SIGTERM'),
+(-310, 'solver SIGUSR1'),
+(-316, 'solver SIGUSR1'),
+(-330, 'solver SIGUSR1'),
+(-312, 'solver SIGUSR2'),
+(-317, 'solver SIGUSR2'),
+(-331, 'solver SIGUSR2');
+
 DELIMITER $$
 
 DROP TRIGGER IF EXISTS `ExperimentResult_has_PropertyValueUpdateTrigger` $$
@@ -604,6 +802,7 @@ CREATE TRIGGER ExperimentResult_has_PropertyValueUpdateTrigger AFTER INSERT ON E
     UPDATE ExperimentResults SET date_modified = CURRENT_TIMESTAMP WHERE idJob = (SELECT idExperimentResults FROM ExperimentResult_has_Property WHERE idExperimentResult_has_Property = NEW.idExperimentResult_has_Property);
   END;
 $$
+
 
 DELIMITER ;
 
@@ -622,4 +821,3 @@ DROP EVENT IF EXISTS MONITOR_JOBS;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
