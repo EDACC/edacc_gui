@@ -320,7 +320,6 @@ public class ExperimentController {
                     invalidSeedGroup = true;
                 }
                 if (entry.getSolverConfiguration() == null) {
-                    // TODO: what if there are no solver binaries?!!
                     entry.setSolverConfiguration(SolverConfigurationDAO.createSolverConfiguration(entry.getSolverBinary(), activeExperiment.getId(), seed_group, entry.getTitle(), idx));
                 } else {
                     entry.getSolverConfiguration().setName(entry.getTitle());

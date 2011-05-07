@@ -82,6 +82,7 @@ public class ExperimentResultCache {
         if (count != resultMap.size()) {
             // full update
             resultMap.clear();
+            runMap.clear();
             ArrayList<ExperimentResult> experimentResults = ExperimentResultDAO.getAllByExperimentId(experiment.getId());
             for (ExperimentResult result : experimentResults) {
                 resultMap.put(new ResultIdentifier(result.getSolverConfigId(), result.getInstanceId(), result.getRun()), result);
