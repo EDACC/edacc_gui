@@ -556,6 +556,10 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     
     public boolean hasEmptyValues() {
         for (int i = 0; i < solverConfigEntryTableModel.getRowCount(); i++) {
+            if ("instance".equals((String) solverConfigEntryTableModel.getValueAt(i, 1))
+                    || "seed".equals((String) solverConfigEntryTableModel.getValueAt(i, 1))) {
+                continue;
+            }
             if ((Boolean) solverConfigEntryTableModel.getValueAt(i, 0)) {
                 if (solverConfigEntryTableModel.getParameters().get(i).getHasValue()) {
                     if ("".equals(solverConfigEntryTableModel.getValueAt(i, 3))) {

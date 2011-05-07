@@ -112,6 +112,9 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int col) {
+        if ("instance".equals(parameters[row].getName()) || "seed".equals(parameters[row].getName())) {
+            return false;
+        }
         if (col == 0) {
             return !parameters[row].isMandatory();
         }
