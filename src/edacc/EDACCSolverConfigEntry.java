@@ -322,6 +322,11 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         jLabel1.setName("jLabel1"); // NOI18N
 
         comboSolverBinaries.setName("comboSolverBinaries"); // NOI18N
+        comboSolverBinaries.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboSolverBinariesActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -480,6 +485,11 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_btnMassReplicationActionPerformed
+
+    private void comboSolverBinariesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboSolverBinariesActionPerformed
+        if (parent != null)
+            parent.setTitles();
+    }//GEN-LAST:event_comboSolverBinariesActionPerformed
     @Action
     public void btnReplicate() {
         try {
@@ -543,4 +553,19 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         }
         return solverConfigEntryTableModel.isModified();
     }
+    
+    public boolean hasEmptyValues() {
+        for (int i = 0; i < solverConfigEntryTableModel.getRowCount(); i++) {
+            if ((Boolean) solverConfigEntryTableModel.getValueAt(i, 0)) {
+                if (solverConfigEntryTableModel.getParameters().get(i).getHasValue()) {
+                    if ("".equals(solverConfigEntryTableModel.getValueAt(i, 3))) {
+                        return true;
+                    }
+                }
+                    
+            } 
+        }
+        return false;
+    }
+    
 }
