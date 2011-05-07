@@ -11,14 +11,20 @@ public class ExperimentTableModel extends AbstractTableModel {
     public static final int COL_ID = 0;
     public static final int COL_NAME = 1;
     public static final int COL_DATE = 2;
-    public static final int COL_NUMRUNS = 3;
-    public static final int COL_DESCRIPTION = 4;
-    public static final int COL_STATUS = 5;
-    public static final int COL_PRIORITY = 6;
-    public static final int COL_ACTIVE = 7;
-    private String[] columns = {"ID", "Name", "Date", "Number of jobs", "Description", "Status", "Priority", "Active"};
+    public static final int COL_DESCRIPTION = 3;
+    public static final int COL_NUMRUNS = 4;
+    public static final int COL_NOTSTARTED = 5;
+    public static final int COL_RUNNING = 6;
+    public static final int COL_FINISHED = 7;
+    public static final int COL_FAILED = 8;
+    public static final int COL_PRIORITY = 9;
+    public static final int COL_ACTIVE = 10;
+    private String[] columns = {"ID", "Name", "Date", "Description", "Number of jobs", "Not started", "Running", "Finished", "Failed", "Priority", "Active"};
     private ArrayList<Experiment> experiments;
-    private String[] status;
+    private Integer[] running;
+    private Integer[] finished;
+    private Integer[] failed;
+    private Integer[] not_started;
 
     public ExperimentTableModel() {
         this.experiments = new ArrayList<Experiment>();
@@ -27,7 +33,15 @@ public class ExperimentTableModel extends AbstractTableModel {
     public void setExperiments(ArrayList<Experiment> experiments) {
         this.experiments = experiments;
         if (experiments != null) {
-            status = new String[experiments.size()];
+            running = new Integer[experiments.size()];
+            finished = new Integer[experiments.size()];
+            failed = new Integer[experiments.size()];
+            not_started = new Integer[experiments.size()];
+        } else {
+            running = null;
+            finished = null;
+            failed = null;
+            not_started = null;
         }
         this.fireTableDataChanged();
     }
@@ -49,6 +63,9 @@ public class ExperimentTableModel extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int col) {
+        if (col == COL_RUNNING || col == COL_FINISHED || col == COL_FAILED || col == COL_NOTSTARTED) {
+            return Integer.class;
+        }
         if (experiments == null || experiments.isEmpty()) {
             return String.class;
         }
@@ -67,12 +84,18 @@ public class ExperimentTableModel extends AbstractTableModel {
                 return experiments.get(rowIndex).getName();
             case COL_DATE:
                 return experiments.get(rowIndex).getDate();
-            case COL_NUMRUNS:
-                return experiments.get(rowIndex).getNumJobs();
             case COL_DESCRIPTION:
                 return experiments.get(rowIndex).getDescription();
-            case COL_STATUS:
-                return status[rowIndex] == null ? "none" : status[rowIndex];
+            case COL_NUMRUNS:
+                return experiments.get(rowIndex).getNumJobs();
+            case COL_NOTSTARTED:
+                return not_started[rowIndex];
+            case COL_RUNNING:
+                return running[rowIndex];
+            case COL_FINISHED:
+                return finished[rowIndex];
+            case COL_FAILED:
+                return failed[rowIndex];
             case COL_PRIORITY:
                 return experiments.get(rowIndex).getPriority();
             case COL_ACTIVE:
@@ -103,9 +126,24 @@ public class ExperimentTableModel extends AbstractTableModel {
         }
     }
 
-    public void setStatusAt(int rowIndex, String s) {
-        status[rowIndex] = s;
-        this.fireTableCellUpdated(rowIndex, COL_STATUS);
+    public void setRunningAt(int rowIndex, Integer value) {
+        running[rowIndex] = value;
+        this.fireTableCellUpdated(rowIndex, COL_RUNNING);
+    }
+
+    public void setFinishedAt(int rowIndex, Integer value) {
+        finished[rowIndex] = value;
+        this.fireTableCellUpdated(rowIndex, COL_FINISHED);
+    }
+
+    public void setFailedAt(int rowIndex, Integer value) {
+        failed[rowIndex] = value;
+        this.fireTableCellUpdated(rowIndex, COL_FAILED);
+    }
+    
+    public void setNotStartedAt(int rowIndex, Integer value) {
+        not_started[rowIndex] = value;
+        this.fireTableCellUpdated(rowIndex, COL_NOTSTARTED);
     }
 
     public Experiment getExperimentAt(int rowIndex) {

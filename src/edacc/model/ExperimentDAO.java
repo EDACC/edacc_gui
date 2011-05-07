@@ -237,17 +237,34 @@ public class ExperimentDAO {
     public static void clearCache() {
         cache.clear();
     }
-
-    public static int getJobCountForExperimentAndStatus(Experiment exp, StatusCode statusCode) throws SQLException {
-        final String query = "SELECT COUNT(idJob) FROM ExperimentResults WHERE Experiment_idExperiment = ? AND status = ?";
-        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+    
+    public static ArrayList<StatusCount> getJobCountForExperiment(Experiment exp) throws SQLException, StatusCodeNotInDBException {
+        final String query = "SELECT status, COUNT(idJob) FROM ExperimentResults WHERE Experiment_idExperiment = ? GROUP BY status";
+                PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.setInt(1, exp.getId());
-        ps.setInt(2, statusCode.getStatusCode());
         ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            return rs.getInt(1);
-        } else {
-            return 0;
+        ArrayList<StatusCount> res = new ArrayList<StatusCount>();
+        while (rs.next()) {
+            res.add(new StatusCount(StatusCodeDAO.getByStatusCode(rs.getInt(1)), rs.getInt(2)));
+        }
+        return res;
+    }
+    
+    public static class StatusCount {
+        StatusCode statusCode;
+        Integer count;
+        
+        public StatusCount(StatusCode statusCode, Integer count) {
+            this.statusCode = statusCode;
+            this.count = count;
+        }
+
+        public Integer getCount() {
+            return count;
+        }
+
+        public StatusCode getStatusCode() {
+            return statusCode;
         }
     }
 }
