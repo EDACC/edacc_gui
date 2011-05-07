@@ -248,12 +248,12 @@ public class ExperimentController {
             for (EDACCSolverConfigEntry entry : solPanel.getAllSolverConfigEntries()) {
                 if (entry.isModified(-1) && entry.hasEmptyValues()) {
                     String[] options = {"Yes", "Yes to all", "No"};
-                    int userinput =JOptionPane.showOptionDialog(Tasks.getTaskView(),
-                                                            "The solver configuration " + entry.getTitle() + " has no value for a parameter which must have a value.\nDo you want to continue?",
-                                                            "Warning",
-                                                            JOptionPane.DEFAULT_OPTION, 
-                                                            JOptionPane.WARNING_MESSAGE, 
-                                                            null, options, options[0]);
+                    int userinput = JOptionPane.showOptionDialog(Tasks.getTaskView(),
+                            "The solver configuration " + entry.getTitle() + " has no value for a parameter which must have a value.\nDo you want to continue?",
+                            "Warning",
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.WARNING_MESSAGE,
+                            null, options, options[0]);
                     if (userinput == 1) {
                         yta = true;
                         break;
@@ -262,9 +262,11 @@ public class ExperimentController {
                     }
                 }
             }
-            if (yta) break;
+            if (yta) {
+                break;
+            }
         }
-        
+
         // check for deleted solver configurations (jobs have to be deleted)
         ArrayList<SolverConfiguration> deletedSolverConfigurations = SolverConfigurationDAO.getAllDeleted();
         final ArrayList<ExperimentResult> deletedJobs = new ArrayList<ExperimentResult>();
@@ -277,8 +279,27 @@ public class ExperimentController {
         //  * the seed group of the solver configurations has been changed or
         //  * some parameter instances have been modified/deleted or added
         ArrayList<SolverConfiguration> modifiedSolverConfigurations = solverConfigPanel.getModifiedSolverConfigurations();
+        yta = false;
+        boolean nta = false;
         for (SolverConfiguration sc : modifiedSolverConfigurations) {
-            deletedJobs.addAll(ExperimentResultDAO.getAllBySolverConfiguration(sc));
+            int userinput = -1;
+            if (!yta && !nta) {
+                String[] options = {"Yes", "Yes to all", "No", "No to all"};
+                userinput = JOptionPane.showOptionDialog(Tasks.getTaskView(),
+                        "The parameter values of the solver configuration " + sc.getName() + " have been changed.\nDo you want to delete the affected jobs?",
+                        "Warning",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.WARNING_MESSAGE,
+                        null, options, options[0]);
+                if (userinput == 1) {
+                    yta = true;
+                } else if (userinput == 3) {
+                    nta = true;
+                }
+            }
+            if (!nta && (yta || userinput == 0)) {
+                deletedJobs.addAll(ExperimentResultDAO.getAllBySolverConfiguration(sc));
+            }
         }
         if (deletedJobs.size() > 0) {
             int notDeletableJobsCount = 0;
@@ -332,6 +353,7 @@ public class ExperimentController {
             }
         }
         SolverConfigurationDAO.saveAll();
+        getExperimentResults().updateExperimentResults();
         main.generateJobsTableModel.updateNumRuns();
         Util.updateTableColumnWidth(main.tblGenerateJobs);
         if (invalidSeedGroup) {
