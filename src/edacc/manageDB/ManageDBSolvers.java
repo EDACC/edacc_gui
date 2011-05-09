@@ -111,6 +111,7 @@ public class ManageDBSolvers implements Observer {
         ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(binary);
         b.setMd5(Util.calculateMD5(new ByteArrayInputStream(zipped.toByteArray())));
         SolverBinariesModel.getInstance().addSolverBinariesForSolver(currentSolver, b);
+        
         /*if (SolverDAO.solverAlreadyInDB(currentSolver) != null) {
             currentSolver.setBinaryFile(null);
             currentSolver.setBinaryName(null);

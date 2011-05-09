@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+  <Properties>
+    <Property name="defaultCloseOperation" type="int" value="2"/>
+    <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
+  </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+  </SyntheticProperties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="2"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="lRunCommand" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lRunPath" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lBinaryName" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Component id="tfRunPath" pref="266" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="bChoosePath" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="tfBinaryName" alignment="0" pref="296" max="32767" attributes="0"/>
+                          <Component id="tfRunCommand" alignment="0" pref="296" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="lCommand" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="lCommandPreview" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="jButton2" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="286" max="32767" attributes="0"/>
+                      <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Component id="lCaption" alignment="0" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
+              <Component id="lCaption" min="-2" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="tfBinaryName" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lBinaryName" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="tfRunCommand" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lRunCommand" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lRunPath" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="tfRunPath" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="bChoosePath" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lCommand" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lCommandPreview" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jButton2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JLabel" name="lBinaryName">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lBinaryName.text"/>
+        <Property name="name" type="java.lang.String" value="lBinaryName" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lRunCommand">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lRunCommand.text"/>
+        <Property name="name" type="java.lang.String" value="lRunCommand" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lRunPath">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lRunPath.text"/>
+        <Property name="name" type="java.lang.String" value="lRunPath" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="tfBinaryName">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="tfBinaryName.text"/>
+        <Property name="name" type="java.lang.String" value="tfBinaryName" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="tfRunCommand">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="tfRunCommand.text"/>
+        <Property name="name" type="java.lang.String" value="tfRunCommand" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="tfRunPath">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="tfRunPath.text"/>
+        <Property name="name" type="java.lang.String" value="tfRunPath" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lCommand">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lCommand.text"/>
+        <Property name="name" type="java.lang.String" value="lCommand" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lCommandPreview">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lCommandPreview.text"/>
+        <Property name="name" type="java.lang.String" value="lCommandPreview" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jButton1">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="jButton1.text"/>
+        <Property name="name" type="java.lang.String" value="jButton1" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jButton2">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="jButton2.text"/>
+        <Property name="name" type="java.lang.String" value="jButton2" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lCaption">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="lCaption.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="lCaption.text"/>
+        <Property name="name" type="java.lang.String" value="lCaption" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="bChoosePath">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="bChoosePath.text"/>
+        <Property name="name" type="java.lang.String" value="bChoosePath" noResource="true"/>
+      </Properties>
+    </Component>
+  </SubComponents>
+</Form>
