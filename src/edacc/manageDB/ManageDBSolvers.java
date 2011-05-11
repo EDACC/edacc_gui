@@ -4,9 +4,11 @@
  */
 package edacc.manageDB;
 
+import edacc.EDACCApp;
 import edacc.model.MD5CheckFailedException;
 import edacc.model.SolverIsInExperimentException;
 import edacc.EDACCManageDBMode;
+import edacc.EDACCSolverBinaryDlg;
 import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Solver;
@@ -107,17 +109,17 @@ public class ManageDBSolvers implements Observer {
         SolverBinaries b = new SolverBinaries(currentSolver);
         b.setBinaryArchive(binary);
         b.setBinaryName(binary[0].getName()); // TODO ändern
+
+        binary = stripBaseDir(binary);
+
         // TODO beim SPeichern wird momentan ein zweites Mal gezippt -> zwischenspeichern vom Stream!!
         ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(binary);
         b.setMd5(Util.calculateMD5(new ByteArrayInputStream(zipped.toByteArray())));
-        SolverBinariesModel.getInstance().addSolverBinariesForSolver(currentSolver, b);
-        
-        /*if (SolverDAO.solverAlreadyInDB(currentSolver) != null) {
-            currentSolver.setBinaryFile(null);
-            currentSolver.setBinaryName(null);
-            currentSolver.setMd5(null);
-            throw new SolverAlreadyInDBException();
-        }*/
+        new EDACCSolverBinaryDlg(EDACCApp.getApplication().getMainFrame(), true, b, this).setVisible(true);
+    }
+
+    public void addSolverBinary(SolverBinaries solverBin) throws SQLException {
+        SolverBinariesModel.getInstance().addSolverBinariesForSolver(currentSolver, solverBin);
     }
 
     public void addSolverCode(File[] code) throws FileNotFoundException {

@@ -11,15 +11,31 @@
 
 package edacc;
 
+import edacc.manageDB.ManageDBSolvers;
+import edacc.manageDB.SolverBinariesListModel;
+import edacc.model.Solver;
+import edacc.model.SolverBinaries;
+import java.awt.Frame;
+import java.io.File;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author dgall
  */
 public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
 
+    private SolverBinaries solverBin;
+    private ManageDBSolvers controller;
+
     /** Creates new form EDACCSolverBinaryDlg */
-    public EDACCSolverBinaryDlg(java.awt.Frame parent, boolean modal) {
+    public EDACCSolverBinaryDlg(Frame parent, boolean modal, SolverBinaries solverBin, ManageDBSolvers controller) {
         super(parent, modal);
+        this.solverBin = solverBin;
+        this.controller = controller;
         initComponents();
     }
 
@@ -37,18 +53,19 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
         lRunPath = new javax.swing.JLabel();
         tfBinaryName = new javax.swing.JTextField();
         tfRunCommand = new javax.swing.JTextField();
-        tfRunPath = new javax.swing.JTextField();
         lCommand = new javax.swing.JLabel();
         lCommandPreview = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         lCaption = new javax.swing.JLabel();
-        bChoosePath = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        lbRunPath = new javax.swing.JList();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCSolverBinaryDlg.class);
+        setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCSolverBinaryDlg.class);
         lBinaryName.setText(resourceMap.getString("lBinaryName.text")); // NOI18N
         lBinaryName.setName("lBinaryName"); // NOI18N
 
@@ -63,9 +80,11 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
 
         tfRunCommand.setText(resourceMap.getString("tfRunCommand.text")); // NOI18N
         tfRunCommand.setName("tfRunCommand"); // NOI18N
-
-        tfRunPath.setText(resourceMap.getString("tfRunPath.text")); // NOI18N
-        tfRunPath.setName("tfRunPath"); // NOI18N
+        tfRunCommand.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tfRunCommandChanged(evt);
+            }
+        });
 
         lCommand.setText(resourceMap.getString("lCommand.text")); // NOI18N
         lCommand.setName("lCommand"); // NOI18N
@@ -75,6 +94,11 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
 
         jButton1.setText(resourceMap.getString("jButton1.text")); // NOI18N
         jButton1.setName("jButton1"); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addBinary(evt);
+            }
+        });
 
         jButton2.setText(resourceMap.getString("jButton2.text")); // NOI18N
         jButton2.setName("jButton2"); // NOI18N
@@ -83,8 +107,17 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
         lCaption.setText(resourceMap.getString("lCaption.text")); // NOI18N
         lCaption.setName("lCaption"); // NOI18N
 
-        bChoosePath.setText(resourceMap.getString("bChoosePath.text")); // NOI18N
-        bChoosePath.setName("bChoosePath"); // NOI18N
+        jScrollPane1.setName("jScrollPane1"); // NOI18N
+
+        lbRunPath.setModel(new SolverBinariesListModel(solverBin));
+        lbRunPath.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        lbRunPath.setName("lbRunPath"); // NOI18N
+        lbRunPath.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                lbRuntPathChanged(evt);
+            }
+        });
+        jScrollPane1.setViewportView(lbRunPath);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -97,32 +130,27 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lRunCommand)
                             .addComponent(lRunPath)
-                            .addComponent(lBinaryName))
-                        .addGap(26, 26, 26)
+                            .addComponent(lBinaryName)
+                            .addComponent(lCommand))
+                        .addGap(59, 59, 59)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(tfRunPath, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(bChoosePath))
-                            .addComponent(tfBinaryName, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
-                            .addComponent(tfRunCommand, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lCommand)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lCommandPreview))
+                            .addComponent(tfBinaryName, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
+                            .addComponent(tfRunCommand, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
+                            .addComponent(lCommandPreview, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)))
+                    .addComponent(lCaption)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 286, Short.MAX_VALUE)
-                        .addComponent(jButton1))
-                    .addComponent(lCaption))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 344, Short.MAX_VALUE)
+                        .addComponent(jButton1)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(34, 34, 34)
+                .addContainerGap()
                 .addComponent(lCaption)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tfBinaryName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lBinaryName))
@@ -131,54 +159,71 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
                     .addComponent(tfRunCommand, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lRunCommand))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lRunPath)
-                    .addComponent(tfRunPath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(bChoosePath))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lRunPath)
+                        .addGap(108, 108, 108))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lCommandPreview)
+                            .addComponent(lCommand))))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lCommand)
-                    .addComponent(lCommandPreview))
-                .addGap(31, 31, 31)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton2)
                     .addComponent(jButton1))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                EDACCSolverBinaryDlg dialog = new EDACCSolverBinaryDlg(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+    private void addBinary(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBinary
+        solverBin.setBinaryName(tfBinaryName.getText());
+        if (tfRunCommand.getText().equals(""))
+            solverBin.setRunCommand(null);
+        else
+            solverBin.setRunCommand(tfRunCommand.getText());
+        solverBin.setRunPath(((File) lbRunPath.getModel().getElementAt(lbRunPath.getSelectedIndex())).getPath());
+        try {
+            controller.addSolverBinary(solverBin);
+            this.dispose();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "An error occured while adding Solver Binary: \n" + ex.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_addBinary
+
+    private void tfRunCommandChanged(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfRunCommandChanged
+        updateRunCommandLine();
+    }//GEN-LAST:event_tfRunCommandChanged
+
+    private void lbRuntPathChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lbRuntPathChanged
+        updateRunCommandLine();
+    }//GEN-LAST:event_lbRuntPathChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton bChoosePath;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lBinaryName;
     private javax.swing.JLabel lCaption;
     private javax.swing.JLabel lCommand;
     private javax.swing.JLabel lCommandPreview;
     private javax.swing.JLabel lRunCommand;
     private javax.swing.JLabel lRunPath;
+    private javax.swing.JList lbRunPath;
     private javax.swing.JTextField tfBinaryName;
     private javax.swing.JTextField tfRunCommand;
-    private javax.swing.JTextField tfRunPath;
     // End of variables declaration//GEN-END:variables
+
+    private void updateRunCommandLine() {
+        String runCommand = tfRunCommand.getText();
+        String runPath = ((File) lbRunPath.getModel().getElementAt(lbRunPath.getSelectedIndex())).getPath();
+        if (runCommand != null)
+            lCommandPreview.setText(runCommand + " " + runPath);
+        else
+            lCommandPreview.setText(runPath);
+    }
 
 }

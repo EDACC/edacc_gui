@@ -104,8 +104,11 @@ public class SolverDAO {
         }*/
 
         // save SolverBinaries
-        for (SolverBinaries b : SolverBinariesModel.getInstance().getBinariesForSolver(solver))
+        for (SolverBinaries b : SolverBinariesModel.getInstance().getBinariesForSolver(solver)) {
+            // set new id of solver for the binary
+            b.setIdSolver(solver.getId());
             SolverBinariesDAO.save(b);
+        }
 
         cache.cache(solver);
         solver.setSaved();

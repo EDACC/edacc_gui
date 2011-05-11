@@ -21,7 +21,7 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
     /**
      * The id of the associated Solver.
      */
-    private final int idSolver;
+    private int idSolver;
 
     /**
      * The name of the binary.
@@ -91,6 +91,10 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
      */
     public int getIdSolver() {
         return idSolver;
+    }
+
+    public void setIdSolver(int idSolver) {
+        this.idSolver = idSolver;
     }
 
     /**
