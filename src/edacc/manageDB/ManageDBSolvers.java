@@ -110,7 +110,7 @@ public class ManageDBSolvers implements Observer {
         b.setBinaryArchive(binary);
         b.setBinaryName(binary[0].getName()); // TODO ändern
 
-        binary = stripBaseDir(binary);
+       // binary = stripBaseDir(binary);
 
         // TODO beim SPeichern wird momentan ein zweites Mal gezippt -> zwischenspeichern vom Stream!!
         ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(binary);
