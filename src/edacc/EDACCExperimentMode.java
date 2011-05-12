@@ -1968,11 +1968,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         try {
             HashMap<String, Integer> limits = expController.getMaxLimits();
-            EDACCExperimentModeGenerateJobs dialog = new EDACCExperimentModeGenerateJobs(EDACCApp.getApplication().getMainFrame(), true, limits.get("cpuTimeLimit"), limits.get("memoryLimit"), limits.get("wallClockTimeLimit"), limits.get("stackSizeLimit"), limits.get("outputSizeLimit"));
+            EDACCExperimentModeGenerateJobs dialog = new EDACCExperimentModeGenerateJobs(EDACCApp.getApplication().getMainFrame(), true, limits.get("cpuTimeLimit"), limits.get("memoryLimit"), limits.get("wallClockTimeLimit"), limits.get("stackSizeLimit"), limits.get("outputSizeLimitFirst"), limits.get("outputSizeLimitLast"));
             dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
             dialog.setVisible(true);
             if (!dialog.isCancelled()) {
-                Tasks.startTask("generateJobs", new Class[]{edacc.model.Tasks.class, int.class, int.class, int.class, int.class, int.class}, new Object[]{null, dialog.getCpuTimeLimit(), dialog.getMemoryLimit(), dialog.getWallClockTimeLimit(), dialog.getStackSizeLimit(), dialog.getOutputSizeLimit()}, expController, this);
+                Tasks.startTask("generateJobs", new Class[]{edacc.model.Tasks.class, int.class, int.class, int.class, int.class, int.class, int.class}, new Object[]{null, dialog.getCpuTimeLimit(), dialog.getMemoryLimit(), dialog.getWallClockTimeLimit(), dialog.getStackSizeLimit(), dialog.getOutputSizeLimitFirst(), dialog.getOutputSizeLimitLast()}, expController, this);
             } else {
                 javax.swing.JOptionPane.showMessageDialog(null, "No jobs have been generated.", "Cancelled", javax.swing.JOptionPane.ERROR_MESSAGE);
             }

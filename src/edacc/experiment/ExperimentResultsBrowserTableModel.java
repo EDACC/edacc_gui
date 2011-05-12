@@ -396,7 +396,11 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             case COL_STACKSIZELIMIT:
                 return j.getStackSizeLimit();
             case COL_OUTPUTSIZELIMIT:
-                return j.getOutputSizeLimit();
+                if (j.getOutputSizeLimitFirst() == -1 || j.getOutputSizeLimitLast() == -1) {
+                    return "none";
+                } else {
+                    return "Preserve first " + j.getOutputSizeLimitFirst() + " MB and last " + j.getOutputSizeLimitLast() + " MB";
+                }
             case COL_SOLVER_OUTPUT:
                 return "view";
             case COL_LAUNCHER_OUTPUT:

@@ -25,15 +25,15 @@ public class ExperimentResultDAO {
     protected static final String outputTable = "ExperimentResultsOutput";
     protected static final String insertQuery = "INSERT INTO " + table + " (SolverConfig_idSolverConfig, Experiment_idExperiment,"
             + "Instances_idInstance, run, status, seed, "
-            + "startTime, priority, resultTime, computeQueue, resultCode, CPUTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimit) "
-            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            + "startTime, priority, resultTime, computeQueue, resultCode, CPUTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast) "
+            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     protected static final String insertOutputsQuery = "INSERT INTO " + outputTable + " (ExperimentResults_idJob, solverOutput, launcherOutput, watcherOutput, verifierOutput, solverExitCode, watcherExitCode, verifierExitCode) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idJob=?";
     protected static final String selectQuery = "SELECT SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance, "
             + "idJob, run, seed, status, resultTime, resultCode, "
             + "solverExitCode, watcherExitCode, verifierExitCode, computeQueue, TIMESTAMPDIFF(SECOND, startTime, NOW()) AS runningTime, "
             + "IF(status = " + StatusCode.RUNNING.getStatusCode() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) AS date_modified,"
-            + "priority, startTime, CPUTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimit, computeNode, computeNodeIP "
+            + "priority, startTime, CPUTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast, computeNode, computeNodeIP "
             + "FROM " + table + " LEFT JOIN ExperimentResultsOutput ON (idJob = ExperimentResults_idJob) ";
     protected static final String copyOutputQuery = "UPDATE ExperimentResults as dest, ExperimentResults as src "
             + "SET "
@@ -43,14 +43,14 @@ public class ExperimentResultDAO {
             + "dest.verifierOutput = src.verifierOutput "
             + "WHERE src.idJob = ? AND dest.idJob = ?";
 
-    public static ExperimentResult createExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float time, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimit) throws SQLException {
-        ExperimentResult r = new ExperimentResult(run, priority, computeQueue, status, seed, resultCode, time, SolverConfigId, ExperimentId, InstanceId, startTime, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimit);
+    public static ExperimentResult createExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float time, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimitFirst, int outputSizeLimitLast) throws SQLException {
+        ExperimentResult r = new ExperimentResult(run, priority, computeQueue, status, seed, resultCode, time, SolverConfigId, ExperimentId, InstanceId, startTime, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast);
         r.setNew();
         return r;
     }
 
-    public static ExperimentResultEx createExperimentResult(int run, int priority, int computeQueue, StatusCode status, ResultCode resultCode, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimit, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
-        ExperimentResultEx r = new ExperimentResultEx(run, priority, computeQueue, status, resultCode, seed, time, SolverConfigId, ExperimentId, InstanceId, startTime, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimit, solverOutput, launcherOutput, watcherOutput, verifierOutput);
+    public static ExperimentResultEx createExperimentResult(int run, int priority, int computeQueue, StatusCode status, ResultCode resultCode, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimitFirst, int outputSizeLimitLast, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
+        ExperimentResultEx r = new ExperimentResultEx(run, priority, computeQueue, status, resultCode, seed, time, SolverConfigId, ExperimentId, InstanceId, startTime, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast, solverOutput, launcherOutput, watcherOutput, verifierOutput);
         r.setNew();
         return r;
     }
@@ -83,7 +83,8 @@ public class ExperimentResultDAO {
                 st.setInt(13, r.getMemoryLimit());
                 st.setInt(14, r.getWallClockTimeLimit());
                 st.setInt(15, r.getStackSizeLimit());
-                st.setInt(16, r.getOutputSizeLimit());
+                st.setInt(16, r.getOutputSizeLimitFirst());
+                st.setInt(17, r.getOutputSizeLimitLast());
 
                 st.addBatch();
             }
@@ -323,7 +324,8 @@ public class ExperimentResultDAO {
         r.setMemoryLimit(rs.getInt("memoryLimit"));
         r.setWallClockTimeLimit(rs.getInt("wallClockTimeLimit"));
         r.setStackSizeLimit(rs.getInt("stackSizeLimit"));
-        r.setOutputSizeLimit(rs.getInt("outputSizeLimit"));
+        r.setOutputSizeLimitFirst(rs.getInt("outputSizeLimitFirst"));
+        r.setOutputSizeLimitLast(rs.getInt("outputSizeLimitLast"));
 
         r.setComputeNode(rs.getString("computeNode"));
         r.setComputeNodeIP(rs.getString("computeNodeIP"));
@@ -483,7 +485,8 @@ public class ExperimentResultDAO {
                     er.getMemoryLimit(),
                     er.getWallClockTimeLimit(),
                     er.getStackSizeLimit(),
-                    er.getOutputSizeLimit(),
+                    er.getOutputSizeLimitFirst(),
+                    er.getOutputSizeLimitLast(),
                     rs.getBytes(3),
                     rs.getBytes(4),
                     rs.getBytes(5),

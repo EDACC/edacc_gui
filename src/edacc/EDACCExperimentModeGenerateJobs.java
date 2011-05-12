@@ -14,17 +14,30 @@ import edacc.experiment.Util;
 public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
 
     private boolean cancelled;
-    private int cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimit;
+    private int cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast;
 
     /** Creates new form EDACCExperimentModeGenerateJobs */
-    public EDACCExperimentModeGenerateJobs(java.awt.Frame parent, boolean modal, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimit) {
+    public EDACCExperimentModeGenerateJobs(java.awt.Frame parent, boolean modal, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimitFirst, int outputSizeLimitLast) {
         super(parent, modal);
         initComponents();
+        cancelled = true;
         txtCPUTimeLimit.setText("" + cpuTimeLimit);
         txtMemoryLimit.setText("" + memoryLimit);
         txtWallClockTimeLimit.setText("" + wallClockTimeLimit);
         txtStackSizeLimit.setText("" + stackSizeLimit);
-        txtOutputSizeLimit.setText("" + outputSizeLimit);
+        if (outputSizeLimitFirst != -1 && outputSizeLimitLast != -1) {
+            chkLimitOutput.setSelected(true);
+            txtOutputLimitFirst.setText("" + outputSizeLimitFirst);
+            txtOutputLimitLast.setText("" + outputSizeLimitLast);
+            txtOutputLimitFirst.setEnabled(true);
+            txtOutputLimitLast.setEnabled(true);
+        } else {
+            chkLimitOutput.setSelected(false);
+            txtOutputLimitFirst.setText("0");
+            txtOutputLimitLast.setText("0");
+            txtOutputLimitFirst.setEnabled(false);
+            txtOutputLimitLast.setEnabled(false);
+        }
     }
 
     /** This method is called from within the constructor to
@@ -41,12 +54,15 @@ public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
         txtMemoryLimit = new javax.swing.JTextField();
         txtWallClockTimeLimit = new javax.swing.JTextField();
         txtStackSizeLimit = new javax.swing.JTextField();
-        txtOutputSizeLimit = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        chkLimitOutput = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
+        txtOutputLimitFirst = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        txtOutputLimitLast = new javax.swing.JTextField();
         btnGenerate = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
 
@@ -60,47 +76,21 @@ public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
         txtCPUTimeLimit.setText(resourceMap.getString("txtCPUTimeLimit.text")); // NOI18N
         txtCPUTimeLimit.setToolTipText(resourceMap.getString("txtCPUTimeLimit.toolTipText")); // NOI18N
         txtCPUTimeLimit.setName("txtCPUTimeLimit"); // NOI18N
-        txtCPUTimeLimit.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtCPUTimeLimitKeyReleased(evt);
+        txtCPUTimeLimit.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtCPUTimeLimitFocusGained(evt);
             }
         });
 
         txtMemoryLimit.setText(resourceMap.getString("txtMemoryLimit.text")); // NOI18N
         txtMemoryLimit.setToolTipText(resourceMap.getString("txtMemoryLimit.toolTipText")); // NOI18N
         txtMemoryLimit.setName("txtMemoryLimit"); // NOI18N
-        txtMemoryLimit.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtMemoryLimitKeyReleased(evt);
-            }
-        });
 
         txtWallClockTimeLimit.setText(resourceMap.getString("txtWallClockTimeLimit.text")); // NOI18N
         txtWallClockTimeLimit.setName("txtWallClockTimeLimit"); // NOI18N
-        txtWallClockTimeLimit.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtWallClockTimeLimitKeyReleased(evt);
-            }
-        });
 
         txtStackSizeLimit.setText(resourceMap.getString("txtStackSizeLimit.text")); // NOI18N
         txtStackSizeLimit.setName("txtStackSizeLimit"); // NOI18N
-        txtStackSizeLimit.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtStackSizeLimitKeyReleased(evt);
-            }
-        });
-
-        txtOutputSizeLimit.setText(resourceMap.getString("txtOutputSizeLimit.text")); // NOI18N
-        txtOutputSizeLimit.setName("txtOutputSizeLimit"); // NOI18N
-        txtOutputSizeLimit.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtOutputSizeLimitKeyReleased(evt);
-            }
-        });
-
-        jLabel8.setText(resourceMap.getString("jLabel8.text")); // NOI18N
-        jLabel8.setName("jLabel8"); // NOI18N
 
         jLabel7.setText(resourceMap.getString("jLabel7.text")); // NOI18N
         jLabel7.setName("jLabel7"); // NOI18N
@@ -116,55 +106,83 @@ public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
         jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
         jLabel2.setName("jLabel2"); // NOI18N
 
+        chkLimitOutput.setText(resourceMap.getString("chkLimitOutput.text")); // NOI18N
+        chkLimitOutput.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        chkLimitOutput.setName("chkLimitOutput"); // NOI18N
+        chkLimitOutput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkLimitOutputActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
+        jLabel1.setName("jLabel1"); // NOI18N
+
+        txtOutputLimitFirst.setText(resourceMap.getString("txtOutputLimitFirst.text")); // NOI18N
+        txtOutputLimitFirst.setName("txtOutputLimitFirst"); // NOI18N
+
+        jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
+        jLabel3.setName("jLabel3"); // NOI18N
+
+        txtOutputLimitLast.setText(resourceMap.getString("txtOutputLimitLast.text")); // NOI18N
+        txtOutputLimitLast.setName("txtOutputLimitLast"); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 388, Short.MAX_VALUE)
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addContainerGap()
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(txtMemoryLimit, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
-                        .addComponent(txtWallClockTimeLimit, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
-                        .addComponent(txtStackSizeLimit, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
-                        .addComponent(txtOutputSizeLimit, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
-                        .addComponent(txtCPUTimeLimit, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE))
-                    .addContainerGap()))
+                        .addComponent(chkLimitOutput)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel3))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtMemoryLimit, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+                    .addComponent(txtWallClockTimeLimit, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+                    .addComponent(txtStackSizeLimit, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+                    .addComponent(txtCPUTimeLimit, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+                    .addComponent(txtOutputLimitFirst, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+                    .addComponent(txtOutputLimitLast, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 138, Short.MAX_VALUE)
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addGap(3, 3, 3)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel2)
-                        .addComponent(txtCPUTimeLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                        .addComponent(jLabel4)
-                        .addComponent(txtMemoryLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGap(6, 6, 6)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtWallClockTimeLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel6))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtStackSizeLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel7))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtOutputSizeLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel8))
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(3, 3, 3)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(txtCPUTimeLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jLabel4)
+                    .addComponent(txtMemoryLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(6, 6, 6)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtWallClockTimeLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtStackSizeLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkLimitOutput)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(txtOutputLimitFirst, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txtOutputLimitLast, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         btnGenerate.setText(resourceMap.getString("btnGenerate.text")); // NOI18N
@@ -187,77 +205,27 @@ public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(230, Short.MAX_VALUE)
+                .addContainerGap(450, Short.MAX_VALUE)
                 .addComponent(btnCancel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnGenerate)
                 .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnGenerate)
                     .addComponent(btnCancel))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void txtCPUTimeLimitKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCPUTimeLimitKeyReleased
-        int ss = txtCPUTimeLimit.getSelectionStart();
-        int se = txtCPUTimeLimit.getSelectionEnd();
-        int dot = txtCPUTimeLimit.getCaret().getDot();
-        txtCPUTimeLimit.setText(Util.getNumberText(txtCPUTimeLimit.getText()));
-        txtCPUTimeLimit.getCaret().setDot(dot);
-        txtCPUTimeLimit.setSelectionStart(ss);
-        txtCPUTimeLimit.setSelectionEnd(se);
-}//GEN-LAST:event_txtCPUTimeLimitKeyReleased
-
-    private void txtMemoryLimitKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMemoryLimitKeyReleased
-        int ss = txtMemoryLimit.getSelectionStart();
-        int se = txtMemoryLimit.getSelectionEnd();
-        int dot = txtMemoryLimit.getCaret().getDot();
-        txtMemoryLimit.setText(Util.getNumberText(txtMemoryLimit.getText()));
-        txtMemoryLimit.getCaret().setDot(dot);
-        txtMemoryLimit.setSelectionStart(ss);
-        txtMemoryLimit.setSelectionEnd(se);
-}//GEN-LAST:event_txtMemoryLimitKeyReleased
-
-    private void txtWallClockTimeLimitKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtWallClockTimeLimitKeyReleased
-        int ss = txtWallClockTimeLimit.getSelectionStart();
-        int se = txtWallClockTimeLimit.getSelectionEnd();
-        int dot = txtWallClockTimeLimit.getCaret().getDot();
-        txtWallClockTimeLimit.setText(Util.getNumberText(txtWallClockTimeLimit.getText()));
-        txtWallClockTimeLimit.getCaret().setDot(dot);
-        txtWallClockTimeLimit.setSelectionStart(ss);
-        txtWallClockTimeLimit.setSelectionEnd(se);
-}//GEN-LAST:event_txtWallClockTimeLimitKeyReleased
-
-    private void txtStackSizeLimitKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtStackSizeLimitKeyReleased
-        int ss = txtStackSizeLimit.getSelectionStart();
-        int se = txtStackSizeLimit.getSelectionEnd();
-        int dot = txtStackSizeLimit.getCaret().getDot();
-        txtStackSizeLimit.setText(Util.getNumberText(txtStackSizeLimit.getText()));
-        txtStackSizeLimit.getCaret().setDot(dot);
-        txtStackSizeLimit.setSelectionStart(ss);
-        txtStackSizeLimit.setSelectionEnd(se);
-}//GEN-LAST:event_txtStackSizeLimitKeyReleased
-
-    private void txtOutputSizeLimitKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtOutputSizeLimitKeyReleased
-        int ss = txtOutputSizeLimit.getSelectionStart();
-        int se = txtOutputSizeLimit.getSelectionEnd();
-        int dot = txtOutputSizeLimit.getCaret().getDot();
-        txtOutputSizeLimit.setText(Util.getNumberText(txtOutputSizeLimit.getText()));
-        txtOutputSizeLimit.getCaret().setDot(dot);
-        txtOutputSizeLimit.setSelectionStart(ss);
-        txtOutputSizeLimit.setSelectionEnd(se);
-}//GEN-LAST:event_txtOutputSizeLimitKeyReleased
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         cancelled = true;
@@ -266,29 +234,65 @@ public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
 
     private void btnGenerateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerateActionPerformed
         try {
+            boolean format_check = true;
+            format_check &= Util.verifyNumber_geq(txtCPUTimeLimit, -1);
+            format_check &= Util.verifyNumber_geq(txtMemoryLimit, -1);
+            format_check &= Util.verifyNumber_geq(txtWallClockTimeLimit, -1);
+            format_check &= Util.verifyNumber_geq(txtStackSizeLimit, -1);
+
+            if (chkLimitOutput.isSelected()) {
+                format_check &= Util.verifyNumber_geq(txtOutputLimitFirst, 0);
+                format_check &= Util.verifyNumber_geq(txtOutputLimitLast, 0);
+            }
+            if (!format_check) {
+                throw new NumberFormatException();
+            }
             cpuTimeLimit = Integer.parseInt(txtCPUTimeLimit.getText());
             memoryLimit = Integer.parseInt(txtMemoryLimit.getText());
             wallClockTimeLimit = Integer.parseInt(txtWallClockTimeLimit.getText());
             stackSizeLimit = Integer.parseInt(txtStackSizeLimit.getText());
-            outputSizeLimit = Integer.parseInt(txtOutputSizeLimit.getText());
+            if (chkLimitOutput.isSelected()) {
+                outputSizeLimitFirst = Integer.parseInt(txtOutputLimitFirst.getText());
+                outputSizeLimitLast = Integer.parseInt(txtOutputLimitLast.getText());
+            } else {
+                outputSizeLimitFirst = -1;
+                outputSizeLimitLast = -1;
+            }
             cancelled = false;
             this.setVisible(false);
         } catch (NumberFormatException ex) {
-            javax.swing.JOptionPane.showMessageDialog(null, "Expected integers for seed and limits.", "Invalid data", javax.swing.JOptionPane.ERROR_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(null, "Couldn't validate input. Please correct input and try again.", "Invalid data", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnGenerateActionPerformed
+
+    private void chkLimitOutputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkLimitOutputActionPerformed
+        if (chkLimitOutput.isSelected()) {
+            txtOutputLimitFirst.setEnabled(true);
+            txtOutputLimitLast.setEnabled(true);
+        } else {
+            txtOutputLimitFirst.setEnabled(false);
+            txtOutputLimitLast.setEnabled(false);
+        }
+    }//GEN-LAST:event_chkLimitOutputActionPerformed
+
+    private void txtCPUTimeLimitFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCPUTimeLimitFocusGained
+        txtCPUTimeLimit.selectAll();
+    }//GEN-LAST:event_txtCPUTimeLimitFocusGained
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnGenerate;
+    private javax.swing.JCheckBox chkLimitOutput;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField txtCPUTimeLimit;
     private javax.swing.JTextField txtMemoryLimit;
-    private javax.swing.JTextField txtOutputSizeLimit;
+    private javax.swing.JTextField txtOutputLimitFirst;
+    private javax.swing.JTextField txtOutputLimitLast;
     private javax.swing.JTextField txtStackSizeLimit;
     private javax.swing.JTextField txtWallClockTimeLimit;
     // End of variables declaration//GEN-END:variables
@@ -305,15 +309,19 @@ public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
         return memoryLimit;
     }
 
-    public int getOutputSizeLimit() {
-        return outputSizeLimit;
-    }
-
     public int getStackSizeLimit() {
         return stackSizeLimit;
     }
 
     public int getWallClockTimeLimit() {
         return wallClockTimeLimit;
+    }
+
+    public int getOutputSizeLimitFirst() {
+        return outputSizeLimitFirst;
+    }
+
+    public int getOutputSizeLimitLast() {
+        return outputSizeLimitLast;
     }
 }

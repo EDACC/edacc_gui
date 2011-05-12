@@ -5,12 +5,20 @@ import edacc.model.InstanceClass;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstance;
+import java.awt.Color;
+import java.awt.Insets;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import javax.swing.BorderFactory;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
@@ -201,5 +209,37 @@ public class Util {
         } else {
             return f.getParent();
         }
+    }
+
+    public static boolean verifyNumber_geq(JTextField field, Integer number) {
+        boolean res;
+        try {
+            res = Integer.parseInt(field.getText()) >= number;
+        } catch (Exception ex) {
+            res = false;
+        }
+        JTextField tmp = new JTextField();
+        Border defaultBorder = tmp.getBorder();
+        if (!res) {
+            // Mark as error
+            
+            // default thickness
+            int thickness = 1;
+            if (tmp.getBorder() instanceof LineBorder) {
+                // if the look and feel uses some line border then get the thickness from it
+                thickness = ((LineBorder)tmp.getBorder()).getThickness();
+            }
+            // red line border with the hopefully same thickness as the old border
+            Border errorBorder = BorderFactory.createLineBorder(new Color(255, 0, 0), thickness);
+            // this is a hack: create a border inside the red border so that the distance from text to our new border seems to be the same as with the original border
+            Border insideBorder = BorderFactory.createLineBorder(new Color(255, 238, 238), tmp.getBorder().getBorderInsets(tmp).left - thickness); // light red, color of the JTextField Background
+            field.setBackground(new Color(255, 238, 238));
+            field.setBorder(BorderFactory.createCompoundBorder(errorBorder, insideBorder));
+        } else {
+            // this is easier .. set the default border from look&feel
+            field.setBackground(UIManager.getColor("TextField.background"));
+            field.setBorder(defaultBorder);
+        }
+        return res;
     }
 }
