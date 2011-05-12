@@ -28,6 +28,8 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
      */
     private String binaryName;
 
+    private String rootDir;
+
     /**
      * The binary files which will be persisted in the db as zip archive.
      * This is always a reference to the real file system. If the object is NEW
@@ -184,6 +186,14 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
     @Override
     public int getId() {
         return getIdSolverBinary();
+    }
+
+    public String getRootDir() {
+        return rootDir;
+    }
+
+    public void setRootDir(String rootDir) {
+        this.rootDir = rootDir;
     }
 
     @Override

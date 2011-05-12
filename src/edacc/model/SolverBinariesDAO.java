@@ -8,6 +8,7 @@ import edacc.manageDB.Util;
 import edacc.manageDB.NoSolverBinarySpecifiedException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -42,7 +43,7 @@ public class SolverBinariesDAO {
             ps.setInt(1, s.getIdSolver());
             ps.setString(2, s.getBinaryName());
             if (s.getBinaryFiles() != null && s.getBinaryFiles().length > 0) {
-                ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(s.getBinaryFiles());
+                ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(s.getBinaryFiles(), new File(s.getRootDir()));
                 ps.setBinaryStream(3, new ByteArrayInputStream(zipped.toByteArray()));
             } else {
                 throw new NoSolverBinarySpecifiedException();

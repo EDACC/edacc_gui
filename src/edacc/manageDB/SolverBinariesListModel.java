@@ -5,12 +5,7 @@
 
 package edacc.manageDB;
 
-import edacc.model.Solver;
 import edacc.model.SolverBinaries;
-import edacc.model.SolverBinariesModel;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractListModel;
 
 /**

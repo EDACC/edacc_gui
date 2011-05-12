@@ -47,7 +47,7 @@ public class SolverDAO {
         // new solvers without binary aren't allowed
         if (solver.isNew() && solver.getName().isEmpty())
             throw new NoSolverNameSpecifiedException();
-        if (solver.isNew() && !SolverBinariesModel.getInstance().solverHasBinary(solver))
+        if (solver.isNew() && solver.getSolverBinaries().size() == 0)
             throw new NoSolverBinarySpecifiedException();
 
         PreparedStatement ps;
@@ -104,7 +104,7 @@ public class SolverDAO {
         }*/
 
         // save SolverBinaries
-        for (SolverBinaries b : SolverBinariesModel.getInstance().getBinariesForSolver(solver)) {
+        for (SolverBinaries b : solver.getSolverBinaries()) {
             // set new id of solver for the binary
             b.setIdSolver(solver.getId());
             SolverBinariesDAO.save(b);

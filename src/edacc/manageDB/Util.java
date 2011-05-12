@@ -17,6 +17,7 @@ import edacc.model.InstanceClassDAO;
 import edacc.model.InstanceDAO;
 import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstanceDAO;
+import edacc.model.SolverBinaries;
 import edacc.model.SolverDAO;
 import edacc.model.Tasks;
 import java.io.BufferedInputStream;
@@ -156,6 +157,14 @@ public class Util {
         return bos;
     }
 
+    public static ByteArrayOutputStream zipFileArrayToByteStream(File[] files, File base) throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ZipOutputStream out = new ZipOutputStream(bos);
+        zip(files, base, out);
+        out.close();
+        return bos;
+    }
+
     private static void zip(File dir, File base, ZipOutputStream out) throws IOException {
         File[] files = dir.listFiles();
         byte[] buffer = new byte[8192];
@@ -185,6 +194,27 @@ public class Util {
                 zip(files[i], files[i], out); // recursively zip sub-directories
             } else {
                 FileInputStream fin = new FileInputStream(files[i]);
+                ZipEntry entry = new ZipEntry(files[i].getPath());
+                out.putNextEntry(entry);
+
+                int bytes_read = 0;
+                while ((bytes_read = fin.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytes_read);
+                }
+                fin.close();
+            }
+        }
+    }
+
+    private static void zip(File[] files, File base, ZipOutputStream out) throws IOException {
+        byte[] buffer = new byte[8192];
+
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isDirectory()) {
+                zip(files[i], base, out); // recursively zip sub-directories
+            } else {
+                final String FILE_SEP = System.getProperty("file.separator");
+                FileInputStream fin = new FileInputStream(new File(base.getPath() + FILE_SEP + files[i].getPath()));
                 ZipEntry entry = new ZipEntry(files[i].getPath());
                 out.putNextEntry(entry);
 
@@ -380,9 +410,13 @@ public class Util {
         }
     }
 
-   /* public static File[] removeCommonPrefix(File[] files) {
-        
-    }*/
+    public static void removeCommonPrefix(SolverBinaries b) {
+        File[] files = b.getBinaryFiles();
+        String lcp = getCommonPrefix(files);
+        b.setRootDir(lcp);
+        for (int i = 0; i < files.length; i++)
+            files[i] = new File(files[i].getAbsolutePath().replaceAll(lcp, ""));
+    }
 
     private static String getCommonPrefix(File[] files) {
         if (files == null || files.length == 0)

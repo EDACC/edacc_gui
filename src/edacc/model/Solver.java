@@ -1,6 +1,7 @@
 package edacc.model;
 
 import java.io.File;
+import java.util.Vector;
 
 
 public class Solver extends BaseModel implements IntegerPKModel {
@@ -10,9 +11,11 @@ public class Solver extends BaseModel implements IntegerPKModel {
     private File[] codeFile;
     private String authors;
     private String version;
+    private Vector<SolverBinaries> solverBinaries;
     
     public Solver() {
         this.setNew();
+        this.solverBinaries = new Vector<SolverBinaries>();
     }
 
     public String getDescription() {
@@ -76,6 +79,18 @@ public class Solver extends BaseModel implements IntegerPKModel {
         }
     }
 
+    public void addSolverBinary(SolverBinaries b) {
+        this.solverBinaries.add(b);
+    }
+
+    public void removeSolverBinary(SolverBinaries b) {
+        solverBinaries.remove(b);
+    }
+
+    public Vector<SolverBinaries> getSolverBinaries() {
+        return (Vector<SolverBinaries>) solverBinaries.clone();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -85,23 +100,24 @@ public class Solver extends BaseModel implements IntegerPKModel {
             return false;
         }
         final Solver other = (Solver) obj;
-        return this.getName().equals(other.getName()) && this.getVersion().equals(other.getVersion());
+        if (this.id != other.id) {
+            return false;
+        }
+        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
+            return false;
+        }
+        if ((this.version == null) ? (other.version != null) : !this.version.equals(other.version)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 17 * hash + (this.name != null ? this.name.hashCode() : 0);
-        hash = 17 * hash + (this.version != null ? this.version.hashCode() : 0);
+        int hash = 7;
+        hash = 67 * hash + this.id;
         return hash;
     }
-
- /*   @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 29 * hash + (this.md5 != null ? this.md5.hashCode() : 0);
-        return hash;
-    }*/
 
     @Override
     public String toString() {
