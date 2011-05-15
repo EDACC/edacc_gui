@@ -4,6 +4,7 @@
  */
 package edacc.satinstances;
 
+import edacc.EDACCApp;
 import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
 import java.io.BufferedInputStream;
@@ -93,7 +94,7 @@ public class PropertyValueTypeManager {
             // create a new file in the tmp dir (base) with the right package
             // structure (eg. edacc/satinstances/Foo.class for the class edacc.satinstances.Foo.class)
             File f = new File(rs.getString("typeClassFileName"));
-            f.getParentFile().mkdirs();
+            f.mkdirs();
 
             FileOutputStream out = new FileOutputStream(f);
             InputStream in = rs.getBinaryStream("typeClass");
@@ -270,7 +271,7 @@ public class PropertyValueTypeManager {
             for(int i = 0; i < toAdd.size(); i++){
                 if (ent.getName().equals(toAdd.get(i)+ ".class")) {
                     toAdd.remove(i);
-                    files.add(getFileOfJarEntry(new JarFile(file), ent));
+                    files.add(getFileOfJarEntry(new JarFile(file), ent, file));
                     List<Class<PropertyValueType<?>>> classes = getClassesFromFiles(files, cl);
                     Enumeration<PropertyValueType<?>> enumerationToAdd = createPropertyValueTypeObjects(classes).elements();
 
@@ -295,14 +296,15 @@ public class PropertyValueTypeManager {
      * Creates the file of the given JarEntry out from the given JarFile.
      * @param jf JarFile which contains the JarEntry
      * @param ent JarEntry from which the file is requested
+     * @param root File which is the JarFile
      * @return File of the given JarEntry
      * @throws IOException
      * @author rretz
      */
-    private File getFileOfJarEntry(JarFile jf, JarEntry ent) throws IOException{
+    private File getFileOfJarEntry(JarFile jf, JarEntry ent, File root) throws IOException{
         File input = new File(ent.getName());
         BufferedInputStream bis = new BufferedInputStream(jf.getInputStream(ent));
-        File dir = new File(input.getParent());
+        File dir = new File(root.getParent());
         dir.mkdirs();
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(input) );
         for ( int c; ( c = bis.read() ) != -1; )
@@ -330,6 +332,25 @@ public class PropertyValueTypeManager {
         }
         else
             throw new PropertyValueTypeInPropertyException();
+    }
+
+    /**
+     * Adds the all PropertyValueType classes from the file "defaultPropertyValueTypes" in the lib directory to the Database. This PropertyValueType classes represent the
+     * default types of EDACC.
+     * @author rretz
+     */
+    public void addDefaultToDB() throws NoConnectionToDBException, SQLException, IOException {
+        File f = new File(EDACCApp.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+        String path;
+        if (f.isDirectory()) {
+            path = f.getPath() + "/edacc/resources/defaultPropertyValueType.jar";
+        } else {
+            path = f.getParent() + "/edacc/resources/defaultPropertyValueType.jar";
+        }
+        
+        File defaultTypes = new File(path);
+        Vector<String> names = readNameFromJarFile(defaultTypes);
+        addPropertyValueTypes(names, defaultTypes);     
     }
 
 
