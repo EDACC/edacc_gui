@@ -1,6 +1,7 @@
 package edacc;
 
 import edacc.experiment.ExperimentResultsBrowserTableModel;
+import edacc.experiment.Util;
 import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JTable;
@@ -41,7 +42,7 @@ public class EDACCExperimentModeJobsCellRenderer extends DefaultTableCellRendere
         }
 
         if (status < -1) {
-            comp.setBackground(Color.red);
+            comp.setBackground(Util.COLOR_ERROR);
         } else if (status == -1) {
             comp.setBackground(royalBlue);
         } else if (status == 0) {

@@ -45,25 +45,27 @@ public class ClientDAO {
         st.close();
         return res;
     }
-    
+
     private static String getIntArray(Collection<Integer> c) {
         String res = "(";
-        Iterator<Integer> it  = c.iterator();
+        Iterator<Integer> it = c.iterator();
         while (it.hasNext()) {
-            res += ""+ it.next();
-            if (it.hasNext()) res += ",";
+            res += "" + it.next();
+            if (it.hasNext()) {
+                res += ",";
+            }
         }
         res += ")";
         return res;
     }
 
-    public static ArrayList<Client> getClients() throws SQLException {
+    public static synchronized ArrayList<Client> getClients() throws SQLException {
         ArrayList<Client> clients = new ArrayList<Client>();
 
         HashSet<Integer> clientIds = getClientIds();
         ArrayList<Integer> idsModified = new ArrayList<Integer>();
         ArrayList<Client> deletedClients = new ArrayList<Client>();
-        
+
         for (Client c : cache.values()) {
             if (clientIds.contains(c.getId())) {
                 idsModified.add(c.getId());
@@ -72,34 +74,29 @@ public class ClientDAO {
             }
             clientIds.remove(c.getId());
         }
-        
+
         if (!idsModified.isEmpty()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idClient, message, TIMESTAMPDIFF(SECOND, lastReport, NOW()) > 20 AS dead FROM " + table + " WHERE idClient IN " + getIntArray(idsModified));
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                
+
                 Client c = cache.getCached(rs.getInt("idClient"));
                 c.setMessage(rs.getString("message"));
                 c.setDead(rs.getBoolean("dead"));
-                if (c.isModified()) {
-                    c.setSaved();
-                    c.notifyObservers();
-                }
             }
             rs.close();
             st.close();
         }
-        
+
         if (!clientIds.isEmpty()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idClient, numCores, numThreads, hyperthreading, turboboost, CPUName, cacheSize, cpuflags, memory, memoryFree, cpuinfo, meminfo, message, gridQueue_idgridQueue, lastReport, TIMESTAMPDIFF(SECOND, lastReport, NOW()) > 20 AS dead FROM " + table + " WHERE idClient IN " + getIntArray(clientIds));
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 Client c = new Client(rs);
-                c.setSaved();
                 cache.cache(c);
             }
             rs.close();
-            st.close();           
+            st.close();
         }
         for (Client c : cache.values()) {
             clients.add(c);
@@ -108,6 +105,35 @@ public class ClientDAO {
             c.setDeleted();
             c.notifyObservers();
             cache.remove(c);
+        }
+
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT Experiment_idExperiment, Client_idClient, numCores FROM Experiment_has_Client");
+        ResultSet rs = st.executeQuery();
+        HashMap<Client, HashMap<Experiment, Integer>> map = new HashMap<Client, HashMap<Experiment, Integer>>();
+        while (rs.next()) {
+            int clientId = rs.getInt("Client_idClient");
+            int numCores = rs.getInt("numCores");
+            Client c = cache.getCached(clientId);
+            if (c == null) {
+                continue;
+            }
+            Experiment exp = ExperimentDAO.getById(rs.getInt("Experiment_idExperiment"));
+            HashMap<Experiment, Integer> tmp = map.get(c);
+            if (tmp == null) {
+                tmp = new HashMap<Experiment, Integer>();
+                map.put(c, tmp);
+            }
+            tmp.put(exp, numCores);
+        }
+        for (Client c : cache.values()) {
+            HashMap<Experiment, Integer> tmp = map.get(c);
+            if (tmp != null) {
+                c.setComputingExperiments(tmp);
+            }
+            if (c.isModified()) {
+                c.notifyObservers();
+                c.setSaved();
+            }
         }
         return clients;
     }

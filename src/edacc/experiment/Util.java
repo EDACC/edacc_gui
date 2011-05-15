@@ -6,7 +6,6 @@ import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstance;
 import java.awt.Color;
-import java.awt.Insets;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
-import javax.swing.border.MatteBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
@@ -27,6 +25,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class Util {
 
+    public static final Color COLOR_ERROR = new Color(0xed1c24);
+    
     /**
      * Updates the width of each column according to the table size and the data in the cells.
      * @param table
@@ -222,12 +222,12 @@ public class Util {
         Border defaultBorder = tmp.getBorder();
         if (!res) {
             // Mark as error
-            
+
             // default thickness
             int thickness = 1;
             if (tmp.getBorder() instanceof LineBorder) {
                 // if the look and feel uses some line border then get the thickness from it
-                thickness = ((LineBorder)tmp.getBorder()).getThickness();
+                thickness = ((LineBorder) tmp.getBorder()).getThickness();
             }
             // red line border with the hopefully same thickness as the old border
             Border errorBorder = BorderFactory.createLineBorder(new Color(255, 0, 0), thickness);

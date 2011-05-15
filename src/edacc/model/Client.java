@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.logging.Level;
@@ -32,6 +33,7 @@ public class Client extends BaseModel implements IntegerPKModel {
     private int gridQueueId;
     private Timestamp lastReport;
     private boolean dead;
+    private HashMap<Experiment, Integer> computingExperiments;
     private Observable observable;
 
     public Client(ResultSet rs) throws SQLException {
@@ -51,6 +53,7 @@ public class Client extends BaseModel implements IntegerPKModel {
         this.gridQueueId = rs.getInt("gridQueue_idgridQueue");
         this.lastReport = rs.getTimestamp("lastReport");
         this.dead = rs.getBoolean("dead");
+        computingExperiments = new HashMap<Experiment, Integer>();
         observable = new Observable() {
 
             @Override
@@ -195,9 +198,22 @@ public class Client extends BaseModel implements IntegerPKModel {
     }
 
     protected void setDead(boolean dead) {
-        if (!this.dead == dead) {
+        if (this.dead != dead) {
             this.dead = dead;
             this.setModified();
         }
+    }
+
+    public HashMap<Experiment, Integer> getComputingExperiments() {
+        return computingExperiments;
+    }
+
+    protected void setComputingExperiments(HashMap<Experiment, Integer> computingExperiments) {
+        if (!this.computingExperiments.equals(computingExperiments)) {
+            if (!this.isNew()) {
+                this.setModified();
+            }
+        }
+        this.computingExperiments = computingExperiments;
     }
 }

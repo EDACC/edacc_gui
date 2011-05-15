@@ -1,6 +1,7 @@
 package edacc;
 
 import edacc.experiment.ClientTableModel;
+import edacc.experiment.Util;
 import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JCheckBox;
@@ -30,7 +31,7 @@ public class EDACCExperimentModeClientCellRenderer extends DefaultTableCellRende
         }
         if (!isSelected) {
             if (((ClientTableModel) table.getModel()).getClientAt(table.convertRowIndexToModel(row)).isDead()) {
-                c.setBackground(Color.RED);
+                c.setBackground(Util.COLOR_ERROR);
             } else {
                 c.setBackground(Color.WHITE);
             }

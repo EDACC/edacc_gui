@@ -17,15 +17,16 @@ import javax.swing.table.DefaultTableModel;
 public class ClientTableModel extends DefaultTableModel implements Observer {
 
     public static final int COL_COMPUTENODE = 0;
-    public static final int COL_CORES = 1;
-    public static final int COL_THREADS = 2;
-    public static final int COL_HYPERTHREADING = 3;
-    public static final int COL_TURBOBOOST = 4;
-    public static final int COL_CPUNAME = 5;
-    public static final int COL_CACHESIZE = 6;
-    public static final int COL_MEMORY = 7;
-    public static final int COL_MEMORYFREE = 8;
-    private static final String[] columns = {"Compute Node", "Cores", "Threads", "Hyperthreading", "Turboboost", "CPU Name", "Cache Size", "Memory", "Free Memory"};
+    public static final int COL_STATUS = 1;
+    public static final int COL_CORES = 2;
+    public static final int COL_THREADS = 3;
+    public static final int COL_HYPERTHREADING = 4;
+    public static final int COL_TURBOBOOST = 5;
+    public static final int COL_CPUNAME = 6;
+    public static final int COL_CACHESIZE = 7;
+    public static final int COL_MEMORY = 8;
+    public static final int COL_MEMORYFREE = 9;
+    private static final String[] columns = {"Compute Node", "Status", "Cores", "Threads", "Hyperthreading", "Turboboost", "CPU Name", "Cache Size", "Memory", "Free Memory"};
     private ArrayList<Client> clients;
 
     public ClientTableModel() {
@@ -71,6 +72,11 @@ public class ClientTableModel extends DefaultTableModel implements Observer {
                 } catch (SQLException ex) {
                     return "error";
                 }
+            case COL_STATUS:
+                int computeCores = 0;
+                for (Integer cores : clients.get(row).getComputingExperiments().values()) 
+                    computeCores += cores;
+                return "" + computeCores + " threads computing " + clients.get(row).getComputingExperiments().size() + " experiments";
             case COL_CORES:
                 return clients.get(row).getNumCores();
             case COL_THREADS:
