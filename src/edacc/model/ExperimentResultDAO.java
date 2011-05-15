@@ -294,6 +294,27 @@ public class ExperimentResultDAO {
             }
             st.executeBatch();
             st.close();
+            
+            // send message to clients to stop calculation of deleted jobs
+            HashMap<Integer, ArrayList<Integer>> clientJobs = new HashMap<Integer, ArrayList<Integer>>();
+            for (ExperimentResult r : experimentResults) {
+                if (r.getIdClient() == null || !r.getStatus().equals(StatusCode.RUNNING)) 
+                    continue;
+                ArrayList<Integer> tmp = clientJobs.get(r.getIdClient());
+                if (tmp == null) {
+                    tmp = new ArrayList<Integer>();
+                    clientJobs.put(r.getIdClient(), tmp);
+                }
+                tmp.add(r.getId());
+            }
+            for (Integer clientId : clientJobs.keySet()) {
+                String message = "";
+                for (Integer jobId : clientJobs.get(clientId)) {
+                    message += "kill " + jobId + '\n';
+                }
+                ClientDAO.sendMessage(clientId, message);
+            }
+            
         } catch (SQLException e) {
             DatabaseConnector.getInstance().getConn().rollback();
             throw e;

@@ -19,7 +19,6 @@ public class ClientDAO {
     protected static final String table = "Client";
     protected static final String selectQuery = "SELECT * FROM Clients";
     protected static final String updateQuery = "UPDATE " + table + " SET message =? WHERE idClient=?";
-    protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idExperiment=?";
     private static final ObjectCache<Client> cache = new ObjectCache<Client>();
 
     private static HashSet<Integer> getClientIds() throws SQLException {
@@ -142,14 +141,30 @@ public class ClientDAO {
         ps.close();
         return res;
     }
-    
-    public static void sendMessage(Client client, String message) throws SQLException {
-        message += '\n';
+
+    public static void sendMessage(Integer clientId, String message) throws SQLException {
+        if (message.equals("")) {
+            return;
+        }
+        if (message.charAt(message.length() - 1) != '\n') {
+            message += '\n';
+        }
         final String query = "UPDATE Client SET message = CONCAT(message, ?) WHERE idClient = ?";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.setString(1, message);
-        ps.setInt(2, client.getId());
-        
+        ps.setInt(2, clientId);
+
+        ps.executeUpdate();
+        ps.close();
+    }
+
+    public static void sendMessage(Client client, String message) throws SQLException {
+        sendMessage(client.getId(), message);
+    }
+
+    public static void removeDeadClients() throws SQLException {
+        final String query = "DELETE FROM Client WHERE TIMESTAMPDIFF(SECOND, lastReport, NOW()) > 20";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.executeUpdate();
         ps.close();
     }

@@ -201,9 +201,7 @@ public class Client extends BaseModel implements IntegerPKModel {
 
     protected void setComputingExperiments(HashMap<Experiment, Integer> computingExperiments) {
         if (!this.computingExperiments.equals(computingExperiments)) {
-            if (!this.isNew()) {
-                this.setModified();
-            }
+            this.setModified();
         }
         this.computingExperiments = computingExperiments;
     }

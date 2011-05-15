@@ -538,7 +538,7 @@ public class ExperimentController {
                     ExperimentResultDAO.batchUpdateRun(updateJobs);
                 } catch (Exception ex) {
                     DatabaseConnector.getInstance().getConn().rollback();
-                    if (ex.getMessage().contains("cancelled")) {
+                    if (ex.getMessage() != null && ex.getMessage().contains("cancelled")) {
                         throw new TaskCancelledException();
                     }
                     if (ex instanceof SQLException) {
