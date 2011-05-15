@@ -4,6 +4,7 @@ import edacc.EDACCExperimentMode;
 import edacc.EDACCSolverConfigEntry;
 import edacc.EDACCSolverConfigPanel;
 import edacc.EDACCSolverConfigPanelSolver;
+import edacc.model.ClientDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
 import edacc.model.ExpResultHasSolvPropertyNotInDBException;
@@ -110,6 +111,7 @@ public class ExperimentController {
         InstanceDAO.clearCache();
         StatusCodeDAO.initialize();
         ResultCodeDAO.initialize();
+        ClientDAO.clearCache();
         ArrayList<Experiment> v = new ArrayList<Experiment>();
         v.addAll(ExperimentDAO.getAll());
         experiments = v;

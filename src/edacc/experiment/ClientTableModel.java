@@ -32,6 +32,11 @@ public class ClientTableModel extends DefaultTableModel implements Observer {
     public ClientTableModel() {
         clients = new ArrayList<Client>();
     }
+    
+    public void clearClients() {
+        clients = new ArrayList<Client>();
+        this.fireTableDataChanged();
+    }
 
     public void addClient(Client client) {
         client.addObserver(this);

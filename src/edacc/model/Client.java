@@ -1,14 +1,11 @@
 package edacc.model;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 /**
@@ -96,19 +93,13 @@ public class Client extends BaseModel implements IntegerPKModel {
         if (SwingUtilities.isEventDispatchThread()) {
             observable.notifyObservers(this);
         } else {
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
+            SwingUtilities.invokeLater(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        observable.notifyObservers(Client.this);
-                    }
-                });
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                @Override
+                public void run() {
+                    observable.notifyObservers(Client.this);
+                }
+            });
         }
     }
 

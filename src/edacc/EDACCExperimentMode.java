@@ -362,6 +362,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         if (experimentUpdateThread != null) {
             experimentUpdateThread.cancel(true);
         }
+        if (clientUpdateThread != null) {
+            clientUpdateThread.cancel(true);
+        }
         expController.unloadExperiment();
         reinitializeExperiments();
         reinitializeInstances();
@@ -775,6 +778,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         jScrollPane7.setName("jScrollPane7"); // NOI18N
 
+        tblClients.setAutoCreateRowSorter(true);
         tblClients.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 

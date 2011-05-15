@@ -2,8 +2,12 @@ package edacc.experiment;
 
 import edacc.model.Client;
 import edacc.model.ClientDAO;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 /**
@@ -15,12 +19,24 @@ public class ClientUpdateThread extends SwingWorker<Void, Client> {
     private ClientTableModel model;
     private HashSet<Integer> ids;
 
-    public ClientUpdateThread(ClientTableModel model) {
+    public ClientUpdateThread(final ClientTableModel model) {
         super();
         ids = new HashSet<Integer>();
         this.model = model;
-        for (int row = 0; row < model.getRowCount(); row++) {
-            ids.add(model.getClientAt(row).getId());
+        if (!SwingUtilities.isEventDispatchThread()) {
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        model.clearClients();
+                    }
+                    
+                });
+            } catch (Exception ex) {
+            }
+        } else {
+            model.clearClients();
         }
     }
 

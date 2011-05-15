@@ -137,4 +137,8 @@ public class ClientDAO {
         }
         return clients;
     }
+
+    public static void clearCache() {
+        cache.clear();
+    }
 }
