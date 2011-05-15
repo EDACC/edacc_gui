@@ -1,5 +1,7 @@
 package edacc.experiment;
 
+import edacc.model.Client;
+import edacc.model.ClientDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.ExpResultHasSolvPropertyNotInDBException;
 import edacc.model.Experiment;
@@ -35,11 +37,18 @@ public class ExperimentResultCache {
     private HashMap<SolverConfigInstanceIdentifier, Integer> runMap;
     private Timestamp lastUpdated;
     private Experiment experiment;
+    private Client client;
 
     public ExperimentResultCache(Experiment experiment) {
         this.experiment = experiment;
+        this.client = null;
         resultMap = null;
         lastUpdated = new Timestamp(0);
+    }
+
+    public ExperimentResultCache(Client client) {
+        this((Experiment) null);
+        this.client = client;
     }
 
     public synchronized int size() {
@@ -60,8 +69,17 @@ public class ExperimentResultCache {
      * @throws ComputationMethodDoesNotExistException
      */
     public synchronized void updateExperimentResults() throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
-        Timestamp ts = ExperimentResultDAO.getLastModifiedByExperimentId(experiment.getId());
-        ArrayList<ExperimentResult> modified = ExperimentResultDAO.getAllModifiedByExperimentId(experiment.getId(), lastUpdated);
+        Timestamp ts;
+        ArrayList<ExperimentResult> modified;
+        if (experiment != null) {
+            ts = ExperimentResultDAO.getLastModifiedByExperimentId(experiment.getId());
+            modified = ExperimentResultDAO.getAllModifiedByExperimentId(experiment.getId(), lastUpdated);
+        } else if (client != null) {
+            ts = ExperimentResultDAO.getLastModifiedByClientId(client.getId());
+            modified = ExperimentResultDAO.getAllModifiedByClientId(client.getId(), lastUpdated);
+        } else {
+            return;
+        }
         if (resultMap == null) {
             resultMap = new HashMap<ResultIdentifier, ExperimentResult>();
             runMap = new HashMap<SolverConfigInstanceIdentifier, Integer>();
@@ -78,24 +96,34 @@ public class ExperimentResultCache {
                 runMap.put(new SolverConfigInstanceIdentifier(result.getSolverConfigId(), result.getInstanceId()), result.getRun());
             }
         }
-        int count = ExperimentDAO.getJobCount(experiment);
+        int count;
+        if (experiment != null) {
+            count = ExperimentDAO.getJobCount(experiment);
+        } else {
+            count = ClientDAO.getJobCount(client);
+        }
         if (count != resultMap.size()) {
             // full update
             resultMap.clear();
             runMap.clear();
-            ArrayList<ExperimentResult> experimentResults = ExperimentResultDAO.getAllByExperimentId(experiment.getId());
+            ArrayList<ExperimentResult> experimentResults;
+            if (experiment != null) {
+                experimentResults = ExperimentResultDAO.getAllByExperimentId(experiment.getId());
+            } else {
+                experimentResults = ExperimentResultDAO.getAllByClientId(client.getId());
+            }
             for (ExperimentResult result : experimentResults) {
                 resultMap.put(new ResultIdentifier(result.getSolverConfigId(), result.getInstanceId(), result.getRun()), result);
 
                 Integer maxRun = runMap.get(new SolverConfigInstanceIdentifier(result.getSolverConfigId(), result.getInstanceId()));
                 if (maxRun == null || maxRun < result.getRun()) {
                     runMap.put(new SolverConfigInstanceIdentifier(result.getSolverConfigId(), result.getInstanceId()), result.getRun());
-                } 
+                }
             }
         }
         lastUpdated = ts;
     }
-    
+
     public synchronized Integer getNumRuns(int solverConfigId, int instanceId) {
         Integer numRuns = runMap.get(new SolverConfigInstanceIdentifier(solverConfigId, instanceId));
         return numRuns == null ? 0 : (numRuns + 1);

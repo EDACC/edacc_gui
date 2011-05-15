@@ -22,18 +22,6 @@ public class ClientDAO {
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idExperiment=?";
     private static final ObjectCache<Client> cache = new ObjectCache<Client>();
 
-    /**
-     * persists a client object in the database
-     * @param experiment The Experiment object to persist
-     */
-    public static void save(Client client) throws SQLException {
-        if (client.isNew()) {
-            throw new SQLException("Can''t insert clients.");
-        }
-        if (client.isModified()) {
-        }
-    }
-
     private static HashSet<Integer> getClientIds() throws SQLException {
         HashSet<Integer> res = new HashSet<Integer>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idClient FROM " + table);
@@ -125,6 +113,7 @@ public class ClientDAO {
             }
             tmp.put(exp, numCores);
         }
+        st.close();
         for (Client c : cache.values()) {
             HashMap<Experiment, Integer> tmp = map.get(c);
             if (tmp != null) {
@@ -136,6 +125,33 @@ public class ClientDAO {
             }
         }
         return clients;
+    }
+
+    public static int getJobCount(Client client) throws SQLException {
+        final String query = "SELECT COUNT(idJob) FROM ExperimentResults WHERE Client_idClient = ?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, client.getId());
+        ResultSet rs = ps.executeQuery();
+        int res = 0;
+        if (rs.next()) {
+            res = rs.getInt(1);
+        } else {
+            res = 0;
+        }
+        rs.close();
+        ps.close();
+        return res;
+    }
+    
+    public static void sendMessage(Client client, String message) throws SQLException {
+        message += '\n';
+        final String query = "UPDATE Client SET message = CONCAT(message, ?) WHERE idClient = ?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setString(1, message);
+        ps.setInt(2, client.getId());
+        
+        ps.executeUpdate();
+        ps.close();
     }
 
     public static void clearCache() {

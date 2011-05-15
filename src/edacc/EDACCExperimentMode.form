@@ -439,6 +439,9 @@
                     </Property>
                     <Property name="name" type="java.lang.String" value="tblClients" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tblClientsMouseClicked"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>

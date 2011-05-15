@@ -2,11 +2,8 @@ package edacc.experiment;
 
 import edacc.model.Client;
 import edacc.model.ClientDAO;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
