@@ -19,20 +19,7 @@ public class ClientDAO {
     protected static final String table = "Client";
     protected static final String selectQuery = "SELECT * FROM Clients";
     protected static final String updateQuery = "UPDATE " + table + " SET message =? WHERE idClient=?";
-    protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idExperiment=?";
     private static final ObjectCache<Client> cache = new ObjectCache<Client>();
-
-    /**
-     * persists a client object in the database
-     * @param experiment The Experiment object to persist
-     */
-    public static void save(Client client) throws SQLException {
-        if (client.isNew()) {
-            throw new SQLException("Can''t insert clients.");
-        }
-        if (client.isModified()) {
-        }
-    }
 
     private static HashSet<Integer> getClientIds() throws SQLException {
         HashSet<Integer> res = new HashSet<Integer>();
@@ -125,6 +112,7 @@ public class ClientDAO {
             }
             tmp.put(exp, numCores);
         }
+        st.close();
         for (Client c : cache.values()) {
             HashMap<Experiment, Integer> tmp = map.get(c);
             if (tmp != null) {
@@ -136,6 +124,49 @@ public class ClientDAO {
             }
         }
         return clients;
+    }
+
+    public static int getJobCount(Client client) throws SQLException {
+        final String query = "SELECT COUNT(idJob) FROM ExperimentResults WHERE Client_idClient = ?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, client.getId());
+        ResultSet rs = ps.executeQuery();
+        int res = 0;
+        if (rs.next()) {
+            res = rs.getInt(1);
+        } else {
+            res = 0;
+        }
+        rs.close();
+        ps.close();
+        return res;
+    }
+
+    public static void sendMessage(Integer clientId, String message) throws SQLException {
+        if (message.equals("")) {
+            return;
+        }
+        if (message.charAt(message.length() - 1) != '\n') {
+            message += '\n';
+        }
+        final String query = "UPDATE Client SET message = CONCAT(message, ?) WHERE idClient = ?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setString(1, message);
+        ps.setInt(2, clientId);
+
+        ps.executeUpdate();
+        ps.close();
+    }
+
+    public static void sendMessage(Client client, String message) throws SQLException {
+        sendMessage(client.getId(), message);
+    }
+
+    public static void removeDeadClients() throws SQLException {
+        final String query = "DELETE FROM Client WHERE TIMESTAMPDIFF(SECOND, lastReport, NOW()) > 20";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.executeUpdate();
+        ps.close();
     }
 
     public static void clearCache() {

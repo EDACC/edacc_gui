@@ -37,6 +37,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
     private String computeNodeIP;
     private transient HashMap<Integer, ExperimentResultHasProperty> propertyValues;
     private Timestamp datemodified;
+    private Integer idClient;
 
     protected ExperimentResult() {
     }
@@ -346,5 +347,13 @@ public class ExperimentResult extends BaseModel implements Serializable {
 
     protected void setComputeNodeIP(String computeNodeIP) {
         this.computeNodeIP = computeNodeIP;
+    }
+
+    public Integer getIdClient() {
+        return idClient;
+    }
+
+    protected void setIdClient(Integer idClient) {
+        this.idClient = idClient;
     }
 }

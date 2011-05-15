@@ -16,13 +16,18 @@ import edacc.experiment.ExperimentTableModel;
 import edacc.experiment.ExperimentUpdateThread;
 import edacc.experiment.GenerateJobsTableModel;
 import edacc.experiment.InstanceTableModel;
+import edacc.experiment.ResultsBrowserTableRowSorter;
 import edacc.experiment.SolverTableModel;
 import edacc.experiment.Util;
 import edacc.gridqueues.GridQueuesController;
+import edacc.model.Client;
+import edacc.model.ClientDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentResult;
+import edacc.model.Instance;
+import edacc.model.InstanceClass;
 import edacc.model.StatusCode;
 import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.NoConnectionToDBException;
@@ -454,6 +459,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        popupTblClients = new javax.swing.JPopupMenu();
+        menuSendMessage = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        menuKillSoft = new javax.swing.JMenuItem();
+        menuKillHard = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        menuRemoveDeadClients = new javax.swing.JMenuItem();
         manageExperimentPane = new javax.swing.JTabbedPane();
         panelManageExperiment = new javax.swing.JPanel();
         scrollPaneExperimentsTable = new javax.swing.JScrollPane();
@@ -544,6 +556,51 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnSetPriority = new javax.swing.JButton();
         panelAnalysis = new javax.swing.JScrollPane();
 
+        popupTblClients.setName("popupTblClients"); // NOI18N
+
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentMode.class);
+        menuSendMessage.setText(resourceMap.getString("menuSendMessage.text")); // NOI18N
+        menuSendMessage.setName("menuSendMessage"); // NOI18N
+        menuSendMessage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuSendMessageActionPerformed(evt);
+            }
+        });
+        popupTblClients.add(menuSendMessage);
+
+        jSeparator1.setName("jSeparator1"); // NOI18N
+        popupTblClients.add(jSeparator1);
+
+        menuKillSoft.setText(resourceMap.getString("menuKillSoft.text")); // NOI18N
+        menuKillSoft.setName("menuKillSoft"); // NOI18N
+        menuKillSoft.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuKillSoftActionPerformed(evt);
+            }
+        });
+        popupTblClients.add(menuKillSoft);
+
+        menuKillHard.setText(resourceMap.getString("menuKillHard.text")); // NOI18N
+        menuKillHard.setName("menuKillHard"); // NOI18N
+        menuKillHard.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuKillHardActionPerformed(evt);
+            }
+        });
+        popupTblClients.add(menuKillHard);
+
+        jSeparator2.setName("jSeparator2"); // NOI18N
+        popupTblClients.add(jSeparator2);
+
+        menuRemoveDeadClients.setText(resourceMap.getString("menuRemoveDeadClients.text")); // NOI18N
+        menuRemoveDeadClients.setName("menuRemoveDeadClients"); // NOI18N
+        menuRemoveDeadClients.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuRemoveDeadClientsActionPerformed(evt);
+            }
+        });
+        popupTblClients.add(menuRemoveDeadClients);
+
         setName("Form"); // NOI18N
 
         manageExperimentPane.setName("manageExperimentPane"); // NOI18N
@@ -558,7 +615,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         panelManageExperiment.setName("panelManageExperiment"); // NOI18N
         panelManageExperiment.setPreferredSize(new java.awt.Dimension(0, 0));
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentMode.class);
         scrollPaneExperimentsTable.setToolTipText(resourceMap.getString("scrollPaneExperimentsTable.toolTipText")); // NOI18N
         scrollPaneExperimentsTable.setName("scrollPaneExperimentsTable"); // NOI18N
         scrollPaneExperimentsTable.setNextFocusableComponent(btnLoadExperiment);
@@ -787,7 +843,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
             }
         ));
+        tblClients.setComponentPopupMenu(popupTblClients);
         tblClients.setName("tblClients"); // NOI18N
+        tblClients.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblClientsMouseClicked(evt);
+            }
+        });
         jScrollPane7.setViewportView(tblClients);
 
         javax.swing.GroupLayout panelClientBrowserLayout = new javax.swing.GroupLayout(panelClientBrowser);
@@ -1605,6 +1667,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
     }//GEN-LAST:event_manageExperimentPaneStateChanged
 
+    private ArrayList<Client> getSelectedClients() {
+        ArrayList<Client> res = new ArrayList<Client>();
+        if (tblClients.getSelectedRowCount() > 0) {
+            for (int row : tblClients.getSelectedRows()) {
+                res.add(clientTableModel.getClientAt(tblClients.convertRowIndexToModel(row)));
+            }
+        }
+        return res;
+    }
+
     private void txtMaxSeedsKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMaxSeedsKeyReleased
         int ss = txtMaxSeeds.getSelectionStart();
         int se = txtMaxSeeds.getSelectionEnd();
@@ -1750,6 +1822,77 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tableExperimentsWasEditing = false;
     }//GEN-LAST:event_tableExperimentsKeyReleased
 
+    private void tblClientsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblClientsMouseClicked
+        if (evt.getClickCount() == 2) {
+            if (tblClients.getSelectedRow() != -1) {
+                Client client = clientTableModel.getClientAt(tblClients.convertRowIndexToModel(tblClients.getSelectedRow()));
+                EDACCExperimentModeClientDialog dialog = new EDACCExperimentModeClientDialog(EDACCApp.getApplication().getMainFrame(), true, client);
+                EDACCApp.getApplication().show(dialog);
+            }
+        }
+    }//GEN-LAST:event_tblClientsMouseClicked
+
+    private void menuSendMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSendMessageActionPerformed
+        ArrayList<Client> clients = getSelectedClients();
+        if (clients.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "You have to select some clients.", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            String message = JOptionPane.showInputDialog(this, "Message:", "Send Message", JOptionPane.QUESTION_MESSAGE);
+            if (message != null) {
+                try {
+                    for (Client c : clients) {
+                        ClientDAO.sendMessage(c, message);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }//GEN-LAST:event_menuSendMessageActionPerformed
+
+    private void menuKillSoftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuKillSoftActionPerformed
+        ArrayList<Client> clients = getSelectedClients();
+        if (clients.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "You have to select some clients.", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            if (JOptionPane.showConfirmDialog(this, "This will kill the selected clients after their current jobs are finished. Are you sure you want to continue?", "Kill Clients", JOptionPane.YES_NO_OPTION) == 0) {
+                try {
+                    for (Client c : clients) {
+                        ClientDAO.sendMessage(c, "kill_client soft");
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }//GEN-LAST:event_menuKillSoftActionPerformed
+
+    private void menuKillHardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuKillHardActionPerformed
+        ArrayList<Client> clients = getSelectedClients();
+        if (clients.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "You have to select some clients.", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            if (JOptionPane.showConfirmDialog(this, "This will kill the selected clients and their current jobs will be cancelled. Are you sure you want to continue?", "Kill Clients", JOptionPane.YES_NO_OPTION) == 0) {
+                try {
+                    for (Client c : clients) {
+                        ClientDAO.sendMessage(c, "kill_client hard");
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }//GEN-LAST:event_menuKillHardActionPerformed
+
+    private void menuRemoveDeadClientsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuRemoveDeadClientsActionPerformed
+        if (JOptionPane.showConfirmDialog(this, "This will remove all dead clients from the client table. Are you sure you want to continue?", "Delete Clients", JOptionPane.YES_NO_OPTION) == 0) {
+            try {
+                ClientDAO.removeDeadClients();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_menuRemoveDeadClientsActionPerformed
     public void stopJobsTimer() {
         if (jobsTimer != null) {
             jobsTimer.cancel();
@@ -1805,7 +1948,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                 Experiment selectedExperiment = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
                 updateJobsTableColumnWidth = true;
-                Tasks.startTask("loadExperiment", new Class[]{Experiment.class, edacc.model.Tasks.class}, new Object[]{selectedExperiment, null}, expController, this);
+                Tasks.startTask("loadExperiment", new Class[]{Experiment.class, edacc.model.Tasks.class
+                        },
+                        new Object[]{
+                            selectedExperiment, null}, expController,
+                        this);
             }
         }
     }
@@ -1998,7 +2145,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Action
     public void btnSaveInstances() {
-        Tasks.startTask("saveExperimentHasInstances", new Class[]{Tasks.class}, new Object[]{null}, expController, this);
+        Tasks.startTask("saveExperimentHasInstances", new Class[]{Tasks.class
+                }, new Object[]{null}, expController, this);
     }
 
     @Action
@@ -2033,12 +2181,20 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             EDACCExperimentModeGenerateJobs dialog = new EDACCExperimentModeGenerateJobs(EDACCApp.getApplication().getMainFrame(), true, limits.get("cpuTimeLimit"), limits.get("memoryLimit"), limits.get("wallClockTimeLimit"), limits.get("stackSizeLimit"), limits.get("outputSizeLimitFirst"), limits.get("outputSizeLimitLast"));
             dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
             dialog.setVisible(true);
+
+
+
+
             if (!dialog.isCancelled()) {
-                Tasks.startTask("generateJobs", new Class[]{edacc.model.Tasks.class, int.class, int.class, int.class, int.class, int.class, int.class}, new Object[]{null, dialog.getCpuTimeLimit(), dialog.getMemoryLimit(), dialog.getWallClockTimeLimit(), dialog.getStackSizeLimit(), dialog.getOutputSizeLimitFirst(), dialog.getOutputSizeLimitLast()}, expController, this);
+                Tasks.startTask("generateJobs", new Class[]{edacc.model.Tasks.class, int.class, int.class, int.class, int.class, int.class, int.class
+                        },
+                        new Object[]{
+                            null, dialog.getCpuTimeLimit(), dialog.getMemoryLimit(), dialog.getWallClockTimeLimit(), dialog.getStackSizeLimit(), dialog.getOutputSizeLimitFirst(), dialog.getOutputSizeLimitLast()
+                        }, expController,
+                        this);
             } else {
                 javax.swing.JOptionPane.showMessageDialog(null, "No jobs have been generated.", "Cancelled", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
-
         } catch (final Exception ex) {
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -2209,6 +2365,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JTree jTreeInstanceClass;
@@ -2216,6 +2374,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JLabel lblFilterStatus;
     private javax.swing.JLabel lblJobsFilterStatus;
     private javax.swing.JTabbedPane manageExperimentPane;
+    private javax.swing.JMenuItem menuKillHard;
+    private javax.swing.JMenuItem menuKillSoft;
+    private javax.swing.JMenuItem menuRemoveDeadClients;
+    private javax.swing.JMenuItem menuSendMessage;
     private javax.swing.JScrollPane panelAnalysis;
     private javax.swing.JPanel panelChooseInstances;
     private javax.swing.JPanel panelChooseSolver;
@@ -2224,6 +2386,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JPanel panelJobBrowser;
     private javax.swing.JPanel panelManageExperiment;
     private javax.swing.JPanel pnlEditExperiment;
+    private javax.swing.JPopupMenu popupTblClients;
     private javax.swing.JScrollPane scrollPaneExperimentsTable;
     private javax.swing.JTable tableExperiments;
     private javax.swing.JTable tableInstances;
@@ -2519,95 +2682,5 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     public void deinitialize() {
         reinitializeGUI();
-    }
-
-    class ResultsBrowserTableRowSorter extends TableRowSorter<AbstractTableModel> {
-
-        ResultsBrowserTableRowSorter(ExperimentResultsBrowserTableModel jobsTableModel) {
-            super(jobsTableModel);
-        }
-
-        @Override
-        public void setModel(AbstractTableModel model) {
-            super.setModel(new DefaultTableModel() {
-
-                @Override
-                public int getRowCount() {
-                    return jobsTableModel.getRowCount();
-                }
-
-                @Override
-                public Object getValueAt(int row, int column) {
-                    return jobsTableModel.getValueAt(row, column);
-                }
-
-                @Override
-                public Class<?> getColumnClass(int columnIndex) {
-                    int col = jobsTableModel.getIndexForColumn(columnIndex);
-                    if (col == ExperimentResultsBrowserTableModel.COL_RUNTIME) {
-                        return Integer.class;
-                    }
-                    return jobsTableModel.getColumnClass(columnIndex);
-                }
-
-                @Override
-                public int getColumnCount() {
-                    return jobsTableModel.getColumnCount();
-                }
-            });
-            setModelWrapper(new ExperimentResultsBrowserModelWrapper<AbstractTableModel>(getModelWrapper()));
-        }
-
-        @Override
-        public void toggleSortOrder(int column) {
-            synchronized (getModel()) {
-                super.toggleSortOrder(column);
-            }
-        }
-
-        class ExperimentResultsBrowserModelWrapper<M extends TableModel> extends DefaultRowSorter.ModelWrapper<M, Integer> {
-
-            private DefaultRowSorter.ModelWrapper<M, Integer> delegate;
-
-            public ExperimentResultsBrowserModelWrapper(DefaultRowSorter.ModelWrapper<M, Integer> delegate) {
-                this.delegate = delegate;
-            }
-
-            @Override
-            public M getModel() {
-                return delegate.getModel();
-            }
-
-            @Override
-            public int getColumnCount() {
-                return delegate.getColumnCount();
-            }
-
-            @Override
-            public int getRowCount() {
-                return delegate.getRowCount();
-            }
-
-            @Override
-            public Object getValueAt(int row, int column) {
-                ExperimentResultsBrowserTableModel model = jobsTableModel;
-                int col = model.getIndexForColumn(column);
-                if (col == ExperimentResultsBrowserTableModel.COL_STATUS) {
-                    return "" + (char) (model.getStatus(row).getStatusCode() + 68);
-                } else if (col == ExperimentResultsBrowserTableModel.COL_RUNTIME) {
-                    if (model.getExperimentResult(row).getStatus().equals(StatusCode.RUNNING)) {
-                        return model.getExperimentResult(row).getRunningTime();
-                    } else {
-                        return -1;
-                    }
-                }
-                return model.getValueAt(row, column);
-            }
-
-            @Override
-            public Integer getIdentifier(int row) {
-                return delegate.getIdentifier(row);
-            }
-        }
     }
 }
