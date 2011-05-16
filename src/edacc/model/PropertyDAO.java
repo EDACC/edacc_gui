@@ -10,9 +10,12 @@ import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.PropertyValueType;
 import edacc.satinstances.PropertyValueTypeManager;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.sql.PreparedStatement;
@@ -333,6 +336,37 @@ public class PropertyDAO {
         OutputStream output = new FileOutputStream(f);
         ObjectOutputStream o = new ObjectOutputStream(output);
         o.writeObject(property);
+    }
+    
+    /**
+     * Import the properties included in the given files.
+     * @param files
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws ClassNotFoundException
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws ComputationMethodAlreadyExistsException
+     * @throws NoComputationMethodBinarySpecifiedException
+     * @throws PropertyIsUsedException
+     * @throws PropertyTypeDoesNotExistException
+     * @throws PropertyNotInDBException
+     * @throws PropertyTypeNotExistException
+     * @throws ComputationMethodDoesNotExistException 
+     */
+    public static void importProperty(File[] files) throws FileNotFoundException, IOException, ClassNotFoundException, NoConnectionToDBException, SQLException, ComputationMethodAlreadyExistsException, NoComputationMethodBinarySpecifiedException, PropertyIsUsedException, PropertyTypeDoesNotExistException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException{
+        for(int i = 0; i < files.length; i++){
+            InputStream input = new FileInputStream(files[i]);
+            ObjectInputStream in = new ObjectInputStream(input);
+            Property prop = (Property) in.readObject();
+            ComputationMethod compMeth = prop.getComputationMethod();
+            if(compMeth != null){
+                compMeth.isNew();
+                ComputationMethodDAO.save(compMeth);
+            }
+            prop.isNew();
+            PropertyDAO.save(prop);          
+        }
     }
 
 }
