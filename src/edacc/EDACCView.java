@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities;
 import edacc.manageDB.Util;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
+import edacc.satinstances.PropertyValueTypeManager;
 import java.io.IOException;
 import java.net.URL;
 import javax.help.HelpSet;
@@ -425,6 +426,9 @@ public class EDACCView extends FrameView implements Observer {
                         task.setOperationName("Database");
                         task.setStatus("Generating tables");
                         DatabaseConnector.getInstance().createDBSchema();
+                        
+                        task.setStatus("Adding default property value types");
+                        PropertyValueTypeManager.getInstance().addDefaultToDB();
 
                         SwingUtilities.invokeLater(new Runnable() {
 
