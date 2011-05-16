@@ -28,6 +28,7 @@ import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import sun.tools.jar.resources.jar;
 
 /**
@@ -93,9 +94,8 @@ public class PropertyValueTypeManager {
         while (rs.next()) {
             // create a new file in the tmp dir (base) with the right package
             // structure (eg. edacc/satinstances/Foo.class for the class edacc.satinstances.Foo.class)
-            File f = new File(rs.getString("typeClassFileName"));
-            f.mkdirs();
-
+            File f = new File(base.getPath() + "/" + rs.getString("typeClassFileName"));
+            
             FileOutputStream out = new FileOutputStream(f);
             InputStream in = rs.getBinaryStream("typeClass");
             int len = 0;

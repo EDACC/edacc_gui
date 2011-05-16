@@ -8,21 +8,44 @@ package edacc.model;
 import edacc.properties.PropertyTypeNotExistException;
 import edacc.properties.PropertySource;
 import edacc.satinstances.PropertyValueType;
+import edacc.satinstances.PropertyValueTypeManager;
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author rretz
  */
-public class Property extends BaseModel implements IntegerPKModel{
+public class Property extends BaseModel implements IntegerPKModel, Serializable{
 
    private int id;
    private String name;
    private String description;
    private Vector<String> RegularExpression;
    private PropertyType type;
-   private PropertyValueType valueType;
+   private transient PropertyValueType valueType;
+   private String propertyValueTypeName;
    private PropertySource source;
+
+    public String getPropertyValueTypeName() {
+        return propertyValueTypeName;
+    }
+
+    public void setPropertyValueTypeName(String propertyValueTypeName) {
+        this.propertyValueTypeName = propertyValueTypeName;
+    }
+
+    public PropertySource getSource() {
+        return source;
+    }
+
+    public void setSource(PropertySource source) {
+        this.source = source;
+    }
    private boolean multiple;
    private ComputationMethod computationMethod;
    private String computationMethodParameters;
@@ -99,6 +122,7 @@ public class Property extends BaseModel implements IntegerPKModel{
 
     public void setValueType(PropertyValueType valueType) {
         this.valueType = valueType;
+        this.propertyValueTypeName = valueType.getName();
         if (this.isSaved())
             this.setModified();
     }
@@ -115,6 +139,17 @@ public class Property extends BaseModel implements IntegerPKModel{
     }
 
     public PropertyValueType<?> getPropertyValueType() {
+        if(valueType == null){
+            try {
+                this. valueType =  PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(propertyValueTypeName);
+            } catch (IOException ex) {
+                Logger.getLogger(Property.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoConnectionToDBException ex) {
+                Logger.getLogger(Property.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(Property.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         return this.valueType;
     }
 

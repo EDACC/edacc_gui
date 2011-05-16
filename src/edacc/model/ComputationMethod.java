@@ -6,13 +6,14 @@
 package edacc.model;
 
 import java.io.File;
+import java.io.Serializable;
 
 
 /**
  *
  * @author rretz
  */
-public class ComputationMethod extends BaseModel implements IntegerPKModel {
+public class ComputationMethod extends BaseModel implements IntegerPKModel, Serializable {
     private int id;
     private String name;
     private String description;

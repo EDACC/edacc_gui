@@ -4,6 +4,11 @@
   <NonVisualComponents>
     <Component class="javax.swing.ButtonGroup" name="buttonGroup1">
     </Component>
+    <Component class="javax.swing.JFileChooser" name="jFileChooser1">
+      <Properties>
+        <Property name="name" type="java.lang.String" value="jFileChooser1" noResource="true"/>
+      </Properties>
+    </Component>
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
@@ -144,10 +149,14 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="buttonNewProperty" min="-2" pref="57" max="-2" attributes="0"/>
+                              <Component id="buttonNewProperty" linkSize="1" min="-2" pref="57" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="buttonRemoveProperty" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="678" max="32767" attributes="0"/>
+                              <Component id="buttonRemoveProperty" linkSize="1" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="buttonExportProperty" linkSize="1" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="buttonImportProperty" linkSize="1" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace pref="510" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -156,8 +165,10 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="buttonNewProperty" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="buttonRemoveProperty" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="buttonNewProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="buttonRemoveProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="buttonExportProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="buttonImportProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="32767" attributes="0"/>
                           </Group>
@@ -181,6 +192,24 @@
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonRemovePropertyActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="buttonExportProperty">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="buttonExportProperty.text"/>
+                        <Property name="name" type="java.lang.String" value="buttonExportProperty" noResource="true"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonExportPropertyActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="buttonImportProperty">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="buttonImportProperty.text"/>
+                        <Property name="name" type="java.lang.String" value="buttonImportProperty" noResource="true"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonImportPropertyActionPerformed"/>
                       </Events>
                     </Component>
                   </SubComponents>

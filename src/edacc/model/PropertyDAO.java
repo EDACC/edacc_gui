@@ -9,7 +9,12 @@ import edacc.properties.PropertySource;
 import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.PropertyValueType;
 import edacc.satinstances.PropertyValueTypeManager;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -313,6 +318,21 @@ public class PropertyDAO {
             ps.setString(2, regularExpression.get(i));
             ps.executeUpdate();
         }
+    }
+    
+    /**
+     * Exports the  Property object into a file, located in the given path. The name of the file
+     * is the name of the property.
+     * @param property Property Object to export
+     * @param path Path in which the Property have to be exported.
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
+    public static void exportProperty(Property property, String path) throws FileNotFoundException, IOException{
+        File f = new File(path + "/" + property.getName());
+        OutputStream output = new FileOutputStream(f);
+        ObjectOutputStream o = new ObjectOutputStream(output);
+        o.writeObject(property);
     }
 
 }

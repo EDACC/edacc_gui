@@ -18,6 +18,7 @@ import edacc.model.PropertyType;
 import edacc.model.PropertyTypeDoesNotExistException;
 import edacc.satinstances.PropertyValueType;
 import edacc.satinstances.PropertyValueTypeManager;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Vector;
@@ -149,5 +150,17 @@ public class ManagePropertyController {
 
     public Vector<ComputationMethod> loadAllComputationMethods() throws NoConnectionToDBException, SQLException, ComputationMethodDoesNotExistException {
         return ComputationMethodDAO.getAll();
+    }
+
+    /**
+     * Exports the Property Objects related to the given rows of the propertyTable of the view into the given path.
+     * @param selectedRows
+     * @param path 
+     */
+    public void exportProperty(int[] selectedRows, String path) throws FileNotFoundException, IOException {
+        PropertyTableModel tableModel = (PropertyTableModel) tableSolverProperty.getModel();
+        for(int i = 0; i < selectedRows.length; i++){
+            PropertyDAO.exportProperty(tableModel.getProperty(selectedRows[i]), path);
+        }
     }
 }

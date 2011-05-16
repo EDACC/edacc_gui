@@ -8,7 +8,6 @@
  *
  * Created on 07.09.2010, 14:37:06
  */
-
 package edacc;
 
 import edacc.properties.ManagePropertyDialogSourceListener;
@@ -30,6 +29,7 @@ import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.PropertyValueType;
 import edacc.satinstances.PropertyValueTypeManager;
 import java.awt.Component;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Vector;
@@ -46,6 +46,7 @@ import javax.swing.table.DefaultTableCellRenderer;
  * @author rretz
  */
 public class EDACCManagePropertyDialog extends javax.swing.JDialog {
+
     private ManagePropertyController controller;
     private PropertyTableModel propertyTableModel;
     private PropertySource[] ResultPropertySources = {PropertySource.LauncherOutput, PropertySource.SolverOutput, PropertySource.VerifierOutput, PropertySource.WatcherOutput};
@@ -61,16 +62,16 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     public EDACCManagePropertyDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-         controller = new ManagePropertyController(this, panelManageProperty, tableProperty);
-        
-         buttonGroup1.add(radioBtnComputationMethod);
-         buttonGroup1.add(radioBtnRegExpression);
+        controller = new ManagePropertyController(this, panelManageProperty, tableProperty);
 
-         // initialize tableSolverProperty
+        buttonGroup1.add(radioBtnComputationMethod);
+        buttonGroup1.add(radioBtnRegExpression);
+
+        // initialize tableSolverProperty
         propertyTableModel = new PropertyTableModel();
         tableProperty.setModel(propertyTableModel);
         tableProperty.getSelectionModel().addListSelectionListener(new PropertyTableSelectionListener(tableProperty, controller));
-           
+
         // Adding new ColumnModel for the suitable representation of boolen values in the table.
         tableProperty.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
 
@@ -85,7 +86,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
 
         sourceListener = new ManagePropertyDialogSourceListener(controller);
         typeListener = new ManagePropertyDialogTypeListener(controller, comboBoxPropertyType);
-        
+
     }
 
     /** This method is called from within the constructor to
@@ -98,12 +99,15 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        jFileChooser1 = new javax.swing.JFileChooser();
         panelManageProperty = new javax.swing.JPanel();
         jSplitPane1 = new javax.swing.JSplitPane();
         panelMangePropertyShow = new javax.swing.JPanel();
         panelManageSolverPropertyShowButtons = new javax.swing.JPanel();
         buttonNewProperty = new javax.swing.JButton();
         buttonRemoveProperty = new javax.swing.JButton();
+        buttonExportProperty = new javax.swing.JButton();
+        buttonImportProperty = new javax.swing.JButton();
         panelManageSolverPropertyTable = new javax.swing.JScrollPane();
         tableProperty = new javax.swing.JTable();
         panelManagerPropertyEdit = new javax.swing.JPanel();
@@ -132,6 +136,8 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         textAreaRegularExpressions = new javax.swing.JTextArea();
         buttonSaveProperty = new javax.swing.JButton();
         buttonDone = new javax.swing.JButton();
+
+        jFileChooser1.setName("jFileChooser1"); // NOI18N
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCManagePropertyDialog.class);
@@ -169,6 +175,22 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             }
         });
 
+        buttonExportProperty.setText(resourceMap.getString("buttonExportProperty.text")); // NOI18N
+        buttonExportProperty.setName("buttonExportProperty"); // NOI18N
+        buttonExportProperty.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonExportPropertyActionPerformed(evt);
+            }
+        });
+
+        buttonImportProperty.setText(resourceMap.getString("buttonImportProperty.text")); // NOI18N
+        buttonImportProperty.setName("buttonImportProperty"); // NOI18N
+        buttonImportProperty.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonImportPropertyActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelManageSolverPropertyShowButtonsLayout = new javax.swing.GroupLayout(panelManageSolverPropertyShowButtons);
         panelManageSolverPropertyShowButtons.setLayout(panelManageSolverPropertyShowButtonsLayout);
         panelManageSolverPropertyShowButtonsLayout.setHorizontalGroup(
@@ -178,17 +200,28 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 .addComponent(buttonNewProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonRemoveProperty)
-                .addContainerGap(678, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(buttonExportProperty)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(buttonImportProperty)
+                .addContainerGap(510, Short.MAX_VALUE))
         );
+
+        panelManageSolverPropertyShowButtonsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {buttonExportProperty, buttonImportProperty, buttonNewProperty, buttonRemoveProperty});
+
         panelManageSolverPropertyShowButtonsLayout.setVerticalGroup(
             panelManageSolverPropertyShowButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelManageSolverPropertyShowButtonsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelManageSolverPropertyShowButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttonNewProperty)
-                    .addComponent(buttonRemoveProperty))
+                    .addComponent(buttonRemoveProperty)
+                    .addComponent(buttonExportProperty)
+                    .addComponent(buttonImportProperty))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        panelManageSolverPropertyShowButtonsLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {buttonExportProperty, buttonImportProperty, buttonNewProperty, buttonRemoveProperty});
 
         panelManageSolverPropertyTable.setName("panelManageSolverPropertyTable"); // NOI18N
 
@@ -501,34 +534,33 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
 }//GEN-LAST:event_buttonNewPropertyActionPerformed
 
     private void buttonDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDoneActionPerformed
-       this.setVisible(false);
-       clearPropertyEditField();
-       doEnable(false);
+        this.setVisible(false);
+        clearPropertyEditField();
+        doEnable(false);
     }//GEN-LAST:event_buttonDoneActionPerformed
 
     private void comboBoxPropertySourceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxPropertySourceActionPerformed
-
     }//GEN-LAST:event_comboBoxPropertySourceActionPerformed
 
     private void buttonPropertyAddValueTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPropertyAddValueTypeActionPerformed
-      if(PropertyValueTypesDialog == null){
+        if (PropertyValueTypesDialog == null) {
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
             PropertyValueTypesDialog = new EDACCManagePropertyValueTypesDialog(mainFrame, true, this);
             PropertyValueTypesDialog.setLocationRelativeTo(mainFrame);
             PropertyValueTypesDialog.initialize();
-      }
-      PropertyValueTypesDialog.setVisible(true);
+        }
+        PropertyValueTypesDialog.setVisible(true);
     }//GEN-LAST:event_buttonPropertyAddValueTypeActionPerformed
 
     private void buttonRemovePropertyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemovePropertyActionPerformed
-        if(tableProperty.getSelectedRow() == -1){
-                 JOptionPane.showMessageDialog(this,
-                "Nothing is selected. Select a solver property.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-            }else{
+        if (tableProperty.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(this,
+                    "Nothing is selected. Select a solver property.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } else {
             try {
-                try {                 
+                try {
                     controller.removeProperty(tableProperty.convertRowIndexToModel(tableProperty.getSelectedRow()));
 
                 } catch (PropertyTypeDoesNotExistException ex) {
@@ -548,49 +580,50 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (PropertyIsUsedException ex) {
                 JOptionPane.showMessageDialog(this,
-                "Cannot delete the solver property, because it's already in use.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+                        "Cannot delete the solver property, because it's already in use.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
-            }
+        }
     }//GEN-LAST:event_buttonRemovePropertyActionPerformed
 
     private void buttonSavePropertyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSavePropertyActionPerformed
-        if(comboBoxPropertyType.getSelectedIndex() == -1){
-              JOptionPane.showMessageDialog(this,
-                "You must specify the type of the property.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-        }
-        if(textPropertyFieldName.getText().equals("")){
+        if (comboBoxPropertyType.getSelectedIndex() == -1) {
             JOptionPane.showMessageDialog(this,
-                "You must specify a name for the property.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-        }else if((textAreaRegularExpressions.getText().equals("") && comboBoxComputationMethod.getSelectedIndex() == -1)
+                    "You must specify the type of the property.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        if (textPropertyFieldName.getText().equals("")) {
+            JOptionPane.showMessageDialog(this,
+                    "You must specify a name for the property.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } else if ((textAreaRegularExpressions.getText().equals("") && comboBoxComputationMethod.getSelectedIndex() == -1)
                 || (radioBtnComputationMethod.isSelected() && comboBoxComputationMethod.getSelectedIndex() == -1)
                 || (radioBtnRegExpression.isSelected() && textAreaRegularExpressions.getText().equals(""))
-                || (!radioBtnComputationMethod.isSelected() && !radioBtnRegExpression.isSelected())){
+                || (!radioBtnComputationMethod.isSelected() && !radioBtnRegExpression.isSelected())) {
             JOptionPane.showMessageDialog(this,
-                "You must specify a regular expression or choose a computation method for the property.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-        }else if(comboBoxPropertySource.getSelectedIndex() == -1){
+                    "You must specify a regular expression or choose a computation method for the property.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } else if (comboBoxPropertySource.getSelectedIndex() == -1) {
             JOptionPane.showMessageDialog(this,
-                "You must select a source for the property.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-        }else if(comboBoxPropertyValuetype.getSelectedIndex() == -1){
+                    "You must select a source for the property.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } else if (comboBoxPropertyValuetype.getSelectedIndex() == -1) {
             JOptionPane.showMessageDialog(this,
-                "You must select a  property value type for the property.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-        }else{
+                    "You must select a  property value type for the property.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } else {
             try {
-                if(radioBtnRegExpression.isSelected()){
-                    controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), textAreaRegularExpressions.getText(), null, "", (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String)comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
-                }else if(radioBtnComputationMethod.isSelected())
-                    controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), "", (ComputationMethod) ComputationMethodDAO.getByName((String)comboBoxComputationMethod.getSelectedItem()), textFieldComputationmethodParameter.getText(), (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String)comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
+                if (radioBtnRegExpression.isSelected()) {
+                    controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), textAreaRegularExpressions.getText(), null, "", (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String) comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
+                } else if (radioBtnComputationMethod.isSelected()) {
+                    controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), "", (ComputationMethod) ComputationMethodDAO.getByName((String) comboBoxComputationMethod.getSelectedItem()), textFieldComputationmethodParameter.getText(), (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String) comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
+                }
             } catch (IOException ex) {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (NoConnectionToDBException ex) {
@@ -612,13 +645,49 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_buttonSavePropertyActionPerformed
 
     private void buttonNewComputationMethodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonNewComputationMethodActionPerformed
-        if(computationMethodDialog == null){
+        if (computationMethodDialog == null) {
             computationMethodDialog = new EDACCManageComputationMethodDialog(EDACCApp.getApplication().getMainFrame(), true, this);
-            computationMethodDialog.setLocationRelativeTo(this);           
+            computationMethodDialog.setLocationRelativeTo(this);
         }
         computationMethodDialog.initialize();
         computationMethodDialog.setVisible(true);
     }//GEN-LAST:event_buttonNewComputationMethodActionPerformed
+
+    /**
+     * Shows an FileChooser, in which the user can delcare the directory to which the selected properties
+     * have to be exported. If no property is selected, an messageDialog is shown.
+     * @param evt 
+     */
+    private void buttonExportPropertyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonExportPropertyActionPerformed
+        if (this.tableProperty.getSelectedRowCount() == 0) {
+            JOptionPane.showMessageDialog(this,
+                    "No Property is selected. Select one or more of the Properties in the table.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }else {
+            try {
+                jFileChooser1.setFileSelectionMode(jFileChooser1.DIRECTORIES_ONLY);
+                int returnVal = jFileChooser1.showOpenDialog(this);
+                if(returnVal == jFileChooser1.CANCEL_OPTION)
+                    return;
+                
+                String path = jFileChooser1.getSelectedFile().getAbsolutePath();
+                int[] selectedRows = tableProperty.getSelectedRows();
+                for(int i = 0; i < selectedRows.length; i++){
+                    selectedRows[i] = tableProperty.convertRowIndexToModel(selectedRows[i]);
+                }
+                controller.exportProperty(selectedRows, path);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    
+    }//GEN-LAST:event_buttonExportPropertyActionPerformed
+    private void buttonImportPropertyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonImportPropertyActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_buttonImportPropertyActionPerformed
 
     /**
     * @param args the command line arguments
@@ -639,7 +708,9 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonDone;
+    private javax.swing.JButton buttonExportProperty;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton buttonImportProperty;
     private javax.swing.JButton buttonNewComputationMethod;
     private javax.swing.JButton buttonNewProperty;
     private javax.swing.JButton buttonPropertyAddValueType;
@@ -650,6 +721,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     private javax.swing.JComboBox comboBoxPropertySource;
     private javax.swing.JComboBox comboBoxPropertyType;
     private javax.swing.JComboBox comboBoxPropertyValuetype;
+    private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
@@ -749,16 +821,36 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             comboBoxPropertyType.addItemListener(typeListener);
             clearPropertyEditField();
             
-        } catch (SQLException ex) {
-            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ComputationMethodDoesNotExistException ex) {
-            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (PropertyNotInDBException ex) {
-            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (PropertyTypeNotExistException ex) {
-            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+        
+
+} catch (SQLException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class  
+
+.getName()).log(Level.SEVERE, null, ex);
+        } 
+
+catch (ComputationMethodDoesNotExistException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class  
+
+.getName()).log(Level.SEVERE, null, ex);
+        } 
+
+catch (PropertyNotInDBException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class  
+
+.getName()).log(Level.SEVERE, null, ex);
+        } 
+
+catch (PropertyTypeNotExistException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class  
+
+.getName()).log(Level.SEVERE, null, ex);
+        } 
+
+catch (IOException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class  
+
+.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -887,25 +979,49 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             Vector<ComputationMethod> items = controller.loadAllComputationMethods();
             for (int i = 0; i < items.size(); i++) {
                 comboBoxComputationMethod.addItem(items.get(i).getName());
-            }
+            
+
+}
         } catch (NoConnectionToDBException ex) {
-            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ComputationMethodDoesNotExistException ex) {
-            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(EDACCManagePropertyDialog.class  
+
+.getName()).log(Level.SEVERE, null, ex);
+        } 
+
+catch (SQLException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class  
+
+.getName()).log(Level.SEVERE, null, ex);
+        } 
+
+catch (ComputationMethodDoesNotExistException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class  
+
+.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     void loadPropertyValues() {
         try {
             controller.loadPropertyValueTypes();
-        } catch (IOException ex) {
-            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoConnectionToDBException ex) {
-            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+        
+
+} catch (IOException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class  
+
+.getName()).log(Level.SEVERE, null, ex);
+        } 
+
+catch (NoConnectionToDBException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class  
+
+.getName()).log(Level.SEVERE, null, ex);
+        } 
+
+catch (SQLException ex) {
+            Logger.getLogger(EDACCManagePropertyDialog.class  
+
+.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
