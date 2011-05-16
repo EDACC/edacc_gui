@@ -83,6 +83,7 @@ public class EDACCExperimentModeClientDialog extends javax.swing.JDialog impleme
             thread.start();
         }
         super.setVisible(b);
+        client.deleteObserver(this);
     }
 
     /**

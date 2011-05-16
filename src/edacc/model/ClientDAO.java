@@ -167,6 +167,8 @@ public class ClientDAO {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.executeUpdate();
         ps.close();
+        // update cache; will notify client browser
+        getClients();
     }
 
     public static void clearCache() {
