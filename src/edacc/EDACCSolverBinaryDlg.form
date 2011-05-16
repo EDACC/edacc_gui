@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
-    <Property name="title" type="java.lang.String" resourceKey="Form.title"/>
     <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
   </Properties>
   <SyntheticProperties>
@@ -36,10 +35,10 @@
                       </Group>
                       <EmptySpace min="-2" pref="59" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="tfBinaryName" alignment="0" pref="302" max="32767" attributes="0"/>
-                          <Component id="jScrollPane1" alignment="0" pref="302" max="32767" attributes="0"/>
-                          <Component id="tfRunCommand" alignment="0" pref="302" max="32767" attributes="0"/>
-                          <Component id="lCommandPreview" alignment="0" pref="302" max="32767" attributes="0"/>
+                          <Component id="tfBinaryName" alignment="0" pref="348" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" alignment="0" pref="348" max="32767" attributes="0"/>
+                          <Component id="tfRunCommand" alignment="0" pref="348" max="32767" attributes="0"/>
+                          <Component id="lCommandPreview" alignment="0" pref="348" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Component id="lCaption" alignment="0" min="-2" max="-2" attributes="0"/>

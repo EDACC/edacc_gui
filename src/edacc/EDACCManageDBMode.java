@@ -1489,17 +1489,21 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             if (binaryFileChooser == null) {
                 binaryFileChooser = new JFileChooser();
                 binaryFileChooser.setMultiSelectionEnabled(true);
+                binaryFileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             }
+            
             if (binaryFileChooser.showDialog(this, "Add Solver Binaries") == JFileChooser.APPROVE_OPTION) {
                 manageDBSolvers.addSolverBinary(binaryFileChooser.getSelectedFiles());
                 unsavedChanges = true;
             }
         } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
             JOptionPane.showMessageDialog(panelManageDBInstances,
                     "The binary of the solver couldn't be found: " + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
+            ex.printStackTrace();
             JOptionPane.showMessageDialog(panelManageDBInstances,
                     "An error occured while adding the binary of the solver: " + ex.getMessage(),
                     "Error",

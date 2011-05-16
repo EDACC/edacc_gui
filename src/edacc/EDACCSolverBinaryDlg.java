@@ -62,10 +62,9 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
         lbRunPath = new javax.swing.JList();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCSolverBinaryDlg.class);
-        setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
 
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCSolverBinaryDlg.class);
         lBinaryName.setText(resourceMap.getString("lBinaryName.text")); // NOI18N
         lBinaryName.setName("lBinaryName"); // NOI18N
 
@@ -134,10 +133,10 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
                             .addComponent(lCommand))
                         .addGap(59, 59, 59)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(tfBinaryName, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
-                            .addComponent(tfRunCommand, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
-                            .addComponent(lCommandPreview, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)))
+                            .addComponent(tfBinaryName, javax.swing.GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
+                            .addComponent(tfRunCommand, javax.swing.GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
+                            .addComponent(lCommandPreview, javax.swing.GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)))
                     .addComponent(lCaption)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton2)
@@ -185,7 +184,7 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
             solverBin.setRunCommand(null);
         else
             solverBin.setRunCommand(tfRunCommand.getText());
-        solverBin.setRunPath(((File) lbRunPath.getModel().getElementAt(lbRunPath.getSelectedIndex())).getPath());
+        solverBin.setRunPath((String) lbRunPath.getModel().getElementAt(lbRunPath.getSelectedIndex()));
         try {
             controller.addSolverBinary(solverBin);
             this.dispose();
@@ -219,7 +218,7 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
 
     private void updateRunCommandLine() {
         String runCommand = tfRunCommand.getText();
-        String runPath = ((File) lbRunPath.getModel().getElementAt(lbRunPath.getSelectedIndex())).getPath();
+        String runPath = (String) lbRunPath.getModel().getElementAt(lbRunPath.getSelectedIndex());
         if (runCommand != null)
             lCommandPreview.setText(runCommand + " " + runPath);
         else

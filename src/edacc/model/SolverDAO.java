@@ -113,7 +113,6 @@ public class SolverDAO {
 
         // save SolverBinaries
         for (SolverBinaries b : solver.getSolverBinaries()) {
-            System.out.println(b.isSaved());
             // set new id of solver for the binary
             b.setIdSolver(solver.getId());
             SolverBinariesDAO.save(b);

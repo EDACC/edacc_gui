@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,6 +45,10 @@ public class SolverBinariesDAO {
             ps.setString(2, s.getBinaryName());
             if (s.getBinaryFiles() != null && s.getBinaryFiles().length > 0) {
                 ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(s.getBinaryFiles(), new File(s.getRootDir()));
+                        FileOutputStream os = new FileOutputStream(new File("D:\\test.zip"));
+                        
+        os.write(zipped.toByteArray());
+        os.close();
                 ps.setBinaryStream(3, new ByteArrayInputStream(zipped.toByteArray()));
             } else {
                 throw new NoSolverBinarySpecifiedException();
