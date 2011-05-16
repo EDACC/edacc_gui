@@ -77,7 +77,7 @@ public class ManageDBSolvers implements Observer {
      * @throws SQLException
      * @throws FileNotFoundException
      */
-    public void saveSolvers() throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, NoSolverNameSpecifiedException,IOException {
+    public void saveSolvers() throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, NoSolverNameSpecifiedException,IOException, NoSuchAlgorithmException {
         for (Solver s : solverTableModel.getSolvers()) {
             SolverDAO.save(s);
         }

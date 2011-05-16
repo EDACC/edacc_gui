@@ -1473,6 +1473,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     "IO exception while reading solver data from the filesystem" + ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
+        } catch (NoSuchAlgorithmException ex) {
+             JOptionPane.showMessageDialog(panelManageDBInstances,
+                    ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);           
         }
     }//GEN-LAST:event_btnSolverSaveToDBActionPerformed
 

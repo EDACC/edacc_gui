@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,7 +33,7 @@ public class SolverBinariesDAO {
         
     }
 
-    public static void save(SolverBinaries s) throws SQLException, NoSolverBinarySpecifiedException, FileNotFoundException, IOException {
+    public static void save(SolverBinaries s) throws SQLException, NoSolverBinarySpecifiedException, FileNotFoundException, IOException, NoSuchAlgorithmException {
         if (s.isSaved()) {
             return;
         }
@@ -45,10 +46,7 @@ public class SolverBinariesDAO {
             ps.setString(2, s.getBinaryName());
             if (s.getBinaryFiles() != null && s.getBinaryFiles().length > 0) {
                 ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(s.getBinaryFiles(), new File(s.getRootDir()));
-                        FileOutputStream os = new FileOutputStream(new File("D:\\test.zip"));
-                        
-        os.write(zipped.toByteArray());
-        os.close();
+                s.setMd5(Util.calculateMD5(new ByteArrayInputStream(zipped.toByteArray())));
                 ps.setBinaryStream(3, new ByteArrayInputStream(zipped.toByteArray()));
             } else {
                 throw new NoSolverBinarySpecifiedException();
