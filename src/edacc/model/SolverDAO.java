@@ -42,6 +42,14 @@ public class SolverDAO {
     public static void save(Solver solver) throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, NoSolverNameSpecifiedException,  IOException {
         if (solver == null)
             return;
+        if (solver.isSaved()) {
+            for (SolverBinaries sb : solver.getSolverBinaries()) {
+                if (sb.isModified()) {
+                    solver.setModified();
+                    break;
+                }
+            }
+        }
          if (solver.isSaved())
             return;
         // new solvers without binary aren't allowed
@@ -105,6 +113,7 @@ public class SolverDAO {
 
         // save SolverBinaries
         for (SolverBinaries b : solver.getSolverBinaries()) {
+            System.out.println(b.isSaved());
             // set new id of solver for the binary
             b.setIdSolver(solver.getId());
             SolverBinariesDAO.save(b);
@@ -154,6 +163,7 @@ public class SolverDAO {
         i.setDescription(rs.getString("description"));
         i.setAuthor(rs.getString("authors"));
         i.setVersion(rs.getString("version"));
+        i.setSolverBinaries(SolverBinariesDAO.getBinariesOfSolver(i));
         return i;
     }
     

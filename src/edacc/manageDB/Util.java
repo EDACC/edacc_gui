@@ -415,12 +415,15 @@ public class Util {
         String lcp = getCommonPrefix(files);
         b.setRootDir(lcp);
         for (int i = 0; i < files.length; i++)
-            files[i] = new File(files[i].getAbsolutePath().replaceAll(lcp, ""));
+            files[i] = new File(files[i].getAbsolutePath().replace(lcp, ""));
     }
 
     private static String getCommonPrefix(File[] files) {
         if (files == null || files.length == 0)
             return "";
+        if (files.length == 1) {
+            return files[0].getPath();
+        }
         Arrays.sort(files, new Comparator<File>() {
 
             @Override

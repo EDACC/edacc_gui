@@ -24,7 +24,7 @@ public class SolverBinariesDAO {
 
     private static final String TABLE = "SolverBinaries";
     private static final String INSERT_QUERY = "INSERT INTO " + TABLE + " (idSolver, binaryName, binaryArchive, md5, version, runCommand, runPath) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
+    private static final String UPDATE_QUERY = "UPDATE " + TABLE + " SET binaryName = ?, version = ?, runCommand = ?, runPath = ? WHERE idSolverBinary = ?";
     private static ObjectCache<SolverBinaries> cache = new ObjectCache<SolverBinaries>();
 
     private SolverBinariesDAO() {
@@ -53,6 +53,12 @@ public class SolverBinariesDAO {
             ps.setString(6, s.getRunCommand());
             ps.setString(7, s.getRunPath());
         } else if (s.isModified()) {
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(UPDATE_QUERY);
+            ps.setString(1, s.getBinaryName());
+            ps.setString(2, s.getVersion());
+            ps.setString(3, s.getRunCommand());
+            ps.setString(4, s.getRunPath());
+            ps.setInt(5, s.getIdSolverBinary());
         } else if (s.isDeleted()) {
         }
         ps.executeUpdate();
@@ -80,7 +86,7 @@ public class SolverBinariesDAO {
     }
 
     public static Vector<SolverBinaries> getBinariesOfSolver(Solver solver) throws SQLException {
-        final String query = "SELECT * FROM " + TABLE + " WHERE idSolver=?";
+        final String query = "SELECT idSolverBinary, idSolver, binaryName, md5, version, runCommand, runPath FROM " + TABLE + " WHERE idSolver=?";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.setInt(1, solver.getId());
         ResultSet rs = ps.executeQuery();
@@ -101,7 +107,7 @@ public class SolverBinariesDAO {
     }
 
     public static Vector<SolverBinaries> getAll() throws SQLException {
-        final String query = "SELECT * FROM " + TABLE;
+        final String query = "SELECT idSolverBinary, idSolver, binaryName, md5, version, runCommand, runPath FROM " + TABLE;
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ResultSet rs = ps.executeQuery();
         Vector<SolverBinaries> res = new Vector<SolverBinaries>();
@@ -121,7 +127,7 @@ public class SolverBinariesDAO {
     }
 
     public static SolverBinaries getById(int id) throws SQLException {
-        final String query = "SELECT * FROM " + TABLE + " WHERE idSolverBinary=?";
+        final String query = "SELECT idSolverBinary, idSolver, binaryName, md5, version, runCommand, runPath FROM " + TABLE + " WHERE idSolverBinary=?";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();

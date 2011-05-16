@@ -189,7 +189,7 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
         try {
             controller.addSolverBinary(solverBin);
             this.dispose();
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "An error occured while adding Solver Binary: \n" + ex.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_addBinary

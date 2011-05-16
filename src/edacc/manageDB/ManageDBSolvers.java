@@ -13,6 +13,7 @@ import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Solver;
 import edacc.model.SolverBinaries;
+import edacc.model.SolverBinariesDAO;
 import edacc.model.SolverDAO;
 import edacc.model.SolverNotInDBException;
 import java.io.ByteArrayInputStream;
@@ -24,6 +25,9 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
@@ -100,6 +104,7 @@ public class ManageDBSolvers implements Observer {
     public void showSolver(int index) {
         currentSolver = solverTableModel.getSolver(index); // will be null if no solver selected!
         gui.showSolverDetails(currentSolver);
+        gui.showSolverBinariesDetails(currentSolver == null ? null : currentSolver.getSolverBinaries());
     }
 
     public void addSolverBinary(File[] binary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException, SolverAlreadyInDBException {
@@ -121,9 +126,10 @@ public class ManageDBSolvers implements Observer {
         ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(binary, new File(b.getRootDir()));
         b.setMd5(Util.calculateMD5(new ByteArrayInputStream(zipped.toByteArray())));
         new EDACCSolverBinaryDlg(EDACCApp.getApplication().getMainFrame(), true, b, this).setVisible(true);
+        gui.showSolverBinariesDetails(currentSolver.getSolverBinaries());
     }
 
-    public void addSolverBinary(SolverBinaries solverBin) throws SQLException {
+    public void addSolverBinary(SolverBinaries solverBin) throws SQLException, NoSolverBinarySpecifiedException, FileNotFoundException, IOException {
         currentSolver.addSolverBinary(solverBin);
     }
 
