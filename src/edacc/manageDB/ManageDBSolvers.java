@@ -108,15 +108,9 @@ public class ManageDBSolvers implements Observer {
             return;
         SolverBinaries b = new SolverBinaries(currentSolver);
         b.setBinaryArchive(binary);
-        b.setBinaryName(binary[0].getName()); // TODO ändern
-
-        for (File f : b.getBinaryFiles())
-            System.out.println(f.getPath());
+        b.setBinaryName(binary[0].getName());
 
         Util.removeCommonPrefix(b);
-
-        for (File f : b.getBinaryFiles())
-            System.out.println(f.getPath());
 
         // TODO beim SPeichern wird momentan ein zweites Mal gezippt -> zwischenspeichern vom Stream!!
         ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(binary, new File(b.getRootDir()));

@@ -446,32 +446,4 @@ public class Util {
         }
         return lcp;
     }
-
-    private static String getCommonPrefix(String[] files) {
-        if (files == null || files.length == 0)
-            return "";
-        Arrays.sort(files, new Comparator<String>() {
-
-            @Override
-            public int compare(String o1, String o2) {
-                return o1.compareTo(o2);
-            }
-
-        });
-        String lcp = "";
-        for (int j = 1; j < files[0].length(); j++) {
-            String pref = files[0].substring(0, j);
-            for (int i = 1; i < files.length; i++) {
-                if (!files[i].startsWith(pref))
-                    return lcp;
-            }
-            lcp = pref;
-        }
-        return lcp;
-    }
-
-    public static void main(String[] args) {
-        String[] s = {"iamarobot", "iamabanana", "iamanananas"};
-        System.out.println(getCommonPrefix(s));
-    }
 }
