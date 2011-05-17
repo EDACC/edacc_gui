@@ -42,7 +42,7 @@ public class ComputationMethodDAO {
      * @throws NoComputationMethodBinarySpecifiedException
      * @throws FileNotFoundException
      */
-    public static ComputationMethod createComputationMethod(String name, String description, String md5, File binary) throws NoConnectionToDBException, SQLException, ComputationMethodAlreadyExistsException, NoComputationMethodBinarySpecifiedException, FileNotFoundException {
+    public static ComputationMethod createComputationMethod(String name, String description, String md5, File binary) throws NoConnectionToDBException, SQLException, ComputationMethodAlreadyExistsException, NoComputationMethodBinarySpecifiedException, FileNotFoundException, ComputationMethodSameNameAlreadyExists, ComputationMethodSameMD5AlreadyExists {
         ComputationMethod cm = new ComputationMethod();
         cm.setName(name);
         cm.setDescription(description);
@@ -66,7 +66,7 @@ public class ComputationMethodDAO {
      * @throws NoComputationMethodBinarySpecifiedException
      * @throws FileNotFoundException
      */
-    public static void save(ComputationMethod cm) throws NoConnectionToDBException, NoConnectionToDBException, NoConnectionToDBException, SQLException, ComputationMethodAlreadyExistsException, NoComputationMethodBinarySpecifiedException, FileNotFoundException {
+    public static void save(ComputationMethod cm) throws NoConnectionToDBException, NoConnectionToDBException, NoConnectionToDBException, SQLException, ComputationMethodAlreadyExistsException, NoComputationMethodBinarySpecifiedException, FileNotFoundException, ComputationMethodSameNameAlreadyExists, ComputationMethodSameMD5AlreadyExists {
         if (cm.isDeleted()) {
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
             ps.setInt(1, cm.getId());
@@ -88,13 +88,31 @@ public class ComputationMethodDAO {
             }
 
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                    "SELECT idComputationMethod FROM " + table + " WHERE name=? OR md5=?;");
+                    "SELECT idComputationMethod FROM " + table + " WHERE name=? AND md5=?;");
             ps.setString(1, cm.getName());
             ps.setString(2, cm.getMd5());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 throw new ComputationMethodAlreadyExistsException();
             }
+            
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                    "SELECT idComputationMethod FROM " + table + " WHERE name=?;");
+            ps.setString(1, cm.getName());
+            rs = ps.executeQuery();
+            if(rs.next()){
+                throw new ComputationMethodSameNameAlreadyExists();
+            }
+            
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+            "SELECT idComputationMethod FROM " + table + " WHERE md5=?;");
+            ps.setString(1, cm.getMd5());
+            rs = ps.executeQuery();
+            if(rs.next()){
+                throw new ComputationMethodSameMD5AlreadyExists();
+            }
+            
+            
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setString(1, cm.getName());
             ps.setString(2, cm.getDescription());
@@ -233,6 +251,15 @@ public class ComputationMethodDAO {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT idComputationMethod FROM " + table + " WHERE name=?;");
         ps.setString(1, name);
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        return getById(rs.getInt(1));
+    }
+
+    public static ComputationMethod getByMD5(String md5) throws SQLException, NoConnectionToDBException, ComputationMethodDoesNotExistException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT idComputationMethod FROM " + table + " WHERE md5=?;");
+        ps.setString(1, md5);
         ResultSet rs = ps.executeQuery();
         rs.next();
         return getById(rs.getInt(1));

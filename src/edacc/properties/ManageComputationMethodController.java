@@ -11,6 +11,8 @@ import edacc.model.ComputationMethod;
 import edacc.model.ComputationMethodAlreadyExistsException;
 import edacc.model.ComputationMethodDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
+import edacc.model.ComputationMethodSameMD5AlreadyExists;
+import edacc.model.ComputationMethodSameNameAlreadyExists;
 import edacc.model.NoComputationMethodBinarySpecifiedException;
 import edacc.model.NoConnectionToDBException;
 import java.io.File;
@@ -68,7 +70,7 @@ public class ManageComputationMethodController {
      * @throws FileNotFoundException
      */
     public void removeComputationMethod(int rowIndex) throws NoConnectionToDBException, SQLException, SQLException,
-            ComputationMethodAlreadyExistsException, NoComputationMethodBinarySpecifiedException, FileNotFoundException {
+            ComputationMethodAlreadyExistsException, NoComputationMethodBinarySpecifiedException, FileNotFoundException, ComputationMethodSameNameAlreadyExists, ComputationMethodSameMD5AlreadyExists {
         ComputationMethod toRemove = tableModel.getComputationMethod(rowIndex);
         toRemove.setDeleted();
         ComputationMethodDAO.save(toRemove);
@@ -76,7 +78,7 @@ public class ManageComputationMethodController {
 
     public void saveComputationMethod(String name, String description, File selectedFile) throws NoConnectionToDBException, SQLException,
             ComputationMethodDoesNotExistException, ComputationMethodAlreadyExistsException, NoComputationMethodBinarySpecifiedException,
-            FileNotFoundException, IOException, NoSuchAlgorithmException {
+            FileNotFoundException, IOException, NoSuchAlgorithmException, ComputationMethodSameNameAlreadyExists, ComputationMethodSameMD5AlreadyExists {
         if(editId != -1){
             ComputationMethod toSave = ComputationMethodDAO.getById(editId);
             toSave.setName(name);

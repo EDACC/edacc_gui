@@ -9,6 +9,7 @@ import edacc.model.ComputationMethod;
 import edacc.model.ComputationMethodAlreadyExistsException;
 import edacc.model.ComputationMethodDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
+import edacc.model.ComputationMethodSameNameAlreadyExists;
 import edacc.model.NoComputationMethodBinarySpecifiedException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
@@ -26,6 +27,7 @@ import java.sql.SQLException;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 
@@ -178,8 +180,16 @@ public class ManagePropertyController {
 
     public void importProperty(File[] files) {
         try {
-            PropertyDAO.importProperty(files);
+
+                PropertyDAO.importProperty(files);
+            
             loadProperties();
+        } catch (ComputationMethodSameNameAlreadyExists ex) {
+           JOptionPane.showMessageDialog(main,
+                    "The name of a computation Method of an added property already exists, but the MD5 sums doesn't "
+                   + " match.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -189,9 +199,7 @@ public class ManagePropertyController {
         } catch (NoConnectionToDBException ex) {
             Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ComputationMethodAlreadyExistsException ex) {
-            Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);    
         } catch (NoComputationMethodBinarySpecifiedException ex) {
             Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (PropertyIsUsedException ex) {

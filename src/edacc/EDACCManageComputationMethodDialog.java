@@ -14,6 +14,8 @@ package edacc;
 import edacc.model.ComputationMethod;
 import edacc.model.ComputationMethodAlreadyExistsException;
 import edacc.model.ComputationMethodDoesNotExistException;
+import edacc.model.ComputationMethodSameMD5AlreadyExists;
+import edacc.model.ComputationMethodSameNameAlreadyExists;
 import edacc.model.NoComputationMethodBinarySpecifiedException;
 import edacc.model.NoConnectionToDBException;
 import edacc.properties.ComputationMethodTableSelectionListener;
@@ -371,7 +373,12 @@ public class EDACCManageComputationMethodDialog extends javax.swing.JDialog {
                 Logger.getLogger(EDACCManageComputationMethodDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(EDACCManageComputationMethodDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ComputationMethodSameNameAlreadyExists ex) {
+                Logger.getLogger(EDACCManageComputationMethodDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ComputationMethodSameMD5AlreadyExists ex) {
+                Logger.getLogger(EDACCManageComputationMethodDialog.class.getName()).log(Level.SEVERE, null, ex);
             }
+
         }
     }//GEN-LAST:event_buttonRemoveActionPerformed
 
@@ -405,7 +412,12 @@ public class EDACCManageComputationMethodDialog extends javax.swing.JDialog {
                 Logger.getLogger(EDACCManageComputationMethodDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (NoSuchAlgorithmException ex) {
                 Logger.getLogger(EDACCManageComputationMethodDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ComputationMethodSameNameAlreadyExists ex) {
+                Logger.getLogger(EDACCManageComputationMethodDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ComputationMethodSameMD5AlreadyExists ex) {
+                Logger.getLogger(EDACCManageComputationMethodDialog.class.getName()).log(Level.SEVERE, null, ex);
             }
+           
         }
     }//GEN-LAST:event_buttonSaveActionPerformed
 
