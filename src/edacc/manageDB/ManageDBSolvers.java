@@ -11,6 +11,7 @@ import edacc.EDACCManageDBMode;
 import edacc.EDACCSolverBinaryDlg;
 import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
+import edacc.model.Parameter;
 import edacc.model.Solver;
 import edacc.model.SolverBinaries;
 import edacc.model.SolverDAO;
@@ -24,6 +25,9 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
@@ -77,9 +81,11 @@ public class ManageDBSolvers implements Observer {
      * @throws SQLException
      * @throws FileNotFoundException
      */
-    public void saveSolvers() throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, NoSolverNameSpecifiedException,IOException, NoSuchAlgorithmException {
+    public void saveSolvers() throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, NoSolverNameSpecifiedException, IOException, NoSuchAlgorithmException {
         for (Solver s : solverTableModel.getSolvers()) {
+            Vector<Parameter> params = manageDBParameters.getParametersOfSolver(s);
             SolverDAO.save(s);
+            manageDBParameters.rehash(s, params);
         }
     }
 
@@ -104,8 +110,9 @@ public class ManageDBSolvers implements Observer {
     }
 
     public void addSolverBinary(File[] binary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException, SolverAlreadyInDBException {
-        if (binary.length == 0)
+        if (binary.length == 0) {
             return;
+        }
         SolverBinaries b = new SolverBinaries(currentSolver);
         b.setBinaryArchive(binary);
         b.setBinaryName(binary[0].getName());
@@ -124,9 +131,11 @@ public class ManageDBSolvers implements Observer {
     }
 
     public void addSolverCode(File[] code) throws FileNotFoundException {
-        for (File c : code)
-            if (!c.exists())
+        for (File c : code) {
+            if (!c.exists()) {
                 throw new FileNotFoundException("Couldn't find file \"" + c.getName() + "\".");
+            }
+        }
         currentSolver.setCodeFile(code);
     }
 
@@ -164,14 +173,14 @@ public class ManageDBSolvers implements Observer {
      * the binaryName field of the solver will be used as filename.
      */
     public void exportSolver(Solver s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException, MD5CheckFailedException {
-       throw new NotImplementedException();
+        throw new NotImplementedException();
         /* TODO Implement if (f.isDirectory()) {
-            f = new File(f.getAbsolutePath() + System.getProperty("file.separator") + s.getBinaryName());
+        f = new File(f.getAbsolutePath() + System.getProperty("file.separator") + s.getBinaryName());
         }
         SolverDAO.getBinaryFileOfSolver(s, f);
         String md5File = Util.calculateMD5(f);
         if (!md5File.equals(s.getMd5())) {
-            throw new MD5CheckFailedException("The exported solver binary of solver \"" + s.getName() + "\" seems to be corrupt!");
+        throw new MD5CheckFailedException("The exported solver binary of solver \"" + s.getName() + "\" seems to be corrupt!");
         }*/
     }
 
@@ -184,8 +193,9 @@ public class ManageDBSolvers implements Observer {
     public void exportSolverCode(Solver s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException {
         if (f.isDirectory()) {
             f = new File(f.getAbsolutePath() + System.getProperty("file.separator") + s.getName() + "_code");
+        } else {
+            return;
         }
-        else return;
         SolverDAO.exportSolverCode(s, f);
     }
 
