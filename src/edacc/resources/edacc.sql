@@ -798,7 +798,9 @@ INSERT INTO ResultCodes VALUES
 (-330, 'solver SIGUSR1'),
 (-312, 'solver SIGUSR2'),
 (-317, 'solver SIGUSR2'),
-(-331, 'solver SIGUSR2');
+(-331, 'solver SIGUSR2'),
+(-398, 'solver binary not executable'),
+(-399, 'solver binary not executable');
 
 DELIMITER $$
 
