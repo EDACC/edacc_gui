@@ -201,6 +201,10 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
 
     @Override
     public String toString() {
-        return version;
+        if (version == null || "".equals(version)) {
+            return binaryName;
+        } else {
+            return binaryName + " " + version;
+        }
     }
 }

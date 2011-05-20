@@ -356,7 +356,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(comboSolverBinaries, 0, 460, Short.MAX_VALUE)))
+                        .addComponent(comboSolverBinaries, 0, 498, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
