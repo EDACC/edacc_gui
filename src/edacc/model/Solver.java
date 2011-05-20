@@ -3,8 +3,8 @@ package edacc.model;
 import java.io.File;
 import java.util.Vector;
 
-
 public class Solver extends BaseModel implements IntegerPKModel {
+
     private int id;
     private String name;
     private String description;
@@ -12,7 +12,7 @@ public class Solver extends BaseModel implements IntegerPKModel {
     private String authors;
     private String version;
     private Vector<SolverBinaries> solverBinaries;
-    
+
     public Solver() {
         this.setNew();
         this.solverBinaries = new Vector<SolverBinaries>();
@@ -67,7 +67,7 @@ public class Solver extends BaseModel implements IntegerPKModel {
     public void setName(String name) {
         this.name = name;
     }
-    
+
     protected File[] getCodeFile() {
         return codeFile;
     }
@@ -81,6 +81,9 @@ public class Solver extends BaseModel implements IntegerPKModel {
 
     public void addSolverBinary(SolverBinaries b) {
         this.solverBinaries.add(b);
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     public void removeSolverBinary(SolverBinaries b) {
@@ -89,6 +92,10 @@ public class Solver extends BaseModel implements IntegerPKModel {
 
     public Vector<SolverBinaries> getSolverBinaries() {
         return (Vector<SolverBinaries>) solverBinaries.clone();
+    }
+
+    protected void setSolverBinaries(Vector<SolverBinaries> solverBinaries) {
+        this.solverBinaries = solverBinaries;
     }
 
     @Override

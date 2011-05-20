@@ -168,13 +168,14 @@ public class Util {
     private static void zip(File dir, File base, ZipOutputStream out) throws IOException {
         File[] files = dir.listFiles();
         byte[] buffer = new byte[8192];
+        final String FILE_SEP = System.getProperty("file.separator");
 
         for (int i = 0; i < files.length; i++) {
             if (files[i].isDirectory()) {
                 zip(files[i], base, out); // recursively zip sub-directories
             } else {
                 FileInputStream fin = new FileInputStream(files[i]);
-                ZipEntry entry = new ZipEntry(files[i].getPath().substring(base.getPath().length() + 1));
+                ZipEntry entry = new ZipEntry(files[i].getPath().substring(base.getPath().length() + 1).replace(FILE_SEP, "/"));
                 out.putNextEntry(entry);
 
                 int bytes_read = 0;
@@ -208,14 +209,15 @@ public class Util {
 
     private static void zip(File[] files, File base, ZipOutputStream out) throws IOException {
         byte[] buffer = new byte[8192];
-
+        final String FILE_SEP = System.getProperty("file.separator");
+        
         for (int i = 0; i < files.length; i++) {
-            if (files[i].isDirectory()) {
-                zip(files[i], base, out); // recursively zip sub-directories
+            File file_on_disk = new File(base.getPath() + FILE_SEP + files[i].getPath());
+            if (file_on_disk.isDirectory()) {
+                zip(file_on_disk, base, out); // recursively zip sub-directories
             } else {
-                final String FILE_SEP = System.getProperty("file.separator");
-                FileInputStream fin = new FileInputStream(new File(base.getPath() + FILE_SEP + files[i].getPath()));
-                ZipEntry entry = new ZipEntry(files[i].getPath());
+                FileInputStream fin = new FileInputStream(file_on_disk);
+                ZipEntry entry = new ZipEntry(files[i].getPath().replace(FILE_SEP, "/"));
                 out.putNextEntry(entry);
 
                 int bytes_read = 0;
@@ -415,12 +417,15 @@ public class Util {
         String lcp = getCommonPrefix(files);
         b.setRootDir(lcp);
         for (int i = 0; i < files.length; i++)
-            files[i] = new File(files[i].getAbsolutePath().replaceAll(lcp, ""));
+            files[i] = new File(files[i].getAbsolutePath().replace(lcp, ""));
     }
 
     private static String getCommonPrefix(File[] files) {
         if (files == null || files.length == 0)
             return "";
+        if (files.length == 1) {
+            return files[0].getPath();
+        }
         Arrays.sort(files, new Comparator<File>() {
 
             @Override
@@ -430,42 +435,15 @@ public class Util {
 
         });
         String lcp = "";
-        for (int j = 1; j < files[0].length(); j++) {
+        for (int j = 1; j < files[0].getPath().length(); j++) {
             String pref = files[0].getPath().substring(0, j);
             for (int i = 1; i < files.length; i++) {
-                if (!files[i].getPath().startsWith(pref))
+                if (!files[i].getPath().startsWith(pref)) {
                     return lcp;
+                }
             }
             lcp = pref;
         }
         return lcp;
-    }
-
-    private static String getCommonPrefix(String[] files) {
-        if (files == null || files.length == 0)
-            return "";
-        Arrays.sort(files, new Comparator<String>() {
-
-            @Override
-            public int compare(String o1, String o2) {
-                return o1.compareTo(o2);
-            }
-
-        });
-        String lcp = "";
-        for (int j = 1; j < files[0].length(); j++) {
-            String pref = files[0].substring(0, j);
-            for (int i = 1; i < files.length; i++) {
-                if (!files[i].startsWith(pref))
-                    return lcp;
-            }
-            lcp = pref;
-        }
-        return lcp;
-    }
-
-    public static void main(String[] args) {
-        String[] s = {"iamarobot", "iamabanana", "iamanananas"};
-        System.out.println(getCommonPrefix(s));
     }
 }
