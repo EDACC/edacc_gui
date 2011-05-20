@@ -181,7 +181,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                Solver solver = solTableModel.getSolver(tableSolvers.convertRowIndexToModel(tableSolvers.getSelectedRow()));
+                int row = tableSolvers.convertRowIndexToModel(tableSolvers.getSelectedRow());
+                if (row == -1)
+                    return;
+                Solver solver = solTableModel.getSolver(row);
+                if (solver == null)
+                    return;
                 ArrayList<SolverConfiguration> scs;
                 try {
                     scs = SolverConfigurationDAO.getSolverConfigurationBySolverId(solver.getId());
@@ -2546,6 +2551,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     
     @Override
     public void onTaskFailed(String methodName, Throwable e) {
+        e.printStackTrace();
         if (e instanceof TaskCancelledException) {
             javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         } else if (e instanceof SQLException) {
