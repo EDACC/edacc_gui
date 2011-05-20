@@ -212,4 +212,28 @@ public class SolverConfigurationDAO {
     public static boolean isDeleted(SolverConfiguration sc) {
         return sc.isDeleted();
     }
+
+    /**
+     * uncached!
+     * @param id
+     * @return
+     * @throws SQLException he
+     */
+    public static ArrayList<SolverConfiguration> getSolverConfigurationBySolverId(int id) throws SQLException {
+        ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idSolverConfig, Experiment_idExperiment, SolverBinaries_idSolverBinary, seed_group, name, idx FROM SolverConfig JOIN SolverBinaries ON (SolverConfig.SolverBinaries_idSolverBinary = SolverBinaries.idSolverBinary) WHERE idSolver = ?");
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            SolverConfiguration c = cache.getCached(rs.getInt("IdSolverConfig"));
+            if (c != null) {
+                res.add(c);
+            } else {
+                SolverConfiguration i = getSolverConfigurationFromResultset(rs);
+                i.setSaved();
+                res.add(i);
+            }
+        }
+        return res;
+    }
 }

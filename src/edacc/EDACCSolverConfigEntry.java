@@ -404,6 +404,9 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         String newName = editNameDialog.getNameText();
         border.setTitle(newName);
         parent.setTitles();
+        this.invalidate();
+        this.revalidate();
+        this.repaint();
     }//GEN-LAST:event_btnEditNameActionPerformed
 
     private void btnMassReplicationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMassReplicationActionPerformed
