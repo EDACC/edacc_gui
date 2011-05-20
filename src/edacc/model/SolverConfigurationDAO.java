@@ -15,7 +15,7 @@ public class SolverConfigurationDAO {
     private static final String table = "SolverConfig";
     private static final String deleteQuery = "DELETE FROM " + table + " WHERE idSolverConfig=?";
     private static final String insertQuery = "INSERT INTO " + table + " (SolverBinaries_IdSolverBinary, Experiment_IdExperiment, seed_group, name, idx) VALUES (?,?,?,?,?)";
-    private static final String updateQuery = "UPDATE " + table + " SET seed_group=?, name=?, idx=? WHERE idSolverConfig=?";
+    private static final String updateQuery = "UPDATE " + table + " SET SolverBinaries_IdSolverBinary = ?, seed_group=?, name=?, idx=? WHERE idSolverConfig=?";
     public static ObjectCache<SolverConfiguration> cache = new ObjectCache<SolverConfiguration>();
 
     private static SolverConfiguration getSolverConfigurationFromResultset(ResultSet rs) throws SQLException {
@@ -51,10 +51,11 @@ public class SolverConfigurationDAO {
             cache.cache(i);
         } else if (i.isModified()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
-            st.setInt(1, i.getSeed_group());
-            st.setString(2, i.getName());
-            st.setInt(3, i.getIdx());
-            st.setInt(4, i.getId());
+            st.setInt(1, i.getSolverBinary().getIdSolverBinary());
+            st.setInt(2, i.getSeed_group());
+            st.setString(3, i.getName());
+            st.setInt(4, i.getIdx());
+            st.setInt(5, i.getId());
             st.executeUpdate();
             i.setSaved();
         }

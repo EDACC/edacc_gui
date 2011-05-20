@@ -26,8 +26,6 @@ import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentResult;
-import edacc.model.Instance;
-import edacc.model.InstanceClass;
 import edacc.model.StatusCode;
 import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.NoConnectionToDBException;
@@ -57,7 +55,6 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JFileChooser;
-import javax.swing.DefaultRowSorter;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -74,9 +71,6 @@ import javax.swing.SortOrder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -2440,7 +2434,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         } else if (e instanceof IOException && (methodName.equals("exportCSV") || methodName.equals("exportTeX"))) {
             javax.swing.JOptionPane.showMessageDialog(this, "I/O Exception during export:\n\n" + e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         } else {
-            e.printStackTrace();
             javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }
