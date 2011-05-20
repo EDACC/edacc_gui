@@ -57,11 +57,12 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(AnalysisBottomPanel.class);
         btnGeneratePlot.setText(resourceMap.getString("btnGeneratePlot.text")); // NOI18N
         btnGeneratePlot.setName("btnGeneratePlot"); // NOI18N
+        btnGeneratePlot.setPreferredSize(new java.awt.Dimension(115, 25));
 
         btnShowPlots.setAction(actionMap.get("btnShowPlots")); // NOI18N
         btnShowPlots.setText(resourceMap.getString("btnShowPlots.text")); // NOI18N
         btnShowPlots.setName("btnShowPlots"); // NOI18N
-        btnShowPlots.setPreferredSize(new java.awt.Dimension(99, 23));
+        btnShowPlots.setPreferredSize(new java.awt.Dimension(115, 25));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -69,17 +70,17 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnGeneratePlot)
+                .addComponent(btnGeneratePlot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnShowPlots, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(183, Short.MAX_VALUE))
+                .addContainerGap(151, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnGeneratePlot)
+                    .addComponent(btnGeneratePlot, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnShowPlots, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );

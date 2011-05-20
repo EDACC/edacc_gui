@@ -34,7 +34,7 @@ public class SolverConfigurationSelector extends JPanel {
 
     public SolverConfigurationSelector() {
         super(new GridBagLayout());
-        Dimension dimensionButton = new Dimension(109, 25);
+        Dimension dimensionButton = new Dimension(125, 25);
         tableModel = new SolverConfigurationTableModel();
         table = new JTable(tableModel);
         sorter = new TableRowSorter<SolverConfigurationTableModel>(tableModel);

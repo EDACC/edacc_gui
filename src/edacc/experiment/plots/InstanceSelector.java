@@ -40,7 +40,7 @@ public class InstanceSelector extends JPanel {
 
     public InstanceSelector() {
         super(new GridBagLayout());
-        Dimension dimensionButton = new Dimension(109, 25);
+        Dimension dimensionButton = new Dimension(125, 25);
         tableModel = new InstanceTableModel();
         table = new JTable(tableModel);
         table.moveColumn(0, 1);

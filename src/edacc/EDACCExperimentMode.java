@@ -1070,7 +1070,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnSaveInstances.setMaximumSize(new java.awt.Dimension(109, 23));
         btnSaveInstances.setMinimumSize(new java.awt.Dimension(109, 23));
         btnSaveInstances.setName("btnSaveInstances"); // NOI18N
-        btnSaveInstances.setPreferredSize(new java.awt.Dimension(117, 25));
+        btnSaveInstances.setPreferredSize(new java.awt.Dimension(125, 25));
 
         btnFilterInstances.setAction(actionMap.get("btnInstanceFilter")); // NOI18N
         btnFilterInstances.setText(resourceMap.getString("btnFilterInstances.text")); // NOI18N
@@ -1078,7 +1078,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnFilterInstances.setMaximumSize(new java.awt.Dimension(109, 23));
         btnFilterInstances.setMinimumSize(new java.awt.Dimension(109, 23));
         btnFilterInstances.setName("btnFilterInstances"); // NOI18N
-        btnFilterInstances.setPreferredSize(new java.awt.Dimension(117, 25));
+        btnFilterInstances.setPreferredSize(new java.awt.Dimension(125, 25));
 
         btnSelectAllInstances.setAction(actionMap.get("btnSelectAllInstances")); // NOI18N
         btnSelectAllInstances.setText(resourceMap.getString("btnSelectAllInstances.text")); // NOI18N
@@ -1086,7 +1086,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnSelectAllInstances.setMaximumSize(new java.awt.Dimension(109, 23));
         btnSelectAllInstances.setMinimumSize(new java.awt.Dimension(109, 23));
         btnSelectAllInstances.setName("btnSelectAllInstances"); // NOI18N
-        btnSelectAllInstances.setPreferredSize(new java.awt.Dimension(117, 25));
+        btnSelectAllInstances.setPreferredSize(new java.awt.Dimension(125, 25));
 
         btnDeselectAllInstances.setAction(actionMap.get("btnDeselectAllInstances")); // NOI18N
         btnDeselectAllInstances.setText(resourceMap.getString("btnDeselectAllInstances.text")); // NOI18N
@@ -1094,29 +1094,29 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnDeselectAllInstances.setMaximumSize(new java.awt.Dimension(109, 23));
         btnDeselectAllInstances.setMinimumSize(new java.awt.Dimension(109, 23));
         btnDeselectAllInstances.setName("btnDeselectAllInstances"); // NOI18N
-        btnDeselectAllInstances.setPreferredSize(new java.awt.Dimension(117, 25));
+        btnDeselectAllInstances.setPreferredSize(new java.awt.Dimension(125, 25));
 
         btnInvertSelection.setAction(actionMap.get("btnInvertSelection")); // NOI18N
         btnInvertSelection.setText(resourceMap.getString("btnInvertSelection.text")); // NOI18N
         btnInvertSelection.setToolTipText(resourceMap.getString("btnInvertSelection.toolTipText")); // NOI18N
         btnInvertSelection.setName("btnInvertSelection"); // NOI18N
-        btnInvertSelection.setPreferredSize(new java.awt.Dimension(117, 25));
+        btnInvertSelection.setPreferredSize(new java.awt.Dimension(125, 25));
 
         btnUndoInstances.setAction(actionMap.get("btnUndoInstances")); // NOI18N
         btnUndoInstances.setText(resourceMap.getString("btnUndoInstances.text")); // NOI18N
         btnUndoInstances.setToolTipText(resourceMap.getString("btnUndoInstances.toolTipText")); // NOI18N
         btnUndoInstances.setName("btnUndoInstances"); // NOI18N
-        btnUndoInstances.setPreferredSize(new java.awt.Dimension(117, 25));
+        btnUndoInstances.setPreferredSize(new java.awt.Dimension(125, 25));
 
         btnSelectedInstances.setAction(actionMap.get("btnSelectedInstances")); // NOI18N
         btnSelectedInstances.setText(resourceMap.getString("btnSelectedInstances.text")); // NOI18N
         btnSelectedInstances.setName("btnSelectedInstances"); // NOI18N
-        btnSelectedInstances.setPreferredSize(new java.awt.Dimension(117, 25));
+        btnSelectedInstances.setPreferredSize(new java.awt.Dimension(125, 25));
 
         btnRandomSelection.setAction(actionMap.get("btnRandomSelection")); // NOI18N
         btnRandomSelection.setText(resourceMap.getString("btnRandomSelection.text")); // NOI18N
         btnRandomSelection.setName("btnRandomSelection"); // NOI18N
-        btnRandomSelection.setPreferredSize(new java.awt.Dimension(117, 25));
+        btnRandomSelection.setPreferredSize(new java.awt.Dimension(125, 25));
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -1127,7 +1127,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(btnFilterInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 488, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 464, Short.MAX_VALUE)
                         .addComponent(btnUndoInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnSaveInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -1236,12 +1236,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnSelectQueue.setText(resourceMap.getString("btnSelectQueue.text")); // NOI18N
         btnSelectQueue.setToolTipText(resourceMap.getString("btnSelectQueue.toolTipText")); // NOI18N
         btnSelectQueue.setName("btnSelectQueue"); // NOI18N
-        btnSelectQueue.setPreferredSize(new java.awt.Dimension(155, 25));
+        btnSelectQueue.setPreferredSize(new java.awt.Dimension(190, 25));
 
         btnGeneratePackage.setText(resourceMap.getString("generatePackage.text")); // NOI18N
         btnGeneratePackage.setToolTipText(resourceMap.getString("generatePackage.toolTipText")); // NOI18N
         btnGeneratePackage.setName("generatePackage"); // NOI18N
-        btnGeneratePackage.setPreferredSize(new java.awt.Dimension(155, 25));
+        btnGeneratePackage.setPreferredSize(new java.awt.Dimension(190, 25));
         btnGeneratePackage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnGeneratePackage(evt);
@@ -1252,11 +1252,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnGenerateJobs.setText(resourceMap.getString("btnGenerateJobs.text")); // NOI18N
         btnGenerateJobs.setToolTipText(resourceMap.getString("btnGenerateJobs.toolTipText")); // NOI18N
         btnGenerateJobs.setName("btnGenerateJobs"); // NOI18N
-        btnGenerateJobs.setPreferredSize(new java.awt.Dimension(155, 25));
+        btnGenerateJobs.setPreferredSize(new java.awt.Dimension(190, 25));
 
         btnSetNumRuns.setText(resourceMap.getString("btnSetNumRuns.text")); // NOI18N
+        btnSetNumRuns.setMaximumSize(new java.awt.Dimension(190, 25));
+        btnSetNumRuns.setMinimumSize(new java.awt.Dimension(190, 25));
         btnSetNumRuns.setName("btnSetNumRuns"); // NOI18N
-        btnSetNumRuns.setPreferredSize(new java.awt.Dimension(155, 25));
+        btnSetNumRuns.setPreferredSize(new java.awt.Dimension(190, 25));
         btnSetNumRuns.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSetNumRunsActionPerformed(evt);
@@ -1272,8 +1274,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnGeneratePackage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSetNumRuns, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 459, Short.MAX_VALUE)
+                .addComponent(btnSetNumRuns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 297, Short.MAX_VALUE)
                 .addComponent(btnGenerateJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );

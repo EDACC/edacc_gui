@@ -933,7 +933,7 @@
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" attributes="0">
                                           <Component id="btnFilterInstances" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace pref="488" max="32767" attributes="0"/>
+                                          <EmptySpace pref="464" max="32767" attributes="0"/>
                                           <Component id="btnUndoInstances" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                           <Component id="btnSaveInstances" min="-2" max="-2" attributes="0"/>
@@ -992,7 +992,7 @@
                             </Property>
                             <Property name="name" type="java.lang.String" value="btnSaveInstances" noResource="true"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[117, 25]"/>
+                              <Dimension value="[125, 25]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -1011,7 +1011,7 @@
                             </Property>
                             <Property name="name" type="java.lang.String" value="btnFilterInstances" noResource="true"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[117, 25]"/>
+                              <Dimension value="[125, 25]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -1030,7 +1030,7 @@
                             </Property>
                             <Property name="name" type="java.lang.String" value="btnSelectAllInstances" noResource="true"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[117, 25]"/>
+                              <Dimension value="[125, 25]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -1049,7 +1049,7 @@
                             </Property>
                             <Property name="name" type="java.lang.String" value="btnDeselectAllInstances" noResource="true"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[117, 25]"/>
+                              <Dimension value="[125, 25]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -1062,7 +1062,7 @@
                             <Property name="toolTipText" type="java.lang.String" resourceKey="btnInvertSelection.toolTipText"/>
                             <Property name="name" type="java.lang.String" value="btnInvertSelection" noResource="true"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[117, 25]"/>
+                              <Dimension value="[125, 25]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -1075,7 +1075,7 @@
                             <Property name="toolTipText" type="java.lang.String" resourceKey="btnUndoInstances.toolTipText"/>
                             <Property name="name" type="java.lang.String" value="btnUndoInstances" noResource="true"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[117, 25]"/>
+                              <Dimension value="[125, 25]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -1087,7 +1087,7 @@
                             <Property name="text" type="java.lang.String" resourceKey="btnSelectedInstances.text"/>
                             <Property name="name" type="java.lang.String" value="btnSelectedInstances" noResource="true"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[117, 25]"/>
+                              <Dimension value="[125, 25]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -1099,7 +1099,7 @@
                             <Property name="text" type="java.lang.String" resourceKey="btnRandomSelection.text"/>
                             <Property name="name" type="java.lang.String" value="btnRandomSelection" noResource="true"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[117, 25]"/>
+                              <Dimension value="[125, 25]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -1209,8 +1209,8 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnGeneratePackage" min="-2" max="-2" attributes="1"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="btnSetNumRuns" min="-2" pref="133" max="-2" attributes="0"/>
-                              <EmptySpace pref="459" max="32767" attributes="0"/>
+                              <Component id="btnSetNumRuns" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace pref="297" max="32767" attributes="0"/>
                               <Component id="btnGenerateJobs" min="-2" max="-2" attributes="1"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -1241,7 +1241,7 @@
                         <Property name="toolTipText" type="java.lang.String" resourceKey="btnSelectQueue.toolTipText"/>
                         <Property name="name" type="java.lang.String" value="btnSelectQueue" noResource="true"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[155, 25]"/>
+                          <Dimension value="[190, 25]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -1251,7 +1251,7 @@
                         <Property name="toolTipText" type="java.lang.String" resourceKey="generatePackage.toolTipText"/>
                         <Property name="name" type="java.lang.String" value="generatePackage" noResource="true"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[155, 25]"/>
+                          <Dimension value="[190, 25]"/>
                         </Property>
                       </Properties>
                       <Events>
@@ -1267,16 +1267,22 @@
                         <Property name="toolTipText" type="java.lang.String" resourceKey="btnGenerateJobs.toolTipText"/>
                         <Property name="name" type="java.lang.String" value="btnGenerateJobs" noResource="true"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[155, 25]"/>
+                          <Dimension value="[190, 25]"/>
                         </Property>
                       </Properties>
                     </Component>
                     <Component class="javax.swing.JButton" name="btnSetNumRuns">
                       <Properties>
                         <Property name="text" type="java.lang.String" resourceKey="btnSetNumRuns.text"/>
+                        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[190, 25]"/>
+                        </Property>
+                        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[190, 25]"/>
+                        </Property>
                         <Property name="name" type="java.lang.String" value="btnSetNumRuns" noResource="true"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[155, 25]"/>
+                          <Dimension value="[190, 25]"/>
                         </Property>
                       </Properties>
                       <Events>
