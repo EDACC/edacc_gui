@@ -28,8 +28,6 @@ import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
-import sun.tools.jar.resources.jar;
 
 /**
  *

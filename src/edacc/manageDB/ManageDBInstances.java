@@ -14,8 +14,6 @@ import edacc.EDACCManageDBMode;
 import edacc.experiment.ExperimentTableModel;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
-import edacc.model.Experiment;
-import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.InstanceClassAlreadyInDBException;
 import edacc.model.InstanceNotInDBException;
@@ -124,13 +122,13 @@ public class ManageDBInstances implements Observer {
                 loadInstanceClasses();
             } else {
                 Vector<Instance> instances;
-                if(autoClass){
-                    instances  = buildInstancesGivenClassAutogenerate(instanceFiles, (InstanceClass) input, ret, task, compress);
-                }else{
+                if (autoClass) {
+                    instances = buildInstancesGivenClassAutogenerate(instanceFiles, (InstanceClass) input, ret, task, compress);
+                } else {
                     instances = buildInstancesGivenClass(instanceFiles, (InstanceClass) input, task, compress);
                 }
 
-               
+
                 main.instanceTableModel.addInstances(instances);
                 loadInstanceClasses();
             }
@@ -166,7 +164,7 @@ public class ManageDBInstances implements Observer {
         //      }
         /*
          * Vector<Instance> toRemove = new Vector<Instance>();
-
+        
         for (int i = 0; i < rows.length; i++) {
         toRemove.add((Instance )main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(rows[i]), 1));
         }
@@ -331,7 +329,7 @@ public class ManageDBInstances implements Observer {
 
             /* Are the instances, related to the classes to remove, related to other class? If not, ask if the instances have to be deleted
              * else delte the classes
-            */
+             */
             if (lastRelated.isEmpty()) {
                 Vector<InstanceClass> errors = new Vector<InstanceClass>();
                 for (int i = 0; i < toRemove.size(); i++) {
@@ -355,14 +353,14 @@ public class ManageDBInstances implements Observer {
                 ExperimentTableModel expTableModel = new ExperimentTableModel();
                 expTableModel.setExperiments(ExperimentHasInstanceDAO.getAllExperimentsByInstances(lastRelated));
                 if (EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
-                EDACCApp.getApplication().getMainFrame(),
-                "If you remove the instance classes, instances used in den following experiments will be deleted too. \n" +
-                        "Do you really want to remove the selected instance classes?",
-                new JTable(expTableModel))
-                == EDACCExtendedWarning.RET_OK_OPTION){
+                        EDACCApp.getApplication().getMainFrame(),
+                        "If you remove the instance classes, instances used in den following experiments will be deleted too. \n"
+                        + "Do you really want to remove the selected instance classes?",
+                        new JTable(expTableModel))
+                        == EDACCExtendedWarning.RET_OK_OPTION) {
 
                     //Delete the related instances and instance classes
-                    for(int i = 0; i < lastRelated.size(); i++){
+                    for (int i = 0; i < lastRelated.size(); i++) {
                         InstanceDAO.delete(lastRelated.get(i));
                     }
                     Vector<InstanceClass> errors = new Vector<InstanceClass>();
@@ -382,7 +380,7 @@ public class ManageDBInstances implements Observer {
                                 "A Problem occured by removing the following instance classes.  \n ",
                                 new JTable(tableModel));
                     }
-                    
+
                 }
                 return;
             }
@@ -478,7 +476,7 @@ public class ManageDBInstances implements Observer {
      */
     public Vector<Instance> buildInstancesAutogenerateClass(Vector<File> instanceFiles, File ret, Tasks task, boolean compressBinary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException, InstanceClassAlreadyInDBException, InstanceException {
 
-        if(instanceFiles.isEmpty()){
+        if (instanceFiles.isEmpty()) {
             throw new InstanceException();
         }
         Vector<Instance> instances = new Vector<Instance>();
@@ -493,12 +491,12 @@ public class ManageDBInstances implements Observer {
         //Create the instances and assigne them to their InstanceClass
         for (int i = 0; i < instanceFiles.size(); i++) {
             try {
-                String md5 = calculateMD5(instanceFiles.get(i));               
+                String md5 = calculateMD5(instanceFiles.get(i));
                 try {
                     //Get all InstanceClasses of the Instance and assigne it to the corresponding InstanceClass
                     InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
                     String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, instanceFiles.get(i).getParent().length());
-                    String[] possibleInstanceClasses = rawPath.split("\\\\|/");                                     
+                    String[] possibleInstanceClasses = rawPath.split("\\\\|/");
                     if (possibleInstanceClasses.length != 1) {
                         instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes, 0);
                     } else {
@@ -539,9 +537,9 @@ public class ManageDBInstances implements Observer {
 
     }
 
-       public Vector<Instance> buildInstancesGivenClassAutogenerate(Vector<File> instanceFiles, InstanceClass input, File ret, Tasks task, boolean compressBinary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException, InstanceClassAlreadyInDBException, InstanceException {
+    public Vector<Instance> buildInstancesGivenClassAutogenerate(Vector<File> instanceFiles, InstanceClass input, File ret, Tasks task, boolean compressBinary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException, InstanceClassAlreadyInDBException, InstanceException {
 
-        if(instanceFiles.isEmpty()){
+        if (instanceFiles.isEmpty()) {
             throw new InstanceException();
         }
 
@@ -692,7 +690,7 @@ public class ManageDBInstances implements Observer {
                         InstanceHasInstanceClassDAO.createInstanceHasInstance(toChange.get(i), input);
                     }
                     loadInstanceClasses();
-                }           
+                }
             } catch (NoConnectionToDBException ex) {
                 JOptionPane.showMessageDialog(panelManageDBInstances,
                         ex.getMessage(),
@@ -722,7 +720,7 @@ public class ManageDBInstances implements Observer {
         JOptionPane.WARNING_MESSAGE);
         }else{
         Boolean isSource = false;
-
+        
         try {
         Vector<Instance> toRemove = new Vector<Instance>();
         for(int i = 0; i < selectedRowsInstance.length; i++){
@@ -731,13 +729,13 @@ public class ManageDBInstances implements Observer {
         // check if the user really want to remove the instances from the instace classes
         InstanceTableModel tableModel = new InstanceTableModel();
         tableModel.addInstances(toRemove);
-
+        
         //                JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
         //                EDACCExtWarningErrorDialog removeInstances = new EDACCExtWarningErrorDialog(mainFrame, true, true, tableModel,
         //                    "Do you really won't to remove the the listed instances from the selected instance classes?");
         //                removeInstances.setLocationRelativeTo(mainFrame);
         //                EDACCApp.getApplication().show(removeInstances);
-
+        
         // remove the instances from the instace classes
         //if(removeInstances.isAccept()){
         if(EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
@@ -758,7 +756,7 @@ public class ManageDBInstances implements Observer {
         }
         }
         }
-
+        
         if(isSource){
         JOptionPane.showMessageDialog(panelManageDBInstances,
         "Some of the choosen instance classes are source classes, " +
@@ -767,7 +765,7 @@ public class ManageDBInstances implements Observer {
         JOptionPane.ERROR_MESSAGE);
         }
         main.instanceClassTableModel.changeInstanceTable();
-
+        
         } catch (NoConnectionToDBException ex) {
         JOptionPane.showMessageDialog(panelManageDBInstances,
         ex.getMessage(),
@@ -918,12 +916,13 @@ public class ManageDBInstances implements Observer {
         ((InstanceTableModel) tableInstances.getModel()).clearTable();
         TreePath[] selected = main.getInstanceClassTree().getSelectionPaths();
         Vector<InstanceClass> choosen = new Vector<InstanceClass>();
-        if(selected == null)
+        if (selected == null) {
             return;
+        }
         for (int i = 0; i < selected.length; i++) {
             choosen.addAll(getAllToEnd((DefaultMutableTreeNode) (selected[i].getLastPathComponent())));
             /*  DefaultMutableTreeNode[] nodes = getPath()
-
+            
             Enumeration<DefaultMutableTreeNode> tmp = nodes.children();
             while(tmp.hasMoreElements()){
             choosen.add((InstanceClass) tmp.nextElement().getUserObject());
@@ -978,8 +977,8 @@ public class ManageDBInstances implements Observer {
 
                 if (EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
                         EDACCApp.getApplication().getMainFrame(),
-                        "Do you really won't to remove  the listed instances from the selected instance classes? \n" +
-                        "If the instances are deleted from all their instance classes, the instances are deleted too.",
+                        "Do you really won't to remove  the listed instances from the selected instance classes? \n"
+                        + "If the instances are deleted from all their instance classes, the instances are deleted too.",
                         new JTable(tableModel)) == EDACCExtendedWarning.RET_OK_OPTION) {
                     Vector<InstanceClass> choosen = new Vector<InstanceClass>();
                     for (int j = 0; j < selected.length; j++) {
