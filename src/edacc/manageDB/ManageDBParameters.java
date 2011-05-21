@@ -136,7 +136,17 @@ public class ManageDBParameters implements Observer {
         return parameterPrefixes.contains(prefix); 
     }
 
+    @Override
     public void update(Observable o, Object arg) {
         parameterTableModel.clear();
+    }
+
+    void rehash(Solver s, Vector<Parameter> params) {
+        for (Parameter p : params)
+            parameterTableModel.addParameter(s, p);
+    }
+
+    Vector<Parameter> getParametersOfSolver(Solver s) {
+        return parameterTableModel.getParamtersOfSolver(s);
     }
 }

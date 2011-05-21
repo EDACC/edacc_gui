@@ -92,8 +92,9 @@ public class PropertyValueTypeManager {
         while (rs.next()) {
             // create a new file in the tmp dir (base) with the right package
             // structure (eg. edacc/satinstances/Foo.class for the class edacc.satinstances.Foo.class)
-            File f = new File(base.getPath() + "/" + rs.getString("typeClassFileName"));
-            
+            File f = new File(rs.getString("typeClassFileName"));
+            f.getParentFile().mkdirs();
+
             FileOutputStream out = new FileOutputStream(f);
             InputStream in = rs.getBinaryStream("typeClass");
             int len = 0;

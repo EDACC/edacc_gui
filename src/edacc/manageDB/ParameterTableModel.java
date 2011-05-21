@@ -162,4 +162,9 @@ public class ParameterTableModel extends AbstractTableModel{
         parameters.clear();
         fireTableDataChanged();
     }
+
+    void rehash(Solver oldSolver, Solver newSolver) {
+        Vector<Parameter> params = parameters.remove(oldSolver);
+        parameters.put(newSolver, params);
+    }
 }

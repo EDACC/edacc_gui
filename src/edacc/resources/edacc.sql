@@ -748,6 +748,7 @@ CREATE  TABLE IF NOT EXISTS `SolverDownloads` (
 ENGINE = InnoDB;
 
 INSERT INTO StatusCodes VALUES
+(-6, 'unknown verifier result code'),
 (-5, 'launcher crash'),
 (-4, 'watcher crash'),
 (-3, 'solver crash'),
@@ -756,6 +757,8 @@ INSERT INTO StatusCodes VALUES
 (0, 'running'),
 (1, 'finished'),
 (21, 'time limit exceeded'),
+(22, 'wallclock time limit'),
+(23, 'memory limit'),
 (-402, 'watcher SIGINT'),
 (-403, 'watcher SIGQUIT'),
 (-404, 'watcher SIGILL'),
@@ -778,6 +781,8 @@ INSERT INTO ResultCodes VALUES
 (10, 'UNSAT'),
 (11, 'SAT'),
 (-21, 'time limit exceeded'),
+(-22, 'wall clock limit exceeded'),
+(-23, 'memory limit exceeded'),
 (-302, 'solver SIGINT'),
 (-303, 'solver SIGQUIT'),
 (-304, 'solver SIGILL'),
@@ -793,7 +798,9 @@ INSERT INTO ResultCodes VALUES
 (-330, 'solver SIGUSR1'),
 (-312, 'solver SIGUSR2'),
 (-317, 'solver SIGUSR2'),
-(-331, 'solver SIGUSR2');
+(-331, 'solver SIGUSR2'),
+(-398, 'solver binary not executable'),
+(-399, 'solver binary not executable');
 
 DELIMITER $$
 

@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package edacc.model;
 
 import java.io.File;
@@ -17,19 +16,15 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
      * The (db) id of this object.
      */
     private int idSolverBinary;
-
     /**
      * The id of the associated Solver.
      */
     private int idSolver;
-
     /**
      * The name of the binary.
      */
     private String binaryName;
-
     private String rootDir;
-
     /**
      * The binary files which will be persisted in the db as zip archive.
      * This is always a reference to the real file system. If the object is NEW
@@ -42,31 +37,27 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
      * The save method in the SolverBinariesDAO will handle the described procedure.
      */
     private File[] binaryFiles;
-
     /**
      * The md5 sum of the archive.
      * NULL, if no md5 sum has been calculated yet (eg. because of missing binaryArchive).
      */
     private String md5;
-
     /**
      * A short version string describing the binary.
      */
     private String version;
-
     /**
      * The command to execute the unzipped binary (eg. "java -jar").
      * NULL, if the file specified in runPath can be executed by ./filename.
      */
     private String runCommand;
-
     /**
      * The path to the main binary file.
      */
     private String runPath;
 
     public SolverBinaries(Solver s) {
-        this (s.getId());
+        this(s.getId());
     }
 
     public SolverBinaries(int idSolver) {
@@ -111,6 +102,9 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
      */
     public void setBinaryName(String binaryName) {
         this.binaryName = binaryName;
+        if (isSaved()) {
+            setModified();
+        }
     }
 
     /**
@@ -139,6 +133,9 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
      */
     public void setVersion(String version) {
         this.version = version;
+        if (isSaved()) {
+            setModified();
+        }
     }
 
     /**
@@ -153,6 +150,9 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
      */
     public void setRunCommand(String runCommand) {
         this.runCommand = runCommand;
+        if (isSaved()) {
+            setModified();
+        }
     }
 
     /**
@@ -167,6 +167,9 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
      */
     public void setRunPath(String runPath) {
         this.runPath = runPath;
+        if (isSaved()) {
+            setModified();
+        }
     }
 
     /**
@@ -198,8 +201,10 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
 
     @Override
     public String toString() {
-        return version;
+        if (version == null || "".equals(version)) {
+            return binaryName;
+        } else {
+            return binaryName + " " + version;
+        }
     }
-    
-    
 }

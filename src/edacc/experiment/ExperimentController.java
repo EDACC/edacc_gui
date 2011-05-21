@@ -345,6 +345,7 @@ public class ExperimentController {
                 if (entry.getSolverConfiguration() == null) {
                     entry.setSolverConfiguration(SolverConfigurationDAO.createSolverConfiguration(entry.getSolverBinary(), activeExperiment.getId(), seed_group, entry.getTitle(), idx));
                 } else {
+                    entry.getSolverConfiguration().setSolverBinary(entry.getSolverBinary());
                     entry.getSolverConfiguration().setName(entry.getTitle());
                     entry.getSolverConfiguration().setSeed_group(seed_group);
                     entry.getSolverConfiguration().setIdx(idx);
