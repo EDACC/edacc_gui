@@ -20,7 +20,7 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author rretz
  */
-public class InstanceTableModel extends AbstractTableModel {
+public class InstanceTableModel extends edacc.experiment.InstanceTableModel{
 
     public static final int COL_PROPERTY = 2;
     private boolean[] visible;

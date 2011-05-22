@@ -783,7 +783,7 @@ public class ManageDBInstances implements Observer {
     /**
      * Shows the dialog to configure a filter and add it to the instance table. If less than 2 instances are in the
      * instance table, no filter can be added. Selects the first entry in the instance table after adding the filter.
-     */
+    
     public void addFilter() {
 
         if (main.instanceFilter == null) {
@@ -811,7 +811,7 @@ public class ManageDBInstances implements Observer {
                 main.setFilterStatus("This list of instances has filters applied to it. Use the filter button below to modify.");
             }
         }
-    }
+    }*/
 
     public void onTaskStart(String methodName) {
     }

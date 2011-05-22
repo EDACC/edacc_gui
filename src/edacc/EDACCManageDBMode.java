@@ -48,6 +48,9 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.RowSorter.SortKey;
+import javax.swing.SwingUtilities;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -72,7 +75,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     public EDACCCreateEditInstanceClassDialog createInstanceClassDialog;
     public EDACCAddNewInstanceSelectClassDialog addInstanceDialog;
     public EDACCInstanceGeneratorUnifKCNF instanceGenKCNF;
-    public EDACCManageDBInstanceFilter instanceFilter;
+    public EDACCInstanceFilter instanceFilter;
     private SolverBinariesTableModel solverBinariesTableModel;
 
     public EDACCManageDBMode() {
@@ -85,11 +88,19 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
         // initialize instance table
         instanceTableModel = new InstanceTableModel();
-        tableInstances.setModel(instanceTableModel);
         sorter = new TableRowSorter<InstanceTableModel>(instanceTableModel);
+        tableInstances.setModel(instanceTableModel);
         tableInstances.setRowSorter(sorter);
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                instanceFilter = new EDACCInstanceFilter(EDACCApp.getApplication().getMainFrame(), true, tableInstances, true);
+            }
+        });
         tableInstances.getSelectionModel().addListSelectionListener(new InstanceTableSelectionListener(tableInstances, manageDBInstances));
         tableInstances.addMouseListener(new InstanceTableMouseListener(jPMInstanceTable));
+
 
         // initialize instance class table
         instanceClassTreeModel = new DefaultTreeModel(new DefaultMutableTreeNode("test1"));
@@ -98,20 +109,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         jTreeInstanceClass.addTreeSelectionListener(new InstanceClassTreeSelectionListener(manageDBInstances, jTreeInstanceClass));
         jTreeInstanceClass.addMouseListener(new InstanceClassTreeMouseListener(jPMInstanceTreeInstanceClass));
 
-        //jTreeInstanceClass.setRootVisible(false);
-       /* instanceClassTableModel = new InstanceClassTableModel(tableInstances);
-        tableInstanceClass.setModel(instanceClassTableModel);
-        tableInstanceClass.getSelectionModel().addListSelectionListener(new InstanceClassTableSelectionListener(tableInstanceClass, manageDBInstances));        
-        tableInstanceClass.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
-        
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
-        boolean isSelected, boolean hasFocus, int row, int column) {
-        JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        lbl.setHorizontalAlignment(JLabel.CENTER);
-        return lbl;
-        }
-        });*/
+
 
         // initialize parameter table
         parameterTableModel = new ParameterTableModel();
@@ -1438,7 +1436,13 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     }//GEN-LAST:event_btnRemoveInstancesActionPerformed
 
     private void btnFilterInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterInstancesActionPerformed
-        manageDBInstances.addFilter();
+        EDACCApp.getApplication().show(instanceFilter);
+        instanceTableModel.fireTableDataChanged();
+        if (instanceFilter.hasFiltersApplied()) {
+            setFilterStatus("This list of instances has filters applied to it. Use the filter button below to modify.");
+        } else {
+            setFilterStatus("");
+        }
     }//GEN-LAST:event_btnFilterInstancesActionPerformed
 
     private void btnSolverSaveToDBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverSaveToDBActionPerformed
@@ -1474,10 +1478,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         } catch (NoSuchAlgorithmException ex) {
-             JOptionPane.showMessageDialog(panelManageDBInstances,
+            JOptionPane.showMessageDialog(panelManageDBInstances,
                     ex.getMessage(),
                     "Error",
-                    JOptionPane.ERROR_MESSAGE);           
+                    JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnSolverSaveToDBActionPerformed
 
@@ -1496,7 +1500,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 binaryFileChooser.setMultiSelectionEnabled(true);
                 binaryFileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             }
-            
+
             if (binaryFileChooser.showDialog(this, "Add Solver Binaries") == JFileChooser.APPROVE_OPTION) {
                 manageDBSolvers.addSolverBinary(binaryFileChooser.getSelectedFiles());
                 unsavedChanges = true;

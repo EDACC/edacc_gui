@@ -32,9 +32,6 @@ public class InstanceTableModel extends AbstractTableModel {
     private static final String[] columns_competition = {"Name", "Benchmark Type", "selected"};
     private static final String[] columns_noCompetition = {"Name", "selected"};
 
-    public static Icon[] getAllColumnNames() {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
     private String[] columns = columns_noCompetition;
     ArrayList<Property> properties;
     protected ArrayList<Instance> instances;
