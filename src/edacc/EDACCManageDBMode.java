@@ -54,6 +54,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import org.jdesktop.application.Action;
 
@@ -2304,6 +2305,18 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
     public void showSolverBinariesDetails(Vector<SolverBinaries> solverBinaries) {
         solverBinariesTableModel.setSolverBinaries(solverBinaries);
+    }
+
+    public void updateInstanceTable() {
+        instanceFilter.clearInstanceClassIds();
+        if (jTreeInstanceClass.getSelectionPaths() != null) {
+            for (TreePath path : jTreeInstanceClass.getSelectionPaths()) {
+                for (Integer id : edacc.experiment.Util.getInstanceClassIdsFromPath((DefaultMutableTreeNode) (path.getLastPathComponent()))) {
+                    instanceFilter.addInstanceClassId(id);
+                }
+            }
+            instanceTableModel.fireTableDataChanged();
+        }
     }
 
     /**

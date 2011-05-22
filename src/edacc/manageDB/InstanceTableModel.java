@@ -6,13 +6,17 @@ package edacc.manageDB;
 
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
+import edacc.model.InstanceHasInstanceClassDAO;
 import edacc.model.InstanceHasProperty;
 import edacc.model.InstanceHasPropertyDAO;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
 import edacc.model.PropertyType;
 import edacc.satinstances.ConvertException;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 
@@ -20,7 +24,7 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author rretz
  */
-public class InstanceTableModel extends edacc.experiment.InstanceTableModel{
+public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
 
     public static final int COL_PROPERTY = 2;
     private boolean[] visible;
@@ -29,6 +33,7 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel{
     private boolean[] CONST_VISIBLE = {true, true};
     private static String[] columns;
     protected Vector<Instance> instances;
+    protected HashMap<Instance, LinkedList<Integer>> instanceClassIds;
 
     public static String[] getAllColumnNames() {
         return columns;
@@ -42,6 +47,7 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel{
             columns[i] = CONST_COLUMNS[i];
             visible[i] = CONST_VISIBLE[i];
         }
+        instanceClassIds = new HashMap<Instance, LinkedList<Integer>>();
     }
 
     public boolean isEmpty() {
@@ -58,6 +64,16 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel{
     public void addInstances(Vector<Instance> instances) {
         for (int i = 0; i < instances.size(); i++) {
             addInstance(instances.get(i));
+        }
+
+
+        for (Instance i : instances) {
+            instanceClassIds.put(i, new LinkedList<Integer>());
+        }
+        try {
+            InstanceHasInstanceClassDAO.fillInstanceClassIds(instanceClassIds);
+        } catch (SQLException ex) {
+            // TODO: error
         }
     }
 
@@ -117,7 +133,7 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel{
      */
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-                if (columnIndex != -1) {
+        if (columnIndex != -1) {
             columnIndex = getIndexForColumn(columnIndex);
         }
 
@@ -208,7 +224,7 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel{
     }
 
     private int getIndexForColumn(int columnIndex) {
-         for (int i = 0; i < visible.length; i++) {
+        for (int i = 0; i < visible.length; i++) {
             if (visible[i]) {
                 columnIndex--;
             }
@@ -217,5 +233,10 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel{
             }
         }
         return 0;
+    }
+
+    public LinkedList<Integer> getInstanceClassIdsForRow(int rowIndex) {
+        LinkedList<Integer> res = instanceClassIds.get(instances.get(rowIndex));
+        return res == null ? new LinkedList<Integer>() : res;
     }
 }

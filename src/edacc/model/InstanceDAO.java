@@ -133,14 +133,13 @@ public class InstanceDAO {
     private static void save(Instance instance, String formula, InstanceClass instanceClass) {
         if (instance.isNew()) {
             try {
-                // Add Instance to InstanceClass
-                InstanceHasInstanceClassDAO.createInstanceHasInstance(instance, instanceClass);
+                
                 // insert query, set ID!
                 // TODO insert instance blob
                 // insert instance into db
                 PreparedStatement ps;
                 final String insertQuery = "INSERT INTO " + table + " (name, md5, instance) "
-                        + "VALUES (?, ?, ?, ?)";
+                        + "VALUES (?, ?, ?)";
                 ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
                 ps.setString(1, instance.getName());
                 ps.setString(2, instance.getMd5());
@@ -149,10 +148,10 @@ public class InstanceDAO {
                     //output = new File(instance.getFile().getName());
                     //Util.sevenZipEncode(input, output);
 
-                    ps.setBinaryStream(4, input);
+                    ps.setBinaryStream(3, input);
 
                 } else {
-                    ps.setNull(4, Types.BLOB);
+                    ps.setNull(3, Types.BLOB);
                 }
 
                 ps.executeUpdate();
@@ -166,6 +165,8 @@ public class InstanceDAO {
 
                 ps.close();
                 instance.setSaved();
+                // Add Instance to InstanceClass
+                InstanceHasInstanceClassDAO.createInstanceHasInstance(instance, instanceClass);
 
 
                 //                output.delete();

@@ -913,6 +913,7 @@ public class ManageDBInstances implements Observer {
     }
 
     public void changeInstanceTable() {
+        
         ((InstanceTableModel) tableInstances.getModel()).clearTable();
         TreePath[] selected = main.getInstanceClassTree().getSelectionPaths();
         Vector<InstanceClass> choosen = new Vector<InstanceClass>();
@@ -939,6 +940,7 @@ public class ManageDBInstances implements Observer {
                 Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+         main.updateInstanceTable();
         ((InstanceTableModel) tableInstances.getModel()).fireTableDataChanged();
     }
 
