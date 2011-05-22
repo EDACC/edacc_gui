@@ -120,7 +120,7 @@ public class InstanceClassDAO {
                     + " WHERE idinstanceClass=?";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
 
-            ps.setInt(5, instanceClass.getInstanceClassID());
+            ps.setInt(4, instanceClass.getInstanceClassID());
             ps.setString(1, instanceClass.getName());
             ps.setString(2, instanceClass.getDescription());
             if (parent != null) {
