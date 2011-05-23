@@ -533,7 +533,7 @@ public class InstanceDAO {
     public static Vector<Instance> getLastRelatedInstances(InstanceClass i) throws SQLException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT COUNT(Instances_idInstance) AS sum, Instances_idInstance, instanceClass_idinstanceClass " +
-                "FROM instances_has_instanceclass as ihi " +
+                "FROM Instances_has_instanceClass as ihi " +
                 "GROUP BY Instances_idInstance " +
                 "HAVING sum =1 AND instanceClass_idinstanceClass =?");
         ps.setInt(1, i.getId());
