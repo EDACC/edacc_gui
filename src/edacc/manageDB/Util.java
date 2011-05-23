@@ -422,11 +422,12 @@ public class Util {
     }
 
     private static String getCommonPrefix(File[] files) {
+        final String separator = System.getProperty("file.separator");
         if (files == null || files.length == 0)
             return "";
-        if (files.length == 1) {
-            return files[0].getPath();
-        }
+       // if (files.length == 1) {
+      //      return files[0].getParent();
+      //  }
         Arrays.sort(files, new Comparator<File>() {
 
             @Override
@@ -443,7 +444,9 @@ public class Util {
                     return lcp;
                 }
             }
-            lcp = pref;
+            if (pref.length() - separator.length() >= 0 && pref.substring(pref.length() - separator.length(), pref.length()).equals(separator)) {
+                lcp = pref;
+            }
         }
         return lcp;
     }
