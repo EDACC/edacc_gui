@@ -415,7 +415,11 @@ public class Util {
 
     public static void removeCommonPrefix(SolverBinaries b) {
         File[] files = b.getBinaryFiles();
-        String lcp = getCommonPrefix(files);
+        String lcp;
+        if (files.length == 1)
+            lcp = files[0].getParentFile().getAbsolutePath();
+        else
+            lcp = getCommonPrefix(files);
         b.setRootDir(lcp);
         for (int i = 0; i < files.length; i++)
             files[i] = new File(files[i].getAbsolutePath().replace(lcp, ""));
