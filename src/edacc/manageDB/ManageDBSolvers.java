@@ -147,7 +147,7 @@ public class ManageDBSolvers implements Observer {
      * @throws SolverIsInExperimentException if the solver is used in an experiment.
      * @throws SQLException if an SQL error occurs while deleting the solver.
      */
-    public void removeSolver() throws SolverIsInExperimentException, SQLException {
+    public void removeSolver() throws SolverIsInExperimentException, SQLException, NoSolverBinarySpecifiedException, FileNotFoundException, IOException {
         removeSolver(currentSolver);
 
         solverTableModel.removeSolver(currentSolver);
@@ -159,7 +159,7 @@ public class ManageDBSolvers implements Observer {
      * @throws SolverIsInExperimentException if the solver is used in an experiment.
      * @throws SQLException if an SQL error occurs while deleting the solver.
      */
-    public void removeSolver(Solver s) throws SolverIsInExperimentException, SQLException {
+    public void removeSolver(Solver s) throws SolverIsInExperimentException, SQLException, NoSolverBinarySpecifiedException, FileNotFoundException, IOException {
         try {
             SolverDAO.removeSolver(s);
         } catch (SolverNotInDBException ex) {

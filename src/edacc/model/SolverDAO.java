@@ -130,7 +130,7 @@ public class SolverDAO {
      * @throws SolverIsInExperimentException if the solver is used in an experiment. In this case you have to remove the experiment first.
      * @throws SolverNotInDBException if the solver is not persisted in the db. In this case, the object will be marked as "deleted" but nothing will be done to the cache or db.
      */
-    public static void removeSolver(Solver solver) throws SolverIsInExperimentException, SQLException, SolverNotInDBException {
+    public static void removeSolver(Solver solver) throws SolverIsInExperimentException, SQLException, SolverNotInDBException, NoSolverBinarySpecifiedException, FileNotFoundException, IOException {
         if (solver.isNew()) {
             solver.setDeleted();
             throw new SolverNotInDBException(solver);
