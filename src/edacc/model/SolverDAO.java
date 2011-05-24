@@ -130,7 +130,7 @@ public class SolverDAO {
      * @throws SolverIsInExperimentException if the solver is used in an experiment. In this case you have to remove the experiment first.
      * @throws SolverNotInDBException if the solver is not persisted in the db. In this case, the object will be marked as "deleted" but nothing will be done to the cache or db.
      */
-    public static void removeSolver(Solver solver) throws SolverIsInExperimentException, SQLException, SolverNotInDBException {
+    public static void removeSolver(Solver solver) throws SolverIsInExperimentException, SQLException, SolverNotInDBException, NoSolverBinarySpecifiedException, FileNotFoundException, IOException {
         if (solver.isNew()) {
             solver.setDeleted();
             throw new SolverNotInDBException(solver);
@@ -143,6 +143,9 @@ public class SolverDAO {
 
         // remove also the parameters of the solver
         ParameterDAO.removeParametersOfSolver(solver);
+
+        // remove also the solver binaries of the solver
+        SolverBinariesDAO.removeBinariesOfSolver(solver);
 
         // now remove the solver from the db
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(removeQuery);
@@ -247,8 +250,12 @@ public class SolverDAO {
     private static boolean isInExperiment(Solver solver) throws NoConnectionToDBException, SQLException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
 
-        ResultSet rs = st.executeQuery("SELECT s.idSolver FROM " + table + " AS s JOIN SolverConfig as sc ON "
-                + "s.idSolver = sc.Solver_idSolver WHERE idSolver = " + solver.getId());
+        ResultSet rs = st.executeQuery("SELECT s.idSolver FROM " + table + " AS s " +
+                "JOIN SolverConfig as sc " +
+                "JOIN SolverBinaries AS sb " +
+                "ON s.idSolver = sb.idSolver " +
+                "AND sc.SolverBinaries_idSolverBinary = sb.idSolverBinary " +
+                "WHERE s.idSolver = " + solver.getId());
         return rs.next();
     }
 
