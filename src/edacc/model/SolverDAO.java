@@ -250,8 +250,12 @@ public class SolverDAO {
     private static boolean isInExperiment(Solver solver) throws NoConnectionToDBException, SQLException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
 
-        ResultSet rs = st.executeQuery("SELECT s.idSolver FROM " + table + " AS s JOIN SolverConfig as sc ON "
-                + "s.idSolver = sc.Solver_idSolver WHERE idSolver = " + solver.getId());
+        ResultSet rs = st.executeQuery("SELECT s.idSolver FROM " + table + " AS s " +
+                "JOIN SolverConfig as sc " +
+                "JOIN SolverBinaries AS sb " +
+                "ON s.idSolver = sb.idSolver " +
+                "AND sc.SolverBinaries_idSolverBinary = sb.idSolverBinary " +
+                "WHERE s.idSolver = " + solver.getId());
         return rs.next();
     }
 
