@@ -42,8 +42,8 @@ public class InstanceDAO {
         String from = " ";
         int tbl = 0;
         for (Property p : props) {
-           // from += "LEFT JOIN (SELECT idInstance, value FROM Instance_has_Property WHERE idProperty = \"" + p.getId() + "\") AS tbl_" + tbl++ + " USING (idInstance) ";
-           from += "LEFT OUTER JOIN Instance_has_Property AS tbl_" + tbl++ + " ON i.idInstance=tbl_" + (tbl-1) + ".idInstance AND tbl_" + (tbl-1) + ".idProperty=" + p.getId() + " ";
+            // from += "LEFT JOIN (SELECT idInstance, value FROM Instance_has_Property WHERE idProperty = \"" + p.getId() + "\") AS tbl_" + tbl++ + " USING (idInstance) ";
+            from += "LEFT OUTER JOIN Instance_has_Property AS tbl_" + tbl++ + " ON i.idInstance=tbl_" + (tbl - 1) + ".idInstance AND tbl_" + (tbl - 1) + ".idProperty=" + p.getId() + " ";
         }
         return from;
     }
@@ -133,7 +133,7 @@ public class InstanceDAO {
     private static void save(Instance instance, String formula, InstanceClass instanceClass) {
         if (instance.isNew()) {
             try {
-                
+
                 // insert query, set ID!
                 // TODO insert instance blob
                 // insert instance into db
@@ -187,7 +187,7 @@ public class InstanceDAO {
     public static void save(Instance instance, boolean compressBinary, InstanceClass instanceClass) throws SQLException, FileNotFoundException, IOException {
         PreparedStatement ps;
         if (instance.isNew()) {
-            try {               
+            try {
                 // insert query, set ID!
                 // TODO insert instance blob
                 // insert instance into db
@@ -509,16 +509,17 @@ public class InstanceDAO {
      * @param lastRelated
      * @throws SQLException
      */
-    static void deleteAll(Vector<Instance> lastRelated) throws SQLException {
-        if(lastRelated.isEmpty())
+    public static void deleteAll(Vector<Instance> lastRelated) throws SQLException {
+        if (lastRelated.isEmpty()) {
             return;
+        }
         String query = "DELETE FROM Instances WHERE idInstance=" + lastRelated.get(0).getId();
-        for(int i = 1; i < lastRelated.size(); i++){
+        for (int i = 1; i < lastRelated.size(); i++) {
             query += " OR idInstance=" + lastRelated.get(i).getId();
         }
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.executeUpdate();
-        for(int i = 0; i < lastRelated.size(); i++){
+        for (int i = 0; i < lastRelated.size(); i++) {
             cache.remove(lastRelated.get(i));
             lastRelated.get(i).setDeleted();
         }
@@ -532,14 +533,14 @@ public class InstanceDAO {
      */
     public static Vector<Instance> getLastRelatedInstances(InstanceClass i) throws SQLException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT COUNT(Instances_idInstance) AS sum, Instances_idInstance, instanceClass_idinstanceClass " +
-                "FROM Instances_has_instanceClass as ihi " +
-                "GROUP BY Instances_idInstance " +
-                "HAVING sum =1 AND instanceClass_idinstanceClass =?");
+                "SELECT COUNT(Instances_idInstance) AS sum, Instances_idInstance, instanceClass_idinstanceClass "
+                + "FROM Instances_has_instanceClass as ihi "
+                + "GROUP BY Instances_idInstance "
+                + "HAVING sum =1 AND instanceClass_idinstanceClass =?");
         ps.setInt(1, i.getId());
         ResultSet rs = ps.executeQuery();
         Vector<Instance> lastRelated = new Vector<Instance>();
-        while(rs.next()){
+        while (rs.next()) {
             lastRelated.add(InstanceDAO.getById(rs.getInt("Instances_idInstance")));
         }
 

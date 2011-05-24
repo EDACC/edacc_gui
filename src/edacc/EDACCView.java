@@ -527,7 +527,7 @@ public class EDACCView extends FrameView implements Observer {
                     return;
                 }
             }
-            manageDBMode.deinitialize();
+
         }
         Tasks.startTask(new TaskRunnable() {
 

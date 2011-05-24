@@ -360,9 +360,8 @@ public class ManageDBInstances implements Observer {
                         == EDACCExtendedWarning.RET_OK_OPTION) {
 
                     //Delete the related instances and instance classes
-                    for (int i = 0; i < lastRelated.size(); i++) {
-                        InstanceDAO.delete(lastRelated.get(i));
-                    }
+                        InstanceDAO.deleteAll(lastRelated);
+
                     Vector<InstanceClass> errors = new Vector<InstanceClass>();
                     for (int i = 0; i < toRemove.size(); i++) {
                         try {
