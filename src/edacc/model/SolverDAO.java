@@ -144,6 +144,9 @@ public class SolverDAO {
         // remove also the parameters of the solver
         ParameterDAO.removeParametersOfSolver(solver);
 
+        // remove also the solver binaries of the solver
+        SolverBinariesDAO.removeBinariesOfSolver(solver);
+
         // now remove the solver from the db
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(removeQuery);
         ps.setInt(1, solver.getId());

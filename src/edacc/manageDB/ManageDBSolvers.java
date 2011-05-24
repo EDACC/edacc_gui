@@ -14,6 +14,7 @@ import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
 import edacc.model.Solver;
 import edacc.model.SolverBinaries;
+import edacc.model.SolverBinariesDAO;
 import edacc.model.SolverDAO;
 import edacc.model.SolverNotInDBException;
 import java.io.ByteArrayInputStream;
@@ -40,6 +41,7 @@ public class ManageDBSolvers implements Observer {
     private SolverTableModel solverTableModel;
     private Solver currentSolver;
     private ManageDBParameters manageDBParameters;
+    private SolverBinariesTableModel solverBinariesTableModel;
 
     public ManageDBSolvers(EDACCManageDBMode gui, SolverTableModel solverTableModel, ManageDBParameters manageDBParameters) {
         this.gui = gui;
@@ -164,6 +166,24 @@ public class ManageDBSolvers implements Observer {
             // if the solver isn't in the db, just remove it from the table model
         }
         solverTableModel.removeSolver(s);
+    }
+
+    public void removeSolverBinary(SolverBinaries b) {
+        b.setDeleted();
+        try {
+            SolverBinariesDAO.save(b);
+        } catch (SQLException ex) {
+            Logger.getLogger(ManageDBSolvers.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSolverBinarySpecifiedException ex) {
+            Logger.getLogger(ManageDBSolvers.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ManageDBSolvers.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ManageDBSolvers.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(ManageDBSolvers.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        solverBinariesTableModel.setSolverBinaries(currentSolver.getSolverBinaries());
     }
 
     /**

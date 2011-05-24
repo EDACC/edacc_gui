@@ -17,6 +17,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -27,7 +29,20 @@ public class SolverBinariesDAO {
     private static final String TABLE = "SolverBinaries";
     private static final String INSERT_QUERY = "INSERT INTO " + TABLE + " (idSolver, binaryName, binaryArchive, md5, version, runCommand, runPath) VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String UPDATE_QUERY = "UPDATE " + TABLE + " SET binaryName = ?, version = ?, runCommand = ?, runPath = ? WHERE idSolverBinary = ?";
+    private static final String DELETE_QUERY = "DELETE FROM " + TABLE + " WHERE idSolverBinary=?";
     private static ObjectCache<SolverBinaries> cache = new ObjectCache<SolverBinaries>();
+
+    public static void removeBinariesOfSolver(Solver solver) throws SQLException, NoSolverBinarySpecifiedException, FileNotFoundException, IOException {
+        for (SolverBinaries b : solver.getSolverBinaries()) {
+            b.setDeleted();
+            try {
+                save(b);
+            } catch (NoSuchAlgorithmException ex) {
+                throw new IOException("Error while calculating md5 sum: " + ex.getMessage());
+            }
+        }
+
+    }
 
     private SolverBinariesDAO() {
         
@@ -63,6 +78,8 @@ public class SolverBinariesDAO {
             ps.setString(4, s.getRunPath());
             ps.setInt(5, s.getIdSolverBinary());
         } else if (s.isDeleted()) {
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(DELETE_QUERY);
+            ps.setInt(1, s.getIdSolverBinary());
         }
         ps.executeUpdate();
         if (s.isNew()) {
@@ -72,8 +89,15 @@ public class SolverBinariesDAO {
                 s.setIdSolverBinary(rs.getInt(1));
             }
         }
-        cache.cache(s);
-        s.setSaved();
+        if (s.isDeleted()) {
+            cache.remove(s);
+            // remove SolverBinary from Vector in corresponding solver object
+            SolverDAO.getById(s.getIdSolver()).removeSolverBinary(s);
+            s.setNew();
+        } else {
+            cache.cache(s);
+            s.setSaved();
+        }
     }
 
     private static SolverBinaries getSolverBinaryFromResultSet(ResultSet rs) throws SQLException {
