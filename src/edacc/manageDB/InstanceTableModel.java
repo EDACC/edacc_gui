@@ -136,7 +136,9 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
         if (columnIndex != -1) {
             columnIndex = getIndexForColumn(columnIndex);
         }
-
+        if(instances.isEmpty()){
+            return null;
+        }
         switch (columnIndex) {
             case 0:
                 return instances.get(rowIndex).getName();

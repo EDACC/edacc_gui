@@ -159,7 +159,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         manageDBParameters.loadParametersOfSolvers(solverTableModel.getSolvers());
         manageDBInstances.loadInstanceClasses();
         instanceTableModel.updateProperties();
-
+        tableInstances.updateUI();
+        instanceTableModel.fireTableDataChanged();
+        
         jTreeInstanceClass.updateUI();
         unsavedChanges = false;
     }
@@ -2317,6 +2319,13 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             }
             instanceTableModel.fireTableDataChanged();
         }
+    }
+
+    void deinitialize() {
+        tableInstances.clearSelection();
+        jTreeInstanceClass.clearSelection();
+        instanceTableModel.clearTable();
+        
     }
 
     /**
