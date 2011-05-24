@@ -14,6 +14,7 @@ import edacc.EDACCManageDBMode;
 import edacc.experiment.ExperimentTableModel;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
+import edacc.model.Experiment;
 import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.InstanceClassAlreadyInDBException;
 import edacc.model.InstanceNotInDBException;
@@ -40,6 +41,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
@@ -351,36 +353,21 @@ public class ManageDBInstances implements Observer {
             } else {
                 // List the Experiments to which the instances, which are dangered related to and ask to remove these isntances.
                 ExperimentTableModel expTableModel = new ExperimentTableModel();
-                expTableModel.setExperiments(ExperimentHasInstanceDAO.getAllExperimentsByInstances(lastRelated));
-                if (EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
-                        EDACCApp.getApplication().getMainFrame(),
-                        "If you remove the instance classes, instances used in den following experiments will be deleted too. \n"
-                        + "Do you really want to remove the selected instance classes?",
-                        new JTable(expTableModel))
-                        == EDACCExtendedWarning.RET_OK_OPTION) {
-
-                    //Delete the related instances and instance classes
-                        InstanceDAO.deleteAll(lastRelated);
-
-                    Vector<InstanceClass> errors = new Vector<InstanceClass>();
-                    for (int i = 0; i < toRemove.size(); i++) {
-                        try {
-                            InstanceClassDAO.delete(toRemove.get(i));
-                        } catch (InstanceSourceClassHasInstance ex) {
-                            errors.add(toRemove.get(i));
-                        }
+                ArrayList<Experiment> inExp = ExperimentHasInstanceDAO.getAllExperimentsByInstances(lastRelated);
+                if (!inExp.isEmpty()) {
+                    expTableModel.setExperiments(inExp);
+                    if (EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
+                            EDACCApp.getApplication().getMainFrame(),
+                            "If you remove the instance classes, instances used in den following experiments will be deleted too. \n"
+                            + "Do you really want to remove the selected instance classes?",
+                            new JTable(expTableModel))
+                            == EDACCExtendedWarning.RET_OK_OPTION) {
+                        deleteInstanceClasssAndInstances(lastRelated, toRemove);
                     }
-                    loadInstanceClasses();
-                    if (!errors.isEmpty()) {
-                        tableModel = new AddInstanceInstanceClassTableModel();
-                        tableModel.addClasses(errors);
-                        EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS,
-                                EDACCApp.getApplication().getMainFrame(),
-                                "A Problem occured by removing the following instance classes.  \n ",
-                                new JTable(tableModel));
-                    }
-
+                } else {
+                    deleteInstanceClasssAndInstances(lastRelated, toRemove);
                 }
+
                 return;
             }
         }
@@ -784,34 +771,33 @@ public class ManageDBInstances implements Observer {
      * instance table, no filter can be added. Selects the first entry in the instance table after adding the filter.
     
     public void addFilter() {
-
-        if (main.instanceFilter == null) {
-            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            main.instanceFilter = new EDACCManageDBInstanceFilter(mainFrame, true);
-            main.instanceFilter.setLocationRelativeTo(mainFrame);
-        }
-        EDACCApp.getApplication().show(main.instanceFilter);
-
-        Vector<RowFilter<Object, Object>> filters = main.instanceFilter.getFilter();
-        if (filters != null) {
-            if (filters.isEmpty()) {
-                removeFilter(tableInstances);
-                main.setFilterStatus("");
-                if (tableInstances.getRowCount() != 0) {
-                    tableInstances.addRowSelectionInterval(0, 0);
-                }
-            } else {
-                main.sorter.setRowFilter(RowFilter.andFilter(filters));
-                tableInstances.setRowSorter(main.sorter);
-                main.instanceTableModel.fireTableDataChanged();
-                if (tableInstances.getRowCount() != 0) {
-                    tableInstances.addRowSelectionInterval(0, 0);
-                }
-                main.setFilterStatus("This list of instances has filters applied to it. Use the filter button below to modify.");
-            }
-        }
+    
+    if (main.instanceFilter == null) {
+    JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+    main.instanceFilter = new EDACCManageDBInstanceFilter(mainFrame, true);
+    main.instanceFilter.setLocationRelativeTo(mainFrame);
+    }
+    EDACCApp.getApplication().show(main.instanceFilter);
+    
+    Vector<RowFilter<Object, Object>> filters = main.instanceFilter.getFilter();
+    if (filters != null) {
+    if (filters.isEmpty()) {
+    removeFilter(tableInstances);
+    main.setFilterStatus("");
+    if (tableInstances.getRowCount() != 0) {
+    tableInstances.addRowSelectionInterval(0, 0);
+    }
+    } else {
+    main.sorter.setRowFilter(RowFilter.andFilter(filters));
+    tableInstances.setRowSorter(main.sorter);
+    main.instanceTableModel.fireTableDataChanged();
+    if (tableInstances.getRowCount() != 0) {
+    tableInstances.addRowSelectionInterval(0, 0);
+    }
+    main.setFilterStatus("This list of instances has filters applied to it. Use the filter button below to modify.");
+    }
+    }
     }*/
-
     public void onTaskStart(String methodName) {
     }
 
@@ -912,7 +898,7 @@ public class ManageDBInstances implements Observer {
     }
 
     public void changeInstanceTable() {
-        
+
         ((InstanceTableModel) tableInstances.getModel()).clearTable();
         TreePath[] selected = main.getInstanceClassTree().getSelectionPaths();
         Vector<InstanceClass> choosen = new Vector<InstanceClass>();
@@ -939,7 +925,7 @@ public class ManageDBInstances implements Observer {
                 Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-         main.updateInstanceTable();
+        main.updateInstanceTable();
         ((InstanceTableModel) tableInstances.getModel()).fireTableDataChanged();
     }
 
@@ -1100,5 +1086,37 @@ public class ManageDBInstances implements Observer {
             md5Error.addAll(exportInstanceClasses((DefaultMutableTreeNode) selected.getChildAt(i), dir.getAbsolutePath(), task));
         }
         return md5Error;
+    }
+
+    /**
+     * Starts the deletion the given Instances and InstanceClasses
+     * @param lastRelated
+     * @param toRemove
+     * @throws SQLException
+     * @throws NoConnectionToDBException
+     * @throws InstanceIsInExperimentException 
+     */
+    private void deleteInstanceClasssAndInstances(Vector<Instance> lastRelated, Vector<InstanceClass> toRemove) throws SQLException, NoConnectionToDBException, InstanceIsInExperimentException {
+        AddInstanceInstanceClassTableModel tableModel = new AddInstanceInstanceClassTableModel();
+        //Delete the related instances and instance classes
+        InstanceDAO.deleteAll(lastRelated);
+
+        Vector<InstanceClass> errors = new Vector<InstanceClass>();
+        for (int i = 0; i < toRemove.size(); i++) {
+            try {
+                InstanceClassDAO.delete(toRemove.get(i));
+            } catch (InstanceSourceClassHasInstance ex) {
+                errors.add(toRemove.get(i));
+            }
+        }
+        loadInstanceClasses();
+        if (!errors.isEmpty()) {
+            tableModel = new AddInstanceInstanceClassTableModel();
+            tableModel.addClasses(errors);
+            EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS,
+                    EDACCApp.getApplication().getMainFrame(),
+                    "A Problem occured by removing the following instance classes.  \n ",
+                    new JTable(tableModel));
+        }
     }
 }

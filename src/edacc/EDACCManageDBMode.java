@@ -159,7 +159,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         manageDBParameters.loadParametersOfSolvers(solverTableModel.getSolvers());
         manageDBInstances.loadInstanceClasses();
         instanceTableModel.updateProperties();
-
+        instanceTableModel.fireTableDataChanged();
         jTreeInstanceClass.updateUI();
         unsavedChanges = false;
     }
@@ -1814,7 +1814,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         } else {
             try {
                 manageDBInstances.RemoveInstanceClass((DefaultMutableTreeNode) jTreeInstanceClass.getSelectionPath().getLastPathComponent());
-                //instanceClassTableModel.fireTableDataChanged();                 ;
+                instanceTableModel.fireTableDataChanged();                ;
             } catch (InstanceIsInExperimentException ex) {
                 Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
                 //instanceClassTableModel.fireTableDataChanged();                 ;
@@ -1866,6 +1866,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         EDACCApp.getApplication().show(this.instanceGenKCNF);
         try {
             manageDBInstances.loadInstanceClasses();
+            jTreeInstanceClass.updateUI();
             //try {
             /* } catch (NoConnectionToDBException ex) {
             Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
@@ -2317,6 +2318,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             }
             instanceTableModel.fireTableDataChanged();
         }
+    }
+
+    public void reinitialize() {
+        tableInstances.clearSelection();
+        instanceTableModel.clearTable();
+        jTreeInstanceClass.clearSelection();
     }
 
     /**
