@@ -174,6 +174,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             solverConfigEntryTableModel.setValueAt(entry.solverConfigEntryTableModel.getValueAt(i, 3), i, 3);
             solverConfigEntryTableModel.setValueAt(entry.solverConfigEntryTableModel.getValueAt(i, 0), i, 0);
         }
+        comboSolverBinaries.setSelectedIndex(entry.comboSolverBinaries.getSelectedIndex());
         updateTableColumnWidth = true;
     }
 
