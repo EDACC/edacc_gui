@@ -44,6 +44,10 @@ public class SolverBinariesDAO {
 
     }
 
+    public static void clearCache() {
+        cache.clear();
+    }
+
     private SolverBinariesDAO() {
         
     }

@@ -40,6 +40,7 @@ import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import edacc.model.PropertyNotInDBException;
 import edacc.model.ResultCodeDAO;
+import edacc.model.SolverBinariesDAO;
 import edacc.model.StatusCodeNotInDBException;
 import edacc.model.TaskCancelledException;
 import edacc.model.Tasks;
@@ -140,6 +141,7 @@ public class ExperimentController {
         main.solverConfigPanel.beginUpdate();
         solverConfigPanel.removeAll();
         SolverConfigurationDAO.clearCache();
+        SolverBinariesDAO.clearCache();
         ArrayList<Solver> vs = new ArrayList<Solver>();
         ArrayList<SolverConfiguration> vss = new ArrayList<SolverConfiguration>();
         Vector<ExperimentHasInstance> ehi = new Vector<ExperimentHasInstance>();
