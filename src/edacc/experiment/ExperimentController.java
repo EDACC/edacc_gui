@@ -1583,20 +1583,23 @@ public class ExperimentController {
      * @return true, iff some data is modified
      */
     public boolean experimentResultsIsModified() {
+        boolean res = false;
         try {
             experimentResultCache.updateExperimentResults();
             ArrayList<SolverConfiguration> solverConfigs = SolverConfigurationDAO.getSolverConfigurationByExperimentId(activeExperiment.getId());
             LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
             for (SolverConfiguration sc : solverConfigs) {
                 for (Instance i : instances) {
-                    if (main.generateJobsTableModel.getNumRuns(i, sc) != (int) experimentResultCache.getNumRuns(sc.getId(), i.getId())) {
-                        return true;
+                    int savedNumRuns = experimentResultCache.getNumRuns(sc.getId(), i.getId());
+                    main.generateJobsTableModel.setSavedNumRuns(i, sc, savedNumRuns);
+                    if (main.generateJobsTableModel.getNumRuns(i, sc) != savedNumRuns) {
+                        res = true;
                     }
                 }
             }
         } catch (Exception _) {
         }
-        return false;
+        return res;
     }
 
     /**

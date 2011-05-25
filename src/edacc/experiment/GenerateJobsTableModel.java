@@ -22,6 +22,7 @@ public class GenerateJobsTableModel extends DefaultTableModel {
     private HashMap<Integer, Integer> rowMap;
     private HashMap<Integer, Integer> colMap;
     private int[][] numRuns;
+    private int[][] savedNumRuns;
     private ExperimentController expController;
     
     public GenerateJobsTableModel(ExperimentController expController) {
@@ -34,6 +35,7 @@ public class GenerateJobsTableModel extends DefaultTableModel {
         instances = new ArrayList<Instance>();
         instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
         numRuns = new int[instances.size()][solverConfigs.size()+1];
+        savedNumRuns = new int[instances.size()][solverConfigs.size()+1];
         rowMap = new HashMap<Integer, Integer>();
         colMap = new HashMap<Integer, Integer>();
         for (int row = 0; row < instances.size(); row++) {
@@ -44,7 +46,9 @@ public class GenerateJobsTableModel extends DefaultTableModel {
         }
         for (SolverConfiguration sc : solverConfigs) {
             for (Instance i : instances) {
-                setNumRuns(i, sc, expController.getExperimentResults().getNumRuns(sc.getId(), i.getId()));
+                int numRuns = expController.getExperimentResults().getNumRuns(sc.getId(), i.getId());
+                setNumRuns(i, sc, numRuns);
+                setSavedNumRuns(i, sc, numRuns);
             }
         }
         this.fireTableStructureChanged();
@@ -113,5 +117,13 @@ public class GenerateJobsTableModel extends DefaultTableModel {
 
     public SolverConfiguration getSolverConfiguration(int col) {
         return solverConfigs.get(col-1);
+    }
+
+    public void setSavedNumRuns(Instance instance, SolverConfiguration solverConfig, int value) {
+        savedNumRuns[rowMap.get(instance.getId())][colMap.get(solverConfig.getId())] = value;
+    }
+    
+    public Integer getSavedNumRuns(Instance instance, SolverConfiguration solverConfig) {
+        return savedNumRuns[rowMap.get(instance.getId())][colMap.get(solverConfig.getId())];
     }
 }

@@ -229,6 +229,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         /* -------------------------------- generate jobs tab -------------------------------- */
         generateJobsTableModel = new GenerateJobsTableModel(expController);
         tblGenerateJobs.setModel(generateJobsTableModel);
+        tblGenerateJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeGenerateJobsTableCellRenderer());
         generateJobsTableModel.addTableModelListener(new TableModelListener() {
             
             @Override

@@ -27,6 +27,9 @@ public class Util {
 
     public static final Color COLOR_ERROR = new Color(0xed1c24);
     
+    public static final Color COLOR_GENERATEJOBSTABLE_UNSAVED_BIGGER = Color.green;
+    public static final Color COLOR_GENERATEJOBSTABLE_UNSAVED_LOWER = COLOR_ERROR;
+    
     /**
      * Updates the width of each column according to the table size and the data in the cells.
      * @param table
