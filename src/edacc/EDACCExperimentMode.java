@@ -56,8 +56,6 @@ import java.util.Observer;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -219,7 +217,19 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 instanceFilter = new EDACCInstanceFilter(EDACCApp.getApplication().getMainFrame(), true, tableInstances, true);
             }
         });
-        
+        tableInstances.addKeyListener(new java.awt.event.KeyAdapter() {
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                    for (int row : tableInstances.getSelectedRows()) {
+                        int rowModel = tableInstances.convertRowIndexToModel(row);
+                        insTableModel.setValueAt(!(Boolean) insTableModel.getValueAt(rowModel, InstanceTableModel.COL_SELECTED), rowModel, InstanceTableModel.COL_SELECTED);
+                    }
+                }
+            }
+            
+        });
         instanceClassTreeModel = new DefaultTreeModel(null);
         jTreeInstanceClass.setModel(instanceClassTreeModel);
         jTreeInstanceClass.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
@@ -267,6 +277,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     EDACCExperimentModeUpdateStatus updateStatusDialog = new EDACCExperimentModeUpdateStatus(mainFrame, true, expController);
                     updateStatusDialog.setLocationRelativeTo(mainFrame);
                     updateStatusDialog.setVisible(true);
+                }
+                if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_R) {
+                    btnRefreshJobs();
                 }
             }
         });
