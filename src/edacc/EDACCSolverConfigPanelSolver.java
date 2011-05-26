@@ -99,6 +99,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
         if (!useSolverConfiguration) {
             entry.solver = SolverDAO.getById(entry.solverConfiguration.getSolverBinary().getIdSolver());
             entry.solverConfiguration = null;
+            entry.solverConfigEntryTableModel.setParameterInstances(null);
         }
         this.add(entry, getIndex(solverConfiguration.getSolverBinary().getIdSolver()));
         parent.getSolTableModel().setSolverSelected(solverConfiguration.getSolverBinary().getIdSolver(), true);

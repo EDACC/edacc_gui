@@ -45,7 +45,7 @@ import org.jdesktop.application.Action;
  */
 public class EDACCSolverConfigEntry extends javax.swing.JPanel {
 
-    private SolverConfigEntryTableModel solverConfigEntryTableModel;
+    protected SolverConfigEntryTableModel solverConfigEntryTableModel;
     private TitledBorder border;
     protected SolverConfiguration solverConfiguration;
     protected Solver solver;

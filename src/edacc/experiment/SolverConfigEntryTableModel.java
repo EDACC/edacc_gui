@@ -70,12 +70,18 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
     }
 
     public void setParameterInstances(ArrayList<ParameterInstance> params) {
-        for (int i = 0; i < params.size(); i++) {
-            for (int j = 0; j < parameters.length; j++) {
-                if (parameters[j].getId() == params.get(i).getParameter_id()) {
-                    parameterInstances[j] = params.get(i);
-                    this.values[j] = params.get(i).getValue();
-                    this.selected[j] = true;
+        if (params == null) {
+            for (int i = 0; i < parameterInstances.length; i++) {
+                parameterInstances[i] = null;
+            }
+        } else {
+            for (int i = 0; i < params.size(); i++) {
+                for (int j = 0; j < parameters.length; j++) {
+                    if (parameters[j].getId() == params.get(i).getParameter_id()) {
+                        parameterInstances[j] = params.get(i);
+                        this.values[j] = params.get(i).getValue();
+                        this.selected[j] = true;
+                    }
                 }
             }
         }
