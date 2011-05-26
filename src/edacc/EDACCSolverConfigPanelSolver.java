@@ -72,9 +72,9 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
     }
 
     private void doRepaint() {
-        // TODO : parent.update?!!!
-        this.repaint();
         this.revalidate();
+        this.invalidate();
+        this.repaint();
         parent.setTitles();
     }
 
@@ -166,6 +166,10 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
             parent.remove(this);
         }
         doRepaint();
+        // repaint parent
+        parent.invalidate();
+        parent.revalidate();
+        parent.repaint();
     }
 
     public void setTitles() {
