@@ -14,7 +14,7 @@ import edacc.experiment.Util;
 public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
 
     private boolean cancelled;
-    private int cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast;
+    private int cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast, maxSeed;
 
     /** Creates new form EDACCExperimentModeGenerateJobs */
     public EDACCExperimentModeGenerateJobs(java.awt.Frame parent, boolean modal, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimitFirst, int outputSizeLimitLast) {
@@ -63,6 +63,8 @@ public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
         txtOutputLimitFirst = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         txtOutputLimitLast = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        txtMaxSeed = new javax.swing.JTextField();
         btnGenerate = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
 
@@ -127,6 +129,12 @@ public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
         txtOutputLimitLast.setText(resourceMap.getString("txtOutputLimitLast.text")); // NOI18N
         txtOutputLimitLast.setName("txtOutputLimitLast"); // NOI18N
 
+        jLabel5.setText(resourceMap.getString("jLabel5.text")); // NOI18N
+        jLabel5.setName("jLabel5"); // NOI18N
+
+        txtMaxSeed.setText(resourceMap.getString("txtMaxSeed.text")); // NOI18N
+        txtMaxSeed.setName("txtMaxSeed"); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -142,7 +150,8 @@ public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel1)
                             .addComponent(jLabel7)
-                            .addComponent(jLabel3))))
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel5))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtMemoryLimit, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
@@ -150,7 +159,8 @@ public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
                     .addComponent(txtStackSizeLimit, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
                     .addComponent(txtCPUTimeLimit, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
                     .addComponent(txtOutputLimitFirst, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
-                    .addComponent(txtOutputLimitLast, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE))
+                    .addComponent(txtOutputLimitLast, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+                    .addComponent(txtMaxSeed, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -182,7 +192,11 @@ public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(txtOutputLimitLast, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(txtMaxSeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
         btnGenerate.setText(resourceMap.getString("btnGenerate.text")); // NOI18N
@@ -258,6 +272,7 @@ public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
                 outputSizeLimitFirst = -1;
                 outputSizeLimitLast = -1;
             }
+            maxSeed = Integer.parseInt(txtMaxSeed.getText());
             cancelled = false;
             this.setVisible(false);
         } catch (NumberFormatException ex) {
@@ -286,10 +301,12 @@ public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField txtCPUTimeLimit;
+    private javax.swing.JTextField txtMaxSeed;
     private javax.swing.JTextField txtMemoryLimit;
     private javax.swing.JTextField txtOutputLimitFirst;
     private javax.swing.JTextField txtOutputLimitLast;
@@ -323,5 +340,9 @@ public class EDACCExperimentModeGenerateJobs extends javax.swing.JDialog {
 
     public int getOutputSizeLimitLast() {
         return outputSizeLimitLast;
+    }
+
+    public int getMaxSeed() {
+        return maxSeed;
     }
 }

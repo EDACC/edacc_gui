@@ -75,6 +75,7 @@
                               <Component id="jLabel1" alignment="1" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel7" alignment="1" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel3" alignment="1" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel5" alignment="1" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -86,6 +87,7 @@
                       <Component id="txtCPUTimeLimit" alignment="0" pref="347" max="32767" attributes="2"/>
                       <Component id="txtOutputLimitFirst" alignment="0" pref="347" max="32767" attributes="0"/>
                       <Component id="txtOutputLimitLast" alignment="0" pref="347" max="32767" attributes="0"/>
+                      <Component id="txtMaxSeed" alignment="0" pref="347" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -126,7 +128,12 @@
                       <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="txtOutputLimitLast" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtMaxSeed" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace pref="14" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -219,6 +226,18 @@
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="txtOutputLimitLast.text"/>
             <Property name="name" type="java.lang.String" value="txtOutputLimitLast" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel5">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jLabel5.text"/>
+            <Property name="name" type="java.lang.String" value="jLabel5" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="txtMaxSeed">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="txtMaxSeed.text"/>
+            <Property name="name" type="java.lang.String" value="txtMaxSeed" noResource="true"/>
           </Properties>
         </Component>
       </SubComponents>
