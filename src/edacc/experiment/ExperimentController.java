@@ -358,7 +358,6 @@ public class ExperimentController {
                     entry.getSolverConfiguration().setSolverBinary(entry.getSolverBinary());
                     entry.getSolverConfiguration().setName(entry.getTitle());
                     entry.getSolverConfiguration().setSeed_group(seed_group);
-                    System.out.println(idx + ": " + entry.getSolverConfiguration().getName());
                     entry.getSolverConfiguration().setIdx(idx);
 
                 }
