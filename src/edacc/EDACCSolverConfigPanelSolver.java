@@ -7,7 +7,6 @@ package edacc;
 
 import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
-import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -24,7 +23,7 @@ import javax.swing.border.TitledBorder;
 public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
 
     private Solver solver;
-    private EDACCSolverConfigPanel parent;
+    protected EDACCSolverConfigPanel parent;
     private GridBagConstraints gridBagConstraints;
     private GridBagLayout layout;
 
@@ -94,7 +93,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
      * @throws SQLException
      */
     public final void addSolverConfiguration(SolverConfiguration solverConfiguration, boolean useSolverConfiguration) throws SQLException {
-        EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solverConfiguration);
+        EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solverConfiguration, parent.getSolverConfigs().getSolverConfigurationParameters(solverConfiguration));
         entry.setParent(this);
         if (!useSolverConfiguration) {
             entry.solver = SolverDAO.getById(entry.solverConfiguration.getSolverBinary().getIdSolver());
@@ -148,7 +147,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
      */
     public void removeEntry(EDACCSolverConfigEntry entry) {
         if (entry.getSolverConfiguration() != null) {
-            SolverConfigurationDAO.removeSolverConfiguration(entry.getSolverConfiguration());
+            parent.getSolverConfigs().markAsDeleted(entry.getSolverConfiguration());
         }
         this.remove(entry);
 
@@ -211,7 +210,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
      */
     public boolean isModified() {
         // checks for deleted entries
-        if (SolverConfigurationDAO.isModified()) {
+        if (parent.getSolverConfigs().isModified()) {
             return true;
         }
         int idx = 0;
@@ -238,7 +237,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
         for (Component comp : this.getComponents()) {
             if (comp instanceof EDACCSolverConfigEntry) {
                 EDACCSolverConfigEntry entry = (EDACCSolverConfigEntry) comp;
-                if (entry.isModified(-1) && entry.getSolverConfiguration() != null && !SolverConfigurationDAO.isDeleted(entry.getSolverConfiguration())) {
+                if (entry.isModified(-1) && entry.getSolverConfiguration() != null && !parent.getSolverConfigs().isDeleted(entry.getSolverConfiguration())) {
                     res.add(entry.getSolverConfiguration());
                 }
             }

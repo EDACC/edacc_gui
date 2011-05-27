@@ -165,8 +165,8 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
 
     private void itemEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemEditActionPerformed
         if (table.getSelectedRow() != -1) {
-
-            EDACCSolverConfigEntry entry = tableModel.getEntry(table.convertRowIndexToModel(table.getSelectedRow()));
+            // TODO: fix
+          /*  EDACCSolverConfigEntry entry = tableModel.getEntry(table.convertRowIndexToModel(table.getSelectedRow()));
             try {
                 EDACCSolverConfigEntry copy;
                 if (entry.getSolverConfiguration() != null) {
@@ -188,7 +188,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
                 dialog.dispose();
             } catch (Exception e) {
                 // TODO: error
-            }
+            }*/
         }
     }//GEN-LAST:event_itemEditActionPerformed
 

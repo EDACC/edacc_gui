@@ -1,5 +1,6 @@
 package edacc.experiment;
 
+import edacc.model.SolverConfigCache;
 import edacc.EDACCExperimentMode;
 import edacc.EDACCSolverConfigEntry;
 import edacc.EDACCSolverConfigPanel;
@@ -38,7 +39,6 @@ import edacc.model.Property;
 import edacc.model.PropertyDAO;
 import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
-import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import edacc.model.PropertyNotInDBException;
 import edacc.model.ResultCodeDAO;
@@ -65,8 +65,6 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
@@ -91,6 +89,8 @@ public class ExperimentController {
     private static RandomNumberGenerator rnd = new JavaRandom();
     // caching experiments
     private ExperimentResultCache experimentResultCache;
+    // caching solver configs
+    private SolverConfigCache solverConfigCache;
     public static Property PROP_CPUTIME;
 
     /**
@@ -140,23 +140,29 @@ public class ExperimentController {
     public void loadExperiment(Experiment exp, Tasks task) throws SQLException, Exception {
         main.reinitializeSolvers();
         activeExperiment = exp;
-        main.solverConfigPanel.beginUpdate();
-        solverConfigPanel.removeAll();
-        SolverConfigurationDAO.clearCache();
+       // main.solverConfigPanel.beginUpdate();
+       // solverConfigPanel.removeAll();
         SolverBinariesDAO.clearCache();
         ArrayList<Solver> vs = new ArrayList<Solver>();
-        ArrayList<SolverConfiguration> vss = new ArrayList<SolverConfiguration>();
         Vector<ExperimentHasInstance> ehi = new Vector<ExperimentHasInstance>();
         task.setStatus("Loading solvers..");
         vs.addAll(SolverDAO.getAll());
         main.solTableModel.setSolvers(vs);
         task.setTaskProgress(.25f);
         task.setStatus("Loading solver configurations..");
-        vss.addAll(SolverConfigurationDAO.getSolverConfigurationByExperimentId(exp.getId()));
-        for (int i = 0; i < vss.size(); i++) {
-            main.solverConfigPanel.addSolverConfiguration(vss.get(i));
+        if (solverConfigCache != null) {
+            solverConfigCache.changeExperiment(activeExperiment);
+        } else {
+            solverConfigCache = new SolverConfigCache(activeExperiment);
+            solverConfigPanel.setSolverConfigCache(solverConfigCache);
+            solverConfigCache.reload();
         }
-        main.solverConfigPanel.endUpdate();
+        
+        //vss.addAll(SolverConfigurationDAO.getSolverConfigurationByExperimentId(exp.getId()));
+       // for (int i = 0; i < vss.size(); i++) {
+       //     main.solverConfigPanel.addSolverConfiguration(vss.get(i));
+       // }
+       // main.solverConfigPanel.endUpdate();
         task.setTaskProgress(.5f);
         task.setStatus("Loading instances..");
         // select instances for the experiment
@@ -274,7 +280,7 @@ public class ExperimentController {
         }
 
         // check for deleted solver configurations (jobs have to be deleted)
-        ArrayList<SolverConfiguration> deletedSolverConfigurations = SolverConfigurationDAO.getAllDeleted();
+        ArrayList<SolverConfiguration> deletedSolverConfigurations = solverConfigCache.getAllDeleted();
         final ArrayList<ExperimentResult> deletedJobs = new ArrayList<ExperimentResult>();
         for (SolverConfiguration sc : deletedSolverConfigurations) {
             deletedJobs.addAll(ExperimentResultDAO.getAllBySolverConfiguration(sc));
@@ -347,11 +353,12 @@ public class ExperimentController {
                     invalidSeedGroup = true;
                 }
                 if (entry.getSolverConfiguration() == null) {
-                    entry.setSolverConfiguration(SolverConfigurationDAO.createSolverConfiguration(entry.getSolverBinary(), activeExperiment.getId(), seed_group, entry.getTitle(), idx));
+                    entry.setSolverConfiguration(solverConfigCache.createSolverConfiguration(entry.getSolverBinary(), activeExperiment.getId(), seed_group, entry.getTitle(), idx));
                 } else {
                     entry.getSolverConfiguration().setSolverBinary(entry.getSolverBinary());
                     entry.getSolverConfiguration().setName(entry.getTitle());
                     entry.getSolverConfiguration().setSeed_group(seed_group);
+                    System.out.println(idx + ": " + entry.getSolverConfiguration().getName());
                     entry.getSolverConfiguration().setIdx(idx);
 
                 }
@@ -359,7 +366,7 @@ public class ExperimentController {
                 idx++;
             }
         }
-        SolverConfigurationDAO.saveAll();
+        solverConfigCache.saveAll();
         getExperimentResults().updateExperimentResults();
         main.generateJobsTableModel.updateNumRuns();
         Util.updateTableColumnWidth(main.tblGenerateJobs);
@@ -380,7 +387,7 @@ public class ExperimentController {
      * @throws SQLException
      */
     public void undoSolverConfigurations(Tasks task) throws SQLException {
-        main.solverConfigPanel.beginUpdate();
+        /*main.solverConfigPanel.beginUpdate();
         main.solverConfigPanel.removeAll();
         ArrayList<SolverConfiguration> solverConfigurations = SolverConfigurationDAO.getAllCached();
         Collections.sort(solverConfigurations, new Comparator<SolverConfiguration>() {
@@ -394,7 +401,10 @@ public class ExperimentController {
             main.solverConfigPanel.addSolverConfiguration(sc);
             sc.setSaved();
         }
-        main.solverConfigPanel.endUpdate();
+        main.solverConfigPanel.endUpdate();*/
+        
+        solverConfigCache.reload();
+        
         main.setTitles();
     }
 
@@ -486,7 +496,7 @@ public class ExperimentController {
         LinkedList<Instance> listInstances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
 
         // get solver configurations of this experiment
-        ArrayList<SolverConfiguration> vsc = SolverConfigurationDAO.getSolverConfigurationByExperimentId(activeExperiment.getId());
+        ArrayList<SolverConfiguration> vsc = solverConfigCache.getAll();
 
         int experiments_added = 0;
         HashMap<SeedGroup, Integer> linked_seeds = new HashMap<SeedGroup, Integer>();
@@ -1576,9 +1586,8 @@ public class ExperimentController {
         boolean res = false;
         try {
             experimentResultCache.updateExperimentResults();
-            ArrayList<SolverConfiguration> solverConfigs = SolverConfigurationDAO.getSolverConfigurationByExperimentId(activeExperiment.getId());
             LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(activeExperiment.getId());
-            for (SolverConfiguration sc : solverConfigs) {
+            for (SolverConfiguration sc : solverConfigCache.getAll()) {
                 for (Instance i : instances) {
                     int savedNumRuns = experimentResultCache.getNumRuns(sc.getId(), i.getId());
                     main.generateJobsTableModel.setSavedNumRuns(i, sc, savedNumRuns);
@@ -1704,7 +1713,7 @@ public class ExperimentController {
         if (activeExperiment == null) {
             return null;
         }
-        return SolverConfigurationDAO.getSolverConfigurationByExperimentId(activeExperiment.getId());
+        return solverConfigCache.getAll();
     }
 
     /**

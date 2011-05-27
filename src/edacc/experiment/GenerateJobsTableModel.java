@@ -4,7 +4,6 @@ import edacc.model.Instance;
 import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
-import edacc.model.SolverConfigurationDAO;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ public class GenerateJobsTableModel extends DefaultTableModel {
 
 
     public void updateNumRuns() throws SQLException, InstanceClassMustBeSourceException, IOException {
-        solverConfigs = SolverConfigurationDAO.getSolverConfigurationByExperimentId(expController.getActiveExperiment().getId());
+        solverConfigs = expController.getSolverConfigurations();
         instances = new ArrayList<Instance>();
         instances.addAll(InstanceDAO.getAllByExperimentId(expController.getActiveExperiment().getId()));
         numRuns = new int[instances.size()][solverConfigs.size()+1];

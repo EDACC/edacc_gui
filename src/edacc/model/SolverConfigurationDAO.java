@@ -29,7 +29,7 @@ public class SolverConfigurationDAO {
         return i;
     }
 
-    private static void save(SolverConfiguration i) throws SQLException {
+    protected static void save(SolverConfiguration i) throws SQLException {
         if (i.isDeleted()) {
             cache.remove(i);
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
@@ -148,18 +148,6 @@ public class SolverConfigurationDAO {
         }
 
         return res;
-    }
-
-    /**
-     * Equalises local data with database data so that the state of all
-     * solver configurations is saved.
-     * @throws SQLException
-     */
-    public static void saveAll() throws SQLException {
-        Enumeration<SolverConfiguration> e = cache.elements();
-        while (e.hasMoreElements()) {
-            save(e.nextElement());
-        }
     }
 
     /**

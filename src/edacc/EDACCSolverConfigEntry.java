@@ -14,7 +14,6 @@ import edacc.model.Solver;
 import edacc.model.SolverBinaries;
 import edacc.model.SolverBinariesDAO;
 import edacc.model.SolverConfiguration;
-import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import java.awt.Color;
 import java.awt.Component;
@@ -121,11 +120,11 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
      * @param solverConfiguration
      * @throws SQLException
      */
-    public EDACCSolverConfigEntry(SolverConfiguration solverConfiguration) throws SQLException {
+    public EDACCSolverConfigEntry(SolverConfiguration solverConfiguration, ArrayList<ParameterInstance> params) throws SQLException {
         this(solverConfiguration.getSolverBinary().getIdSolver());
         this.solverConfiguration = solverConfiguration;
         
-        solverConfigEntryTableModel.setParameterInstances(SolverConfigurationDAO.getSolverConfigurationParameters(solverConfiguration));
+        solverConfigEntryTableModel.setParameterInstances(params);
         txtSeedGroup.setText(String.valueOf(solverConfiguration.getSeed_group()));
         border.setTitle(solverConfiguration.getName());
         comboSolverBinaries.setSelectedItem(solverConfiguration.getSolverBinary());
@@ -556,8 +555,10 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         } catch (NumberFormatException _) {
             txtSeedGroup.setText("0");
         }
-
-        if (solverConfiguration == null || solverConfiguration.getSeed_group() != seedGroup || (idx != -1 && (!border.getTitle().equals(solverConfiguration.getName()) || solverConfiguration.getIdx() != idx)) || solverConfiguration.getSolverBinary() != this.getSolverBinary()) {
+        if (solverConfiguration == null
+                || solverConfiguration.getSeed_group() != seedGroup
+                || (idx != -1 && (!border.getTitle().equals(solverConfiguration.getName()) || solverConfiguration.getIdx() != idx))
+                || solverConfiguration.getSolverBinary() != this.getSolverBinary()) {
             return true;
         }
         return solverConfigEntryTableModel.isModified();

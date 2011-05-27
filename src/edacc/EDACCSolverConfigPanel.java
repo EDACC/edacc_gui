@@ -5,28 +5,31 @@
  */
 package edacc;
 
+import edacc.model.SolverConfigCache;
 import edacc.experiment.SolverTableModel;
 import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
-import edacc.model.SolverConfigurationDAO;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * A JPanel which serves as container for <code>EDACCSolverConfigPanelSolver</code> objects.
  * @author simon
  * @see edacc.EDACCSolverConfigPanelSolver
  */
-public class EDACCSolverConfigPanel extends javax.swing.JPanel {
+public class EDACCSolverConfigPanel extends javax.swing.JPanel implements Observer {
 
     private GridBagConstraints gridBagConstraints;
     private GridBagLayout layout;
     private EDACCExperimentMode parent;
     private boolean update;
+    private SolverConfigCache solverConfigs;
 
     /** Creates new form EDACCSolverConfigPanel */
     public EDACCSolverConfigPanel() {
@@ -197,7 +200,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
      */
     public boolean isModified() {
         // checks for deleted entries
-        if (SolverConfigurationDAO.isModified()) {
+        if (solverConfigs != null && solverConfigs.isModified()) {
             return true;
         }
         // checks for changed entries
@@ -277,4 +280,31 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
+
+    
+    public void setSolverConfigCache(SolverConfigCache solverConfigs) {
+        this.solverConfigs = solverConfigs;
+        solverConfigs.addObserver(this);
+    }
+    
+    @Override
+    public void update(Observable o, Object arg) {
+        if (arg == null) {
+            // full update
+            this.removeAll();
+            for (SolverConfiguration sc : solverConfigs.getAll()) {
+                try {
+                    addSolverConfiguration(sc);
+                } catch (SQLException ex) {
+                    // TODO: error
+                }
+            }
+        } else {
+            // TODO: implement?
+        }
+    }
+
+    protected SolverConfigCache getSolverConfigs() {
+        return solverConfigs;
+    }
 }
