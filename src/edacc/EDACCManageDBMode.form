@@ -1096,7 +1096,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane1" pref="530" max="32767" attributes="0"/>
+                      <Component id="jSplitPane1" pref="536" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1149,7 +1149,7 @@
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="panelInstanceClassTable" pref="432" max="32767" attributes="0"/>
+                              <Component id="panelInstanceClassTable" pref="438" max="32767" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="panelButtonsInstanceClass" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -1291,12 +1291,19 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
+                          <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="panelInstanceTable" alignment="0" pref="588" max="32767" attributes="2"/>
                                   <Component id="panelButtonsInstances" alignment="1" max="32767" attributes="2"/>
-                                  <Component id="lblFilterStatus" alignment="0" pref="588" max="32767" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Component id="btnFilterInstances" linkSize="10" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="lblFilterStatus" alignment="0" pref="481" max="32767" attributes="0"/>
+                                          <Component id="btnSelectInstanceColumns" linkSize="10" alignment="1" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
                               </Group>
                           </Group>
                       </Group>
@@ -1305,8 +1312,12 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="lblFilterStatus" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="btnSelectInstanceColumns" linkSize="16" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnFilterInstances" linkSize="16" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="panelInstanceTable" pref="377" max="32767" attributes="0"/>
+                              <Component id="panelInstanceTable" min="-2" pref="340" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="panelButtonsInstances" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -1396,9 +1407,7 @@
                                           <Component id="btnAddToClass" linkSize="9" min="-2" pref="151" max="-2" attributes="0"/>
                                           <EmptySpace type="separate" max="-2" attributes="0"/>
                                           <Component id="btnRemoveFromClass" linkSize="9" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="btnSelectInstanceColumns" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="32767" attributes="0"/>
+                                          <EmptySpace pref="115" max="32767" attributes="0"/>
                                           <Component id="bComputeProperty" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="1">
@@ -1409,9 +1418,7 @@
                                           <Component id="btnAddInstances1" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                           <Component id="btnGenerate" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace pref="36" max="32767" attributes="0"/>
-                                          <Component id="btnFilterInstances" linkSize="10" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <EmptySpace pref="129" max="32767" attributes="0"/>
                                           <Component id="btnExportInstances" linkSize="10" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
@@ -1427,7 +1434,6 @@
                                       <Component id="btnAddInstances" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnRemoveInstances" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnExportInstances" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="btnFilterInstances" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnAddInstances1" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnGenerate" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
@@ -1436,7 +1442,6 @@
                                       <Component id="btnAddToClass" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnRemoveFromClass" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="bComputeProperty" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="btnSelectInstanceColumns" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="32767" attributes="0"/>
                               </Group>
@@ -1466,19 +1471,6 @@
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRemoveInstancesActionPerformed"/>
-                          </Events>
-                        </Component>
-                        <Component class="javax.swing.JButton" name="btnFilterInstances">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="btnFilterInstances.text"/>
-                            <Property name="toolTipText" type="java.lang.String" resourceKey="btnFilterInstances.toolTipText"/>
-                            <Property name="name" type="java.lang.String" value="btnFilterInstances" noResource="true"/>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[83, 25]"/>
-                            </Property>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnFilterInstancesActionPerformed"/>
                           </Events>
                         </Component>
                         <Component class="javax.swing.JButton" name="btnExportInstances">
@@ -1549,15 +1541,6 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnGenerateActionPerformed"/>
                           </Events>
                         </Component>
-                        <Component class="javax.swing.JButton" name="btnSelectInstanceColumns">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="btnSelectInstanceColumns.text"/>
-                            <Property name="name" type="java.lang.String" value="btnSelectInstanceColumns" noResource="true"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSelectInstanceColumnsActionPerformed"/>
-                          </Events>
-                        </Component>
                       </SubComponents>
                     </Container>
                     <Component class="javax.swing.JLabel" name="lblFilterStatus">
@@ -1565,6 +1548,28 @@
                         <Property name="text" type="java.lang.String" resourceKey="lblFilterStatus.text"/>
                         <Property name="name" type="java.lang.String" value="lblFilterStatus" noResource="true"/>
                       </Properties>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="btnFilterInstances">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="btnFilterInstances.text"/>
+                        <Property name="toolTipText" type="java.lang.String" resourceKey="btnFilterInstances.toolTipText"/>
+                        <Property name="name" type="java.lang.String" value="btnFilterInstances" noResource="true"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[83, 25]"/>
+                        </Property>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnFilterInstancesActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="btnSelectInstanceColumns">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="btnSelectInstanceColumns.text"/>
+                        <Property name="name" type="java.lang.String" value="btnSelectInstanceColumns" noResource="true"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSelectInstanceColumnsActionPerformed"/>
+                      </Events>
                     </Component>
                   </SubComponents>
                 </Container>

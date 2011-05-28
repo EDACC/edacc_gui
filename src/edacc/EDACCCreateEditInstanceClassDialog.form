@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
@@ -41,7 +41,7 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
               <Component id="jPanel2" min="-2" pref="179" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
@@ -62,8 +62,8 @@
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jButtonCancel" linkSize="2" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="202" max="32767" attributes="0"/>
-                  <Component id="jButtonEdit" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="204" max="32767" attributes="0"/>
+                  <Component id="jButtonEdit" linkSize="2" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jButtonCreate" linkSize="2" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
@@ -75,9 +75,9 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jButtonCreate" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jButtonCancel" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jButtonEdit" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButtonCreate" linkSize="5" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButtonCancel" linkSize="5" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButtonEdit" linkSize="5" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
           </Group>
@@ -129,26 +129,21 @@
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jLabelName" alignment="0" min="-2" pref="57" max="-2" attributes="1"/>
-                              <Component id="jLabelDescription" alignment="0" min="-2" pref="63" max="-2" attributes="1"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jScrollPane1" alignment="1" pref="318" max="32767" attributes="0"/>
-                              <Component id="jTextFieldName" alignment="0" pref="318" max="32767" attributes="0"/>
-                          </Group>
-                      </Group>
+                      <Component id="jLabelName" alignment="0" min="-2" pref="57" max="-2" attributes="1"/>
+                      <Component id="jLabelDescription" alignment="0" min="-2" pref="63" max="-2" attributes="1"/>
+                      <Component id="jLabelParent" alignment="0" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="jLabelParent" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="31" max="32767" attributes="0"/>
-                          <Component id="jButtonSelectParent" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="jLabelSelectedParent" min="-2" pref="36" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="116" max="-2" attributes="0"/>
-                          <Component id="jButtonRemoveParent" min="-2" pref="87" max="-2" attributes="0"/>
+                          <Component id="jButtonSelectParent" linkSize="3" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="8" max="32767" attributes="0"/>
+                          <Component id="jLabelSelectedParent" min="-2" pref="148" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="jButtonRemoveParent" linkSize="3" min="-2" pref="87" max="-2" attributes="0"/>
                       </Group>
+                      <Component id="jScrollPane1" alignment="1" pref="334" max="32767" attributes="0"/>
+                      <Component id="jTextFieldName" alignment="0" pref="334" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -169,12 +164,10 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="103" alignment="0" groupAlignment="3" attributes="0">
-                          <Component id="jButtonSelectParent" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
-                          <Component id="jLabelParent" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
+                      <Component id="jLabelParent" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButtonRemoveParent" linkSize="4" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButtonSelectParent" linkSize="4" min="-2" pref="23" max="-2" attributes="0"/>
                       <Component id="jLabelSelectedParent" min="-2" pref="18" max="-2" attributes="0"/>
-                      <Component id="jButtonRemoveParent" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="19" max="32767" attributes="0"/>
               </Group>
