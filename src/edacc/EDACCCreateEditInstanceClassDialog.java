@@ -14,6 +14,7 @@ package edacc;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassAlreadyInDBException;
 import edacc.model.InstanceClassDAO;
+import edacc.model.InstanceDAO;
 import edacc.model.NoConnectionToDBException;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -59,7 +60,11 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
             DefaultMutableTreeNode checkParent =  (DefaultMutableTreeNode)node.getParent();
             if((checkParent != null) && (!checkParent.isRoot())){
                 this.parentClass = (InstanceClass) checkParent.getUserObject();
-                this.jLabelSelectedParent.setText(parentClass.getName());
+                try {
+                    this.jLabelSelectedParent.setText(InstanceClassDAO.getCompletePathOf(parentClass.getId()));
+                } catch (SQLException ex) {
+                    Logger.getLogger(EDACCCreateEditInstanceClassDialog.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
            
         }
@@ -344,7 +349,11 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
             parentClass = selectParent.getInstanceClassParent();
             if (!jButtonEdit.isVisible()) {
                 if (parentClass != null) {
-                    jLabelSelectedParent.setText(parentClass.getName());
+                try {
+                    jLabelSelectedParent.setText(InstanceClassDAO.getCompletePathOf(parentClass.getId()));
+                } catch (SQLException ex) {
+                    Logger.getLogger(EDACCCreateEditInstanceClassDialog.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 } else {
                     parentClass = tmpParent;
                 }
@@ -352,7 +361,12 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
                 if (parentClass == null) {
                     parentClass = tmpParent;
                 } else {
-                    jLabelSelectedParent.setText(parentClass.getName());
+                try {
+                    jLabelSelectedParent.setText(InstanceClassDAO.getCompletePathOf(parentClass.getId()));
+                } catch (SQLException ex) {
+                    Logger.getLogger(EDACCCreateEditInstanceClassDialog.class.getName()).log(Level.SEVERE, null, ex);
+                }
+;
                 }
             }
     }//GEN-LAST:event_jButtonSelectParentActionPerformed
