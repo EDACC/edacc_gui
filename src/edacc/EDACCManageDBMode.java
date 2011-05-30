@@ -1428,7 +1428,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     JOptionPane.WARNING_MESSAGE);
         } else {
             try {
+                
                 manageDBInstances.removeInstances(tableInstances.getSelectedRows());
+                tableInstances.clearSelection();
+                instanceTableModel.fireTableDataChanged();
             } catch (NoConnectionToDBException ex) {
                 Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
@@ -1436,7 +1439,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             }
         }
         this.tableInstances.requestFocus();
-
+        
     }//GEN-LAST:event_btnRemoveInstancesActionPerformed
 
     private void btnFilterInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterInstancesActionPerformed
