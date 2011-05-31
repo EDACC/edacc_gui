@@ -494,7 +494,7 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog implemen
             selectParent.setVisible(true);
             if (selectParent.getInstanceClassParent() != null) {
                 parentClass = selectParent.getInstanceClassParent();
-                this.lbParentClass.setText(parentClass.getName());
+                this.lbParentClass.setText(InstanceClassDAO.getCompletePathOf(parentClass.getId()));
             } else {
                 this.lbParentClass.setText("");
             }

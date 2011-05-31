@@ -383,4 +383,24 @@ public class InstanceClassDAO {
             return null;
         }
     }
+
+    /**
+     * 
+     * @param id The id of the InstanceClass, which ancestors path is requested.
+     * @return The  ancestors path of the InstanceClass as a String. The path is represented like \grandparent\parent\child.
+     * @throws SQLException 
+     */
+    public static String getCompletePathOf(int id) throws SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT parent FROM " + table + " WHERE idinstanceClass =?;");
+        st.setInt(1, id);
+        ResultSet rs = st.executeQuery();
+        rs.next();
+        Object tmp = rs.getObject(1);
+        if(tmp != null){
+            String res = getCompletePathOf(rs.getInt(1));
+            return res + "\\" + getById(id).getName(); 
+        }else {
+            return "\\" + getById(id).getName();
+        }    
+    }
 }

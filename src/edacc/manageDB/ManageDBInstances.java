@@ -514,6 +514,7 @@ public class ManageDBInstances implements Observer {
         if (!errorsDB.isEmpty()) {
             FileNameTableModel tmp = new FileNameTableModel();
             tmp.setAll(errorsDB);
+            task.cancel(true);
             EDACCExtendedWarning.showMessageDialog(
                     EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
                     "The following instances are already in the database. (Equal name or md5 hash)",
@@ -578,11 +579,13 @@ public class ManageDBInstances implements Observer {
         if (!errorsDB.isEmpty()) {
             FileNameTableModel tmp = new FileNameTableModel();
             tmp.setAll(errorsDB);
+            task.cancel(true);
             EDACCExtendedWarning.showMessageDialog(
                     EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
                     "The following instances are already in the database. (Equal name or md5 hash)",
-                    new JTable(tmp));
+                    new JTable(tmp));           
         }
+        
         return instances;
 
     }

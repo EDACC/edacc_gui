@@ -37,6 +37,10 @@ public class FileNameTableModel extends AbstractTableModel{
                 return "";
         }
     }
+    
+    public String getColumnName(int column){
+        return columns[column];
+    }
 
     public void setAll(Vector<String> toAdd){
         names.addAll(toAdd);
