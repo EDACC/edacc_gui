@@ -53,7 +53,9 @@ public class ManageDBParameters implements Observer {
     }
 
     public void newParam() {
-        parameterTableModel.addParameter(new Parameter());
+        Parameter p = new Parameter();
+        p.setOrder(parameterTableModel.getHighestOrder() + 1);
+        parameterTableModel.addParameter(p);
     }
 
     public void setCurrentSolver(Solver currentSolver) {
