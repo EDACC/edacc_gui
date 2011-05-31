@@ -23,9 +23,21 @@ public class ParameterTableSelectionListener implements ListSelectionListener {
         this.controller = controller;
     }
 
+    @Override
     public void valueChanged(ListSelectionEvent e) {
         if (e.getSource() == table.getSelectionModel() && table.getRowSelectionAllowed()) {
-            controller.showParameter(table.getSelectedRow());
+            int row = table.getSelectedRow();
+            if (row < 0 || row >= table.getRowCount())
+                return;
+            ParameterTableModel model = (ParameterTableModel)table.getModel();
+            System.out.print(row);
+            System.out.print(" " + model.getParameter(row).getName());
+            System.out.print("--->");
+            row = table.convertRowIndexToModel(table.getSelectedRow());
+            System.out.print(row);
+
+            System.out.println(" " + model.getParameter(row).getName());
+            controller.showParameter(row);
         }
     }
 }
