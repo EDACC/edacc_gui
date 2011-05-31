@@ -31,6 +31,7 @@ public class DatabaseConnector extends Observable {
     private Properties properties;
     private final Object sync = new Object();
     private ConnectionWatchDog watchDog;
+    private Boolean isCompetitionDB;
 
     private DatabaseConnector() {
         connections = new LinkedList<ThreadConnection>();
@@ -62,6 +63,7 @@ public class DatabaseConnector extends Observable {
             watchDog.terminate();
         }
         try {
+            this.isCompetitionDB = null;
             this.hostname = hostname;
             this.port = port;
             this.username = username;
@@ -370,10 +372,14 @@ public class DatabaseConnector extends Observable {
      * @throws SQLException
      */
     public boolean isCompetitionDB() throws NoConnectionToDBException, SQLException {
+        if (isCompetitionDB != null) {
+            return isCompetitionDB;
+        }
         PreparedStatement ps = getConn().prepareStatement("SELECT competition FROM DBConfiguration");
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
-            return rs.getBoolean("competition");
+            isCompetitionDB = rs.getBoolean("competition");
+            return isCompetitionDB;
         }
         return false;
     }

@@ -352,7 +352,7 @@ public class ManageDBInstances implements Observer {
                 }
             } else {
                 // List the Experiments to which the instances, which are dangered related to and ask to remove these isntances.
-                ExperimentTableModel expTableModel = new ExperimentTableModel();
+                ExperimentTableModel expTableModel = new ExperimentTableModel(true);
                 ArrayList<Experiment> inExp = ExperimentHasInstanceDAO.getAllExperimentsByInstances(lastRelated);
                 if (!inExp.isEmpty()) {
                     expTableModel.setExperiments(inExp);

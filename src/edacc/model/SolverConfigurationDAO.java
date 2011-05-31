@@ -62,7 +62,7 @@ public class SolverConfigurationDAO {
     }
 
     public static ArrayList<ParameterInstance> getSolverConfigurationParameters(SolverConfiguration i) throws SQLException {
-        return ParameterInstanceDAO.getBySolverConfigId(i.getId());
+        return ParameterInstanceDAO.getBySolverConfig(i);
     }
 
     /**
@@ -129,67 +129,8 @@ public class SolverConfigurationDAO {
         return null;
     }
 
-    /**
-     * Returns all solver config ids associated with the experiment specified by id.
-     * @param id the experiment id
-     * @return vector of solver config ids
-     * @throws SQLException
-     */
-    public static ArrayList<Integer> getAllSolverConfigIdsByExperimentId(int id) throws SQLException {
-        ArrayList<Integer> res = new ArrayList<Integer>();
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idSolverConfig "
-                + "FROM " + table + " "
-                + "WHERE Experiment_idExperiment=? GROUP BY idSolverConfig ORDER BY idSolverConfig;");
-        st.setInt(1, id);
-        ResultSet rs = st.executeQuery();
-        while (rs.next()) {
-            res.add(rs.getInt(1));
-        }
-
-        return res;
-    }
-
-    /**
-     * Returns a vector of all solver configurations which are marked as deleted.
-     * @return a vector of solver configurations
-     */
-    public static ArrayList<SolverConfiguration> getAllDeleted() {
-        ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
-        Enumeration<SolverConfiguration> e = cache.elements();
-        while (e.hasMoreElements()) {
-            SolverConfiguration sc = e.nextElement();
-            if (sc.isDeleted()) {
-                res.add(sc);
-            }
-        }
-        return res;
-    }
-
     public static void clearCache() {
         cache.clear();
-    }
-
-    /**
-     * Checks if there are unsaved solver configurations in the cache
-     * @return true, if and only if there are unsaved solver configurations
-     * in the cache, false otherwise
-     */
-    public static boolean isModified() {
-        for (SolverConfiguration sc : cache.values()) {
-            if (!sc.isSaved()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static ArrayList<SolverConfiguration> getAllCached() {
-        ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
-        for (SolverConfiguration sc : cache.values()) {
-            res.add(sc);
-        }
-        return res;
     }
 
     /**
@@ -201,27 +142,24 @@ public class SolverConfigurationDAO {
         return sc.isDeleted();
     }
 
-    /**
-     * uncached!
-     * @param id
-     * @return
-     * @throws SQLException he
-     */
-    public static ArrayList<SolverConfiguration> getSolverConfigurationBySolverId(int id) throws SQLException {
+    public static ArrayList<SolverConfiguration> getAll() throws SQLException {
         ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idSolverConfig, Experiment_idExperiment, SolverBinaries_idSolverBinary, seed_group, name, idx FROM SolverConfig JOIN SolverBinaries ON (SolverConfig.SolverBinaries_idSolverBinary = SolverBinaries.idSolverBinary) WHERE idSolver = ?");
-        st.setInt(1, id);
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
-            SolverConfiguration c = cache.getCached(rs.getInt("IdSolverConfig"));
-            if (c != null) {
-                res.add(c);
+            SolverConfiguration sc = cache.getCached(rs.getInt("idSolverConfig"));
+            if (sc != null) {
+                res.add(sc);
             } else {
-                SolverConfiguration i = getSolverConfigurationFromResultset(rs);
-                i.setSaved();
-                res.add(i);
+                sc = getSolverConfigurationFromResultset(rs);
+                sc.setSaved();
+                cache.cache(sc);
+                sc.setSaved();
+                res.add(sc);
             }
         }
+        rs.close();
+        st.close();
         return res;
     }
 }

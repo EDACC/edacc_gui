@@ -43,7 +43,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, ExperimentController expController) {
         super(parent, modal);
         this.expController = expController;
-        experimentTableModel = new ExperimentTableModel();
+        experimentTableModel = new ExperimentTableModel(true);
         solverConfigTableModel = new SolverConfigurationTableModel();
         experimentSolverConfigTableModel = new ExperimentSolverConfigurationTableModel();
         initComponents();

@@ -68,7 +68,6 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     private String[] columns;
     private ArrayList<Property> properties;
     private boolean[] visible;
-    private HashMap<Integer, ArrayList<ParameterInstance>> parameterInstances;
     private HashMap<Integer, GridQueue> gridQueues;
     private HashMap<Integer, String> parameters;
     private int firstInstancePropertyColumn;
@@ -188,12 +187,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     public ArrayList<ParameterInstance> getParameters(int row) {
         try {
             SolverConfiguration sc = SolverConfigurationDAO.getSolverConfigurationById(jobs.get(row).getSolverConfigId());
-            ArrayList<ParameterInstance> params = parameterInstances.get(sc.getId());
-            if (params == null) {
-                params = ParameterInstanceDAO.getBySolverConfigId(sc.getId());
-                parameterInstances.put(sc.getId(), params);
-            }
-            return params;
+            return ParameterInstanceDAO.getBySolverConfig(sc);
         } catch (Exception e) {
             return null;
         }
@@ -216,7 +210,6 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             public void run() {
                 ExperimentResultsBrowserTableModel.this.jobs = jobs;
                 if (jobs != null) {
-                    parameterInstances = new HashMap<Integer, ArrayList<ParameterInstance>>();
                     gridQueues = new HashMap<Integer, GridQueue>();
                     parameters = new HashMap<Integer, String>();
                     try {

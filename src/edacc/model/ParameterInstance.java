@@ -2,7 +2,7 @@ package edacc.model;
 
 public class ParameterInstance extends BaseModel {
     private int parameter_id;
-    private int solver_config_id;
+    private SolverConfiguration solverConfiguration;
     private String value;
     
     public int getParameter_id() {
@@ -16,12 +16,12 @@ public class ParameterInstance extends BaseModel {
         }
     }
 
-    public int getSolver_config_id() {
-        return solver_config_id;
+    public SolverConfiguration getSolverConfiguration() {
+        return solverConfiguration;
     }
 
-    public void setSolver_config_id(int solver_config_id) {
-        this.solver_config_id = solver_config_id;
+    public void setSolverConfiguration(SolverConfiguration solverConfiguration) {
+        this.solverConfiguration = solverConfiguration;
         if (this.isSaved()) {
             this.setModified();
         }

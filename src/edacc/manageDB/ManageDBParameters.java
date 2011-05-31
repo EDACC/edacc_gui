@@ -53,7 +53,9 @@ public class ManageDBParameters implements Observer {
     }
 
     public void newParam() {
-        parameterTableModel.addParameter(new Parameter());
+        Parameter p = new Parameter();
+        p.setOrder(parameterTableModel.getHighestOrder() + 1);
+        parameterTableModel.addParameter(p);
     }
 
     public void setCurrentSolver(Solver currentSolver) {
@@ -142,8 +144,10 @@ public class ManageDBParameters implements Observer {
     }
 
     void rehash(Solver s, Vector<Parameter> params) {
-        for (Parameter p : params)
+        parameterTableModel.removeParametersOfSolver(s);
+        for (Parameter p : params) {
             parameterTableModel.addParameter(s, p);
+        }
     }
 
     Vector<Parameter> getParametersOfSolver(Solver s) {

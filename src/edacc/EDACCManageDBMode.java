@@ -1975,11 +1975,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     }//GEN-LAST:event_btnSelectInstanceColumnsActionPerformed
 
     private void parameterChanged() {
-        final int selectedRow = tableParameters.getSelectedRow();
+        int selectedRow = tableParameters.getSelectedRow();
 
         if (selectedRow == -1) {
             return;
         }
+        selectedRow = tableParameters.convertRowIndexToModel(selectedRow);
         Parameter p = parameterTableModel.getParameter(selectedRow);
         p.setName(tfParametersName.getText());
 

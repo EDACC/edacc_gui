@@ -33,7 +33,7 @@ public class EDACCExperimentModeImportSolverConfigs extends javax.swing.JDialog 
         super(parent, modal);
         cancelled = true;
         selectedSolverConfigs = new ArrayList<SolverConfiguration>();
-        experimentTableModel = new ExperimentTableModel();
+        experimentTableModel = new ExperimentTableModel(true);
         solverConfigTableModel = new SolverConfigurationTableModel();
         experimentTableModel.setExperiments(expController.getExperiments());
 

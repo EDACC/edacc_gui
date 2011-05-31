@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,13 +36,16 @@ public class ExperimentResultDAO {
             + "IF(status = " + StatusCode.RUNNING.getStatusCode() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) AS date_modified,"
             + "priority, startTime, CPUTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast, computeNode, computeNodeIP, Client_idClient "
             + "FROM " + table + " LEFT JOIN ExperimentResultsOutput ON (idJob = ExperimentResults_idJob) ";
-    protected static final String copyOutputQuery = "UPDATE ExperimentResults as dest, ExperimentResults as src "
+    protected static final String copyOutputQuery = "UPDATE ExperimentResultsOutput as dest, ExperimentResultsOutput as src "
             + "SET "
             + "dest.solverOutput = src.solverOutput, "
             + "dest.watcherOutput = src.watcherOutput, "
             + "dest.launcherOutput = src.launcherOutput, "
-            + "dest.verifierOutput = src.verifierOutput "
-            + "WHERE src.idJob = ? AND dest.idJob = ?";
+            + "dest.verifierOutput = src.verifierOutput, "
+            + "dest.solverExitCode = src.solverExitCode, "
+            + "dest.watcherExitCode = src.watcherExitCode, "
+            + "dest.verifierExitCode = src.verifierExitCode "
+            + "WHERE src.ExperimentResults_idJob = ? AND dest.ExperimentResults_idJob = ?";
 
     public static ExperimentResult createExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float time, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimitFirst, int outputSizeLimitLast) throws SQLException {
         ExperimentResult r = new ExperimentResult(run, priority, computeQueue, status, seed, resultCode, time, SolverConfigId, ExperimentId, InstanceId, startTime, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast);
@@ -123,6 +127,7 @@ public class ExperimentResultDAO {
             st.close();
         } catch (SQLException e) {
             DatabaseConnector.getInstance().getConn().rollback();
+            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
             throw e;
         } finally {
             curSt = null;
@@ -169,34 +174,33 @@ public class ExperimentResultDAO {
      * @throws IllegalArgumentException if <code>from.size() != to.size()</code> or <code>from == null</code> or <code>to == null</code>
      */
     public static void batchCopyOutputs(ArrayList<ExperimentResult> from, ArrayList<ExperimentResult> to) throws NoConnectionToDBException, SQLException {
-        throw new IllegalArgumentException("not yet implemented.");
-        // TODO: update copy output query
-     /*   if (from.size() != to.size() || from == null || to == null) {
-        throw new IllegalArgumentException("from.size() != to.size()");
+        if (from.size() != to.size() || from == null || to == null) {
+            throw new IllegalArgumentException("from.size() != to.size()");
         }
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         try {
-        DatabaseConnector.getInstance().getConn().setAutoCommit(false);
-        final String query = copyOutputQuery;
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
-        curSt = st;
-        for (int i = 0; i < from.size(); i++) {
-        st.setInt(1, from.get(i).getId());
-        st.setInt(2, to.get(i).getId());
-        st.addBatch();
-        }
-        
-        st.executeBatch();
-        st.close();
+            DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+            final String query = copyOutputQuery;
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+            curSt = st;
+            for (int i = 0; i < from.size(); i++) {
+                st.setInt(1, from.get(i).getId());
+                st.setInt(2, to.get(i).getId());
+                st.addBatch();
+            }
+
+            st.executeBatch();
+            st.close();
         } catch (Throwable e) {
-        DatabaseConnector.getInstance().getConn().rollback();
-        if (e instanceof SQLException) {
-        throw (SQLException) e;
-        }
+            DatabaseConnector.getInstance().getConn().rollback();
+            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+            if (e instanceof SQLException) {
+                throw (SQLException) e;
+            }
         } finally {
-        curSt = null;
-        DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
-        }*/
+            curSt = null;
+            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+        }
     }
 
     /**
@@ -294,12 +298,13 @@ public class ExperimentResultDAO {
             }
             st.executeBatch();
             st.close();
-            
+
             // send message to clients to stop calculation of deleted jobs
             HashMap<Integer, ArrayList<Integer>> clientJobs = new HashMap<Integer, ArrayList<Integer>>();
             for (ExperimentResult r : experimentResults) {
-                if (r.getIdClient() == null || !r.getStatus().equals(StatusCode.RUNNING)) 
+                if (r.getIdClient() == null || !r.getStatus().equals(StatusCode.RUNNING)) {
                     continue;
+                }
                 ArrayList<Integer> tmp = clientJobs.get(r.getIdClient());
                 if (tmp == null) {
                     tmp = new ArrayList<Integer>();
@@ -314,7 +319,7 @@ public class ExperimentResultDAO {
                 }
                 ClientDAO.sendMessage(clientId, message);
             }
-            
+
         } catch (SQLException e) {
             DatabaseConnector.getInstance().getConn().rollback();
             throw e;
@@ -858,8 +863,8 @@ public class ExperimentResultDAO {
         ResultSet rs = st.executeQuery();
         Timestamp res = null;
         if (rs.next()) {
-            res =  rs.getTimestamp(1);
-        } 
+            res = rs.getTimestamp(1);
+        }
         rs.close();
         st.close();
         return res;
@@ -890,10 +895,10 @@ public class ExperimentResultDAO {
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
             ExperimentResult er = getExperimentResultFromResultSet(rs);
+            ExperimentResultHasPropertyDAO.assign(er);
             v.add(er);
             er.setSaved();
         }
-        ExperimentResultHasPropertyDAO.assign(v, id);
         rs.close();
         st.close();
         return v;
@@ -947,6 +952,46 @@ public class ExperimentResultDAO {
             res = new Timestamp(0);
         } else {
             res.setTime(res.getTime() + 1);
+        }
+        rs.close();
+        st.close();
+        return res;
+    }
+
+    public static ArrayList<ExperimentResult> getBySolverConfigurationAndInstance(SolverConfiguration sc, Instance i) throws SQLException, StatusCodeNotInDBException, ResultCodeNotInDBException, Exception {
+        ArrayList<ExperimentResult> v = new ArrayList<ExperimentResult>();
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
+                selectQuery
+                + "WHERE Instances_idInstance=? AND SolverConfig_idSolverConfig=?;");
+        st.setInt(1, i.getId());
+        st.setInt(2, sc.getId());
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            ExperimentResult er = getExperimentResultFromResultSet(rs);
+            v.add(er);
+            er.setSaved();
+        }
+        ExperimentResultHasPropertyDAO.assign(v, sc.getExperiment_id());
+        rs.close();
+        st.close();
+        return v;
+    }
+
+    public static int getMaxRunForSeedGroupByExperimentIdAndInstanceId(int seed_group, int expId, int instanceId) throws SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT MAX(run) FROM " + table + " "
+                + "JOIN SolverConfig ON (ExperimentResults.SolverConfig_idSolverConfig = SolverConfig.idSolverConfig) "
+                + "WHERE ExperimentResults.Experiment_idExperiment = ? AND seed_group = ? AND Instances_idInstance = ?;");
+        st.setInt(2, seed_group);
+        st.setInt(1, expId);
+        st.setInt(3, instanceId);
+        ResultSet rs = st.executeQuery();
+        int res = -1;
+        if (rs.next()) {
+            res = rs.getInt(1);
+        }
+        if (rs.wasNull()) {
+            res = -1;
         }
         rs.close();
         st.close();

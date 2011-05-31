@@ -165,7 +165,7 @@ public class InstanceSelector extends JPanel {
     }
 
     public void setInstances(ArrayList<Instance> instances) {
-        tableModel.setInstances(instances);
+        tableModel.setInstances(instances, false, true);
         updateTableColumnWidth = true;
     }
 
