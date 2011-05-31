@@ -26,31 +26,33 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="lRunCommand" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="lRunPath" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="lBinaryName" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="lCommand" alignment="0" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="59" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="tfBinaryName" alignment="0" pref="348" max="32767" attributes="0"/>
-                          <Component id="jScrollPane1" alignment="0" pref="348" max="32767" attributes="0"/>
-                          <Component id="tfRunCommand" alignment="0" pref="348" max="32767" attributes="0"/>
-                          <Component id="lCommandPreview" alignment="0" pref="348" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
                   <Component id="lCaption" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jButton2" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="390" max="32767" attributes="0"/>
+                      <EmptySpace pref="395" max="32767" attributes="0"/>
                       <Component id="jButton1" min="-2" max="-2" attributes="0"/>
                   </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="lRunCommand" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lBinaryName" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lRunPath" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lCommand" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lVersion" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="tfVersion" pref="343" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" alignment="0" pref="343" max="32767" attributes="0"/>
+                          <Component id="tfBinaryName" alignment="0" pref="343" max="32767" attributes="1"/>
+                          <Component id="lCommandPreview" alignment="0" pref="343" max="32767" attributes="0"/>
+                          <Component id="tfRunCommand" alignment="0" pref="343" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -64,32 +66,32 @@
                   <Component id="tfBinaryName" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lBinaryName" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="lRunPath" min="-2" max="-2" attributes="0"/>
+                  <Component id="jScrollPane1" pref="151" max="32767" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="tfRunCommand" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lRunCommand" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="lRunPath" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="108" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
-                      <Component id="jScrollPane1" pref="102" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="lCommandPreview" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="lCommand" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                  </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lCommandPreview" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lCommand" alignment="3" min="-2" pref="14" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lVersion" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="tfVersion" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jButton2" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -189,5 +191,17 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JLabel" name="lVersion">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lVersion.text"/>
+        <Property name="name" type="java.lang.String" value="lVersion" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="tfVersion">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="tfVersion.text"/>
+        <Property name="name" type="java.lang.String" value="tfVersion" noResource="true"/>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>
