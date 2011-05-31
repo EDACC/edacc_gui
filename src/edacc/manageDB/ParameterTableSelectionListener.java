@@ -29,14 +29,8 @@ public class ParameterTableSelectionListener implements ListSelectionListener {
             int row = table.getSelectedRow();
             if (row < 0 || row >= table.getRowCount())
                 return;
-            ParameterTableModel model = (ParameterTableModel)table.getModel();
-            System.out.print(row);
-            System.out.print(" " + model.getParameter(row).getName());
-            System.out.print("--->");
+            ParameterTableModel model = (ParameterTableModel)table.getModel();           
             row = table.convertRowIndexToModel(table.getSelectedRow());
-            System.out.print(row);
-
-            System.out.println(" " + model.getParameter(row).getName());
             controller.showParameter(row);
         }
     }

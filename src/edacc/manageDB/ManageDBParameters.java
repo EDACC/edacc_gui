@@ -142,8 +142,10 @@ public class ManageDBParameters implements Observer {
     }
 
     void rehash(Solver s, Vector<Parameter> params) {
-        for (Parameter p : params)
+        parameterTableModel.removeParametersOfSolver(s);
+        for (Parameter p : params) {
             parameterTableModel.addParameter(s, p);
+        }
     }
 
     Vector<Parameter> getParametersOfSolver(Solver s) {
