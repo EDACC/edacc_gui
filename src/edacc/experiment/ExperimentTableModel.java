@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 public class ExperimentTableModel extends AbstractTableModel {
 
+    public static final int COL_COUNT_SIMPLE = 4;
     public static final int COL_ID = 0;
     public static final int COL_NAME = 1;
     public static final int COL_DATE = 2;
@@ -25,9 +26,10 @@ public class ExperimentTableModel extends AbstractTableModel {
     private Integer[] finished;
     private Integer[] failed;
     private Integer[] not_started;
-
-    public ExperimentTableModel() {
+    private boolean simple;
+    public ExperimentTableModel(boolean simple) {
         this.experiments = new ArrayList<Experiment>();
+        this.simple = simple;
     }
 
     public void setExperiments(ArrayList<Experiment> experiments) {
@@ -53,7 +55,7 @@ public class ExperimentTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return columns.length;
+        return simple==true?COL_COUNT_SIMPLE:columns.length;
     }
 
     @Override

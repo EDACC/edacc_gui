@@ -221,7 +221,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
                 Parameter p = (Parameter) solverConfigEntryTableModel.getValueAt(i, 5);
                 ParameterInstance pi = (ParameterInstance) solverConfigEntryTableModel.getValueAt(i, 6);
                 if (pi == null) {
-                    pi = ParameterInstanceDAO.createParameterInstance(p.getId(), solverConfiguration.getId(), (String) solverConfigEntryTableModel.getValueAt(i, 2));
+                    pi = ParameterInstanceDAO.createParameterInstance(p.getId(), solverConfiguration, (String) solverConfigEntryTableModel.getValueAt(i, 2));
                     parameterVector.add(pi);
                 }
                 if (!pi.getValue().equals((String) solverConfigEntryTableModel.getValueAt(i, 3))) {

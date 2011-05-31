@@ -35,6 +35,8 @@ import edacc.model.InstanceNotInDBException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
+import edacc.model.ParameterInstance;
+import edacc.model.ParameterInstanceDAO;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
 import edacc.model.Solver;
@@ -43,6 +45,7 @@ import edacc.model.SolverDAO;
 import edacc.model.PropertyNotInDBException;
 import edacc.model.ResultCodeDAO;
 import edacc.model.SolverBinariesDAO;
+import edacc.model.SolverConfigurationDAO;
 import edacc.model.StatusCodeNotInDBException;
 import edacc.model.TaskCancelledException;
 import edacc.model.Tasks;
@@ -66,9 +69,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.swing.JOptionPane;
@@ -124,7 +130,7 @@ public class ExperimentController {
             main.instanceClassTreeModel.setRoot(root);
             ArrayList<Instance> instances = new ArrayList<Instance>();
             instances.addAll(InstanceDAO.getAll());
-            main.insTableModel.setInstances(instances);
+            main.insTableModel.setInstances(instances, true, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -140,8 +146,8 @@ public class ExperimentController {
     public void loadExperiment(Experiment exp, Tasks task) throws SQLException, Exception {
         main.reinitializeSolvers();
         activeExperiment = exp;
-       // main.solverConfigPanel.beginUpdate();
-       // solverConfigPanel.removeAll();
+        // main.solverConfigPanel.beginUpdate();
+        // solverConfigPanel.removeAll();
         SolverBinariesDAO.clearCache();
         ArrayList<Solver> vs = new ArrayList<Solver>();
         Vector<ExperimentHasInstance> ehi = new Vector<ExperimentHasInstance>();
@@ -150,6 +156,27 @@ public class ExperimentController {
         main.solTableModel.setSolvers(vs);
         task.setTaskProgress(.25f);
         task.setStatus("Loading solver configurations..");
+
+        // only use solver configurations with different semantics in the solver config model
+        ArrayList<SolverConfiguration> scs = new ArrayList<SolverConfiguration>();
+        for (SolverConfiguration sc : SolverConfigurationDAO.getAll()) {
+            boolean equal = false;
+            for (SolverConfiguration sc2 : scs) {
+                if (sc2.hasEqualSemantics(sc)) {
+                    equal = true;
+                    break;
+                }
+            }
+            if (!equal) {
+                scs.add(sc);
+            }
+        }
+        main.solverConfigTableModel.setSolverConfigurations(scs);
+        // don't show solver configurations of the current experiment
+        main.solverConfigurationTableRowFilter.clearExcludedExperiments();
+        main.solverConfigurationTableRowFilter.excludeExperiment(activeExperiment.getId());
+
+        // now load solver configs of the current experiment
         if (solverConfigCache != null) {
             solverConfigCache.changeExperiment(activeExperiment);
         } else {
@@ -157,12 +184,12 @@ public class ExperimentController {
             solverConfigPanel.setSolverConfigCache(solverConfigCache);
             solverConfigCache.reload();
         }
-        
+
         //vss.addAll(SolverConfigurationDAO.getSolverConfigurationByExperimentId(exp.getId()));
-       // for (int i = 0; i < vss.size(); i++) {
-       //     main.solverConfigPanel.addSolverConfiguration(vss.get(i));
-       // }
-       // main.solverConfigPanel.endUpdate();
+        // for (int i = 0; i < vss.size(); i++) {
+        //     main.solverConfigPanel.addSolverConfiguration(vss.get(i));
+        // }
+        // main.solverConfigPanel.endUpdate();
         task.setTaskProgress(.5f);
         task.setStatus("Loading instances..");
         // select instances for the experiment
@@ -390,20 +417,20 @@ public class ExperimentController {
         main.solverConfigPanel.removeAll();
         ArrayList<SolverConfiguration> solverConfigurations = SolverConfigurationDAO.getAllCached();
         Collections.sort(solverConfigurations, new Comparator<SolverConfiguration>() {
-
-            @Override
-            public int compare(SolverConfiguration o1, SolverConfiguration o2) {
-                return o1.getId() - o2.getId();
-            }
+        
+        @Override
+        public int compare(SolverConfiguration o1, SolverConfiguration o2) {
+        return o1.getId() - o2.getId();
+        }
         });
         for (SolverConfiguration sc : solverConfigurations) {
-            main.solverConfigPanel.addSolverConfiguration(sc);
-            sc.setSaved();
+        main.solverConfigPanel.addSolverConfiguration(sc);
+        sc.setSaved();
         }
         main.solverConfigPanel.endUpdate();*/
-        
+
         solverConfigCache.reload();
-        
+
         main.setTitles();
     }
 
@@ -575,7 +602,7 @@ public class ExperimentController {
         task.setStatus("Preparing job generation");
 
         HashMap<Integer, Boolean> solverConfigHasSeed = new HashMap<Integer, Boolean>();
-        
+
         // first pass over already existing jobs to accumulate existing linked seeds
         for (SolverConfiguration c : vsc) {
             Vector<Parameter> params = ParameterDAO.getParameterFromSolverId(c.getSolverBinary().getIdSolver());
@@ -591,7 +618,7 @@ public class ExperimentController {
                 // don't generate seed groups for solver configurations which have no seed
                 continue;
             }
-            
+
             for (Instance i : listInstances) {
                 ArrayList<ExperimentResult> jobs = experimentResultCache.getResults(c.getId(), i.getId());
                 for (ExperimentResult job : jobs) {
@@ -1449,6 +1476,118 @@ public class ExperimentController {
         } finally {
         DatabaseConnector.getInstance().getConn().setAutoCommit(autocommit);
         }*/
+    }
+
+    public void importData(Tasks task, ArrayList<SolverConfiguration> selectedSolverConfigs, ArrayList<Instance> selectedInstances, boolean importFinishedRuns) throws SQLException, Exception {
+        // assertion: no unsaved data.
+
+        DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+        try {
+            // get selected instance ids for active experiment
+            HashSet<Integer> instanceIds = new HashSet<Integer>();
+            for (Instance i : InstanceDAO.getAllByExperimentId(activeExperiment.getId())) {
+                instanceIds.add(i.getId());
+            }
+
+            // get highest seed group which doesn't exist
+            int seed_group = 0;
+            for (SolverConfiguration sc : solverConfigCache.getAll()) {
+                if (sc.getSeed_group() >= seed_group) {
+                    seed_group = sc.getSeed_group() + 1;
+                }
+            }
+
+            // check for existing solver configs with same semantics to the imported ones
+            HashMap<Integer, Integer> mapHisScToMySc = new HashMap<Integer, Integer>();
+            for (SolverConfiguration sc2 : selectedSolverConfigs) {
+                for (SolverConfiguration sc : solverConfigCache.getAll()) {
+                    if (sc.hasEqualSemantics(sc2)) {
+                        mapHisScToMySc.put(sc2.getId(), sc.getId());
+                    }
+                }
+            }
+
+            // save solver configurations which doesn't exist
+            for (SolverConfiguration sc : selectedSolverConfigs) {
+                if (!mapHisScToMySc.containsKey(sc.getId())) {
+                    // find the index: high(idx)+1
+                    int idx = 0;
+                    for (SolverConfiguration sc2 : solverConfigCache.getAll()) {
+                        if (sc2.getSolverBinary().getIdSolver() == sc.getSolverBinary().getIdSolver()) {
+                            idx++;
+                        }
+                    }
+                    SolverConfiguration sc2 = solverConfigCache.createSolverConfiguration(sc.getSolverBinary(), activeExperiment.getId(), seed_group++, sc.getName(), idx);
+                    for (ParameterInstance pi : ParameterInstanceDAO.getBySolverConfig(sc)) {
+                        ParameterInstanceDAO.createParameterInstance(pi.getParameter_id(), sc2, pi.getValue());
+                    }
+
+                    // update map
+                    for (SolverConfiguration tmp : selectedSolverConfigs) {
+                        if (tmp.hasEqualSemantics(sc2)) {
+                            mapHisScToMySc.put(tmp.getId(), sc2.getId());
+                        }
+                    }
+                }
+            }
+
+            // save instances
+            for (Instance i : selectedInstances) {
+                if (!instanceIds.contains(i.getId())) {
+                    ExperimentHasInstanceDAO.createExperimentHasInstance(activeExperiment.getId(), i.getId());
+                }
+            }
+
+            // import jobs
+            if (importFinishedRuns) {
+
+
+                ArrayList<ExperimentResult> resultsToImport = new ArrayList<ExperimentResult>();
+                ArrayList<ExperimentResult> importedResults = new ArrayList<ExperimentResult>();
+                HashMap<Integer, HashMap<Integer, Integer>> instanceSeedGroupFirstRun = new HashMap<Integer, HashMap<Integer, Integer>>();
+                for (Instance i : selectedInstances) {
+                    HashMap<Integer, Integer> seedGroupFirstRun = instanceSeedGroupFirstRun.get(i.getId());
+                    if (seedGroupFirstRun == null) {
+                        seedGroupFirstRun = new HashMap<Integer, Integer>();
+                        instanceSeedGroupFirstRun.put(i.getId(), seedGroupFirstRun);
+                    }
+                    for (SolverConfiguration sc : selectedSolverConfigs) {
+                        ArrayList<ExperimentResult> tmp = ExperimentResultDAO.getBySolverConfigurationAndInstance(sc, i);
+                        SolverConfiguration solverConfig = SolverConfigurationDAO.getSolverConfigurationById(mapHisScToMySc.get(sc.getId()));
+                        Integer firstRun = seedGroupFirstRun.get(solverConfig.getSeed_group());
+                        if (firstRun == null) {
+                            firstRun = ExperimentResultDAO.getMaxRunForSeedGroupByExperimentIdAndInstanceId(solverConfig.getSeed_group(), activeExperiment.getId(), i.getId()) + 1;
+                        }
+                        for (ExperimentResult er : tmp) {
+                            if (er.getStatus().equals(StatusCode.SUCCESSFUL)) {
+                                resultsToImport.add(er);
+                                importedResults.add(ExperimentResultDAO.createExperimentResult(firstRun++, er.getPriority(), er.getComputeQueue(), er.getStatus(), er.getSeed(), er.getResultCode(), er.getResultTime(), mapHisScToMySc.get(sc.getId()), activeExperiment.getId(), er.getInstanceId(), er.getStartTime(), er.getCPUTimeLimit(), er.getMemoryLimit(), er.getWallClockTimeLimit(), er.getStackSizeLimit(), er.getOutputSizeLimitFirst(), er.getOutputSizeLimitLast()));
+                            }
+                        }
+                        seedGroupFirstRun.put(solverConfig.getSeed_group(), firstRun);
+                    }
+                }
+                ExperimentResultDAO.batchSave(importedResults);
+                ExperimentResultDAO.batchCopyOutputs(resultsToImport, importedResults);
+            }
+
+            solverConfigCache.reload();
+
+            if (importFinishedRuns) {
+                experimentResultCache.updateExperimentResults();
+                main.generateJobsTableModel.updateNumRuns();
+                // no use of seed here because seeds are given by seed groups if jobs have to be generated
+                generateJobs(task, -1, -1, -1, -1, -1, -1, 0);
+                activeExperiment.invalidateNumJobs();
+            }
+            DatabaseConnector.getInstance().getConn().setAutoCommit(true);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            DatabaseConnector.getInstance().getConn().rollback();
+            DatabaseConnector.getInstance().getConn().setAutoCommit(true);
+            throw ex;
+        }
+
     }
 
     private class RunCountSCId {

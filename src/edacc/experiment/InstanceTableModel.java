@@ -41,7 +41,7 @@ public class InstanceTableModel extends AbstractTableModel {
     protected String[] benchmarkTypes;
     protected HashMap<Instance, LinkedList<Integer>> instanceClassIds;
 
-    public void setInstances(ArrayList<Instance> instances) {
+    public void setInstances(ArrayList<Instance> instances, boolean filterInstanceClassIds, boolean updateProperties) {
         boolean isCompetition;
 
         try {
@@ -60,7 +60,8 @@ public class InstanceTableModel extends AbstractTableModel {
             COL_SELECTED = 1;
             COL_PROP = 2;
         }
-        updateProperties();
+        if (updateProperties || properties == null)
+            updateProperties();
         this.instances = instances;
         experimentHasInstances = new Vector<ExperimentHasInstance>();
         experimentHasInstances.setSize(instances.size());
@@ -78,7 +79,7 @@ public class InstanceTableModel extends AbstractTableModel {
             }
 
         }
-        
+        if (filterInstanceClassIds) {
         instanceClassIds = new HashMap<Instance, LinkedList<Integer>>();
         for (Instance i : instances) {
             instanceClassIds.put(i, new LinkedList<Integer>());
@@ -88,11 +89,14 @@ public class InstanceTableModel extends AbstractTableModel {
         } catch (SQLException ex) {
             // TODO: error
         }
-        
+        }
         this.fireTableStructureChanged();
     }
     
+    
+    
     public LinkedList<Integer> getInstanceClassIdsForRow(int rowIndex) {
+        if (instanceClassIds == null) return null;
         LinkedList<Integer> res = instanceClassIds.get(instances.get(rowIndex));
         return res == null ? new LinkedList<Integer>() : res;
     }

@@ -121,6 +121,8 @@ public class ExperimentHasInstanceDAO {
      * @throws SQLException
      */
     public static ArrayList<Experiment> getAllExperimentsByInstances(Vector<Instance> instances) throws SQLException {
+        if (instances.isEmpty())
+            return new ArrayList<Experiment>();
         String query = "SELECT Experiment_idExperiment " +
                 "FROM " + table + " " +
                 "WHERE Instances_idInstance=" + instances.firstElement().getId() + " ";

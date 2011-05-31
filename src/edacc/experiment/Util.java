@@ -147,9 +147,9 @@ public class Util {
                     } else {
                         value = param.getValue();
                     }
-                    paramString += solverParameter.getPrefix() == null ? value : (solverParameter.getPrefix() + " ") + value;
+                    paramString += solverParameter.getPrefix() == null ? value : (solverParameter.getPrefix() + (solverParameter.getSpace()?" ":"")) + value;
                 } else {
-                    paramString += solverParameter.getPrefix() == null ? "" : (solverParameter.getPrefix() + " ");
+                    paramString += solverParameter.getPrefix() == null ? "" : (solverParameter.getPrefix());
                 }
 
                 if (params.get(params.size() - 1) != param) {

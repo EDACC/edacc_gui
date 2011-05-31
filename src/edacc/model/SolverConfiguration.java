@@ -1,5 +1,8 @@
 package edacc.model;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 public class SolverConfiguration extends BaseModel implements IntegerPKModel {
 
     private SolverBinaries solverBinary;
@@ -50,7 +53,7 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
             this.setModified();
         }
     }
-    
+
     public String getName() {
         return name;
     }
@@ -76,5 +79,60 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SolverConfiguration other = (SolverConfiguration) obj;
+        if (this.id != other.id) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + this.id;
+        return hash;
+    }
+
+    public boolean hasEqualSemantics(SolverConfiguration sc) throws SQLException {
+        boolean equal = true;
+        if (sc.getSolverBinary().getId() != getSolverBinary().getId()) {
+            // if the solver configs doesn't have the same solver binary -> other semantics
+            equal = false;
+        } else {
+            ArrayList<ParameterInstance> paramInstances = ParameterInstanceDAO.getBySolverConfig(sc);
+            ArrayList<ParameterInstance> myParamInstances = ParameterInstanceDAO.getBySolverConfig(this);
+            if (paramInstances.size() != myParamInstances.size()) {
+                // if number of parameters doesn't equal, the solver config has other semantics
+                equal = false;
+            } else {
+                // try to find every parameter instance
+                // if every parameter instance was found with same value -> same semantics
+                for (ParameterInstance hisPi : myParamInstances) {
+                    boolean found = false;
+                    for (ParameterInstance myPi : paramInstances) {
+                        if (myPi.getParameter_id() == hisPi.getParameter_id()
+                                && (hisPi.getValue() == null && myPi.getValue() == null || myPi.getValue().equals(hisPi.getValue()))) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        equal = false;
+                        break;
+                    }
+                }
+            }
+        } 
+        return equal;
     }
 }

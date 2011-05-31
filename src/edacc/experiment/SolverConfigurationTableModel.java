@@ -18,11 +18,11 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
     public static final int COL_SEL = 0;
     public static final int COL_SOLVER = 1;
     public static final int COL_NAME = 2;
-    public static final int COL_PARAMETERS = 3;
-    private String[] columns = {"Selected", "Solver", "Solver Configuration", "Parameters"};
+    public static final int COL_SOLVERBINARY = 3;
+    public static final int COL_PARAMETERS = 4;
+    private String[] columns = {"Selected", "Solver", "Solver Configuration", "Solver Binary", "Parameters"};
     public boolean[] selected;
     private ArrayList<SolverConfiguration> solverConfigurations;
-    private HashMap<Integer, ArrayList<ParameterInstance>> parameterInstances;
 
     @Override
     public int getRowCount() {
@@ -34,20 +34,9 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
         return columns.length;
     }
 
-    /**
-     * Returns all parameter instances for that job
-     * @param row
-     * @return null, if there was an error
-     */
-    public ArrayList<ParameterInstance> getParameters(int row) {
+    public ArrayList<ParameterInstance> getParametersBySolverConfig(SolverConfiguration sc) {
         try {
-            SolverConfiguration sc = solverConfigurations.get(row);
-            ArrayList<ParameterInstance> params = parameterInstances.get(sc.getId());
-            if (params == null) {
-                params = ParameterInstanceDAO.getBySolverConfigId(sc.getId());
-                parameterInstances.put(sc.getId(), params);
-            }
-            return params;
+            return ParameterInstanceDAO.getBySolverConfig(sc);
         } catch (Exception e) {
             return null;
         }
@@ -75,8 +64,11 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
                 }
             case COL_NAME:
                 return solverConfigurations.get(rowIndex).getName();
+            case COL_SOLVERBINARY:
+                return solverConfigurations.get(rowIndex).getSolverBinary().toString();
             case COL_PARAMETERS:
-                return Util.getParameterString(getParameters(rowIndex));
+                SolverConfiguration sc = solverConfigurations.get(rowIndex);
+                return Util.getParameterString(getParametersBySolverConfig(sc));
         }
         return "";
     }
@@ -103,7 +95,6 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
     }
 
     public void setSolverConfigurations(ArrayList<SolverConfiguration> solverConfigurations) {
-        parameterInstances = new HashMap<Integer, ArrayList<ParameterInstance>>();
         selected = new boolean[solverConfigurations.size()];
         for (int i = 0; i < selected.length; i++) {
             selected[i] = false;

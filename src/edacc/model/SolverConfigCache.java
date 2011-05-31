@@ -34,8 +34,8 @@ public class SolverConfigCache extends Observable {
         return res;
     }
 
-    public synchronized SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int id, int seed_group, String title, int idx) throws SQLException, Exception {
-        SolverConfiguration sc = SolverConfigurationDAO.createSolverConfiguration(solverBinary, id, seed_group, title, idx);
+    public synchronized SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int expId, int seed_group, String title, int idx) throws SQLException, Exception {
+        SolverConfiguration sc = SolverConfigurationDAO.createSolverConfiguration(solverBinary, expId, seed_group, title, idx);
         solverConfigs.put(sc.getId(), sc);
         return sc;
     }
@@ -100,6 +100,9 @@ public class SolverConfigCache extends Observable {
     public synchronized void saveAll() throws SQLException {
         for (SolverConfiguration sc : getAll()) {
             SolverConfigurationDAO.save(sc);
+            if (sc.isDeleted()) {
+                solverConfigs.remove(sc.getId());
+            }
         }
     }
 }
