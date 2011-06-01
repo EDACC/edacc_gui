@@ -39,6 +39,7 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
         setLocationRelativeTo(parent);
         initComponents();
         lbRunPath.setSelectedIndex(0);
+        showSolverBin();
     }
 
     /** This method is called from within the constructor to
@@ -250,6 +251,19 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
             lCommandPreview.setText(runCommand + " " + runPath);
         else
             lCommandPreview.setText(runPath);
+    }
+
+    private void showSolverBin() {
+        if (solverBin == null)
+            return;
+        tfBinaryName.setText(solverBin.getBinaryName());
+        tfRunCommand.setText(solverBin.getRunCommand());
+        tfVersion.setText(solverBin.getVersion());
+        int selectedIndex = ((SolverBinariesListModel) lbRunPath.getModel()).getIndexOf(solverBin.getRunPath());
+        // if an error occured select first index
+        if (selectedIndex < 0)
+            selectedIndex = 0;
+        lbRunPath.setSelectedIndex(selectedIndex);
     }
 
 }

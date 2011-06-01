@@ -51,4 +51,8 @@ public class SolverBinariesListModel extends AbstractListModel {
         }
         return paths.get(index);
     }
+
+    public int getIndexOf(String path) {
+        return paths.indexOf(path);
+    }
 }
