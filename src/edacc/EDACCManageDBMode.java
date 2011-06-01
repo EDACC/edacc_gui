@@ -118,9 +118,13 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         tableParameters.setModel(parameterTableModel);
         tableParameters.setRowSorter(new TableRowSorter<ParameterTableModel>(parameterTableModel));
 
+        // initialize the solver binaries table
+        solverBinariesTableModel = new SolverBinariesTableModel();
+        tableSolverBinaries.setModel(solverBinariesTableModel);
+
         // initialize solver table
         solverTableModel = new SolverTableModel();
-        manageDBSolvers = new ManageDBSolvers(this, solverTableModel, manageDBParameters);
+        manageDBSolvers = new ManageDBSolvers(this, solverTableModel, manageDBParameters, solverBinariesTableModel);
         tableSolver.setModel(solverTableModel);
         tableSolver.setRowSorter(new TableRowSorter<SolverTableModel>(solverTableModel));
 
@@ -150,8 +154,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         tableInstanceClass.getColumnModel().getColumn(2).setMinWidth(40);
         tableInstanceClass.getColumnModel().getColumn(3).setMinWidth(40);
         this.jSplitPane2.setDividerLocation(-1);*/
-        solverBinariesTableModel = new SolverBinariesTableModel();
-        tableSolverBinaries.setModel(solverBinariesTableModel);
     }
 
     void initialize() throws NoConnectionToDBException, SQLException {
@@ -208,10 +210,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         chkSpace = new javax.swing.JCheckBox();
         lSpace = new javax.swing.JLabel();
         panelSolverOverall = new javax.swing.JPanel();
-        panelSolverButtons = new javax.swing.JPanel();
-        btnSolverDelete = new javax.swing.JButton();
-        btnSolverNew = new javax.swing.JButton();
-        btnSolverExport = new javax.swing.JButton();
         panelSolver = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tableSolver = new javax.swing.JTable();
@@ -222,18 +220,24 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         jScrollPane3 = new javax.swing.JScrollPane();
         taSolverDescription = new javax.swing.JTextArea();
         jlSolverBinary = new javax.swing.JLabel();
-        btnSolverAddBinary = new javax.swing.JButton();
         jlSolverCode = new javax.swing.JLabel();
         btnSolverAddCode = new javax.swing.JButton();
         tfSolverAuthors = new javax.swing.JTextField();
         tfSolverVersion = new javax.swing.JTextField();
         jlSolverAuthors = new javax.swing.JLabel();
         jlSolverVersion = new javax.swing.JLabel();
+        btnSolverAddBinary = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         tableSolverBinaries = new javax.swing.JTable();
+        btnSolverEditBinary = new javax.swing.JButton();
+        btnSolverDeleteBinary = new javax.swing.JButton();
+        panelSolverButtons = new javax.swing.JPanel();
+        btnSolverDelete = new javax.swing.JButton();
+        btnSolverNew = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         btnSolverSaveToDB = new javax.swing.JButton();
         btnSolverRefresh = new javax.swing.JButton();
+        btnSolverExport = new javax.swing.JButton();
         panelManageDBInstances = new javax.swing.JPanel();
         jSplitPane1 = new javax.swing.JSplitPane();
         panelInstanceClass = new javax.swing.JPanel();
@@ -595,7 +599,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelParametersLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -616,7 +620,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             panelParametersOverallLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelParametersOverallLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelParameters, javax.swing.GroupLayout.DEFAULT_SIZE, 417, Short.MAX_VALUE)
+                .addComponent(panelParameters, javax.swing.GroupLayout.DEFAULT_SIZE, 561, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelParametersButons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -627,66 +631,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
         panelSolverOverall.setName("panelSolverOverall"); // NOI18N
         panelSolverOverall.setPreferredSize(new java.awt.Dimension(500, 489));
-
-        panelSolverButtons.setName("panelSolverButtons"); // NOI18N
-
-        btnSolverDelete.setText(resourceMap.getString("btnSolverDelete.text")); // NOI18N
-        btnSolverDelete.setToolTipText(resourceMap.getString("btnSolverDelete.toolTipText")); // NOI18N
-        btnSolverDelete.setName("btnSolverDelete"); // NOI18N
-        btnSolverDelete.setPreferredSize(new java.awt.Dimension(81, 25));
-        btnSolverDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSolverDeleteActionPerformed(evt);
-            }
-        });
-
-        btnSolverNew.setText(resourceMap.getString("btnNew.text")); // NOI18N
-        btnSolverNew.setToolTipText(resourceMap.getString("btnNew.toolTipText")); // NOI18N
-        btnSolverNew.setMaximumSize(new java.awt.Dimension(81, 25));
-        btnSolverNew.setMinimumSize(new java.awt.Dimension(81, 25));
-        btnSolverNew.setName("btnNew"); // NOI18N
-        btnSolverNew.setPreferredSize(new java.awt.Dimension(81, 25));
-        btnSolverNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSolverNewActionPerformed(evt);
-            }
-        });
-
-        btnSolverExport.setText(resourceMap.getString("exportSolver.text")); // NOI18N
-        btnSolverExport.setToolTipText(resourceMap.getString("exportSolver.toolTipText")); // NOI18N
-        btnSolverExport.setName("exportSolver"); // NOI18N
-        btnSolverExport.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnExport(evt);
-            }
-        });
-
-        javax.swing.GroupLayout panelSolverButtonsLayout = new javax.swing.GroupLayout(panelSolverButtons);
-        panelSolverButtons.setLayout(panelSolverButtonsLayout);
-        panelSolverButtonsLayout.setHorizontalGroup(
-            panelSolverButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelSolverButtonsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btnSolverNew, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSolverDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnSolverExport, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-
-        panelSolverButtonsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnSolverDelete, btnSolverExport, btnSolverNew});
-
-        panelSolverButtonsLayout.setVerticalGroup(
-            panelSolverButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelSolverButtonsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelSolverButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(btnSolverNew, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSolverDelete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSolverExport))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
 
         panelSolver.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("panelSolver.border.title"))); // NOI18N
         panelSolver.setAutoscrolls(true);
@@ -749,15 +693,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         jlSolverBinary.setText(resourceMap.getString("jlSolverBinary.text")); // NOI18N
         jlSolverBinary.setName("jlSolverBinary"); // NOI18N
 
-        btnSolverAddBinary.setText(resourceMap.getString("btnSolverAddBinary.text")); // NOI18N
-        btnSolverAddBinary.setToolTipText(resourceMap.getString("btnSolverAddBinary.toolTipText")); // NOI18N
-        btnSolverAddBinary.setName("btnSolverAddBinary"); // NOI18N
-        btnSolverAddBinary.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSolverAddBinaryActionPerformed(evt);
-            }
-        });
-
         jlSolverCode.setText(resourceMap.getString("jlSolverCode.text")); // NOI18N
         jlSolverCode.setName("jlSolverCode"); // NOI18N
 
@@ -802,6 +737,49 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         jlSolverVersion.setText(resourceMap.getString("jlSolverVersion.text")); // NOI18N
         jlSolverVersion.setName("jlSolverVersion"); // NOI18N
 
+        btnSolverAddBinary.setText(resourceMap.getString("btnSolverAddBinary.text")); // NOI18N
+        btnSolverAddBinary.setToolTipText(resourceMap.getString("btnSolverAddBinary.toolTipText")); // NOI18N
+        btnSolverAddBinary.setName("btnSolverAddBinary"); // NOI18N
+        btnSolverAddBinary.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolverAddBinaryActionPerformed(evt);
+            }
+        });
+
+        jScrollPane4.setName("jScrollPane4"); // NOI18N
+
+        tableSolverBinaries.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tableSolverBinaries.setName("tableSolverBinaries"); // NOI18N
+        jScrollPane4.setViewportView(tableSolverBinaries);
+
+        btnSolverEditBinary.setText(resourceMap.getString("btnSolverEditBinary.text")); // NOI18N
+        btnSolverEditBinary.setActionCommand(resourceMap.getString("btnSolverEditBinary.actionCommand")); // NOI18N
+        btnSolverEditBinary.setName("btnSolverEditBinary"); // NOI18N
+        btnSolverEditBinary.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolverEditBinaryActionPerformed(evt);
+            }
+        });
+
+        btnSolverDeleteBinary.setText(resourceMap.getString("btnSolverDeleteBinary.text")); // NOI18N
+        btnSolverDeleteBinary.setActionCommand(resourceMap.getString("btnSolverDeleteBinary.actionCommand")); // NOI18N
+        btnSolverDeleteBinary.setName("btnSolverDeleteBinary"); // NOI18N
+        btnSolverDeleteBinary.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolverDeleteBinaryActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -816,25 +794,33 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                             .addComponent(jlSolverAuthors))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-                            .addComponent(tfSolverName, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-                            .addComponent(tfSolverAuthors, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)))
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)
+                            .addComponent(tfSolverName, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)
+                            .addComponent(tfSolverAuthors, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jlSolverVersion)
+                                .addGap(56, 56, 56))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jlSolverCode)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jlSolverBinary)
-                            .addComponent(jlSolverVersion))
+                            .addComponent(tfSolverVersion, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)
+                            .addComponent(btnSolverAddCode)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jlSolverBinary)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnSolverAddBinary)
-                            .addComponent(tfSolverVersion, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jlSolverCode)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnSolverAddCode)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(btnSolverAddBinary, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnSolverEditBinary, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 119, Short.MAX_VALUE)
+                                .addComponent(btnSolverDeleteBinary, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE))))
                 .addContainerGap())
         );
-
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnSolverAddBinary, btnSolverAddCode});
 
         jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jlSolverBinary, jlSolverCode, jlSolverDescription, jlSolverName});
 
@@ -860,51 +846,91 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     .addComponent(jlSolverVersion))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSolverAddBinary)
-                    .addComponent(jlSolverBinary))
+                    .addComponent(jlSolverCode)
+                    .addComponent(btnSolverAddCode))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jlSolverBinary)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSolverAddCode)
-                    .addComponent(jlSolverCode))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnSolverAddBinary)
+                    .addComponent(btnSolverEditBinary)
+                    .addComponent(btnSolverDeleteBinary))
+                .addGap(12, 12, 12))
         );
 
-        jScrollPane4.setName("jScrollPane4"); // NOI18N
+        panelSolverButtons.setName("panelSolverButtons"); // NOI18N
 
-        tableSolverBinaries.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+        btnSolverDelete.setText(resourceMap.getString("btnSolverDelete.text")); // NOI18N
+        btnSolverDelete.setToolTipText(resourceMap.getString("btnSolverDelete.toolTipText")); // NOI18N
+        btnSolverDelete.setName("btnSolverDelete"); // NOI18N
+        btnSolverDelete.setPreferredSize(new java.awt.Dimension(81, 25));
+        btnSolverDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolverDeleteActionPerformed(evt);
             }
-        ));
-        tableSolverBinaries.setName("tableSolverBinaries"); // NOI18N
-        jScrollPane4.setViewportView(tableSolverBinaries);
+        });
+
+        btnSolverNew.setText(resourceMap.getString("btnNew.text")); // NOI18N
+        btnSolverNew.setToolTipText(resourceMap.getString("btnNew.toolTipText")); // NOI18N
+        btnSolverNew.setMaximumSize(new java.awt.Dimension(81, 25));
+        btnSolverNew.setMinimumSize(new java.awt.Dimension(81, 25));
+        btnSolverNew.setName("btnNew"); // NOI18N
+        btnSolverNew.setPreferredSize(new java.awt.Dimension(81, 25));
+        btnSolverNew.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolverNewActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panelSolverButtonsLayout = new javax.swing.GroupLayout(panelSolverButtons);
+        panelSolverButtons.setLayout(panelSolverButtonsLayout);
+        panelSolverButtonsLayout.setHorizontalGroup(
+            panelSolverButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelSolverButtonsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnSolverNew, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnSolverDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(247, Short.MAX_VALUE))
+        );
+
+        panelSolverButtonsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnSolverDelete, btnSolverNew});
+
+        panelSolverButtonsLayout.setVerticalGroup(
+            panelSolverButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelSolverButtonsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelSolverButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(btnSolverNew, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSolverDelete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout panelSolverLayout = new javax.swing.GroupLayout(panelSolver);
         panelSolver.setLayout(panelSolverLayout);
         panelSolverLayout.setHorizontalGroup(
             panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSolverLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panelSolverButtons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(44, 44, 44))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSolverLayout.createSequentialGroup()
                 .addGroup(panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelSolverLayout.setVerticalGroup(
             panelSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSolverLayout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelSolverButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(11, 11, 11))
         );
 
         jScrollPane2.getAccessibleContext().setAccessibleParent(manageDBPane);
@@ -915,20 +941,13 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             panelSolverOverallLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelSolverOverallLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelSolverOverallLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelSolver, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(panelSolverOverallLayout.createSequentialGroup()
-                        .addComponent(panelSolverButtons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())))
+                .addComponent(panelSolver, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelSolverOverallLayout.setVerticalGroup(
             panelSolverOverallLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSolverOverallLayout.createSequentialGroup()
+            .addGroup(panelSolverOverallLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelSolver, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelSolverButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(panelSolver, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jSplitPane2.setLeftComponent(panelSolverOverall);
@@ -954,14 +973,25 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             }
         });
 
+        btnSolverExport.setText(resourceMap.getString("exportSolver.text")); // NOI18N
+        btnSolverExport.setToolTipText(resourceMap.getString("exportSolver.toolTipText")); // NOI18N
+        btnSolverExport.setName("exportSolver"); // NOI18N
+        btnSolverExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExport(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnSolverRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 304, Short.MAX_VALUE)
+                .addComponent(btnSolverRefresh)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 197, Short.MAX_VALUE)
+                .addComponent(btnSolverExport, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnSolverSaveToDB)
                 .addContainerGap())
         );
@@ -969,7 +999,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                 .addComponent(btnSolverRefresh)
-                .addComponent(btnSolverSaveToDB))
+                .addComponent(btnSolverSaveToDB)
+                .addComponent(btnSolverExport))
         );
 
         javax.swing.GroupLayout panelManageDBSolverLayout = new javax.swing.GroupLayout(panelManageDBSolver);
@@ -987,7 +1018,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             panelManageDBSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManageDBSolverLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 494, Short.MAX_VALUE)
+                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 638, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1971,6 +2002,56 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         tableInstances.updateUI();
     }//GEN-LAST:event_btnSelectInstanceColumnsActionPerformed
 
+    private void btnSolverEditBinaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverEditBinaryActionPerformed
+       
+    }//GEN-LAST:event_btnSolverEditBinaryActionPerformed
+
+    private void btnSolverDeleteBinaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverDeleteBinaryActionPerformed
+        // show warning first
+        final int userAnswer = JOptionPane.showConfirmDialog(panelSolver,
+                "The selected solver binaries will be deleted. Do you wish to continue?",
+                "Delete selected solver binaries",
+                JOptionPane.YES_NO_OPTION);
+        if (userAnswer == JOptionPane.NO_OPTION) {
+            return;
+        }
+
+        int[] rows = tableSolverBinaries.getSelectedRows();
+        LinkedList<SolverBinaries> selectedSolverBinaries = new LinkedList<SolverBinaries>();
+        int lastSelectedIndex = -1;
+        for (int i : rows) {
+            selectedSolverBinaries.add(solverBinariesTableModel.getSolverBinaries(tableSolverBinaries.convertRowIndexToModel(i)));
+            lastSelectedIndex = i;
+        }
+        if (selectedSolverBinaries.isEmpty()) {
+            JOptionPane.showMessageDialog(panelSolver, "No solver binary selected!", "Warning", JOptionPane.WARNING_MESSAGE);
+        } else {
+            while (!selectedSolverBinaries.isEmpty()) { // are there remaining solvers to delete?
+                try {
+                    SolverBinaries s = selectedSolverBinaries.removeFirst();
+                    manageDBSolvers.removeSolverBinary(s);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this,
+                            "An error occured while deleting a solver binary: " + ex.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                } finally {
+                    tableSolverBinaries.getSelectionModel().clearSelection();
+                    solverBinariesTableModel.fireTableDataChanged();
+                    tableSolverBinaries.updateUI();
+
+                    // try to select the solver which stood one row over the last deleted solver
+                    if (lastSelectedIndex >= tableSolverBinaries.getRowCount()) {
+                        lastSelectedIndex = tableSolverBinaries.getRowCount() - 1;
+                    }
+                    if (lastSelectedIndex >= 0) {
+                        tableSolverBinaries.getSelectionModel().setSelectionInterval(lastSelectedIndex, lastSelectedIndex);
+                    }
+                }
+            }
+        }
+    }//GEN-LAST:event_btnSolverDeleteBinaryActionPerformed
+
     private void parameterChanged() {
         int selectedRow = tableParameters.getSelectedRow();
 
@@ -2030,6 +2111,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         tfSolverAuthors.setEnabled(enabled);
         tfSolverVersion.setEnabled(enabled);
         btnSolverAddBinary.setEnabled(enabled);
+        btnSolverEditBinary.setEnabled(false); // TODO implement
+        btnSolverDeleteBinary.setEnabled(enabled);
         btnSolverAddCode.setEnabled(enabled);
         btnSolverExport.setEnabled(enabled);
 
@@ -2106,6 +2189,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     private javax.swing.JButton btnSolverAddBinary;
     private javax.swing.JButton btnSolverAddCode;
     private javax.swing.JButton btnSolverDelete;
+    private javax.swing.JButton btnSolverDeleteBinary;
+    private javax.swing.JButton btnSolverEditBinary;
     private javax.swing.JButton btnSolverExport;
     private javax.swing.JButton btnSolverNew;
     private javax.swing.JButton btnSolverRefresh;

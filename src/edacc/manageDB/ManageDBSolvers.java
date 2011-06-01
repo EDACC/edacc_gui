@@ -43,10 +43,11 @@ public class ManageDBSolvers implements Observer {
     private ManageDBParameters manageDBParameters;
     private SolverBinariesTableModel solverBinariesTableModel;
 
-    public ManageDBSolvers(EDACCManageDBMode gui, SolverTableModel solverTableModel, ManageDBParameters manageDBParameters) {
+    public ManageDBSolvers(EDACCManageDBMode gui, SolverTableModel solverTableModel, ManageDBParameters manageDBParameters, SolverBinariesTableModel solverBinariesTableModel) {
         this.gui = gui;
         this.solverTableModel = solverTableModel;
         this.manageDBParameters = manageDBParameters;
+        this.solverBinariesTableModel = solverBinariesTableModel;
         DatabaseConnector.getInstance().addObserver(this);
     }
 
