@@ -1590,6 +1590,14 @@ public class ExperimentController {
 
     }
 
+    public boolean hasGridQueuesAssigned() {
+        try {
+            return !ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(activeExperiment).isEmpty();
+        } catch (SQLException ex) {
+            return false;
+        }
+    }
+
     private class RunCountSCId {
 
         public int runcount;
