@@ -167,4 +167,13 @@ public class ParameterTableModel extends AbstractTableModel{
         Vector<Parameter> params = parameters.remove(oldSolver);
         parameters.put(newSolver, params);
     }
+
+    public int getHighestOrder() {
+        Vector<Parameter> params = parameters.get(currentSolver);
+        int max = 0;
+        for (Parameter p : params)
+            if (p.getOrder() > max)
+                max = p.getOrder();
+        return max;
+    }
 }
