@@ -119,6 +119,9 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
      */
     public void setMd5(String md5) {
         this.md5 = md5;
+        if (isSaved()) {
+            setModified();
+        }
     }
 
     /**
@@ -184,6 +187,9 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
      */
     public void setBinaryArchive(File[] binaryFiles) {
         this.binaryFiles = binaryFiles;
+        if (isSaved()) {
+            setModified();
+        }
     }
 
     @Override

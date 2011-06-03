@@ -96,4 +96,10 @@ public class SolverBinariesTableModel extends DefaultTableModel {
         }
         this.fireTableDataChanged();
     }
+
+    public SolverBinaries getSolverBinaries(int index) {
+        if (this.solverBinaries == null)
+            return null;
+        return solverBinaries.get(index);
+    }
 }
