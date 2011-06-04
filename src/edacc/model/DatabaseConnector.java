@@ -161,6 +161,9 @@ public class DatabaseConnector extends Observable {
     }
 
     public Connection getConn() throws SQLException {
+        if (connections.isEmpty()) {
+            throw new SQLException("No connection to database.");
+        }
         return getConn(0);
     }
 
