@@ -91,7 +91,6 @@ public class ExperimentController {
     EDACCExperimentMode main;
     EDACCSolverConfigPanel solverConfigPanel;
     private Experiment activeExperiment;
-    private ArrayList<Experiment> experiments;
     private static RandomNumberGenerator rnd = new JavaRandom();
     // caching experiments
     private ExperimentResultCache experimentResultCache;
@@ -121,9 +120,8 @@ public class ExperimentController {
         StatusCodeDAO.initialize();
         ResultCodeDAO.initialize();
         ClientDAO.clearCache();
-        ArrayList<Experiment> v = new ArrayList<Experiment>();
-        v.addAll(ExperimentDAO.getAll());
-        experiments = v;
+        ArrayList<Experiment> experiments = new ArrayList<Experiment>();
+        experiments.addAll(ExperimentDAO.getAll());
         main.expTableModel.setExperiments(experiments);
         try {
             DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getAllAsTreeFast();
@@ -1268,6 +1266,10 @@ public class ExperimentController {
     }
 
     public ArrayList<Experiment> getExperiments() {
+        ArrayList<Experiment> experiments = new ArrayList<Experiment>();
+        for (int row = 0; row < main.expTableModel.getRowCount(); row++) {
+            experiments.add(main.expTableModel.getExperimentAt(row));
+        }
         return experiments;
     }
 

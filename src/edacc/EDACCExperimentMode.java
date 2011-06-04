@@ -2071,6 +2071,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                         Experiment newExp;
                         try {
                             newExp = expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc);
+                            if (experimentUpdateThread != null) {
+                                experimentUpdateThread.cancel(true);
+                            }
+                            if (experimentUpdateThread == null || experimentUpdateThread.isDone()) {
+                                experimentUpdateThread = new ExperimentUpdateThread(expTableModel);
+                            }
+                            experimentUpdateThread.execute();
                         } catch (SQLException ex) {
                             createDatabaseErrorMessage(ex);
                             return;
@@ -2119,6 +2126,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                         tableExperiments.getSelectionModel().setSelectionInterval(removedIndex, removedIndex);
                     }
                     btnRemoveExperiment.requestFocusInWindow();
+                    if (experimentUpdateThread != null) {
+                        experimentUpdateThread.cancel(true);
+                    }
+                    if (experimentUpdateThread == null || experimentUpdateThread.isDone()) {
+                        experimentUpdateThread = new ExperimentUpdateThread(expTableModel);
+                    }
+                    experimentUpdateThread.execute();
                 } catch (SQLException ex) {
                     createDatabaseErrorMessage(ex);
                 } catch (Exception e) {
@@ -2535,10 +2549,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         String status = "";
         if (!expController.hasGridQueuesAssigned()) {
             status += "Warning: no grid queue assigned! ";
-        } 
+        }
         if (resultBrowserRowFilter.hasFiltersApplied()) {
             status += "This list of jobs has filters applied to it. Use the filter button below to modify. Showing " + tableJobs.getRowCount() + " Jobs.";
-        } 
+        }
         lblJobsFilterStatus.setText(status);
     }
 
