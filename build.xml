@@ -76,7 +76,10 @@
         <echo>Copying runsolver and client</echo>
         <mkdir dir="${dist.dir}/bin" />
         <copy todir="${dist.dir}/bin">
+            <fileset file="client/AUTHORS"/>
             <fileset file="client/client"/>
+            <fileset file="client/LICENSE"/>
+            <fileset file="client/README"/>
             <fileset file="client/runsolver"/>
             <fileset file="client/runsolver_copyright.txt"/>
         </copy>
@@ -94,7 +97,10 @@
         <echo>Copying runsolver and client</echo>
         <mkdir dir="${build.classes.dir}/bin" />
         <copy todir="${build.classes.dir}/bin">
+            <fileset file="client/AUTHORS"/>
             <fileset file="client/client"/>
+            <fileset file="client/LICENSE"/>
+            <fileset file="client/README"/>
             <fileset file="client/runsolver"/>
             <fileset file="client/runsolver_copyright.txt"/>
         </copy>
