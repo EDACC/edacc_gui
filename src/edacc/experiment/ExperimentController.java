@@ -411,24 +411,7 @@ public class ExperimentController {
      * @throws SQLException
      */
     public void undoSolverConfigurations(Tasks task) throws SQLException {
-        /*main.solverConfigPanel.beginUpdate();
-        main.solverConfigPanel.removeAll();
-        ArrayList<SolverConfiguration> solverConfigurations = SolverConfigurationDAO.getAllCached();
-        Collections.sort(solverConfigurations, new Comparator<SolverConfiguration>() {
-        
-        @Override
-        public int compare(SolverConfiguration o1, SolverConfiguration o2) {
-        return o1.getId() - o2.getId();
-        }
-        });
-        for (SolverConfiguration sc : solverConfigurations) {
-        main.solverConfigPanel.addSolverConfiguration(sc);
-        sc.setSaved();
-        }
-        main.solverConfigPanel.endUpdate();*/
-
         solverConfigCache.reload();
-
         main.setTitles();
     }
 
@@ -777,40 +760,14 @@ public class ExperimentController {
                 });
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            // TODO: shouldn't happen but show message if it does
         }
 
-    }
-
-    /**
-     * Deletes all illegal characters of filename and returns the result.
-     * @param filename
-     * @return
-     */
-    private String getFilename(String filename) {
-        final char[] ILLEGAL_CHARACTERS = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':', ' '};
-        String res = "";
-        for (char c : filename.toCharArray()) {
-            boolean illegal = false;
-            for (char i : ILLEGAL_CHARACTERS) {
-                if (c == i) {
-                    illegal = true;
-                }
-            }
-            if (illegal) {
-                res += "_";
-            } else {
-                res += c;
-            }
-        }
-        return res;
     }
 
     /**
      * Generates a ZIP archive with the necessary files for the grid.
      */
-    public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException, InstanceNotInDBException, TaskCancelledException {
+    public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, boolean exportClient, boolean exportRunsolver, boolean exportConfig, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException, InstanceNotInDBException, TaskCancelledException {
         boolean foundSolverWithSameName = false;
         File tmpDir = new File("tmp");
         tmpDir.mkdir();
@@ -822,7 +779,7 @@ public class ExperimentController {
         for (ExperimentHasGridQueue eq : eqs) {
             GridQueue queue = GridQueueDAO.getById(eq.getIdGridQueue());
 
-            File zipFile = new File(location + getFilename(activeExperiment.getName() + "_" + queue.getName() + "_" + dateStr + ".zip"));
+            File zipFile = new File(location + Util.getFilename(activeExperiment.getName() + "_" + queue.getName() + "_" + dateStr + ".zip"));
             if (zipFile.exists()) {
                 zipFile.delete();
             }
@@ -902,19 +859,22 @@ public class ExperimentController {
                 task.setStatus("Writing client");
 
                 // add configuration File
-                addConfigurationFile(zos, activeExperiment, queue);
+                if (exportConfig) {
+                    addConfigurationFile(zos, activeExperiment, queue);
+                }
 
                 // add run script
                 addRunScript(zos, exportInstances, exportSolvers, queue);
 
                 // add client binary
-                addClient(zos);
+                if (exportClient) {
+                    addClient(zos);
+                }
 
                 // add runsolver
-                addRunsolver(zos);
-                // add empty result library
-                entry = new ZipEntry("results" + System.getProperty("file.separator") + "~");
-                zos.putNextEntry(entry);
+                if (exportRunsolver) {
+                    addRunsolver(zos);
+                }
             }
             zos.close();
 
@@ -1009,13 +969,17 @@ public class ExperimentController {
 
     private void addConfigurationFile(ZipOutputStream zos, Experiment activeExperiment, GridQueue activeQueue) throws IOException {
         // generate content of config file
-        String sConf = "host = $host\n" + "username = $user\n" + "password = $pwd\n" + "database = $db\n" + "experiment = $exp\n" + "gridqueue = $q\n";
+        String sConf = 
+                "host = $host\n" 
+                + "username = $user\n" 
+                + "password = $pwd\n" 
+                + "database = $db\n" 
+                + "gridqueue = $q\n";
         DatabaseConnector con = DatabaseConnector.getInstance();
         sConf = sConf.replace("$host", con.getHostname());
         sConf = sConf.replace("$user", con.getUsername());
         sConf = sConf.replace("$pwd", con.getPassword());
         sConf = sConf.replace("$db", con.getDatabase());
-        sConf = sConf.replace("$exp", String.valueOf(activeExperiment.getId()));
         sConf = sConf.replace("$q", String.valueOf(activeQueue.getId()));
 
         // write file into zip archive

@@ -26,10 +26,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 public class Util {
 
     public static final Color COLOR_ERROR = new Color(0xed1c24);
-    
     public static final Color COLOR_GENERATEJOBSTABLE_UNSAVED_BIGGER = Color.green;
     public static final Color COLOR_GENERATEJOBSTABLE_UNSAVED_LOWER = COLOR_ERROR;
-    
+
     /**
      * Updates the width of each column according to the table size and the data in the cells.
      * @param table
@@ -147,7 +146,7 @@ public class Util {
                     } else {
                         value = param.getValue();
                     }
-                    paramString += solverParameter.getPrefix() == null ? value : (solverParameter.getPrefix() + (solverParameter.getSpace()?" ":"")) + value;
+                    paramString += solverParameter.getPrefix() == null ? value : (solverParameter.getPrefix() + (solverParameter.getSpace() ? " " : "")) + value;
                 } else {
                     paramString += solverParameter.getPrefix() == null ? "" : (solverParameter.getPrefix());
                 }
@@ -242,6 +241,30 @@ public class Util {
             // this is easier .. set the default border from look&feel
             field.setBackground(UIManager.getColor("TextField.background"));
             field.setBorder(defaultBorder);
+        }
+        return res;
+    }
+
+    /**
+     * Replaces all illegal characters by '_' of filename and returns the result.
+     * @param filename
+     * @return
+     */
+    public static String getFilename(String filename) {
+        final char[] ILLEGAL_CHARACTERS = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':', ' '};
+        String res = "";
+        for (char c : filename.toCharArray()) {
+            boolean illegal = false;
+            for (char i : ILLEGAL_CHARACTERS) {
+                if (c == i) {
+                    illegal = true;
+                }
+            }
+            if (illegal) {
+                res += "_";
+            } else {
+                res += c;
+            }
         }
         return res;
     }
