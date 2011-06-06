@@ -74,6 +74,9 @@ public class Parameter extends BaseModel implements IntegerPKModel {
 
     public void setHasValue(boolean hasValue) {
         this.hasValue = hasValue;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     /**
@@ -88,6 +91,9 @@ public class Parameter extends BaseModel implements IntegerPKModel {
      */
     public void setMandatory(boolean mandatory) {
         this.mandatory = mandatory;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 
     /**
@@ -102,5 +108,8 @@ public class Parameter extends BaseModel implements IntegerPKModel {
      */
     public void setSpace(boolean space) {
         this.space = space;
+        if (this.isSaved()) {
+            this.setModified();
+        }
     }
 }

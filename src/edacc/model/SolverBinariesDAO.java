@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -176,5 +178,15 @@ public class SolverBinariesDAO {
         }
         rs.close();
         return res;
+    }
+
+    public static InputStream getZippedBinaryFile(SolverBinaries b) throws SQLException {
+        final String query = "SELECT binaryArchive FROM " + TABLE + " WHERE idSolverBinary=?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, b.getId());
+        ResultSet rs = ps.executeQuery();
+        if (rs.next())
+            return rs.getBinaryStream("binaryArchive");
+        return null;
     }
 }
