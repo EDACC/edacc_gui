@@ -21,7 +21,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Observable;
@@ -29,6 +31,10 @@ import java.util.Observer;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
@@ -191,18 +197,34 @@ public class ManageDBSolvers implements Observer {
      * Exports the binary of a solver to the file system.
      * @param s The solver to be exported
      * @param f The location where the binary shall be stored. If it is a directory,
-     * the binaryName field of the solver will be used as filename.
+     * the solverName field of the solver will be used as filename.
      */
     public void exportSolver(Solver s, File f) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException, MD5CheckFailedException {
-        throw new NotImplementedException();
-        /* TODO Implement if (f.isDirectory()) {
-        f = new File(f.getAbsolutePath() + System.getProperty("file.separator") + s.getBinaryName());
+        FileOutputStream fos;
+        if (f.isDirectory()) {
+            fos = new FileOutputStream(f.getAbsolutePath() + System.getProperty("file.separator") + s.getName() + ".zip");
+        } else {
+            fos = new FileOutputStream(f);
         }
-        SolverDAO.getBinaryFileOfSolver(s, f);
-        String md5File = Util.calculateMD5(f);
-        if (!md5File.equals(s.getMd5())) {
-        throw new MD5CheckFailedException("The exported solver binary of solver \"" + s.getName() + "\" seems to be corrupt!");
-        }*/
+        ZipOutputStream zos = new ZipOutputStream(fos);
+        for (SolverBinaries b : s.getSolverBinaries()) {
+            InputStream binStream = SolverBinariesDAO.getZippedBinaryFile(b);
+            ZipInputStream zis = new ZipInputStream(binStream);
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                ZipEntry newEntry = new ZipEntry(b.getBinaryName() + "_" + b.getVersion() + "/" + entry.getName());
+                zos.putNextEntry(newEntry);
+                for (int c = zis.read(); c != -1; c = zis.read()) {
+                    zos.write(c);
+                }
+                zos.closeEntry();
+                zis.closeEntry();
+            }
+            zis.close();
+            binStream.close();
+        }
+        zos.close();
+        fos.close();
     }
 
     /** Exports the code of a solver.
