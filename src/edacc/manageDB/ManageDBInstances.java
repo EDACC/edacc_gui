@@ -33,6 +33,7 @@ import edacc.model.MD5CheckFailedException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import edacc.model.PropertyNotInDBException;
+import edacc.model.TaskCancelledException;
 import edacc.model.Tasks;
 import edacc.properties.PropertyComputationController;
 import edacc.properties.PropertyTypeNotExistException;
@@ -73,6 +74,15 @@ public class ManageDBInstances implements Observer {
     JTable tableInstances;
     Lock lock = new ReentrantLock();
     Condition condition;
+    private Vector<Instance> tmp;
+
+    public void setTmp(Vector<Instance> tmp) {
+        this.tmp = tmp;
+    }
+
+    public Vector<Instance> getTmp() {
+        return tmp;
+    }
 
     public ManageDBInstances(EDACCManageDBMode main, JPanel panelManageDBInstances,
             JFileChooser jFileChooserManageDBInstance, JFileChooser jFileChooserManageDBExportInstance,
@@ -83,6 +93,7 @@ public class ManageDBInstances implements Observer {
         this.jFileChooserManageDBExportInstance = jFileChooserManageDBExportInstance;
         this.tableInstances = tableInstances;
         DatabaseConnector.getInstance().addObserver(this);
+        this.tmp = new Vector<Instance>();
     }
 
     /**
@@ -111,9 +122,9 @@ public class ManageDBInstances implements Observer {
      * Will open a jFilechooser to select a file or directory to add all containing
      * instance files into the "instance table" of the MangeDBMode.
      */
-    public void addInstances(InstanceClass input, File ret, Tasks task, String fileExtension, Boolean compress, Boolean autoClass) throws InstanceException {
+    public void addInstances(InstanceClass input, File ret, Tasks task, String fileExtension, Boolean compress, Boolean autoClass) throws InstanceException, TaskCancelledException {
         try {
-
+            Tasks.getTaskView().setCancelable(true);
             RecursiveFileScanner InstanceScanner = new RecursiveFileScanner(fileExtension);
             Vector<File> instanceFiles = InstanceScanner.searchFileExtension(ret);
             task.setOperationName("Adding Instances");
@@ -133,6 +144,7 @@ public class ManageDBInstances implements Observer {
 
                 main.instanceTableModel.addInstances(instances);
                 loadInstanceClasses();
+                Tasks.getTaskView().setCancelable(false);
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
@@ -157,26 +169,6 @@ public class ManageDBInstances implements Observer {
         }
         InstanceTableModel tableModel = new InstanceTableModel();
         tableModel.addInstances(toRemove);
-        //EDACCExtWarningErrorDialog removeInstances = new EDACCExtWarningErrorDialog(mainFrame, true, true, tableModel,
-        //        "Do you really won't to remove the listed instances?");
-        //removeInstances.setLocationRelativeTo(mainFrame);
-        //EDACCApp.getApplication().show(removeInstances);
-        //if(EDACCExtendedWarning.){
-//            Tasks.startTask("TryToRemoveInstances", new Class[]{Vector.class, edacc.model.Tasks.class}, new Object[]{toRemove,  null}, this, this.main);
-        //      }
-        /*
-         * Vector<Instance> toRemove = new Vector<Instance>();
-        
-        for (int i = 0; i < rows.length; i++) {
-        toRemove.add((Instance )main.instanceTableModel.getValueAt(tableInstances.convertRowIndexToModel(rows[i]), 1));
-        }
-        InstanceTableModel tableModel = new InstanceTableModel();
-        tableModel.addInstances(toRemove);
-        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        EDACCExtWarningErrorDialog removeInstances = new EDACCExtWarningErrorDialog(mainFrame, true, true, tableModel,
-        "Do you really won't to remove the listed instances?");
-        removeInstances.setLocationRelativeTo(mainFrame);
-        EDACCApp.getApplication().show(removeInstances); */
         if (EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
                 EDACCApp.getApplication().getMainFrame(),
                 "Do you really want to remove the listed instances?",
@@ -191,11 +183,15 @@ public class ManageDBInstances implements Observer {
      * Remove the given rows from the instanceTableModel
      * @param rows the rows which have to be deleted
      */
-    public void TryToRemoveInstances(Vector<Instance> toRemove, Tasks task) throws NoConnectionToDBException, SQLException {
+    public void TryToRemoveInstances(Vector<Instance> toRemove, Tasks task) throws NoConnectionToDBException, SQLException, TaskCancelledException {
+        Tasks.getTaskView().setCancelable(true);
         task.setOperationName("Removing instances");
         Vector<Instance> rem = new Vector<Instance>();
         Vector<Instance> notRem = new Vector<Instance>();
         for (int i = 0; i < toRemove.size(); i++) {
+            if (task.isCancelled()) {
+                throw new TaskCancelledException();
+            }
             Instance ins = toRemove.get(i);
             try {
                 InstanceDAO.delete(ins);
@@ -213,6 +209,7 @@ public class ManageDBInstances implements Observer {
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
+        Tasks.getTaskView().setCancelable(false);
     }
 
     /**
@@ -252,12 +249,15 @@ public class ManageDBInstances implements Observer {
      */
     public void exportInstances(int[] rows, String path, Tasks task) throws IOException, NoConnectionToDBException, SQLException,
             InstanceNotInDBException, FileNotFoundException, MD5CheckFailedException,
-            NoSuchAlgorithmException {
+            NoSuchAlgorithmException, TaskCancelledException {
         task.setOperationName("Exporting instances");
-
+        Tasks.getTaskView().setCancelable(true);
         Instance temp;
         Vector<Instance> md5Error = new Vector<Instance>();
         for (int i = 0; i < rows.length; i++) {
+            if (task.isCancelled()) {
+                throw new TaskCancelledException();
+            }
             temp = (Instance) main.instanceTableModel.getInstance(tableInstances.convertRowIndexToModel(rows[i]));
 
             File f = new File(path + System.getProperty("file.separator") + temp.getName());
@@ -272,6 +272,7 @@ public class ManageDBInstances implements Observer {
                 f.delete();
             }
         }
+        Tasks.getTaskView().setCancelable(false);
 
         if (!md5Error.isEmpty()) {
             InstanceTableModel tableModel = new InstanceTableModel();
@@ -399,7 +400,7 @@ public class ManageDBInstances implements Observer {
      */
     public Vector<Instance> buildInstancesGivenClass(Vector<File> instanceFiles, InstanceClass instanceClass, Tasks task, boolean compressBinary)
             throws FileNotFoundException, NullPointerException, NullPointerException, IOException,
-            NoSuchAlgorithmException, SQLException {
+            NoSuchAlgorithmException, SQLException, TaskCancelledException {
 
         Vector<Instance> instances = new Vector<Instance>();
         String duplicatesDB = "";
@@ -411,12 +412,16 @@ public class ManageDBInstances implements Observer {
 
         task.setTaskProgress((float) 0 / (float) instanceFiles.size());
         for (int i = 0; i < instanceFiles.size(); i++) {
+            if (task.isCancelled()) {
+                throw new TaskCancelledException();
+            }
             try {
                 String md5 = calculateMD5(instanceFiles.get(i));
                 String fileName = instanceFiles.get(i).getName();
                 Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), fileName, md5);
                 instances.add(temp);
                 InstanceDAO.save(temp, compressBinary, instanceClass);
+                this.tmp.add(temp);
             } catch (InstanceAlreadyInDBException ex) {
                 errorsDB.add(instanceFiles.get(i).getAbsolutePath());
             }
@@ -424,7 +429,7 @@ public class ManageDBInstances implements Observer {
             task.setStatus("Added " + i + " instances of " + instanceFiles.size());
         }
 
-
+        setTmp(new Vector<Instance>());
         String instanceErrs = instanceErrors.toString();
         if (!errorsAdd.isEmpty()) {
             FileNameTableModel tmp = new FileNameTableModel();
@@ -460,7 +465,7 @@ public class ManageDBInstances implements Observer {
      * @throws InstanceException
      * @throws SQLException
      */
-    public Vector<Instance> buildInstancesAutogenerateClass(Vector<File> instanceFiles, File ret, Tasks task, boolean compressBinary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException, InstanceClassAlreadyInDBException, InstanceException {
+    public Vector<Instance> buildInstancesAutogenerateClass(Vector<File> instanceFiles, File ret, Tasks task, boolean compressBinary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException, InstanceClassAlreadyInDBException, InstanceException, TaskCancelledException {
 
         if (instanceFiles.isEmpty()) {
             throw new InstanceException();
@@ -476,6 +481,9 @@ public class ManageDBInstances implements Observer {
 
         //Create the instances and assigne them to their InstanceClass
         for (int i = 0; i < instanceFiles.size(); i++) {
+            if (task.isCancelled()) {
+                throw new TaskCancelledException();
+            }
             try {
                 String md5 = calculateMD5(instanceFiles.get(i));
                 try {
@@ -491,6 +499,7 @@ public class ManageDBInstances implements Observer {
                     Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, md5);
                     instances.add(temp);
                     InstanceDAO.save(temp, compressBinary, instanceClass);
+                    this.tmp.add(temp);
                 } catch (InstanceException e) {
                     errorsAdd.add(instanceFiles.get(i).getAbsolutePath());
                 }
@@ -501,7 +510,7 @@ public class ManageDBInstances implements Observer {
             task.setTaskProgress((float) i / (float) instanceFiles.size());
             task.setStatus("Added " + i + " instances of " + instanceFiles.size());
         }
-
+        setTmp(new Vector<Instance>());
         if (!errorsAdd.isEmpty()) {
             FileNameTableModel tmp = new FileNameTableModel();
             tmp.setAll(errorsAdd);
@@ -524,7 +533,7 @@ public class ManageDBInstances implements Observer {
 
     }
 
-    public Vector<Instance> buildInstancesGivenClassAutogenerate(Vector<File> instanceFiles, InstanceClass input, File ret, Tasks task, boolean compressBinary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException, InstanceClassAlreadyInDBException, InstanceException {
+    public Vector<Instance> buildInstancesGivenClassAutogenerate(Vector<File> instanceFiles, InstanceClass input, File ret, Tasks task, boolean compressBinary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, SQLException, InstanceClassAlreadyInDBException, InstanceException, TaskCancelledException {
 
         if (instanceFiles.isEmpty()) {
             throw new InstanceException();
@@ -541,6 +550,9 @@ public class ManageDBInstances implements Observer {
 
         //Create the instances and assigne them to their InstanceClass
         for (int i = 0; i < instanceFiles.size(); i++) {
+            if (task.isCancelled()) {
+                throw new TaskCancelledException();
+            }
             try {
                 String md5 = calculateMD5(instanceFiles.get(i));
                 try {
@@ -556,6 +568,7 @@ public class ManageDBInstances implements Observer {
                     Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, md5);
                     instances.add(temp);
                     InstanceDAO.save(temp, compressBinary, instanceClass);
+                    this.tmp.add(temp);
                 } catch (InstanceException e) {
                     errorsAdd.add(instanceFiles.get(i).getAbsolutePath());
                 }
@@ -567,6 +580,8 @@ public class ManageDBInstances implements Observer {
             task.setStatus("Added " + i + " instances of " + instanceFiles.size());
         }
 
+        setTmp(new Vector<Instance>());
+        
         if (!errorsAdd.isEmpty()) {
             FileNameTableModel tmp = new FileNameTableModel();
             tmp.setAll(errorsAdd);
@@ -583,9 +598,9 @@ public class ManageDBInstances implements Observer {
             EDACCExtendedWarning.showMessageDialog(
                     EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
                     "The following instances are already in the database. (Equal name or md5 hash)",
-                    new JTable(tmp));           
+                    new JTable(tmp));
         }
-        
+
         return instances;
 
     }

@@ -27,8 +27,8 @@ public class instanceGeneratorUnifKCNFController {
      * @param num number of instances per class
      * @param genClass generate instance classes
      */
-    public void generate(int k, double r, int n, boolean series, int step, int stop, int num, boolean genClass, InstanceClass parent, Tasks task) throws SQLException, InstanceClassAlreadyInDBException {
-       
+    public synchronized void generate(int k, double r, int n, boolean series, int step, int stop, int num, boolean genClass, InstanceClass parent, final Tasks task) throws SQLException, InstanceClassAlreadyInDBException, TaskCancelledException {
+        Tasks.getTaskView().setCancelable(true);
         unifRandomKSAT instance;
         InstanceDAO instanceController = new InstanceDAO();
         InstanceClass ic;
@@ -73,10 +73,14 @@ public class instanceGeneratorUnifKCNFController {
                 } catch (Exception ex) {
                     Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                if (task.isCancelled()) {
+                    throw new TaskCancelledException();
+                }
             }
         }
         task.setStatus("Generated " + steps + " of " + steps + " instances" );
         task.setTaskProgress(1);
+        Tasks.getTaskView().setCancelable(false);
 
     }
 }

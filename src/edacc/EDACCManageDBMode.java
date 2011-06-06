@@ -17,12 +17,14 @@ import edacc.model.Instance;
 import edacc.model.InstanceIsInExperimentException;
 import edacc.model.InstanceNotInDBException;
 import edacc.model.InstanceClass;
+import edacc.model.InstanceDAO;
 import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.MD5CheckFailedException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
 import edacc.model.Solver;
 import edacc.model.SolverBinaries;
+import edacc.model.TaskCancelledException;
 import edacc.model.Tasks;
 import java.awt.*;
 import java.io.File;
@@ -36,6 +38,7 @@ import java.util.LinkedList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.sound.midi.ControllerEventListener;
 import javax.swing.ImageIcon;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
@@ -1452,7 +1455,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     JOptionPane.WARNING_MESSAGE);
         } else {
             try {
-                
+
                 manageDBInstances.removeInstances(tableInstances.getSelectedRows());
                 tableInstances.clearSelection();
                 instanceTableModel.fireTableDataChanged();
@@ -1463,7 +1466,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             }
         }
         this.tableInstances.requestFocus();
-        
+
     }//GEN-LAST:event_btnRemoveInstancesActionPerformed
 
     private void btnFilterInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterInstancesActionPerformed
@@ -1844,7 +1847,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         } else {
             try {
                 manageDBInstances.RemoveInstanceClass((DefaultMutableTreeNode) jTreeInstanceClass.getSelectionPath().getLastPathComponent());
-                instanceTableModel.fireTableDataChanged();                ;
+                instanceTableModel.fireTableDataChanged();;
             } catch (InstanceIsInExperimentException ex) {
                 Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
                 //instanceClassTableModel.fireTableDataChanged();                 ;
@@ -1999,7 +2002,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     }//GEN-LAST:event_btnSelectInstanceColumnsActionPerformed
 
     private void btnSolverEditBinaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverEditBinaryActionPerformed
-       
     }//GEN-LAST:event_btnSolverEditBinaryActionPerformed
 
     private void btnSolverDeleteBinaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverDeleteBinaryActionPerformed
@@ -2343,10 +2345,24 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 JOptionPane.showMessageDialog(panelManageDBInstances,
                         "No Instances have been found.", "Error",
                         JOptionPane.WARNING_MESSAGE);
+            } else if (e instanceof TaskCancelledException) {
+                InstanceTableModel tableModel = new InstanceTableModel();
+                tableModel.addInstances(manageDBInstances.getTmp());
+                if (EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
+                        EDACCApp.getApplication().getMainFrame(),
+                        "Do you  want to remove the already added instances in the list?",
+                        new JTable(tableModel))
+                        == EDACCExtendedWarning.RET_OK_OPTION) {
+                    try {
+                        InstanceDAO.deleteAll(manageDBInstances.getTmp());
+                    } catch (SQLException ex) {
+                        Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    manageDBInstances.setTmp(new Vector<Instance>());
+                }
             }
 
-        }
-        Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, e);
+        }       
     }
 
     public void onTaskSuccessful(String methodName, Object result) {

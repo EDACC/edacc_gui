@@ -558,6 +558,7 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog implemen
 
     @Override
     public void onTaskFailed(String methodName, Throwable e) {
+        e.printStackTrace();
         if(methodName.equals("generate")){
             if(e instanceof SQLException) {
                 JOptionPane.showMessageDialog(this,
