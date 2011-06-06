@@ -37,6 +37,9 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
         jPanel1 = new javax.swing.JPanel();
         chkInstances = new javax.swing.JCheckBox();
         chkSolvers = new javax.swing.JCheckBox();
+        chkClient = new javax.swing.JCheckBox();
+        chkRunsolver = new javax.swing.JCheckBox();
+        chkConfig = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         packageFileChooser = new javax.swing.JFileChooser();
 
@@ -47,13 +50,25 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel1.border.title"))); // NOI18N
         jPanel1.setName("jPanel1"); // NOI18N
 
-        chkInstances.setSelected(true);
         chkInstances.setText(resourceMap.getString("chkInstances.text")); // NOI18N
+        chkInstances.setEnabled(false);
         chkInstances.setName("chkInstances"); // NOI18N
 
-        chkSolvers.setSelected(true);
         chkSolvers.setText(resourceMap.getString("chkSolvers.text")); // NOI18N
+        chkSolvers.setEnabled(false);
         chkSolvers.setName("chkSolvers"); // NOI18N
+
+        chkClient.setSelected(true);
+        chkClient.setText(resourceMap.getString("chkClient.text")); // NOI18N
+        chkClient.setName("chkClient"); // NOI18N
+
+        chkRunsolver.setSelected(true);
+        chkRunsolver.setText(resourceMap.getString("chkRunsolver.text")); // NOI18N
+        chkRunsolver.setName("chkRunsolver"); // NOI18N
+
+        chkConfig.setSelected(true);
+        chkConfig.setText(resourceMap.getString("chkConfig.text")); // NOI18N
+        chkConfig.setName("chkConfig"); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -63,15 +78,24 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkInstances)
-                    .addComponent(chkSolvers))
-                .addContainerGap(503, Short.MAX_VALUE))
+                    .addComponent(chkSolvers)
+                    .addComponent(chkClient)
+                    .addComponent(chkRunsolver)
+                    .addComponent(chkConfig))
+                .addContainerGap(551, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(chkInstances)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkSolvers))
+                .addComponent(chkSolvers)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkClient)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkRunsolver)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkConfig))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel2.border.title"))); // NOI18N
@@ -90,14 +114,11 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(packageFileChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(packageFileChooser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(packageFileChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(packageFileChooser, javax.swing.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -112,7 +133,7 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -132,14 +153,17 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
             }
 
             String location = packageFileChooser.getSelectedFile().getAbsolutePath() + System.getProperty("file.separator");
-            Tasks.startTask("generatePackage", new Class[]{String.class, boolean.class, boolean.class, edacc.model.Tasks.class}, new Object[]{location, chkInstances.isSelected(), chkSolvers.isSelected(), null}, expController, this);
+            Tasks.startTask("generatePackage", new Class[]{String.class, boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, edacc.model.Tasks.class}, new Object[]{location, chkInstances.isSelected(), chkSolvers.isSelected(), chkClient.isSelected(), chkRunsolver.isSelected(), chkConfig.isSelected(), null}, expController, this);
             dispose();
         } else if (evt.getActionCommand().equals("CancelSelection")) {
             dispose();
         }
     }//GEN-LAST:event_packageFileChooserActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox chkClient;
+    private javax.swing.JCheckBox chkConfig;
     private javax.swing.JCheckBox chkInstances;
+    private javax.swing.JCheckBox chkRunsolver;
     private javax.swing.JCheckBox chkSolvers;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
