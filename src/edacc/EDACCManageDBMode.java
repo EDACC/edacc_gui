@@ -1391,10 +1391,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    public void test(Tasks task) {
-        task.setStatus("lalalaaaaaa");
-        System.out.println("test");
-    }
     public void btnAddInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddInstancesActionPerformed
 
         //Starts the dialog at which the user has to choose a instance source class or the autogeneration.
@@ -1443,8 +1439,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         } catch (SQLException ex) {
             Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
         }
-        this.instanceTableModel.fireTableDataChanged();
+        jTreeInstanceClass.clearSelection();
+        tableInstances.clearSelection();
         this.instanceClassTreeModel.reload();
+        this.instanceTableModel.fireTableDataChanged();
+        
     }//GEN-LAST:event_btnAddInstancesActionPerformed
 
     private void btnRemoveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstancesActionPerformed
@@ -2363,7 +2362,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             }
 
         }
-        
+
     }
 
     public void onTaskSuccessful(String methodName, Object result) {
