@@ -2362,7 +2362,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 }
             }
 
-        }       
+        }
+        
     }
 
     public void onTaskSuccessful(String methodName, Object result) {

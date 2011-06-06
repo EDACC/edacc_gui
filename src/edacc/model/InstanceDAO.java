@@ -266,7 +266,7 @@ public class InstanceDAO {
         }
 
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idInstance,  md5, name, instanceClass_idinstanceClass FROM " + table + " WHERE idInstance=?");
+                "SELECT idInstance,  md5, name FROM " + table + " WHERE idInstance=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         Instance i = new Instance();
@@ -274,7 +274,6 @@ public class InstanceDAO {
             i.setId(rs.getInt("idInstance"));
             i.setMd5(rs.getString("md5"));
             i.setName(rs.getString("name"));
-            Integer idInstanceClass = rs.getInt("instanceClass_idinstanceClass");
             ArrayList<Instance> tmp = new ArrayList<Instance>();
             tmp.add(i);
             InstanceHasPropertyDAO.assign(tmp);
@@ -545,5 +544,20 @@ public class InstanceDAO {
         }
 
         return lastRelated;
+    }
+
+    /**
+     * 
+     * @param md5
+     * @return the instance object with the given md5 sum.
+     */
+    public static Instance getByMd5(String md5) throws SQLException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT idInstance FROM " + table + " WHERE md5=?");
+        ps.setString(1, md5);
+        ResultSet rs = ps.executeQuery();
+        if(rs.next())
+            return getById(rs.getInt(1));
+        return null;        
     }
 }
