@@ -250,7 +250,7 @@ public class ManageDBInstances implements Observer {
      */
     public void exportInstances(int[] rows, String path, Tasks task) throws IOException, NoConnectionToDBException, SQLException,
             InstanceNotInDBException, FileNotFoundException, MD5CheckFailedException,
-            NoSuchAlgorithmException, TaskCancelledException {
+            NoSuchAlgorithmException, TaskCancelledException {       
         task.setOperationName("Exporting instances");
         Tasks.getTaskView().setCancelable(true);
         Instance temp;
@@ -1059,7 +1059,8 @@ public class ManageDBInstances implements Observer {
         }
     }
 
-    public void exportInstanceClass(DefaultMutableTreeNode selected, String path, Tasks task) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException, InstanceNotInDBException {
+    public void exportInstanceClass(DefaultMutableTreeNode selected, String path, Tasks task) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException, InstanceNotInDBException, TaskCancelledException {
+        Tasks.getTaskView().setCancelable(true);
         task.setOperationName("Exporting instance classes");
         InstanceClass root = (InstanceClass) selected.getUserObject();
         Vector<InstanceClass> tmp = new Vector<InstanceClass>();
@@ -1074,6 +1075,9 @@ public class ManageDBInstances implements Observer {
 
         //Creates all files of the Instances related to the the InstanceClass
         for (int i = 0; i < toExport.size(); i++) {
+            if(task.isCancelled()){
+                throw new TaskCancelledException();
+            }
             task.setStatus(i + " of " + toExport.size() + " instances from the class " + root.getName());
             task.setTaskProgress((float) i / (float) toExport.size());
             File f = new File(dir.getAbsolutePath() + System.getProperty("file.separator")
@@ -1090,6 +1094,7 @@ public class ManageDBInstances implements Observer {
         }
         task.setStatus(toExport.size() + " of " + toExport.size() + " instances from the class " + root.getName());
         task.setTaskProgress(1);
+        Tasks.getTaskView().setCancelable(true);
         //Creates all files of the Instances related to the the childs of the InstanceClass
         for (int i = 0; i < selected.getChildCount(); i++) {
             md5Error.addAll(exportInstanceClasses((DefaultMutableTreeNode) selected.getChildAt(i), dir.getAbsolutePath(), task));
