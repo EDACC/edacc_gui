@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Vector;
@@ -1765,13 +1766,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     }//GEN-LAST:event_btnSolverRefreshActionPerformed
 
     private void btnNewInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewInstanceClassActionPerformed
-        try {
+            saveExpandedState();
             jTreeInstanceClass.setSelectionPath(null);
             manageDBInstances.addInstanceClasses();
-            manageDBInstances.loadInstanceClasses();
-        } catch (SQLException ex) {
-            Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            manageDBInstances.UpdateInstanceClasses();
+            jTreeInstanceClass.setExpandsSelectedPaths(true);
+            restoreExpandedState();
         /*tableInstanceClass.updateUI();
         unsavedChanges = true;*/
     }//GEN-LAST:event_btnNewInstanceClassActionPerformed
@@ -2460,5 +2460,29 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
     public JTree getInstanceClassTree() {
         return jTreeInstanceClass;
+    }
+    
+    private Enumeration descendantExpandedPathsBeforeDrag;
+    private TreePath selectedPathStored;
+
+    public void saveExpandedState()
+    {
+        descendantExpandedPathsBeforeDrag = jTreeInstanceClass.getExpandedDescendants( new TreePath(((DefaultMutableTreeNode)instanceClassTreeModel.getRoot()).getPath()) );
+        selectedPathStored = jTreeInstanceClass.getSelectionModel().getSelectionPath();
+    }
+
+
+    public void restoreExpandedState()
+    {
+        if( descendantExpandedPathsBeforeDrag != null )
+        {
+            for( Enumeration e = descendantExpandedPathsBeforeDrag; e.hasMoreElements(); )
+            {
+                TreePath tmpPath = (TreePath) ( e.nextElement() );
+                jTreeInstanceClass.expandPath(
+                        new TreePath( ( (DefaultMutableTreeNode) tmpPath.getLastPathComponent() ).getPath() ) );
+            }
+        }
+        jTreeInstanceClass.getSelectionModel().setSelectionPath( selectedPathStored );
     }
 }

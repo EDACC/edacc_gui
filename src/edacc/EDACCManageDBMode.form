@@ -235,7 +235,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="panelParameters" alignment="0" pref="240" max="32767" attributes="0"/>
+                          <Component id="panelParameters" alignment="0" pref="220" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
@@ -271,7 +271,7 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="1" attributes="0">
                                       <Component id="jPanel2" alignment="0" max="32767" attributes="0"/>
-                                      <Component id="jScrollPane1" alignment="0" pref="208" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane1" alignment="0" pref="188" max="32767" attributes="0"/>
                                       <Component id="panelParametersButons" alignment="1" max="32767" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -361,9 +361,9 @@
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="chkSpace" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Group type="103" alignment="1" groupAlignment="0" attributes="0">
-                                              <Component id="tfParametersName" alignment="0" pref="99" max="32767" attributes="2"/>
-                                              <Component id="tfParametersPrefix" alignment="0" pref="99" max="32767" attributes="2"/>
-                                              <Component id="tfParametersOrder" alignment="0" pref="99" max="32767" attributes="2"/>
+                                              <Component id="tfParametersName" alignment="0" pref="79" max="32767" attributes="2"/>
+                                              <Component id="tfParametersPrefix" alignment="0" pref="79" max="32767" attributes="2"/>
+                                              <Component id="tfParametersOrder" alignment="0" pref="79" max="32767" attributes="2"/>
                                               <Component id="chkMandatory" min="-2" pref="28" max="-2" attributes="0"/>
                                               <Component id="chkHasNoValue" min="-2" pref="28" max="-2" attributes="0"/>
                                           </Group>
@@ -527,7 +527,7 @@
                                   <Group type="102" alignment="1" attributes="0">
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnParametersNew" linkSize="3" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace pref="26" max="32767" attributes="0"/>
+                                      <EmptySpace max="32767" attributes="0"/>
                                       <Component id="btnParametersDelete" linkSize="3" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                   </Group>

@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Vector;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 /**
  *
@@ -21,6 +20,11 @@ import javax.swing.tree.DefaultTreeModel;
  */
 public class InstanceClassDAO {
 
+    public static DefaultMutableTreeNode getTreeCache() {
+        return treeCache;
+    }
+    private static DefaultMutableTreeNode treeCache;
+    private static DefaultMutableTreeNode tmpTreeBranch = new DefaultMutableTreeNode(null);
     protected static final String table = "instanceClass";
     private static final ObjectCache<InstanceClass> cache = new ObjectCache<InstanceClass>();
 
@@ -56,6 +60,7 @@ public class InstanceClassDAO {
         } else {
             i.setParentId(parent.getInstanceClassID());
         }
+        addToTmpTreeBranch(i, parent);
         save(i, parent);
         return i;
     }
@@ -133,7 +138,6 @@ public class InstanceClassDAO {
             instanceClass.setSaved();
             cache.cache(instanceClass);
             ps.close();
-
         } else {
             return;
         }
@@ -247,6 +251,7 @@ public class InstanceClassDAO {
                 }
             }
         }
+        treeCache = root;
         return root;
     }
 
@@ -265,6 +270,7 @@ public class InstanceClassDAO {
             }
             root.add(getNodeWithChildren(rs.getInt(1), ps));
         }
+        treeCache = root;
         return root;
     }
 
@@ -396,11 +402,60 @@ public class InstanceClassDAO {
         ResultSet rs = st.executeQuery();
         rs.next();
         Object tmp = rs.getObject(1);
-        if(tmp != null){
+        if (tmp != null) {
             String res = getCompletePathOf(rs.getInt(1));
-            return res + "\\" + getById(id).getName(); 
-        }else {
+            return res + "\\" + getById(id).getName();
+        } else {
             return "\\" + getById(id).getName();
-        }    
+        }
     }
+
+    private static void addToTmpTreeBranch(InstanceClass i, InstanceClass parent) {
+        if (parent == null) {
+            tmpTreeBranch = new DefaultMutableTreeNode(null);
+            tmpTreeBranch.add(new DefaultMutableTreeNode(i));
+        } else if (tmpTreeBranch.isLeaf()) {
+            tmpTreeBranch = new DefaultMutableTreeNode(parent);
+            tmpTreeBranch.add(new DefaultMutableTreeNode(i));
+        } else {
+            searchNodeAddChild(parent, i, tmpTreeBranch);
+        }
+    }
+
+    private static void searchNodeAddChild(InstanceClass parent, InstanceClass i, DefaultMutableTreeNode node) {
+        if (node.getUserObject() == parent) {
+            node.add(new DefaultMutableTreeNode(i));
+        } else {
+            for (int j = 0; j < node.getChildCount(); j++) {
+                searchNodeAddChild(parent, i, (DefaultMutableTreeNode) node.getChildAt(j));
+            }
+        }
+    }
+
+    public static void addTmpTreeBranchToTreeCache() {
+        if (((DefaultMutableTreeNode) tmpTreeBranch.getRoot()).getUserObject() == null) {
+            for (int i = 0; i < tmpTreeBranch.getChildCount(); i++) {
+                DefaultMutableTreeNode tmp = (DefaultMutableTreeNode) tmpTreeBranch.getChildAt(i);
+                treeCache.add(tmp);
+            }
+        } else {
+            InstanceClass parent = (InstanceClass) ((DefaultMutableTreeNode) tmpTreeBranch).getUserObject();
+            for (int i = 0; i < tmpTreeBranch.getChildCount(); i++) {
+                DefaultMutableTreeNode tmp = (DefaultMutableTreeNode) tmpTreeBranch.getChildAt(i);
+                searchInstanceClassAddChildTree(parent, tmp, treeCache);
+            }
+        }
+        tmpTreeBranch = new DefaultMutableTreeNode(null);
+    }
+
+    private static void searchInstanceClassAddChildTree(InstanceClass parent, DefaultMutableTreeNode tmpTreeBranch, DefaultMutableTreeNode treeCache) {
+        if (treeCache.getUserObject() == parent) {
+            treeCache.add(tmpTreeBranch);
+        } else {
+            for (int j = 0; j < treeCache.getChildCount(); j++) {
+                searchInstanceClassAddChildTree(parent, tmpTreeBranch, (DefaultMutableTreeNode) treeCache.getChildAt(j));
+            }
+        }
+    }
+
 }

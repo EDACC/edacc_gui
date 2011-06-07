@@ -11,6 +11,7 @@
 
 package edacc;
 
+import edacc.manageDB.ManageDBInstances;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassAlreadyInDBException;
 import edacc.model.InstanceClassDAO;
@@ -293,10 +294,10 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
                     if(!jTextArea1.getText().isEmpty())
                         description = jTextArea1.getText();                   
                     ret = InstanceClassDAO.createInstanceClass(jTextFieldName.getText(), description, parentClass);
-                   // tableModel.addClass(ret);
                     this.jTextArea1.setText("");
                     this.jTextFieldName.setText("");
                     this.dispose();
+                    
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(this,
                     "There is a Problem with the database: " + ex.getMessage(),

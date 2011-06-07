@@ -250,7 +250,7 @@ public class ManageDBInstances implements Observer {
      */
     public void exportInstances(int[] rows, String path, Tasks task) throws IOException, NoConnectionToDBException, SQLException,
             InstanceNotInDBException, FileNotFoundException, MD5CheckFailedException,
-            NoSuchAlgorithmException, TaskCancelledException {       
+            NoSuchAlgorithmException, TaskCancelledException {
         task.setOperationName("Exporting instances");
         Tasks.getTaskView().setCancelable(true);
         Instance temp;
@@ -419,7 +419,7 @@ public class ManageDBInstances implements Observer {
                 throw new TaskCancelledException();
             }
             try {
-                 md5 = calculateMD5(instanceFiles.get(i));
+                md5 = calculateMD5(instanceFiles.get(i));
                 String fileName = instanceFiles.get(i).getName();
                 Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), fileName, md5);
                 instances.add(temp);
@@ -446,13 +446,13 @@ public class ManageDBInstances implements Observer {
 
         if (!errorsDB.isEmpty()) {
             FileNameTableModel tmp = new FileNameTableModel();
-            tmp.setAll(errorsDB);       
+            tmp.setAll(errorsDB);
             if (EDACCExtendedWarning.showMessageDialog(
                     EDACCExtendedWarning.OK_CANCEL_OPTIONS, EDACCApp.getApplication().getMainFrame(),
                     "The following instances are already in the database. (Equal name or md5 hash). \\n"
                     + "Do you want to add the instances to the selected/autobuilded classes?",
                     new JTable(tmp)) == EDACCExtendedWarning.RET_OK_OPTION) {
-                for (int i = 0; i < errorsDBInstances.size(); i++ ) {
+                for (int i = 0; i < errorsDBInstances.size(); i++) {
                     InstanceHasInstanceClassDAO.createInstanceHasInstance(InstanceDAO.getByMd5(errorsDBInstances.get(i)), instanceClass);
                 }
             }
@@ -1075,7 +1075,7 @@ public class ManageDBInstances implements Observer {
 
         //Creates all files of the Instances related to the the InstanceClass
         for (int i = 0; i < toExport.size(); i++) {
-            if(task.isCancelled()){
+            if (task.isCancelled()) {
                 throw new TaskCancelledException();
             }
             task.setStatus(i + " of " + toExport.size() + " instances from the class " + root.getName());
@@ -1201,5 +1201,13 @@ public class ManageDBInstances implements Observer {
             Instance temp = InstanceDAO.getByMd5(md5);
             InstanceHasInstanceClassDAO.createInstanceHasInstance(temp, instanceClass);
         }
+    }
+
+    public void UpdateInstanceClasses() {
+        InstanceClassDAO.addTmpTreeBranchToTreeCache();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getTreeCache();
+        main.instanceClassTreeModel.setRoot(root);
+        main.getInstanceClassTree().setRootVisible(false);
+        main.instanceClassTreeModel.reload();
     }
 }
