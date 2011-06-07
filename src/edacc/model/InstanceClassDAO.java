@@ -46,7 +46,7 @@ public class InstanceClassDAO {
         ps.setString(1, name);
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
-            throw new InstanceClassAlreadyInDBException();
+            return getById(rs.getInt(1));
         }
         InstanceClass i = new InstanceClass();
         i.setName(name);

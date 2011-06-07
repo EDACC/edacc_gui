@@ -1443,7 +1443,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         tableInstances.clearSelection();
         this.instanceClassTreeModel.reload();
         this.instanceTableModel.fireTableDataChanged();
-        
+
     }//GEN-LAST:event_btnAddInstancesActionPerformed
 
     private void btnRemoveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstancesActionPerformed
@@ -1454,7 +1454,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     JOptionPane.WARNING_MESSAGE);
         } else {
             try {
-
                 manageDBInstances.removeInstances(tableInstances.getSelectedRows());
                 tableInstances.clearSelection();
                 instanceTableModel.fireTableDataChanged();
