@@ -5,7 +5,9 @@
  */
 package edacc;
 
+import edacc.model.ParameterInstanceDAO;
 import edacc.model.Solver;
+import edacc.model.SolverConfigCache;
 import edacc.model.SolverDAO;
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -15,6 +17,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -27,7 +31,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author simon
  */
-public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swing.JPanel {
+public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swing.JPanel implements Observer {
 
     private EDACCSolverConfigPanel solverConfigPanel;
     private TableModel tableModel;
@@ -103,6 +107,11 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
             }
         ));
         table.setName("table"); // NOI18N
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(table);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -116,6 +125,15 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    public void setSolverConfigCache(SolverConfigCache solverConfigCache) {
+        solverConfigCache.addObserver(this);
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        tableModel.update();
+    }
 
     private class SolverConfigDialog extends JDialog {
 
@@ -166,17 +184,17 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
     private void itemEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemEditActionPerformed
         if (table.getSelectedRow() != -1) {
             // TODO: fix
-          /*  EDACCSolverConfigEntry entry = tableModel.getEntry(table.convertRowIndexToModel(table.getSelectedRow()));
+            EDACCSolverConfigEntry entry = tableModel.getEntry(table.convertRowIndexToModel(table.getSelectedRow()));
             try {
                 EDACCSolverConfigEntry copy;
                 if (entry.getSolverConfiguration() != null) {
-                    copy = new EDACCSolverConfigEntry(entry.getSolverConfiguration());
+                    copy = new EDACCSolverConfigEntry(entry.getSolverConfiguration(), ParameterInstanceDAO.getBySolverConfig(entry.getSolverConfiguration()));
                 } else {
                     copy = new EDACCSolverConfigEntry(SolverDAO.getById(entry.getSolverId()), entry.getTitle());
                 }
                 copy.assign(entry);
                 copy.removeButtons();
-
+                copy.setParent(entry.parent);
 
                 SolverConfigDialog dialog = new SolverConfigDialog(copy);
                 dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
@@ -187,8 +205,8 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
                 }
                 dialog.dispose();
             } catch (Exception e) {
-                // TODO: error
-            }*/
+                e.printStackTrace();
+            }
         }
     }//GEN-LAST:event_itemEditActionPerformed
 
@@ -198,6 +216,14 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
         }
         tableModel.update();
     }//GEN-LAST:event_itemRemoveActionPerformed
+
+    private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
+        if (evt.getClickCount() >= 2) {
+            itemEditActionPerformed(null);
+            evt.consume();
+        }
+    }//GEN-LAST:event_tableMouseClicked
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem itemEdit;
     private javax.swing.JMenuItem itemRemove;

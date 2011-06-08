@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Observable;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -24,30 +26,50 @@ public class SolverConfigCache extends Observable {
     public synchronized ArrayList<SolverConfiguration> getAll() {
         ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
         res.addAll(solverConfigs.values());
-        Collections.sort(res, new Comparator<SolverConfiguration>() {
-
-            @Override
-            public int compare(SolverConfiguration o1, SolverConfiguration o2) {
-                return o1.getIdx() - o2.getIdx();
-            }
-        });
         return res;
     }
 
-    public synchronized SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int expId, int seed_group, String title, int idx) throws SQLException, Exception {
-        SolverConfiguration sc = SolverConfigurationDAO.createSolverConfiguration(solverBinary, expId, seed_group, title, idx);
+    public synchronized SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int expId, int seed_group, String title) throws SQLException, Exception {
+        SolverConfiguration sc = SolverConfigurationDAO.createSolverConfiguration(solverBinary, expId, seed_group, title);
         solverConfigs.put(sc.getId(), sc);
         return sc;
     }
 
-    public synchronized void markAsDeleted(SolverConfiguration sc) {
+    public synchronized void markAsDeleted(final SolverConfiguration sc) {
         sc.setDeleted();
-        setChanged();
-        notifyObservers(sc);
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                setChanged();
+                notifyObservers(sc);
+            }
+        });
     }
 
-    public synchronized void synchronize() {
-        // TODO: implement when necessary
+    public synchronized void synchronize() throws SQLException {
+        HashSet<Integer> ids = new HashSet<Integer>();
+        for (final SolverConfiguration sc : SolverConfigurationDAO.getSolverConfigurationByExperimentId(experiment.getId())) {
+            if (solverConfigs.get(sc.getId()) == null) {
+                solverConfigs.put(sc.getId(), sc);
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        setChanged();
+                        notifyObservers(sc);
+                    }
+                });
+
+            }
+            ids.add(sc.getId());
+        }
+        for (SolverConfiguration sc : solverConfigs.values()) {
+            if (!ids.contains(sc.getId())) {
+                markAsDeleted(sc);
+                solverConfigs.remove(sc.getId());
+            }
+        }
     }
 
     public synchronized void reload() throws SQLException {
@@ -56,8 +78,14 @@ public class SolverConfigCache extends Observable {
         for (SolverConfiguration sc : SolverConfigurationDAO.getSolverConfigurationByExperimentId(experiment.getId())) {
             solverConfigs.put(sc.getId(), sc);
         }
-        setChanged();
-        notifyObservers();
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                setChanged();
+                notifyObservers();
+            }
+        });
     }
 
     public synchronized void changeExperiment(Experiment experiment) throws SQLException {

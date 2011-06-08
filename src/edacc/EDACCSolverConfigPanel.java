@@ -150,7 +150,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel implements Observ
      * Removes the <code>EDACCSolverConfigPanelSolver</code> and every <code>EDACCSolverConfigEntry</code> which was generated with this solver.
      * @param o solver to be removed
      */
-    public void removeSolver(Object o) {
+    public void removeSolver(Object o, boolean markAsDeleted) {
         if (!(o instanceof Solver)) {
             return;
         }
@@ -158,7 +158,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel implements Observ
 
         for (int i = 0; i < this.getComponentCount(); i++) {
             if (((EDACCSolverConfigPanelSolver) this.getComponent(i)).getSolver().getId() == solver.getId()) {
-                ((EDACCSolverConfigPanelSolver) this.getComponent(i)).removeAll();
+                ((EDACCSolverConfigPanelSolver) this.getComponent(i)).removeAll(markAsDeleted);
                 doRepaint();
                 return;
             }
@@ -232,14 +232,18 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel implements Observ
         return res;
     }
 
-    @Override
-    public void removeAll() {
+    public void removeAll(boolean markAsDeleted) {
         while (this.getComponents().length > 0) {
             EDACCSolverConfigPanelSolver entry = (EDACCSolverConfigPanelSolver) this.getComponent(0);
             entry.removeAll();
             this.remove(entry);
         }
         doRepaint();
+    }
+    
+    @Override
+    public void removeAll() {
+        removeAll(false);
     }
 
     public SolverTableModel getSolTableModel() {
@@ -281,12 +285,11 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel implements Observ
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 
-    
     public void setSolverConfigCache(SolverConfigCache solverConfigs) {
         this.solverConfigs = solverConfigs;
         solverConfigs.addObserver(this);
     }
-    
+
     @Override
     public void update(Observable o, Object arg) {
         if (arg == null) {
@@ -300,7 +303,27 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel implements Observ
                 }
             }
         } else {
-            // TODO: implement?
+            if (arg instanceof SolverConfiguration) {
+                SolverConfiguration sc = (SolverConfiguration) arg;
+                if (!solverConfigs.isDeleted(sc)) {
+                    try {
+                        addSolverConfiguration(sc);
+                    } catch (SQLException ex) {
+                        // no one wants to catch this one
+                    }
+                } else {
+                    for (EDACCSolverConfigPanelSolver scp : this.getAllSolverConfigSolverPanels()) {
+                        if (scp.getSolver().getId() == sc.getSolverBinary().getIdSolver()) {
+                            for (EDACCSolverConfigEntry entry : scp.getAllSolverConfigEntries()) {
+                                if (entry.getSolverConfiguration() != null && entry.getSolverConfiguration().getId() == sc.getId()) {
+                                    entry.btnRemove();
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
         }
     }
 

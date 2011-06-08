@@ -93,6 +93,13 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
      * @throws SQLException
      */
     public final void addSolverConfiguration(SolverConfiguration solverConfiguration, boolean useSolverConfiguration) throws SQLException {
+        if (useSolverConfiguration) {
+            for (EDACCSolverConfigEntry entry : this.getAllSolverConfigEntries()) {
+                if (entry.getSolverConfiguration().getId() == solverConfiguration.getId()) {
+                    return;
+                }
+            }
+        }
         EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solverConfiguration, parent.getSolverConfigs().getSolverConfigurationParameters(solverConfiguration));
         entry.setParent(this);
         if (!useSolverConfiguration) {
@@ -112,7 +119,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
      * @throws SQLException
      */
     public void replicateEntry(EDACCSolverConfigEntry entry) throws SQLException {
-        EDACCSolverConfigEntry repl = new EDACCSolverConfigEntry(SolverDAO.getById(entry.getSolverId()), this.getComponentCount()+1);
+        EDACCSolverConfigEntry repl = new EDACCSolverConfigEntry(SolverDAO.getById(entry.getSolverId()), this.getComponentCount() + 1);
         repl.setParent(this);
         repl.assign(entry);
         int pos = 0;
@@ -135,7 +142,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
                 break;
             }
         }
-        this.add(toAdd, pos+1);
+        this.add(toAdd, pos + 1);
         setGridBagConstraints();
         doRepaint();
     }
@@ -145,8 +152,8 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
      * it is marked as deleted.
      * @param entry
      */
-    public void removeEntry(EDACCSolverConfigEntry entry) {
-        if (entry.getSolverConfiguration() != null) {
+    public void removeEntry(EDACCSolverConfigEntry entry, boolean markAsDeleted) {
+        if (markAsDeleted && entry.getSolverConfiguration() != null) {
             parent.getSolverConfigs().markAsDeleted(entry.getSolverConfiguration());
         }
         this.remove(entry);
@@ -213,12 +220,11 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
         if (parent.getSolverConfigs().isModified()) {
             return true;
         }
-        int idx = 0;
         // checks for changed entries
         for (Component comp : this.getComponents()) {
             if (comp instanceof EDACCSolverConfigEntry) {
                 EDACCSolverConfigEntry entry = (EDACCSolverConfigEntry) comp;
-                if (entry.isModified(idx++)) {
+                if (entry.isModified()) {
                     return true;
                 }
             }
@@ -237,7 +243,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
         for (Component comp : this.getComponents()) {
             if (comp instanceof EDACCSolverConfigEntry) {
                 EDACCSolverConfigEntry entry = (EDACCSolverConfigEntry) comp;
-                if (entry.isModified(-1) && entry.getSolverConfiguration() != null && !parent.getSolverConfigs().isDeleted(entry.getSolverConfiguration())) {
+                if (entry.isModified() && entry.getSolverConfiguration() != null && !parent.getSolverConfigs().isDeleted(entry.getSolverConfiguration())) {
                     res.add(entry.getSolverConfiguration());
                 }
             }
@@ -269,18 +275,22 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    public void removeAll(boolean markAsDeleted) {
+        while (this.getComponents().length > 0) {
+            removeEntry((EDACCSolverConfigEntry) this.getComponent(0), markAsDeleted);
+        }        
+    }
+    
     @Override
     public void removeAll() {
-        while (this.getComponents().length > 0) {
-            removeEntry((EDACCSolverConfigEntry) this.getComponent(0));
-        }
+        removeAll(false);
     }
 
     public ArrayList<EDACCSolverConfigEntry> getAllSolverConfigEntries() {
         ArrayList<EDACCSolverConfigEntry> res = new ArrayList<EDACCSolverConfigEntry>();
         for (Component c : this.getComponents()) {
             if (c instanceof EDACCSolverConfigEntry) {
-                res.add((EDACCSolverConfigEntry)c);
+                res.add((EDACCSolverConfigEntry) c);
             }
         }
         return res;

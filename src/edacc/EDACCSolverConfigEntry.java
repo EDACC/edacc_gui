@@ -48,7 +48,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     private TitledBorder border;
     protected SolverConfiguration solverConfiguration;
     protected Solver solver;
-    private EDACCSolverConfigPanelSolver parent;
+    protected EDACCSolverConfigPanelSolver parent;
     private boolean updateTableColumnWidth;
 
     private EDACCSolverConfigEntry(int solverId) throws SQLException {
@@ -508,7 +508,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
 
     @Action
     public void btnRemove() {
-        parent.removeEntry(this);
+        parent.removeEntry(this, true);
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEditName;
@@ -548,7 +548,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
      * @param idx the idx to check the equality. If <code>idx == -1</code> the idx and name of the solver configuration will not be checked
      * @return <code>true</code>, if and only if data is unsaved, false otherwise
      */
-    public boolean isModified(int idx) {
+    public boolean isModified() {
         int seedGroup = 0;
         try {
             seedGroup = Integer.parseInt(txtSeedGroup.getText());
@@ -557,7 +557,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         }
         if (solverConfiguration == null
                 || solverConfiguration.getSeed_group() != seedGroup
-                || (idx != -1 && (!border.getTitle().equals(solverConfiguration.getName()) || solverConfiguration.getIdx() != idx))
+                || !border.getTitle().equals(solverConfiguration.getName())
                 || solverConfiguration.getSolverBinary() != this.getSolverBinary()) {
             return true;
         }

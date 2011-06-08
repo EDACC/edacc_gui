@@ -95,7 +95,7 @@ public class ExperimentController {
     // caching experiments
     private ExperimentResultCache experimentResultCache;
     // caching solver configs
-    private SolverConfigCache solverConfigCache;
+    public SolverConfigCache solverConfigCache;
     public static Property PROP_CPUTIME;
 
     /**
@@ -180,6 +180,7 @@ public class ExperimentController {
         } else {
             solverConfigCache = new SolverConfigCache(activeExperiment);
             solverConfigPanel.setSolverConfigCache(solverConfigCache);
+            main.solverConfigTablePanel.setSolverConfigCache(solverConfigCache);
             solverConfigCache.reload();
         }
 
@@ -283,7 +284,7 @@ public class ExperimentController {
         boolean yta = false;
         for (EDACCSolverConfigPanelSolver solPanel : solverConfigPanel.getAllSolverConfigSolverPanels()) {
             for (EDACCSolverConfigEntry entry : solPanel.getAllSolverConfigEntries()) {
-                if (entry.isModified(-1) && entry.hasEmptyValues()) {
+                if (entry.isModified() && entry.hasEmptyValues()) {
                     String[] options = {"Yes", "Yes to all", "No"};
                     int userinput = JOptionPane.showOptionDialog(Tasks.getTaskView(),
                             "The solver configuration " + entry.getTitle() + " has no value for a parameter which must have a value.\nDo you want to continue?",
@@ -366,7 +367,6 @@ public class ExperimentController {
 
         for (EDACCSolverConfigPanelSolver solPanel : solverConfigPanel.getAllSolverConfigSolverPanels()) {
             // iterate over solvers
-            int idx = 0;
             for (EDACCSolverConfigEntry entry : solPanel.getAllSolverConfigEntries()) {
                 // iterate over solver configs
                 int seed_group = 0;
@@ -378,16 +378,14 @@ public class ExperimentController {
                     invalidSeedGroup = true;
                 }
                 if (entry.getSolverConfiguration() == null) {
-                    entry.setSolverConfiguration(solverConfigCache.createSolverConfiguration(entry.getSolverBinary(), activeExperiment.getId(), seed_group, entry.getTitle(), idx));
+                    entry.setSolverConfiguration(solverConfigCache.createSolverConfiguration(entry.getSolverBinary(), activeExperiment.getId(), seed_group, entry.getTitle()));
                 } else {
                     entry.getSolverConfiguration().setSolverBinary(entry.getSolverBinary());
                     entry.getSolverConfiguration().setName(entry.getTitle());
                     entry.getSolverConfiguration().setSeed_group(seed_group);
-                    entry.getSolverConfiguration().setIdx(idx);
 
                 }
                 entry.saveParameterInstances();
-                idx++;
             }
         }
         solverConfigCache.saveAll();
@@ -1469,14 +1467,7 @@ public class ExperimentController {
             // save solver configurations which doesn't exist
             for (SolverConfiguration sc : selectedSolverConfigs) {
                 if (!mapHisScToMySc.containsKey(sc.getId())) {
-                    // find the index: high(idx)+1
-                    int idx = 0;
-                    for (SolverConfiguration sc2 : solverConfigCache.getAll()) {
-                        if (sc2.getSolverBinary().getIdSolver() == sc.getSolverBinary().getIdSolver()) {
-                            idx++;
-                        }
-                    }
-                    SolverConfiguration sc2 = solverConfigCache.createSolverConfiguration(sc.getSolverBinary(), activeExperiment.getId(), seed_group++, sc.getName(), idx);
+                    SolverConfiguration sc2 = solverConfigCache.createSolverConfiguration(sc.getSolverBinary(), activeExperiment.getId(), seed_group++, sc.getName());
                     for (ParameterInstance pi : ParameterInstanceDAO.getBySolverConfig(sc)) {
                         ParameterInstanceDAO.createParameterInstance(pi.getParameter_id(), sc2, pi.getValue());
                     }
@@ -1541,7 +1532,6 @@ public class ExperimentController {
             }
             DatabaseConnector.getInstance().getConn().setAutoCommit(true);
         } catch (Exception ex) {
-            ex.printStackTrace();
             DatabaseConnector.getInstance().getConn().rollback();
             DatabaseConnector.getInstance().getConn().setAutoCommit(true);
             throw ex;
@@ -1551,6 +1541,9 @@ public class ExperimentController {
 
     public boolean hasGridQueuesAssigned() {
         try {
+            if (activeExperiment == null) {
+                return false;
+            }
             return !ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(activeExperiment).isEmpty();
         } catch (SQLException ex) {
             return false;

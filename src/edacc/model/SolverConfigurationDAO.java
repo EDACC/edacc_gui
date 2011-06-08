@@ -14,8 +14,8 @@ public class SolverConfigurationDAO {
 
     private static final String table = "SolverConfig";
     private static final String deleteQuery = "DELETE FROM " + table + " WHERE idSolverConfig=?";
-    private static final String insertQuery = "INSERT INTO " + table + " (SolverBinaries_IdSolverBinary, Experiment_IdExperiment, seed_group, name, idx) VALUES (?,?,?,?,?)";
-    private static final String updateQuery = "UPDATE " + table + " SET SolverBinaries_IdSolverBinary = ?, seed_group=?, name=?, idx=? WHERE idSolverConfig=?";
+    private static final String insertQuery = "INSERT INTO " + table + " (SolverBinaries_IdSolverBinary, Experiment_IdExperiment, seed_group, name) VALUES (?,?,?,?)";
+    private static final String updateQuery = "UPDATE " + table + " SET SolverBinaries_IdSolverBinary = ?, seed_group=?, name=? WHERE idSolverConfig=?";
     public static ObjectCache<SolverConfiguration> cache = new ObjectCache<SolverConfiguration>();
 
     private static SolverConfiguration getSolverConfigurationFromResultset(ResultSet rs) throws SQLException {
@@ -25,7 +25,6 @@ public class SolverConfigurationDAO {
         i.setId(rs.getInt("IdSolverConfig"));
         i.setSeed_group(rs.getInt("seed_group"));
         i.setName(rs.getString("name"));
-        i.setIdx(rs.getInt("idx"));
         return i;
     }
 
@@ -41,7 +40,6 @@ public class SolverConfigurationDAO {
             st.setInt(2, i.getExperiment_id());
             st.setInt(3, i.getSeed_group());
             st.setString(4, i.getName());
-            st.setInt(5, i.getIdx());
             st.executeUpdate();
             ResultSet generatedKeys = st.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -54,8 +52,7 @@ public class SolverConfigurationDAO {
             st.setInt(1, i.getSolverBinary().getIdSolverBinary());
             st.setInt(2, i.getSeed_group());
             st.setString(3, i.getName());
-            st.setInt(4, i.getIdx());
-            st.setInt(5, i.getId());
+            st.setInt(4, i.getId());
             st.executeUpdate();
             i.setSaved();
         }
@@ -73,7 +70,7 @@ public class SolverConfigurationDAO {
         solverConfig.setDeleted();
     }
 
-    public static SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int experimentId, int seed_group, String name, int idx) throws SQLException, Exception {
+    public static SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int experimentId, int seed_group, String name) throws SQLException, Exception {
         if (solverBinary == null) {
             throw new Exception("Solver binary missing.");
         }
@@ -82,7 +79,6 @@ public class SolverConfigurationDAO {
         i.setExperiment_id(experimentId);
         i.setSeed_group(seed_group);
         i.setName(name);
-        i.setIdx(idx);
         save(i);
         cache.cache(i);
         return i;
@@ -91,7 +87,7 @@ public class SolverConfigurationDAO {
     public static ArrayList<SolverConfiguration> getSolverConfigurationByExperimentId(int experimentId) throws SQLException {
         ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
         // TODO: was ordered by solver id, has it to be ordered by solver id?
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Experiment_IdExperiment=? ORDER BY idx");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Experiment_IdExperiment=?");
         st.setInt(1, experimentId);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {

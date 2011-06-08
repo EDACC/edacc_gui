@@ -17,6 +17,7 @@ import edacc.experiment.ExperimentUpdateThread;
 import edacc.experiment.GenerateJobsTableModel;
 import edacc.experiment.InstanceTableModel;
 import edacc.experiment.ResultsBrowserTableRowSorter;
+import edacc.experiment.SolverConfigUpdateThread;
 import edacc.experiment.SolverConfigurationTableModel;
 import edacc.experiment.SolverConfigurationTableRowFilter;
 import edacc.experiment.SolverTableModel;
@@ -112,7 +113,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private ResultsBrowserTableRowSorter resultsBrowserTableRowSorter;
     public GenerateJobsTableModel generateJobsTableModel;
     private ClientTableModel clientTableModel;
-    private EDACCExperimentModeSolverConfigurationTablePanel solverConfigTablePanel;
+    public EDACCExperimentModeSolverConfigurationTablePanel solverConfigTablePanel;
     private AnalysisPanel analysePanel;
     private Timer jobsTimer = null;
     private Integer resultBrowserETA;
@@ -121,8 +122,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private boolean tableExperimentsWasEditing = false;
     private ExperimentUpdateThread experimentUpdateThread;
     private ClientUpdateThread clientUpdateThread;
+    private SolverConfigUpdateThread solverConfigUpdateThread;
     public SolverConfigurationTableModel solverConfigTableModel;
     public SolverConfigurationTableRowFilter solverConfigurationTableRowFilter;
+    
 
     /** Creates new form EDACCExperimentMode */
     @SuppressWarnings("LeakingThisInConstructor")
@@ -411,6 +414,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         if (clientUpdateThread != null) {
             clientUpdateThread.cancel(true);
+        }
+        if (solverConfigUpdateThread != null) {
+            solverConfigUpdateThread.cancel(true);
         }
         expController.unloadExperiment();
         reinitializeExperiments();
@@ -1607,6 +1613,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 splitPaneSolver.setDividerLocation(0.5);
 
                 edacc.experiment.Util.updateTableColumnWidth(tableSolvers);
+                if (solverConfigUpdateThread == null || solverConfigUpdateThread.isDone()) {
+                    solverConfigUpdateThread = new SolverConfigUpdateThread(expController.solverConfigCache);
+                }
+                solverConfigUpdateThread.execute();
                 break;
             case TAB_INSTANCES:
                 instanceFilter.setFilterInstanceClasses(false);
@@ -1702,6 +1712,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         if (clientUpdateThread != null && manageExperimentPane.getSelectedIndex() != TAB_CLIENTBROWSER) {
             clientUpdateThread.cancel(true);
+        }
+        if (solverConfigUpdateThread != null && manageExperimentPane.getSelectedIndex() != TAB_SOLVERS) {
+            solverConfigUpdateThread.cancel(true);
         }
     }//GEN-LAST:event_manageExperimentPaneStateChanged
 
@@ -2150,7 +2163,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             if (solTableModel.isSelected(i) && !solverConfigPanel.solverExists(solTableModel.getSolver(i).getId())) {
                 solverConfigPanel.addSolver(solTableModel.getSolver(i));
             } else if (!solTableModel.isSelected(i)) {
-                solverConfigPanel.removeSolver(solTableModel.getSolver(i));
+                solverConfigPanel.removeSolver(solTableModel.getSolver(i), true);
             }
         }
         solverConfigPanel.endUpdate();
