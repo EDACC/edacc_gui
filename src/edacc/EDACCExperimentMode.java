@@ -34,7 +34,6 @@ import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.ObjectCache;
 import edacc.model.PropertyNotInDBException;
-import edacc.model.Solver;
 import edacc.model.SolverBinaries;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
@@ -59,15 +58,11 @@ import java.util.Observer;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.RowFilter;
-import javax.swing.RowFilter.Entry;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
@@ -2058,7 +2053,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             return;
         }
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        final EDACCExperimentModeNewExp dialogNewExp = new EDACCExperimentModeNewExp(mainFrame, true, expController);
+        final EDACCExperimentModeNewExp dialogNewExp = new EDACCExperimentModeNewExp(mainFrame, true);
         dialogNewExp.setLocationRelativeTo(mainFrame);
         try {
             while (true) {
@@ -2075,8 +2070,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
             }
             if (!dialogNewExp.canceled) {
-                final ArrayList<Integer> selectedSolverConfigIds = dialogNewExp.getSelectedSolverConfigIds();
-                final ArrayList<Boolean> duplicate = dialogNewExp.getDuplicateListForSelectedSolverConfigs();
                 Tasks.startTask(new TaskRunnable() {
 
                     @Override
@@ -2100,10 +2093,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                         }
                         try {
                             expController.loadExperiment(newExp, task);
-                            if (!selectedSolverConfigIds.isEmpty()) {
-                                expController.importDataFromSolverConfigurations(task, selectedSolverConfigIds, duplicate);
-                                expController.loadExperiment(newExp, task);
-                            }
                         } catch (Exception e) {
                             javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Error while importing data", javax.swing.JOptionPane.ERROR_MESSAGE);
                         } finally {
@@ -2537,7 +2526,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Override
     public void onTaskFailed(String methodName, Throwable e) {
-        e.printStackTrace();
         if (e instanceof TaskCancelledException) {
             javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         } else if (e instanceof SQLException) {
@@ -2662,7 +2650,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
 
         Experiment exp = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
-        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription(), expController);
+        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription());
         dialogEditExp.setLocationRelativeTo(mainFrame);
         try {
             while (true) {
