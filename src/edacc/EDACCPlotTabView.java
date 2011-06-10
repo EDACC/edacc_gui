@@ -74,6 +74,7 @@ public class EDACCPlotTabView extends javax.swing.JFrame {
     /** Creates new form EDACCPlotTabView */
     public EDACCPlotTabView() {
         initComponents();
+        lblCoordinates.setText("");
         this.setSize(new Dimension(800, 600));
         addWindowListener(new WindowAdapter() {
 
