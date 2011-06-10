@@ -47,6 +47,9 @@
         <Property name="text" type="java.lang.String" resourceKey="txtRegexp.text"/>
         <Property name="name" type="java.lang.String" value="txtRegexp" noResource="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtRegexpKeyReleased"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

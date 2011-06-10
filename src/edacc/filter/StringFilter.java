@@ -5,6 +5,8 @@
  */
 package edacc.filter;
 
+import java.awt.event.KeyListener;
+
 /**
  * This class implements a filter for strings by using regular expressions.
  * @author simon
@@ -38,6 +40,11 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
 
         txtRegexp.setText(resourceMap.getString("txtRegexp.text")); // NOI18N
         txtRegexp.setName("txtRegexp"); // NOI18N
+        txtRegexp.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtRegexpKeyReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -55,6 +62,12 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
                 .addComponent(lblName))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void txtRegexpKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtRegexpKeyReleased
+        for (KeyListener listener : getKeyListeners()) {
+            listener.keyReleased(evt);
+        }
+    }//GEN-LAST:event_txtRegexpKeyReleased
 
     @Override
     public boolean include(Object value) {

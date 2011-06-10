@@ -5,6 +5,9 @@
  */
 package edacc.filter;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
 /**
  * This class implements a filter for numbers (Integer, Float, Double).
  * @author simon
@@ -51,6 +54,11 @@ public class NumberFilter extends javax.swing.JPanel implements FilterInterface 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(NumberFilter.class);
         txtValue.setText(resourceMap.getString("txtValue.text")); // NOI18N
         txtValue.setName("txtValue"); // NOI18N
+        txtValue.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtValueKeyReleased(evt);
+            }
+        });
 
         comboOperator.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         comboOperator.setName("comboOperator"); // NOI18N
@@ -77,6 +85,12 @@ public class NumberFilter extends javax.swing.JPanel implements FilterInterface 
                 .addComponent(txtValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void txtValueKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtValueKeyReleased
+        for (KeyListener listener : getKeyListeners()) {
+            listener.keyReleased(evt);
+        }
+    }//GEN-LAST:event_txtValueKeyReleased
 
     @Override
     public boolean include(Object value) {

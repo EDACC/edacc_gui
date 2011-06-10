@@ -7,12 +7,16 @@ package edacc;
 
 import edacc.filter.ArgumentPanel;
 import edacc.filter.BooleanFilter;
+import edacc.filter.FilterInterface;
 import edacc.filter.NumberFilter;
 import edacc.filter.Parser;
 import edacc.filter.StringFilter;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
@@ -270,6 +274,11 @@ public class EDACCFilter extends javax.swing.JDialog {
 
         txtExpression.setText(resourceMap.getString("txtExpression.text")); // NOI18N
         txtExpression.setName("txtExpression"); // NOI18N
+        txtExpression.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtExpressionKeyReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -331,6 +340,13 @@ public class EDACCFilter extends javax.swing.JDialog {
         btnDismiss();
     }//GEN-LAST:event_formComponentHidden
 
+    private void txtExpressionKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtExpressionKeyReleased
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            evt.consume();
+            btnApply();
+        }
+    }//GEN-LAST:event_txtExpressionKeyReleased
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnApply;
@@ -379,13 +395,33 @@ public class EDACCFilter extends javax.swing.JDialog {
         if (comboFilterTypes.getSelectedItem() instanceof FilterType) {
             // find out which filter to use, construct it and add it to the panel.
             FilterType filterType = (FilterType) comboFilterTypes.getSelectedItem();
+            FilterInterface filter = null;
             if (filterType.clazz == Integer.class || filterType.clazz == Float.class || filterType.clazz == Double.class) {
-                pnlArguments.add(new ArgumentPanel(this, new NumberFilter(filterType.name), argNum, filterType.column));
+                filter = new NumberFilter(filterType.name);
             } else if (filterType.clazz == String.class) {
-                pnlArguments.add(new ArgumentPanel(this, new StringFilter(filterType.name), argNum, filterType.column));
+                filter = new StringFilter(filterType.name);
             } else if (filterType.clazz == Boolean.class) {
-                pnlArguments.add(new ArgumentPanel(this, new BooleanFilter(filterType.name), argNum, filterType.column));
+                filter = new BooleanFilter(filterType.name);
             }
+            if (filter == null) {
+                return;
+            }
+            // add key listener for VK_ENTER event on textfields
+            if (filter instanceof Component) {
+                ((Component) filter).addKeyListener(new KeyAdapter() {
+
+                    @Override
+                    public void keyReleased(KeyEvent e) {
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                            e.consume();
+                            btnApply();
+                        }
+                    }
+                    
+                });
+            }
+            
+            pnlArguments.add(new ArgumentPanel(this, filter, argNum, filterType.column));
             // replace the expression by `$argNum` iff the current expression will always validate to true
             // add `&& $argNum` to the expression iff there is currently a valid expression and this expression will not always validate to true
             try {
