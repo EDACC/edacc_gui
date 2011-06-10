@@ -848,7 +848,7 @@ public class ExperimentController {
                     }
                     task.setStatus("Writing instance " + (done - solvers.size()) + " of " + instances.size());
                     File f = InstanceDAO.getBinaryFileOfInstance(i);
-                    entry = new ZipEntry("instances" + System.getProperty("file.separator") + i.getName());
+                    entry = new ZipEntry("instances" + System.getProperty("file.separator") + i.getMd5() + "_" + i.getName());
                     addFileToZIP(f, entry, zos);
                 }
             }

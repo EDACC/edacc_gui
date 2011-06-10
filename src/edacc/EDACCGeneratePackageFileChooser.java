@@ -51,7 +51,6 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
         jPanel1.setName("jPanel1"); // NOI18N
 
         chkInstances.setText(resourceMap.getString("chkInstances.text")); // NOI18N
-        chkInstances.setEnabled(false);
         chkInstances.setName("chkInstances"); // NOI18N
 
         chkSolvers.setText(resourceMap.getString("chkSolvers.text")); // NOI18N

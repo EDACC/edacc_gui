@@ -1791,7 +1791,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     private void btnGeneratePackage(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGeneratePackage
         EDACCGeneratePackageFileChooser packageFileChooser = new EDACCGeneratePackageFileChooser(EDACCApp.getApplication().getMainFrame(), true, expController);
-        packageFileChooser.setVisible(true);
+        packageFileChooser.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+        packageFileChooser.setName("EDACCGeneratePackageFileChooser");
+        EDACCApp.getApplication().show(packageFileChooser);
 }//GEN-LAST:event_btnGeneratePackage
 
     private void btnSetNumRunsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSetNumRunsActionPerformed
