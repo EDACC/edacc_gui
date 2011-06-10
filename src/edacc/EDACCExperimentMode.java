@@ -1824,6 +1824,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         ObjectCache<SolverConfiguration> cache = SolverConfigurationDAO.cache;
         SolverConfigurationDAO.cache = new ObjectCache<SolverConfiguration>();
         EDACCExperimentModeImportSolverConfigs dialog = new EDACCExperimentModeImportSolverConfigs(EDACCApp.getApplication().getMainFrame(), true, expController);
+        dialog.setName("EDACCExperimentModeImportSolverConfigs");
         dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         EDACCApp.getApplication().show(dialog);
         SolverConfigurationDAO.cache = cache;
@@ -2212,7 +2213,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     });
                 } finally {
                     if (jScrollPane4.getViewport().getView() == solverConfigTablePanel) {
-                        solverConfigTablePanel.update();
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                solverConfigTablePanel.update();
+                            }
+                            
+                        });
+                        
                     }
                 }
             }

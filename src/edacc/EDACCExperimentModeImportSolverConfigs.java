@@ -31,6 +31,7 @@ public class EDACCExperimentModeImportSolverConfigs extends javax.swing.JDialog 
     /** Creates new form EDACCExperimentModeImportSolverConfigs */
     public EDACCExperimentModeImportSolverConfigs(java.awt.Frame parent, boolean modal, ExperimentController expController) {
         super(parent, modal);
+        
         cancelled = true;
         selectedSolverConfigs = new ArrayList<SolverConfiguration>();
         experimentTableModel = new ExperimentTableModel(true);
@@ -78,12 +79,13 @@ public class EDACCExperimentModeImportSolverConfigs extends javax.swing.JDialog 
         btnCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentModeImportSolverConfigs.class);
+        setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
 
         jSplitPane1.setDividerLocation(400);
         jSplitPane1.setName("jSplitPane1"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentModeImportSolverConfigs.class);
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel1.border.title"))); // NOI18N
         jPanel1.setName("jPanel1"); // NOI18N
 

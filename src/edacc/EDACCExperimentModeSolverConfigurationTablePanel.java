@@ -141,6 +141,8 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
 
         public SolverConfigDialog(EDACCSolverConfigEntry entry) {
             super();
+            
+            setTitle("Edit Solver Configuration");
             JButton btnCancel = new JButton("Cancel");
             JButton btnApply = new JButton("Apply");
             apply = false;
