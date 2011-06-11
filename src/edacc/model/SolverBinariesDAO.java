@@ -18,6 +18,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -188,5 +189,28 @@ public class SolverBinariesDAO {
         if (rs.next())
             return rs.getBinaryStream("binaryArchive");
         return null;
+    }
+    
+     public static ArrayList<SolverBinaries> getSolverBinariesInExperiment(Experiment experiment) throws SQLException {
+        final String query = "SELECT DISTINCT idSolverBinary, idSolver, binaryName, md5, version, runCommand, runPath FROM " + TABLE + " "
+                + "JOIN SolverConfig ON (idSolverBinary = SolverBinaries_idSolverBinary) "
+                + "WHERE Experiment_idExperiment = ?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, experiment.getId());
+        ResultSet rs = ps.executeQuery();
+        ArrayList<SolverBinaries> res = new ArrayList<SolverBinaries>();
+        while (rs.next()) {
+            SolverBinaries c = cache.getCached(rs.getInt("idSolverBinary"));
+            if (c != null)
+                res.add(c);
+            else {
+                SolverBinaries b = getSolverBinaryFromResultSet(rs);
+                cache.cache(b);
+                res.add(b);
+                b.setSaved();
+            }
+        }
+        rs.close();
+        return res;
     }
 }

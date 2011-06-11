@@ -92,7 +92,6 @@
         <Component class="javax.swing.JCheckBox" name="chkSolvers">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="chkSolvers.text"/>
-            <Property name="enabled" type="boolean" value="false"/>
             <Property name="name" type="java.lang.String" value="chkSolvers" noResource="true"/>
           </Properties>
         </Component>

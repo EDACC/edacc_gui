@@ -44,6 +44,7 @@ import edacc.model.SolverConfiguration;
 import edacc.model.SolverDAO;
 import edacc.model.PropertyNotInDBException;
 import edacc.model.ResultCodeDAO;
+import edacc.model.SolverBinaries;
 import edacc.model.SolverBinariesDAO;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.StatusCodeNotInDBException;
@@ -76,6 +77,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -786,11 +788,11 @@ public class ExperimentController {
 
 
             task.setOperationName("Generating Package " + (++count) + " of " + eqs.size());
-            ArrayList<Solver> solvers;
+            ArrayList<SolverBinaries> solverBinaries;
             if (exportSolvers) {
-                solvers = ExperimentDAO.getSolversInExperiment(activeExperiment);
+                solverBinaries = SolverBinariesDAO.getSolverBinariesInExperiment(activeExperiment);
             } else {
-                solvers = new ArrayList<Solver>();
+                solverBinaries = new ArrayList<SolverBinaries>();
             }
 
             LinkedList<Instance> instances;
@@ -800,40 +802,36 @@ public class ExperimentController {
                 instances = new LinkedList<Instance>();
             }
 
-            int total = solvers.size() + instances.size();
+            int total = solverBinaries.size() + instances.size();
             int done = 0;
-
-
-            /* TODO !!!! HashSet<String> tmp = new HashSet<String>();
-            HashSet<String> solvernameMap = new HashSet<String>();
-            for (Solver s : solvers) {
-            if (tmp.contains(s.getBinaryName() + "_" + s.getVersion())) {
-            solvernameMap.add(s.getBinaryName() + "_" + s.getVersion());
-            foundSolverWithSameName = true;
-            } else {
-            tmp.add(s.getBinaryName() + "_" + s.getVersion());
-            }
-            }*/
 
             if (!task.isCancelled() && exportSolvers) {
                 // add solvers to zip file
-                for (Solver s : solvers) {
+                for (SolverBinaries binary : solverBinaries) {
                     done++;
                     task.setTaskProgress((float) done / (float) total);
                     if (task.isCancelled()) {
                         task.setStatus("Cancelled");
                         break;
                     }
-                    task.setStatus("Writing solver " + done + " of " + solvers.size());
-                    /* TODO     File bin = SolverDAO.getBinaryFileOfSolver(s);
-                    String filename;
-                    if (solvernameMap.contains(s.getBinaryName())) {
-                    filename = s.getBinaryName() + "_" + s.getVersion() + "_" + s.getMd5().substring(0, 3);
-                    } else {
-                    filename = s.getBinaryName() + "_" + s.getVersion();
+                    task.setStatus("Writing solver " + done + " of " + solverBinaries.size());
+                    ZipInputStream zis = new ZipInputStream(SolverBinariesDAO.getZippedBinaryFile(binary));
+                    ZipEntry entryIn;
+                    byte[] buffer = new byte[4*1024];
+                    while ((entryIn = zis.getNextEntry()) != null) {
+                        if (entryIn.isDirectory()) {
+                            continue;
+                        }
+                        entry = new ZipEntry("solvers" + System.getProperty("file.separator") + binary.getMd5()  + System.getProperty("file.separator") + entryIn.getName());
+                        zos.putNextEntry(entry);
+                        
+                        int read;
+                        while ((read = zis.read(buffer, 0, buffer.length)) != -1) {
+                            zos.write(buffer, 0, read);
+                        }
+                        
+                        zos.closeEntry();
                     }
-                    entry = new ZipEntry("solvers" + System.getProperty("file.separator") + filename);
-                    addFileToZIP(bin, entry, zos);*/
                 }
             }
 
@@ -846,7 +844,7 @@ public class ExperimentController {
                         task.setStatus("Cancelled");
                         break;
                     }
-                    task.setStatus("Writing instance " + (done - solvers.size()) + " of " + instances.size());
+                    task.setStatus("Writing instance " + (done - solverBinaries.size()) + " of " + instances.size());
                     File f = InstanceDAO.getBinaryFileOfInstance(i);
                     entry = new ZipEntry("instances" + System.getProperty("file.separator") + i.getMd5() + "_" + i.getName());
                     addFileToZIP(f, entry, zos);
@@ -862,7 +860,7 @@ public class ExperimentController {
                 }
 
                 // add run script
-               // addRunScript(zos, exportInstances, exportSolvers, queue);
+                // addRunScript(zos, exportInstances, exportSolvers, queue);
 
                 // add client binary
                 if (exportClient) {
