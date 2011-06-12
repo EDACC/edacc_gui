@@ -70,7 +70,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.TableRowSorter;
-import org.jdesktop.application.Action;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
 import javax.swing.event.CellEditorListener;
@@ -87,28 +86,75 @@ import javax.swing.tree.TreeSelectionModel;
  */
 public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvents {
 
+    /**
+     * The experiment tab index.
+     */
     public static final int TAB_EXPERIMENTS = 0;
+    /**
+     * The client bowser tab index.
+     */
     public static final int TAB_CLIENTBROWSER = 1;
+    /**
+     * The solvers tab index.
+     */
     public static final int TAB_SOLVERS = 2;
+    /**
+     * The instances tab index.
+     */
     public static final int TAB_INSTANCES = 3;
+    /**
+     * The generate jobs tab index.
+     */
     public static final int TAB_GENERATEJOBS = 4;
+    /**
+     * The job browser tab index.
+     */
     public static final int TAB_JOBBROWSER = 5;
+    /**
+     * The analysis tab index.
+     */
     public static final int TAB_ANALYSIS = 6;
-    public ExperimentController expController;
+    
+    private ExperimentController expController;
+    /**
+     * The table model for the experiment table. Will be created on object constructions and never be recreated.
+     */
     public ExperimentTableModel expTableModel;
+    /**
+     * The table model for the instance table. Will be created on object construction and never be recreated.
+     */
     public InstanceTableModel insTableModel;
+    /**
+     * The table model for the solver table. Will be created on object construction and never be recreated.
+     */    
     public SolverTableModel solTableModel;
+    /**
+     * The table model for the jobs table. Will be created on object construction and never be recreated.
+     */   
     public ExperimentResultsBrowserTableModel jobsTableModel;
-    public EDACCSolverConfigPanel solverConfigPanel;
-    public TableRowSorter<InstanceTableModel> sorter;
+    /**
+     * The table model for the generate jobs table. Will be created on object construction and never be recreated.
+     */
+    public GenerateJobsTableModel generateJobsTableModel;
+    
+    private EDACCSolverConfigPanel solverConfigPanel;
+    private TableRowSorter<InstanceTableModel> sorter;
+    /**
+     * The filter for the job browser. Will be created on object construction and never be recreated.
+     */
     public EDACCFilter resultBrowserRowFilter;
+    /**
+     * The tree model for the instance classes. Will be created on object construction and never be recreated.
+     */
     public DefaultTreeModel instanceClassTreeModel;
     private EDACCInstanceFilter instanceFilter;
     private EDACCOutputViewer outputViewer;
     private EDACCExperimentModeJobsCellRenderer tableJobsStringRenderer;
     private ResultsBrowserTableRowSorter resultsBrowserTableRowSorter;
-    public GenerateJobsTableModel generateJobsTableModel;
     private ClientTableModel clientTableModel;
+    /**
+     * The panel for the solver configurations in the solvers tab. Will be created on object construction and never be recreated.
+     */
     public EDACCExperimentModeSolverConfigurationTablePanel solverConfigTablePanel;
     private AnalysisPanel analysePanel;
     private Timer jobsTimer = null;
@@ -119,7 +165,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private ExperimentUpdateThread experimentUpdateThread;
     private ClientUpdateThread clientUpdateThread;
     private SolverConfigUpdateThread solverConfigUpdateThread;
+    /**
+     * The table model for the solver configuration table. Will be created on object construction and never be recreated.
+     */
     public SolverConfigurationTableModel solverConfigTableModel;
+    /**
+     * The filter for the solver configuration table. Will be created on object construction and never be recreated.
+     */
     public SolverConfigurationTableRowFilter solverConfigurationTableRowFilter;
     private TableColumnSelector jobsColumnSelector;
     private TableColumnSelector instanceColumnSelector;
@@ -276,7 +328,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     updateStatusDialog.setVisible(true);
                 }
                 if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_R) {
-                    btnRefreshJobs();
+                    btnRefreshJobsActionPerformed(null);
                 }
             }
         });
@@ -330,7 +382,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         });
     }
 
-    protected void jobsTableRepaintRow(int rowIndex) {
+    private void jobsTableRepaintRow(int rowIndex) {
         final int cols1 = tableJobs.getColumnCount();
         Rectangle rect;
         if (cols1 > 0) {
@@ -342,7 +394,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
     }
 
-    protected void tableJobsProcessMouseEvent(MouseEvent e) {
+    private void tableJobsProcessMouseEvent(MouseEvent e) {
         final int eventId = e.getID();
         if (eventId == MouseEvent.MOUSE_EXITED || eventId == MouseEvent.MOUSE_ENTERED) {
             tableJobs.setCursor(Cursor.getDefaultCursor());
@@ -371,7 +423,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
     }
 
-    protected void tableJobsProcessMouseMotionEvent(MouseEvent e) {
+    private void tableJobsProcessMouseMotionEvent(MouseEvent e) {
         int col_view = tableJobs.columnAtPoint(e.getPoint());
         int col = tableJobs.convertColumnIndexToModel(col_view);
         if (col == ExperimentResultsBrowserTableModel.COL_SOLVER_OUTPUT
@@ -707,40 +759,59 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jPanel7.setName("jPanel7"); // NOI18N
         jPanel7.setPreferredSize(new java.awt.Dimension(0, 0));
 
-        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCExperimentMode.class, this);
-        btnDiscardExperiment.setAction(actionMap.get("btnDiscardExperiment")); // NOI18N
         btnDiscardExperiment.setText(resourceMap.getString("btnDiscardExperiment.text")); // NOI18N
         btnDiscardExperiment.setToolTipText(resourceMap.getString("btnDiscardExperiment.toolTipText")); // NOI18N
         btnDiscardExperiment.setMaximumSize(new java.awt.Dimension(69, 23));
         btnDiscardExperiment.setMinimumSize(new java.awt.Dimension(69, 23));
         btnDiscardExperiment.setName("btnDiscardExperiment"); // NOI18N
         btnDiscardExperiment.setPreferredSize(new java.awt.Dimension(80, 25));
+        btnDiscardExperiment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDiscardExperimentActionPerformed(evt);
+            }
+        });
 
-        btnRemoveExperiment.setAction(actionMap.get("btnRemoveExperiment")); // NOI18N
         btnRemoveExperiment.setText(resourceMap.getString("btnRemoveExperiment.text")); // NOI18N
         btnRemoveExperiment.setToolTipText(resourceMap.getString("btnRemoveExperiment.toolTipText")); // NOI18N
         btnRemoveExperiment.setName("btnRemoveExperiment"); // NOI18N
         btnRemoveExperiment.setPreferredSize(new java.awt.Dimension(80, 25));
+        btnRemoveExperiment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveExperimentActionPerformed(evt);
+            }
+        });
 
-        btnLoadExperiment.setAction(actionMap.get("btnLoadExperiment")); // NOI18N
         btnLoadExperiment.setText(resourceMap.getString("btnLoadExperiment.text")); // NOI18N
         btnLoadExperiment.setToolTipText(resourceMap.getString("btnLoadExperiment.toolTipText")); // NOI18N
         btnLoadExperiment.setName("btnLoadExperiment"); // NOI18N
         btnLoadExperiment.setPreferredSize(new java.awt.Dimension(80, 25));
+        btnLoadExperiment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoadExperimentActionPerformed(evt);
+            }
+        });
 
-        btnCreateExperiment.setAction(actionMap.get("btnCreateExperiment")); // NOI18N
         btnCreateExperiment.setText(resourceMap.getString("btnCreateExperiment.text")); // NOI18N
         btnCreateExperiment.setToolTipText(resourceMap.getString("btnCreateExperiment.toolTipText")); // NOI18N
         btnCreateExperiment.setName("btnCreateExperiment"); // NOI18N
         btnCreateExperiment.setPreferredSize(new java.awt.Dimension(80, 25));
+        btnCreateExperiment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCreateExperimentActionPerformed(evt);
+            }
+        });
 
-        btnEditExperiment.setAction(actionMap.get("btnEditExperiment")); // NOI18N
         btnEditExperiment.setText(resourceMap.getString("btnEditExperiment.text")); // NOI18N
         btnEditExperiment.setToolTipText(resourceMap.getString("btnEditExperiment.toolTipText")); // NOI18N
         btnEditExperiment.setMaximumSize(new java.awt.Dimension(71, 23));
         btnEditExperiment.setMinimumSize(new java.awt.Dimension(71, 23));
         btnEditExperiment.setName("btnEditExperiment"); // NOI18N
         btnEditExperiment.setPreferredSize(new java.awt.Dimension(80, 25));
+        btnEditExperiment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditExperimentActionPerformed(evt);
+            }
+        });
 
         btnImport.setText(resourceMap.getString("btnImport.text")); // NOI18N
         btnImport.setName("btnImport"); // NOI18N
@@ -876,29 +947,45 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tableSolvers.setName("tableSolvers"); // NOI18N
         jScrollPane3.setViewportView(tableSolvers);
 
-        btnSelectAllSolvers.setAction(actionMap.get("btnSelectAllSolvers")); // NOI18N
         btnSelectAllSolvers.setText(resourceMap.getString("btnSelectAllSolvers.text")); // NOI18N
         btnSelectAllSolvers.setToolTipText(resourceMap.getString("btnSelectAllSolvers.toolTipText")); // NOI18N
         btnSelectAllSolvers.setName("btnSelectAllSolvers"); // NOI18N
         btnSelectAllSolvers.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnSelectAllSolvers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelectAllSolversActionPerformed(evt);
+            }
+        });
 
-        btnDeselectAllSolvers.setAction(actionMap.get("btnDeselectAll")); // NOI18N
         btnDeselectAllSolvers.setText(resourceMap.getString("btnDeselectAllSolvers.text")); // NOI18N
         btnDeselectAllSolvers.setToolTipText(resourceMap.getString("btnDeselectAllSolvers.toolTipText")); // NOI18N
         btnDeselectAllSolvers.setName("btnDeselectAllSolvers"); // NOI18N
         btnDeselectAllSolvers.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnDeselectAllSolvers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeselectAllSolversActionPerformed(evt);
+            }
+        });
 
-        btnReverseSolverSelection.setAction(actionMap.get("btnReverseSolverSelection")); // NOI18N
         btnReverseSolverSelection.setText(resourceMap.getString("btnReverseSolverSelection.text")); // NOI18N
         btnReverseSolverSelection.setToolTipText(resourceMap.getString("btnReverseSolverSelection.toolTipText")); // NOI18N
         btnReverseSolverSelection.setName("btnReverseSolverSelection"); // NOI18N
         btnReverseSolverSelection.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnReverseSolverSelection.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReverseSolverSelectionActionPerformed(evt);
+            }
+        });
 
-        btnChooseSolvers.setAction(actionMap.get("btnChooseSolvers")); // NOI18N
         btnChooseSolvers.setText(resourceMap.getString("btnChooseSolvers.text")); // NOI18N
         btnChooseSolvers.setToolTipText(resourceMap.getString("btnChooseSolvers.toolTipText")); // NOI18N
         btnChooseSolvers.setName("btnChooseSolvers"); // NOI18N
         btnChooseSolvers.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnChooseSolvers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnChooseSolversActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
@@ -1037,17 +1124,25 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jScrollPane4.getVerticalScrollBar().setUnitIncrement(30);
         splitPaneSolverSolverConfigs.setRightComponent(jScrollPane4);
 
-        btnSaveSolverConfigurations.setAction(actionMap.get("btnSaveSolverConfigurations")); // NOI18N
         btnSaveSolverConfigurations.setText(resourceMap.getString("btnSaveSolverConfigurations.text")); // NOI18N
         btnSaveSolverConfigurations.setToolTipText(resourceMap.getString("btnSaveSolverConfigurations.toolTipText")); // NOI18N
         btnSaveSolverConfigurations.setName("btnSaveSolverConfigurations"); // NOI18N
         btnSaveSolverConfigurations.setPreferredSize(new java.awt.Dimension(109, 25));
+        btnSaveSolverConfigurations.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveSolverConfigurationsActionPerformed(evt);
+            }
+        });
 
-        btnUndoSolverConfigurations.setAction(actionMap.get("btnUndoSolverConfigurations")); // NOI18N
         btnUndoSolverConfigurations.setText(resourceMap.getString("btnUndoSolverConfigurations.text")); // NOI18N
         btnUndoSolverConfigurations.setToolTipText(resourceMap.getString("btnUndoSolverConfigurations.toolTipText")); // NOI18N
         btnUndoSolverConfigurations.setName("btnUndoSolverConfigurations"); // NOI18N
         btnUndoSolverConfigurations.setPreferredSize(new java.awt.Dimension(109, 25));
+        btnUndoSolverConfigurations.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUndoSolverConfigurationsActionPerformed(evt);
+            }
+        });
 
         btnChangeView.setText(resourceMap.getString("btnChangeView.text")); // NOI18N
         btnChangeView.setName("btnChangeView"); // NOI18N
@@ -1155,59 +1250,91 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         jPanel5.setName("jPanel5"); // NOI18N
 
-        btnSaveInstances.setAction(actionMap.get("btnSaveInstances")); // NOI18N
         btnSaveInstances.setText(resourceMap.getString("btnSaveInstances.text")); // NOI18N
         btnSaveInstances.setToolTipText(resourceMap.getString("btnSaveInstances.toolTipText")); // NOI18N
         btnSaveInstances.setMaximumSize(new java.awt.Dimension(109, 23));
         btnSaveInstances.setMinimumSize(new java.awt.Dimension(109, 23));
         btnSaveInstances.setName("btnSaveInstances"); // NOI18N
         btnSaveInstances.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnSaveInstances.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveInstancesActionPerformed(evt);
+            }
+        });
 
-        btnFilterInstances.setAction(actionMap.get("btnInstanceFilter")); // NOI18N
         btnFilterInstances.setText(resourceMap.getString("btnFilterInstances.text")); // NOI18N
         btnFilterInstances.setToolTipText(resourceMap.getString("btnFilterInstances.toolTipText")); // NOI18N
         btnFilterInstances.setMaximumSize(new java.awt.Dimension(109, 23));
         btnFilterInstances.setMinimumSize(new java.awt.Dimension(109, 23));
         btnFilterInstances.setName("btnFilterInstances"); // NOI18N
         btnFilterInstances.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnFilterInstances.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFilterInstancesActionPerformed(evt);
+            }
+        });
 
-        btnSelectAllInstances.setAction(actionMap.get("btnSelectAllInstances")); // NOI18N
         btnSelectAllInstances.setText(resourceMap.getString("btnSelectAllInstances.text")); // NOI18N
         btnSelectAllInstances.setToolTipText(resourceMap.getString("btnSelectAllInstances.toolTipText")); // NOI18N
         btnSelectAllInstances.setMaximumSize(new java.awt.Dimension(109, 23));
         btnSelectAllInstances.setMinimumSize(new java.awt.Dimension(109, 23));
         btnSelectAllInstances.setName("btnSelectAllInstances"); // NOI18N
         btnSelectAllInstances.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnSelectAllInstances.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelectAllInstancesActionPerformed(evt);
+            }
+        });
 
-        btnDeselectAllInstances.setAction(actionMap.get("btnDeselectAllInstances")); // NOI18N
         btnDeselectAllInstances.setText(resourceMap.getString("btnDeselectAllInstances.text")); // NOI18N
         btnDeselectAllInstances.setToolTipText(resourceMap.getString("btnDeselectAllInstances.toolTipText")); // NOI18N
         btnDeselectAllInstances.setMaximumSize(new java.awt.Dimension(109, 23));
         btnDeselectAllInstances.setMinimumSize(new java.awt.Dimension(109, 23));
         btnDeselectAllInstances.setName("btnDeselectAllInstances"); // NOI18N
         btnDeselectAllInstances.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnDeselectAllInstances.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeselectAllInstancesActionPerformed(evt);
+            }
+        });
 
-        btnInvertSelection.setAction(actionMap.get("btnInvertSelection")); // NOI18N
         btnInvertSelection.setText(resourceMap.getString("btnInvertSelection.text")); // NOI18N
         btnInvertSelection.setToolTipText(resourceMap.getString("btnInvertSelection.toolTipText")); // NOI18N
         btnInvertSelection.setName("btnInvertSelection"); // NOI18N
         btnInvertSelection.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnInvertSelection.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInvertSelectionActionPerformed(evt);
+            }
+        });
 
-        btnUndoInstances.setAction(actionMap.get("btnUndoInstances")); // NOI18N
         btnUndoInstances.setText(resourceMap.getString("btnUndoInstances.text")); // NOI18N
         btnUndoInstances.setToolTipText(resourceMap.getString("btnUndoInstances.toolTipText")); // NOI18N
         btnUndoInstances.setName("btnUndoInstances"); // NOI18N
         btnUndoInstances.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnUndoInstances.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUndoInstancesActionPerformed(evt);
+            }
+        });
 
-        btnSelectedInstances.setAction(actionMap.get("btnSelectedInstances")); // NOI18N
         btnSelectedInstances.setText(resourceMap.getString("btnSelectedInstances.text")); // NOI18N
         btnSelectedInstances.setName("btnSelectedInstances"); // NOI18N
         btnSelectedInstances.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnSelectedInstances.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelectedInstancesActionPerformed(evt);
+            }
+        });
 
-        btnRandomSelection.setAction(actionMap.get("btnRandomSelection")); // NOI18N
         btnRandomSelection.setText(resourceMap.getString("btnRandomSelection.text")); // NOI18N
         btnRandomSelection.setName("btnRandomSelection"); // NOI18N
         btnRandomSelection.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnRandomSelection.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRandomSelectionActionPerformed(evt);
+            }
+        });
 
         btnInstanceColumnSelection.setText(resourceMap.getString("btnInstanceColumnSelection.text")); // NOI18N
         btnInstanceColumnSelection.setName("btnInstanceColumnSelection"); // NOI18N
@@ -1335,11 +1462,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         jPanel6.setName("jPanel6"); // NOI18N
 
-        btnSelectQueue.setAction(actionMap.get("btnSelectQueue")); // NOI18N
         btnSelectQueue.setText(resourceMap.getString("btnSelectQueue.text")); // NOI18N
         btnSelectQueue.setToolTipText(resourceMap.getString("btnSelectQueue.toolTipText")); // NOI18N
         btnSelectQueue.setName("btnSelectQueue"); // NOI18N
         btnSelectQueue.setPreferredSize(new java.awt.Dimension(190, 25));
+        btnSelectQueue.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelectQueueActionPerformed(evt);
+            }
+        });
 
         btnGeneratePackage.setText(resourceMap.getString("generatePackage.text")); // NOI18N
         btnGeneratePackage.setToolTipText(resourceMap.getString("generatePackage.toolTipText")); // NOI18N
@@ -1351,11 +1482,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         });
 
-        btnGenerateJobs.setAction(actionMap.get("btnGenerateJobs")); // NOI18N
         btnGenerateJobs.setText(resourceMap.getString("btnGenerateJobs.text")); // NOI18N
         btnGenerateJobs.setToolTipText(resourceMap.getString("btnGenerateJobs.toolTipText")); // NOI18N
         btnGenerateJobs.setName("btnGenerateJobs"); // NOI18N
         btnGenerateJobs.setPreferredSize(new java.awt.Dimension(190, 25));
+        btnGenerateJobs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGenerateJobsActionPerformed(evt);
+            }
+        });
 
         btnSetNumRuns.setText(resourceMap.getString("btnSetNumRuns.text")); // NOI18N
         btnSetNumRuns.setMaximumSize(new java.awt.Dimension(190, 25));
@@ -1439,36 +1574,47 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         ));
         tableJobs.setToolTipText(resourceMap.getString("tableJobs.toolTipText")); // NOI18N
         tableJobs.setName("tableJobs"); // NOI18N
-        tableJobs.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tableJobsMouseClicked(evt);
-            }
-        });
         jScrollPane6.setViewportView(tableJobs);
 
-        btnRefreshJobs.setAction(actionMap.get("btnRefreshJobs")); // NOI18N
         btnRefreshJobs.setText(resourceMap.getString("btnRefreshJobs.text")); // NOI18N
         btnRefreshJobs.setToolTipText(resourceMap.getString("btnRefreshJobs.toolTipText")); // NOI18N
         btnRefreshJobs.setName("btnRefreshJobs"); // NOI18N
         btnRefreshJobs.setPreferredSize(new java.awt.Dimension(103, 25));
+        btnRefreshJobs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshJobsActionPerformed(evt);
+            }
+        });
 
-        btnBrowserColumnSelection.setAction(actionMap.get("btnBrowserColumnSelection")); // NOI18N
         btnBrowserColumnSelection.setText(resourceMap.getString("btnBrowserColumnSelection.text")); // NOI18N
         btnBrowserColumnSelection.setToolTipText(resourceMap.getString("btnBrowserColumnSelection.toolTipText")); // NOI18N
         btnBrowserColumnSelection.setName("btnBrowserColumnSelection"); // NOI18N
         btnBrowserColumnSelection.setPreferredSize(new java.awt.Dimension(103, 25));
+        btnBrowserColumnSelection.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBrowserColumnSelectionActionPerformed(evt);
+            }
+        });
 
-        btnFilterJobs.setAction(actionMap.get("btnFilterJobs")); // NOI18N
         btnFilterJobs.setText(resourceMap.getString("btnFilterJobs.text")); // NOI18N
         btnFilterJobs.setToolTipText(resourceMap.getString("btnFilterJobs.toolTipText")); // NOI18N
         btnFilterJobs.setName("btnFilterJobs"); // NOI18N
         btnFilterJobs.setPreferredSize(new java.awt.Dimension(103, 25));
+        btnFilterJobs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFilterJobsActionPerformed(evt);
+            }
+        });
 
-        btnExport.setAction(actionMap.get("btnCSVExport")); // NOI18N
         btnExport.setText(resourceMap.getString("btnExport.text")); // NOI18N
         btnExport.setToolTipText(resourceMap.getString("btnExport.toolTipText")); // NOI18N
         btnExport.setName("btnExport"); // NOI18N
         btnExport.setPreferredSize(new java.awt.Dimension(103, 25));
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
 
         lblJobsFilterStatus.setName("lblJobsFilterStatus"); // NOI18N
 
@@ -1504,10 +1650,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         });
 
-        btnSetPriority.setAction(actionMap.get("btnSetPriority")); // NOI18N
         btnSetPriority.setText(resourceMap.getString("btnSetPriority.text")); // NOI18N
         btnSetPriority.setName("btnSetPriority"); // NOI18N
         btnSetPriority.setPreferredSize(new java.awt.Dimension(103, 25));
+        btnSetPriority.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSetPriorityActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelJobBrowserLayout = new javax.swing.GroupLayout(panelJobBrowser);
         panelJobBrowser.setLayout(panelJobBrowserLayout);
@@ -1596,6 +1746,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Checks for unsaved changes.
+     * @return true, iff there are some unsaved changes.
+     */
     public boolean hasUnsavedChanges() {
         if (expController.getActiveExperiment() == null) {
             return false;
@@ -1603,6 +1757,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         return solverConfigPanel.isModified() || insTableModel.isModified();
     }
 
+    /**
+     * Updates the tab titles and the status text according to the state of the GUI. 
+     */
     public void setTitles() {
         if (solverConfigPanel.isModified()) {
             manageExperimentPane.setTitleAt(TAB_SOLVERS, "Solvers (modified)");
@@ -1624,6 +1781,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         manageExperimentPane.invalidate();
     }
 
+    /**
+     * Updates the generate jobs tab title according to the state of this tab.
+     */
     public void setGenerateJobsTitle() {
         if (generateJobsIsModified()) {
             manageExperimentPane.setTitleAt(TAB_GENERATEJOBS, "Generate Jobs (modified)");
@@ -1632,8 +1792,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
     }
 
+    /**
+     * Checks if the generate jobs table data is modified.
+     * @return true, iff some data is modified.
+     */
     public boolean generateJobsIsModified() {
-
         return expController.experimentResultsIsModified();
     }
 
@@ -1809,7 +1972,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     private void tableExperimentsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableExperimentsMouseClicked
         if (evt.getClickCount() == 2) {
-            this.btnLoadExperiment();
+            this.btnLoadExperimentActionPerformed(null);
         }
     }//GEN-LAST:event_tableExperimentsMouseClicked
 
@@ -1820,9 +1983,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             stopJobsTimer();
         }
     }//GEN-LAST:event_txtJobsTimerKeyReleased
-
-    private void tableJobsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableJobsMouseClicked
-    }//GEN-LAST:event_tableJobsMouseClicked
 
     private void btnComputeResultPropertiesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnComputeResultPropertiesActionPerformed
         EDACCComputeResultProperties compute = new EDACCComputeResultProperties(EDACCApp.getApplication().getMainFrame(), true, expController.getActiveExperiment());
@@ -1900,7 +2060,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     private void tableExperimentsKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableExperimentsKeyReleased
         if (!tableExperimentsWasEditing && evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            btnLoadExperiment();
+            btnLoadExperimentActionPerformed(null);
         }
         tableExperimentsWasEditing = false;
     }//GEN-LAST:event_tableExperimentsKeyReleased
@@ -2076,51 +2236,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
     }//GEN-LAST:event_btnInstanceColumnSelectionActionPerformed
 
-    public void stopJobsTimer() {
-        if (jobsTimer != null) {
-            jobsTimer.cancel();
-            jobsTimer = null;
-            chkJobsTimer.setSelected(false);
-        }
-    }
-
-    /**
-     * Method to be called after an experiment is loaded.
-     */
-    public void afterExperimentLoaded() {
-        reinitializeInstances();
-        reinitializeJobBrowser();
-        manageExperimentPane.setEnabledAt(TAB_SOLVERS, true);
-        manageExperimentPane.setEnabledAt(TAB_INSTANCES, true);
-        manageExperimentPane.setEnabledAt(TAB_GENERATEJOBS, true);
-        manageExperimentPane.setEnabledAt(TAB_JOBBROWSER, true);
-        manageExperimentPane.setEnabledAt(TAB_ANALYSIS, true);
-
-        setTitles();
-        btnDiscardExperiment.setEnabled(true);
-        btnImport.setEnabled(true);
-    }
-
-    /**
-     * Method to be call after an experiment ist unloaded.
-     */
-    public void afterExperimentUnloaded() {
-        manageExperimentPane.setSelectedIndex(0);
-        manageExperimentPane.setEnabledAt(TAB_SOLVERS, false);
-        manageExperimentPane.setEnabledAt(TAB_INSTANCES, false);
-        manageExperimentPane.setEnabledAt(TAB_GENERATEJOBS, false);
-        manageExperimentPane.setEnabledAt(TAB_JOBBROWSER, false);
-        manageExperimentPane.setEnabledAt(TAB_ANALYSIS, false);
-        setTitles();
-        btnDiscardExperiment.setEnabled(false);
-    }
-
-    private void createDatabaseErrorMessage(SQLException e) {
-        javax.swing.JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "There was an error while communicating with the database: " + e, "Connection error", javax.swing.JOptionPane.ERROR_MESSAGE);
-    }
-
-    @Action
-    public void btnLoadExperiment() {
+    private void btnLoadExperimentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadExperimentActionPerformed
         if (tableExperiments.getSelectedRow() != -1) {
             if (expController.getActiveExperiment() == null || !hasUnsavedChanges() || JOptionPane.showConfirmDialog(this,
                     "Loading an experiment will make you lose all unsaved changes of the current experiment. Continue loading the experiment?",
@@ -2135,11 +2251,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                         this);
             }
         }
-    }
+    }//GEN-LAST:event_btnLoadExperimentActionPerformed
 
-    @Action
-    public void btnCreateExperiment() {
-        btnDiscardExperiment();
+    private void btnCreateExperimentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateExperimentActionPerformed
+        btnDiscardExperimentActionPerformed(null);
         if (expController.getActiveExperiment() != null) {
             return;
         }
@@ -2198,10 +2313,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         } finally {
             dialogNewExp.dispose();
         }
-    }
+    }//GEN-LAST:event_btnCreateExperimentActionPerformed
 
-    @Action
-    public void btnRemoveExperiment() {
+    private void btnRemoveExperimentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveExperimentActionPerformed
         if (tableExperiments.getSelectedRow() != -1) {
             int removedIndex = tableExperiments.getSelectedRow();
             int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), "Do you really want to remove the experiment " + expTableModel.getValueAt(tableExperiments.convertRowIndexToModel(removedIndex), 0) + "?", "Remove experiment", javax.swing.JOptionPane.YES_NO_OPTION);
@@ -2233,11 +2347,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
             }
         }
+    }//GEN-LAST:event_btnRemoveExperimentActionPerformed
 
-    }
-
-    @Action
-    public void btnChooseSolvers() {
+    private void btnChooseSolversActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseSolversActionPerformed
         solverConfigPanel.beginUpdate();
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
             if (solTableModel.isSelected(i) && !solverConfigPanel.solverExists(solTableModel.getSolver(i).getId())) {
@@ -2251,10 +2363,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             solverConfigTablePanel.update();
         }
         setTitles();
-    }
+    }//GEN-LAST:event_btnChooseSolversActionPerformed
 
-    @Action
-    public void btnSaveSolverConfigurations() {
+    private void btnSaveSolverConfigurationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveSolverConfigurationsActionPerformed
         Tasks.startTask(new TaskRunnable() {
 
             @Override
@@ -2283,10 +2394,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
             }
         });
-    }
+    }//GEN-LAST:event_btnSaveSolverConfigurationsActionPerformed
 
-    @Action
-    public void btnUndoSolverConfigurations() {
+    private void btnUndoSolverConfigurationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUndoSolverConfigurationsActionPerformed
         Tasks.startTask(new TaskRunnable() {
 
             @Override
@@ -2315,58 +2425,49 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
             }
         });
-    }
+    }//GEN-LAST:event_btnUndoSolverConfigurationsActionPerformed
 
-    @Action
-    public void btnSelectAllSolvers() {
+    private void btnSelectAllSolversActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllSolversActionPerformed
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
             solTableModel.setSelected(i, true);
         }
-    }
+    }//GEN-LAST:event_btnSelectAllSolversActionPerformed
 
-    @Action
-    public void btnDeselectAll() {
+    private void btnDeselectAllSolversActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeselectAllSolversActionPerformed
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
             solTableModel.setSelected(i, false);
         }
-    }
+    }//GEN-LAST:event_btnDeselectAllSolversActionPerformed
 
-    @Action
-    public void btnReverseSolverSelection() {
+    private void btnReverseSolverSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReverseSolverSelectionActionPerformed
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
             solTableModel.setSelected(i, !solTableModel.isSelected(i));
         }
-    }
+    }//GEN-LAST:event_btnReverseSolverSelectionActionPerformed
 
-    @Action
-    public void btnSaveInstances() {
-        Tasks.startTask("saveExperimentHasInstances", new Class[]{Tasks.class
-                }, new Object[]{null}, expController, this);
-    }
+    private void btnSaveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveInstancesActionPerformed
+        Tasks.startTask("saveExperimentHasInstances", new Class[]{Tasks.class}, new Object[]{null}, expController, this);
+    }//GEN-LAST:event_btnSaveInstancesActionPerformed
 
-    @Action
-    public void btnSelectAllInstances() {
+    private void btnSelectAllInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstancesActionPerformed
         for (int i = 0; i < tableInstances.getRowCount(); i++) {
             tableInstances.setValueAt(true, i, tableInstances.convertColumnIndexToView(InstanceTableModel.COL_SELECTED));
         }
-    }
+    }//GEN-LAST:event_btnSelectAllInstancesActionPerformed
 
-    @Action
-    public void btnDeselectAllInstances() {
+    private void btnDeselectAllInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeselectAllInstancesActionPerformed
         for (int i = 0; i < tableInstances.getRowCount(); i++) {
             tableInstances.setValueAt(false, i, tableInstances.convertColumnIndexToView(InstanceTableModel.COL_SELECTED));
         }
-    }
+    }//GEN-LAST:event_btnDeselectAllInstancesActionPerformed
 
-    @Action
-    public void btnInvertSelection() {
+    private void btnInvertSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInvertSelectionActionPerformed
         for (int i = 0; i < tableInstances.getRowCount(); i++) {
             tableInstances.setValueAt(!((Boolean) tableInstances.getValueAt(i, tableInstances.convertColumnIndexToView(InstanceTableModel.COL_SELECTED))), i, tableInstances.convertColumnIndexToView(InstanceTableModel.COL_SELECTED));
         }
-    }
+    }//GEN-LAST:event_btnInvertSelectionActionPerformed
 
-    @Action
-    public void btnGenerateJobs() {
+    private void btnGenerateJobsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerateJobsActionPerformed
         if (hasUnsavedChanges()) {
             javax.swing.JOptionPane.showMessageDialog(null, "Please save all unsaved data first or reload the experiment before generating jobs.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             return;
@@ -2395,14 +2496,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
             });
         }
-    }
+    }//GEN-LAST:event_btnGenerateJobsActionPerformed
 
-    public JTable getTableInstances() {
-        return tableInstances;
-    }
-
-    @Action
-    public void btnInstanceFilter() {
+    private void btnFilterInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterInstancesActionPerformed
         EDACCApp.getApplication().show(instanceFilter);
         insTableModel.fireTableDataChanged();
         if (instanceFilter.hasFiltersApplied()) {
@@ -2410,16 +2506,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         } else {
             setFilterStatus("");
         }
-    }
+    }//GEN-LAST:event_btnFilterInstancesActionPerformed
 
-    @Action
-    public void btnRefreshJobs() {
+    private void btnRefreshJobsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshJobsActionPerformed
         resultBrowserETA = null;
         Tasks.startTask("loadJobs", expController, this, false);
-    }
+    }//GEN-LAST:event_btnRefreshJobsActionPerformed
 
-    @Action
-    public void btnBrowserColumnSelection() {
+    private void btnBrowserColumnSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBrowserColumnSelectionActionPerformed
         List<SortKey> sortKeys = (List<SortKey>) tableJobs.getRowSorter().getSortKeys();
         List<String> columnNames = new ArrayList<String>();
         for (SortKey sk : sortKeys) {
@@ -2439,8 +2533,228 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         tableJobs.getRowSorter().setSortKeys(newSortKeys);
         Util.updateTableColumnWidth(tableJobs);
+    }//GEN-LAST:event_btnBrowserColumnSelectionActionPerformed
+
+    private void btnFilterJobsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterJobsActionPerformed
+        EDACCApp.getApplication().show(resultBrowserRowFilter);
+        jobsTableModel.fireTableDataChanged();
+        updateJobsFilterStatus();
+    }//GEN-LAST:event_btnFilterJobsActionPerformed
+
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
+        stopJobsTimer();
+        JFileChooser fc = new JFileChooser();
+        FileFilter CSVFilter = new FileFilter() {
+
+            @Override
+            public boolean accept(File f) {
+                return f.getName().toLowerCase().endsWith(".csv") || f.isDirectory();
+            }
+
+            @Override
+            public String getDescription() {
+                return "CSV Files (comma separated values)";
+            }
+        };
+        FileFilter TeXFilter = new FileFilter() {
+
+            @Override
+            public boolean accept(File f) {
+                return f.getName().toLowerCase().endsWith(".tex") || f.isDirectory();
+            }
+
+            @Override
+            public String getDescription() {
+                return "TeX Files (*.tex)";
+            }
+        };
+        fc.setFileFilter(CSVFilter);
+        fc.setFileFilter(TeXFilter);
+        if (fc.showDialog(this, "Export") != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        String filename = fc.getSelectedFile().getAbsolutePath();
+        if (fc.getFileFilter() == CSVFilter && !filename.toLowerCase().endsWith(".csv")) {
+            filename += ".csv";
+        }
+        if (fc.getFileFilter() == TeXFilter && !filename.toLowerCase().endsWith(".tex")) {
+            filename += ".tex";
+        }
+        if (filename.toLowerCase().endsWith(".csv")) {
+            Tasks.startTask("exportCSV", new Class[]{File.class, edacc.model.Tasks.class}, new Object[]{new File(filename), null}, expController, this);
+        } else if (filename.toLowerCase().endsWith(".tex")) {
+            Tasks.startTask("exportTeX", new Class[]{File.class, edacc.model.Tasks.class}, new Object[]{new File(filename), null}, expController, this);
+        }
+    }//GEN-LAST:event_btnExportActionPerformed
+
+    private void btnUndoInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUndoInstancesActionPerformed
+        insTableModel.undo();
+        this.setTitles();
+    }//GEN-LAST:event_btnUndoInstancesActionPerformed
+
+    private void btnDiscardExperimentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDiscardExperimentActionPerformed
+        boolean unload = !hasUnsavedChanges() || (JOptionPane.showConfirmDialog(this,
+                "Discarding an experiment will make you lose all unsaved changes of the current experiment. Continue discarding the experiment?",
+                "Warning!",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION);
+        if (unload) {
+            expController.unloadExperiment();
+            tableExperiments.requestFocusInWindow();
+        }
+    }//GEN-LAST:event_btnDiscardExperimentActionPerformed
+
+    private void btnSelectQueueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectQueueActionPerformed
+        try {
+            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+            EDACCManageGridQueuesDialog manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true, expController);
+            manageGridQueues.setLocationRelativeTo(mainFrame);
+            manageGridQueues.setVisible(true);
+        } catch (NoConnectionToDBException ex) {
+            JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+        }
+    }//GEN-LAST:event_btnSelectQueueActionPerformed
+
+    private void btnEditExperimentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditExperimentActionPerformed
+        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+
+        Experiment exp = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
+        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription());
+        dialogEditExp.setLocationRelativeTo(mainFrame);
+        try {
+            while (true) {
+                dialogEditExp.setVisible(true);
+                if (dialogEditExp.canceled) {
+                    break;
+                }
+                if ("".equals(dialogEditExp.expName)) {
+                    javax.swing.JOptionPane.showMessageDialog(null, "The experiment must have a name.", "Edit experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
+                } else if (expController.getExperiment(dialogEditExp.expName) != null && expController.getExperiment(dialogEditExp.expName) != exp) {
+                    javax.swing.JOptionPane.showMessageDialog(null, "There exists already an experiment with the same name.", "Edit experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
+                } else {
+                    break;
+                }
+            }
+            if (!dialogEditExp.canceled) {
+                String oldName = exp.getName();
+                String oldDescr = exp.getDescription();
+                exp.setName(dialogEditExp.expName);
+                exp.setDescription(dialogEditExp.expDesc);
+                try {
+                    expController.saveExperiment(exp);
+                } catch (SQLException ex) {
+                    exp.setName(oldName);
+                    exp.setDescription(oldDescr);
+                    createDatabaseErrorMessage(ex);
+                }
+                for (int i = 0; i < expTableModel.getRowCount(); i++) {
+                    if (expTableModel.getExperimentAt(i) == exp) {
+                        expTableModel.fireTableRowsUpdated(i, i);
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            createDatabaseErrorMessage(ex);
+        } catch (Exception ex) {
+            javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage(), "Edit experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
+        } finally {
+            dialogEditExp.dispose();
+        }
+    }//GEN-LAST:event_btnEditExperimentActionPerformed
+
+    private void btnSelectedInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectedInstancesActionPerformed
+        LinkedList<SortKey> sortKeys = new LinkedList<SortKey>();
+        jTreeInstanceClass.setSelectionInterval(0, jTreeInstanceClass.getRowCount() - 1);
+        sortKeys.add(new SortKey(InstanceTableModel.COL_SELECTED, SortOrder.DESCENDING));
+        tableInstances.getRowSorter().setSortKeys(sortKeys);
+    }//GEN-LAST:event_btnSelectedInstancesActionPerformed
+
+    private void btnRandomSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRandomSelectionActionPerformed
+        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+        EDACCExperimentModeRandomInstanceSelection random = new EDACCExperimentModeRandomInstanceSelection(mainFrame, true, this);
+        random.setLocationRelativeTo(mainFrame);
+        random.setVisible(true);
+    }//GEN-LAST:event_btnRandomSelectionActionPerformed
+
+    private void btnSetPriorityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSetPriorityActionPerformed
+        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+        EDACCExperimentModePrioritySelection priorityDialog = new EDACCExperimentModePrioritySelection(mainFrame, true);
+        priorityDialog.setLocationRelativeTo(mainFrame);
+        priorityDialog.setVisible(true);
+        final Integer priority = priorityDialog.getPriority();
+        if (priority != null) {
+            Tasks.startTask(new TaskRunnable() {
+
+                @Override
+                public void run(Tasks task) {
+                    try {
+                        expController.setPriority(priority);
+                    } catch (Exception ex) {
+                        javax.swing.JOptionPane.showMessageDialog(Tasks.getTaskView(), ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            });
+
+        }
+    }//GEN-LAST:event_btnSetPriorityActionPerformed
+
+    /**
+     * Stops the jobs timer.
+     */
+    public void stopJobsTimer() {
+        if (jobsTimer != null) {
+            jobsTimer.cancel();
+            jobsTimer = null;
+            chkJobsTimer.setSelected(false);
+        }
     }
 
+    /**
+     * Method to be called after an experiment is loaded.
+     */
+    public void afterExperimentLoaded() {
+        reinitializeInstances();
+        reinitializeJobBrowser();
+        manageExperimentPane.setEnabledAt(TAB_SOLVERS, true);
+        manageExperimentPane.setEnabledAt(TAB_INSTANCES, true);
+        manageExperimentPane.setEnabledAt(TAB_GENERATEJOBS, true);
+        manageExperimentPane.setEnabledAt(TAB_JOBBROWSER, true);
+        manageExperimentPane.setEnabledAt(TAB_ANALYSIS, true);
+
+        setTitles();
+        btnDiscardExperiment.setEnabled(true);
+        btnImport.setEnabled(true);
+    }
+
+    /**
+     * Method to be call after an experiment ist unloaded.
+     */
+    public void afterExperimentUnloaded() {
+        manageExperimentPane.setSelectedIndex(0);
+        manageExperimentPane.setEnabledAt(TAB_SOLVERS, false);
+        manageExperimentPane.setEnabledAt(TAB_INSTANCES, false);
+        manageExperimentPane.setEnabledAt(TAB_GENERATEJOBS, false);
+        manageExperimentPane.setEnabledAt(TAB_JOBBROWSER, false);
+        manageExperimentPane.setEnabledAt(TAB_ANALYSIS, false);
+        setTitles();
+        btnDiscardExperiment.setEnabled(false);
+    }
+
+    private void createDatabaseErrorMessage(SQLException e) {
+        javax.swing.JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "There was an error while communicating with the database: " + e, "Connection error", javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
+
+    /**
+     * Returns the instance table.
+     * @return the instance table
+     */
+    public JTable getTableInstances() {
+        return tableInstances;
+    }
+
+    /**
+     * Updates the runtime estimation in the job browser tab.
+     */
     public void updateRuntimeEstimation() {
         if (jobsTableModel.getJobs() == null) {
             lblETA.setText("");
@@ -2636,13 +2950,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
     }
 
-    @Action
-    public void btnFilterJobs() {
-        EDACCApp.getApplication().show(resultBrowserRowFilter);
-        jobsTableModel.fireTableDataChanged();
-        updateJobsFilterStatus();
-    }
-
+    /**
+     * Updates the jobs filter status in the job browser tab. Also sets a warning message if no grid queue is assigned.
+     */
     public void updateJobsFilterStatus() {
         lblJobsFilterStatus.setIcon(new ImageIcon("warning-icon.png"));
         lblJobsFilterStatus.setForeground(Color.red);
@@ -2655,159 +2965,30 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         lblJobsFilterStatus.setText(status);
     }
-
-    @Action
-    public void btnCSVExport() {
-        stopJobsTimer();
-        JFileChooser fc = new JFileChooser();
-        FileFilter CSVFilter = new FileFilter() {
-
-            @Override
-            public boolean accept(File f) {
-                return f.getName().toLowerCase().endsWith(".csv") || f.isDirectory();
-            }
-
-            @Override
-            public String getDescription() {
-                return "CSV Files (comma separated values)";
-            }
-        };
-        FileFilter TeXFilter = new FileFilter() {
-
-            @Override
-            public boolean accept(File f) {
-                return f.getName().toLowerCase().endsWith(".tex") || f.isDirectory();
-            }
-
-            @Override
-            public String getDescription() {
-                return "TeX Files (*.tex)";
-            }
-        };
-        fc.setFileFilter(CSVFilter);
-        fc.setFileFilter(TeXFilter);
-        if (fc.showDialog(this, "Export") != JFileChooser.APPROVE_OPTION) {
-            return;
-        }
-        String filename = fc.getSelectedFile().getAbsolutePath();
-        if (fc.getFileFilter() == CSVFilter && !filename.toLowerCase().endsWith(".csv")) {
-            filename += ".csv";
-        }
-        if (fc.getFileFilter() == TeXFilter && !filename.toLowerCase().endsWith(".tex")) {
-            filename += ".tex";
-        }
-        if (filename.toLowerCase().endsWith(".csv")) {
-            Tasks.startTask("exportCSV", new Class[]{File.class, edacc.model.Tasks.class}, new Object[]{new File(filename), null}, expController, this);
-        } else if (filename.toLowerCase().endsWith(".tex")) {
-            Tasks.startTask("exportTeX", new Class[]{File.class, edacc.model.Tasks.class}, new Object[]{new File(filename), null}, expController, this);
-        }
-    }
-
+    
+    /**
+     * Returns the jobs table of the job browser tab.
+     * @return the jobs table
+     */
     public JTable getTableJobs() {
         return tableJobs;
     }
 
-    @Action
-    public void btnUndoInstances() {
-        insTableModel.undo();
-        this.setTitles();
-    }
-
+    /**
+     * Updates the filter status of the instances tab.
+     * @param status 
+     */
     public void setFilterStatus(String status) {
         lblFilterStatus.setForeground(Color.red);
         lblFilterStatus.setText(status);
 
     }
 
-    @Action
-    public void btnDiscardExperiment() {
-        boolean unload = !hasUnsavedChanges() || (JOptionPane.showConfirmDialog(this,
-                "Discarding an experiment will make you lose all unsaved changes of the current experiment. Continue discarding the experiment?",
-                "Warning!",
-                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION);
-        if (unload) {
-            expController.unloadExperiment();
-            tableExperiments.requestFocusInWindow();
-        }
-    }
-
-    @Action
-    public void btnSelectQueue() {
-        try {
-            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            EDACCManageGridQueuesDialog manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true, expController);
-            manageGridQueues.setLocationRelativeTo(mainFrame);
-            manageGridQueues.setVisible(true);
-        } catch (NoConnectionToDBException ex) {
-            JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-        }
-    }
-
-    @Action
-    public void btnEditExperiment() {
-        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-
-        Experiment exp = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
-        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription());
-        dialogEditExp.setLocationRelativeTo(mainFrame);
-        try {
-            while (true) {
-                dialogEditExp.setVisible(true);
-                if (dialogEditExp.canceled) {
-                    break;
-                }
-                if ("".equals(dialogEditExp.expName)) {
-                    javax.swing.JOptionPane.showMessageDialog(null, "The experiment must have a name.", "Edit experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
-                } else if (expController.getExperiment(dialogEditExp.expName) != null && expController.getExperiment(dialogEditExp.expName) != exp) {
-                    javax.swing.JOptionPane.showMessageDialog(null, "There exists already an experiment with the same name.", "Edit experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
-                } else {
-                    break;
-                }
-            }
-            if (!dialogEditExp.canceled) {
-                String oldName = exp.getName();
-                String oldDescr = exp.getDescription();
-                exp.setName(dialogEditExp.expName);
-                exp.setDescription(dialogEditExp.expDesc);
-                try {
-                    expController.saveExperiment(exp);
-                } catch (SQLException ex) {
-                    exp.setName(oldName);
-                    exp.setDescription(oldDescr);
-                    createDatabaseErrorMessage(ex);
-                }
-                for (int i = 0; i < expTableModel.getRowCount(); i++) {
-                    if (expTableModel.getExperimentAt(i) == exp) {
-                        expTableModel.fireTableRowsUpdated(i, i);
-                    }
-                }
-            }
-        } catch (SQLException ex) {
-            createDatabaseErrorMessage(ex);
-        } catch (Exception ex) {
-            javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage(), "Edit experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
-        } finally {
-            dialogEditExp.dispose();
-        }
-    }
-
-    @Action
-    public void btnSelectedInstances() {
-        LinkedList<SortKey> sortKeys = new LinkedList<SortKey>();
-        jTreeInstanceClass.setSelectionInterval(0, jTreeInstanceClass.getRowCount() - 1);
-        sortKeys.add(new SortKey(InstanceTableModel.COL_SELECTED, SortOrder.DESCENDING));
-        tableInstances.getRowSorter().setSortKeys(sortKeys);
-    }
-
-    @Action
-    public void btnRandomSelection() {
-        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        EDACCExperimentModeRandomInstanceSelection random = new EDACCExperimentModeRandomInstanceSelection(mainFrame, true, this);
-        random.setLocationRelativeTo(mainFrame);
-        random.setVisible(true);
-    }
-
+    /**
+     * Randomly selects <code>count</code> instances in the instance table.
+     * @param count the number of instances to be selected
+     * @throws Exception if their are less then instances than count in the instances table an exception is thrown.
+     */
     public void randomInstanceSelection(int count) throws Exception {
         LinkedList<Integer> idxs = new LinkedList<Integer>();
         for (int i = 0; i < tableInstances.getRowCount(); i++) {
@@ -2827,29 +3008,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         insTableModel.fireTableDataChanged();
     }
 
-    @Action
-    public void btnSetPriority() {
-        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        EDACCExperimentModePrioritySelection priorityDialog = new EDACCExperimentModePrioritySelection(mainFrame, true);
-        priorityDialog.setLocationRelativeTo(mainFrame);
-        priorityDialog.setVisible(true);
-        final Integer priority = priorityDialog.getPriority();
-        if (priority != null) {
-            Tasks.startTask(new TaskRunnable() {
-
-                @Override
-                public void run(Tasks task) {
-                    try {
-                        expController.setPriority(priority);
-                    } catch (Exception ex) {
-                        javax.swing.JOptionPane.showMessageDialog(Tasks.getTaskView(), ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            });
-
-        }
-    }
-
+    /**
+     * Deinitializes the experiment mode.
+     */
     public void deinitialize() {
         reinitializeGUI();
     }

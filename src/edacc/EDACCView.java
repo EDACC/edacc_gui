@@ -395,7 +395,6 @@ public class EDACCView extends FrameView implements Observer {
 
                 Util.clearCaches();
                 DatabaseConnector.getInstance().disconnect();
-                experimentMode.expController.unloadExperiment();
                 manageDBModeMenuItem.setSelected(false);
                 manageExperimentModeMenuItem.setSelected(false);
                 noMode();
@@ -403,7 +402,6 @@ public class EDACCView extends FrameView implements Observer {
         } else {
             Util.clearCaches();
             DatabaseConnector.getInstance().disconnect();
-            experimentMode.expController.unloadExperiment();
             manageDBModeMenuItem.setSelected(false);
             manageExperimentModeMenuItem.setSelected(false);
             noMode();
