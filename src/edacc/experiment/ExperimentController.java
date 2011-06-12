@@ -768,7 +768,6 @@ public class ExperimentController {
      * Generates a ZIP archive with the necessary files for the grid.
      */
     public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, boolean exportClient, boolean exportRunsolver, boolean exportConfig, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException, InstanceNotInDBException, TaskCancelledException {
-        boolean foundSolverWithSameName = false;
         File tmpDir = new File("tmp");
         tmpDir.mkdir();
         Tasks.getTaskView().setCancelable(true);
@@ -881,10 +880,6 @@ public class ExperimentController {
                 throw new TaskCancelledException("Cancelled");
             }
         }
-        if (foundSolverWithSameName) {
-            javax.swing.JOptionPane.showMessageDialog(null, "The resulting package file contains solvers with same names.", "Information", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-        }
-
     }
 
     private boolean deleteDirectory(File dir) {

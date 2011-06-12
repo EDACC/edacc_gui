@@ -26,6 +26,7 @@ public class EDACCExperimentModeClientCellRenderer extends DefaultTableCellRende
             checkbox.setBackground(c.getBackground());
             checkbox.setForeground(c.getForeground());
             checkbox.setSelected((Boolean) value);
+            checkbox.setEnabled(false);
             checkbox.repaint();
             c = checkbox;
         }

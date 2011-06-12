@@ -1855,6 +1855,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             if (tblClients.getSelectedRow() != -1) {
                 Client client = clientTableModel.getClientAt(tblClients.convertRowIndexToModel(tblClients.getSelectedRow()));
                 EDACCExperimentModeClientDialog dialog = new EDACCExperimentModeClientDialog(EDACCApp.getApplication().getMainFrame(), true, client);
+                dialog.setName("EDACCExperimentModeClientDialog");
                 EDACCApp.getApplication().show(dialog);
             }
         }

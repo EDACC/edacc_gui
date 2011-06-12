@@ -13,6 +13,7 @@ package edacc;
 import edacc.experiment.ExperimentResultCache;
 import edacc.experiment.ExperimentResultsBrowserTableModel;
 import edacc.experiment.ResultsBrowserTableRowSorter;
+import edacc.experiment.Util;
 import edacc.model.Client;
 import edacc.model.ClientDAO;
 import edacc.model.ExperimentResult;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
@@ -30,12 +32,13 @@ import javax.swing.SwingWorker;
  */
 public class EDACCExperimentModeClientDialog extends javax.swing.JDialog implements Observer {
 
-    ExperimentResultsBrowserTableModel jobsTableModel;
-    ExperimentResultCache resultCache;
-    ResultsBrowserTableRowSorter resultsBrowserTableRowSorter;
-    EDACCExperimentModeJobsCellRenderer tableJobsStringRenderer;
-    Client client;
-    Thread thread;
+    private ExperimentResultsBrowserTableModel jobsTableModel;
+    private ExperimentResultCache resultCache;
+    private ResultsBrowserTableRowSorter resultsBrowserTableRowSorter;
+    private EDACCExperimentModeJobsCellRenderer tableJobsStringRenderer;
+    private EDACCJobsFilter jobsRowFilter;
+    private Client client;
+    private Thread thread;
 
     /** Creates new form EDACCExperimentModeClient */
     public EDACCExperimentModeClientDialog(java.awt.Frame parent, boolean modal, Client client) {
@@ -58,6 +61,7 @@ public class EDACCExperimentModeClientDialog extends javax.swing.JDialog impleme
         thread = new Thread(new Runnable() {
 
             @Override
+            @SuppressWarnings("SleepWhileInLoop")
             public void run() {
                 try {
                     Thread.sleep(1000);
@@ -74,6 +78,13 @@ public class EDACCExperimentModeClientDialog extends javax.swing.JDialog impleme
             }
         });
 
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                jobsRowFilter = new EDACCJobsFilter(EDACCApp.getApplication().getMainFrame(), true, tblJobs, false);
+            }
+        });
         client.addObserver(this);
     }
 
@@ -122,7 +133,7 @@ public class EDACCExperimentModeClientDialog extends javax.swing.JDialog impleme
                     results = new ArrayList<ExperimentResult>();
                     results.addAll(resultCache.values());
                     jobsTableModel.setJobs(results);
-                    //main.resultBrowserRowFilter.updateFilterTypes();
+                    jobsRowFilter.updateFilterTypes();
                     jobsTableModel.fireTableDataChanged();
                 } else {
                     // repaint the table: updates the currently visible rectangle, otherwise there might be duplicates of rows.
@@ -153,7 +164,6 @@ public class EDACCExperimentModeClientDialog extends javax.swing.JDialog impleme
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             // TODO: shouldn't happen but show message if it does
         }
 
@@ -174,6 +184,9 @@ public class EDACCExperimentModeClientDialog extends javax.swing.JDialog impleme
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblJobs = new javax.swing.JTable();
+        btnBrowserColumnSelection = new javax.swing.JButton();
+        btnFilterJobs = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentModeClientDialog.class);
@@ -204,7 +217,7 @@ public class EDACCExperimentModeClientDialog extends javax.swing.JDialog impleme
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addComponent(txtMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 447, Short.MAX_VALUE)
+                .addComponent(txtMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 477, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSendMessage))
         );
@@ -236,15 +249,59 @@ public class EDACCExperimentModeClientDialog extends javax.swing.JDialog impleme
         tblJobs.setName("tblJobs"); // NOI18N
         jScrollPane1.setViewportView(tblJobs);
 
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCExperimentModeClientDialog.class, this);
+        btnBrowserColumnSelection.setAction(actionMap.get("btnBrowserColumnSelection")); // NOI18N
+        btnBrowserColumnSelection.setText(resourceMap.getString("btnBrowserColumnSelection.text")); // NOI18N
+        btnBrowserColumnSelection.setToolTipText(resourceMap.getString("btnBrowserColumnSelection.toolTipText")); // NOI18N
+        btnBrowserColumnSelection.setName("btnBrowserColumnSelection"); // NOI18N
+        btnBrowserColumnSelection.setPreferredSize(new java.awt.Dimension(103, 25));
+        btnBrowserColumnSelection.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBrowserColumnSelectionActionPerformed(evt);
+            }
+        });
+
+        btnFilterJobs.setAction(actionMap.get("btnFilterJobs")); // NOI18N
+        btnFilterJobs.setText(resourceMap.getString("btnFilterJobs.text")); // NOI18N
+        btnFilterJobs.setToolTipText(resourceMap.getString("btnFilterJobs.toolTipText")); // NOI18N
+        btnFilterJobs.setName("btnFilterJobs"); // NOI18N
+        btnFilterJobs.setPreferredSize(new java.awt.Dimension(103, 25));
+        btnFilterJobs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFilterJobsActionPerformed(evt);
+            }
+        });
+
+        jButton1.setText(resourceMap.getString("jButton1.text")); // NOI18N
+        jButton1.setName("jButton1"); // NOI18N
+        jButton1.setPreferredSize(new java.awt.Dimension(103, 25));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 510, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(btnBrowserColumnSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnFilterJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 225, Short.MAX_VALUE)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnBrowserColumnSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnFilterJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -281,8 +338,42 @@ public class EDACCExperimentModeClientDialog extends javax.swing.JDialog impleme
         }
     }//GEN-LAST:event_txtMessageKeyReleased
 
+    private void btnBrowserColumnSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBrowserColumnSelectionActionPerformed
+        List<SortKey> sortKeys = (List<SortKey>) tblJobs.getRowSorter().getSortKeys();
+        List<String> columnNames = new ArrayList<String>();
+        for (SortKey sk : sortKeys) {
+            columnNames.add(tblJobs.getColumnName(tblJobs.convertColumnIndexToView(sk.getColumn())));
+        }
+        EDACCResultsBrowserColumnSelection dialog = new EDACCResultsBrowserColumnSelection(EDACCApp.getApplication().getMainFrame(), true, jobsTableModel);
+        dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+        dialog.setVisible(true);
+        List<SortKey> newSortKeys = new ArrayList<SortKey>();
+        for (int k = 0; k < columnNames.size(); k++) {
+            String col = columnNames.get(k);
+            for (int i = 0; i < tblJobs.getColumnCount(); i++) {
+                if (tblJobs.getColumnName(i).equals(col)) {
+                    newSortKeys.add(new SortKey(tblJobs.convertColumnIndexToModel(i), sortKeys.get(k).getSortOrder()));
+                }
+            }
+        }
+        tblJobs.getRowSorter().setSortKeys(newSortKeys);
+        Util.updateTableColumnWidth(tblJobs);        
+    }//GEN-LAST:event_btnBrowserColumnSelectionActionPerformed
+
+    private void btnFilterJobsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterJobsActionPerformed
+        EDACCApp.getApplication().show(jobsRowFilter);
+        jobsTableModel.fireTableDataChanged();
+    }//GEN-LAST:event_btnFilterJobsActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        setVisible(false);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBrowserColumnSelection;
+    private javax.swing.JButton btnFilterJobs;
     private javax.swing.JButton btnSendMessage;
+    private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
