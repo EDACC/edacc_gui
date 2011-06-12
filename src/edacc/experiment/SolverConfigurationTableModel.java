@@ -92,6 +92,7 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
         if (columnIndex == 0) {
             selected[rowIndex] = (Boolean) aValue;
         }
+        fireTableCellUpdated(rowIndex, columnIndex);
     }
 
     public void setSolverConfigurations(ArrayList<SolverConfiguration> solverConfigurations) {

@@ -59,8 +59,6 @@ import java.util.Observer;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -78,7 +76,6 @@ import javax.swing.SortOrder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -182,6 +179,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         solverConfigTablePanel = new EDACCExperimentModeSolverConfigurationTablePanel(solverConfigPanel);
         solTableModel = new SolverTableModel();
         tableSolvers.setModel(solTableModel);
+        Util.addSpaceSelection(tableSolvers, SolverTableModel.COL_SELECTED);
         solverConfigPanel.setParent(this);
         solverConfigTableModel = new SolverConfigurationTableModel();
 
@@ -190,6 +188,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tableSolverConfigurationsRowSorter.setRowFilter(solverConfigurationTableRowFilter);
         tblSolverConfigs.setRowSorter(tableSolverConfigurationsRowSorter);
         tblSolverConfigs.setModel(solverConfigTableModel);
+        Util.addSpaceSelection(tblSolverConfigs, SolverConfigurationTableModel.COL_SEL);
         tableSolvers.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             @Override
@@ -226,24 +225,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 instanceFilter = new EDACCInstanceFilter(EDACCApp.getApplication().getMainFrame(), true, tableInstances, true);
             }
         });
-        tableInstances.addKeyListener(new java.awt.event.KeyAdapter() {
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    for (int row : tableInstances.getSelectedRows()) {
-                        int rowModel = tableInstances.convertRowIndexToModel(row);
-                        insTableModel.setValueAt(!(Boolean) insTableModel.getValueAt(rowModel, InstanceTableModel.COL_SELECTED), rowModel, InstanceTableModel.COL_SELECTED);
-                    }
-                }
-            }
-        });
         instanceClassTreeModel = new DefaultTreeModel(null);
         jTreeInstanceClass.setModel(instanceClassTreeModel);
         jTreeInstanceClass.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         jTreeInstanceClass.setRootVisible(false);
         jTreeInstanceClass.setShowsRootHandles(true);
         instanceColumnSelector = new TableColumnSelector(tableInstances);
+        Util.addSpaceSelection(tableInstances, InstanceTableModel.COL_SELECTED);
         /* -------------------------------- end of instances tab -------------------------------- */
         /* -------------------------------- generate jobs tab -------------------------------- */
         generateJobsTableModel = new GenerateJobsTableModel(expController);
@@ -411,6 +399,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
     }
 
+    /**
+     * Reinitializes the gui. Stops all running threads and calls the reinitialization methods.
+     * @see reinitialize*()
+     */
     public void reinitializeGUI() {
         if (experimentUpdateThread != null) {
             experimentUpdateThread.cancel(true);
@@ -428,10 +420,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         reinitializeJobBrowser();
     }
 
+    /**
+     * Reinitializes the experiment tab.
+     */
     public void reinitializeExperiments() {
         expTableModel.setExperiments(null);
     }
 
+    /**
+     * Reinitializes the instances tab, i.e. clears all filters and instance class selections. It also resets the visible columns.
+     */
     public void reinitializeInstances() {
         instanceFilter.clearFilters();
         jTreeInstanceClass.setSelectionPath(null);
@@ -449,10 +447,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         insTableModel.fireTableDataChanged();
     }
 
+    /**
+     * Reinitializes the solvers tab.
+     */
     public void reinitializeSolvers() {
         jScrollPane4.setViewportView(solverConfigPanel);
     }
 
+    /**
+     * Reinitializes the job browser, i.e. clears the jobs table, clears the filters and resets the column visibility.
+     */
     public void reinitializeJobBrowser() {
         try {
             jobsTableModel.setJobs(null);
@@ -465,8 +469,18 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jobsTimerWasActive = false;
     }
 
+    /**
+     * initializes the experiment mode. Should be called when changing from manage db mode to experiment mode.<br/>
+     * Will throw an exception on errors.
+     * @throws SQLException
+     * @throws InstanceClassMustBeSourceException
+     * @throws IOException
+     * @throws NoConnectionToDBException
+     * @throws PropertyNotInDBException
+     * @throws PropertyTypeNotExistException
+     * @throws ComputationMethodDoesNotExistException 
+     */
     public void initialize() throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
-
         btnRemoveExperiment.setEnabled(false);
         btnEditExperiment.setEnabled(false);
         btnLoadExperiment.setEnabled(false);
@@ -483,6 +497,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 reinitializeInstances();
             }
         });
+        
+        // reload all columns
+        solTableModel.fireTableStructureChanged();
+        
+        boolean isCompetition = DatabaseConnector.getInstance().isCompetitionDB();
+        // if it is no competition db, then remove the competition columns
+        if (!isCompetition) {
+            tableSolvers.removeColumn(tableSolvers.getColumnModel().getColumn(SolverTableModel.COL_CATEGORIES));
+        }
     }
 
     /** This method is called from within the constructor to

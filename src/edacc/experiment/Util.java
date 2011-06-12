@@ -6,6 +6,8 @@ import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstance;
 import java.awt.Color;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
@@ -267,5 +270,27 @@ public class Util {
             }
         }
         return res;
+    }
+
+    /**
+     * If this table has a editable boolean column, the user can press space to toggle the selection of the selected rows for the column.
+     * @param table the table to add the key listener
+     * @param column the column which has values of boolean class and is editable
+     */
+    public static void addSpaceSelection(final JTable table, final int column) {
+        table.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                    TableModel model = table.getModel();
+                    for (int row : table.getSelectedRows()) {
+                        int rowModel = table.convertRowIndexToModel(row);
+                        model.setValueAt(!(Boolean) model.getValueAt(rowModel, column), rowModel, column);
+                    }
+                    e.consume();
+                }
+            }
+        });
     }
 }

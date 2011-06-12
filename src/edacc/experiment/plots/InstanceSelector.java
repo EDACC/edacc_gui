@@ -3,6 +3,7 @@ package edacc.experiment.plots;
 import edacc.EDACCApp;
 import edacc.experiment.InstanceTableModel;
 import edacc.EDACCInstanceFilter;
+import edacc.experiment.Util;
 import edacc.model.Instance;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -46,6 +47,8 @@ public class InstanceSelector extends JPanel {
         table.moveColumn(0, 1);
         sorter = new TableRowSorter<InstanceTableModel>(tableModel);
         table.setRowSorter(sorter);
+        Util.addSpaceSelection(table, InstanceTableModel.COL_SELECTED);
+        
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override

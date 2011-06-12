@@ -13,9 +13,12 @@ import java.util.HashMap;
  */
 public class SolverTableModel extends AbstractTableModel {
 
-    private static final String[] columns_noCompetition = {"Name", "Version", "binary name", "md5", "description", "Selected"};
-    private static final String[] columns_competition = {"Name", "Version", "binary name", "md5", "description", "categories", "Selected"};
-    private String[] columns = columns_competition;
+    public static final int COL_NAME = 0;
+    public static final int COL_VERSION = 1;
+    public static final int COL_DESCRIPTION = 2;
+    public static final int COL_CATEGORIES = 3;
+    public static final int COL_SELECTED = 4;
+    private static final String[] columns = {"Name", "Version", "description", "categories", "Selected"};
     private String[] categories;
     private boolean isCompetition;
     private ArrayList<Solver> solvers;
@@ -38,7 +41,6 @@ public class SolverTableModel extends AbstractTableModel {
         }
         categories = null;
         if (isCompetition) {
-            columns = columns_competition;
             if (solvers != null) {
                 categories = new String[solvers.size()];
                 try {
@@ -59,10 +61,7 @@ public class SolverTableModel extends AbstractTableModel {
                 } catch (Exception e) {
                 }
             }
-        } else {
-            columns = columns_noCompetition;
-        }
-        this.fireTableStructureChanged();
+        } 
     }
 
     @Override
@@ -110,23 +109,15 @@ public class SolverTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
-            case 0:
+            case COL_NAME:
                 return solvers.get(rowIndex).getName();
-            case 1:
+            case COL_VERSION:
                 return solvers.get(rowIndex).getVersion();
-            case 2:
-                return "";//solvers.get(rowIndex).getBinaryName();
-            case 3:
-                return "";//solvers.get(rowIndex).getMd5();
-            case 4:
+            case COL_DESCRIPTION:
                 return solvers.get(rowIndex).getDescription();
-            case 5:
-                if (isCompetition) {
-                    return categories[rowIndex] == null ? "" : categories[rowIndex];
-                } else {
-                    return selected[rowIndex];
-                }
-            case 6:
+            case COL_CATEGORIES:
+                return categories == null ? "" : (categories[rowIndex] == null ? "" : categories[rowIndex]);
+            case COL_SELECTED:
                 return selected[rowIndex];
             default:
                 return "";

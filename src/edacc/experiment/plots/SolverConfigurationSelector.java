@@ -1,6 +1,7 @@
 package edacc.experiment.plots;
 
 import edacc.experiment.SolverConfigurationTableModel;
+import edacc.experiment.Util;
 import edacc.model.SolverConfiguration;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -35,10 +36,13 @@ public class SolverConfigurationSelector extends JPanel {
     public SolverConfigurationSelector() {
         super(new GridBagLayout());
         Dimension dimensionButton = new Dimension(125, 25);
+        
         tableModel = new SolverConfigurationTableModel();
         table = new JTable(tableModel);
         sorter = new TableRowSorter<SolverConfigurationTableModel>(tableModel);
         table.setRowSorter(sorter);
+        Util.addSpaceSelection(table, SolverConfigurationTableModel.COL_SEL);
+        
         scrollPane = new JScrollPane(table);
         lblFilter = new JLabel("");
         lblFilter.setForeground(Color.red);
