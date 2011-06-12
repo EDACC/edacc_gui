@@ -47,6 +47,7 @@ public class EDACCExperimentModeClientDialog extends javax.swing.JDialog impleme
         initComponents();
         this.client = client;
         jobsTableModel = new ExperimentResultsBrowserTableModel();
+        jobsTableModel.updateProperties();
         tblJobs.setModel(jobsTableModel);
         resultsBrowserTableRowSorter = new ResultsBrowserTableRowSorter(jobsTableModel);
         resultsBrowserTableRowSorter.setSortsOnUpdates(true);
@@ -58,6 +59,7 @@ public class EDACCExperimentModeClientDialog extends javax.swing.JDialog impleme
         tblJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeJobsCellRenderer());
         tblJobs.setDefaultRenderer(Float.class, new EDACCExperimentModeJobsCellRenderer());
         jobsColumnSelector = new TableColumnSelector(tblJobs);
+        jobsColumnSelector.setColumnVisiblity(jobsTableModel.getDefaultVisibility());
         
         resultCache = new ExperimentResultCache(client);
         thread = new Thread(new Runnable() {
