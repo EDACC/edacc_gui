@@ -36,8 +36,7 @@ public class ResultsBrowserTableRowSorter extends TableRowSorter<AbstractTableMo
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                int col = jobsTableModel.getIndexForColumn(columnIndex);
-                if (col == ExperimentResultsBrowserTableModel.COL_RUNTIME) {
+                if (columnIndex == ExperimentResultsBrowserTableModel.COL_RUNTIME) {
                     return Integer.class;
                 }
                 return jobsTableModel.getColumnClass(columnIndex);
@@ -82,9 +81,8 @@ public class ResultsBrowserTableRowSorter extends TableRowSorter<AbstractTableMo
         }
 
         @Override
-        public Object getValueAt(int row, int column) {
+        public Object getValueAt(int row, int col) {
             ExperimentResultsBrowserTableModel model = jobsTableModel;
-            int col = model.getIndexForColumn(column);
             if (col == ExperimentResultsBrowserTableModel.COL_STATUS) {
                 return "" + (char) (model.getStatus(row).getStatusCode() + 68);
             } else if (col == ExperimentResultsBrowserTableModel.COL_RUNTIME) {
@@ -94,7 +92,7 @@ public class ResultsBrowserTableRowSorter extends TableRowSorter<AbstractTableMo
                     return -1;
                 }
             }
-            return model.getValueAt(row, column);
+            return model.getValueAt(row, col);
         }
 
         @Override

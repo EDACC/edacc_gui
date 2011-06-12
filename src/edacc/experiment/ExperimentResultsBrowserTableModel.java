@@ -63,30 +63,30 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     private ArrayList<ExperimentResult> jobs;
     // the constant columns
     private String[] CONST_COLUMNS = {"ID", "Priority", "Compute Queue", "Compute Node", "Compute Node IP", "Solver", "Solver Configuration", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Run time", "Result Code", "CPU Time Limit", "Wall Clock Time Limit", "Memory Limit", "Stack Size Limit", "Output Size Limit", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
-    // the visibility of each column
-    private boolean[] CONST_VISIBLE = {false, false, true, false, false, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false};
+    // the default visibility of each column
+    public static boolean[] DEFAULT_VISIBILITY = {false, false, true, false, false, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false};
     private String[] columns;
     private ArrayList<Property> properties;
-    private boolean[] visible;
     private HashMap<Integer, GridQueue> gridQueues;
     private HashMap<Integer, String> parameters;
     private int firstInstancePropertyColumn;
 
     public ExperimentResultsBrowserTableModel() {
         columns = new String[CONST_COLUMNS.length];
-        visible = new boolean[columns.length];
-        for (int i = 0; i < columns.length; i++) {
-            columns[i] = CONST_COLUMNS[i];
-            visible[i] = CONST_VISIBLE[i];
-        }
+        System.arraycopy(CONST_COLUMNS, 0, columns, 0, columns.length);
     }
 
-    public void updateProperties() {
+    public boolean updateProperties() {
         ArrayList<Property> tmp = new ArrayList<Property>();
         try {
             tmp.addAll(PropertyDAO.getAllResultProperties());
             firstInstancePropertyColumn = COL_PROPERTY + tmp.size();
             tmp.addAll(PropertyDAO.getAllInstanceProperties());
+            for (int i = tmp.size() - 1; i >= 0; i--) {
+                if (tmp.get(i).isMultiple()) {
+                    tmp.remove(i);
+                }
+            }
         } catch (Exception e) {
             if (edacc.ErrorLogger.DEBUG) {
                 e.printStackTrace();
@@ -94,23 +94,16 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         }
         if (!tmp.equals(properties)) {
             properties = tmp;
-
-            for (int i = properties.size() - 1; i >= 0; i--) {
-                if (properties.get(i).isMultiple()) {
-                    properties.remove(i);
-                }
-            }
             columns = java.util.Arrays.copyOf(columns, CONST_COLUMNS.length + properties.size());
-            visible = java.util.Arrays.copyOf(visible, CONST_VISIBLE.length + properties.size());
             int j = 0;
             for (int i = CONST_COLUMNS.length; i < columns.length; i++) {
                 columns[i] = properties.get(j).getName();
                 j++;
             }
-            this.resetColumnVisibility();
             this.fireTableStructureChanged();
+            return true;
         }
-
+        return false;
     }
 
     /**
@@ -235,26 +228,6 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         }
     }
 
-    public int getIndexForColumn(int col) {
-        for (int i = 0; i < visible.length; i++) {
-            if (visible[i]) {
-                col--;
-            }
-            if (col == -1) {
-                return i;
-            }
-        }
-        return 0;
-    }
-
-    /**
-     * Returns an array of all column names, not only the visible ones.
-     * @return array of string with all column names
-     */
-    public String[] getAllColumnNames() {
-        return columns;
-    }
-
     @Override
     public int getRowCount() {
         return jobs == null ? 0 : jobs.size();
@@ -262,26 +235,16 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        int res = 0;
-        for (int i = 0; i < visible.length; i++) {
-            if (visible[i]) {
-                res++;
-            }
-        }
-        return res;
+        return columns.length;
     }
 
     @Override
     public String getColumnName(int col) {
-        return columns[getIndexForColumn(col)];
+        return columns[col];
     }
 
     @Override
     public Class getColumnClass(int col) {
-        return getRealColumnClass(getIndexForColumn(col));
-    }
-
-    public Class getRealColumnClass(int col) {
         if (getRowCount() == 0) {
             return String.class;
         } else {
@@ -295,38 +258,18 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
                 }
                 return properties.get(propertyIdx).getPropertyValueType().getJavaType();
             } else {
-                if (getRealValueAt(0, col) == null) {
+                if (getValueAt(0, col) == null) {
                     return String.class;
                 } else {
-                    return getRealValueAt(0, col).getClass();
+                    return getValueAt(0, col).getClass();
                 }
             }
         }
     }
 
-    /**
-     * Sets the column visibility.
-     * @param visible a boolean array - length must equal getAllCoulumnNames().length or this method does nothing.
-     */
-    public void setColumnVisibility(boolean[] visible, boolean updateTable) {
-        if (columns.length != visible.length) {
-            return;
-        }
-        this.visible = visible;
-        if (updateTable) {
-            this.fireTableStructureChanged();
-        }
-    }
 
-    /**
-     * Returns the visibility array
-     * @return array of boolean, where entry i says whether column i is visible or not
-     */
-    public boolean[] getColumnVisibility() {
-        return visible;
-    }
-
-    public Object getRealValueAt(int rowIndex, int columnIndex) {
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
         if (rowIndex < 0 || rowIndex >= getRowCount()) {
             return null;
         }
@@ -443,19 +386,6 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         }
     }
 
-    @Override
-    public Object getValueAt(int rowIndex, int columnIndex) {
-        if (rowIndex < 0 || rowIndex >= getRowCount()) {
-            return null;
-        }
-        ExperimentResult j = jobs.get(rowIndex);
-
-        if (columnIndex != -1) {
-            columnIndex = getIndexForColumn(columnIndex);
-        }
-        return getRealValueAt(rowIndex, columnIndex);
-    }
-
     public int getFirstInstancePropertyColumn() {
         return firstInstancePropertyColumn;
     }
@@ -538,11 +468,12 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         return res;
     }
 
-    public void resetColumnVisibility() {
-        System.arraycopy(CONST_VISIBLE, 0, visible, 0, CONST_VISIBLE.length);
-        for (int i = CONST_VISIBLE.length; i < visible.length; i++) {
-            visible[i] = false;
+    public boolean[] getDefaultVisibility() {
+        boolean[] res = new boolean[columns.length];
+        System.arraycopy(DEFAULT_VISIBILITY, 0, res, 0, DEFAULT_VISIBILITY.length);
+        for (int i = DEFAULT_VISIBILITY.length; i < res.length; i++) {
+            res[i] = false;
         }
-        fireTableStructureChanged();
+        return res;
     }
 }

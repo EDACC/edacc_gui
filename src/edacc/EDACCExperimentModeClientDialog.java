@@ -13,6 +13,7 @@ package edacc;
 import edacc.experiment.ExperimentResultCache;
 import edacc.experiment.ExperimentResultsBrowserTableModel;
 import edacc.experiment.ResultsBrowserTableRowSorter;
+import edacc.experiment.TableColumnSelector;
 import edacc.experiment.Util;
 import edacc.model.Client;
 import edacc.model.ClientDAO;
@@ -36,10 +37,10 @@ public class EDACCExperimentModeClientDialog extends javax.swing.JDialog impleme
     private ExperimentResultCache resultCache;
     private ResultsBrowserTableRowSorter resultsBrowserTableRowSorter;
     private EDACCExperimentModeJobsCellRenderer tableJobsStringRenderer;
-    private EDACCJobsFilter jobsRowFilter;
+    private EDACCFilter jobsRowFilter;
     private Client client;
     private Thread thread;
-
+    private TableColumnSelector jobsColumnSelector;
     /** Creates new form EDACCExperimentModeClient */
     public EDACCExperimentModeClientDialog(java.awt.Frame parent, boolean modal, Client client) {
         super(parent, modal);
@@ -56,7 +57,8 @@ public class EDACCExperimentModeClientDialog extends javax.swing.JDialog impleme
         tblJobs.setDefaultRenderer(String.class, tableJobsStringRenderer);
         tblJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeJobsCellRenderer());
         tblJobs.setDefaultRenderer(Float.class, new EDACCExperimentModeJobsCellRenderer());
-
+        jobsColumnSelector = new TableColumnSelector(tblJobs);
+        
         resultCache = new ExperimentResultCache(client);
         thread = new Thread(new Runnable() {
 
@@ -82,7 +84,7 @@ public class EDACCExperimentModeClientDialog extends javax.swing.JDialog impleme
 
             @Override
             public void run() {
-                jobsRowFilter = new EDACCJobsFilter(EDACCApp.getApplication().getMainFrame(), true, tblJobs, false);
+                jobsRowFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tblJobs, false);
             }
         });
         client.addObserver(this);
@@ -344,7 +346,7 @@ public class EDACCExperimentModeClientDialog extends javax.swing.JDialog impleme
         for (SortKey sk : sortKeys) {
             columnNames.add(tblJobs.getColumnName(tblJobs.convertColumnIndexToView(sk.getColumn())));
         }
-        EDACCResultsBrowserColumnSelection dialog = new EDACCResultsBrowserColumnSelection(EDACCApp.getApplication().getMainFrame(), true, jobsTableModel);
+        EDACCResultsBrowserColumnSelection dialog = new EDACCResultsBrowserColumnSelection(EDACCApp.getApplication().getMainFrame(), true, jobsColumnSelector, jobsTableModel);
         dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         dialog.setVisible(true);
         List<SortKey> newSortKeys = new ArrayList<SortKey>();

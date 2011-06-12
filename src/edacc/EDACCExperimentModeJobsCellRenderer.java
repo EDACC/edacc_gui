@@ -26,7 +26,7 @@ public class EDACCExperimentModeJobsCellRenderer extends DefaultTableCellRendere
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
         if (value == null) {
-            int column = ((ExperimentResultsBrowserTableModel) table.getModel()).getIndexForColumn(col);
+            int column = col;
             if (column >= ExperimentResultsBrowserTableModel.COL_PROPERTY) {
                 value = "not yet calculated";
             } else if (column == ExperimentResultsBrowserTableModel.COL_RUNTIME) {

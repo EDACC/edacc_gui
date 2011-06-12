@@ -21,6 +21,7 @@ import edacc.experiment.SolverConfigUpdateThread;
 import edacc.experiment.SolverConfigurationTableModel;
 import edacc.experiment.SolverConfigurationTableRowFilter;
 import edacc.experiment.SolverTableModel;
+import edacc.experiment.TableColumnSelector;
 import edacc.experiment.Util;
 import edacc.gridqueues.GridQueuesController;
 import edacc.model.Client;
@@ -58,6 +59,8 @@ import java.util.Observer;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -75,6 +78,7 @@ import javax.swing.SortOrder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -100,7 +104,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public ExperimentResultsBrowserTableModel jobsTableModel;
     public EDACCSolverConfigPanel solverConfigPanel;
     public TableRowSorter<InstanceTableModel> sorter;
-    public EDACCJobsFilter resultBrowserRowFilter;
+    public EDACCFilter resultBrowserRowFilter;
     public DefaultTreeModel instanceClassTreeModel;
     private EDACCInstanceFilter instanceFilter;
     private EDACCOutputViewer outputViewer;
@@ -120,7 +124,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private SolverConfigUpdateThread solverConfigUpdateThread;
     public SolverConfigurationTableModel solverConfigTableModel;
     public SolverConfigurationTableRowFilter solverConfigurationTableRowFilter;
-    
+    private TableColumnSelector jobsColumnSelector;
+    private TableColumnSelector instanceColumnSelector;
 
     /** Creates new form EDACCExperimentMode */
     @SuppressWarnings("LeakingThisInConstructor")
@@ -238,6 +243,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jTreeInstanceClass.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         jTreeInstanceClass.setRootVisible(false);
         jTreeInstanceClass.setShowsRootHandles(true);
+        instanceColumnSelector = new TableColumnSelector(tableInstances);
         /* -------------------------------- end of instances tab -------------------------------- */
         /* -------------------------------- generate jobs tab -------------------------------- */
         generateJobsTableModel = new GenerateJobsTableModel(expController);
@@ -262,7 +268,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
             @Override
             public void run() {
-                resultBrowserRowFilter = new EDACCJobsFilter(EDACCApp.getApplication().getMainFrame(), true, tableJobs, false);
+                resultBrowserRowFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tableJobs, false);
             }
         });
 
@@ -286,6 +292,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
             }
         });
+        jobsColumnSelector = new TableColumnSelector(tableJobs);
+        resetJobsColumnVisibility();
         /* -------------------------------- end of jobs browser tab -------------------------------- */
         /* -------------------------------- analyze tab -------------------------------- */
         analysePanel = new AnalysisPanel(expController);
@@ -357,7 +365,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         } else if (eventId == MouseEvent.MOUSE_CLICKED) {
             int col_view = tableJobs.columnAtPoint(e.getPoint());
-            int col = jobsTableModel.getIndexForColumn(tableJobs.convertColumnIndexToModel(col_view));
+            int col = tableJobs.convertColumnIndexToModel(col_view);
             if (col == ExperimentResultsBrowserTableModel.COL_SOLVER_OUTPUT
                     || col == ExperimentResultsBrowserTableModel.COL_LAUNCHER_OUTPUT
                     || col == ExperimentResultsBrowserTableModel.COL_WATCHER_OUTPUT
@@ -377,7 +385,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     protected void tableJobsProcessMouseMotionEvent(MouseEvent e) {
         int col_view = tableJobs.columnAtPoint(e.getPoint());
-        int col = jobsTableModel.getIndexForColumn(tableJobs.convertColumnIndexToModel(col_view));
+        int col = tableJobs.convertColumnIndexToModel(col_view);
         if (col == ExperimentResultsBrowserTableModel.COL_SOLVER_OUTPUT
                 || col == ExperimentResultsBrowserTableModel.COL_LAUNCHER_OUTPUT
                 || col == ExperimentResultsBrowserTableModel.COL_WATCHER_OUTPUT
@@ -431,6 +439,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             jTreeInstanceClass.collapseRow(i);
         }
         lblFilterStatus.setText("");
+        insTableModel.fireTableStructureChanged();
+        instanceColumnSelector = new TableColumnSelector(tableInstances);
+        resetInstanceColumnVisibility();
+        instanceFilter.setFilterInstanceClasses(false);
+        insTableModel.fireTableDataChanged();
+        edacc.experiment.Util.updateTableColumnWidth(tableInstances);
+        instanceFilter.setFilterInstanceClasses(true);
+        insTableModel.fireTableDataChanged();
     }
 
     public void reinitializeSolvers() {
@@ -444,12 +460,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         } catch (SQLException ex) {
         }
         resultBrowserRowFilter.clearFilters();
-        jobsTableModel.resetColumnVisibility();
+        resetJobsColumnVisibility();
         updateJobsFilterStatus();
         jobsTimerWasActive = false;
     }
 
     public void initialize() throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
+
         btnRemoveExperiment.setEnabled(false);
         btnEditExperiment.setEnabled(false);
         btnLoadExperiment.setEnabled(false);
@@ -462,11 +479,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
             @Override
             public void run() {
-                tableInstances.moveColumn(InstanceTableModel.COL_SELECTED, insTableModel.getColumnCount() - 1);
                 edacc.experiment.Util.updateTableColumnWidth(tableExperiments);
+                reinitializeInstances();
             }
         });
-
     }
 
     /** This method is called from within the constructor to
@@ -539,6 +555,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnUndoInstances = new javax.swing.JButton();
         btnSelectedInstances = new javax.swing.JButton();
         btnRandomSelection = new javax.swing.JButton();
+        btnInstanceColumnSelection = new javax.swing.JButton();
         lblFilterStatus = new javax.swing.JLabel();
         panelExperimentParams = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
@@ -1169,6 +1186,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnRandomSelection.setName("btnRandomSelection"); // NOI18N
         btnRandomSelection.setPreferredSize(new java.awt.Dimension(125, 25));
 
+        btnInstanceColumnSelection.setText(resourceMap.getString("btnInstanceColumnSelection.text")); // NOI18N
+        btnInstanceColumnSelection.setName("btnInstanceColumnSelection"); // NOI18N
+        btnInstanceColumnSelection.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnInstanceColumnSelection.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInstanceColumnSelectionActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -1178,7 +1204,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(btnFilterInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 484, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnInstanceColumnSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 349, Short.MAX_VALUE)
                         .addComponent(btnUndoInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnSaveInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -1208,7 +1236,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnFilterInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnUndoInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSaveInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnSaveInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnInstanceColumnSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -1640,7 +1669,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     jobsTableModel.setJobs(null);
                 } catch (SQLException ex) {
                 }
-                jobsTableModel.updateProperties();
+                if (jobsTableModel.updateProperties()) {
+                    jobsColumnSelector = new TableColumnSelector(tableJobs);
+                    resetJobsColumnVisibility();
+                }
 
                 // first draw the results browser, then load the jobs (SwingUtilites)
                 SwingUtilities.invokeLater(new Runnable() {
@@ -1989,6 +2021,38 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             });
         }
     }//GEN-LAST:event_btnImportActionPerformed
+
+    private void btnInstanceColumnSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInstanceColumnSelectionActionPerformed
+        List<SortKey> sortKeys = (List<SortKey>) tableInstances.getRowSorter().getSortKeys();
+        List<String> columnNames = new ArrayList<String>();
+        for (SortKey sk : sortKeys) {
+            columnNames.add(tableInstances.getColumnName(tableInstances.convertColumnIndexToView(sk.getColumn())));
+        }
+        EDACCInstanceColumnSelection dialog = new EDACCInstanceColumnSelection(EDACCApp.getApplication().getMainFrame(), true, instanceColumnSelector);
+        dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+        dialog.setVisible(true);
+        List<SortKey> newSortKeys = new ArrayList<SortKey>();
+        for (int k = 0; k < columnNames.size(); k++) {
+            String col = columnNames.get(k);
+            for (int i = 0; i < tableInstances.getColumnCount(); i++) {
+                if (tableInstances.getColumnName(i).equals(col)) {
+                    newSortKeys.add(new SortKey(tableInstances.convertColumnIndexToModel(i), sortKeys.get(k).getSortOrder()));
+                }
+            }
+        }
+        tableInstances.getRowSorter().setSortKeys(newSortKeys);
+        instanceFilter.setFilterInstanceClasses(false);
+        insTableModel.fireTableDataChanged();
+        edacc.experiment.Util.updateTableColumnWidth(tableInstances);
+        instanceFilter.setFilterInstanceClasses(true);
+        insTableModel.fireTableDataChanged();
+        try {
+            int col = tableInstances.getColumnModel().getColumnIndex("Selected");
+            tableInstances.moveColumn(col, tableInstances.getColumnCount() - 1);
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_btnInstanceColumnSelectionActionPerformed
+
     public void stopJobsTimer() {
         if (jobsTimer != null) {
             jobsTimer.cancel();
@@ -2222,9 +2286,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                             public void run() {
                                 solverConfigTablePanel.update();
                             }
-                            
                         });
-                        
+
                     }
                 }
             }
@@ -2339,7 +2402,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         for (SortKey sk : sortKeys) {
             columnNames.add(tableJobs.getColumnName(tableJobs.convertColumnIndexToView(sk.getColumn())));
         }
-        EDACCResultsBrowserColumnSelection dialog = new EDACCResultsBrowserColumnSelection(EDACCApp.getApplication().getMainFrame(), true, jobsTableModel);
+        EDACCResultsBrowserColumnSelection dialog = new EDACCResultsBrowserColumnSelection(EDACCApp.getApplication().getMainFrame(), true, jobsColumnSelector, jobsTableModel);
         dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         dialog.setVisible(true);
         List<SortKey> newSortKeys = new ArrayList<SortKey>();
@@ -2436,6 +2499,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JButton btnGeneratePackage;
     private javax.swing.JButton btnImport;
     private javax.swing.JButton btnImportSolverConfigs;
+    private javax.swing.JButton btnInstanceColumnSelection;
     private javax.swing.JButton btnInvertSelection;
     private javax.swing.JButton btnInvertSolverConfigSelection;
     private javax.swing.JButton btnLoadExperiment;
@@ -2765,5 +2829,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     public void deinitialize() {
         reinitializeGUI();
+    }
+
+    private void resetJobsColumnVisibility() {
+        jobsColumnSelector.setColumnVisiblity(jobsTableModel.getDefaultVisibility());
+    }
+
+    private void resetInstanceColumnVisibility() {
+        instanceColumnSelector.setColumnVisiblity(insTableModel.getDefaultVisibility());
     }
 }

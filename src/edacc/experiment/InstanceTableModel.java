@@ -13,9 +13,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.Icon;
 import javax.swing.table.AbstractTableModel;
 import java.util.Vector;
 
@@ -29,9 +26,8 @@ public class InstanceTableModel extends AbstractTableModel {
     public static int COL_BENCHTYPE = 1;
     public static int COL_SELECTED = 1;
     public static int COL_PROP = 2;
-    private static final String[] columns_competition = {"Name", "Benchmark Type", "selected"};
-    private static final String[] columns_noCompetition = {"Name", "selected"};
-
+    private static final String[] columns_competition = {"Name", "Benchmark Type", "Selected"};
+    private static final String[] columns_noCompetition = {"Name", "Selected"};
     private String[] columns = columns_noCompetition;
     ArrayList<Property> properties;
     protected ArrayList<Instance> instances;
@@ -60,8 +56,7 @@ public class InstanceTableModel extends AbstractTableModel {
             COL_SELECTED = 1;
             COL_PROP = 2;
         }
-        if (updateProperties || properties == null)
-            updateProperties();
+        updateProperties(updateProperties || properties == null);
         this.instances = instances;
         experimentHasInstances = new Vector<ExperimentHasInstance>();
         experimentHasInstances.setSize(instances.size());
@@ -80,32 +75,36 @@ public class InstanceTableModel extends AbstractTableModel {
 
         }
         if (filterInstanceClassIds) {
-        instanceClassIds = new HashMap<Instance, LinkedList<Integer>>();
-        for (Instance i : instances) {
-            instanceClassIds.put(i, new LinkedList<Integer>());
+            instanceClassIds = new HashMap<Instance, LinkedList<Integer>>();
+            for (Instance i : instances) {
+                instanceClassIds.put(i, new LinkedList<Integer>());
+            }
+            try {
+                InstanceHasInstanceClassDAO.fillInstanceClassIds(instanceClassIds);
+            } catch (SQLException ex) {
+                // TODO: error
+            }
         }
-        try {
-            InstanceHasInstanceClassDAO.fillInstanceClassIds(instanceClassIds);
-        } catch (SQLException ex) {
-            // TODO: error
-        }
-        }
-        this.fireTableStructureChanged();
+        fireTableStructureChanged();
     }
-    
-    
-    
+
     public LinkedList<Integer> getInstanceClassIdsForRow(int rowIndex) {
-        if (instanceClassIds == null) return null;
+        if (instanceClassIds == null) {
+            return null;
+        }
         LinkedList<Integer> res = instanceClassIds.get(instances.get(rowIndex));
         return res == null ? new LinkedList<Integer>() : res;
     }
 
-    private void updateProperties() {
-        properties = new ArrayList<Property>();
+    private void updateProperties(boolean updateProperties) {
+        if (updateProperties) {
+            properties = new ArrayList<Property>();
+        }
         // TODO: fix!
         try {
-            properties.addAll(PropertyDAO.getAllInstanceProperties());
+            if (updateProperties) {
+                properties.addAll(PropertyDAO.getAllInstanceProperties());
+            }
             if (properties.size() > 0) {
                 columns = java.util.Arrays.copyOf(columns, COL_PROP + properties.size());
                 for (int i = COL_PROP; i < columns.length; i++) {
@@ -273,7 +272,7 @@ public class InstanceTableModel extends AbstractTableModel {
         if (columnIndex == COL_NAME) {
             return instances.get(rowIndex).getName();
         } else if (columnIndex == COL_BENCHTYPE) {
-            return benchmarkTypes[rowIndex]==null?"":benchmarkTypes[rowIndex];
+            return benchmarkTypes[rowIndex] == null ? "" : benchmarkTypes[rowIndex];
         } else if (columnIndex == COL_SELECTED) {
             return selectedInstances.containsKey(instances.get(rowIndex).getId());
         } else {
@@ -295,5 +294,19 @@ public class InstanceTableModel extends AbstractTableModel {
 
     public boolean[] getColumnVisibility() {
         throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public boolean[] getDefaultVisibility() {
+        boolean[] res = new boolean[columns.length];
+        for (int i = 0; i < res.length; i++) {
+            res[i] = false;
+        }
+        if (COL_BENCHTYPE == -1) {
+            res[0] = true;
+            res[1] = true;
+        } else {
+            res[2] = true;
+        }
+        return res;
     }
 }
