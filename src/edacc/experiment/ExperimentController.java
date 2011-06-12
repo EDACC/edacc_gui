@@ -767,7 +767,7 @@ public class ExperimentController {
     /**
      * Generates a ZIP archive with the necessary files for the grid.
      */
-    public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, boolean exportClient, boolean exportRunsolver, boolean exportConfig, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException, InstanceNotInDBException, TaskCancelledException {
+    public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, boolean exportClient, boolean exportRunsolver, boolean exportConfig, File clientBinary, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException, InstanceNotInDBException, TaskCancelledException {
         File tmpDir = new File("tmp");
         tmpDir.mkdir();
         Tasks.getTaskView().setCancelable(true);
@@ -816,19 +816,19 @@ public class ExperimentController {
                     task.setStatus("Writing solver " + done + " of " + solverBinaries.size());
                     ZipInputStream zis = new ZipInputStream(SolverBinariesDAO.getZippedBinaryFile(binary));
                     ZipEntry entryIn;
-                    byte[] buffer = new byte[4*1024];
+                    byte[] buffer = new byte[4 * 1024];
                     while ((entryIn = zis.getNextEntry()) != null) {
                         if (entryIn.isDirectory()) {
                             continue;
                         }
-                        entry = new ZipEntry("solvers" + System.getProperty("file.separator") + binary.getMd5()  + System.getProperty("file.separator") + entryIn.getName());
+                        entry = new ZipEntry("solvers" + System.getProperty("file.separator") + binary.getMd5() + System.getProperty("file.separator") + entryIn.getName());
                         zos.putNextEntry(entry);
-                        
+
                         int read;
                         while ((read = zis.read(buffer, 0, buffer.length)) != -1) {
                             zos.write(buffer, 0, read);
                         }
-                        
+
                         zos.closeEntry();
                     }
                 }
@@ -863,7 +863,7 @@ public class ExperimentController {
 
                 // add client binary
                 if (exportClient) {
-                    addClient(zos);
+                    addClient(zos, clientBinary);
                 }
 
                 // add runsolver
@@ -1002,10 +1002,15 @@ public class ExperimentController {
         zos.closeEntry();
     }
 
-    private void addClient(ZipOutputStream zos) throws IOException, ClientBinaryNotFoundException {
-        String[] files = new String[]{"AUTHORS", "client", "LICENSE", "README"};
+    private void addClient(ZipOutputStream zos, File clientBinary) throws IOException, ClientBinaryNotFoundException {
+
+        String[] files = new String[]{"AUTHORS", clientBinary.getName(), "LICENSE", "README"};
         for (String filename : files) {
-            InputStream in = new FileInputStream(new File(Util.getPath() + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + filename));
+            File f = new File(clientBinary.getParentFile() + System.getProperty("file.separator") + filename);
+            if (!f.exists() || f.isDirectory()) {
+                continue;
+            }
+            InputStream in = new FileInputStream(f);
             if (in == null) {
                 throw new ClientBinaryNotFoundException();
             }

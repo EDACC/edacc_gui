@@ -58,11 +58,17 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="chkInstances" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="chkSolvers" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="chkClient" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="chkClient" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="txtClientLocation" pref="479" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnChooseClientBinary" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <Component id="chkRunsolver" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="chkConfig" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="551" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -73,7 +79,11 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="chkSolvers" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="chkClient" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="chkClient" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtClientLocation" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnChooseClientBinary" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="chkRunsolver" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
@@ -116,6 +126,21 @@
             <Property name="name" type="java.lang.String" value="chkConfig" noResource="true"/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JTextField" name="txtClientLocation">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="txtClientLocation.text"/>
+            <Property name="name" type="java.lang.String" value="txtClientLocation" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="btnChooseClientBinary">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="btnChooseClientBinary.text"/>
+            <Property name="name" type="java.lang.String" value="btnChooseClientBinary" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnChooseClientBinaryActionPerformed"/>
+          </Events>
+        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="jPanel2">
@@ -133,12 +158,12 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="packageFileChooser" alignment="1" pref="662" max="32767" attributes="0"/>
+              <Component id="packageFileChooser" alignment="1" pref="669" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="packageFileChooser" alignment="0" pref="367" max="32767" attributes="0"/>
+              <Component id="packageFileChooser" alignment="0" pref="363" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>

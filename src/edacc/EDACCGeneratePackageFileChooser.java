@@ -7,15 +7,24 @@ package edacc;
 
 import edacc.events.TaskEvents;
 import edacc.experiment.ExperimentController;
+import edacc.experiment.Util;
 import edacc.model.Tasks;
 import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import org.jdesktop.application.ApplicationContext;
 
 /**
  *
  * @author simon
  */
 public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog implements TaskEvents {
-
+    private final String generatepackage_settings_filename = "generate_package.xml";
+    
     private ExperimentController expController;
 
     /** Creates new form EDACCGeneratePackageFileChooser */
@@ -23,6 +32,22 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
         super(parent, modal);
         initComponents();
         this.expController = expController;
+        
+        File clientBinary = null; 
+        ApplicationContext ctxt = EDACCApp.getApplication().getContext();
+        try {
+            Map<String, String> map = (Map<String, String>) ctxt.getLocalStorage().load(generatepackage_settings_filename);
+            String fn;
+            if (map != null && (fn = map.get("client_binary_location")) != null) {
+                clientBinary = new File(fn);
+            }
+        } catch (IOException ex) {
+            
+        }
+        if (clientBinary == null || !clientBinary.exists() || clientBinary.isDirectory()) {
+            clientBinary = new File(Util.getPath() + "/bin/client");
+        }
+        txtClientLocation.setText(clientBinary.getPath());
     }
 
     /** This method is called from within the constructor to
@@ -40,6 +65,8 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
         chkClient = new javax.swing.JCheckBox();
         chkRunsolver = new javax.swing.JCheckBox();
         chkConfig = new javax.swing.JCheckBox();
+        txtClientLocation = new javax.swing.JTextField();
+        btnChooseClientBinary = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         packageFileChooser = new javax.swing.JFileChooser();
 
@@ -68,6 +95,17 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
         chkConfig.setText(resourceMap.getString("chkConfig.text")); // NOI18N
         chkConfig.setName("chkConfig"); // NOI18N
 
+        txtClientLocation.setText(resourceMap.getString("txtClientLocation.text")); // NOI18N
+        txtClientLocation.setName("txtClientLocation"); // NOI18N
+
+        btnChooseClientBinary.setText(resourceMap.getString("btnChooseClientBinary.text")); // NOI18N
+        btnChooseClientBinary.setName("btnChooseClientBinary"); // NOI18N
+        btnChooseClientBinary.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnChooseClientBinaryActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -77,10 +115,15 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkInstances)
                     .addComponent(chkSolvers)
-                    .addComponent(chkClient)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(chkClient)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtClientLocation, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnChooseClientBinary))
                     .addComponent(chkRunsolver)
                     .addComponent(chkConfig))
-                .addContainerGap(551, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -89,7 +132,10 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkSolvers)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkClient)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkClient)
+                    .addComponent(txtClientLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnChooseClientBinary))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkRunsolver)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -112,11 +158,11 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(packageFileChooser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE)
+            .addComponent(packageFileChooser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 669, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(packageFileChooser, javax.swing.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE)
+            .addComponent(packageFileChooser, javax.swing.GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -150,14 +196,39 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
                 }
             }
 
+            File clientBinary = null;
+            if (chkClient.isSelected()) {
+                clientBinary = new File(txtClientLocation.getText());
+                if (!clientBinary.exists() || clientBinary.isDirectory()) {
+                    javax.swing.JOptionPane.showMessageDialog(this, "Client binary doesn't exist.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("client_binary_location", txtClientLocation.getText());
+                try {
+                    EDACCApp.getApplication().getContext().getLocalStorage().save(map, generatepackage_settings_filename);
+                } catch (IOException ex) {
+                }
+            }
             String location = packageFileChooser.getSelectedFile().getAbsolutePath() + System.getProperty("file.separator");
-            Tasks.startTask("generatePackage", new Class[]{String.class, boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, edacc.model.Tasks.class}, new Object[]{location, chkInstances.isSelected(), chkSolvers.isSelected(), chkClient.isSelected(), chkRunsolver.isSelected(), chkConfig.isSelected(), null}, expController, this);
+            Tasks.startTask("generatePackage", new Class[]{String.class, boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, File.class, edacc.model.Tasks.class}, new Object[]{location, chkInstances.isSelected(), chkSolvers.isSelected(), chkClient.isSelected(), chkRunsolver.isSelected(), chkConfig.isSelected(), clientBinary, null}, expController, this);
             dispose();
         } else if (evt.getActionCommand().equals("CancelSelection")) {
             dispose();
         }
     }//GEN-LAST:event_packageFileChooserActionPerformed
+
+    private void btnChooseClientBinaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseClientBinaryActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(txtClientLocation.getText()).getParentFile());
+        fileChooser.showOpenDialog(EDACCApp.getApplication().getMainFrame());
+        if (fileChooser.getSelectedFile() != null) {
+            txtClientLocation.setText(fileChooser.getSelectedFile().getPath());
+        }
+
+    }//GEN-LAST:event_btnChooseClientBinaryActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnChooseClientBinary;
     private javax.swing.JCheckBox chkClient;
     private javax.swing.JCheckBox chkConfig;
     private javax.swing.JCheckBox chkInstances;
@@ -166,6 +237,7 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JFileChooser packageFileChooser;
+    private javax.swing.JTextField txtClientLocation;
     // End of variables declaration//GEN-END:variables
 
     @Override
