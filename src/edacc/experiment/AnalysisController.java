@@ -12,9 +12,17 @@ import org.rosuda.JRI.Rengine;
  * @author simon
  */
 public class AnalysisController {
-
+    /** Used for to synchronize usage of the R engine. */
     public static final Object syncR = new Object();
-    public static PlotPanel lastPlotPanel; // for the RPlotDevice .. see edacc.model.RPlotDevice.java
+    /** 
+     * For the RPlotDevice 
+     * @see edacc.model.RPlotDevice
+     */
+    public static PlotPanel lastPlotPanel; 
+    /**
+     * The analysis panel. Is set by <code>AnalysisBottomPanel</code>
+     * @see edacc.experiment.AnalysisBottomPanel
+     */
     public static AnalysisPanel analysisPanel;
     private static Rengine re;
     private static HashMap<Integer, PlotPanel> plotPanels = new HashMap<Integer, PlotPanel>();
@@ -216,6 +224,9 @@ public class AnalysisController {
      * Saves the image of the panel to a filename in the pdf format using R.
      * @param pnl the panel
      * @param filename the filename
+     * @param width the width of the pdf
+     * @param height the height of the pdf
+     * @exception ImageSaveFailedException thrown if saving the image fails.
      */
     public static void saveToPdf(PlotPanel pnl, String filename, double width, double height) throws ImageSaveFailedException {
         synchronized (syncR) {

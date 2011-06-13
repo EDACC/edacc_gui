@@ -35,35 +35,60 @@ import javax.swing.SwingUtilities;
 public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
     // constants for the columns
+    /** The index of the ID column */
     public static final int COL_ID = 0;
+    /** The index of the priority column */
     public static final int COL_PRIORITY = 1;
+    /** The index of the compute queue column */
     public static final int COL_COMPUTEQUEUE = 2;
+    /** The index of the compute node column */
     public static final int COL_COMPUTENODE = 3;
+    /** The index of the compute node ip column */
     public static final int COL_COMPUTENODEIP = 4;
+    /** The index of the solver column */
     public static final int COL_SOLVER = 5;
+    /** The index of the solver configuration column */
     public static final int COL_SOLVERCONFIGURATION = 6;
+    /** The index of the parameters column */
     public static final int COL_PARAMETERS = 7;
+    /** The index of the instance column */
     public static final int COL_INSTANCE = 8;
+    /** The index of the run column */
     public static final int COL_RUN = 9;
+    /** The index of the time column */
     public static final int COL_TIME = 10;
+    /** The index of the seed column */
     public static final int COL_SEED = 11;
+    /** The index of the status column */
     public static final int COL_STATUS = 12;
+    /** The index of the runtime column */
     public static final int COL_RUNTIME = 13;
+    /** The index of the result code column */
     public static final int COL_RESULTCODE = 14;
+    /** The index of the cpu time limit column */
     public static final int COL_CPUTIMELIMIT = 15;
+    /** The index of the wall clock limit column */
     public static final int COL_WALLCLOCKLIMIT = 16;
+    /** The index of the memory limit column */
     public static final int COL_MEMORYLIMIT = 17;
+    /** The index of the stack size limit column */
     public static final int COL_STACKSIZELIMIT = 18;
+    /** The index of the output size limit column */
     public static final int COL_OUTPUTSIZELIMIT = 19;
+    /** The index of the solver output column */
     public static final int COL_SOLVER_OUTPUT = 20;
+    /** The index of the launcher output column */
     public static final int COL_LAUNCHER_OUTPUT = 21;
+    /** The index of the watcher output column */
     public static final int COL_WATCHER_OUTPUT = 22;
+    /** The index of the verifier output column */
     public static final int COL_VERIFIER_OUTPUT = 23;
+    /** The index of the first property column */
     public static final int COL_PROPERTY = 24;
     private ArrayList<ExperimentResult> jobs;
     // the constant columns
     private String[] CONST_COLUMNS = {"ID", "Priority", "Compute Queue", "Compute Node", "Compute Node IP", "Solver", "Solver Configuration", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Run time", "Result Code", "CPU Time Limit", "Wall Clock Time Limit", "Memory Limit", "Stack Size Limit", "Output Size Limit", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
-    // the default visibility of each column
+    /** the default visibility of each column */
     public static boolean[] DEFAULT_VISIBILITY = {false, false, true, false, false, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false};
     private String[] columns;
     private ArrayList<Property> properties;
@@ -71,11 +96,16 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
     private HashMap<Integer, String> parameters;
     private int firstInstancePropertyColumn;
 
+    /** Creates a new experiment result browser table model */
     public ExperimentResultsBrowserTableModel() {
         columns = new String[CONST_COLUMNS.length];
         System.arraycopy(CONST_COLUMNS, 0, columns, 0, columns.length);
     }
 
+    /** 
+     * Updates the properties. 
+     * @return true, iff something has changed (new properties or properties were removed)
+     */
     public boolean updateProperties() {
         ArrayList<Property> tmp = new ArrayList<Property>();
         try {
@@ -186,6 +216,11 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         }
     }
 
+    /** 
+     * Returns the experiment result represented by the row at the specified row index
+     * @param row the row index
+     * @return the experiment result
+     */
     public ExperimentResult getExperimentResult(int row) {
         return jobs.get(row);
     }
@@ -386,6 +421,10 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         }
     }
 
+    /**
+     * Returns the first column index which is a instance property column
+     * @return the first instance property column
+     */
     public int getFirstInstancePropertyColumn() {
         return firstInstancePropertyColumn;
     }
@@ -417,6 +456,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
     /**
      * Returns all disjunct status codes which are currently in that model
+     * @return 
      */
     public ArrayList<StatusCode> getStatusEnums() {
         ArrayList<StatusCode> res = new ArrayList<StatusCode>();
@@ -433,6 +473,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
 
     /**
      * Returns all disjunct solver names which are currently in that model
+     * @return 
      */
     public ArrayList<String> getSolvers() {
         ArrayList<String> res = new ArrayList<String>();
@@ -447,14 +488,27 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         return res;
     }
 
+    /**
+     * Returns the jobs in this model.
+     * @return <code>ArrayList</code> of the jobs
+     */
     public ArrayList<ExperimentResult> getJobs() {
         return jobs;
     }
 
+    /**
+     * Returns the jobs count.
+     * @return 
+     */
     public int getJobsCount() {
         return jobs == null ? 0 : jobs.size();
     }
 
+    /**
+     * Returns the jobs count with the specified status code.
+     * @param status the status code
+     * @return 
+     */
     public int getJobsCount(StatusCode status) {
         if (jobs == null) {
             return 0;
@@ -468,6 +522,10 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
         return res;
     }
 
+    /**
+     * Returns the default visibility.
+     * @return 
+     */
     public boolean[] getDefaultVisibility() {
         boolean[] res = new boolean[columns.length];
         System.arraycopy(DEFAULT_VISIBILITY, 0, res, 0, DEFAULT_VISIBILITY.length);

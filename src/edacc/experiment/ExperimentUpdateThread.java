@@ -11,11 +11,17 @@ import java.util.List;
 import javax.swing.SwingWorker;
 
 /**
- *
+ * The experiment update thread.<br/>
+ * Updates the running, finished, failed and not started counts in the experiment table every 10 seconds.
  * @author simon
  */
 public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> {
     private ExperimentTableModel model;
+    
+    /**
+     * Creates a new experiment update thread.
+     * @param model the model to be used
+     */
     public ExperimentUpdateThread(ExperimentTableModel model) {
         super();
         this.model = model;
@@ -67,7 +73,7 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
         }
     }
 
-    public class ExperimentStatus {
+    class ExperimentStatus {
 
         Experiment experiment;
         int finished;

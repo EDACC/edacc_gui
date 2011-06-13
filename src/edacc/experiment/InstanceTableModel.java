@@ -18,25 +18,34 @@ import java.util.Vector;
 
 /**
  *
- * @author daniel
+ * @author daniel, simon
  */
 public class InstanceTableModel extends AbstractTableModel {
 
-    public static int COL_NAME = 0;
-    public static int COL_BENCHTYPE = 1;
-    public static int COL_SELECTED = 1;
-    public static int COL_PROP = 2;
-    private static final String[] columns_competition = {"Name", "Benchmark Type", "Selected"};
-    private static final String[] columns_noCompetition = {"Name", "Selected"};
-    private String[] columns = columns_noCompetition;
+    /** The index of the name column */
+    public static final int COL_NAME = 0;
+    /** The index of the benchmark type column */
+    public static final int COL_BENCHTYPE = 1;
+    /** The index of the selected column */
+    public static final int COL_SELECTED = 2;
+    /** The index of the first property column */
+    public static final int COL_PROP = 3;
+    private String[] columns = {"Name", "Benchmark Type", "Selected"};
     ArrayList<Property> properties;
-    protected ArrayList<Instance> instances;
-    protected Vector<ExperimentHasInstance> experimentHasInstances;
-    protected HashMap<Integer, ExperimentHasInstance> selectedInstances;
-    protected Vector<ExperimentHasInstance> savedExperimentInstances;
-    protected String[] benchmarkTypes;
-    protected HashMap<Instance, LinkedList<Integer>> instanceClassIds;
+    private ArrayList<Instance> instances;
+    private Vector<ExperimentHasInstance> experimentHasInstances;
+    private HashMap<Integer, ExperimentHasInstance> selectedInstances;
+    private Vector<ExperimentHasInstance> savedExperimentInstances;
+    private String[] benchmarkTypes;
+    private HashMap<Instance, LinkedList<Integer>> instanceClassIds;
 
+    /**
+     * Sets the instances for this model. Also updates the properties if <code>updateProperties</code> is true. 
+     * @param instances the instances to be set
+     * @param filterInstanceClassIds if true, reload instance class ids from the db (used for edacc.EDACCInstanceFilter)
+     * @param updateProperties if true, properties are updated from the db
+     * @see edacc.EDACCInstanceFilter
+     */
     public void setInstances(ArrayList<Instance> instances, boolean filterInstanceClassIds, boolean updateProperties) {
         boolean isCompetition;
 
@@ -44,17 +53,6 @@ public class InstanceTableModel extends AbstractTableModel {
             isCompetition = DatabaseConnector.getInstance().isCompetitionDB();
         } catch (Exception e) {
             isCompetition = false;
-        }
-        if (isCompetition) {
-            columns = columns_competition;
-            COL_BENCHTYPE = 1;
-            COL_SELECTED = 2;
-            COL_PROP = 3;
-        } else {
-            columns = columns_noCompetition;
-            COL_BENCHTYPE = -1;
-            COL_SELECTED = 1;
-            COL_PROP = 2;
         }
         updateProperties(updateProperties || properties == null);
         this.instances = instances;
@@ -85,9 +83,14 @@ public class InstanceTableModel extends AbstractTableModel {
                 // TODO: error
             }
         }
-        fireTableStructureChanged();
+        fireTableDataChanged();
     }
 
+    /**
+     * Returns the instance class ids for the instance represented by this row
+     * @param rowIndex the row index
+     * @return <code>LinkedList</code> of class ids
+     */
     public LinkedList<Integer> getInstanceClassIdsForRow(int rowIndex) {
         if (instanceClassIds == null) {
             return null;
@@ -143,6 +146,9 @@ public class InstanceTableModel extends AbstractTableModel {
         }
     }
 
+    /**
+     * Loads the last save state.
+     */
     public void undo() {
         setExperimentHasInstances(this.savedExperimentInstances);
         this.fireTableDataChanged();
@@ -164,6 +170,11 @@ public class InstanceTableModel extends AbstractTableModel {
         return res;
     }
 
+    /**
+     * Returns the instance represented by this row
+     * @param rowIndex the row index
+     * @return the instance
+     */
     public Instance getInstanceAt(int rowIndex) {
         return instances.get(rowIndex);
     }
@@ -186,20 +197,34 @@ public class InstanceTableModel extends AbstractTableModel {
         return res;
     }
 
+    /**
+     * Checks if some data is modified
+     * @return true, if some data is modified
+     */
     public boolean isModified() {
         return getDeletedExperimentHasInstances().size() > 0 || getNewInstanceIds().size() > 0;
     }
 
+    /**
+     * Updates the instance selection according to the specified <code>ExperimentHasInstance</code>
+     * @param e the ExperimentHasInstance
+     * @param row the row index
+     */
     public void setExperimentHasInstance(ExperimentHasInstance e, int row) {
         this.experimentHasInstances.set(row, e);
     }
 
+    /** Creates a new instance table model */
     public InstanceTableModel() {
         this.instances = new ArrayList<Instance>();
         this.experimentHasInstances = new Vector<ExperimentHasInstance>();
         selectedInstances = new HashMap<Integer, ExperimentHasInstance>();
     }
 
+    /**
+     * Returns all selected instances
+     * @return <code>ArrayList</code> of selected instances
+     */
     public ArrayList<Instance> getSelectedInstances() {
         ArrayList<Instance> res = new ArrayList<Instance>();
         for (Instance instance : instances) {
@@ -259,10 +284,20 @@ public class InstanceTableModel extends AbstractTableModel {
         this.fireTableCellUpdated(row, col);
     }
 
+    /**
+     * Returns the <code>ExperimentHasInstance</code> represented by this row
+     * @param rowIndex the row index
+     * @return 
+     */
     public ExperimentHasInstance getExperimentHasInstance(int rowIndex) {
         return experimentHasInstances.get(rowIndex);
     }
 
+    /**
+     * Returns the instance represented by this row
+     * @param rowIndex the row index
+     * @return the instnace
+     */
     public Instance getInstance(int rowIndex) {
         return instances.get(rowIndex);
     }
@@ -272,7 +307,7 @@ public class InstanceTableModel extends AbstractTableModel {
         if (columnIndex == COL_NAME) {
             return instances.get(rowIndex).getName();
         } else if (columnIndex == COL_BENCHTYPE) {
-            return benchmarkTypes[rowIndex] == null ? "" : benchmarkTypes[rowIndex];
+            return (benchmarkTypes == null || benchmarkTypes[rowIndex] == null) ? "" : benchmarkTypes[rowIndex];
         } else if (columnIndex == COL_SELECTED) {
             return selectedInstances.containsKey(instances.get(rowIndex).getId());
         } else {
@@ -292,21 +327,18 @@ public class InstanceTableModel extends AbstractTableModel {
         }
     }
 
-    public boolean[] getColumnVisibility() {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
+    /**
+     * Returns the default visibility for all known columns including the benchmark type column, also if this is not a competition db.
+     * @return array of boolean representing the visibility of the columns
+     */
     public boolean[] getDefaultVisibility() {
         boolean[] res = new boolean[columns.length];
         for (int i = 0; i < res.length; i++) {
             res[i] = false;
         }
-        if (COL_BENCHTYPE == -1) {
-            res[0] = true;
-            res[1] = true;
-        } else {
-            res[2] = true;
-        }
+        res[0] = true;
+        res[1] = true;
+        res[2] = true;
         return res;
-    }
+    }  
 }

@@ -6,7 +6,6 @@ import edacc.model.SolverConfiguration;
 import edacc.model.SolverDAO;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -15,12 +14,18 @@ import javax.swing.table.AbstractTableModel;
  */
 public class SolverConfigurationTableModel extends AbstractTableModel {
 
+    /** The index for the selected column */
     public static final int COL_SEL = 0;
+    /** The index for the solver column */
     public static final int COL_SOLVER = 1;
+    /** The index for the name column */
     public static final int COL_NAME = 2;
+    /** The index for the solver binary column */
     public static final int COL_SOLVERBINARY = 3;
+    /** The index for the parameters column */
     public static final int COL_PARAMETERS = 4;
     private String[] columns = {"Selected", "Solver", "Solver Configuration", "Solver Binary", "Parameters"};
+    /** The selection of the rows */
     public boolean[] selected;
     private ArrayList<SolverConfiguration> solverConfigurations;
 
@@ -34,7 +39,7 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
         return columns.length;
     }
 
-    public ArrayList<ParameterInstance> getParametersBySolverConfig(SolverConfiguration sc) {
+    private ArrayList<ParameterInstance> getParametersBySolverConfig(SolverConfiguration sc) {
         try {
             return ParameterInstanceDAO.getBySolverConfig(sc);
         } catch (Exception e) {
@@ -42,6 +47,11 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
         }
     }
 
+    /**
+     * Returns the solver configuration at the specified row
+     * @param row the row index
+     * @return a solver configuration
+     */
     public SolverConfiguration getSolverConfigurationAt(int row) {
         return solverConfigurations.get(row);
     }
@@ -95,6 +105,10 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
         fireTableCellUpdated(rowIndex, columnIndex);
     }
 
+    /**
+     * Sets the solver configurations for this model
+     * @param solverConfigurations an <code>ArrayList</code> of solver configurations used for this model
+     */
     public void setSolverConfigurations(ArrayList<SolverConfiguration> solverConfigurations) {
         selected = new boolean[solverConfigurations.size()];
         for (int i = 0; i < selected.length; i++) {
@@ -103,6 +117,10 @@ public class SolverConfigurationTableModel extends AbstractTableModel {
         this.solverConfigurations = solverConfigurations;
     }
 
+    /**
+     * Returns the selected solver configurations as an <code>ArrayList</code>
+     * @return an <code>ArrayList</code> of solver configurations
+     */
     public ArrayList<SolverConfiguration> getSelectedSolverConfigurations() {
         ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
         for (int i = 0; i < solverConfigurations.size(); i++) {

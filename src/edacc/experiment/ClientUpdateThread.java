@@ -16,6 +16,10 @@ public class ClientUpdateThread extends SwingWorker<Void, Client> {
     private ClientTableModel model;
     private HashSet<Integer> ids;
 
+    /**
+     * Creates the client update thread
+     * @param model the model to be used
+     */
     public ClientUpdateThread(final ClientTableModel model) {
         super();
         ids = new HashSet<Integer>();

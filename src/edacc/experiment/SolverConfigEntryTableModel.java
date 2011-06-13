@@ -18,12 +18,17 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
     private String[] values;
     private Boolean[] selected;
 
+    /** Creates the solver config entry table model */
     public SolverConfigEntryTableModel() {
         this.parameterInstances = new ParameterInstance[0];
         this.parameters = new Parameter[0];
         this.values = new String[0];
     }
 
+    /**
+     * Sets the parameters for this model
+     * @param parameters the parameters <code>ArrayList</code>
+     */
     public void setParameters(ArrayList<Parameter> parameters) {
         this.parameters = new Parameter[parameters.size()];
         this.parameterInstances = new ParameterInstance[parameters.size()];
@@ -69,6 +74,13 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
         return false;
     }
 
+    /**
+     * Sets the parameter instances for this model. Tries to find the parameter 
+     * for each parameter instance and sets the value according to the parameter 
+     * instance. If a parameter is found for a specific parameter instance, this
+     * parameter will be selected in this model.
+     * @param params parameter instances as <code>ArrayList</code>
+     */
     public void setParameterInstances(ArrayList<ParameterInstance> params) {
         if (params == null) {
             for (int i = 0; i < parameterInstances.length; i++) {
@@ -88,6 +100,10 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
         this.fireTableDataChanged();
     }
 
+    /**
+     * Tries to find the given parameter instance. If found, it will be removed from the model.
+     * @param pi the parameter instance to be removed
+     */
     public void removeParameterInstance(ParameterInstance pi) {
         for (int i = 0; i < parameterInstances.length; i++) {
             if (parameterInstances[i] == pi) {
@@ -169,12 +185,20 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
         }
     }
 
+    /**
+     * Returns all parameters in this model
+     * @return <code>ArrayList</code> of parameters
+     */
     public ArrayList<Parameter> getParameters() {
         ArrayList<Parameter> res = new ArrayList<Parameter>();
         res.addAll(Arrays.asList(parameters));
         return res;
     }
 
+    /**
+     * Returns all parameter instances in this model
+     * @return <code>ArrayList</code> of parameter instances
+     */
     public ArrayList<ParameterInstance> getParameterInstances() {
         ArrayList<ParameterInstance> res = new ArrayList<ParameterInstance>();
         for (ParameterInstance pi : parameterInstances) {

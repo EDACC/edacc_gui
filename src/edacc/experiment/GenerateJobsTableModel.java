@@ -11,7 +11,7 @@ import java.util.HashMap;
 import javax.swing.table.DefaultTableModel;
 
 /**
- *
+ * The generate jobs table model
  * @author simon
  */
 public class GenerateJobsTableModel extends DefaultTableModel {
@@ -24,11 +24,21 @@ public class GenerateJobsTableModel extends DefaultTableModel {
     private int[][] savedNumRuns;
     private ExperimentController expController;
     
+    /**
+     * Creates a new generate jobs table model.
+     * @param expController the experiment controller to be used
+     */
     public GenerateJobsTableModel(ExperimentController expController) {
         this.expController = expController;
     }
-
-
+    
+    /**
+     * Updates the number of runs by using the experiment result cache of the experiment controller.<br/>
+     * The cache should be updated first to get valid results.
+     * @throws SQLException
+     * @throws InstanceClassMustBeSourceException
+     * @throws IOException 
+     */
     public void updateNumRuns() throws SQLException, InstanceClassMustBeSourceException, IOException {
         solverConfigs = expController.getSolverConfigurations();
         instances = new ArrayList<Instance>();
@@ -102,26 +112,60 @@ public class GenerateJobsTableModel extends DefaultTableModel {
         }
     }
 
+    /**
+     * Sets the number of runs for a (instance, solver configuration)-pair.
+     * @param instance the instance
+     * @param solverConfig the solver configuration
+     * @param value the number of runs 
+     */
     public void setNumRuns(Instance instance, SolverConfiguration solverConfig, Integer value) {
         numRuns[rowMap.get(instance.getId())][colMap.get(solverConfig.getId())] = value;
     }
 
+    /**
+     * Returns the number of runs for a (instance, solver configuration)-pair.
+     * @param instance the instance
+     * @param solverConfig the solver configuration
+     * @return the number of runs
+     */
     public Integer getNumRuns(Instance instance, SolverConfiguration solverConfig) {
         return numRuns[rowMap.get(instance.getId())][colMap.get(solverConfig.getId())];
     }
 
+    /**
+     * Returns the instance represented by the row
+     * @param row the row for which an instance should be returned
+     * @return the instance
+     */
     public Instance getInstance(int row) {
         return instances.get(row);
     }
 
+    /**
+     * Returns the solver configuration represented by the column
+     * @param col the column for which a solver configuration should be returned
+     * @return the solver configuration
+     */
     public SolverConfiguration getSolverConfiguration(int col) {
         return solverConfigs.get(col-1);
     }
 
+    /**
+     * Sets the saved number of runs for a (instance, solver configuration)-pair.
+     * @param instance the instance
+     * @param solverConfig the solver configuration
+     * @param value the saved number of runs 
+     */
     public void setSavedNumRuns(Instance instance, SolverConfiguration solverConfig, int value) {
         savedNumRuns[rowMap.get(instance.getId())][colMap.get(solverConfig.getId())] = value;
     }
     
+    /**
+     * Returns the saved number of runs for a (instance, solver configuration)-pair.
+     * @param instance the instance
+     * @param solverConfig the solver configuration
+     * @return the saved number of runs
+     */
     public Integer getSavedNumRuns(Instance instance, SolverConfiguration solverConfig) {
         return savedNumRuns[rowMap.get(instance.getId())][colMap.get(solverConfig.getId())];
     }

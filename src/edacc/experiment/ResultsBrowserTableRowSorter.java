@@ -15,6 +15,10 @@ public class ResultsBrowserTableRowSorter extends TableRowSorter<AbstractTableMo
 
     private ExperimentResultsBrowserTableModel jobsTableModel;
 
+    /**
+     * Creates a new result browser table row sorter
+     * @param jobsTableModel the jobs table model to be used
+     */
     public ResultsBrowserTableRowSorter(ExperimentResultsBrowserTableModel jobsTableModel) {
         super(jobsTableModel);
         this.jobsTableModel = jobsTableModel;

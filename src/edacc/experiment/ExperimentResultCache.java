@@ -39,6 +39,10 @@ public class ExperimentResultCache {
     private Experiment experiment;
     private Client client;
 
+    /**
+     * Creates the experiment result cache
+     * @param experiment the experiment for which results should be cached
+     */
     public ExperimentResultCache(Experiment experiment) {
         this.experiment = experiment;
         this.client = null;
@@ -46,15 +50,27 @@ public class ExperimentResultCache {
         lastUpdated = new Timestamp(0);
     }
 
+    /**
+     * Creates the experiment result cache
+     * @param client the client for which results should be cached
+     */
     public ExperimentResultCache(Client client) {
         this((Experiment) null);
         this.client = client;
     }
 
+    /**
+     * The number of results this cache contains.
+     * @return 
+     */
     public synchronized int size() {
         return resultMap == null ? 0 : resultMap.size();
     }
 
+    /**
+     * The values of this cache.
+     * @return 
+     */
     public synchronized Collection<ExperimentResult> values() {
         return resultMap.values();
     }
@@ -67,6 +83,10 @@ public class ExperimentResultCache {
      * @throws PropertyNotInDBException
      * @throws NoConnectionToDBException
      * @throws ComputationMethodDoesNotExistException
+     * @throws ExpResultHasSolvPropertyNotInDBException
+     * @throws ExperimentResultNotInDBException
+     * @throws StatusCodeNotInDBException
+     * @throws ResultCodeNotInDBException 
      */
     public synchronized void updateExperimentResults() throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         Timestamp ts;
@@ -124,13 +144,19 @@ public class ExperimentResultCache {
         lastUpdated = ts;
     }
 
+    /**
+     * Returns the number of runs of the (solver config id, instance id)-pair.
+     * @param solverConfigId the solver config id
+     * @param instanceId the instance id
+     * @return the number of runs
+     */
     public synchronized Integer getNumRuns(int solverConfigId, int instanceId) {
         Integer numRuns = runMap.get(new SolverConfigInstanceIdentifier(solverConfigId, instanceId));
         return numRuns == null ? 0 : (numRuns + 1);
     }
 
     /**
-     * Returns all experiment results with any run in the given list for the active experiment.
+     * Returns all experiment results with any run in the given list for the active experiment.<br/>
      * updateExperimentResults() should be called first.
      * @param runs
      * @return arraylist of experiment results
@@ -148,9 +174,9 @@ public class ExperimentResultCache {
     }
 
     /**
-     * Returns all experiment results with the specified run for the active experiment.
+     * Returns all experiment results with the specified run for the active experiment.<br/>
      * updateExperimentResults() should be called first.
-     * @param runs
+     * @param run
      * @return arraylist of experiment results
      */
     public synchronized ArrayList<ExperimentResult> getAllByRun(Integer run) {
@@ -164,8 +190,8 @@ public class ExperimentResultCache {
     }
 
     /**
-     * Returns all disjunct runs in an array list.
-     * This array list should contain all integers between 0 and numRuns-1 inclusive.
+     * Returns all disjunct runs in an array list.<br/>
+     * This array list should contain all integers between 0 and numRuns-1 inclusive.<br/>
      * updateExperimentResults() should be called first.
      * @return an array list of all runs
      * @throws SQLException
@@ -200,6 +226,7 @@ public class ExperimentResultCache {
      * Returns a Vector of all ExperimentResults in the current experiment with the solverConfig id and instance id specified
      * @param solverConfigId the solverConfig id of the ExperimentResults
      * @param instanceId the instance id of the ExperimentResults
+     * @param status the experiment results have a status specified by this array
      * @return returns an empty vector if there are no such ExperimentResults
      */
     public ArrayList<ExperimentResult> getResults(int solverConfigId, int instanceId, StatusCode[] status) {
@@ -229,6 +256,7 @@ public class ExperimentResultCache {
      * @param solverConfigId the solverConfig id for the ExperimentResult
      * @param instanceId the instance id for the ExperimentResult
      * @param run the run
+     * @param status the experiment results have a status specified by this array
      * @return returns null if there is no such ExperimentResult
      */
     public synchronized ExperimentResult getResult(int solverConfigId, int instanceId, int run, StatusCode[] status) {
@@ -248,6 +276,13 @@ public class ExperimentResultCache {
         return res;
     }
 
+    /**
+     * Checks of the result identified by the solver config id, instance id and run is cached.
+     * @param solverConfigId the solver config id
+     * @param instanceId the instance id
+     * @param run the run
+     * @return true, iff the result is cached
+     */
     public synchronized boolean contains(int solverConfigId, int instanceId, int run) {
         return resultMap.containsKey(new ResultIdentifier(solverConfigId, instanceId, run));
     }

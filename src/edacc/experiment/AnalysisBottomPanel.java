@@ -29,7 +29,10 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
     private PlotPanel panel;
     private Plot plot;
 
-    /** Creates new form AnalysisBottomPanel */
+    /** 
+     * Creates new form AnalysisBottomPanel 
+     * @param analysisPanel the analysis panel
+     */
     @SuppressWarnings("LeakingThisInConstructor")
     public AnalysisBottomPanel(AnalysisPanel analysisPanel) {
         initComponents();
@@ -59,10 +62,14 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
         btnGeneratePlot.setName("btnGeneratePlot"); // NOI18N
         btnGeneratePlot.setPreferredSize(new java.awt.Dimension(115, 25));
 
-        btnShowPlots.setAction(actionMap.get("btnShowPlots")); // NOI18N
         btnShowPlots.setText(resourceMap.getString("btnShowPlots.text")); // NOI18N
         btnShowPlots.setName("btnShowPlots"); // NOI18N
         btnShowPlots.setPreferredSize(new java.awt.Dimension(115, 25));
+        btnShowPlots.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnShowPlotsActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -85,6 +92,14 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnShowPlotsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowPlotsActionPerformed
+        if ("Hide Plots".equals(btnShowPlots.getText())) {
+            EDACCPlotTabView.setTabViewsVisible(false);
+        } else {
+            EDACCPlotTabView.setTabViewsVisible(true);
+        }
+    }//GEN-LAST:event_btnShowPlotsActionPerformed
 
     /**
      * This will generate the plot for the current plot type in the AnalysisPanel.
@@ -133,15 +148,7 @@ public class AnalysisBottomPanel extends javax.swing.JPanel implements edacc.eve
         }
 
     }
-
-    @Action
-    public void btnShowPlots() {
-        if ("Hide Plots".equals(btnShowPlots.getText())) {
-            EDACCPlotTabView.setTabViewsVisible(false);
-        } else {
-            EDACCPlotTabView.setTabViewsVisible(true);
-        }
-    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGeneratePlot;
     private javax.swing.JButton btnShowPlots;

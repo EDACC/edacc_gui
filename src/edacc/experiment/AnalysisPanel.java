@@ -18,7 +18,7 @@ import javax.swing.JLabel;
  * @author simon
  */
 public class AnalysisPanel extends javax.swing.JPanel {
-
+    /** The combobox with the plot types */
     public JComboBox comboType;
     private JLabel jLabel1;
     private java.awt.GridBagConstraints gridBagConstraints;
@@ -34,7 +34,10 @@ public class AnalysisPanel extends javax.swing.JPanel {
                 ProbabilisticDomination.class
             };
 
-    /** Creates new form AnalysisPanel */
+    /** 
+     * Creates new form AnalysisPanel
+     * @param controller the experiment controller to be used.
+     */
     public AnalysisPanel(ExperimentController controller) {
         initComponents();
         this.expController = controller;

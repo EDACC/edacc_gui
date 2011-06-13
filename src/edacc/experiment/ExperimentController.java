@@ -94,14 +94,15 @@ public class ExperimentController {
     private static RandomNumberGenerator rnd = new JavaRandom();
     // caching experiments
     private ExperimentResultCache experimentResultCache;
-    // caching solver configs
+    /** caching solver configs */
     public SolverConfigCache solverConfigCache;
+    /** the cpu time property. Will be created when creating an experiment controller. */
     public static Property PROP_CPUTIME;
 
     /**
      * Creates a new experiment Controller
-     * @param experimentMode
-     * @param solverConfigPanel
+     * @param experimentMode the experiment mode to be used
+     * @param solverConfigPanel the solver config panel to be used
      */
     public ExperimentController(EDACCExperimentMode experimentMode, EDACCSolverConfigPanel solverConfigPanel) {
         this.main = experimentMode;
@@ -114,6 +115,12 @@ public class ExperimentController {
     /**
      * Initializes the experiment controller. Loads the experiments and the instances classes.
      * @throws SQLException
+     * @throws InstanceClassMustBeSourceException
+     * @throws IOException
+     * @throws NoConnectionToDBException
+     * @throws PropertyNotInDBException
+     * @throws PropertyTypeNotExistException
+     * @throws ComputationMethodDoesNotExistException 
      */
     public void initialize() throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         InstanceDAO.clearCache();
@@ -129,6 +136,9 @@ public class ExperimentController {
             ArrayList<Instance> instances = new ArrayList<Instance>();
             instances.addAll(InstanceDAO.getAll());
             main.insTableModel.setInstances(instances, true, true);
+            if (!DatabaseConnector.getInstance().isCompetitionDB()) {
+                main.tableInstances.removeColumn(main.tableInstances.getColumnModel().getColumn(InstanceTableModel.COL_BENCHTYPE));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -140,6 +150,7 @@ public class ExperimentController {
      * @param exp
      * @param task
      * @throws SQLException
+     * @throws Exception 
      */
     public void loadExperiment(Experiment exp, Tasks task) throws SQLException, Exception {
         main.reinitializeSolvers();
@@ -210,6 +221,12 @@ public class ExperimentController {
      * Removes an experiment form the db.
      * @param id
      * @throws SQLException
+     * @throws InstanceClassMustBeSourceException
+     * @throws IOException
+     * @throws NoConnectionToDBException
+     * @throws PropertyNotInDBException
+     * @throws PropertyTypeNotExistException
+     * @throws ComputationMethodDoesNotExistException 
      */
     public void removeExperiment(int id) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         Experiment e = ExperimentDAO.getById(id);
@@ -220,6 +237,10 @@ public class ExperimentController {
         initialize();
     }
 
+    /** 
+     * Returns the experiment result cache
+     * @return the experiment result cache
+     */
     public ExperimentResultCache getExperimentResults() {
         return experimentResultCache;
     }
@@ -247,13 +268,14 @@ public class ExperimentController {
      * instances and solvers
      * @param name
      * @param description
+     * @return the newly created experiment
      * @throws SQLException
      * @throws InstanceClassMustBeSourceException
      * @throws IOException
      * @throws NoConnectionToDBException
      * @throws PropertyNotInDBException
      * @throws PropertyTypeNotExistException
-     * @throws ComputationMethodDoesNotExistException
+     * @throws ComputationMethodDoesNotExistException 
      */
     public Experiment createExperiment(String name, String description) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         java.util.Date d = new java.util.Date();
@@ -274,7 +296,20 @@ public class ExperimentController {
     /**
      * Saves all solver configurations with parameter instances in the solver
      * config panel.
+     * @param task
      * @throws SQLException
+     * @throws InterruptedException
+     * @throws InvocationTargetException
+     * @throws PropertyNotInDBException
+     * @throws PropertyTypeNotExistException
+     * @throws IOException
+     * @throws NoConnectionToDBException
+     * @throws ComputationMethodDoesNotExistException
+     * @throws ExpResultHasSolvPropertyNotInDBException
+     * @throws ExperimentResultNotInDBException
+     * @throws StatusCodeNotInDBException
+     * @throws ResultCodeNotInDBException
+     * @throws Exception 
      */
     public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException, Exception {
         // TODO: there are some points where this task should never be canceled (by an application crash or lost db connection)... fix them!
@@ -415,7 +450,19 @@ public class ExperimentController {
 
     /**
      * saves the instances selection of the currently loaded experiment
+     * @param task
      * @throws SQLException
+     * @throws InterruptedException
+     * @throws InvocationTargetException
+     * @throws PropertyNotInDBException
+     * @throws PropertyTypeNotExistException
+     * @throws IOException
+     * @throws NoConnectionToDBException
+     * @throws ComputationMethodDoesNotExistException
+     * @throws ExpResultHasSolvPropertyNotInDBException
+     * @throws ExperimentResultNotInDBException
+     * @throws StatusCodeNotInDBException
+     * @throws ResultCodeNotInDBException 
      */
     public void saveExperimentHasInstances(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         task.setStatus("Checking jobs..");
@@ -475,10 +522,26 @@ public class ExperimentController {
     /**
      * generates the ExperimentResults (jobs) in the database for the currently active experiment
      * Doesn't overwrite existing jobs
-     * @throws SQLException
-     * @param numRuns
+     * @param task
+     * @param cpuTimeLimit
+     * @param memoryLimit
+     * @param wallClockTimeLimit
+     * @param stackSizeLimit
+     * @param outputSizeLimitFirst
+     * @param outputSizeLimitLast
+     * @param maxSeed
      * @return number of jobs added to the experiment results table
      * @throws SQLException
+     * @throws TaskCancelledException
+     * @throws IOException
+     * @throws PropertyTypeNotExistException
+     * @throws PropertyNotInDBException
+     * @throws NoConnectionToDBException
+     * @throws ComputationMethodDoesNotExistException
+     * @throws ExpResultHasSolvPropertyNotInDBException
+     * @throws ExperimentResultNotInDBException
+     * @throws StatusCodeNotInDBException
+     * @throws ResultCodeNotInDBException 
      */
     public synchronized int generateJobs(final Tasks task, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimitFirst, int outputSizeLimitLast, int maxSeed) throws SQLException, TaskCancelledException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         PropertyChangeListener cancelExperimentResultDAOStatementListener = new PropertyChangeListener() {
@@ -764,6 +827,21 @@ public class ExperimentController {
 
     /**
      * Generates a ZIP archive with the necessary files for the grid.
+     * @param location
+     * @param exportInstances
+     * @param exportSolvers
+     * @param exportClient
+     * @param exportRunsolver
+     * @param exportConfig
+     * @param clientBinary
+     * @param task
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws NoConnectionToDBException
+     * @throws SQLException
+     * @throws ClientBinaryNotFoundException
+     * @throws InstanceNotInDBException
+     * @throws TaskCancelledException 
      */
     public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, boolean exportClient, boolean exportRunsolver, boolean exportConfig, File clientBinary, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException, InstanceNotInDBException, TaskCancelledException {
         File tmpDir = new File("tmp");
@@ -1050,7 +1128,8 @@ public class ExperimentController {
     /**
      * Exports all jobs and all columns currently visible to a CSV file.
      * @param file
-     * @throws IOException
+     * @param task
+     * @throws IOException 
      */
     public void exportCSV(File file, Tasks task) throws IOException {
         Tasks.getTaskView().setCancelable(true);
@@ -1102,7 +1181,8 @@ public class ExperimentController {
     /**
      * Exports all jobs and all columns currently visible to a TeX file.
      * @param file
-     * @throws IOException
+     * @param task
+     * @throws IOException 
      */
     public void exportTeX(File file, Tasks task) throws IOException {
         Tasks.getTaskView().setCancelable(true);
@@ -1216,6 +1296,10 @@ public class ExperimentController {
         this.loadJobs();
     }
 
+    /**
+     * Returns an <code>ArrayList</code> of all experiments in the experiments table
+     * @return <code>ArrayList</code> of experiments
+     */
     public ArrayList<Experiment> getExperiments() {
         ArrayList<Experiment> experiments = new ArrayList<Experiment>();
         for (int row = 0; row < main.expTableModel.getRowCount(); row++) {
@@ -1234,16 +1318,27 @@ public class ExperimentController {
         return ExperimentDAO.getExperimentByName(name);
     }
 
+    /**
+     * Returns the output of a experiment result as a string
+     * @param type for possible types see edacc.model.ExperimentResult
+     * @param er
+     * @return
+     * @throws SQLException
+     * @throws NoConnectionToDBException
+     * @throws IOException 
+     * @see edacc.model.ExperimentResult
+     */
     public String getExperimentResultOutput(int type, ExperimentResult er) throws SQLException, NoConnectionToDBException, IOException {
         return ExperimentResultDAO.getOutputText(type, er);
     }
 
     /**
-     * returns a hashmap containing the maximum limits of the experiment results for the currently loaded experiment. 
-     * <br/>
+     * returns a hashmap containing the maximum limits of the experiment results for the currently loaded experiment.<br/>
      * <br/>
      * possible keys are: cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast
      * @return
+     * @throws SQLException
+     * @throws Exception 
      */
     public HashMap<String, Integer> getMaxLimits() throws SQLException, Exception {
         HashMap<String, Integer> res = new HashMap<String, Integer>();
@@ -1431,7 +1526,19 @@ public class ExperimentController {
         }*/
     }
 
+    /**
+     * Imports data from the specified solver configs, instances and runs (if <code>importFinishedRuns</code> is true) to the active experiment.
+     * @param task
+     * @param selectedSolverConfigs the solver configs to import
+     * @param selectedInstances the instances to import
+     * @param importFinishedRuns also imports finished runs if this is true
+     * @throws SQLException
+     * @throws Exception 
+     */
     public void importData(Tasks task, ArrayList<SolverConfiguration> selectedSolverConfigs, ArrayList<Instance> selectedInstances, boolean importFinishedRuns) throws SQLException, Exception {
+        if (main.hasUnsavedChanges()) {
+            throw new IllegalArgumentException("Assertion failure: Has unsaved changes.");
+        }
         // assertion: no unsaved data.
 
         DatabaseConnector.getInstance().getConn().setAutoCommit(false);
@@ -1535,6 +1642,10 @@ public class ExperimentController {
 
     }
 
+    /**
+     * Checks if a grid queue is assigned to this experiment
+     * @return true, iff a grid queue is assigned
+     */
     public boolean hasGridQueuesAssigned() {
         try {
             if (activeExperiment == null) {
@@ -1546,134 +1657,8 @@ public class ExperimentController {
         }
     }
 
-    private class RunCountSCId {
-
-        public int runcount;
-        public int scid;
-
-        public RunCountSCId(int runcount, int scid) {
-            this.runcount = runcount;
-            this.scid = scid;
-        }
-    }
-
-    private RunCountSCId importDataFromSolverConfiguration(Tasks task, SolverConfiguration solverConfig, boolean useNotFinishedJobs) throws SQLException, Exception {
-        // TODO: implement
-        return null;
-        /*  Tasks.getTaskView().setCancelable(true);
-        final boolean autocommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
-        DatabaseConnector.getInstance().getConn().setAutoCommit(false);
-        try {
-        task.setStatus("Loading data..");
-        Vector<ExperimentHasInstance> ehi = ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId());
-        HashSet<Integer> instanceIds = new HashSet<Integer>();
-        for (ExperimentHasInstance e : ehi) {
-        instanceIds.add(e.getInstances_id());
-        }
-        Vector<ExperimentHasInstance> ehi_toAdd = ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(solverConfig.getExperiment_id());
-        task.setStatus("Saving instances..");
-        for (ExperimentHasInstance e : ehi_toAdd) {
-        if (task.isCancelled()) {
-        throw new TaskCancelledException();
-        }
-        if (!instanceIds.contains(e.getInstances_id())) {
-        ExperimentHasInstanceDAO.createExperimentHasInstance(activeExperiment.getId(), e.getInstances_id());
-        }
-        }
-        
-        task.setStatus("Saving solver configuration..");
-        ArrayList<SolverConfiguration> solverConfigs = SolverConfigurationDAO.getSolverConfigurationByExperimentId(activeExperiment.getId());
-        Integer equalId = null;
-        for (SolverConfiguration sc : solverConfigs) {
-        if (task.isCancelled()) {
-        throw new TaskCancelledException();
-        }
-        boolean equal = true;
-        if (sc.getSolver_id() == solverConfig.getSolver_id()) {
-        ArrayList<ParameterInstance> paramInstances = ParameterInstanceDAO.getBySolverConfigId(sc.getId());
-        for (ParameterInstance paramInstanceToAdd : ParameterInstanceDAO.getBySolverConfigId(solverConfig.getId())) {
-        boolean found = false;
-        for (ParameterInstance paramInstance : paramInstances) {
-        if (paramInstance.getParameter_id() == paramInstanceToAdd.getParameter_id()
-        && (paramInstance.getValue() == null && paramInstanceToAdd.getValue() == null || paramInstance.getValue().equals(paramInstanceToAdd.getValue()))) {
-        found = true;
-        break;
-        }
-        }
-        if (!found) {
-        equal = false;
-        break;
-        }
-        }
-        } else {
-        equal = false;
-        }
-        if (equal) {
-        equalId = sc.getId();
-        break;
-        }
-        }
-        int newId;
-        if (equalId == null) {
-        // didn't find solver config -> add one
-        SolverConfiguration newSc = SolverConfigurationDAO.createSolverConfiguration(solverConfig.getSolver_id(), activeExperiment.getId(), 0, solverConfig.getName(), SolverConfigurationDAO.getSolverConfigurationCount(activeExperiment.getId(), solverConfig.getSolver_id()));
-        SolverConfigurationDAO.saveAll();
-        for (ParameterInstance pi : ParameterInstanceDAO.getBySolverConfigId(solverConfig.getId())) {
-        ParameterInstanceDAO.createParameterInstance(pi.getParameter_id(), newSc.getId(), pi.getValue());
-        }
-        // now an id is assigned to newSc
-        newId = newSc.getId();
-        } else {
-        // found solver config -> map id
-        newId = equalId;
-        }
-        
-        // At this point: we have the union of all instances and the union of all solver configs saved in the db
-        
-        task.setStatus("Saving results..");
-        LinkedList<Instance> instances = InstanceDAO.getAllByExperimentId(solverConfig.getExperiment_id());
-        
-        ArrayList<ExperimentResult> results = ExperimentResultDAO.getAllByExperimentId(solverConfig.getExperiment_id());
-        ArrayList<ExperimentResult> newResults = new ArrayList<ExperimentResult>();
-        ArrayList<ExperimentResult> oldResults = new ArrayList<ExperimentResult>();
-        int numRuns = activeExperiment.getNumRuns();
-        this.updateExperimentResults();
-        for (Instance i : instances) {
-        if (task.isCancelled()) {
-        throw new TaskCancelledException();
-        }
-        int runCount = ExperimentDAO.getRunCountInExperimentForSolverConfigurationAndInstance(activeExperiment, newId, i.getId());
-        for (ExperimentResult er : results) {
-        if (er.getSolverConfigId() == solverConfig.getId() && er.getInstanceId() == i.getId() && (useNotFinishedJobs || er.getStatus() == ExperimentResultStatus.SUCCESSFUL)) {
-        newResults.add(ExperimentResultDAO.createExperimentResult(runCount++, er.getPriority(), er.getComputeQueue(), er.getStatus().getValue(), er.getSeed(), er.getResultCode(), er.getResultTime(), newId, activeExperiment.getId(), er.getInstanceId(), er.getStartTime()));
-        oldResults.add(er);
-        }
-        }
-        if (runCount > numRuns) {
-        numRuns = runCount;
-        }
-        }
-        ExperimentResultDAO.batchSave(newResults);
-        if (task.isCancelled()) {
-        throw new TaskCancelledException();
-        }
-        task.setStatus("Saving outputs..");
-        ExperimentResultDAO.batchCopyOutputs(oldResults, newResults);
-        if (task.isCancelled()) {
-        throw new TaskCancelledException();
-        }
-        return new RunCountSCId(numRuns, newId);
-        } catch (Exception e) {
-        DatabaseConnector.getInstance().getConn().rollback();
-        throw e;
-        } finally {
-        DatabaseConnector.getInstance().getConn().setAutoCommit(autocommit);
-        }*/
-    }
-
     /**
      * Checks if data in the experiment design tabs is modified.
-     * @param numRuns
      * @return true, iff some data is modified
      */
     public boolean experimentResultsIsModified() {

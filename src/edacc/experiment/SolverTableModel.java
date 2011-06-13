@@ -9,14 +9,19 @@ import java.util.HashMap;
 
 /**
  *
- * @author daniel
+ * @author daniel, simon
  */
 public class SolverTableModel extends AbstractTableModel {
 
+    /** The index of the name column */
     public static final int COL_NAME = 0;
+    /** The index of the version column */
     public static final int COL_VERSION = 1;
+    /** The index of the description column */
     public static final int COL_DESCRIPTION = 2;
+    /** The index of the categories column */
     public static final int COL_CATEGORIES = 3;
+    /** The index of the selected column */
     public static final int COL_SELECTED = 4;
     private static final String[] columns = {"Name", "Version", "description", "categories", "Selected"};
     private String[] categories;
@@ -24,10 +29,15 @@ public class SolverTableModel extends AbstractTableModel {
     private ArrayList<Solver> solvers;
     private Boolean[] selected;
 
+    /** Creates a new solver table model */
     public SolverTableModel() {
         this.solvers = new ArrayList<Solver>();
     }
 
+    /**
+     * Sets the solvers used for this model.
+     * @param solvers the solvers to be used as an <code>ArrayList</code>
+     */
     public void setSolvers(ArrayList<Solver> solvers) {
         this.solvers = solvers;
         this.selected = new Boolean[solvers.size()];
@@ -124,6 +134,11 @@ public class SolverTableModel extends AbstractTableModel {
         }
     }
 
+    /**
+     * Sets the selection of the solver with the given id according to value
+     * @param solverId the solver id
+     * @param value the selection value
+     */
     public void setSolverSelected(int solverId, boolean value) {
         for (int i = 0; i < solvers.size(); i++) {
             if (solvers.get(i).getId() == solverId) {
@@ -134,14 +149,29 @@ public class SolverTableModel extends AbstractTableModel {
         }
     }
 
+    /**
+     * Returns the solver represented by the row
+     * @param row row index
+     * @return a solver
+     */
     public Solver getSolver(int row) {
         return solvers.get(row);
     }
 
+    /**
+     * Checks if the solver in this row is selected
+     * @param row the row index
+     * @return true, iff the solver in this row is selected
+     */
     public boolean isSelected(int row) {
         return selected[row];
     }
 
+    /**
+     * Sets the selection of the solver in this row according to <code>sel</code>
+     * @param row the row index
+     * @param sel the selection value
+     */
     public void setSelected(int row, boolean sel) {
         selected[row] = sel;
         fireTableRowsUpdated(row, row);

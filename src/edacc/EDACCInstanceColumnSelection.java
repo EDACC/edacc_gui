@@ -5,15 +5,15 @@
  */
 package edacc;
 
-import edacc.experiment.ExperimentResultsBrowserTableModel;
 import edacc.experiment.InstanceTableModel;
 import edacc.experiment.TableColumnSelector;
-import java.awt.Component;
+import edacc.model.DatabaseConnector;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import org.jdesktop.application.Action;
 
 /**
@@ -60,11 +60,23 @@ public class EDACCInstanceColumnSelection extends javax.swing.JDialog {
         instancePropertyColumnsConstraints.gridheight = 1;
         instancePropertyColumnsConstraints.gridwidth = 1;
         instancePropertyColumnsConstraints.anchor = GridBagConstraints.WEST;
+
+        int COL_PROP = InstanceTableModel.COL_PROP;
+        boolean isCompetitionDB;
+        try {
+            isCompetitionDB = DatabaseConnector.getInstance().isCompetitionDB();
+        } catch (Exception e) {
+            isCompetitionDB = false;
+        }
+        if (!isCompetitionDB) {
+            COL_PROP--;
+        }
+        
         pnlInstancePropertyColumns.setLayout(new GridBagLayout());
         for (int i = 0; i < checkboxes.length; i++) {
             checkboxes[i] = new JCheckBox(selector.getColumnName(i), visibility[i]);
             checkboxes[i].setVisible(true);
-            if (i < InstanceTableModel.COL_PROP) {
+            if (i < COL_PROP) {
                 pnlBasicColumns.add(checkboxes[i], basicColumnsConstraints);
                 basicColumnsConstraints.gridy++;
             } else {
@@ -203,7 +215,7 @@ public class EDACCInstanceColumnSelection extends javax.swing.JDialog {
         for (int i = 0; i < visibility.length; i++) {
             visibility[i] = checkboxes[i].isSelected();
         }
-       // model.setColumnVisibility(visibility, true);
+        // model.setColumnVisibility(visibility, true);
         selector.setColumnVisiblity(visibility);
         this.dispose();
     }

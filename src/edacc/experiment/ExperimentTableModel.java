@@ -6,19 +6,35 @@ import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
 import java.sql.SQLException;
 
+/**
+ * Represents a experiment table model
+ * @author simon
+ */
 public class ExperimentTableModel extends AbstractTableModel {
 
+    /** Column count if used as simple table */
     public static final int COL_COUNT_SIMPLE = 4;
+    /** Index of the ID column */
     public static final int COL_ID = 0;
+    /** Index of the name column */
     public static final int COL_NAME = 1;
+    /** Index of the date column */
     public static final int COL_DATE = 2;
+    /** Index of the description column */
     public static final int COL_DESCRIPTION = 3;
+    /** Index of the number of runs column */
     public static final int COL_NUMRUNS = 4;
+    /** Index of the not started count column */
     public static final int COL_NOTSTARTED = 5;
+    /** Index of the running count column */
     public static final int COL_RUNNING = 6;
+    /** Index of the finished count column */
     public static final int COL_FINISHED = 7;
+    /** Index of the failed count column */
     public static final int COL_FAILED = 8;
+    /** Index of the priority column */
     public static final int COL_PRIORITY = 9;
+    /** Index of the active column */
     public static final int COL_ACTIVE = 10;
     private String[] columns = {"ID", "Name", "Date", "Description", "Number of jobs", "Not started", "Running", "Finished", "Failed", "Priority", "Active"};
     private ArrayList<Experiment> experiments;
@@ -27,11 +43,20 @@ public class ExperimentTableModel extends AbstractTableModel {
     private Integer[] failed;
     private Integer[] not_started;
     private boolean simple;
+    
+    /**
+     * Creates a new experiment table model.
+     * @param simple if true this will create a simple table model. Just the first <code>COL_COUNT_SIMPLE</code> columns will be used.
+     */
     public ExperimentTableModel(boolean simple) {
         this.experiments = new ArrayList<Experiment>();
         this.simple = simple;
     }
 
+    /**
+     * Sets the experiments for the model
+     * @param experiments the experiments
+     */
     public void setExperiments(ArrayList<Experiment> experiments) {
         this.experiments = experiments;
         if (experiments != null) {
@@ -128,26 +153,51 @@ public class ExperimentTableModel extends AbstractTableModel {
         }
     }
 
+    /**
+     * Sets running at the <code>rowIndex</code>
+     * @param rowIndex the row index
+     * @param value the running count
+     */
     public void setRunningAt(int rowIndex, Integer value) {
         running[rowIndex] = value;
         this.fireTableCellUpdated(rowIndex, COL_RUNNING);
     }
 
+    /**
+     * Sets finished at the <code>rowIndex</code>
+     * @param rowIndex the row index
+     * @param value the finished count
+     */
     public void setFinishedAt(int rowIndex, Integer value) {
         finished[rowIndex] = value;
         this.fireTableCellUpdated(rowIndex, COL_FINISHED);
     }
 
+    /**
+     * Sets failed at the <code>rowIndex</code>
+     * @param rowIndex the row index
+     * @param value the failed count
+     */
     public void setFailedAt(int rowIndex, Integer value) {
         failed[rowIndex] = value;
         this.fireTableCellUpdated(rowIndex, COL_FAILED);
     }
     
+    /**
+     * Sets not started at the <code>rowIndex</code>
+     * @param rowIndex the row index
+     * @param value the not started count
+     */
     public void setNotStartedAt(int rowIndex, Integer value) {
         not_started[rowIndex] = value;
         this.fireTableCellUpdated(rowIndex, COL_NOTSTARTED);
     }
 
+    /**
+     * Returns the experiment represented by this row.
+     * @param rowIndex the row index for which the experiment should be returned
+     * @return 
+     */
     public Experiment getExperimentAt(int rowIndex) {
         return experiments.get(rowIndex);
     }

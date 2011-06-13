@@ -12,6 +12,10 @@ public class TableColumnSelector {
     private JTable table;
     private TableColumn[] columns;
 
+    /**
+     * Creates a new table column selector for a <code>JTable</code>.
+     * @param table the table to be used
+     */
     public TableColumnSelector(JTable table) {
         this.table = table;
 
@@ -21,7 +25,7 @@ public class TableColumnSelector {
         }
     }
 
-    public void setVisible(Object identifier, boolean visible) {
+    private void setVisible(Object identifier, boolean visible) {
         try {
             if (!visible) {
                 table.removeColumn(table.getColumn(identifier));
@@ -44,6 +48,10 @@ public class TableColumnSelector {
         }
     }
 
+    /**
+     * Returns the current visibility of the columns.
+     * @return visibility as boolean array
+     */
     public boolean[] getColumnVisibility() {
         boolean[] res = new boolean[columns.length];
         for (int i = 0; i < columns.length; i++) {
@@ -58,6 +66,12 @@ public class TableColumnSelector {
         return res;
     }
 
+    /**
+     * Sets the visibility of the row.<br/>
+     * <br/>
+     * Throws an <code>IllegalArgumentException</code> if <code>visiblity.length != columns.length</code> where columns are the initial tables columns.
+     * @param visibility the visibility of the columns
+     */
     public void setColumnVisiblity(boolean[] visibility) {
         if (visibility.length != columns.length) {
             throw new IllegalArgumentException("Lengths differ: " + visibility.length + " != " + columns.length);
@@ -75,6 +89,11 @@ public class TableColumnSelector {
         }
     }
     
+    /**
+     * Returns the name of the column at <code>idx</code>
+     * @param idx the column index
+     * @return the name of the column
+     */
     public String getColumnName(int idx) {
         return (String) columns[idx].getIdentifier();
     }

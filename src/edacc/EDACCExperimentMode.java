@@ -489,7 +489,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             jTreeInstanceClass.collapseRow(i);
         }
         lblFilterStatus.setText("");
-        insTableModel.fireTableStructureChanged();
         instanceColumnSelector = new TableColumnSelector(tableInstances);
         resetInstanceColumnVisibility();
         instanceFilter.setFilterInstanceClasses(false);
@@ -2898,7 +2897,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JSplitPane splitPaneSolver;
     private javax.swing.JSplitPane splitPaneSolverSolverConfigs;
     private javax.swing.JTable tableExperiments;
-    private javax.swing.JTable tableInstances;
+    public javax.swing.JTable tableInstances;
     public javax.swing.JTable tableJobs;
     private javax.swing.JTable tableSolvers;
     private javax.swing.JTable tblClients;
@@ -3020,6 +3019,27 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }
 
     private void resetInstanceColumnVisibility() {
-        instanceColumnSelector.setColumnVisiblity(insTableModel.getDefaultVisibility());
+        insTableModel.fireTableStructureChanged();
+        boolean[] tmp = insTableModel.getDefaultVisibility();
+        boolean isCompetition;
+        try {
+            isCompetition = DatabaseConnector.getInstance().isCompetitionDB();
+        } catch (Exception ex) {
+            isCompetition = false;
+        }
+        // if it is no competition db, then remove the competition columns
+        if (!isCompetition) {
+            tableInstances.removeColumn(tableInstances.getColumnModel().getColumn(InstanceTableModel.COL_BENCHTYPE));
+        }
+        boolean[] visibility = new boolean[tableInstances.getColumnCount()];
+
+        int k = 0;
+        for (int i = 0; i < tmp.length; i++) {
+            if (isCompetition || i != InstanceTableModel.COL_BENCHTYPE) {
+                visibility[k++] = tmp[i];
+            }
+        }
+        instanceColumnSelector = new TableColumnSelector(tableInstances);
+        instanceColumnSelector.setColumnVisiblity(visibility);
     }
 }

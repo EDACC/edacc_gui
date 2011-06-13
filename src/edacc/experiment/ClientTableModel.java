@@ -6,8 +6,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -16,34 +14,55 @@ import javax.swing.table.DefaultTableModel;
  */
 public class ClientTableModel extends DefaultTableModel implements Observer {
 
+    /** The index of the compute node column */
     public static final int COL_COMPUTENODE = 0;
+    /** The index of the status column */
     public static final int COL_STATUS = 1;
+    /** The index of the cores column */
     public static final int COL_CORES = 2;
+    /** The index of the threads column */
     public static final int COL_THREADS = 3;
+    /** The index of the hyperthreading column */
     public static final int COL_HYPERTHREADING = 4;
+    /** The index of the turboboost column */
     public static final int COL_TURBOBOOST = 5;
+    /** The index of the cpu name column */
     public static final int COL_CPUNAME = 6;
+    /** The index of the cache size column */
     public static final int COL_CACHESIZE = 7;
+    /** The index of the memory column */
     public static final int COL_MEMORY = 8;
+    /** The index of the free memory column */
     public static final int COL_MEMORYFREE = 9;
     private static final String[] columns = {"Compute Node", "Status", "Cores", "Threads", "Hyperthreading", "Turboboost", "CPU Name", "Cache Size", "Memory", "Free Memory"};
     private ArrayList<Client> clients;
 
+    /** Creates the client table model */
     public ClientTableModel() {
         clients = new ArrayList<Client>();
     }
     
+    /** Clears the clients */
     public void clearClients() {
         clients = new ArrayList<Client>();
         this.fireTableDataChanged();
     }
 
+    /**
+     * Adds a client.
+     * @param client the client to be added 
+     */
     public void addClient(Client client) {
         client.addObserver(this);
         clients.add(client);
         this.fireTableRowsInserted(clients.size() - 1, clients.size() - 1);
     }
 
+    /**
+     * Returns the client represented by <code>row</code>
+     * @param row the row index for which a client should be returned
+     * @return 
+     */
     public Client getClientAt(int row) {
         return clients.get(row);
     }

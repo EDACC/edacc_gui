@@ -5,10 +5,16 @@ package edacc.experiment;
  * @author daniel
  */
 public class SeedGroup {
-    protected int seedGroup;
-    protected int instanceId;
-    protected int run;
+    private int seedGroup;
+    private int instanceId;
+    private int run;
 
+    /**
+     * Creates the 3-tuple seed group
+     * @param seedGroup the seed group as <code>int</code>
+     * @param instanceId the instance id
+     * @param run the run
+     */
     public SeedGroup(int seedGroup, int instanceId, int run) {
         this.seedGroup = seedGroup;
         this.instanceId = instanceId;

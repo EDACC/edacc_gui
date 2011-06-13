@@ -28,8 +28,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class Util {
 
+    /** Color to be used for errors */
     public static final Color COLOR_ERROR = new Color(0xed1c24);
+    /** Color to be used for the generate jobs table if a value is not saved and bigger as the saved value */
     public static final Color COLOR_GENERATEJOBSTABLE_UNSAVED_BIGGER = Color.green;
+    /** Color to be used for the generate jobs table if a value is not saved and lower as the saved value */
     public static final Color COLOR_GENERATEJOBSTABLE_UNSAVED_LOWER = COLOR_ERROR;
 
     /**
@@ -198,6 +201,11 @@ public class Util {
         return res;
     }
 
+    /** 
+     * Returns all instance class ids in the tree below the root node.
+     * @param root the root node
+     * @return an <code>ArrayList</code> of instance class ids
+     */
     public static ArrayList<Integer> getInstanceClassIdsFromPath(DefaultMutableTreeNode root) {
         ArrayList<Integer> res = new ArrayList<Integer>();
         for (int i = 0; i < root.getChildCount(); i++) {
@@ -207,6 +215,10 @@ public class Util {
         return res;
     }
 
+    /**
+     * Returns the path to the root edacc folder, i.e. the path to the EDACC.jar
+     * @return the path to the root edacc folder
+     */
     public static String getPath() {
         File f = new File(EDACCApp.class.getProtectionDomain().getCodeSource().getLocation().getPath());
         if (f.isDirectory()) {
@@ -216,6 +228,13 @@ public class Util {
         }
     }
 
+    /**
+     * Returns true if the number in field is greater or equal the given number. 
+     * Also changes the fields layout to give the user a feedback which values aren't valid.
+     * @param field the text field
+     * @param number the number
+     * @return true, iff the value in the field is valid
+     */
     public static boolean verifyNumber_geq(JTextField field, Integer number) {
         boolean res;
         try {
