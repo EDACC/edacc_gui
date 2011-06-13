@@ -743,6 +743,13 @@ CREATE  TABLE IF NOT EXISTS `SolverDownloads` (
   PRIMARY KEY (`idSolver`, `filesystemID`) )
 ENGINE = InnoDB;
 
+ALTER TABLE `Parameters` 
+  ADD CONSTRAINT `fk_Parameters_Solver`
+  FOREIGN KEY (`Solver_idSolver` )
+  REFERENCES `Solver` (`idSolver` )
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
+
 INSERT INTO StatusCodes VALUES
 (-6, 'unknown verifier result code'),
 (-5, 'launcher crash'),
