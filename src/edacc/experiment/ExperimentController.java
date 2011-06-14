@@ -843,7 +843,7 @@ public class ExperimentController {
      * @throws InstanceNotInDBException
      * @throws TaskCancelledException 
      */
-    public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, boolean exportClient, boolean exportRunsolver, boolean exportConfig, File clientBinary, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException, InstanceNotInDBException, TaskCancelledException {
+    public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, boolean exportClient, boolean exportRunsolver, boolean exportConfig, boolean exportVerifier, File clientBinary, File verifierBinary, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException, InstanceNotInDBException, TaskCancelledException {
         File tmpDir = new File("tmp");
         tmpDir.mkdir();
         Tasks.getTaskView().setCancelable(true);
@@ -931,7 +931,8 @@ public class ExperimentController {
 
                 // add configuration File
                 if (exportConfig) {
-                    addConfigurationFile(zos, activeExperiment, queue);
+                    String verifierFilename = verifierBinary == null ? null : "verifiers/" + verifierBinary.getName();
+                    addConfigurationFile(zos, queue, verifierFilename);
                 }
 
                 // add run script
@@ -945,6 +946,11 @@ public class ExperimentController {
                 // add runsolver
                 if (exportRunsolver) {
                     addRunsolver(zos);
+                }
+
+                // add verifier
+                if (exportVerifier) {
+                    addVerifier(zos, verifierBinary);
                 }
             }
             zos.close();
@@ -1034,7 +1040,7 @@ public class ExperimentController {
         }
     }
 
-    private void addConfigurationFile(ZipOutputStream zos, Experiment activeExperiment, GridQueue activeQueue) throws IOException {
+    private void addConfigurationFile(ZipOutputStream zos, GridQueue activeQueue, String verifierFilename) throws IOException {
         // generate content of config file
         String sConf =
                 "host = $host\n"
@@ -1049,6 +1055,10 @@ public class ExperimentController {
         sConf = sConf.replace("$db", con.getDatabase());
         sConf = sConf.replace("$q", String.valueOf(activeQueue.getId()));
 
+        if (verifierFilename != null) {
+            sConf += "verifier = " + verifierFilename + "\n";
+        }
+        
         // write file into zip archive
         ZipEntry entry = new ZipEntry("config");
         zos.putNextEntry(entry);
@@ -1102,6 +1112,24 @@ public class ExperimentController {
             zos.closeEntry();
             in.close();
         }
+    }
+
+    private void addVerifier(ZipOutputStream zos, File verifierBinary) throws IOException, ClientBinaryNotFoundException {
+        InputStream in = new FileInputStream(verifierBinary);
+        if (in == null) {
+            throw new ClientBinaryNotFoundException();
+        }
+        ZipEntry entry = new ZipEntry("verifiers/" + verifierBinary.getName());
+        zos.putNextEntry(entry);
+
+        byte[] buf = new byte[1024];
+        int data;
+
+        while ((data = in.read(buf)) > -1) {
+            zos.write(buf, 0, data);
+        }
+        zos.closeEntry();
+        in.close();
     }
 
     private void addRunsolver(ZipOutputStream zos) throws IOException, ClientBinaryNotFoundException {

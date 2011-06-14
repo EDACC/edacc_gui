@@ -96,10 +96,7 @@ public class SolverTableModel extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int row, int col) {
-        if (isCompetition) {
-            col--;
-        }
-        if (col == 5) {
+        if (col == COL_SELECTED) {
             return true;
         }
         return false;
@@ -107,10 +104,7 @@ public class SolverTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int col) {
-        if (isCompetition) {
-            col--;
-        }
-        if (col == 5) {
+        if (col == COL_SELECTED) {
             selected[row] = (Boolean) value;
         }
         fireTableCellUpdated(row, col);

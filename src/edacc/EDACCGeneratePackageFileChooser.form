@@ -23,16 +23,16 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
           <Component id="jPanel2" alignment="0" max="32767" attributes="0"/>
+          <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel2" max="32767" attributes="0"/>
+          <Group type="102" alignment="1" attributes="0">
+              <Component id="jPanel1" max="32767" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -58,17 +58,26 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="chkInstances" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="chkSolvers" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="chkClient" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtClientLocation" pref="479" max="32767" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="btnChooseClientBinary" min="-2" max="-2" attributes="0"/>
-                      </Group>
                       <Component id="chkRunsolver" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="chkConfig" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="1" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkClient" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkVerifier" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="txtClientLocation" pref="479" max="32767" attributes="0"/>
+                              <Component id="txtVerifierLocation" alignment="0" pref="479" max="32767" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                      <Component id="btnChooseVerifierBinary" min="0" pref="0" max="32767" attributes="1"/>
+                      <Component id="btnChooseClientBinary" alignment="1" max="32767" attributes="1"/>
+                  </Group>
               </Group>
           </Group>
         </DimensionLayout>
@@ -81,13 +90,20 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="chkClient" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtClientLocation" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="btnChooseClientBinary" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtClientLocation" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace pref="6" max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="chkVerifier" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnChooseVerifierBinary" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtVerifierLocation" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="chkRunsolver" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="chkConfig" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -141,6 +157,28 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnChooseClientBinaryActionPerformed"/>
           </Events>
         </Component>
+        <Component class="javax.swing.JCheckBox" name="chkVerifier">
+          <Properties>
+            <Property name="selected" type="boolean" value="true"/>
+            <Property name="text" type="java.lang.String" resourceKey="chkVerifier.text"/>
+            <Property name="name" type="java.lang.String" value="chkVerifier" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="txtVerifierLocation">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="txtVerifierLocation.text"/>
+            <Property name="name" type="java.lang.String" value="txtVerifierLocation" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="btnChooseVerifierBinary">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="btnChooseVerifierBinary.text"/>
+            <Property name="name" type="java.lang.String" value="btnChooseVerifierBinary" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnChooseVerifierBinaryActionPerformed"/>
+          </Events>
+        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="jPanel2">
@@ -163,7 +201,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="packageFileChooser" alignment="0" pref="363" max="32767" attributes="0"/>
+              <Component id="packageFileChooser" alignment="0" pref="324" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>

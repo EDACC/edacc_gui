@@ -82,6 +82,11 @@
             <fileset file="client/README"/>
             <fileset file="client/runsolver"/>
             <fileset file="client/runsolver_copyright.txt"/>
+            <fileset file="client/verifiers/SAT"/>
+        </copy>
+        <mkdir dir="${dist.dir}/bin/verifiers" />
+        <copy todir="${dist.dir}/bin/verifiers">
+            <fileset file="client/verifiers/SAT"/>
         </copy>
         <echo>Copying Experiment Mode - README.txt</echo>
         <copy todir="${dist.dir}">
@@ -96,6 +101,7 @@
     <target name="-post-compile">
         <echo>Copying runsolver and client</echo>
         <mkdir dir="${build.classes.dir}/bin" />
+        <mkdir dir="${build.classes.dir}/bin/verifiers" />
         <copy todir="${build.classes.dir}/bin">
             <fileset file="client/AUTHORS"/>
             <fileset file="client/client"/>
@@ -103,6 +109,10 @@
             <fileset file="client/README"/>
             <fileset file="client/runsolver"/>
             <fileset file="client/runsolver_copyright.txt"/>
+        </copy>
+        <mkdir dir="${build.classes.dir}/bin/verifiers" />
+        <copy todir="${build.classes.dir}/bin/verifiers">
+            <fileset file="client/verifiers/SAT"/>
         </copy>
     </target>
 </project>

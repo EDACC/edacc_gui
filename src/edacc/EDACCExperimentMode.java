@@ -1810,6 +1810,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
                 break;
             case TAB_CLIENTBROWSER:
+                tblClients.getRowSorter().setSortKeys(new LinkedList());
                 if (clientUpdateThread != null) {
                     if (clientUpdateThread.isDone()) {
                         clientUpdateThread = new ClientUpdateThread(clientTableModel);
