@@ -152,6 +152,9 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
         tblSolverConfigs.setDefaultRenderer(Integer.class, renderer);
         tblSolverConfigs.setDefaultRenderer(Float.class, renderer);
         tblSolverConfigs.setDefaultRenderer(Double.class, renderer);
+        
+        Util.addSpaceSelection(tblInstances, InstanceTableModel.COL_SELECTED);
+        Util.addSpaceSelection(tblSolverConfigs, SolverConfigurationTableModel.COL_SEL);
     }
 
     public void initializeData() {
