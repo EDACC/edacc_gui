@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -89,6 +91,7 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
 
     public void remove(Instance instance) {
         instances.remove(instance);
+        instanceClassIds.remove(instance);
     }
 
     public void removeInstances(Vector<Instance> instances) {
@@ -238,5 +241,33 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
     public LinkedList<Integer> getInstanceClassIdsForRow(int rowIndex) {
         LinkedList<Integer> res = instanceClassIds.get(instances.get(rowIndex));
         return res == null ? new LinkedList<Integer>() : res;
+    }
+
+    void addNewInstances(Vector<Instance> instances) {
+        for (int i = 0; i < instances.size(); i++) {
+            addNewInstance(instances.get(i));
+        }
+
+
+        for (Instance i : instances) {
+            instanceClassIds.put(i, new LinkedList<Integer>());
+        }
+        try {
+            InstanceHasInstanceClassDAO.fillInstanceClassIds(instanceClassIds);
+        } catch (SQLException ex) {
+            // TODO: error
+        }
+    }
+
+    private void addNewInstance(Instance in) {
+          if (!instances.contains(in)) {
+            try {
+                instances.add(in);
+                LinkedList <Integer> classes = InstanceHasInstanceClassDAO.getRelatedInstanceClasses(in.getId());
+                instanceClassIds.put(in, classes);
+            } catch (SQLException ex) {
+                Logger.getLogger(InstanceTableModel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }

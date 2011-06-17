@@ -142,7 +142,7 @@ public class ManageDBInstances implements Observer {
             if (input.getName().equals("")) {
                 Vector<Instance> instances;
                 instances = buildInstancesAutogenerateClass(instanceFiles, ret, task, compress);
-                main.instanceTableModel.addInstances(instances);
+                main.instanceTableModel.addNewInstances(instances);
                 loadInstanceClasses();
             } else {
                 Vector<Instance> instances;
@@ -153,8 +153,9 @@ public class ManageDBInstances implements Observer {
                 }
 
 
-                main.instanceTableModel.addInstances(instances);
+                main.instanceTableModel.addNewInstances(instances);
                 loadInstanceClasses();
+                main.updateInstanceTable();
                 Tasks.getTaskView().setCancelable(false);
             }
         } catch (FileNotFoundException ex) {
