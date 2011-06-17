@@ -222,4 +222,15 @@ public class InstanceHasInstanceClassDAO {
             }
         }
     }
+
+    public static LinkedList<Integer> getRelatedInstanceClasses(int id) throws SQLException {
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE Instances_idInstance=" + id);
+        LinkedList<Integer> classes = new LinkedList<Integer>();
+        while(rs.next()){
+            InstanceHasInstanceClass i = getInstanceHasInstanceClassFromResultset(rs);
+            classes.add(i.getInstanceClass().getId());
+        }
+        return classes;
+    }
 }
