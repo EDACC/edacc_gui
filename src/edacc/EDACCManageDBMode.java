@@ -164,6 +164,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         manageDBSolvers.loadSolvers();
         manageDBParameters.loadParametersOfSolvers(solverTableModel.getSolvers());
         manageDBInstances.loadInstanceClasses();
+        manageDBInstances.loadInstances();
         instanceTableModel.updateProperties();
         instanceTableModel.fireTableDataChanged();
         jTreeInstanceClass.updateUI();
@@ -1766,12 +1767,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     }//GEN-LAST:event_btnSolverRefreshActionPerformed
 
     private void btnNewInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewInstanceClassActionPerformed
-            saveExpandedState();
-            jTreeInstanceClass.setSelectionPath(null);
-            manageDBInstances.addInstanceClasses();
-            manageDBInstances.UpdateInstanceClasses();
-            jTreeInstanceClass.setExpandsSelectedPaths(true);
-            restoreExpandedState();
+        saveExpandedState();
+        jTreeInstanceClass.setSelectionPath(null);
+        manageDBInstances.addInstanceClasses();
+        manageDBInstances.UpdateInstanceClasses();
+        jTreeInstanceClass.setExpandsSelectedPaths(true);
+        restoreExpandedState();
         /*tableInstanceClass.updateUI();
         unsavedChanges = true;*/
     }//GEN-LAST:event_btnNewInstanceClassActionPerformed
@@ -2426,6 +2427,18 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         jTreeInstanceClass.clearSelection();
     }
 
+    public void JTreeStateChanged() {
+        instanceFilter.clearInstanceClassIds();
+        if (jTreeInstanceClass.getSelectionPaths() != null) {
+            for (TreePath path : jTreeInstanceClass.getSelectionPaths()) {
+                for (Integer id : edacc.experiment.Util.getInstanceClassIdsFromPath((DefaultMutableTreeNode) (path.getLastPathComponent()))) {
+                    instanceFilter.addInstanceClassId(id);
+                }
+            }
+            instanceTableModel.fireTableDataChanged();
+        }
+    }
+
     /**
      * Verifies the input of the Parameter name TextField.
      */
@@ -2461,28 +2474,22 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     public JTree getInstanceClassTree() {
         return jTreeInstanceClass;
     }
-    
     private Enumeration descendantExpandedPathsBeforeDrag;
     private TreePath selectedPathStored;
 
-    public void saveExpandedState()
-    {
-        descendantExpandedPathsBeforeDrag = jTreeInstanceClass.getExpandedDescendants( new TreePath(((DefaultMutableTreeNode)instanceClassTreeModel.getRoot()).getPath()) );
+    public void saveExpandedState() {
+        descendantExpandedPathsBeforeDrag = jTreeInstanceClass.getExpandedDescendants(new TreePath(((DefaultMutableTreeNode) instanceClassTreeModel.getRoot()).getPath()));
         selectedPathStored = jTreeInstanceClass.getSelectionModel().getSelectionPath();
     }
 
-
-    public void restoreExpandedState()
-    {
-        if( descendantExpandedPathsBeforeDrag != null )
-        {
-            for( Enumeration e = descendantExpandedPathsBeforeDrag; e.hasMoreElements(); )
-            {
-                TreePath tmpPath = (TreePath) ( e.nextElement() );
+    public void restoreExpandedState() {
+        if (descendantExpandedPathsBeforeDrag != null) {
+            for (Enumeration e = descendantExpandedPathsBeforeDrag; e.hasMoreElements();) {
+                TreePath tmpPath = (TreePath) (e.nextElement());
                 jTreeInstanceClass.expandPath(
-                        new TreePath( ( (DefaultMutableTreeNode) tmpPath.getLastPathComponent() ).getPath() ) );
+                        new TreePath(((DefaultMutableTreeNode) tmpPath.getLastPathComponent()).getPath()));
             }
         }
-        jTreeInstanceClass.getSelectionModel().setSelectionPath( selectedPathStored );
+        jTreeInstanceClass.getSelectionModel().setSelectionPath(selectedPathStored);
     }
 }

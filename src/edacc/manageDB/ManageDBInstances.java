@@ -101,10 +101,21 @@ public class ManageDBInstances implements Observer {
      * @throws NoConnectionToDBException
      * @throws SQLException
      */
-    public void loadInstances() throws NoConnectionToDBException, SQLException, InstanceClassMustBeSourceException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
-        main.instanceTableModel.instances.clear();
-        main.instanceTableModel.addInstances(new Vector<Instance>(InstanceDAO.getAll()));
-        main.instanceTableModel.fireTableDataChanged();
+    public void loadInstances() {
+        try {
+            main.instanceTableModel.instances.clear();
+            main.instanceTableModel.addInstances(new Vector<Instance>(InstanceDAO.getAll()));
+        } catch (SQLException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        }  catch (PropertyNotInDBException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (PropertyTypeNotExistException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ComputationMethodDoesNotExistException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void loadInstanceClasses() throws SQLException {
@@ -951,8 +962,8 @@ public class ManageDBInstances implements Observer {
     }
 
     public void changeInstanceTable() {
-
-        ((InstanceTableModel) tableInstances.getModel()).clearTable();
+            main.updateInstanceTable();
+    /*    ((InstanceTableModel) tableInstances.getModel()).clearTable();
         TreePath[] selected = main.getInstanceClassTree().getSelectionPaths();
         Vector<InstanceClass> choosen = new Vector<InstanceClass>();
         if (selected == null) {
@@ -966,7 +977,7 @@ public class ManageDBInstances implements Observer {
             while(tmp.hasMoreElements()){
             choosen.add((InstanceClass) tmp.nextElement().getUserObject());
             }
-            choosen.add((InstanceClass) nodes.getUserObject());*/
+            choosen.add((InstanceClass) nodes.getUserObject());
         }
         if (!choosen.isEmpty()) {
             try {
@@ -979,7 +990,7 @@ public class ManageDBInstances implements Observer {
             }
         }
         main.updateInstanceTable();
-        ((InstanceTableModel) tableInstances.getModel()).fireTableDataChanged();
+        ((InstanceTableModel) tableInstances.getModel()).fireTableDataChanged();*/
     }
 
     private Vector<InstanceClass> getAllToEnd(DefaultMutableTreeNode root) {
