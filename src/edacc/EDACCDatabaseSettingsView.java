@@ -5,7 +5,11 @@
  */
 package edacc;
 
+import edacc.model.DBEmptyException;
+import edacc.model.DBVersionException;
+import edacc.model.DBVersionUnknownException;
 import edacc.model.DatabaseConnector;
+import edacc.model.NoConnectionToDBException;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
 import java.awt.event.KeyEvent;
@@ -25,6 +29,7 @@ import org.jdesktop.application.LocalStorage;
  * @author Daniel D.
  */
 public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
+
     private final String connection_settings_filename = "connection_details.xml";
 
     /** Creates new form EDACCGridSettingsView */
@@ -33,7 +38,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
         initComponents();
         //btnConnect.requestFocus();
         getRootPane().setDefaultButton(btnConnect);
-        
+
         ApplicationContext ctxt = EDACCApp.getApplication().getContext();
         LocalStorage ls = ctxt.getLocalStorage();
         try {
@@ -363,7 +368,6 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
             @Override
             public void run(Tasks task) {
                 try {
-                    DatabaseConnector.getInstance().connect(txtHostname.getText(), Integer.parseInt(txtPort.getText()), txtUsername.getText(), txtDatabase.getText(), txtPassword.getText(), chkUseSSL.isSelected(), chkCompress.isSelected(), Integer.parseInt(txtMaxConnections.getText()));
                     ApplicationContext ctxt = EDACCApp.getApplication().getContext();
                     LocalStorage ls = ctxt.getLocalStorage();
                     Map<String, String> map = new HashMap<String, String>();
@@ -378,8 +382,7 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
                         map.put("save_password", chkSavePassword.isSelected() ? "true" : "false");
                         if (chkSavePassword.isSelected()) {
                             map.put("password", txtPassword.getText());
-                        }
-                        else {
+                        } else {
                             map.put("password", "");
                         }
                         ctxt.getLocalStorage().save(map, connection_settings_filename);
@@ -387,7 +390,8 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
                         // couldn't save connection settings, doesn't really matter
                         Logger.getLogger(EDACCDatabaseSettingsView.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    
+                    DatabaseConnector.getInstance().connect(txtHostname.getText(), Integer.parseInt(txtPort.getText()), txtUsername.getText(), txtDatabase.getText(), txtPassword.getText(), chkUseSSL.isSelected(), chkCompress.isSelected(), Integer.parseInt(txtMaxConnections.getText()));
+
                     SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
@@ -413,11 +417,129 @@ public class EDACCDatabaseSettingsView extends javax.swing.JDialog {
                         }
                     });
 
+                } catch (final DBVersionException e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            handleDBVersionException(e);
+                        }
+                    });
+
+                } catch (final DBVersionUnknownException e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            handleDBVersionException(e);
+                        }
+                    });
+                } catch (final DBEmptyException e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            handleDBVersionException(e);
+                        }
+                    });
                 }
 
             }
         });
     }//GEN-LAST:event_btnConnectActionPerformed
+
+    private void handleDBVersionException(Exception ex) {
+        if (ex instanceof DBEmptyException) {
+            if (JOptionPane.showConfirmDialog(this,
+                    "It seems that there are no tables in the database. Do you want to create them?",
+                    "Warning!",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+                Tasks.startTask(new TaskRunnable() {
+
+                    @Override
+                    public void run(Tasks task) {
+                        try {
+                            DatabaseConnector.getInstance().createDBSchema(task);
+                        } catch (NoConnectionToDBException ex1) {
+                            JOptionPane.showMessageDialog(Tasks.getTaskView(),
+                                    "Couldn't generate the EDACC tables: No connection to database. Please connect to a database first.",
+                                    "Error!", JOptionPane.ERROR_MESSAGE);
+                            DatabaseConnector.getInstance().disconnect();
+                        } catch (SQLException ex) {
+                            JOptionPane.showMessageDialog(Tasks.getTaskView(),
+                                    "An error occured while trying to generate the EDACC tables: " + ex.getMessage(),
+                                    "Error!", JOptionPane.ERROR_MESSAGE);
+                            DatabaseConnector.getInstance().disconnect();
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(Tasks.getTaskView(),
+                                    "An error occured while trying to generate the EDACC tables: " + ex.getMessage(),
+                                    "Error!", JOptionPane.ERROR_MESSAGE);
+                            DatabaseConnector.getInstance().disconnect();
+                        }
+                    }
+                });
+
+            } else {
+                DatabaseConnector.getInstance().disconnect();
+            }
+            return;
+        }
+
+
+        boolean updateModel = false;
+        if (ex instanceof DBVersionUnknownException) {
+            int userinput = JOptionPane.showConfirmDialog(this, "The version of the database model is unknown. If you created the database\ntables with EDACC 0.2 or EDACC 0.3, you can update the database model\nnow to version " + ((DBVersionUnknownException) ex).localVersion + ".\nDo you want to update the database model?", "Unknown Database Model Version", JOptionPane.YES_NO_OPTION);
+            if (userinput == 0) {
+                // update model
+                updateModel = true;
+            } else {
+                // don't update model
+            }
+        } else if (ex instanceof DBVersionException) {
+            int currentVersion = ((DBVersionException) ex).currentVersion;
+            int localVersion = ((DBVersionException) ex).localVersion;
+            if (currentVersion > localVersion) {
+                JOptionPane.showMessageDialog(this, "The version of the database model is too new. Please update you EDACC application.", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                int userinput = JOptionPane.showConfirmDialog(this, "The version of the database model is " + currentVersion + " which is older\nthan the database model version supported by this application.\nDo you want to update the database model?", "Database Model Version", JOptionPane.YES_NO_OPTION);
+                if (userinput == 0) {
+                    // update model
+                    updateModel = true;
+                } else {
+                    // don't update model
+                }
+            }
+        }
+        if (!updateModel) {
+            DatabaseConnector.getInstance().disconnect();
+        } else {
+            Tasks.startTask(new TaskRunnable() {
+
+                @Override
+                public void run(Tasks task) {
+                    try {
+                        DatabaseConnector.getInstance().updateDBModel(task);
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                EDACCDatabaseSettingsView.this.setVisible(false);
+                            }
+                        });
+                    } catch (final Exception ex1) {
+                        DatabaseConnector.getInstance().disconnect();
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                JOptionPane.showMessageDialog(EDACCDatabaseSettingsView.this, "Error while updating database model:\n\n" + ex1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    }
 
     private void txtHostnameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtHostnameKeyPressed
 //        if (evt.getKeyCode() == KeyEvent.VK_TAB) {

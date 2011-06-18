@@ -677,7 +677,7 @@ DROP TABLE IF EXISTS `ExperimentResultsOutput` ;
 
 CREATE  TABLE IF NOT EXISTS `ExperimentResultsOutput` (
   `ExperimentResults_idJob` INT NOT NULL ,
-  `solverOutput` MEDIUMBLOB NULL ,
+  `solverOutput` LONGBLOB NULL ,
   `watcherOutput` LONGBLOB NULL ,
   `launcherOutput` LONGBLOB NULL ,
   `verifierOutput` LONGBLOB NULL ,
@@ -749,6 +749,17 @@ ALTER TABLE `Parameters`
   REFERENCES `Solver` (`idSolver` )
   ON DELETE CASCADE
   ON UPDATE CASCADE;
+
+-- -----------------------------------------------------
+-- Table `Version`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Version` ;
+
+CREATE  TABLE IF NOT EXISTS `Version` (
+  `version` INT NOT NULL ,
+  `date` TIMESTAMP NOT NULL ,
+  PRIMARY KEY (`version`) )
+ENGINE = InnoDB;
 
 INSERT INTO StatusCodes VALUES
 (-6, 'unknown verifier result code'),

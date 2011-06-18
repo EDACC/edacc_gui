@@ -421,13 +421,8 @@ public class EDACCView extends FrameView implements Observer {
                 @Override
                 public void run(Tasks task) {
                     try {
-                        task.setOperationName("Database");
-                        task.setStatus("Generating tables");
-                        DatabaseConnector.getInstance().createDBSchema();
+                        DatabaseConnector.getInstance().createDBSchema(task);
                         
-                        task.setStatus("Adding default property value types");
-                        PropertyValueTypeManager.getInstance().addDefaultToDB();
-
                         SwingUtilities.invokeLater(new Runnable() {
 
                             @Override
@@ -564,20 +559,8 @@ public class EDACCView extends FrameView implements Observer {
             JOptionPane.showMessageDialog(EDACCView.this.getComponent(), "You have to connect to the database before switching modes", "No database connection", JOptionPane.ERROR_MESSAGE);
             noMode();
         } else if (e instanceof SQLException) {
-            if (((SQLException) e).getErrorCode() == 1146) {
-                // error code for mysql: table .. doesn't exist.
-                if (JOptionPane.showConfirmDialog(mode,
-                        "It seems that there are no tables in the database. Do you want to create them?",
-                        "Warning!",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-                    btnGenerateTables();
-                } else {
-                    noMode();
-                }
-            } else {
-                createDatabaseErrorMessage((SQLException) e);
-                noMode();
-            }
+            createDatabaseErrorMessage((SQLException) e);
+            noMode();
         } else {
             javax.swing.JOptionPane.showMessageDialog(null, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }

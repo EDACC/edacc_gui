@@ -1,6 +1,7 @@
 package edacc.model;
 
 import edacc.EDACCApp;
+import edacc.satinstances.PropertyValueTypeManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,8 +19,8 @@ import java.util.Vector;
  */
 public class DatabaseConnector extends Observable {
     // time after an idling connection is closed
+
     public static final int CONNECTION_TIMEOUT = 60000;
-    
     private static DatabaseConnector instance = null;
     private int maxconnections;
     private LinkedList<ThreadConnection> connections;
@@ -32,6 +33,7 @@ public class DatabaseConnector extends Observable {
     private final Object sync = new Object();
     private ConnectionWatchDog watchDog;
     private Boolean isCompetitionDB;
+    private Integer modelVersion;
 
     private DatabaseConnector() {
         connections = new LinkedList<ThreadConnection>();
@@ -54,7 +56,7 @@ public class DatabaseConnector extends Observable {
      * @throws ClassNotFoundException if the driver couldn't be found.
      * @throws SQLException if an error occurs while trying to establish the connection.
      */
-    public void connect(String hostname, int port, String username, String database, String password, boolean useSSL, boolean compress, int maxconnections) throws ClassNotFoundException, SQLException {
+    public void connect(String hostname, int port, String username, String database, String password, boolean useSSL, boolean compress, int maxconnections) throws ClassNotFoundException, SQLException, DBVersionException, DBVersionUnknownException, DBEmptyException {
         while (connections.size() > 0) {
             ThreadConnection tconn = connections.pop();
             tconn.conn.close();
@@ -64,6 +66,7 @@ public class DatabaseConnector extends Observable {
         }
         try {
             this.isCompetitionDB = null;
+            this.modelVersion = null;
             this.hostname = hostname;
             this.port = port;
             this.username = username;
@@ -86,7 +89,7 @@ public class DatabaseConnector extends Observable {
                 properties.put("useCompression", "true");
             }
             /*java.io.PrintWriter w =
-                    new java.io.PrintWriter(new java.io.OutputStreamWriter(System.out));
+            new java.io.PrintWriter(new java.io.OutputStreamWriter(System.out));
             DriverManager.setLogWriter(w);*/
 
             Class.forName("com.mysql.jdbc.Driver");
@@ -94,6 +97,7 @@ public class DatabaseConnector extends Observable {
             watchDog = new ConnectionWatchDog();
             connections.add(new ThreadConnection(Thread.currentThread(), getNewConnection(), System.currentTimeMillis()));
             watchDog.start();
+            checkVersion();
         } catch (ClassNotFoundException e) {
             throw e;
         } catch (SQLException e) {
@@ -291,15 +295,94 @@ public class DatabaseConnector extends Observable {
         }
     }
 
+    public static int getLocalModelVersion() {
+        int cur_version = 0;
+        while (EDACCApp.class.getClassLoader().getResource("edacc/resources/db_version/" + (cur_version + 1) + ".sql") != null) {
+            cur_version++;
+        }
+        return cur_version;
+    }
+
+    private void checkVersion() throws DBVersionException, DBVersionUnknownException, DBEmptyException {
+        int localVersion = getLocalModelVersion();
+        try {
+            int version = getModelVersion();
+            if (version != localVersion) {
+                throw new DBVersionException(version, localVersion);
+            } else {
+                return;
+            }
+        } catch (SQLException e) {
+        }
+        try {
+            Statement st = getConn().createStatement();
+            ResultSet rs = st.executeQuery("SHOW TABLES;");
+            if (rs.next()) {
+                throw new DBVersionUnknownException(localVersion);
+            }
+        } catch (SQLException e) {
+        }
+        throw new DBEmptyException();
+    }
+
+    public void updateDBModel(Tasks task) throws Exception {
+        task.setOperationName("Updating DB Model..");
+        int localVersion = getLocalModelVersion();
+        int currentVersion = 0;
+        try {
+            currentVersion = getModelVersion();
+        } catch (SQLException e) {
+            if (e.getErrorCode() != 1146) {
+                throw e;
+            }
+            // Error 1146: Table 'Version' doesn't exist
+            // -> assuming version 0
+        }
+        boolean autoCommit = getConn().getAutoCommit();
+        try {
+            getConn().setAutoCommit(false);
+            for (int version = currentVersion + 1; version <= localVersion; version++) {
+                task.setStatus("Updating to version " + version);
+                task.setTaskProgress((version - currentVersion) / (float) (localVersion - currentVersion + 1));
+                InputStream in = EDACCApp.class.getClassLoader().getResourceAsStream("edacc/resources/db_version/" + version + ".sql");
+                if (in == null) {
+                    throw new SQLQueryFileNotFoundException();
+                }
+                executeSqlScript(in);
+
+                Statement st = getConn().createStatement();
+                st.executeUpdate("INSERT INTO `Version` VALUES (" + version + ", NOW())");
+                st.close();
+            }
+        } catch (Exception e) {
+            getConn().rollback();
+            throw e;
+        } finally {
+            getConn().setAutoCommit(autoCommit);
+        }
+    }
+
     /**
      * Creates the correct DB schema for EDACC using an already established connection.
      */
-    public void createDBSchema() throws NoConnectionToDBException, SQLException, IOException {
+    public void createDBSchema(Tasks task) throws NoConnectionToDBException, SQLException, IOException {
+        task.setOperationName("Database");
+        task.setStatus("Generating tables");
 
         InputStream in = EDACCApp.class.getClassLoader().getResourceAsStream("edacc/resources/edacc.sql");
         if (in == null) {
             throw new SQLQueryFileNotFoundException();
         }
+        executeSqlScript(in);
+        Statement st = getConn().createStatement();
+        st.executeUpdate("INSERT INTO `Version` VALUES (" + getLocalModelVersion() + ", NOW())");
+        st.close();
+
+        task.setStatus("Adding default property value types");
+        PropertyValueTypeManager.getInstance().addDefaultToDB();
+    }
+
+    public void executeSqlScript(InputStream in) throws IOException, SQLException {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         String line;
         String text = "";
@@ -385,5 +468,19 @@ public class DatabaseConnector extends Observable {
             return isCompetitionDB;
         }
         return false;
+    }
+
+    public int getModelVersion() throws SQLException {
+        if (modelVersion != null) {
+            return modelVersion;
+        }
+        Integer version = null;
+        Statement st = getConn().createStatement();
+        ResultSet rs = st.executeQuery("SELECT MAX(`version`) FROM `Version`");
+        if (rs.next()) {
+            version = rs.getInt(1);
+        }
+        modelVersion = version;
+        return modelVersion;
     }
 }

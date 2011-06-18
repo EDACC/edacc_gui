@@ -101,7 +101,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="lblHostname" alignment="0" pref="143" max="32767" attributes="1"/>
+                              <Component id="lblHostname" alignment="0" pref="149" max="32767" attributes="1"/>
                               <Component id="lblDatabase" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
                               <Component id="lblUsername" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
                               <Component id="lblPassword" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
@@ -139,7 +139,7 @@
                           <Component id="txtMaxConnections" alignment="0" max="32767" attributes="1"/>
                       </Group>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="16" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
