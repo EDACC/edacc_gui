@@ -1,7 +1,6 @@
 package edacc.experiment;
 
 import edacc.model.DatabaseConnector;
-import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import edacc.model.Solver;
 import edacc.model.SolverDAO;
@@ -11,7 +10,7 @@ import java.util.HashMap;
  *
  * @author daniel, simon
  */
-public class SolverTableModel extends AbstractTableModel {
+public class SolverTableModel extends ThreadSafeDefaultTableModel {
 
     /** The index of the name column */
     public static final int COL_NAME = 0;
@@ -76,7 +75,7 @@ public class SolverTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return solvers.size();
+        return solvers == null ? 0 : solvers.size();
     }
 
     @Override

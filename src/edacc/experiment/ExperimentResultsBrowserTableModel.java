@@ -32,7 +32,7 @@ import javax.swing.SwingUtilities;
  * are always the visible column indexes.
  * @author daniel, simon
  */
-public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
+public class ExperimentResultsBrowserTableModel extends ThreadSafeDefaultTableModel {
 
     // constants for the columns
     /** The index of the ID column */
@@ -256,10 +256,7 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             updateTable.run();
         } else {
             // we have to run this in the EDT, otherwise sync exceptions
-            try {
-                SwingUtilities.invokeAndWait(updateTable);
-            } catch (Exception _) {
-            }
+            SwingUtilities.invokeLater(updateTable);
         }
     }
 
@@ -301,7 +298,6 @@ public class ExperimentResultsBrowserTableModel extends AbstractTableModel {
             }
         }
     }
-
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {

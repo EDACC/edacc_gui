@@ -4,13 +4,12 @@ import edacc.model.Parameter;
 import edacc.model.ParameterInstance;
 import java.util.ArrayList;
 import java.util.Arrays;
-import javax.swing.table.AbstractTableModel;
 
 /**
  *
  * @author simon
  */
-public class SolverConfigEntryTableModel extends AbstractTableModel {
+public class SolverConfigEntryTableModel extends ThreadSafeDefaultTableModel {
 
     private String[] columns = {"Selected", "Parameter Name", "Prefix", "Value", "Order"};
     private Parameter[] parameters;
@@ -114,7 +113,7 @@ public class SolverConfigEntryTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return parameters.length;
+        return parameters == null ? 0 : parameters.length;
     }
 
     @Override

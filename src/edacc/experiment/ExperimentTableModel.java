@@ -1,6 +1,5 @@
 package edacc.experiment;
 
-import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
@@ -10,7 +9,7 @@ import java.sql.SQLException;
  * Represents a experiment table model
  * @author simon
  */
-public class ExperimentTableModel extends AbstractTableModel {
+public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
 
     /** Column count if used as simple table */
     public static final int COL_COUNT_SIMPLE = 4;

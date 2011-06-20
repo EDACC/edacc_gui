@@ -6,13 +6,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author simon
  */
-public class ClientTableModel extends DefaultTableModel implements Observer {
+public class ClientTableModel extends ThreadSafeDefaultTableModel implements Observer {
 
     /** The index of the compute node column */
     public static final int COL_COMPUTENODE = 0;
@@ -41,11 +40,12 @@ public class ClientTableModel extends DefaultTableModel implements Observer {
     public ClientTableModel() {
         clients = new ArrayList<Client>();
     }
-    
+
     /** Clears the clients */
     public void clearClients() {
         clients = new ArrayList<Client>();
-        this.fireTableDataChanged();
+
+        fireTableDataChanged();
     }
 
     /**
@@ -55,7 +55,7 @@ public class ClientTableModel extends DefaultTableModel implements Observer {
     public void addClient(Client client) {
         client.addObserver(this);
         clients.add(client);
-        this.fireTableRowsInserted(clients.size() - 1, clients.size() - 1);
+        fireTableRowsInserted(clients.size() - 1, clients.size() - 1);
     }
 
     /**
@@ -98,8 +98,9 @@ public class ClientTableModel extends DefaultTableModel implements Observer {
                 }
             case COL_STATUS:
                 int computeCores = 0;
-                for (Integer cores : clients.get(row).getComputingExperiments().values()) 
+                for (Integer cores : clients.get(row).getComputingExperiments().values()) {
                     computeCores += cores;
+                }
                 return "" + computeCores + " threads computing " + clients.get(row).getComputingExperiments().size() + " experiments";
             case COL_CORES:
                 return clients.get(row).getNumCores();

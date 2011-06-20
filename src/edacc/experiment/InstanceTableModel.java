@@ -13,14 +13,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import javax.swing.table.AbstractTableModel;
 import java.util.Vector;
 
 /**
  *
  * @author daniel, simon
  */
-public class InstanceTableModel extends AbstractTableModel {
+public class InstanceTableModel extends ThreadSafeDefaultTableModel {
 
     /** The index of the name column */
     public static final int COL_NAME = 0;
@@ -237,7 +236,7 @@ public class InstanceTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return instances.size();
+        return instances == null ? 0 : instances.size();
     }
 
     @Override

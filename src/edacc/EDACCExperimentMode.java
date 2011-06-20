@@ -114,7 +114,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
      * The analysis tab index.
      */
     public static final int TAB_ANALYSIS = 6;
-    
     private ExperimentController expController;
     /**
      * The table model for the experiment table. Will be created on object constructions and never be recreated.
@@ -126,17 +125,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public InstanceTableModel insTableModel;
     /**
      * The table model for the solver table. Will be created on object construction and never be recreated.
-     */    
+     */
     public SolverTableModel solTableModel;
     /**
      * The table model for the jobs table. Will be created on object construction and never be recreated.
-     */   
+     */
     public ExperimentResultsBrowserTableModel jobsTableModel;
     /**
      * The table model for the generate jobs table. Will be created on object construction and never be recreated.
      */
     public GenerateJobsTableModel generateJobsTableModel;
-    
     private EDACCSolverConfigPanel solverConfigPanel;
     private TableRowSorter<InstanceTableModel> sorter;
     /**
@@ -548,10 +546,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 reinitializeInstances();
             }
         });
-        
+
         // reload all columns
         solTableModel.fireTableStructureChanged();
-        
+
         boolean isCompetition = DatabaseConnector.getInstance().isCompetitionDB();
         // if it is no competition db, then remove the competition columns
         if (!isCompetition) {
@@ -2939,6 +2937,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Override
     public void onTaskFailed(String methodName, Throwable e) {
+        e.printStackTrace();
         if (e instanceof TaskCancelledException) {
             javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         } else if (e instanceof SQLException) {
@@ -2965,7 +2964,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         lblJobsFilterStatus.setText(status);
     }
-    
+
     /**
      * Returns the jobs table of the job browser tab.
      * @return the jobs table
@@ -3016,31 +3015,53 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }
 
     private void resetJobsColumnVisibility() {
-        jobsColumnSelector.setColumnVisiblity(jobsTableModel.getDefaultVisibility());
+        Runnable runnable = new Runnable() {
+
+            @Override
+            public void run() {
+                jobsColumnSelector.setColumnVisiblity(jobsTableModel.getDefaultVisibility());
+            }  
+        };
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
+        }
     }
 
     private void resetInstanceColumnVisibility() {
-        insTableModel.fireTableStructureChanged();
-        boolean[] tmp = insTableModel.getDefaultVisibility();
-        boolean isCompetition;
-        try {
-            isCompetition = DatabaseConnector.getInstance().isCompetitionDB();
-        } catch (Exception ex) {
-            isCompetition = false;
-        }
-        // if it is no competition db, then remove the competition columns
-        if (!isCompetition) {
-            tableInstances.removeColumn(tableInstances.getColumnModel().getColumn(InstanceTableModel.COL_BENCHTYPE));
-        }
-        boolean[] visibility = new boolean[tableInstances.getColumnCount()];
+        Runnable runnable = new Runnable() {
 
-        int k = 0;
-        for (int i = 0; i < tmp.length; i++) {
-            if (isCompetition || i != InstanceTableModel.COL_BENCHTYPE) {
-                visibility[k++] = tmp[i];
+            @Override
+            public void run() {
+                insTableModel.fireTableStructureChanged();
+                boolean[] tmp = insTableModel.getDefaultVisibility();
+                boolean isCompetition;
+                try {
+                    isCompetition = DatabaseConnector.getInstance().isCompetitionDB();
+                } catch (Exception ex) {
+                    isCompetition = false;
+                }
+                // if it is no competition db, then remove the competition columns
+                if (!isCompetition) {
+                    tableInstances.removeColumn(tableInstances.getColumnModel().getColumn(InstanceTableModel.COL_BENCHTYPE));
+                }
+                boolean[] visibility = new boolean[tableInstances.getColumnCount()];
+
+                int k = 0;
+                for (int i = 0; i < tmp.length; i++) {
+                    if (isCompetition || i != InstanceTableModel.COL_BENCHTYPE) {
+                        visibility[k++] = tmp[i];
+                    }
+                }
+                instanceColumnSelector = new TableColumnSelector(tableInstances);
+                instanceColumnSelector.setColumnVisiblity(visibility);
             }
+        };
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
         }
-        instanceColumnSelector = new TableColumnSelector(tableInstances);
-        instanceColumnSelector.setColumnVisiblity(visibility);
     }
 }

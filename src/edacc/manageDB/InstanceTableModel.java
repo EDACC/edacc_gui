@@ -100,7 +100,7 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
 
     @Override
     public int getRowCount() {
-        return instances.size();
+        return instances == null ? 0 : instances.size();
     }
 
     @Override

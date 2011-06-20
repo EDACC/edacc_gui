@@ -6,13 +6,12 @@ import edacc.model.SolverConfiguration;
 import edacc.model.SolverDAO;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import javax.swing.table.AbstractTableModel;
 
 /**
  *
  * @author simon
  */
-public class SolverConfigurationTableModel extends AbstractTableModel {
+public class SolverConfigurationTableModel extends ThreadSafeDefaultTableModel {
 
     /** The index for the selected column */
     public static final int COL_SEL = 0;

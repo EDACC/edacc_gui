@@ -787,25 +787,26 @@ public class ExperimentController {
                     main.jobsTableModel.fireTableDataChanged();
                 } else {
                     // repaint the table: updates the currently visible rectangle, otherwise there might be duplicates of rows.
-                    // this has to be done in the EDT.
                     final boolean[] urows = updateRows;
+                    int beg = -1;
+                    for (int i = 0; i < urows.length; i++) {
+                        if (urows[i]) {
+                            if (beg == -1) {
+                                beg = i;
+                            }
+                        } else {
+                            if (beg != -1) {
+                                // this will be invoked later by the ThreadSafeDefaultTableModel.
+                                main.jobsTableModel.fireTableRowsUpdated(beg, i);
+                                beg = -1;
+                            }
+                        }
+                    }
+                    
                     SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
                         public void run() {
-                            int beg = -1;
-                            for (int i = 0; i < urows.length; i++) {
-                                if (urows[i]) {
-                                    if (beg == -1) {
-                                        beg = i;
-                                    }
-                                } else {
-                                    if (beg != -1) {
-                                        main.jobsTableModel.fireTableRowsUpdated(beg, i);
-                                        beg = -1;
-                                    }
-                                }
-                            }
                             main.tableJobs.invalidate();
                             main.tableJobs.revalidate();
                             main.tableJobs.repaint();
@@ -1058,7 +1059,7 @@ public class ExperimentController {
         if (verifierFilename != null) {
             sConf += "verifier = " + verifierFilename + "\n";
         }
-        
+
         // write file into zip archive
         ZipEntry entry = new ZipEntry("config");
         zos.putNextEntry(entry);

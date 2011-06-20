@@ -8,13 +8,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.swing.table.DefaultTableModel;
 
 /**
  * The generate jobs table model
  * @author simon
  */
-public class GenerateJobsTableModel extends DefaultTableModel {
+public class GenerateJobsTableModel extends ThreadSafeDefaultTableModel {
 
     private ArrayList<SolverConfiguration> solverConfigs;
     private ArrayList<Instance> instances;
