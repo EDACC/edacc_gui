@@ -5,7 +5,6 @@
 package edacc.manageDB;
 
 import edacc.EDACCApp;
-import edacc.model.MD5CheckFailedException;
 import edacc.model.SolverIsInExperimentException;
 import edacc.EDACCManageDBMode;
 import edacc.EDACCSolverBinaryDlg;
@@ -34,13 +33,10 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import org.jdesktop.application.Task;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  *
@@ -89,14 +85,98 @@ public class ManageDBSolvers implements Observer {
         }
     }
 
+    public void saveSolvers() {
+        Tasks.startTask(new TaskRunnable() {
+
+            @Override
+            public void run(Tasks task) {
+                try {
+                    saveSolvers(task);
+                } catch (final SQLException ex) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            JOptionPane.showMessageDialog(gui,
+                                    "Solvers cannot be saved. There is a problem with the Database: " + ex.getMessage(),
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    });
+
+                } catch (final FileNotFoundException ex) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            JOptionPane.showMessageDialog(gui,
+                                    "Solvers cannot be saved because a file couldn't be found: " + ex.getMessage(),
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    });
+                } catch (final NoSolverBinarySpecifiedException ex) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            JOptionPane.showMessageDialog(gui,
+                                    ex.getMessage(),
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    });
+                } catch (final NoSolverNameSpecifiedException ex) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            JOptionPane.showMessageDialog(gui,
+                                    ex.getMessage(),
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    });
+                } catch (final IOException ex) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            JOptionPane.showMessageDialog(gui,
+                                    "IO exception while reading solver data from the filesystem" + ex.getMessage(),
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    });
+                } catch (final NoSuchAlgorithmException ex) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            JOptionPane.showMessageDialog(gui,
+                                    ex.getMessage(),
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    });
+                }
+            }
+        }, true);
+    }
+
     /**
      * Tries to save all solvers in the solver table to DB.
      * If a solver is already saved in the DB, it will update its data in the DB.
      * @throws SQLException
      * @throws FileNotFoundException
      */
-    public void saveSolvers() throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, NoSolverNameSpecifiedException, IOException, NoSuchAlgorithmException {
-        for (Solver s : solverTableModel.getSolvers()) {
+    public void saveSolvers(final Tasks task) throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, NoSolverNameSpecifiedException, IOException, NoSuchAlgorithmException {
+        task.setOperationName("Saving solvers...");
+        int countSolvers = solverTableModel.getSolvers().size();
+        for (int i = 0; i < countSolvers; i++) {
+            Solver s = solverTableModel.getSolver(i);
+            task.setTaskProgress((float) i / (float) countSolvers);
+            task.setStatus("Saving solver " + s.getName() + " (" + i + " of " + countSolvers + ")");
             Vector<Parameter> params = manageDBParameters.getParametersOfSolver(s);
             SolverDAO.save(s);
             manageDBParameters.rehash(s, params);
@@ -227,7 +307,7 @@ public class ManageDBSolvers implements Observer {
 
     private void startExportSolverTask(Solver s, File f, Tasks task) throws FileNotFoundException, SQLException, IOException {
         task.setOperationName("Exporting solver binaries...");
-       
+
         FileOutputStream fos;
         if (f.isDirectory()) {
             fos = new FileOutputStream(f.getAbsolutePath() + System.getProperty("file.separator") + s.getName() + ".zip");
