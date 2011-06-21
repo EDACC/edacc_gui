@@ -218,8 +218,15 @@ public class ExperimentController {
         experimentResultCache.updateExperimentResults();
 
         main.generateJobsTableModel.updateNumRuns();
-        Util.updateTableColumnWidth(main.tblGenerateJobs);
+        
+        SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
+            public void run() {
+                Util.updateTableColumnWidth(main.tblGenerateJobs);
+            }
+            
+        });
         main.afterExperimentLoaded();
     }
 

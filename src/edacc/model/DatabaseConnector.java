@@ -343,12 +343,12 @@ public class DatabaseConnector extends Observable {
             getConn().setAutoCommit(false);
             for (int version = currentVersion + 1; version <= localVersion; version++) {
                 task.setStatus("Updating to version " + version);
-                task.setTaskProgress((version - currentVersion) / (float) (localVersion - currentVersion + 1));
+               // task.setTaskProgress((version - currentVersion) / (float) (localVersion - currentVersion + 1));
                 InputStream in = EDACCApp.class.getClassLoader().getResourceAsStream("edacc/resources/db_version/" + version + ".sql");
                 if (in == null) {
                     throw new SQLQueryFileNotFoundException();
                 }
-                executeSqlScript(in);
+                executeSqlScript(task, in);
 
                 Statement st = getConn().createStatement();
                 st.executeUpdate("INSERT INTO `Version` VALUES (" + version + ", NOW())");
@@ -373,7 +373,7 @@ public class DatabaseConnector extends Observable {
         if (in == null) {
             throw new SQLQueryFileNotFoundException();
         }
-        executeSqlScript(in);
+        executeSqlScript(task, in);
         Statement st = getConn().createStatement();
         st.executeUpdate("INSERT INTO `Version` VALUES (" + getLocalModelVersion() + ", NOW())");
         st.close();
@@ -382,7 +382,7 @@ public class DatabaseConnector extends Observable {
         PropertyValueTypeManager.getInstance().addDefaultToDB();
     }
 
-    public void executeSqlScript(InputStream in) throws IOException, SQLException {
+    public void executeSqlScript(Tasks task, InputStream in) throws IOException, SQLException {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         String line;
         String text = "";
@@ -418,10 +418,13 @@ public class DatabaseConnector extends Observable {
         try {
             getConn().setAutoCommit(false);
             Statement st = getConn().createStatement();
+            int current = 0;
             for (String q : queries) {
+                task.setTaskProgress((float)++current/(float)(queries.size()));
                 st.execute(q);
             }
             st.close();
+            task.setTaskProgress(0.f);
             getConn().commit();
         } catch (SQLException e) {
             getConn().rollback();

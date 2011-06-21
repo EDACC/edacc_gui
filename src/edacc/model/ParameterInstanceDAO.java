@@ -137,7 +137,7 @@ public class ParameterInstanceDAO {
     }
     
     public static void cacheParameterInstances(ArrayList<SolverConfiguration> p_scs) throws SQLException {
-        if (p_scs == null)
+        /*if (p_scs == null)
             return;
         ArrayList<SolverConfiguration> scs = new ArrayList<SolverConfiguration>();
         for (SolverConfiguration sc : p_scs) {
@@ -169,7 +169,7 @@ public class ParameterInstanceDAO {
             i.setSaved();
             cur.add(i);
         }
-        cacheParameterInstances(cur_sc, cur);       
+        cacheParameterInstances(cur_sc, cur);       */
     }
 
     public static void clearCache() {
