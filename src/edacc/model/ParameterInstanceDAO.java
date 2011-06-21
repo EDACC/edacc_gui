@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 /**
@@ -45,7 +47,7 @@ public class ParameterInstanceDAO {
             st.setInt(1, i.getSolverConfiguration().getId());
             st.setInt(2, i.getParameter_id());
             st.executeUpdate();
-            
+
             // update cache
             if (pi != null) {
                 for (int k = 0; k < pi.size(); k++) {
@@ -69,7 +71,7 @@ public class ParameterInstanceDAO {
             st.setString(3, i.getValue());
             st.executeUpdate();
             i.setSaved();
-            
+
             // update cache
             if (pi != null) {
                 pi.add(i);
@@ -135,10 +137,11 @@ public class ParameterInstanceDAO {
         cacheParameterInstances(sc, res);
         return res;
     }
-    
+
     public static void cacheParameterInstances(ArrayList<SolverConfiguration> p_scs) throws SQLException {
-        /*if (p_scs == null)
+        if (p_scs == null) {
             return;
+        }
         ArrayList<SolverConfiguration> scs = new ArrayList<SolverConfiguration>();
         for (SolverConfiguration sc : p_scs) {
             if (getCached(sc) == null) {
@@ -148,28 +151,36 @@ public class ParameterInstanceDAO {
         if (scs.isEmpty()) {
             return;
         }
+        Collections.sort(scs, new Comparator<SolverConfiguration>() {
+
+            @Override
+            public int compare(SolverConfiguration o1, SolverConfiguration o2) {
+                return o1.getId() - o2.getId();
+            }
+        });
         String idString = "(";
-        for (int i = 0; i < scs.size()-1; i++) {
+        for (int i = 0; i < scs.size() - 1; i++) {
             idString += "" + scs.get(i).getId() + ",";
         }
-        idString += "" + scs.get(scs.size()-1).getId() + ")";
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE SolverConfig_idSolverConfig IN " + idString);
+        idString += "" + scs.get(scs.size() - 1).getId() + ")";
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE SolverConfig_idSolverConfig IN " + idString + " ORDER BY SolverConfig_idSolverConfig ASC");
         int cur_idx = 0;
         ArrayList<ParameterInstance> cur = new ArrayList<ParameterInstance>();
-        SolverConfiguration cur_sc = scs.get(cur_idx); 
+        SolverConfiguration cur_sc = scs.get(cur_idx);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
             if (rs.getInt("SolverConfig_idSolverConfig") != cur_sc.getId()) {
                 cacheParameterInstances(cur_sc, cur);
-                cur_idx++;
-                cur_sc = scs.get(cur_idx);
+                while (cur_sc.getId() != rs.getInt("SolverConfig_idSolverConfig")) {
+                    cur_sc = scs.get(++cur_idx);
+                }
                 cur = new ArrayList<ParameterInstance>();
             }
             ParameterInstance i = getParameterInstanceFromResultset(rs, cur_sc);
             i.setSaved();
             cur.add(i);
         }
-        cacheParameterInstances(cur_sc, cur);       */
+        cacheParameterInstances(cur_sc, cur);
     }
 
     public static void clearCache() {
