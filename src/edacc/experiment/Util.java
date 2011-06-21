@@ -13,6 +13,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -117,18 +119,22 @@ public class Util {
      */
     public static String getParameterString(ArrayList<ParameterInstance> params) {
         try {
-            if (params == null) {
+            if (params == null || params.isEmpty()) {
                 return "";
+            }
+            Vector<Parameter> solverParams = ParameterDAO.getParameterFromSolverId(params.get(0).getSolverConfiguration().getSolverBinary().getIdSolver());
+            final HashMap<Integer, Parameter> solverParamsMap = new HashMap<Integer, Parameter>();
+            for (Parameter p : solverParams) {
+                solverParamsMap.put(p.getId(), p);
             }
             String paramString = "";
             Collections.sort(params, new Comparator<ParameterInstance>() {
 
                 @Override
                 public int compare(ParameterInstance o1, ParameterInstance o2) {
-                    try {
-                        Parameter sp1 = ParameterDAO.getById(o1.getParameter_id());
+                        Parameter sp1 = solverParamsMap.get(o1.getParameter_id());
 
-                        Parameter sp2 = ParameterDAO.getById(o2.getParameter_id());
+                        Parameter sp2 = solverParamsMap.get(o2.getParameter_id());
                         if (sp1.getOrder() > sp2.getOrder()) {
                             return 1;
                         } else if (sp1.getOrder() == sp2.getOrder()) {
@@ -136,13 +142,10 @@ public class Util {
                         } else {
                             return -1;
                         }
-                    } catch (SQLException ex) {
-                        return 0;
-                    }
                 }
             });
             for (ParameterInstance param : params) {
-                Parameter solverParameter = ParameterDAO.getById(param.getParameter_id());
+                Parameter solverParameter = solverParamsMap.get(param.getParameter_id());
                 if (solverParameter.getHasValue()) {
                     String value;
                     if ("instance".equals(solverParameter.getName().toLowerCase())) {

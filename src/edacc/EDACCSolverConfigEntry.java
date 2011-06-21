@@ -61,7 +61,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         solverConfigEntryTableModel.setParameters(params);
 
         ArrayList<SolverBinaries> solverBinaries = new ArrayList<SolverBinaries>();
-        solverBinaries.addAll(SolverBinariesDAO.getBinariesOfSolver(SolverDAO.getById(solverId)));
+        solverBinaries.addAll(SolverDAO.getById(solverId).getSolverBinaries());
         for (SolverBinaries sb : solverBinaries) {
             comboSolverBinaries.addItem(sb);
         }

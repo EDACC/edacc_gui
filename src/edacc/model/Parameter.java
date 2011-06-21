@@ -2,6 +2,7 @@ package edacc.model;
 
 public class Parameter extends BaseModel implements IntegerPKModel {
     private int id;
+    private int idSolver;
     private String name;
     private String prefix;
     private String value;
@@ -111,5 +112,13 @@ public class Parameter extends BaseModel implements IntegerPKModel {
         if (this.isSaved()) {
             this.setModified();
         }
+    }
+
+    public int getIdSolver() {
+        return idSolver;
+    }
+
+    public void setIdSolver(int idSolver) {
+        this.idSolver = idSolver;
     }
 }

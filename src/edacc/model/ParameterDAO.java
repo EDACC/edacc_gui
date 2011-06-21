@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.Types;
+import java.util.HashMap;
 import java.util.Vector;
 
 /**
@@ -12,7 +13,8 @@ import java.util.Vector;
  */
 public class ParameterDAO {
     private static final String table = "Parameters";
-    private static final ObjectCache<Parameter> cache = new ObjectCache<Parameter>();
+    // solver id -> parameter vector
+    private static final HashMap<Integer, Vector<Parameter>> cache = new HashMap<Integer, Vector<Parameter>>();
 
     /**
      * Saves a parameter for a solver in the DB.
@@ -35,6 +37,7 @@ public class ParameterDAO {
             ps.setString(3, parameter.getValue());
             ps.setBoolean(4, parameter.getHasValue());
             ps.setInt(5, parameter.getOrder());
+            parameter.setIdSolver(solver.getId());
             ps.setInt(6, solver.getId());
             ps.setBoolean(7, parameter.isMandatory());
             ps.setBoolean(8, parameter.getSpace());
@@ -63,7 +66,12 @@ public class ParameterDAO {
             ps.executeUpdate();
             parameter.setSaved();
         }
-        cache.cache(parameter);
+        Vector<Parameter> p = cache.get(solver.getId());
+        if (p == null) {
+            p = new Vector<Parameter>();
+            cache.put(solver.getId(), p);
+        }
+        p.add(parameter);
     }
 
     private static Parameter getParameterFromResultset(ResultSet rs) throws SQLException {
@@ -76,6 +84,7 @@ public class ParameterDAO {
         i.setHasValue(rs.getBoolean("hasValue"));
         i.setMandatory(rs.getBoolean("mandatory"));
         i.setSpace(rs.getBoolean("space"));
+        i.setIdSolver(rs.getInt("Solver_idSolver"));
         return i;
     }
     
@@ -86,36 +95,21 @@ public class ParameterDAO {
      * @throws SQLException
      */
     public static Vector<Parameter> getParameterFromSolverId(int id) throws SQLException {
+        Vector<Parameter> p = cache.get(id);
+        if (p != null) {
+            return p;
+        }
         Vector<Parameter> res = new Vector<Parameter>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Solver_idSolver=? ORDER BY `order`");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
-            Parameter i = cache.getCached(rs.getInt("idParameter"));
-            if (i == null) {
-                i = getParameterFromResultset(rs);
-                cache.cache(i);
-            }
+            Parameter i = getParameterFromResultset(rs);
             res.add(i);
             i.setSaved();
         }
+        cache.put(id, res);
         return res;
-    }
-
-    public static Parameter getById(int id) throws SQLException {
-        Parameter i = cache.getCached(id);
-        if (i != null) {
-            return i;
-        }
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idParameter=?");
-        st.setInt(1, id);
-        ResultSet rs = st.executeQuery();
-        if (rs.next()) {
-            i = getParameterFromResultset(rs);
-            cache.cache(i);
-            return i;
-        }
-        return null;
     }
 
     /**
@@ -136,7 +130,10 @@ public class ParameterDAO {
     }
 
     public static void delete(Parameter p) throws NoConnectionToDBException, SQLException {
-        cache.remove(p);
+        Vector<Parameter> pp = cache.get(p.getIdSolver());
+        if (pp != null) {
+            pp.remove(p);
+        }
         if (p.isNew()) return;
         final String query = "DELETE FROM Parameters WHERE idParameter=?";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);

@@ -135,6 +135,42 @@ public class ParameterInstanceDAO {
         cacheParameterInstances(sc, res);
         return res;
     }
+    
+    public static void cacheParameterInstances(ArrayList<SolverConfiguration> p_scs) throws SQLException {
+        if (p_scs == null)
+            return;
+        ArrayList<SolverConfiguration> scs = new ArrayList<SolverConfiguration>();
+        for (SolverConfiguration sc : p_scs) {
+            if (getCached(sc) == null) {
+                scs.add(sc);
+            }
+        }
+        if (scs.isEmpty()) {
+            return;
+        }
+        String idString = "(";
+        for (int i = 0; i < scs.size()-1; i++) {
+            idString += "" + scs.get(i).getId() + ",";
+        }
+        idString += "" + scs.get(scs.size()-1).getId() + ")";
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE SolverConfig_idSolverConfig IN " + idString);
+        int cur_idx = 0;
+        ArrayList<ParameterInstance> cur = new ArrayList<ParameterInstance>();
+        SolverConfiguration cur_sc = scs.get(cur_idx); 
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            if (rs.getInt("SolverConfig_idSolverConfig") != cur_sc.getId()) {
+                cacheParameterInstances(cur_sc, cur);
+                cur_idx++;
+                cur_sc = scs.get(cur_idx);
+                cur = new ArrayList<ParameterInstance>();
+            }
+            ParameterInstance i = getParameterInstanceFromResultset(rs, cur_sc);
+            i.setSaved();
+            cur.add(i);
+        }
+        cacheParameterInstances(cur_sc, cur);       
+    }
 
     public static void clearCache() {
         cache.clear();

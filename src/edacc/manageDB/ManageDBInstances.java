@@ -119,7 +119,7 @@ public class ManageDBInstances implements Observer {
     }
 
     public void loadInstanceClasses() throws SQLException {
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getAllAsTree();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getAllAsTreeFast();
         main.instanceClassTreeModel.setRoot(root);
         main.getInstanceClassTree().setRootVisible(false);
         //main.instanceClassTreeModel.nodesWereInserted(((DefaultMutableTreeNode)main.instanceClassTreeModel.getRoot()), new int[] {((DefaultMutableTreeNode)main.instanceClassTreeModel.getRoot()).getIndex(child)});

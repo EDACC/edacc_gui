@@ -127,6 +127,13 @@ public class ExperimentController {
         StatusCodeDAO.initialize();
         ResultCodeDAO.initialize();
         ClientDAO.clearCache();
+        
+        SolverBinariesDAO.clearCache();
+        SolverDAO.clearCache();
+        ExperimentDAO.clearCache();
+        SolverConfigurationDAO.clearCache();
+        ParameterInstanceDAO.clearCache();
+        
         ArrayList<Experiment> experiments = new ArrayList<Experiment>();
         experiments.addAll(ExperimentDAO.getAll());
         main.expTableModel.setExperiments(experiments);
@@ -155,9 +162,6 @@ public class ExperimentController {
     public void loadExperiment(Experiment exp, Tasks task) throws SQLException, Exception {
         main.reinitializeSolvers();
         activeExperiment = exp;
-        // main.solverConfigPanel.beginUpdate();
-        // solverConfigPanel.removeAll();
-        SolverBinariesDAO.clearCache();
         ArrayList<Solver> vs = new ArrayList<Solver>();
         Vector<ExperimentHasInstance> ehi = new Vector<ExperimentHasInstance>();
         task.setStatus("Loading solvers..");
@@ -168,7 +172,9 @@ public class ExperimentController {
 
         // only use solver configurations with different semantics in the solver config model
         ArrayList<SolverConfiguration> scs = new ArrayList<SolverConfiguration>();
-        for (SolverConfiguration sc : SolverConfigurationDAO.getAll()) {
+        ArrayList<SolverConfiguration> allScs = SolverConfigurationDAO.getAll();
+        ParameterInstanceDAO.cacheParameterInstances(allScs);
+        for (SolverConfiguration sc : allScs) {
             boolean equal = false;
             for (SolverConfiguration sc2 : scs) {
                 if (sc2.hasEqualSemantics(sc)) {

@@ -52,7 +52,6 @@ public class SolverBinariesDAO {
     }
 
     private SolverBinariesDAO() {
-        
     }
 
     public static void save(SolverBinaries s) throws SQLException, NoSolverBinarySpecifiedException, FileNotFoundException, IOException, NoSuchAlgorithmException {
@@ -127,9 +126,9 @@ public class SolverBinariesDAO {
         Vector<SolverBinaries> res = new Vector<SolverBinaries>();
         while (rs.next()) {
             SolverBinaries c = cache.getCached(rs.getInt("idSolverBinary"));
-            if (c != null)
+            if (c != null) {
                 res.add(c);
-            else {
+            } else {
                 SolverBinaries b = getSolverBinaryFromResultSet(rs);
                 cache.cache(b);
                 res.add(b);
@@ -147,9 +146,9 @@ public class SolverBinariesDAO {
         Vector<SolverBinaries> res = new Vector<SolverBinaries>();
         while (rs.next()) {
             SolverBinaries c = cache.getCached(rs.getInt("idSolverBinary"));
-            if (c != null)
+            if (c != null) {
                 res.add(c);
-            else {
+            } else {
                 SolverBinaries b = getSolverBinaryFromResultSet(rs);
                 cache.cache(b);
                 res.add(b);
@@ -161,21 +160,20 @@ public class SolverBinariesDAO {
     }
 
     public static SolverBinaries getById(int id) throws SQLException {
+        SolverBinaries c = cache.getCached(id);
+        if (c != null) {
+            return c;
+        }
         final String query = "SELECT idSolverBinary, idSolver, binaryName, md5, version, runCommand, runPath FROM " + TABLE + " WHERE idSolverBinary=?";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
         SolverBinaries res = null;
         if (rs.next()) {
-            SolverBinaries c = cache.getCached(rs.getInt("idSolverBinary"));
-            if (c != null)
-                res = c;
-            else {
-                SolverBinaries b = getSolverBinaryFromResultSet(rs);
-                cache.cache(b);
-                res = b;
-                b.setSaved();
-            }
+            SolverBinaries b = getSolverBinaryFromResultSet(rs);
+            cache.cache(b);
+            res = b;
+            b.setSaved();
         }
         rs.close();
         return res;
@@ -186,12 +184,13 @@ public class SolverBinariesDAO {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.setInt(1, b.getId());
         ResultSet rs = ps.executeQuery();
-        if (rs.next())
+        if (rs.next()) {
             return rs.getBinaryStream("binaryArchive");
+        }
         return null;
     }
-    
-     public static ArrayList<SolverBinaries> getSolverBinariesInExperiment(Experiment experiment) throws SQLException {
+
+    public static ArrayList<SolverBinaries> getSolverBinariesInExperiment(Experiment experiment) throws SQLException {
         final String query = "SELECT DISTINCT idSolverBinary, idSolver, binaryName, md5, version, runCommand, runPath FROM " + TABLE + " "
                 + "JOIN SolverConfig ON (idSolverBinary = SolverBinaries_idSolverBinary) "
                 + "WHERE Experiment_idExperiment = ?";
@@ -201,9 +200,9 @@ public class SolverBinariesDAO {
         ArrayList<SolverBinaries> res = new ArrayList<SolverBinaries>();
         while (rs.next()) {
             SolverBinaries c = cache.getCached(rs.getInt("idSolverBinary"));
-            if (c != null)
+            if (c != null) {
                 res.add(c);
-            else {
+            } else {
                 SolverBinaries b = getSolverBinaryFromResultSet(rs);
                 cache.cache(b);
                 res.add(b);
