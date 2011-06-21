@@ -1487,33 +1487,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             }
             unsavedChanges = false;
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
+            JOptionPane.showMessageDialog(panelManageDBSolver,
                     "Solvers cannot be saved. There is a problem with the Database: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "Solvers cannot be saved because a file couldn't be found: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (NoSolverBinarySpecifiedException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (NoSolverNameSpecifiedException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "IO exception while reading solver data from the filesystem" + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (NoSuchAlgorithmException ex) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -1846,7 +1821,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         } else {
             try {
                 manageDBInstances.RemoveInstanceClass((DefaultMutableTreeNode) jTreeInstanceClass.getSelectionPath().getLastPathComponent());
-                instanceTableModel.fireTableDataChanged();;
+                instanceTableModel.fireTableDataChanged();
+                ;
             } catch (InstanceIsInExperimentException ex) {
                 Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
                 //instanceClassTableModel.fireTableDataChanged();                 ;
