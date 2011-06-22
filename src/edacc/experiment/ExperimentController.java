@@ -130,6 +130,7 @@ public class ExperimentController {
         
         SolverBinariesDAO.clearCache();
         SolverDAO.clearCache();
+        ParameterDAO.clearCache();
         ExperimentDAO.clearCache();
         SolverConfigurationDAO.clearCache();
         ParameterInstanceDAO.clearCache();
