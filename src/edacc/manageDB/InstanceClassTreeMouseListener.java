@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package edacc.manageDB;
 
 import java.awt.event.MouseAdapter;
@@ -14,7 +13,8 @@ import javax.swing.JPopupMenu;
  * Opens a JPopMenu, if the PopupTrieer has been used, at the Postion of the cursor of the mouse.
  * @author rretz
  */
-public class InstanceClassTreeMouseListener extends MouseAdapter{
+public class InstanceClassTreeMouseListener extends MouseAdapter {
+
     private final JPopupMenu jPM;
 
     public InstanceClassTreeMouseListener(JPopupMenu jPMInstanceTree) {
@@ -22,9 +22,16 @@ public class InstanceClassTreeMouseListener extends MouseAdapter{
     }
 
     @Override
-     public void mouseReleased( MouseEvent evt ) {
-        if ( evt.isPopupTrigger() )
-            jPM.show( evt.getComponent(), evt.getX(), evt.getY() );
+    public void mouseReleased(MouseEvent evt) {
+        if (evt.isPopupTrigger()) {
+            jPM.show(evt.getComponent(), evt.getX(), evt.getY());
+        }
     }
 
+    @Override
+    public void mousePressed(MouseEvent evt) {
+        if (evt.isPopupTrigger()) {
+            jPM.show(evt.getComponent(), evt.getX(), evt.getY());
+        }
+    }
 }
