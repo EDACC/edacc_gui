@@ -154,7 +154,7 @@ public class ManageDBInstances implements Observer {
 
 
                 main.instanceTableModel.addNewInstances(instances);
-                loadInstanceClasses();
+                UpdateInstanceClasses();
                 main.updateInstanceTable();
                 Tasks.getTaskView().setCancelable(false);
             }
@@ -355,7 +355,7 @@ public class ManageDBInstances implements Observer {
                         errors.add(toRemove.get(i));
                     }
                 }
-                loadInstanceClasses();
+                ReloadInstanceClasses();
                 if (!errors.isEmpty()) {
                     tableModel = new AddInstanceInstanceClassTableModel();
                     tableModel.addClasses(errors);
@@ -1217,6 +1217,13 @@ public class ManageDBInstances implements Observer {
 
     public void UpdateInstanceClasses() {
         InstanceClassDAO.addTmpTreeBranchToTreeCache();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getTreeCache();
+        main.instanceClassTreeModel.setRoot(root);
+        main.getInstanceClassTree().setRootVisible(false);
+        main.instanceClassTreeModel.reload();
+    }
+
+    private void ReloadInstanceClasses() {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getTreeCache();
         main.instanceClassTreeModel.setRoot(root);
         main.getInstanceClassTree().setRootVisible(false);
