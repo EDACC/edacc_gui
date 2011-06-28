@@ -10,6 +10,7 @@ import edacc.experiment.SolverTableModel;
 import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
 import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -111,7 +112,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel implements Observ
                 e.printStackTrace();
             }
         }
-    }
+    }   
 
     /**
      * Generates a new <code>EDACCSolverConfigPanelSolver</code> for a solver configuration or uses an existing one to add the solver configuration.

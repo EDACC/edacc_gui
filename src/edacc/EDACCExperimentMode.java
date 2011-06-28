@@ -64,6 +64,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
@@ -226,6 +227,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         clientUpdateThread = new ClientUpdateThread(clientTableModel);
         /* -------------------------------- end of client browser tab -------------------------------- */
         /* -------------------------------- solver tab -------------------------------- */
+        jScrollPane4.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
         solverConfigTablePanel = new EDACCExperimentModeSolverConfigurationTablePanel(solverConfigPanel);
         solTableModel = new SolverTableModel();
         tableSolvers.setModel(solTableModel);
@@ -332,6 +334,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         });
         jobsColumnSelector = new TableColumnSelector(tableJobs);
         resetJobsColumnVisibility();
+        //jScrollPane6.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
         /* -------------------------------- end of jobs browser tab -------------------------------- */
         /* -------------------------------- analyze tab -------------------------------- */
         analysePanel = new AnalysisPanel(expController);
@@ -2937,7 +2940,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Override
     public void onTaskFailed(String methodName, Throwable e) {
-        e.printStackTrace();
         if (e instanceof TaskCancelledException) {
             javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         } else if (e instanceof SQLException) {
