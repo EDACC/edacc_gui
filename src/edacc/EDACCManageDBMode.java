@@ -1607,8 +1607,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 try {
                     Solver s = selectedSolvers.removeFirst();
                     manageDBSolvers.removeSolver(s);
-                    manageDBParameters.removeParameters(s);
-                    manageDBSolvers.removeSolverBinaries(s);
+                    /*manageDBParameters.removeParameters(s);
+                    manageDBSolvers.removeSolverBinaries(s);*/
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(this,
                             "An error occured while deleting a solver: " + ex.getMessage(),
