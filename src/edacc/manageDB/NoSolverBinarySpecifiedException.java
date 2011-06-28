@@ -12,7 +12,11 @@ package edacc.manageDB;
 public class NoSolverBinarySpecifiedException extends Exception {
 
     public NoSolverBinarySpecifiedException() {
-        super ("You must specify a binary for the solver!");
+        this ("You must specify a binary for the solver!");
+    }
+
+    public NoSolverBinarySpecifiedException(String msg) {
+        super (msg);
     }
 
 }

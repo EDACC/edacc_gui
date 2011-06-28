@@ -1537,7 +1537,7 @@ public class ExperimentController {
         if (results.size() > 0) {
         for (int t = runCount; t < numRuns; t++) {
         ExperimentResult er = results.get(random.nextInt(results.size()));
-        newResults.add(ExperimentResultDAO.createExperimentResult(t, er.getPriority(), er.getComputeQueue(), er.getStatus().getValue(), er.getSeed(), er.getResultCode(), er.getResultTime(), er.getSolverConfigId(), activeExperiment.getId(), er.getInstanceId(), er.getStartTime()));
+        newResults.add(ExperimentResultDAO.createExperimentResult(t, er.getPriority(), er.getComputeQueue(), er.getStatus().getDefaultValue(), er.getSeed(), er.getResultCode(), er.getResultTime(), er.getSolverConfigId(), activeExperiment.getId(), er.getInstanceId(), er.getStartTime()));
         oldResults.add(er);
         }
         }

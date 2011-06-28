@@ -35,16 +35,16 @@ public class SolverBinariesDAO {
     private static final String DELETE_QUERY = "DELETE FROM " + TABLE + " WHERE idSolverBinary=?";
     private static ObjectCache<SolverBinaries> cache = new ObjectCache<SolverBinaries>();
 
-    public static void removeBinariesOfSolver(Solver solver) throws SQLException, NoSolverBinarySpecifiedException, FileNotFoundException, IOException {
-        for (SolverBinaries b : solver.getSolverBinaries()) {
+    public static void removeBinariesOfSolver(Solver solver) throws SQLException {
+        final String query = "DELETE FROM " + TABLE + " WHERE idSolver=?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, solver.getId());
+        ps.executeUpdate();
+        // update object information
+        for (SolverBinaries b : solver.getSolverBinaries())
             b.setDeleted();
-            try {
-                save(b);
-            } catch (NoSuchAlgorithmException ex) {
-                throw new IOException("Error while calculating md5 sum: " + ex.getMessage());
-            }
-        }
-
+        // clear solver binaries vector of solver
+        solver.setSolverBinaries(new Vector<SolverBinaries>());
     }
 
     public static void clearCache() {

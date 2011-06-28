@@ -34,7 +34,7 @@ public class ParameterDAO {
                 ps.setNull(2, Types.VARCHAR);
             else
                 ps.setString(2, parameter.getPrefix());
-            ps.setString(3, parameter.getValue());
+            ps.setString(3, parameter.getDefaultValue());
             ps.setBoolean(4, parameter.getHasValue());
             ps.setInt(5, parameter.getOrder());
             parameter.setIdSolver(solver.getId());
@@ -56,7 +56,7 @@ public class ParameterDAO {
                 ps.setNull(2, Types.VARCHAR);
             else
                 ps.setString(2, parameter.getPrefix());
-            ps.setString(3, parameter.getValue());
+            ps.setString(3, parameter.getDefaultValue());
             ps.setBoolean(4, parameter.getHasValue());
             ps.setInt(5, parameter.getOrder());
             ps.setInt(6, solver.getId());
@@ -80,7 +80,7 @@ public class ParameterDAO {
         i.setName(rs.getString("name"));
         i.setOrder(rs.getInt("order"));
         i.setPrefix(rs.getString("prefix"));
-        i.setValue(rs.getString("defaultValue"));
+        i.setDefaultValue(rs.getString("defaultValue"));
         i.setHasValue(rs.getBoolean("hasValue"));
         i.setMandatory(rs.getBoolean("mandatory"));
         i.setSpace(rs.getBoolean("space"));

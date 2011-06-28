@@ -109,7 +109,7 @@ public class ManageDBInstances implements Observer {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
-        }  catch (PropertyNotInDBException ex) {
+        } catch (PropertyNotInDBException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (PropertyTypeNotExistException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
@@ -154,7 +154,7 @@ public class ManageDBInstances implements Observer {
 
 
                 main.instanceTableModel.addNewInstances(instances);
-                loadInstanceClasses();
+                UpdateInstanceClasses();
                 main.updateInstanceTable();
                 Tasks.getTaskView().setCancelable(false);
             }
@@ -209,6 +209,7 @@ public class ManageDBInstances implements Observer {
                 InstanceDAO.delete(ins);
                 rem.add(ins);
                 tmp.add(ins);
+                 main.instanceTableModel.remove(ins);
                 task.setStatus(i + " of " + toRemove.size() + " instances removed");
                 task.setTaskProgress((float) i / (float) toRemove.size());
             } catch (InstanceIsInExperimentException ex) {
@@ -217,11 +218,21 @@ public class ManageDBInstances implements Observer {
         }
         main.instanceTableModel.removeInstances(rem);
         if (!notRem.isEmpty()) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "Some of the selected instances couldn't be removed, because they are containing to a experiment.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            ExperimentTableModel expTableModel = new ExperimentTableModel(true);
+            ArrayList<Experiment> inExp = ExperimentHasInstanceDAO.getAllExperimentsByInstances(notRem);
+            expTableModel.setExperiments(inExp);
+            if (EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
+                    EDACCApp.getApplication().getMainFrame(),
+                    "If you remove the instance classes, instances used in den following experiments will be deleted too. \n"
+                    + "Do you really want to remove the selected instance classes?",
+                    new JTable(expTableModel))
+                    == EDACCExtendedWarning.RET_OK_OPTION) {
+                InstanceDAO.deleteAll(notRem);
+                main.instanceTableModel.removeInstances(notRem);
+            }
+            
         }
+        main.instanceTableModel.fireTableDataChanged();
         Tasks.getTaskView().setCancelable(false);
     }
 
@@ -355,7 +366,7 @@ public class ManageDBInstances implements Observer {
                         errors.add(toRemove.get(i));
                     }
                 }
-                loadInstanceClasses();
+                ReloadInstanceClasses();
                 if (!errors.isEmpty()) {
                     tableModel = new AddInstanceInstanceClassTableModel();
                     tableModel.addClasses(errors);
@@ -963,32 +974,32 @@ public class ManageDBInstances implements Observer {
     }
 
     public void changeInstanceTable() {
-            main.updateInstanceTable();
-    /*    ((InstanceTableModel) tableInstances.getModel()).clearTable();
+        main.updateInstanceTable();
+        /*    ((InstanceTableModel) tableInstances.getModel()).clearTable();
         TreePath[] selected = main.getInstanceClassTree().getSelectionPaths();
         Vector<InstanceClass> choosen = new Vector<InstanceClass>();
         if (selected == null) {
-            return;
+        return;
         }
         for (int i = 0; i < selected.length; i++) {
-            choosen.addAll(getAllToEnd((DefaultMutableTreeNode) (selected[i].getLastPathComponent())));
-            /*  DefaultMutableTreeNode[] nodes = getPath()
-            
-            Enumeration<DefaultMutableTreeNode> tmp = nodes.children();
-            while(tmp.hasMoreElements()){
-            choosen.add((InstanceClass) tmp.nextElement().getUserObject());
-            }
-            choosen.add((InstanceClass) nodes.getUserObject());
+        choosen.addAll(getAllToEnd((DefaultMutableTreeNode) (selected[i].getLastPathComponent())));
+        /*  DefaultMutableTreeNode[] nodes = getPath()
+        
+        Enumeration<DefaultMutableTreeNode> tmp = nodes.children();
+        while(tmp.hasMoreElements()){
+        choosen.add((InstanceClass) tmp.nextElement().getUserObject());
+        }
+        choosen.add((InstanceClass) nodes.getUserObject());
         }
         if (!choosen.isEmpty()) {
-            try {
-                LinkedList<Instance> test = InstanceDAO.getAllByInstanceClasses(choosen);
-                ((InstanceTableModel) tableInstances.getModel()).addInstances(new Vector<Instance>(test));
-            } catch (NoConnectionToDBException ex) {
-                Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        try {
+        LinkedList<Instance> test = InstanceDAO.getAllByInstanceClasses(choosen);
+        ((InstanceTableModel) tableInstances.getModel()).addInstances(new Vector<Instance>(test));
+        } catch (NoConnectionToDBException ex) {
+        Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+        Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        }
         }
         main.updateInstanceTable();
         ((InstanceTableModel) tableInstances.getModel()).fireTableDataChanged();*/
@@ -1055,7 +1066,7 @@ public class ManageDBInstances implements Observer {
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }
-                loadInstanceClasses();
+                UpdateInstanceClasses();
 
             } catch (NoConnectionToDBException ex) {
                 JOptionPane.showMessageDialog(panelManageDBInstances,
@@ -1217,6 +1228,13 @@ public class ManageDBInstances implements Observer {
 
     public void UpdateInstanceClasses() {
         InstanceClassDAO.addTmpTreeBranchToTreeCache();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getTreeCache();
+        main.instanceClassTreeModel.setRoot(root);
+        main.getInstanceClassTree().setRootVisible(false);
+        main.instanceClassTreeModel.reload();
+    }
+
+    private void ReloadInstanceClasses() {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getTreeCache();
         main.instanceClassTreeModel.setRoot(root);
         main.getInstanceClassTree().setRootVisible(false);
