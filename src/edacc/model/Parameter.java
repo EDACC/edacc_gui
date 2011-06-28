@@ -5,7 +5,7 @@ public class Parameter extends BaseModel implements IntegerPKModel {
     private int idSolver;
     private String name;
     private String prefix;
-    private String value;
+    private String defaultValue;
     private int order;
     private boolean hasValue;
     private boolean mandatory;
@@ -13,7 +13,7 @@ public class Parameter extends BaseModel implements IntegerPKModel {
 
     public Parameter() {
         super();
-        name = prefix = value = "";
+        name = prefix = defaultValue = "";
         hasValue=true;
     }
 
@@ -58,12 +58,12 @@ public class Parameter extends BaseModel implements IntegerPKModel {
         }
     }
 
-    public String getValue() {
-        return value;
+    public String getDefaultValue() {
+        return defaultValue;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
         if (this.isSaved()) {
             this.setModified();
         }

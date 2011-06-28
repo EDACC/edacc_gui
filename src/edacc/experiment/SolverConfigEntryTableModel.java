@@ -35,7 +35,7 @@ public class SolverConfigEntryTableModel extends ThreadSafeDefaultTableModel {
         this.values = new String[parameters.size()];
         for (int i = 0; i < parameters.size(); i++) {
             this.parameters[i] = parameters.get(i);
-            this.values[i] = parameters.get(i).getValue() == null ? "" : parameters.get(i).getValue();
+            this.values[i] = parameters.get(i).getDefaultValue() == null ? "" : parameters.get(i).getDefaultValue();
             if (parameters.get(i).isMandatory()) {
                 this.selected[i] = true;
             } else {
