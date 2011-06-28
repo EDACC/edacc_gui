@@ -260,21 +260,12 @@ public class ManageDBSolvers implements Observer {
         solverTableModel.removeSolver(s);
     }
 
-    public void removeSolverBinary(SolverBinaries b) {
+    public void removeSolverBinary(SolverBinaries b) throws SQLException, NoSolverBinarySpecifiedException, FileNotFoundException, IOException, NoSuchAlgorithmException {
+        Solver s = SolverDAO.getById(b.getIdSolver());
+        if (s.getSolverBinaries().size() <= 1)
+            throw new NoSolverBinarySpecifiedException("There must be at least one binary remaining for solver " + s.getName() + "!");
         b.setDeleted();
-        try {
-            SolverBinariesDAO.save(b);
-        } catch (SQLException ex) {
-            Logger.getLogger(ManageDBSolvers.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSolverBinarySpecifiedException ex) {
-            Logger.getLogger(ManageDBSolvers.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(ManageDBSolvers.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(ManageDBSolvers.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(ManageDBSolvers.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        SolverBinariesDAO.save(b);
         solverBinariesTableModel.setSolverBinaries(currentSolver.getSolverBinaries());
     }
 
@@ -356,5 +347,9 @@ public class ManageDBSolvers implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         solverTableModel.clear();
+    }
+
+    public void removeSolverBinaries(Solver s) throws SQLException {
+        SolverBinariesDAO.removeBinariesOfSolver(s);
     }
 }
