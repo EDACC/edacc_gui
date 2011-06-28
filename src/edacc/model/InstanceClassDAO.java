@@ -82,6 +82,7 @@ public class InstanceClassDAO {
         ps = DatabaseConnector.getInstance().getConn().prepareStatement("DELETE FROM " + table + " WHERE idinstanceClass=?");
         ps.setInt(1, i.getInstanceClassID());
         ps.executeUpdate();
+        removeFromTreeCache(i);
         cache.remove(i);
         i.setDeleted();
         ps.close();
@@ -410,6 +411,11 @@ public class InstanceClassDAO {
         }
     }
 
+    /**
+     * Adds the given InstanceClass-object to the InstanceClassTree to the given parent-object.
+     * @param i
+     * @param parent 
+     */
     private static void addToTmpTreeBranch(InstanceClass i, InstanceClass parent) {
         if (parent == null) {
             tmpTreeBranch = new DefaultMutableTreeNode(null);
@@ -422,6 +428,13 @@ public class InstanceClassDAO {
         }
     }
 
+    /**
+     * Searchs the InstanceClass-object parent in the the given DefaultMutableTreeNode. If the parent is found, the the InstanceClass-object
+     * i is added at a child of parent.
+     * @param parent
+     * @param i
+     * @param node 
+     */
     private static void searchNodeAddChild(InstanceClass parent, InstanceClass i, DefaultMutableTreeNode node) {
         if (node.getUserObject() == parent) {
             node.add(new DefaultMutableTreeNode(i));
@@ -458,4 +471,25 @@ public class InstanceClassDAO {
         }
     }
 
+    /**
+     * Removes the given InstanceClass-object i from the treeCache.
+     * @param i 
+     */
+    private static void removeFromTreeCache(InstanceClass i) {
+        searcheInstanceClassRemoveFromTree(i, treeCache);
+    }
+
+    private static void searcheInstanceClassRemoveFromTree(InstanceClass i, DefaultMutableTreeNode node) {
+        for (int j = 0; j < node.getChildCount(); j++) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(j);
+            if (child.getUserObject() == i) {
+                node.remove(j);
+                return;
+            }
+        }
+        for (int j = 0; j < node.getChildCount(); j++) {
+            searcheInstanceClassRemoveFromTree(i, (DefaultMutableTreeNode) node.getChildAt(j));
+        }
+
+    }
 }

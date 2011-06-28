@@ -1823,7 +1823,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             try {
                 manageDBInstances.RemoveInstanceClass((DefaultMutableTreeNode) jTreeInstanceClass.getSelectionPath().getLastPathComponent());
                 instanceTableModel.fireTableDataChanged();
-                ;
             } catch (InstanceIsInExperimentException ex) {
                 Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
                 //instanceClassTableModel.fireTableDataChanged();                 ;
