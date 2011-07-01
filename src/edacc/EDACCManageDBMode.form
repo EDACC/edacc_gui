@@ -137,7 +137,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="476" max="32767" attributes="0"/>
+              <Component id="manageDBPane" pref="888" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -185,7 +185,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jSplitPane2" alignment="1" pref="510" max="32767" attributes="0"/>
+                          <Component id="jSplitPane2" alignment="1" pref="859" max="32767" attributes="0"/>
                           <Component id="jPanel3" alignment="1" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -196,7 +196,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane2" pref="474" max="32767" attributes="0"/>
+                      <Component id="jSplitPane2" pref="469" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -235,14 +235,14 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="panelParameters" alignment="0" pref="330" max="32767" attributes="0"/>
+                          <Component id="panelParameters" alignment="0" pref="393" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="panelParameters" pref="477" max="32767" attributes="0"/>
+                              <Component id="panelParameters" pref="455" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -269,7 +269,7 @@
                               <Group type="102" alignment="1" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="1" attributes="0">
-                                      <Component id="jScrollPane1" alignment="0" pref="294" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane1" alignment="0" pref="359" max="32767" attributes="0"/>
                                       <Component id="panelParametersButons" alignment="1" max="32767" attributes="0"/>
                                       <Component id="jPanel2" alignment="0" max="32767" attributes="0"/>
                                   </Group>
@@ -281,7 +281,7 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="1" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="jScrollPane1" pref="141" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane1" pref="131" max="32767" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -339,49 +339,46 @@
                           <Layout>
                             <DimensionLayout dim="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Group type="102" attributes="0">
-                                              <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="jlParametersName" linkSize="14" alignment="0" pref="81" max="32767" attributes="1"/>
-                                                  <Component id="jlParametersPrefix" linkSize="14" alignment="0" pref="81" max="32767" attributes="1"/>
-                                                  <Component id="jlParametersOrder" linkSize="14" alignment="0" pref="81" max="32767" attributes="3"/>
-                                              </Group>
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <Component id="jLabel2" min="-2" max="-2" attributes="1"/>
                                               <EmptySpace max="-2" attributes="0"/>
                                           </Group>
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="jLabel1" linkSize="14" alignment="0" min="-2" max="-2" attributes="1"/>
-                                                  <Component id="lMandatory" alignment="0" min="-2" max="-2" attributes="1"/>
-                                                  <Component id="lSpace" alignment="0" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="jlParametersDefaultValue" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Group type="103" alignment="0" groupAlignment="0" attributes="0">
+                                              <Group type="102" attributes="0">
+                                                  <Group type="103" groupAlignment="0" attributes="0">
+                                                      <Component id="jlParametersName" linkSize="14" alignment="0" pref="81" max="32767" attributes="1"/>
+                                                      <Component id="jlParametersPrefix" linkSize="14" alignment="0" pref="81" max="32767" attributes="1"/>
+                                                      <Component id="jlParametersOrder" linkSize="14" alignment="0" pref="81" max="32767" attributes="3"/>
+                                                  </Group>
+                                                  <EmptySpace max="-2" attributes="0"/>
                                               </Group>
-                                              <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                                              <Group type="102" alignment="0" attributes="0">
+                                                  <Group type="103" groupAlignment="0" attributes="0">
+                                                      <Component id="jLabel1" linkSize="14" alignment="0" min="-2" max="-2" attributes="1"/>
+                                                      <Component id="lMandatory" alignment="0" min="-2" max="-2" attributes="1"/>
+                                                      <Component id="lSpace" alignment="0" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="jlParametersDefaultValue" alignment="0" min="-2" max="-2" attributes="0"/>
+                                                  </Group>
+                                                  <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                                              </Group>
                                           </Group>
                                       </Group>
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="tfParametersName" alignment="1" pref="173" max="32767" attributes="3"/>
-                                          <Component id="tfParametersPrefix" alignment="1" pref="173" max="32767" attributes="3"/>
-                                          <Component id="tfParametersOrder" alignment="1" pref="173" max="32767" attributes="3"/>
-                                          <Component id="tfParametersDefaultValue" alignment="1" pref="173" max="32767" attributes="0"/>
+                                          <Group type="103" alignment="1" groupAlignment="0" attributes="0">
+                                              <Component id="tfParametersName" alignment="1" pref="232" max="32767" attributes="3"/>
+                                              <Component id="tfParametersPrefix" alignment="1" pref="232" max="32767" attributes="3"/>
+                                              <Component id="tfParametersOrder" alignment="1" pref="232" max="32767" attributes="3"/>
+                                              <Component id="tfParametersDefaultValue" alignment="1" pref="232" max="32767" attributes="0"/>
+                                              <Component id="chkSpace" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Component id="chkAttachToPrevious" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
+                                          <Component id="chkMandatory" min="-2" pref="28" max="-2" attributes="0"/>
+                                          <Component id="chkHasNoValue" min="-2" pref="28" max="-2" attributes="0"/>
                                       </Group>
-                                      <EmptySpace min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <EmptySpace min="106" pref="106" max="106" attributes="0"/>
-                                      <Component id="chkHasNoValue" min="-2" pref="28" max="-2" attributes="0"/>
-                                      <EmptySpace pref="156" max="32767" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" attributes="0">
-                                      <EmptySpace min="106" pref="106" max="106" attributes="0"/>
-                                      <Component id="chkMandatory" min="-2" pref="28" max="-2" attributes="0"/>
-                                      <EmptySpace min="156" pref="156" max="156" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <EmptySpace min="106" pref="106" max="106" attributes="0"/>
-                                      <Component id="chkSpace" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace pref="164" max="32767" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                             </DimensionLayout>
@@ -408,20 +405,36 @@
                                           <Component id="tfParametersDefaultValue" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="jlParametersDefaultValue" alignment="3" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="1" attributes="0">
-                                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkHasNoValue" min="-2" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="102" attributes="0">
+                                              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+                                              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="chkHasNoValue" min="-2" max="-2" attributes="0"/>
+                                          </Group>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="1" attributes="0">
-                                          <Component id="chkMandatory" min="-2" max="-2" attributes="0"/>
-                                          <Component id="lMandatory" min="-2" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="102" attributes="0">
+                                              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+                                              <Component id="lMandatory" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="chkMandatory" min="-2" max="-2" attributes="0"/>
+                                          </Group>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="1" attributes="0">
                                           <Component id="lSpace" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkSpace" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkAttachToPrevious" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
                                   </Group>
@@ -548,6 +561,22 @@
                                 <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="parameterChangedOnKeyReleased"/>
                               </Events>
                             </Component>
+                            <Component class="javax.swing.JLabel" name="jLabel2">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="jLabel2.text"/>
+                                <Property name="toolTipText" type="java.lang.String" resourceKey="jLabel2.toolTipText"/>
+                                <Property name="name" type="java.lang.String" value="jLabel2" noResource="true"/>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JCheckBox" name="chkAttachToPrevious">
+                              <Properties>
+                                <Property name="toolTipText" type="java.lang.String" resourceKey="chkAttachToPrevious.toolTipText"/>
+                                <Property name="name" type="java.lang.String" value="chkAttachToPrevious" noResource="true"/>
+                              </Properties>
+                              <Events>
+                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="chkAttachToPreviousStateChanged"/>
+                              </Events>
+                            </Component>
                           </SubComponents>
                         </Container>
                         <Container class="javax.swing.JPanel" name="panelParametersButons">
@@ -561,7 +590,7 @@
                                   <Group type="102" alignment="1" attributes="0">
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnParametersNew" linkSize="3" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace pref="108" max="32767" attributes="0"/>
+                                      <EmptySpace pref="173" max="32767" attributes="0"/>
                                       <Component id="btnParametersDelete" linkSize="3" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                   </Group>
@@ -666,7 +695,7 @@
                               <Group type="102" alignment="1" attributes="0">
                                   <Group type="103" groupAlignment="1" attributes="0">
                                       <Component id="jPanel1" alignment="1" max="32767" attributes="1"/>
-                                      <Component id="jScrollPane2" alignment="1" pref="368" max="32767" attributes="3"/>
+                                      <Component id="jScrollPane2" alignment="1" pref="432" max="32767" attributes="3"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
@@ -740,9 +769,9 @@
                                               </Group>
                                               <EmptySpace max="-2" attributes="0"/>
                                               <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="jScrollPane3" alignment="0" pref="237" max="32767" attributes="2"/>
-                                                  <Component id="tfSolverName" alignment="0" pref="237" max="32767" attributes="2"/>
-                                                  <Component id="tfSolverAuthors" alignment="0" pref="237" max="32767" attributes="1"/>
+                                                  <Component id="jScrollPane3" alignment="0" pref="301" max="32767" attributes="2"/>
+                                                  <Component id="tfSolverName" alignment="0" pref="301" max="32767" attributes="2"/>
+                                                  <Component id="tfSolverAuthors" alignment="0" pref="301" max="32767" attributes="1"/>
                                               </Group>
                                           </Group>
                                           <Group type="102" alignment="0" attributes="0">
@@ -757,7 +786,7 @@
                                                   </Group>
                                               </Group>
                                               <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="tfSolverVersion" pref="237" max="32767" attributes="0"/>
+                                                  <Component id="tfSolverVersion" pref="298" max="32767" attributes="0"/>
                                                   <Component id="btnSolverAddCode" min="-2" max="-2" attributes="0"/>
                                               </Group>
                                           </Group>
@@ -769,10 +798,10 @@
                                                       <Component id="btnSolverAddBinary" min="-2" pref="72" max="-2" attributes="2"/>
                                                       <EmptySpace max="-2" attributes="0"/>
                                                       <Component id="btnSolverEditBinary" min="-2" pref="77" max="-2" attributes="0"/>
-                                                      <EmptySpace max="32767" attributes="0"/>
+                                                      <EmptySpace pref="70" max="32767" attributes="0"/>
                                                       <Component id="btnSolverDeleteBinary" min="-2" pref="76" max="-2" attributes="0"/>
                                                   </Group>
-                                                  <Component id="jScrollPane4" alignment="0" pref="237" max="32767" attributes="1"/>
+                                                  <Component id="jScrollPane4" alignment="0" pref="301" max="32767" attributes="1"/>
                                               </Group>
                                           </Group>
                                       </Group>
@@ -999,7 +1028,7 @@
                                       <Component id="btnSolverNew" linkSize="1" min="-2" pref="81" max="-2" attributes="0"/>
                                       <EmptySpace min="-2" max="-2" attributes="0"/>
                                       <Component id="btnSolverDelete" linkSize="1" min="-2" pref="81" max="-2" attributes="0"/>
-                                      <EmptySpace pref="144" max="32767" attributes="0"/>
+                                      <EmptySpace pref="208" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                             </DimensionLayout>
@@ -1073,7 +1102,7 @@
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnSolverRefresh" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="207" max="32767" attributes="0"/>
+                          <EmptySpace pref="501" max="32767" attributes="0"/>
                           <Component id="btnSolverExport" min="-2" pref="79" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="btnSolverSaveToDB" min="-2" max="-2" attributes="0"/>
@@ -1155,7 +1184,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane1" pref="515" max="32767" attributes="0"/>
+                      <Component id="jSplitPane1" pref="528" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1208,7 +1237,7 @@
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="panelInstanceClassTable" pref="414" max="32767" attributes="0"/>
+                              <Component id="panelInstanceClassTable" pref="428" max="32767" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="panelButtonsInstanceClass" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -1353,12 +1382,12 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="panelInstanceTable" alignment="0" pref="543" max="32767" attributes="2"/>
+                                  <Component id="panelInstanceTable" alignment="0" pref="542" max="32767" attributes="2"/>
                                   <Group type="102" attributes="0">
                                       <Component id="btnFilterInstances" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="lblFilterStatus" alignment="0" pref="448" max="32767" attributes="0"/>
+                                          <Component id="lblFilterStatus" alignment="0" pref="447" max="32767" attributes="0"/>
                                           <Component id="btnSelectInstanceColumns" alignment="1" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
@@ -1379,7 +1408,7 @@
                                   <Component id="btnFilterInstances" linkSize="16" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="panelInstanceTable" pref="348" max="32767" attributes="0"/>
+                              <Component id="panelInstanceTable" pref="364" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="panelButtonsInstances" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -1468,7 +1497,7 @@
                                           <Component id="btnAddToClass" linkSize="9" min="-2" pref="151" max="-2" attributes="0"/>
                                           <EmptySpace type="separate" max="-2" attributes="0"/>
                                           <Component id="btnRemoveFromClass" linkSize="9" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace pref="60" max="32767" attributes="0"/>
+                                          <EmptySpace pref="28" max="32767" attributes="0"/>
                                           <Component id="bComputeProperty" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="1">
@@ -1479,7 +1508,7 @@
                                           <Component id="btnAddInstances1" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                           <Component id="btnGenerate" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace pref="74" max="32767" attributes="0"/>
+                                          <EmptySpace pref="49" max="32767" attributes="0"/>
                                           <Component id="btnExportInstances" linkSize="10" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
