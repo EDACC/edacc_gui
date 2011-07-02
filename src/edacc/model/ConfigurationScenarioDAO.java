@@ -9,7 +9,7 @@ import java.util.Map;
 public class ConfigurationScenarioDAO {
     private final static String table = "ConfigurationScenario";
     private final static String table_params = "ConfigurationScenario_has_Parameters";
-    
+
     private static ConfigurationScenario getConfigurationScenarioFromResultSet(ResultSet rs) throws SQLException {
         ConfigurationScenario cs = new ConfigurationScenario();
         cs.setId(rs.getInt("idConfigurationScenario"));
@@ -55,8 +55,6 @@ public class ConfigurationScenarioDAO {
         }
         rs2.close();
         st2.close();
-        
-
-        return null;
+        return cs;
     }
 }
