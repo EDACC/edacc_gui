@@ -13,6 +13,7 @@ import edacc.model.ComputationMethodSameNameAlreadyExists;
 import edacc.model.NoComputationMethodBinarySpecifiedException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
+import edacc.model.PropertyAlreadyInDBException;
 import edacc.model.PropertyDAO;
 import edacc.model.PropertyIsUsedException;
 import edacc.model.PropertyNotInDBException;
@@ -136,7 +137,7 @@ public class ManagePropertyController {
     public void saveProperty(String name, String description, PropertyType type, String regExpression, ComputationMethod computationMethod,
             String computationMethodParameters, PropertySource source, PropertyValueType<?> valueType, boolean isMultipe)
             throws NoConnectionToDBException, SQLException, PropertyIsUsedException, PropertyTypeDoesNotExistException, IOException,
-            PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
+            PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, PropertyAlreadyInDBException {
         Vector<String> regExpressions = new Vector<String>();
         if (editId != -1) {
             Property toEdit = PropertyDAO.getById(editId);

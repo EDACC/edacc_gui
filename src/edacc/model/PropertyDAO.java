@@ -51,8 +51,15 @@ public class PropertyDAO {
     public static Property createProperty(String name, Vector<String> regularExpression, String description, PropertyType type, PropertyValueType valueType,
             PropertySource source, boolean multiple, ComputationMethod computationMethod, String computationMethodParameters, String parameter, Boolean isDefault)
             throws NoConnectionToDBException, SQLException, PropertyIsUsedException, PropertyTypeDoesNotExistException, IOException,
-            PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
+            PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, PropertyAlreadyInDBException {
         Property r = new Property();
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT name  FROM " + table + " WHERE name=?");
+        ps.setString(1, name);
+        ResultSet rs = ps.executeQuery();
+        if(rs.next()){
+            throw new PropertyAlreadyInDBException();
+        }
         r.setName(name);
         r.setDescription(description);
         r.setType(type);
