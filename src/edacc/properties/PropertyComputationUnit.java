@@ -4,15 +4,15 @@
  */
 package edacc.properties;
 
-import edacc.manageDB.Util;
+import com.sun.corba.se.impl.encoding.CodeSetConversion.CTBConverter;
 import edacc.model.ComputationMethodDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
-import edacc.model.DecompressedInputStream;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultDAO;
 import edacc.model.ExperimentResultHasProperty;
 import edacc.model.ExperimentResultHasPropertyDAO;
+import edacc.model.ExperimentResultNotInDBException;
 import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasProperty;
 import edacc.model.InstanceHasPropertyDAO;
@@ -21,7 +21,6 @@ import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
 import edacc.model.PropertyNotInDBException;
-import edacc.model.Tasks;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,7 +37,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.SwingUtilities;
 
 /**
  *
@@ -90,14 +88,23 @@ public class PropertyComputationUnit implements Runnable {
                 }
             } catch (NoConnectionToDBException ex) {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (ExperimentResultNotInDBException ex) {
+                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InstanceNotInDBException ex) {
+                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ComputationMethodDoesNotExistException ex) {
+                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ErrorInExternalProgramException ex) {
+                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+                callback.exceptionCausedByThread(ex);
             }
         } else if (ihp != null) {
             try {
@@ -119,14 +126,20 @@ public class PropertyComputationUnit implements Runnable {
                 }
             } catch (NoConnectionToDBException ex) {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (InstanceNotInDBException ex) {
+                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ComputationMethodDoesNotExistException ex) {
+                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ErrorInExternalProgramException ex) {
+                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {           
+                callback.exceptionCausedByThread(ex);
             }
         }
         callback.callback();

@@ -2,15 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package edacc.properties;
 
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
 import edacc.model.ExpResultHasSolvPropertyNotInDBException;
 import edacc.model.Experiment;
-import edacc.model.ExperimentResult;
-import edacc.model.ExperimentResultDAO;
 import edacc.model.ExperimentResultHasProperty;
 import edacc.model.ExperimentResultHasPropertyDAO;
 import edacc.model.ExperimentResultNotInDBException;
@@ -33,7 +30,6 @@ import java.util.Vector;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,37 +37,44 @@ import java.util.logging.Logger;
  *
  * @author rretz
  */
-public class PropertyComputationController implements Runnable{
+public class PropertyComputationController implements Runnable {
+
     private int availableProcessors;
     LinkedBlockingQueue<InstanceHasProperty> instancePropertyQueue;
-     LinkedBlockingQueue<ExperimentResultHasProperty> resultPropertyQueue;
+    LinkedBlockingQueue<ExperimentResultHasProperty> resultPropertyQueue;
     boolean recompute;
-    private  Integer jobs = new Integer(0);
+    private Integer jobs = new Integer(0);
     private Tasks task;
     private int allJobs;
     private Condition condition;
     private Lock lock;
 
-    public PropertyComputationController(Experiment exp, Vector<Property> givenProperties, boolean recompute, Tasks task, Lock lock) throws NoConnectionToDBException, SQLException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException{
+    public Vector<Exception> getExceptionCollector() {
+        return exceptionCollector;
+    }
+    private Vector<Exception> exceptionCollector;
+
+    public PropertyComputationController(Experiment exp, Vector<Property> givenProperties, boolean recompute, Tasks task, Lock lock) throws NoConnectionToDBException, SQLException, PropertyTypeNotExistException, IOException, PropertyNotInDBException, ComputationMethodDoesNotExistException {
         this.condition = lock.newCondition();
         this.task = task;
         this.lock = lock;
-       // availableProcessors = Runtime.getRuntime().availableProcessors();
+        // availableProcessors = Runtime.getRuntime().availableProcessors();
         availableProcessors = DatabaseConnector.getInstance().getMaxconnections();
         this.task.setOperationName("compute properties");
         this.task.setStatus("initialize the computation");
-        this.recompute = recompute;    
+        this.recompute = recompute;
         try {
             createJobQueue(exp, givenProperties);
         } catch (ExpResultHasSolvPropertyNotInDBException ex) {
             Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
         }
         allJobs = resultPropertyQueue.size();
+        exceptionCollector = new Vector<Exception>();
         task.setStatus("computed " + (allJobs - resultPropertyQueue.size()) + " of " + allJobs + " properties");
-        task.setTaskProgress(((float)(allJobs - resultPropertyQueue.size()))/((float)allJobs));
+        task.setTaskProgress(((float) (allJobs - resultPropertyQueue.size())) / ((float) allJobs));
     }
 
-    public PropertyComputationController(Vector<Instance> instances, Vector<Property> givenProperties, Tasks task, Lock lock){
+    public PropertyComputationController(Vector<Instance> instances, Vector<Property> givenProperties, Tasks task, Lock lock) {
         this.condition = lock.newCondition();
         this.task = task;
         this.lock = lock;
@@ -79,43 +82,44 @@ public class PropertyComputationController implements Runnable{
         availableProcessors = DatabaseConnector.getInstance().getMaxconnections();
         this.task.setOperationName("compute properties");
         this.task.setStatus("initialize the computation");
-        this.recompute = recompute;
         createJobQueue(instances, givenProperties);
         allJobs = instancePropertyQueue.size();
+        exceptionCollector = new Vector<Exception>();
         task.setStatus("computed " + (allJobs - instancePropertyQueue.size()) + " of " + allJobs + " properties");
-        task.setTaskProgress(((float)(allJobs - instancePropertyQueue.size()))/((float)allJobs));
+        task.setTaskProgress(((float) (allJobs - instancePropertyQueue.size())) / ((float) allJobs));
     }
 
     @Override
     public void run() {
-             task.setOperationName("Property computation");
-        for(int i = 0; i < availableProcessors; i++){
-            if(instancePropertyQueue != null){
-                if(i == 0 && instancePropertyQueue.isEmpty()){
+        task.setOperationName("Property computation");
+        for (int i = 0; i < availableProcessors; i++) {
+            if (instancePropertyQueue != null) {
+                if (i == 0 && instancePropertyQueue.isEmpty()) {
                     task.cancel(true);
                     lock.lock();
-                    try{
+                    try {
                         condition.signal();
-                    } finally{
+                    } finally {
                         lock.unlock();
                     }
                     return;
                 }
-                if(instancePropertyQueue.isEmpty()){
+                if (instancePropertyQueue.isEmpty()) {
                     jobs = i;
                     return;
                 }
                 try {
+                    
                     new Thread(new PropertyComputationUnit(instancePropertyQueue.take(), this)).start();
                 } catch (InterruptedException ex) {
                     Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }else if(resultPropertyQueue != null){
-                if(resultPropertyQueue.isEmpty() && i == 0){
+            } else if (resultPropertyQueue != null) {
+                if (resultPropertyQueue.isEmpty() && i == 0) {
                     lock.lock();
-                    try{
+                    try {
                         condition.signal();
-                    } finally{
+                    } finally {
                         lock.unlock();
                     }
                     return;
@@ -129,39 +133,41 @@ public class PropertyComputationController implements Runnable{
                 } catch (InterruptedException ex) {
                     Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }           
+            }
         }
-        jobs = availableProcessors;       
-        
+        jobs = availableProcessors;
+
 
     }
 
-    public  void callback() {
+    public void callback() {
         PropertyComputationUnit unit = null;
-             if(instancePropertyQueue != null){
-            if(!instancePropertyQueue.isEmpty())
+        if (instancePropertyQueue != null) {
+            if (!instancePropertyQueue.isEmpty()) {
                 try {
                     unit = new PropertyComputationUnit(instancePropertyQueue.take(), this);
                     synchronized (PropertyComputationUnit.sync) {
                         jobs++;
                     }
                     task.setStatus("computed " + (allJobs - instancePropertyQueue.size()) + " of " + allJobs + " properties");
-                    task.setTaskProgress(((float)(allJobs - instancePropertyQueue.size()))/((float)allJobs));
+                    task.setTaskProgress(((float) (allJobs - instancePropertyQueue.size())) / ((float) allJobs));
                 } catch (InterruptedException ex) {
                     Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 }
-        }else if(resultPropertyQueue != null){
-            if(!resultPropertyQueue.isEmpty())
+            }
+        } else if (resultPropertyQueue != null) {
+            if (!resultPropertyQueue.isEmpty()) {
                 try {
-                unit = new PropertyComputationUnit(resultPropertyQueue.take(), this);
+                    unit = new PropertyComputationUnit(resultPropertyQueue.take(), this);
                     synchronized (PropertyComputationUnit.sync) {
                         jobs++;
                     }
                     task.setStatus("computed " + (allJobs - resultPropertyQueue.size()) + " of " + allJobs + " properties");
-                    task.setTaskProgress(((float)(allJobs - resultPropertyQueue.size()))/((float)allJobs));
+                    task.setTaskProgress(((float) (allJobs - resultPropertyQueue.size())) / ((float) allJobs));
                 } catch (InterruptedException ex) {
                     Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
         }
 
         if (unit != null) {
@@ -170,76 +176,76 @@ public class PropertyComputationController implements Runnable{
         synchronized (PropertyComputationUnit.sync) {
             jobs--;
         }
-         if(instancePropertyQueue != null){
-              if(jobs == 0 && instancePropertyQueue.isEmpty()){
+        if (instancePropertyQueue != null) {
+            if (jobs == 0 && instancePropertyQueue.isEmpty()) {
                 task.cancel(true);
                 lock.lock();
-                 try{
+                try {
                     condition.signal();
-                } finally{
+                } finally {
                     lock.unlock();
                 }
                 return;
             }
 
-         }else if(resultPropertyQueue != null){
-              if(jobs == 0 && resultPropertyQueue.isEmpty()){
+        } else if (resultPropertyQueue != null) {
+            if (jobs == 0 && resultPropertyQueue.isEmpty()) {
                 task.cancel(true);
                 lock.lock();
-                 try{
+                try {
                     condition.signal();
-                } finally{
+                } finally {
                     lock.unlock();
                 }
                 return;
             }
-         }
-       
+        }
 
-       
+
+
     }
 
     private void createJobQueue(Experiment exp, Vector<Property> givenProperties) throws NoConnectionToDBException, SQLException, ExpResultHasSolvPropertyNotInDBException {
-        resultPropertyQueue = new  LinkedBlockingQueue<ExperimentResultHasProperty>();
-        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idJob FROM " +
-                "ExperimentResults WHERE Experiment_idExperiment=?;");
+        resultPropertyQueue = new LinkedBlockingQueue<ExperimentResultHasProperty>();
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idJob FROM "
+                + "ExperimentResults WHERE Experiment_idExperiment=?;");
         ps.setInt(1, exp.getId());
         ResultSet rs = ps.executeQuery();
         // create all experimentResultHasProperty objects and adds them into the resultPropertyQueue
-        while(rs.next()){
-            for(int i = 0; i < givenProperties.size(); i++){
+        while (rs.next()) {
+            for (int i = 0; i < givenProperties.size(); i++) {
                 try {
-                        try {
-                            ExperimentResultHasProperty tmp = ExperimentResultHasPropertyDAO.getByExperimentResultAndResultProperty(rs.getInt(1), givenProperties.get(i).getId());
-                            resultPropertyQueue.add(tmp);
-                            if(recompute){
-                                tmp.setValue(new Vector<String>());
-                                ExperimentResultHasPropertyDAO.save(tmp);
-                            }
-                        } catch (ExpResultHasSolvPropertyNotInDBException ex) {
-                             resultPropertyQueue.add(ExperimentResultHasPropertyDAO.createExperimentResultHasPropertyDAO(rs.getInt(1), givenProperties.get(i)));
-                        } catch (PropertyTypeNotExistException ex) {
-                            Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
+                    try {
+                        ExperimentResultHasProperty tmp = ExperimentResultHasPropertyDAO.getByExperimentResultAndResultProperty(rs.getInt(1), givenProperties.get(i).getId());
+                        resultPropertyQueue.add(tmp);
+                        if (recompute) {
+                            tmp.setValue(new Vector<String>());
+                            ExperimentResultHasPropertyDAO.save(tmp);
                         }
+                    } catch (ExpResultHasSolvPropertyNotInDBException ex) {
+                        resultPropertyQueue.add(ExperimentResultHasPropertyDAO.createExperimentResultHasPropertyDAO(rs.getInt(1), givenProperties.get(i)));
+                    } catch (PropertyTypeNotExistException ex) {
+                        Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
 
                 } catch (ExperimentResultNotInDBException ex) {
-                    Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);           
+                    Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
                     Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (PropertyNotInDBException ex) {
                     Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (ComputationMethodDoesNotExistException ex) {
                     Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
-                }                             
+                }
             }
         }
     }
 
-    private  void createJobQueue(Vector<Instance> instances, Vector<Property> givenProperties) {
+    private void createJobQueue(Vector<Instance> instances, Vector<Property> givenProperties) {
         instancePropertyQueue = new LinkedBlockingQueue<InstanceHasProperty>();
         // create all InstanceHasProperty objects and adds them to the instancePropertyQueue
-        for(int i = 0; i < instances.size(); i++){
-            for(int j = 0; j < givenProperties.size(); j++){
+        for (int i = 0; i < instances.size(); i++) {
+            for (int j = 0; j < givenProperties.size(); j++) {
                 try {
                     InstanceHasProperty tmp = InstanceHasPropertyDAO.getByInstanceAndProperty(instances.get(i), givenProperties.get(j));
                     instancePropertyQueue.add(tmp);
@@ -270,27 +276,32 @@ public class PropertyComputationController implements Runnable{
                         Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex1);
                     }
                 }
-                
+
 
             }
         }
     }
 
-    public synchronized boolean completed(){
-        synchronized(this.jobs){
-            if(instancePropertyQueue != null){
-                if(jobs <= 0 && instancePropertyQueue.isEmpty() )
+    public synchronized boolean completed() {
+        synchronized (this.jobs) {
+            if (instancePropertyQueue != null) {
+                if (jobs <= 0 && instancePropertyQueue.isEmpty()) {
                     return true;
-                else
-                    return false;               
-             }else if(resultPropertyQueue != null){
-                if(jobs <= 0 && resultPropertyQueue.isEmpty() )
+                } else {
+                    return false;
+                }
+            } else if (resultPropertyQueue != null) {
+                if (jobs <= 0 && resultPropertyQueue.isEmpty()) {
                     return true;
-                else
-                    return false;   
-             }
-             return true;
+                } else {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 
+    public void exceptionCausedByThread(Exception ex) {
+        exceptionCollector.add(ex);
+    }
 }

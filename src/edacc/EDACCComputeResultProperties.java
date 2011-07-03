@@ -12,6 +12,7 @@
 package edacc;
 
 import edacc.events.TaskEvents;
+import edacc.manageDB.ProblemOccuredDuringPropertyComputation;
 import edacc.model.Experiment;
 import edacc.model.Property;
 import edacc.model.Tasks;
@@ -23,6 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -215,7 +217,22 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog implements
 
     @Override
     public void onTaskFailed(String methodName, Throwable e) {
-        e.printStackTrace();
+           if (methodName.equals("computeProperties")) {
+            if (e instanceof ProblemOccuredDuringPropertyComputation) {
+                Vector<Exception> data = ((ProblemOccuredDuringPropertyComputation)e).getExceptionsCollector();
+                String[][] tableData = new String[data.size()][1];
+                for (int i = 0; i < data.size(); i++) {
+                    tableData[i][0] = data.get(i).toString();
+                }
+                String[] columnName = {"Exception"};
+                DefaultTableModel tableModel = new DefaultTableModel(tableData, columnName);
+                EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS,
+                        EDACCApp.getApplication().getMainFrame(),
+                        "An error occured while computing the Properties. \n Please check the regular expression or computation methode of the Property",
+                        new JTable(tableModel));
+            }
+
+        }
     }
 
 

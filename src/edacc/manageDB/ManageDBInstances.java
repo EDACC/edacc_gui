@@ -944,7 +944,7 @@ public class ManageDBInstances implements Observer {
         }
     }
 
-    public void computeProperties(Vector<Instance> instances, Vector<Property> properties, Tasks task) {
+    public void computeProperties(Vector<Instance> instances, Vector<Property> properties, Tasks task) throws ProblemOccuredDuringPropertyComputation {
         System.out.println(instances.size() + " instances, " + properties.size() + " properties.");
 
         lock.lock();
@@ -958,7 +958,11 @@ public class ManageDBInstances implements Observer {
         } finally {
             lock.unlock();
         }
+        if(!comCon.getExceptionCollector().isEmpty()){
+            throw new ProblemOccuredDuringPropertyComputation(comCon.getExceptionCollector());
+        }
         task.cancel(true);
+        
     }
 
     public void changeInstanceTable() {
