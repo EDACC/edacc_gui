@@ -12,7 +12,7 @@ package edacc;
 
 import edacc.events.TaskEvents;
 import edacc.manageDB.*;
-import edacc.manageDB.InstanceParser.InstanceException;
+import edacc.manageDB.InstanceException;
 import edacc.model.Instance;
 import edacc.model.InstanceIsInExperimentException;
 import edacc.model.InstanceNotInDBException;

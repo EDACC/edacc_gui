@@ -8,8 +8,6 @@ import edacc.EDACCAddInstanceToInstanceClass;
 import edacc.EDACCApp;
 import edacc.EDACCCreateEditInstanceClassDialog;
 import edacc.EDACCExtendedWarning;
-import edacc.EDACCManageDBInstanceFilter;
-import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
 import edacc.experiment.ExperimentTableModel;
 import edacc.model.ComputationMethodDoesNotExistException;
@@ -22,7 +20,6 @@ import edacc.model.Instance;
 import edacc.model.InstanceAlreadyInDBException;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassDAO;
-import edacc.model.InstanceClassMustBeSourceException;
 
 import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasInstanceClass;
@@ -209,7 +206,7 @@ public class ManageDBInstances implements Observer {
                 InstanceDAO.delete(ins);
                 rem.add(ins);
                 tmp.add(ins);
-                 main.instanceTableModel.remove(ins);
+                main.instanceTableModel.remove(ins);
                 task.setStatus(i + " of " + toRemove.size() + " instances removed");
                 task.setTaskProgress((float) i / (float) toRemove.size());
             } catch (InstanceIsInExperimentException ex) {
@@ -230,7 +227,7 @@ public class ManageDBInstances implements Observer {
                 InstanceDAO.deleteAll(notRem);
                 main.instanceTableModel.removeInstances(notRem);
             }
-            
+
         }
         main.instanceTableModel.fireTableDataChanged();
         Tasks.getTaskView().setCancelable(false);
@@ -519,23 +516,19 @@ public class ManageDBInstances implements Observer {
             }
             try {
                 String md5 = calculateMD5(instanceFiles.get(i));
-                try {
-                    //Get all InstanceClasses of the Instance and assigne it to the corresponding InstanceClass
-                    InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
-                    String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, instanceFiles.get(i).getParent().length());
-                    String[] possibleInstanceClasses = rawPath.split("\\\\|/");
-                    if (possibleInstanceClasses.length != 1) {
-                        instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes, 0);
-                    } else {
-                        instanceClass = (InstanceClass) ((DefaultMutableTreeNode) nodes.getRoot()).getUserObject();
-                    }
-                    Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, md5);
-                    instances.add(temp);
-                    InstanceDAO.save(temp, compressBinary, instanceClass);
-                    this.tmp.add(temp);
-                } catch (InstanceException e) {
-                    errorsAdd.add(instanceFiles.get(i).getAbsolutePath());
+
+                //Get all InstanceClasses of the Instance and assigne it to the corresponding InstanceClass
+                String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, instanceFiles.get(i).getParent().length());
+                String[] possibleInstanceClasses = rawPath.split("\\\\|/");
+                if (possibleInstanceClasses.length != 1) {
+                    instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes, 0);
+                } else {
+                    instanceClass = (InstanceClass) ((DefaultMutableTreeNode) nodes.getRoot()).getUserObject();
                 }
+                Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), instanceFiles.get(i).getName(), md5);
+                instances.add(temp);
+                InstanceDAO.save(temp, compressBinary, instanceClass);
+                this.tmp.add(temp);
 
             } catch (InstanceAlreadyInDBException ex) {
                 errorsDB.add(instanceFiles.get(i).getAbsolutePath());
@@ -609,25 +602,21 @@ public class ManageDBInstances implements Observer {
             if (task.isCancelled()) {
                 throw new TaskCancelledException();
             }
+
+            String md5 = calculateMD5(instanceFiles.get(i));
             try {
-                String md5 = calculateMD5(instanceFiles.get(i));
-                try {
-                    //Get all InstanceClasses of the Instance and assigne it to the corresponding InstanceClass
-                    InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
-                    String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, instanceFiles.get(i).getParent().length());
-                    String[] possibleInstanceClasses = rawPath.split("\\\\|/");
-                    if (possibleInstanceClasses.length != 1) {
-                        instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes, 0);
-                    } else {
-                        instanceClass = (InstanceClass) ((DefaultMutableTreeNode) nodes.getRoot()).getUserObject();
-                    }
-                    Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, md5);
-                    instances.add(temp);
-                    InstanceDAO.save(temp, compressBinary, instanceClass);
-                    this.tmp.add(temp);
-                } catch (InstanceException e) {
-                    errorsAdd.add(instanceFiles.get(i).getAbsolutePath());
+                //Get all InstanceClasses of the Instance and assigne it to the corresponding InstanceClass    
+                String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, instanceFiles.get(i).getParent().length());
+                String[] possibleInstanceClasses = rawPath.split("\\\\|/");
+                if (possibleInstanceClasses.length != 1) {
+                    instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes, 0);
+                } else {
+                    instanceClass = (InstanceClass) ((DefaultMutableTreeNode) nodes.getRoot()).getUserObject();
                 }
+                Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), instanceFiles.get(i).getName(), md5);
+                instances.add(temp);
+                InstanceDAO.save(temp, compressBinary, instanceClass);
+                this.tmp.add(temp);
 
             } catch (InstanceAlreadyInDBException ex) {
                 errorsDB.add(instanceFiles.get(i).getAbsolutePath());
@@ -1213,7 +1202,6 @@ public class ManageDBInstances implements Observer {
 
             String md5 = calculateMD5(errorsDBInstances.get(i));
             //Get all InstanceClasses of the Instance and assigne it to the corresponding InstanceClass
-            InstanceParser tempInstance = new InstanceParser(errorsDBInstances.get(i).getAbsolutePath());
             String rawPath = errorsDBInstances.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, errorsDBInstances.get(i).getParent().length());
             String[] possibleInstanceClasses = rawPath.split("\\\\|/");
             if (possibleInstanceClasses.length != 1) {
