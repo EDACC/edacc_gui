@@ -13,6 +13,7 @@ import edacc.model.ComputationMethodSameNameAlreadyExists;
 import edacc.model.NoComputationMethodBinarySpecifiedException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
+import edacc.model.PropertyAlreadyInDBException;
 import edacc.model.PropertyDAO;
 import edacc.model.PropertyIsUsedException;
 import edacc.model.PropertyNotInDBException;
@@ -24,6 +25,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -136,19 +138,32 @@ public class ManagePropertyController {
     public void saveProperty(String name, String description, PropertyType type, String regExpression, ComputationMethod computationMethod,
             String computationMethodParameters, PropertySource source, PropertyValueType<?> valueType, boolean isMultipe)
             throws NoConnectionToDBException, SQLException, PropertyIsUsedException, PropertyTypeDoesNotExistException, IOException,
-            PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
+            PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, PropertyAlreadyInDBException {
         Vector<String> regExpressions = new Vector<String>();
         if (editId != -1) {
             Property toEdit = PropertyDAO.getById(editId);
             toEdit.setName(name);
             toEdit.setDescription(description);
+            toEdit.setMultiple(isMultipe);
+            if (!source.equals(PropertySource.Parameter)) {
+                if (computationMethod != null) {
+                    toEdit.setRegularExpression(new Vector<String>());
+                    toEdit.setComputationMethod(computationMethod);
+                    toEdit.setComputationMethodParameters(computationMethodParameters);
+                } else {
+                    toEdit.setComputationMethod(null);
+                    toEdit.setComputationMethodParameters("");
+                    String[] getRegExp = regExpression.split("\n");
+                    regExpressions.addAll(Arrays.asList(getRegExp));
+                    toEdit.setRegularExpression(regExpressions);
+                }
+            }
+
             PropertyDAO.save(toEdit);
         } else {
             // extract the single reg expressions from the regExp String
             String[] getRegExp = regExpression.split("\n");
-            for (int i = 0; i < getRegExp.length; i++) {
-                regExpressions.add(getRegExp[i]);
-            }
+            regExpressions.addAll(Arrays.asList(getRegExp));
             PropertyDAO.createProperty(name, regExpressions, description, type, valueType, source, isMultipe, computationMethod,
                     computationMethodParameters, name, isMultipe);
         }
@@ -181,13 +196,13 @@ public class ManagePropertyController {
     public void importProperty(File[] files) {
         try {
 
-                PropertyDAO.importProperty(files);
-            
+            PropertyDAO.importProperty(files);
+
             loadProperties();
         } catch (ComputationMethodSameNameAlreadyExists ex) {
-           JOptionPane.showMessageDialog(main,
+            JOptionPane.showMessageDialog(main,
                     "The name of a computation Method of an added property already exists, but the MD5 sums doesn't "
-                   + " match.",
+                    + " match.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         } catch (FileNotFoundException ex) {
@@ -199,7 +214,7 @@ public class ManagePropertyController {
         } catch (NoConnectionToDBException ex) {
             Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);    
+            Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoComputationMethodBinarySpecifiedException ex) {
             Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (PropertyIsUsedException ex) {

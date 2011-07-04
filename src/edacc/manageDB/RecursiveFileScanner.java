@@ -5,7 +5,6 @@
 
 package edacc.manageDB;
 
-import edacc.manageDB.InstanceParser.InstanceException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

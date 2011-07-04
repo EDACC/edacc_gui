@@ -10,11 +10,13 @@ public class Parameter extends BaseModel implements IntegerPKModel {
     private boolean hasValue;
     private boolean mandatory;
     private boolean space;
+    private boolean attachToPrevious;
 
     public Parameter() {
         super();
         name = prefix = defaultValue = "";
         hasValue=true;
+        attachToPrevious=false;
     }
 
     public int getId() {
@@ -120,5 +122,13 @@ public class Parameter extends BaseModel implements IntegerPKModel {
 
     public void setIdSolver(int idSolver) {
         this.idSolver = idSolver;
+    }
+
+    public boolean isAttachToPrevious() {
+        return attachToPrevious;
+    }
+
+    public void setAttachToPrevious(boolean attachToPrevious) {
+        this.attachToPrevious = attachToPrevious;
     }
 }

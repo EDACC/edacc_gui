@@ -1,4 +1,4 @@
-package edacc.manageDB.InstanceParser;
+package edacc.manageDB;
 
 /**
  * An Exception class used by the InstanceParser class for reporting parsing errors.
