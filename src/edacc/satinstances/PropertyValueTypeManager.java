@@ -235,7 +235,6 @@ public class PropertyValueTypeManager {
         Vector<String> names = new Vector<String>();
         JarInputStream jaris = new JarInputStream(new FileInputStream(file));
         JarEntry ent = null;
-        ent = jaris.getNextJarEntry();
         while ((ent = jaris.getNextJarEntry()) != null) {
             if (ent.getName().toLowerCase().endsWith(".class")) {
                 names.add(ent.getName().substring(0, (ent.getName().length() - 6)));
