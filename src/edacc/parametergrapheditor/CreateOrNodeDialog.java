@@ -8,7 +8,6 @@ package edacc.parametergrapheditor;
 import edacc.model.ParameterDAO;
 import edacc.model.Solver;
 import edacc.parameterspace.domain.Domain;
-import java.awt.BorderLayout;
 import java.sql.SQLException;
 import javax.swing.JPanel;
 
@@ -31,8 +30,7 @@ public class CreateOrNodeDialog extends javax.swing.JDialog implements ICreateNo
             comboParameter.addItem(param.getName());
         }
         pnlDomain = new SpecifyDomainPanel();
-        panel.setLayout(new BorderLayout());
-        panel.add(pnlDomain, BorderLayout.CENTER);
+        panel.setViewportView(pnlDomain);
     }
 
     /** This method is called from within the constructor to
@@ -49,12 +47,13 @@ public class CreateOrNodeDialog extends javax.swing.JDialog implements ICreateNo
         btnAccept = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
         comboParameter = new javax.swing.JComboBox();
-        panel = new javax.swing.JPanel();
+        panel = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(CreateOrNodeDialog.class);
+        setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(CreateOrNodeDialog.class);
         jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
         jLabel1.setName("jLabel1"); // NOI18N
 
@@ -81,7 +80,7 @@ public class CreateOrNodeDialog extends javax.swing.JDialog implements ICreateNo
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(259, Short.MAX_VALUE)
+                .addContainerGap(421, Short.MAX_VALUE)
                 .addComponent(btnCancel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnAccept)
@@ -101,17 +100,6 @@ public class CreateOrNodeDialog extends javax.swing.JDialog implements ICreateNo
 
         panel.setName("panel"); // NOI18N
 
-        javax.swing.GroupLayout panelLayout = new javax.swing.GroupLayout(panel);
-        panel.setLayout(panelLayout);
-        panelLayout.setHorizontalGroup(
-            panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 385, Short.MAX_VALUE)
-        );
-        panelLayout.setVerticalGroup(
-            panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 9, Short.MAX_VALUE)
-        );
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -121,11 +109,11 @@ public class CreateOrNodeDialog extends javax.swing.JDialog implements ICreateNo
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(comboParameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(275, Short.MAX_VALUE))
+                .addContainerGap(437, Short.MAX_VALUE))
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -136,7 +124,7 @@ public class CreateOrNodeDialog extends javax.swing.JDialog implements ICreateNo
                     .addComponent(jLabel1)
                     .addComponent(comboParameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -170,7 +158,7 @@ public class CreateOrNodeDialog extends javax.swing.JDialog implements ICreateNo
     private javax.swing.JComboBox comboParameter;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel panel;
+    private javax.swing.JScrollPane panel;
     // End of variables declaration//GEN-END:variables
 
     @Override

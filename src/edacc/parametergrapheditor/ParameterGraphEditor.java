@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * EDACCParameterGraphEditor.java
  *
  * Created on 02.07.2011, 17:44:44
@@ -20,9 +15,9 @@ import com.mxgraph.util.mxEvent;
 import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxEventSource;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
-import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxMultiplicity;
+import edacc.EDACCApp;
 import edacc.model.DatabaseConnector;
 import edacc.model.ParameterGraphDAO;
 import edacc.model.Solver;
@@ -34,6 +29,7 @@ import edacc.parameterspace.graph.Edge;
 import edacc.parameterspace.graph.Node;
 import edacc.parameterspace.graph.OrNode;
 import edacc.parameterspace.graph.ParameterGraph;
+import java.awt.Dimension;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.KeyAdapter;
@@ -42,15 +38,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
 import javax.xml.bind.JAXBException;
 
 /**
@@ -209,14 +204,8 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
 
             @Override
             public void invoke(Object o, mxEventObject eo) {
-                if ("beginUpdate".equals(eo.getName())) {
-                } else if ("endUpdate".equals(eo.getName())) {
-                } else if ("execute".equals(eo.getName())) {
-                } else if ("beforeUndo".equals(eo.getName())) {
-                } else if ("undo".equals(eo.getName())) {
-                } else if ("change".equals(eo.getName())) {
+                if ("change".equals(eo.getName())) {
                     for (Object oj : eo.getProperties().values()) {
-
                         if (oj instanceof ArrayList) {
                             ArrayList list = (ArrayList) oj;
                             for (Object object : list) {
@@ -243,6 +232,8 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                                                         dialog = new CreateAndNodeDialog(new javax.swing.JFrame(), true, node.getParameter(), node.getDomain());
                                                     }
                                                     Domain domain = null;
+                                                    ((JDialog) dialog).setLocationRelativeTo(ParameterGraphEditor.this);
+                                                    ((JDialog) dialog).setSize(new Dimension(800, 600));
                                                     ((JDialog) dialog).setVisible(true);
                                                     while (!dialog.isCancelled() && domain == null) {
                                                         try {
@@ -290,8 +281,6 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                             }
                         }
                     }
-                } else {
-                    System.out.println("Unknown: " + eo.getName());
                 }
             }
         });
@@ -338,6 +327,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         graph.setCellsDisconnectable(false);
         graph.setCellsDeletable(true);
         graph.setCellsCloneable(false);
+        graph.setAllowNegativeCoordinates(false);
         
         ParameterGraph parameterGraph = ParameterGraphDAO.loadParameterGraph(solver);
         if (parameterGraph == null) {
@@ -360,6 +350,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             }
             
             graph.getModel().endUpdate();
+            
             btnLayoutActionPerformed(null);
         }
         
@@ -436,11 +427,12 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(ParameterGraphEditor.class);
+        setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
 
         jPanel1.setName("jPanel1"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(ParameterGraphEditor.class);
         btnLayout.setText(resourceMap.getString("btnLayout.text")); // NOI18N
         btnLayout.setName("btnLayout"); // NOI18N
         btnLayout.addActionListener(new java.awt.event.ActionListener() {
@@ -498,7 +490,9 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnLayoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLayoutActionPerformed
-        mxIGraphLayout layout = layout = new mxHierarchicalLayout(graph);
+        mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
+        layout.setInterRankCellSpacing(25);
+       // layout.setFixRoots(true);
         Object cell = graph.getSelectionCell();
 
         if (cell == null
@@ -508,7 +502,6 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
 
         graph.getModel().beginUpdate();
         try {
-            long t0 = System.currentTimeMillis();
             layout.execute(cell);
         } finally {
             mxMorphing morph = new mxMorphing(graphComponent, 20,
@@ -543,37 +536,31 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
 
         List<mxCell> roots = findRoots();
-        for (int i = 0; i < roots.size(); i++) {
-            System.out.println("HAS CYCLE: " + hasCycle(roots.get(i), new HashSet<String>(), new HashSet<String>(), null));
-        }
+        
         if (roots.size() != 1) {
-            System.out.println("Error found " + roots.size() + " roots.");
+            JOptionPane.showMessageDialog(this, "Found " + roots.size() + " roots.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         mxCell root = (mxCell) roots.get(0);
-        if (!(root.getValue() instanceof AndNode)) {
-            System.out.println("Error " + root.getValue() + " - node cannot be the root node.");
+        if (!(root.getValue() instanceof AndNode) || root != rootNode) {
+            // should never happen
+            JOptionPane.showMessageDialog(this, "Invalid root node.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (root != rootNode) {
-            System.out.println("WRONG ROOT!");
-            return ;
-        }
-        System.out.println("FOUND ROOT !");
         Set<Node> nodes = new HashSet<Node>();
         List<Edge> edges = new LinkedList<Edge>();
         Set<Parameter> parameters = new HashSet<Parameter>();
         if (!buildParameterGraph(nodes, edges, parameters, root)) {
-            System.out.println("GRAPH NOT VALID!");
+            // happens if not all leafs are AND nodes
+            JOptionPane.showMessageDialog(this, "Invalid graph.", "Error", JOptionPane.ERROR_MESSAGE);
             return ;
         }
         ParameterGraph parameterGraph = new ParameterGraph(nodes, edges, parameters, (AndNode) root.getValue());
         try {
             ParameterGraphDAO.saveParameterGraph(parameterGraph, solver);
-            System.out.println("SUCCESS!");
+            JOptionPane.showMessageDialog(this, "Saved.", "Information", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception ex) {
-            //TODO: Error
-            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error while saving:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
         
     }//GEN-LAST:event_btnSaveActionPerformed
@@ -588,31 +575,6 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             }
             e.consume();
         }
-    }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-
-            public void run() {
-                try {
-                    DatabaseConnector.getInstance().connect("serv01.local", 3306, "edacc", "EDACC", "edaccteam", false, false, 20);
-
-                    ParameterGraphEditor dialog = new ParameterGraphEditor(new javax.swing.JFrame(), true, SolverDAO.getById(1));
-                    dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-
-                        public void windowClosing(java.awt.event.WindowEvent e) {
-                            System.exit(0);
-                        }
-                    });
-                    dialog.setVisible(true);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
     }
 
     public boolean buildParameterGraph(Set<Node> nodes, List<Edge> edges, Set<Parameter> parameters, mxCell currentCell) {

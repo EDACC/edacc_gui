@@ -8,6 +8,7 @@ package edacc.parametergrapheditor;
 import java.util.Set;
 import javax.swing.JPanel;
 import edacc.parameterspace.domain.*;
+import java.awt.BorderLayout;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,6 +47,7 @@ public class SelectDomainPanel extends javax.swing.JPanel implements IDomainPane
         if (!getDomains(domain, RealDomain.class).isEmpty()) {
             comboDomain.addItem("Real");
         }
+        pnlDomainParameters.setLayout(new BorderLayout());
     }
 
     private List<Domain> getDomains(Domain domain, Class clazz) {
@@ -71,7 +73,7 @@ public class SelectDomainPanel extends javax.swing.JPanel implements IDomainPane
 
         jLabel2 = new javax.swing.JLabel();
         comboDomain = new javax.swing.JComboBox();
-        pnlDomainParameters = new javax.swing.JScrollPane();
+        pnlDomainParameters = new javax.swing.JPanel();
 
         setName("Form"); // NOI18N
 
@@ -89,29 +91,38 @@ public class SelectDomainPanel extends javax.swing.JPanel implements IDomainPane
 
         pnlDomainParameters.setName("pnlDomainParameters"); // NOI18N
 
+        javax.swing.GroupLayout pnlDomainParametersLayout = new javax.swing.GroupLayout(pnlDomainParameters);
+        pnlDomainParameters.setLayout(pnlDomainParametersLayout);
+        pnlDomainParametersLayout.setHorizontalGroup(
+            pnlDomainParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        pnlDomainParametersLayout.setVerticalGroup(
+            pnlDomainParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 112, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(comboDomain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(285, Short.MAX_VALUE))
-            .addComponent(pnlDomainParameters, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(pnlDomainParameters, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 149, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(comboDomain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlDomainParameters, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE))
+                .addComponent(pnlDomainParameters, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -131,14 +142,15 @@ public class SelectDomainPanel extends javax.swing.JPanel implements IDomainPane
         } else {
             pnlDomain = null;
         }
-
+pnlDomainParameters.removeAll();
         if (pnlDomain == null) {
             pnlDomainParameters.setVisible(false);
         } else {
             pnlDomain.invalidate();
             pnlDomain.revalidate();
             pnlDomainParameters.setVisible(true);
-            pnlDomainParameters.setViewportView(pnlDomain);
+            
+            pnlDomainParameters.add(pnlDomain, BorderLayout.CENTER);
         }
         this.invalidate();
         this.revalidate();
@@ -147,7 +159,7 @@ public class SelectDomainPanel extends javax.swing.JPanel implements IDomainPane
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JComboBox comboDomain;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JScrollPane pnlDomainParameters;
+    private javax.swing.JPanel pnlDomainParameters;
     // End of variables declaration//GEN-END:variables
 
     @Override
