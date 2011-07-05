@@ -129,4 +129,8 @@ public class SolverConfigurationTableModel extends ThreadSafeDefaultTableModel {
         }
         return res;
     }
+    
+    public boolean isSelected(int rowIndex) {
+        return selected[rowIndex];
+    }
 }

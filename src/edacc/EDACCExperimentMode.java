@@ -2141,8 +2141,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     private void btnChooseSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseSolverConfigsActionPerformed
         try {
-            for (SolverConfiguration sc : solverConfigTableModel.getSelectedSolverConfigurations()) {
-                solverConfigPanel.addSolverConfiguration(sc, false);
+            for (int row = 0; row < tblSolverConfigs.getRowCount(); row ++) {
+                if (solverConfigTableModel.isSelected(tblSolverConfigs.convertRowIndexToModel(row))) {
+                    solverConfigPanel.addSolverConfiguration(solverConfigTableModel.getSolverConfigurationAt(tblSolverConfigs.convertRowIndexToModel(row)), false);
+                }
             }
             solverConfigTablePanel.update();
         } catch (SQLException ex) {
