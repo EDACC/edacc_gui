@@ -106,7 +106,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                                 // Parameter is null while moving cell, don't know why
                                 return "";
                             }
-                            return "OR\n" + node.getParameter().getName() + "\n" + domainToString(node.getParameter().getDomain());
+                            return "OR\n" + node.getParameter().getName() + "\n" + domainToString(node.getDomain());
                         }
                     } else {
                         return super.convertValueToString(o);
@@ -238,8 +238,9 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                                                     if (child.getSource().getValue() instanceof AndNode) {
                                                         dialog = new CreateOrNodeDialog(new javax.swing.JFrame(), true, ParameterGraphEditor.this.solver);
                                                     } else {
-                                                        parameter = ((OrNode) child.getSource().getValue()).getParameter();
-                                                        dialog = new CreateAndNodeDialog(new javax.swing.JFrame(), true, parameter);
+                                                        OrNode node = (OrNode) child.getSource().getValue();
+                                                        parameter = node.getParameter();
+                                                        dialog = new CreateAndNodeDialog(new javax.swing.JFrame(), true, node.getParameter(), node.getDomain());
                                                     }
                                                     Domain domain = null;
                                                     ((JDialog) dialog).setVisible(true);
@@ -562,14 +563,19 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         Set<Node> nodes = new HashSet<Node>();
         List<Edge> edges = new LinkedList<Edge>();
         Set<Parameter> parameters = new HashSet<Parameter>();
-        buildParameterGraph(nodes, edges, parameters, root);
+        if (!buildParameterGraph(nodes, edges, parameters, root)) {
+            System.out.println("GRAPH NOT VALID!");
+            return ;
+        }
         ParameterGraph parameterGraph = new ParameterGraph(nodes, edges, parameters, (AndNode) root.getValue());
         try {
             ParameterGraphDAO.saveParameterGraph(parameterGraph, solver);
+            System.out.println("SUCCESS!");
         } catch (Exception ex) {
             //TODO: Error
             ex.printStackTrace();
         }
+        
     }//GEN-LAST:event_btnSaveActionPerformed
 
     public void evtKeyReleased(KeyEvent e) {
@@ -609,13 +615,15 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         });
     }
 
-    public void buildParameterGraph(Set<Node> nodes, List<Edge> edges, Set<Parameter> parameters, mxCell currentCell) {
+    public boolean buildParameterGraph(Set<Node> nodes, List<Edge> edges, Set<Parameter> parameters, mxCell currentCell) {
         if (currentCell.isVertex()) {
             Node node = (Node) currentCell.getValue();
             node.setId(currentCell.getId());
             nodes.add(node);
             if (node instanceof OrNode) {
-               
+                if (graph.getOutgoingEdges(currentCell).length == 0) {
+                    return false;
+                }
                 if (((OrNode) node).getParameter() != null) {
                 parameters.add(((OrNode) node).getParameter());
                 }
@@ -630,9 +638,12 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                     edge.setTarget((Node) cell.getTarget().getValue());
                     edges.add(edge);
                 }
-                buildParameterGraph(nodes, edges, parameters, (mxCell) cell.getTarget());
+                if (!buildParameterGraph(nodes, edges, parameters, (mxCell) cell.getTarget())) {
+                    return false;
+                }
             }
         }
+        return true;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLayout;

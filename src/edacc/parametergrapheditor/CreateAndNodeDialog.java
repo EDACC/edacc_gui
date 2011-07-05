@@ -21,14 +21,14 @@ public class CreateAndNodeDialog extends javax.swing.JDialog implements ICreateN
     private Parameter parameter;
 
     /** Creates new form CreateAndNodeDialog */
-    public CreateAndNodeDialog(java.awt.Frame parent, boolean modal, Parameter parameter) {
+    public CreateAndNodeDialog(java.awt.Frame parent, boolean modal, Parameter parameter, Domain domain) {
         super(parent, modal);
         initComponents();
         this.parameter = parameter;
         lblParameter.setText(parameter.getName());
         cancelled = true;
 
-        pnlDomain = new SelectDomainPanel(parameter.getDomain());
+        pnlDomain = new SelectDomainPanel(domain);
         panel.setLayout(new BorderLayout());
         panel.add(pnlDomain, BorderLayout.CENTER);
     }
