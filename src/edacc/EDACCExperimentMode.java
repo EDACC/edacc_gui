@@ -2153,22 +2153,22 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }//GEN-LAST:event_btnChooseSolverConfigsActionPerformed
 
     private void btnSelectAllSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllSolverConfigsActionPerformed
-        for (int row = 0; row < solverConfigTableModel.getRowCount(); row++) {
-            solverConfigTableModel.setValueAt(true, row, SolverConfigurationTableModel.COL_SEL);
+        for (int row = 0; row < tblSolverConfigs.getRowCount(); row++) {
+            solverConfigTableModel.setValueAt(true, tblSolverConfigs.convertRowIndexToModel(row), SolverConfigurationTableModel.COL_SEL);
         }
         solverConfigTableModel.fireTableDataChanged();
     }//GEN-LAST:event_btnSelectAllSolverConfigsActionPerformed
 
     private void btnDeselectAllSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeselectAllSolverConfigsActionPerformed
-        for (int row = 0; row < solverConfigTableModel.getRowCount(); row++) {
-            solverConfigTableModel.setValueAt(false, row, SolverConfigurationTableModel.COL_SEL);
+        for (int row = 0; row < tblSolverConfigs.getRowCount(); row++) {
+            solverConfigTableModel.setValueAt(false, tblSolverConfigs.convertRowIndexToModel(row), SolverConfigurationTableModel.COL_SEL);
         }
         solverConfigTableModel.fireTableDataChanged();
     }//GEN-LAST:event_btnDeselectAllSolverConfigsActionPerformed
 
     private void btnInvertSolverConfigSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInvertSolverConfigSelectionActionPerformed
-        for (int row = 0; row < solverConfigTableModel.getRowCount(); row++) {
-            solverConfigTableModel.setValueAt(!(Boolean) solverConfigTableModel.getValueAt(row, SolverConfigurationTableModel.COL_SEL), row, SolverConfigurationTableModel.COL_SEL);
+        for (int row = 0; row < tblSolverConfigs.getRowCount(); row++) {
+            solverConfigTableModel.setValueAt(!(Boolean) solverConfigTableModel.getValueAt(tblSolverConfigs.convertRowIndexToModel(row), SolverConfigurationTableModel.COL_SEL), tblSolverConfigs.convertRowIndexToModel(row), SolverConfigurationTableModel.COL_SEL);
         }
         solverConfigTableModel.fireTableDataChanged();
     }//GEN-LAST:event_btnInvertSolverConfigSelectionActionPerformed
