@@ -62,6 +62,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
     mxGraph graph;
     mxGraphComponent graphComponent;
     Solver solver;
+    mxCell rootNode;
 
     /** Creates new form EDACCParameterGraphEditor */
     public ParameterGraphEditor(java.awt.Frame parent, boolean modal, Solver solver) throws SQLException, JAXBException {
@@ -340,12 +341,15 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         ParameterGraph parameterGraph = ParameterGraphDAO.loadParameterGraph(solver);
         if (parameterGraph == null) {
             // create root node:
-            graph.updateCellSize(graph.insertVertex(graph.getDefaultParent(), null, new AndNode(null, null), 20, 20, 80, 30));
+            graph.updateCellSize(rootNode = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, new AndNode(null, null), 20, 20, 80, 30));
         } else {
             graph.getModel().beginUpdate();
             HashMap<String, mxCell> mapNodeIdToCell = new HashMap<String, mxCell>();
             for (Node node : parameterGraph.nodes) {
                 mxCell cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, node, 20, 20, 80, 30);
+                if (node == parameterGraph.startNode) {
+                    rootNode = cell;
+                }
                 graph.updateCellSize(cell);
                 mapNodeIdToCell.put(node.getId(), cell);
             }
@@ -550,6 +554,10 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             System.out.println("Error " + root.getValue() + " - node cannot be the root node.");
             return;
         }
+        if (root != rootNode) {
+            System.out.println("WRONG ROOT!");
+            return ;
+        }
         System.out.println("FOUND ROOT !");
         Set<Node> nodes = new HashSet<Node>();
         List<Edge> edges = new LinkedList<Edge>();
@@ -566,7 +574,12 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
 
     public void evtKeyReleased(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_DELETE) {
-            graph.removeCells(graph.getSelectionCells());
+            for (Object cell : graph.getSelectionCells()) {
+                // can't remove root node
+                if (cell != rootNode) {
+                    graph.removeCells(new Object[] {cell});
+                }
+            }
             e.consume();
         }
     }
@@ -601,9 +614,10 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             Node node = (Node) currentCell.getValue();
             node.setId(currentCell.getId());
             nodes.add(node);
-            if (node instanceof AndNode) {
-                if (((AndNode) node).getParameter() != null) {
-                parameters.add(((AndNode) node).getParameter());
+            if (node instanceof OrNode) {
+               
+                if (((OrNode) node).getParameter() != null) {
+                parameters.add(((OrNode) node).getParameter());
                 }
             }
             for (Object o : graph.getOutgoingEdges(currentCell)) {
