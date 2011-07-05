@@ -5,16 +5,19 @@
 
 package edacc.manageDB;
 
+import edacc.EDACCApp;
 import edacc.EDACCManageDBMode;
 import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.Solver;
+import edacc.parametergrapheditor.ParameterGraphEditor;
 import java.sql.SQLException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
+import javax.xml.bind.JAXBException;
 
 /**
  *
@@ -152,5 +155,11 @@ public class ManageDBParameters implements Observer {
 
     Vector<Parameter> getParametersOfSolver(Solver s) {
         return parameterTableModel.getParamtersOfSolver(s);
+    }
+
+    public void showParameterGraphEditor() throws SQLException, JAXBException {
+        ParameterGraphEditor dialog = new ParameterGraphEditor(EDACCApp.getApplication().getMainFrame(), true, parameterTableModel.getCurrentSolver());
+        dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+        EDACCApp.getApplication().show(dialog);
     }
 }

@@ -7,7 +7,6 @@ package edacc.parametergrapheditor;
 
 import edacc.parameterspace.Parameter;
 import edacc.parameterspace.domain.Domain;
-import java.awt.BorderLayout;
 import javax.swing.JPanel;
 
 /**
@@ -29,8 +28,7 @@ public class CreateAndNodeDialog extends javax.swing.JDialog implements ICreateN
         cancelled = true;
 
         pnlDomain = new SelectDomainPanel(domain);
-        panel.setLayout(new BorderLayout());
-        panel.add(pnlDomain, BorderLayout.CENTER);
+        panel.setViewportView(pnlDomain);
     }
 
     /** This method is called from within the constructor to
@@ -45,13 +43,14 @@ public class CreateAndNodeDialog extends javax.swing.JDialog implements ICreateN
         jLabel1 = new javax.swing.JLabel();
         btnAccept = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
-        panel = new javax.swing.JPanel();
         lblParameter = new javax.swing.JLabel();
+        panel = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(CreateAndNodeDialog.class);
+        setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(CreateAndNodeDialog.class);
         jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
         jLabel1.setName("jLabel1"); // NOI18N
 
@@ -71,21 +70,10 @@ public class CreateAndNodeDialog extends javax.swing.JDialog implements ICreateN
             }
         });
 
-        panel.setName("panel"); // NOI18N
-
-        javax.swing.GroupLayout panelLayout = new javax.swing.GroupLayout(panel);
-        panel.setLayout(panelLayout);
-        panelLayout.setHorizontalGroup(
-            panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 518, Short.MAX_VALUE)
-        );
-        panelLayout.setVerticalGroup(
-            panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 53, Short.MAX_VALUE)
-        );
-
         lblParameter.setText(resourceMap.getString("lblParameter.text")); // NOI18N
         lblParameter.setName("lblParameter"); // NOI18N
+
+        panel.setName("panel"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -93,15 +81,15 @@ public class CreateAndNodeDialog extends javax.swing.JDialog implements ICreateN
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(panel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, 628, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(lblParameter)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 355, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 465, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btnCancel)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
@@ -116,7 +104,7 @@ public class CreateAndNodeDialog extends javax.swing.JDialog implements ICreateN
                     .addComponent(jLabel1)
                     .addComponent(lblParameter))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAccept)
@@ -141,7 +129,7 @@ public class CreateAndNodeDialog extends javax.swing.JDialog implements ICreateN
     private javax.swing.JButton btnCancel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel lblParameter;
-    private javax.swing.JPanel panel;
+    private javax.swing.JScrollPane panel;
     // End of variables declaration//GEN-END:variables
 
     @Override

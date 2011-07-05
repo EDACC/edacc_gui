@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * SpecifyMixedDomainPanel.java
  *
  * Created on 03.07.2011, 18:27:59
@@ -14,10 +9,10 @@ import edacc.parameterspace.domain.Domain;
 import edacc.parameterspace.domain.MixedDomain;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
-import javax.swing.JLabel;
 
 /**
  *
@@ -45,6 +40,7 @@ public class SpecifyMixedDomainPanel extends javax.swing.JPanel implements IDoma
         });
         c.gridx = 0;
         c.gridy = 1;
+        c.insets = new Insets(5, 5, 5, 5);
         c.weightx = 0.5;
         c.weighty = .5;
         c.anchor = GridBagConstraints.PAGE_START;
@@ -108,17 +104,19 @@ public class SpecifyMixedDomainPanel extends javax.swing.JPanel implements IDoma
 
         jScrollPane1.setName("jScrollPane1"); // NOI18N
 
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(SpecifyMixedDomainPanel.class);
+        setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("Form.border.title"))); // NOI18N
         setName("Form"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 38, Short.MAX_VALUE)
+            .addGap(0, 26, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 26, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables

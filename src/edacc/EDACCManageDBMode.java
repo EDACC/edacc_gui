@@ -24,8 +24,10 @@ import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
 import edacc.model.Solver;
 import edacc.model.SolverBinaries;
+import edacc.model.SolverDAO;
 import edacc.model.TaskCancelledException;
 import edacc.model.Tasks;
+import edacc.parametergrapheditor.ParameterGraphEditor;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -2113,6 +2115,15 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         parameterChanged();
     }//GEN-LAST:event_chkAttachToPreviousStateChanged
 
+    private void btnGraphActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGraphActionPerformed
+        try {
+            manageDBParameters.showParameterGraphEditor();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            // TODO: error
+        }
+    }//GEN-LAST:event_btnGraphActionPerformed
+
     private void parameterChanged() {
         int selectedRow = tableParameters.getSelectedRow();
 
@@ -2248,6 +2259,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     private javax.swing.JButton btnExportInstances;
     private javax.swing.JButton btnFilterInstances;
     private javax.swing.JButton btnGenerate;
+    private javax.swing.JButton btnGraph;
     private javax.swing.JButton btnNewInstanceClass;
     private javax.swing.JButton btnParametersDelete;
     private javax.swing.JButton btnParametersNew;
