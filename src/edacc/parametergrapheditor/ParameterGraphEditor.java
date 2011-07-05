@@ -255,7 +255,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                                                     if (domain != null) {
                                                         Object node = null;
                                                         if (parameter == null) {
-                                                            node = new OrNode(new Parameter(dialog.getParameterName(), domain));
+                                                            node = new OrNode(new Parameter(dialog.getParameterName(), domain), domain);
                                                         } else {
                                                             node = new AndNode(parameter, domain);
                                                         }
