@@ -56,7 +56,7 @@ public class EDACCManageInstanceColumnSelection extends javax.swing.JDialog {
          for (int i = 0; i < checkboxes.length; i++) {
             checkboxes[i] = new JCheckBox(instancesTableModel.getAllColumnNames()[i], visibility[i]);
             checkboxes[i].setVisible(true);
-            if (i < edacc.manageDB.InstanceTableModel.COL_PROPERTY) {
+            if (i < edacc.manageDB.InstanceTableModel.COL_PROP) {
                 pnlBasicColumns.add(checkboxes[i], basicColumnsConstraints);
                 basicColumnsConstraints.gridy++;
             } else {

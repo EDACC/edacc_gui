@@ -28,7 +28,7 @@ import javax.swing.table.AbstractTableModel;
  */
 public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
 
-    public static final int COL_PROPERTY = 2;
+    public static final int COL_PROP = 2;
     private boolean[] visible;
     private ArrayList<Property> properties;
     private String[] CONST_COLUMNS = {"Name", "MD5"};
@@ -122,8 +122,16 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
     @Override
     public Class getColumnClass(int col) {
         if (this.getRowCount() == 0) {
-            return this.getClass();
+            return String.class;
         } else {
+            if (col >= COL_PROP) {
+                int propertyIdx = col - COL_PROP;
+                if (propertyIdx < properties.size()) {
+                    return properties.get(propertyIdx).getPropertyValueType().getJavaType();
+                } else {
+                    return String.class;
+                }
+            }
             return getValueAt(0, col).getClass();
         }
     }
@@ -146,7 +154,7 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
             case 1:
                 return instances.get(rowIndex).getMd5();
             default:
-                int propertyIdx = columnIndex - COL_PROPERTY;
+                int propertyIdx = columnIndex - COL_PROP;
                 Property prop = properties.get(propertyIdx);
                 if (prop.getType().equals(PropertyType.InstanceProperty)) {
                     InstanceHasProperty ihp = null;
@@ -260,10 +268,10 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
     }
 
     private void addNewInstance(Instance in) {
-          if (!instances.contains(in)) {
+        if (!instances.contains(in)) {
             try {
                 instances.add(in);
-                LinkedList <Integer> classes = InstanceHasInstanceClassDAO.getRelatedInstanceClasses(in.getId());
+                LinkedList<Integer> classes = InstanceHasInstanceClassDAO.getRelatedInstanceClasses(in.getId());
                 instanceClassIds.put(in, classes);
             } catch (SQLException ex) {
                 Logger.getLogger(InstanceTableModel.class.getName()).log(Level.SEVERE, null, ex);

@@ -138,7 +138,7 @@ public class PropertyComputationUnit implements Runnable {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (Exception ex) {           
+            } catch (Exception ex) {
                 callback.exceptionCausedByThread(ex);
             }
         }
@@ -352,8 +352,11 @@ public class PropertyComputationUnit implements Runnable {
                 }
             }
             if (ihp != null) {
-                ihp.setValue(res.firstElement());
-                InstanceHasPropertyDAO.save(ihp);
+                if (!res.isEmpty()) {
+                    ihp.setValue(res.firstElement());
+                    InstanceHasPropertyDAO.save(ihp);
+                }
+
             } else if (erhp != null) {
                 erhp.setValue(res);
                 ExperimentResultHasPropertyDAO.save(erhp);

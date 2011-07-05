@@ -177,15 +177,14 @@ public class PropertyComputationController implements Runnable {
             jobs--;
         }
         if (instancePropertyQueue != null) {
-            if (jobs == 0 && instancePropertyQueue.isEmpty()) {
-                task.cancel(true);
+            if (jobs == 0 && instancePropertyQueue.isEmpty()) {              
                 lock.lock();
                 try {
                     condition.signal();
                 } finally {
-                    lock.unlock();
+                    lock.unlock();                   
                 }
-                return;
+                task.cancel(true);
             }
 
         } else if (resultPropertyQueue != null) {
@@ -302,6 +301,7 @@ public class PropertyComputationController implements Runnable {
     }
 
     public void exceptionCausedByThread(Exception ex) {
+        ex.printStackTrace();
         exceptionCollector.add(ex);
     }
 }
