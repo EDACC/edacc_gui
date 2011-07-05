@@ -200,7 +200,7 @@ public class ParameterGraph {
 		
 		List<ParameterConfiguration> nbh = new LinkedList<ParameterConfiguration>();
 		for (AndNode node: assigned_and_nodes) {
-			for (Object value: preceedingNode(node).getParameter().getDomain().getDiscreteValues()) {
+			for (Object value: preceedingNode(node).getDomain().getDiscreteValues()) {
 				if (node.getDomain().contains(value)) { // same subdomain
 					ParameterConfiguration neighbour = new ParameterConfiguration(config);
 					neighbour.setParameterValue(node.getParameter(), value);
