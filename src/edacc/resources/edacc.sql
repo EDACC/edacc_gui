@@ -61,6 +61,7 @@ CREATE  TABLE IF NOT EXISTS `Parameters` (
   `Solver_idSolver` INT NOT NULL ,
   `mandatory` TINYINT(1)  NULL ,
   `space` TINYINT(1)  NULL ,
+  `attachToPrevious` TINYINT(1)  NULL ,
   PRIMARY KEY (`idParameter`) ,
   INDEX `fk_Parameters_Solver` (`Solver_idSolver` ASC) ,
   UNIQUE INDEX `uniqueprefix` (`Solver_idSolver` ASC, `prefix` ASC) ,
@@ -741,6 +742,36 @@ CREATE  TABLE IF NOT EXISTS `SolverDownloads` (
   `filesystemID` INT NOT NULL ,
   `lastReport` DATETIME NOT NULL ,
   PRIMARY KEY (`idSolver`, `filesystemID`) )
+ENGINE = InnoDB;
+
+ALTER TABLE `Parameters` 
+  ADD CONSTRAINT `fk_Parameters_Solver`
+  FOREIGN KEY (`Solver_idSolver` )
+  REFERENCES `Solver` (`idSolver` )
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
+  
+-- -----------------------------------------------------
+
+-- Table `EDACC`.`ParameterGraph`
+
+-- -----------------------------------------------------
+
+DROP TABLE IF EXISTS `EDACC`.`ParameterGraph` ;
+
+
+
+CREATE  TABLE IF NOT EXISTS `EDACC`.`ParameterGraph` (
+  `idParameterGraph` INT NOT NULL AUTO_INCREMENT ,
+  `Solver_idSolver` INT NOT NULL ,
+  `serializedGraph` LONGBLOB NOT NULL ,
+  INDEX `fk_ParameterGraph_Solver1` (`Solver_idSolver` ASC) ,
+  PRIMARY KEY (`idParameterGraph`) ,
+  CONSTRAINT `fk_ParameterGraph_Solver1`
+    FOREIGN KEY (`Solver_idSolver` )
+    REFERENCES `EDACC`.`Solver` (`idSolver` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
