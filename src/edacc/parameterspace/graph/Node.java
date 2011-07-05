@@ -5,11 +5,13 @@ import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 import edacc.parameterspace.Parameter;
+import edacc.parameterspace.domain.Domain;
 
 @XmlSeeAlso({AndNode.class, OrNode.class})
 public abstract class Node {
 	protected String id;
 	protected Parameter parameter;
+	protected Domain domain;
 	
 	@XmlIDREF public Parameter getParameter() {
 		return parameter;
@@ -59,5 +61,13 @@ public abstract class Node {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public Domain getDomain() {
+		return domain;
+	}
+
+	public void setDomain(Domain domain) {
+		this.domain = domain;
 	}
 }
