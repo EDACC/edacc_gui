@@ -65,7 +65,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Solver Properties">
+            <TitledBorder title="Properties">
               <Property name="titleX" resourceKey="panelManageProperty.border.title"/>
             </TitledBorder>
           </Border>
