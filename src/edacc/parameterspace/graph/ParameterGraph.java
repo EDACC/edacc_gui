@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import edacc.parameterspace.Parameter;
 import edacc.parameterspace.ParameterConfiguration;
+import edacc.parameterspace.domain.RealDomain;
 
 @XmlRootElement( name="parameterspace" )
 public class ParameterGraph {
@@ -26,13 +27,25 @@ public class ParameterGraph {
 	private ParameterGraph() {
 		
 	}
-	
+
 	public ParameterGraph(Set<Node> nodes, List<Edge> edges, Set<Parameter> parameters, AndNode startNode) {
 		this.startNode = startNode;
 		this.nodes = nodes;
 		this.edges = edges;
 		this.parameters = parameters;
 		buildAdjacencyList();
+	}
+	
+	public Map<String, Parameter> getParameterMap() {
+		Map<String, Parameter> map = new HashMap<String, Parameter>();
+		for (Parameter p: this.parameters) {
+			map.put(p.getName(), p);
+		}
+		return map;
+	}
+	
+	public Set<Parameter> getParameterSet() {
+		return java.util.Collections.unmodifiableSet(this.parameters);
 	}
 	
 	public void buildAdjacencyList() {
@@ -200,8 +213,14 @@ public class ParameterGraph {
 		
 		List<ParameterConfiguration> nbh = new LinkedList<ParameterConfiguration>();
 		for (AndNode node: assigned_and_nodes) {
-			for (Object value: preceedingNode(node).getDomain().getDiscreteValues()) {
-				if (node.getDomain().contains(value)) { // same subdomain
+			for (Object value: preceedingNode(node).getParameter().getDomain().getDiscreteValues()) {
+				if (node.getDomain().contains(value)) { // same subdomain, different value
+					if (value instanceof Double || value instanceof Float) {
+						double cur_val = (Double)config.getParameterValue(node.getParameter());
+						double val = (Double)value;
+						if (cur_val - 0.00000001 < val && val < cur_val + 0.00000001) continue;
+					}
+					else if (value.equals(config.getParameterValue(node.getParameter()))) continue;
 					ParameterConfiguration neighbour = new ParameterConfiguration(config);
 					neighbour.setParameterValue(node.getParameter(), value);
 					neighbour.updateChecksum();
@@ -237,7 +256,20 @@ public class ParameterGraph {
 		AndNode node = randomElement(assigned_and_nodes, rng);
 		List<Object> vals = node.getDomain().getDiscreteValues();
 		ParameterConfiguration n = new ParameterConfiguration(config);
-		n.setParameterValue(node.getParameter(), vals.get(rng.nextInt(vals.size())));
+		
+		int tried = 0;
+		int num_vals = vals.size();
+		while (tried++ < num_vals) {
+			Object val = vals.get(rng.nextInt(vals.size()));
+			vals.remove(val);
+			if (val instanceof Double || val instanceof Float) {
+				double cur_val = (Double)n.getParameterValue(node.getParameter());
+				if (cur_val - 0.00000001 < (Double)val && (Double)val < cur_val + 0.00000001) continue;
+			}
+			else if (val.equals(n.getParameterValue(node.getParameter()))) continue;
+			n.setParameterValue(node.getParameter(), val);
+			break;
+		}
 		n.updateChecksum();
 		return n;
 	}
