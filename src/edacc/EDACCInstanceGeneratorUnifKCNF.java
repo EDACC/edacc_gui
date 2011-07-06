@@ -237,9 +237,9 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog implemen
                         .addGap(18, 18, 18)
                         .addComponent(lbParentClass, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnGenerate)
+                        .addComponent(btnCancel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 141, Short.MAX_VALUE)
-                        .addComponent(btnCancel)))
+                        .addComponent(btnGenerate)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -279,11 +279,11 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog implemen
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btSelParClass)
                     .addComponent(lbParentClass, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnGenerate)
-                    .addComponent(btnCancel))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnCancel)
+                    .addComponent(btnGenerate))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         pack();

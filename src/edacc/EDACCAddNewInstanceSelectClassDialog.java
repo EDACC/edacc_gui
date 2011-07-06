@@ -102,9 +102,9 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
             jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelButtonsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButtonOk)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 227, Short.MAX_VALUE)
                 .addComponent(jButtonCancel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 227, Short.MAX_VALUE)
+                .addComponent(jButtonOk)
                 .addContainerGap())
         );
 
@@ -113,8 +113,8 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         jPanelButtonsLayout.setVerticalGroup(
             jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(jButtonOk)
-                .addComponent(jButtonCancel))
+                .addComponent(jButtonCancel)
+                .addComponent(jButtonOk))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
