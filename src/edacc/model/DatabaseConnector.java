@@ -53,10 +53,11 @@ public class DatabaseConnector extends Observable {
      * @param username the username of the DB user.
      * @param database the name of the database containing the EDACC tables.
      * @param password the password of the DB user.
+     * @param doCheckVersion whether to perform a database version check
      * @throws ClassNotFoundException if the driver couldn't be found.
      * @throws SQLException if an error occurs while trying to establish the connection.
      */
-    public void connect(String hostname, int port, String username, String database, String password, boolean useSSL, boolean compress, int maxconnections) throws ClassNotFoundException, SQLException, DBVersionException, DBVersionUnknownException, DBEmptyException {
+    public void connect(String hostname, int port, String username, String database, String password, boolean useSSL, boolean compress, int maxconnections, boolean doCheckVersion) throws ClassNotFoundException, SQLException, DBVersionException, DBVersionUnknownException, DBEmptyException {
         while (connections.size() > 0) {
             ThreadConnection tconn = connections.pop();
             tconn.conn.close();
@@ -97,7 +98,7 @@ public class DatabaseConnector extends Observable {
             watchDog = new ConnectionWatchDog();
             connections.add(new ThreadConnection(Thread.currentThread(), getNewConnection(), System.currentTimeMillis()));
             watchDog.start();
-            checkVersion();
+            if (doCheckVersion) checkVersion();
         } catch (ClassNotFoundException e) {
             throw e;
         } catch (SQLException e) {
@@ -107,6 +108,13 @@ public class DatabaseConnector extends Observable {
             this.setChanged();
             this.notifyObservers();
         }
+    }
+    
+    /**
+     * overloaded connect method with implicit version check, see connect() above.
+     */
+    public void connect(String hostname, int port, String username, String database, String password, boolean useSSL, boolean compress, int maxconnections) throws ClassNotFoundException, SQLException, DBVersionException, DBVersionUnknownException, DBEmptyException {
+        connect(hostname, port, username, database, password, useSSL, compress, maxconnections, true);
     }
 
     private Connection getNewConnection() throws SQLException {
