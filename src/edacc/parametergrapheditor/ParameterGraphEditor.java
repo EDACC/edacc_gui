@@ -101,7 +101,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                                 // Parameter is null while moving cell, don't know why
                                 return "";
                             }
-                            return "OR\n" + node.getParameter().getName() + "\n" + domainToString(node.getDomain());
+                            return "OR\n" + node.getParameter().getName() + "\n" + domainToString(node.getParameter().getDomain());
                         }
                     } else {
                         return super.convertValueToString(o);
@@ -229,7 +229,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                                                     } else {
                                                         OrNode node = (OrNode) child.getSource().getValue();
                                                         parameter = node.getParameter();
-                                                        dialog = new CreateAndNodeDialog(new javax.swing.JFrame(), true, node.getParameter(), node.getDomain());
+                                                        dialog = new CreateAndNodeDialog(new javax.swing.JFrame(), true, node.getParameter(), node.getParameter().getDomain());
                                                     }
                                                     Domain domain = null;
                                                     ((JDialog) dialog).setLocationRelativeTo(ParameterGraphEditor.this);
@@ -248,7 +248,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                                                     if (domain != null) {
                                                         Object node = null;
                                                         if (parameter == null) {
-                                                            node = new OrNode(new Parameter(dialog.getParameterName(), domain), domain);
+                                                            node = new OrNode(new Parameter(dialog.getParameterName(), domain));
                                                         } else {
                                                             node = new AndNode(parameter, domain);
                                                         }
