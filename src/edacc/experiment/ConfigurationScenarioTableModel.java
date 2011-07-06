@@ -24,7 +24,6 @@ public class ConfigurationScenarioTableModel extends ThreadSafeDefaultTableModel
     public static final int COL_VALUE = 3;
     private static final String[] columns = {"Parameter", "Selected", "Fixed Value", "Value"};
     private Vector<Parameter> parameters;
-    
     private SolverBinaries solverBinary;
     private HashMap<Integer, ConfigurationScenarioParameter> configScenarioParameters;
 
@@ -34,18 +33,20 @@ public class ConfigurationScenarioTableModel extends ThreadSafeDefaultTableModel
         this.solverBinary = solverBinary;
         Solver solver = SolverDAO.getById(solverBinary.getIdSolver());
         boolean contains = false;
-        for (SolverBinaries sb : solver.getSolverBinaries()) {
-            if (sb.getIdSolverBinary() == configurationScenario.getIdSolverBinary()) {
-                contains = true;
-                break;
+        if (configurationScenario != null) {
+            for (SolverBinaries sb : solver.getSolverBinaries()) {
+                if (sb.getIdSolverBinary() == configurationScenario.getIdSolverBinary()) {
+                    contains = true;
+                    break;
+                }
+            }
+            if (contains) {
+                for (ConfigurationScenarioParameter param : configurationScenario.getParameters()) {
+                    configScenarioParameters.put(param.getIdParameter(), param);
+                }
             }
         }
-        if (configurationScenario != null && contains) {
-            for (ConfigurationScenarioParameter param : configurationScenario.getParameters()) {
-                configScenarioParameters.put(param.getIdParameter(), param);
-            }
-        }
-        
+
         fireTableDataChanged();
     }
 
@@ -103,7 +104,7 @@ public class ConfigurationScenarioTableModel extends ThreadSafeDefaultTableModel
             if ((Boolean) aValue) {
                 if (!configScenarioParameters.containsKey(parameters.get(row).getId())) {
                     configScenarioParameters.put(parameters.get(row).getId(), new ConfigurationScenarioParameter(true, null, parameters.get(row)));
-                } 
+                }
             } else {
                 configScenarioParameters.remove(parameters.get(row).getId());
             }
@@ -125,11 +126,11 @@ public class ConfigurationScenarioTableModel extends ThreadSafeDefaultTableModel
     public Class<?> getColumnClass(int columnIndex) {
         return getRowCount() == 0 ? String.class : getValueAt(0, columnIndex).getClass();
     }
-    
+
     public SolverBinaries getSolverBinary() {
         return solverBinary;
     }
-    
+
     public HashMap<Integer, ConfigurationScenarioParameter> getConfigScenarioParameters() {
         return configScenarioParameters;
     }
