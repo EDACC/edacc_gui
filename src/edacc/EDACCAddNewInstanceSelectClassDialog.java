@@ -8,7 +8,6 @@
  *
  * Created on 20.03.2010, 12:43:23
  */
-
 package edacc;
 
 import edacc.manageDB.AddInstanceTreeSelectionListener;
@@ -26,6 +25,7 @@ import javax.swing.tree.TreeSelectionModel;
  * @author rretz
  */
 public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
+
     InstanceClass input;
     private int searchDepth = 0;
     private DefaultTreeModel treeModel;
@@ -36,7 +36,7 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         //Filling the tree with all instance source class
-        this.treeModel = treeModel;
+        this.treeModel = new DefaultTreeModel(InstanceClassDAO.getTreeCache());
         jTreeClass.setModel(treeModel);
         jTreeClass.setRootVisible(false);
         jTreeClass.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -206,24 +206,25 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-/**
- * Modifies the input object according to the user inputs, checks them and close the jDialog.
- * @param evt jButtonOk clicked
- */
+
+    /**
+     * Modifies the input object according to the user inputs, checks them and close the jDialog.
+     * @param evt jButtonOk clicked
+     */
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
         this.input = new InstanceClass();
         this.fileExtension = jTextFieldExtension.getText();
-        
-        if(jTreeClass.getSelectionPath() != null){
-            this.input = (InstanceClass) ((DefaultMutableTreeNode)jTreeClass.getSelectionPath().getLastPathComponent()).getUserObject();
+
+        if (jTreeClass.getSelectionPath() != null) {
+            this.input = (InstanceClass) ((DefaultMutableTreeNode) jTreeClass.getSelectionPath().getLastPathComponent()).getUserObject();
             this.setVisible(false);
-        }else{
-            if(!chkAutoClass.isSelected()){
-              JOptionPane.showMessageDialog(this.rootPane,
-                "Select a instance class or choose automatic class generation.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-            }else{
+        } else {
+            if (!chkAutoClass.isSelected()) {
+                JOptionPane.showMessageDialog(this.rootPane,
+                        "Select a instance class or choose automatic class generation.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } else {
                 this.input.setName("");
                 this.setVisible(false);
             }
@@ -239,34 +240,22 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
-        try {
-            treeModel = new DefaultTreeModel(InstanceClassDAO.getAllAsTree());
-            jTreeClass.setModel(treeModel);
-        } catch (NoConnectionToDBException ex) {
-            JOptionPane.showMessageDialog(this.rootPane,
-                    ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-             JOptionPane.showMessageDialog(this.rootPane,
-                    "There is a Problem with the database: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
+
+        treeModel = new DefaultTreeModel(InstanceClassDAO.getTreeCache());
+        jTreeClass.setModel(treeModel);
     }//GEN-LAST:event_formComponentShown
 
     private void jTextFieldExtensionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldExtensionActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextFieldExtensionActionPerformed
 
-    private void jRadioButtonAutomaticActionPerformed(java.awt.event.ActionEvent evt) {                                                      
-       jTreeClass.setSelectionPath(null);
-    }                                                     
-
-    public InstanceClass getInput(){
-        return input;
+    private void jRadioButtonAutomaticActionPerformed(java.awt.event.ActionEvent evt) {
+        jTreeClass.setSelectionPath(null);
     }
 
+    public InstanceClass getInput() {
+        return input;
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox chkAutoClass;
     private javax.swing.JCheckBox chkCompress;
@@ -282,33 +271,19 @@ public class EDACCAddNewInstanceSelectClassDialog extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
 
     public void refresh() {
-         try {
-            treeModel = new DefaultTreeModel(InstanceClassDAO.getAllAsTree());
-            jTreeClass.setModel(treeModel);
-        } catch (NoConnectionToDBException ex) {
-            JOptionPane.showMessageDialog(this.rootPane,
-                    ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-             JOptionPane.showMessageDialog(this.rootPane,
-                    "There is a Problem with the database: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
+        treeModel = new DefaultTreeModel(InstanceClassDAO.getTreeCache());
+        jTreeClass.setModel(treeModel);
     }
 
-
-    public Boolean isAutoClass(){
+    public Boolean isAutoClass() {
         return chkAutoClass.isSelected();
     }
 
-    public String getFileExtension(){
+    public String getFileExtension() {
         return fileExtension;
     }
 
     public Boolean isCompress() {
         return chkCompress.isSelected();
     }
-
 }

@@ -325,7 +325,7 @@ public class ManageDBInstances implements Observer {
         }*/
     }
 
-    public void DeselectAllInstanceClass() {
+    public void deselectAllInstanceClass() {
         /* main.instanceClassTableModel.DeselectAll();
         main.instanceTableModel.clearTable();
         main.instanceClassTableModel.fireTableDataChanged();*/
@@ -555,7 +555,7 @@ public class ManageDBInstances implements Observer {
                     "The following instances are already in the database. (Equal name or md5 hash). \n"
                     + "Do you want to add the instances to the selected/autobuilded classes?",
                     new JTable(tmp)) == EDACCExtendedWarning.RET_OK_OPTION) {
-                AddInstancesToAutoBuildedInstances(errorsDBInstances, nodes, ret);
+                addInstancesToAutoBuildedInstances(errorsDBInstances, nodes, ret);
             }
 
         }
@@ -645,7 +645,7 @@ public class ManageDBInstances implements Observer {
                     "The following instances are already in the database. (Equal name or md5 hash). \n"
                     + "Do you want to add the instances to the selected/autobuilded classes?",
                     new JTable(tmp)) == EDACCExtendedWarning.RET_OK_OPTION) {
-                AddInstancesToAutoBuildedInstances(errorsDBInstances, nodes, ret);
+                addInstancesToAutoBuildedInstances(errorsDBInstances, nodes, ret);
             }
         }
         return instances;
@@ -879,7 +879,7 @@ public class ManageDBInstances implements Observer {
      * @param instanceClassTableModel Table model of the instance classes of the ManageDBMode
      * @param convertRowIndexToModel the row of the selected instance class
      */
-    public void EditInstanceClass() {
+    public void editInstanceClass() {
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
         EDACCCreateEditInstanceClassDialog dialog = new EDACCCreateEditInstanceClassDialog(mainFrame, true, main.getInstanceClassTree());
         dialog.setLocationRelativeTo(mainFrame);
@@ -905,7 +905,7 @@ public class ManageDBInstances implements Observer {
      * @param searchDepth int which represents the depth to which the root path has to be cut
      * @return path cut down to the given search depth or the maximum search depth (depth of the layer of the instance file).
      */
-    private String CutToSearchDepth(String parent, File file, int searchDepth) {
+    private String cutToSearchDepth(String parent, File file, int searchDepth) {
         String tmpString = file.getAbsolutePath().substring(parent.length() + 1);
         char[] tmp = tmpString.toCharArray();
         int count = 0;
@@ -1199,7 +1199,7 @@ public class ManageDBInstances implements Observer {
      * @param errorsDBInstances
      * @param nodes 
      */
-    private void AddInstancesToAutoBuildedInstances(Vector<File> errorsDBInstances, DefaultMutableTreeNode nodes, File ret) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, InstanceException, SQLException, InstanceClassAlreadyInDBException {
+    private void addInstancesToAutoBuildedInstances(Vector<File> errorsDBInstances, DefaultMutableTreeNode nodes, File ret) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NullPointerException, InstanceException, SQLException, InstanceClassAlreadyInDBException {
         InstanceClass instanceClass;
         for (int i = 0; i < errorsDBInstances.size(); i++) {
 

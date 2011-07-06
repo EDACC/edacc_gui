@@ -1454,10 +1454,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         try {
             if (addInstanceDialog == null) {
                 JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-                this.addInstanceDialog = new EDACCAddNewInstanceSelectClassDialog(mainFrame, true, instanceClassTreeModel);
+                this.addInstanceDialog = new EDACCAddNewInstanceSelectClassDialog(mainFrame, true, null);
                 this.addInstanceDialog.setLocationRelativeTo(mainFrame);
+            } else{
+                addInstanceDialog.refresh();
             }
-            addInstanceDialog.refresh();
+            
             EDACCApp.getApplication().show(this.addInstanceDialog);
             Boolean compress = this.addInstanceDialog.isCompress();
             InstanceClass input = this.addInstanceDialog.getInput();
@@ -1717,7 +1719,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         } else {
 
             try {
-                manageDBInstances.EditInstanceClass();
+                manageDBInstances.editInstanceClass();
                 this.manageDBInstances.loadInstanceClasses();
             } catch (SQLException ex) {
                 Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
