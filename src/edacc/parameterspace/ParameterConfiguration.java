@@ -25,7 +25,8 @@ public class ParameterConfiguration {
 	public void updateChecksum() {
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
-			for (Parameter p: parameter_instances.keySet()) {
+			List<Parameter> sortedKeys = new ArrayList(parameter_instances.keySet());
+			for (Parameter p: sortedKeys) {
 				if (parameter_instances.get(p) != null) {
 					md.update(parameter_instances.get(p).toString().getBytes());
 				}
@@ -52,6 +53,19 @@ public class ParameterConfiguration {
 		parameter_instances.put(p, v);
 	}
 	
+	public void setParameterValue(String parameter_name, Object v) {
+		Parameter param = null;
+		for (Parameter p: parameter_instances.keySet()) {
+			if (p.getName().equals(parameter_name)) param = p;
+		}
+		if (param == null) return;
+		
+		if (!param.getDomain().contains(v)) {
+			throw new IllegalArgumentException("Parameter domain does not contain the given value");
+		}
+		parameter_instances.put(param, v);
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -75,8 +89,18 @@ public class ParameterConfiguration {
 		if (parameter_instances == null) {
 			if (other.parameter_instances != null)
 				return false;
-		} else if (!parameter_instances.equals(other.parameter_instances)) // set comparison
+		} else if (!parameter_instances.keySet().equals(other.parameter_instances.keySet())) // set comparison
 			return false;
+		else {
+			for (Parameter p: parameter_instances.keySet()) {
+				if (parameter_instances.get(p) instanceof Double || parameter_instances.get(p) instanceof Float) {
+					double this_val = (Double)parameter_instances.get(p);
+					double other_val = (Double)other.getParameterValue(p);
+					if (!(other_val - 0.00000001 < this_val && this_val < other_val + 0.00000001)) return false;
+				}
+				else if (!parameter_instances.get(p).equals(other.getParameterValue(p))) return false;
+			}
+		}
 		return true;
 	}
 
@@ -100,7 +124,8 @@ public class ParameterConfiguration {
 	public ParameterConfiguration(ParameterConfiguration other) {
 		// TODO: ensure that other.getParameterValue(p) makes a copy in all cases
 		this.parameter_instances = new HashMap<Parameter, Object>();
-		this.checksum = other.checksum.clone();
+		if (other.checksum == null) this.checksum = null;
+		else this.checksum = other.checksum.clone();
 		for (Parameter p: other.parameter_instances.keySet()) {
 			parameter_instances.put(p, other.getParameterValue(p));
 		}

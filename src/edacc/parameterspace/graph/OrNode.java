@@ -10,9 +10,8 @@ public class OrNode extends Node implements Serializable {
 		
 	}
 	
-	public OrNode(Parameter parameter, Domain domain) {
+	public OrNode(Parameter parameter) {
 		this.parameter = parameter;
-		this.domain = domain;
 	}
 
 	@Override

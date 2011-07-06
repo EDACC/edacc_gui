@@ -11,7 +11,7 @@ import edacc.parameterspace.domain.Domain;
 public abstract class Node {
 	protected String id;
 	protected Parameter parameter;
-	protected Domain domain;
+	
 	
 	@XmlIDREF public Parameter getParameter() {
 		return parameter;
@@ -63,11 +63,5 @@ public abstract class Node {
 		this.id = id;
 	}
 
-	public Domain getDomain() {
-		return domain;
-	}
 
-	public void setDomain(Domain domain) {
-		this.domain = domain;
-	}
 }

@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlID;
 
 import edacc.parameterspace.domain.Domain;
 
-public class Parameter {
+public class Parameter implements Comparable<Parameter> {
 	private String name;
 	private Domain domain;
 	
@@ -63,6 +63,8 @@ public class Parameter {
         return "Parameter{" + "name=" + name + ", domain=" + domain + '}';
     }
 
-        
-        
+	@Override
+	public int compareTo(Parameter o) {
+		return this.name.compareTo(o.getName());
+	}
 }
