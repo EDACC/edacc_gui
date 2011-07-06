@@ -39,7 +39,7 @@ public class ConfigurationScenarioDAO {
             st.executeUpdate("DELETE FROM ConfigurationScenario_has_Parameters WHERE ConfigurationScenario_idConfigurationScenario = " + cs.getId());
             st.close();
             for (ConfigurationScenarioParameter param : cs.getParameters()) {
-                if (param.isNew() || param.isModified()) {
+                if (param.isNew() || param.isModified() || param.isSaved()) {
                     PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("INSERT INTO ConfigurationScenario_has_Parameters (ConfigurationScenario_idConfigurationScenario, Parameters_idParameter, configurable, fixedValue) VALUES (?, ?, ?, ?)");
                     ps.setInt(1, cs.getId());
                     param.setIdConfigurationScenario(cs.getId());
