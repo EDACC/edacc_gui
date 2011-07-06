@@ -21,7 +21,7 @@ public class ExperimentDAO {
      * so it can be referenced by related objects
      * @return new Experiment object
      */
-    public static Experiment createExperiment(String name, Date date, String description) throws SQLException {
+    public static Experiment createExperiment(String name, Date date, String description, boolean configurationExp) throws SQLException {
         if (getExperimentByName(name) != null) {
             throw new SQLException("There exists already an experiment with the same name.");
         }
@@ -30,7 +30,7 @@ public class ExperimentDAO {
         i.setDescription(description);
         i.setDate(date);
         i.setActive(true);
-        i.setConfigurationExp(false);
+        i.setConfigurationExp(configurationExp);
         i.setPriority(0);
         save(i);
         cache.cache(i);

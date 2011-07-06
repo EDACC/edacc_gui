@@ -3,11 +3,12 @@ package edacc.model;
 import java.util.ArrayList;
 
 public class ConfigurationScenario extends BaseModel implements IntegerPKModel {
+
     private int id;
     private int idExperiment;
     private int idSolverBinary;
     private ArrayList<ConfigurationScenarioParameter> parameters;
-    
+
     public ConfigurationScenario() {
         parameters = new ArrayList<ConfigurationScenarioParameter>();
     }
@@ -16,7 +17,7 @@ public class ConfigurationScenario extends BaseModel implements IntegerPKModel {
     public int getId() {
         return id;
     }
-    
+
     public void setId(int id) {
         this.id = id;
     }
@@ -33,7 +34,7 @@ public class ConfigurationScenario extends BaseModel implements IntegerPKModel {
         return parameters;
     }
 
-    public void setParameters(ArrayList<ConfigurationScenarioParameter> parameters) {
+    protected void setParameters(ArrayList<ConfigurationScenarioParameter> parameters) {
         this.parameters = parameters;
     }
 
@@ -42,6 +43,11 @@ public class ConfigurationScenario extends BaseModel implements IntegerPKModel {
     }
 
     public void setIdSolverBinary(int idSolverBinary) {
+        if (this.idSolverBinary != idSolverBinary) {
+            if (isSaved()) {
+                setModified();
+            }
+        }
         this.idSolverBinary = idSolverBinary;
     }
 }
