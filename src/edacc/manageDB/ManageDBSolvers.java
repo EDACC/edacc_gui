@@ -181,6 +181,10 @@ public class ManageDBSolvers implements Observer {
             SolverDAO.save(s);
             manageDBParameters.rehash(s, params);
         }
+        // save parameters
+        for (Solver s : solverTableModel.getSolvers()) {
+            manageDBParameters.saveParameters(s);
+        }
     }
 
     public void newSolver() {
