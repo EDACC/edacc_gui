@@ -10,6 +10,7 @@ import edacc.experiment.AnalysisController;
 import edacc.experiment.AnalysisPanel;
 import edacc.experiment.ClientTableModel;
 import edacc.experiment.ClientUpdateThread;
+import edacc.experiment.ConfigurationScenarioTableModel;
 import edacc.experiment.ExperimentController;
 import edacc.experiment.ExperimentResultsBrowserTableModel;
 import edacc.experiment.ExperimentTableModel;
@@ -27,6 +28,7 @@ import edacc.gridqueues.GridQueuesController;
 import edacc.model.Client;
 import edacc.model.ClientDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
+import edacc.model.ConfigurationScenario;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentResult;
@@ -35,9 +37,11 @@ import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.ObjectCache;
 import edacc.model.PropertyNotInDBException;
+import edacc.model.Solver;
 import edacc.model.SolverBinaries;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
+import edacc.model.SolverDAO;
 import edacc.model.TaskCancelledException;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
@@ -59,6 +63,8 @@ import java.util.Observer;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -87,38 +93,24 @@ import javax.swing.tree.TreeSelectionModel;
  */
 public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvents {
 
-    /**
-     * The experiment tab index.
-     */
+    /** The experiment tab index. */
     public static final int TAB_EXPERIMENTS = 0;
-    /**
-     * The client bowser tab index.
-     */
+    /** The client bowser tab index. */
     public static final int TAB_CLIENTBROWSER = 1;
-    /**
-     * The solvers tab index.
-     */
-    public static final int TAB_SOLVERS = 2;
-    /**
-     * The instances tab index.
-     */
-    public static final int TAB_INSTANCES = 3;
-    /**
-     * The generate jobs tab index.
-     */
-    public static final int TAB_GENERATEJOBS = 4;
-    /**
-     * The job browser tab index.
-     */
-    public static final int TAB_JOBBROWSER = 5;
-    /**
-     * The analysis tab index.
-     */
-    public static final int TAB_ANALYSIS = 6;
+    /** The configuration scenario tab index. */
+    public static final int TAB_CONFIGURATIONSCENARIO = 2;
+    /** The solvers tab index. */
+    public static final int TAB_SOLVERS = 3;
+    /** The instances tab index. */
+    public static final int TAB_INSTANCES = 4;
+    /** The generate jobs tab index. */
+    public static final int TAB_GENERATEJOBS = 5;
+    /** The job browser tab index. */
+    public static final int TAB_JOBBROWSER = 6;
+    /** The analysis tab index. */
+    public static final int TAB_ANALYSIS = 7;
     private ExperimentController expController;
-    /**
-     * The table model for the experiment table. Will be created on object constructions and never be recreated.
-     */
+    /** The table model for the experiment table. Will be created on object constructions and never be recreated. */
     public ExperimentTableModel expTableModel;
     /**
      * The table model for the instance table. Will be created on object construction and never be recreated.
@@ -174,6 +166,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public SolverConfigurationTableRowFilter solverConfigurationTableRowFilter;
     private TableColumnSelector jobsColumnSelector;
     private TableColumnSelector instanceColumnSelector;
+    public ConfigurationScenarioTableModel configScenarioTableModel;
 
     /** Creates new form EDACCExperimentMode */
     @SuppressWarnings("LeakingThisInConstructor")
@@ -226,6 +219,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tblClients.setDefaultRenderer(Boolean.class, new EDACCExperimentModeClientCellRenderer());
         clientUpdateThread = new ClientUpdateThread(clientTableModel);
         /* -------------------------------- end of client browser tab -------------------------------- */
+        /* -------------------------------- configuration scenario tab -------------------------------- */
+        configScenarioTableModel = new ConfigurationScenarioTableModel();
+        tblConfigurationScenario.setModel(configScenarioTableModel);
+        /* -------------------------------- end of configuration scenario tab -------------------------------- */
         /* -------------------------------- solver tab -------------------------------- */
         jScrollPane4.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
         solverConfigTablePanel = new EDACCExperimentModeSolverConfigurationTablePanel(solverConfigPanel);
@@ -341,13 +338,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         panelAnalysis.setViewportView(analysePanel);
         /* -------------------------------- end of analyze tab -------------------------------- */
 
-
+        manageExperimentPane.setEnabledAt(TAB_CONFIGURATIONSCENARIO, false);
         manageExperimentPane.setEnabledAt(TAB_SOLVERS, false);
         manageExperimentPane.setEnabledAt(TAB_INSTANCES, false);
         manageExperimentPane.setEnabledAt(TAB_GENERATEJOBS, false);
         manageExperimentPane.setEnabledAt(TAB_JOBBROWSER, false);
         manageExperimentPane.setEnabledAt(TAB_ANALYSIS, false);
         manageExperimentPane.setTitleAt(TAB_EXPERIMENTS, "Experiments");
+
         btnDiscardExperiment.setEnabled(false);
         btnImport.setEnabled(false);
 
@@ -590,6 +588,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         panelClientBrowser = new javax.swing.JPanel();
         jScrollPane7 = new javax.swing.JScrollPane();
         tblClients = new javax.swing.JTable();
+        panelConfigurationScenario = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        comboConfigScenarioSolverBinaries = new javax.swing.JComboBox();
+        comboConfigScenarioSolvers = new javax.swing.JComboBox();
+        jPanel10 = new javax.swing.JPanel();
+        jScrollPane9 = new javax.swing.JScrollPane();
+        tblConfigurationScenario = new javax.swing.JTable();
+        btnConfigScenarioSave = new javax.swing.JButton();
+        btnConfigScenarioUndo = new javax.swing.JButton();
         panelChooseSolver = new javax.swing.JPanel();
         splitPaneSolverSolverConfigs = new javax.swing.JSplitPane();
         jPanel2 = new javax.swing.JPanel();
@@ -914,6 +922,120 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         );
 
         manageExperimentPane.addTab(resourceMap.getString("panelClientBrowser.TabConstraints.tabTitle"), panelClientBrowser); // NOI18N
+
+        panelConfigurationScenario.setName("panelConfigurationScenario"); // NOI18N
+
+        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
+        jLabel1.setName("jLabel1"); // NOI18N
+
+        jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
+        jLabel2.setName("jLabel2"); // NOI18N
+
+        comboConfigScenarioSolverBinaries.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboConfigScenarioSolverBinaries.setName("comboConfigScenarioSolverBinaries"); // NOI18N
+        comboConfigScenarioSolverBinaries.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboConfigScenarioSolverBinariesActionPerformed(evt);
+            }
+        });
+
+        comboConfigScenarioSolvers.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboConfigScenarioSolvers.setName("comboConfigScenarioSolvers"); // NOI18N
+        comboConfigScenarioSolvers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboConfigScenarioSolversActionPerformed(evt);
+            }
+        });
+
+        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel10.border.title"))); // NOI18N
+        jPanel10.setName("jPanel10"); // NOI18N
+
+        jScrollPane9.setName("jScrollPane9"); // NOI18N
+
+        tblConfigurationScenario.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tblConfigurationScenario.setName("tblConfigurationScenario"); // NOI18N
+        jScrollPane9.setViewportView(tblConfigurationScenario);
+
+        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
+        jPanel10.setLayout(jPanel10Layout);
+        jPanel10Layout.setHorizontalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 1084, Short.MAX_VALUE)
+        );
+        jPanel10Layout.setVerticalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
+        );
+
+        btnConfigScenarioSave.setText(resourceMap.getString("btnConfigScenarioSave.text")); // NOI18N
+        btnConfigScenarioSave.setName("btnConfigScenarioSave"); // NOI18N
+        btnConfigScenarioSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConfigScenarioSaveActionPerformed(evt);
+            }
+        });
+
+        btnConfigScenarioUndo.setText(resourceMap.getString("btnConfigScenarioUndo.text")); // NOI18N
+        btnConfigScenarioUndo.setName("btnConfigScenarioUndo"); // NOI18N
+        btnConfigScenarioUndo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConfigScenarioUndoActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panelConfigurationScenarioLayout = new javax.swing.GroupLayout(panelConfigurationScenario);
+        panelConfigurationScenario.setLayout(panelConfigurationScenarioLayout);
+        panelConfigurationScenarioLayout.setHorizontalGroup(
+            panelConfigurationScenarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelConfigurationScenarioLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelConfigurationScenarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(panelConfigurationScenarioLayout.createSequentialGroup()
+                        .addGroup(panelConfigurationScenarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(panelConfigurationScenarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(comboConfigScenarioSolvers, 0, 1019, Short.MAX_VALUE)
+                            .addComponent(comboConfigScenarioSolverBinaries, 0, 1019, Short.MAX_VALUE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelConfigurationScenarioLayout.createSequentialGroup()
+                        .addComponent(btnConfigScenarioUndo)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnConfigScenarioSave)))
+                .addContainerGap())
+        );
+        panelConfigurationScenarioLayout.setVerticalGroup(
+            panelConfigurationScenarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelConfigurationScenarioLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelConfigurationScenarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(comboConfigScenarioSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelConfigurationScenarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(comboConfigScenarioSolverBinaries, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelConfigurationScenarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnConfigScenarioSave)
+                    .addComponent(btnConfigScenarioUndo))
+                .addContainerGap())
+        );
+
+        manageExperimentPane.addTab(resourceMap.getString("panelConfigurationScenario.TabConstraints.tabTitle"), panelConfigurationScenario); // NOI18N
 
         panelChooseSolver.setName("panelChooseSolver"); // NOI18N
 
@@ -2145,7 +2267,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     private void btnChooseSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseSolverConfigsActionPerformed
         try {
-            for (int row = 0; row < tblSolverConfigs.getRowCount(); row ++) {
+            for (int row = 0; row < tblSolverConfigs.getRowCount(); row++) {
                 if (solverConfigTableModel.isSelected(tblSolverConfigs.convertRowIndexToModel(row))) {
                     solverConfigPanel.addSolverConfiguration(solverConfigTableModel.getSolverConfigurationAt(tblSolverConfigs.convertRowIndexToModel(row)), false);
                 }
@@ -2289,7 +2411,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     public void run(Tasks task) {
                         Experiment newExp;
                         try {
-                            newExp = expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc);
+                            newExp = expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc, dialogNewExp.isConfigurationExp);
                             if (experimentUpdateThread != null) {
                                 experimentUpdateThread.cancel(true);
                             }
@@ -2624,7 +2746,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
 
         Experiment exp = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
-        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription());
+        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription(), exp.isConfigurationExp());
         dialogEditExp.setLocationRelativeTo(mainFrame);
         try {
             while (true) {
@@ -2703,6 +2825,44 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
     }//GEN-LAST:event_btnSetPriorityActionPerformed
 
+    private void comboConfigScenarioSolversActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboConfigScenarioSolversActionPerformed
+        comboConfigScenarioSolverBinaries.removeAllItems();
+        if (!(comboConfigScenarioSolvers.getSelectedItem() instanceof Solver)) {
+            return;
+        }
+        for (SolverBinaries solverBinary : ((Solver) comboConfigScenarioSolvers.getSelectedItem()).getSolverBinaries()) {
+            comboConfigScenarioSolverBinaries.addItem(solverBinary);
+        }
+    }//GEN-LAST:event_comboConfigScenarioSolversActionPerformed
+
+    private void comboConfigScenarioSolverBinariesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboConfigScenarioSolverBinariesActionPerformed
+        if (comboConfigScenarioSolverBinaries.getSelectedItem() instanceof SolverBinaries) {
+            try {
+                expController.updateConfigScenarioTable((SolverBinaries) comboConfigScenarioSolverBinaries.getSelectedItem());
+                Util.updateTableColumnWidth(tblConfigurationScenario);
+            } catch (SQLException ex) {
+                createDatabaseErrorMessage(ex);
+            }
+        }
+    }//GEN-LAST:event_comboConfigScenarioSolverBinariesActionPerformed
+
+    private void btnConfigScenarioSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfigScenarioSaveActionPerformed
+        try {
+            expController.saveConfigurationScenario();
+        } catch (SQLException ex) {
+            this.createDatabaseErrorMessage(ex);
+        }
+    }//GEN-LAST:event_btnConfigScenarioSaveActionPerformed
+
+    private void btnConfigScenarioUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfigScenarioUndoActionPerformed
+        try {
+            expController.reloadConfigurationScenario();
+            this.loadConfigurationScenarioTab();
+        } catch (SQLException ex) {
+            createDatabaseErrorMessage(ex);
+        }
+    }//GEN-LAST:event_btnConfigScenarioUndoActionPerformed
+
     /**
      * Stops the jobs timer.
      */
@@ -2720,6 +2880,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public void afterExperimentLoaded() {
         reinitializeInstances();
         reinitializeJobBrowser();
+        loadConfigurationScenarioTab();
+
         manageExperimentPane.setEnabledAt(TAB_SOLVERS, true);
         manageExperimentPane.setEnabledAt(TAB_INSTANCES, true);
         manageExperimentPane.setEnabledAt(TAB_GENERATEJOBS, true);
@@ -2736,6 +2898,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
      */
     public void afterExperimentUnloaded() {
         manageExperimentPane.setSelectedIndex(0);
+        manageExperimentPane.setEnabledAt(TAB_CONFIGURATIONSCENARIO, false);
         manageExperimentPane.setEnabledAt(TAB_SOLVERS, false);
         manageExperimentPane.setEnabledAt(TAB_INSTANCES, false);
         manageExperimentPane.setEnabledAt(TAB_GENERATEJOBS, false);
@@ -2828,6 +2991,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JButton btnChooseSolverConfigs;
     private javax.swing.JButton btnChooseSolvers;
     private javax.swing.JButton btnComputeResultProperties;
+    private javax.swing.JButton btnConfigScenarioSave;
+    private javax.swing.JButton btnConfigScenarioUndo;
     private javax.swing.JButton btnCreateExperiment;
     private javax.swing.JButton btnDeselectAllInstances;
     private javax.swing.JButton btnDeselectAllSolverConfigs;
@@ -2861,8 +3026,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JButton btnUndoInstances;
     private javax.swing.JButton btnUndoSolverConfigurations;
     private javax.swing.JCheckBox chkJobsTimer;
+    private javax.swing.JComboBox comboConfigScenarioSolverBinaries;
+    private javax.swing.JComboBox comboConfigScenarioSolvers;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -2879,6 +3049,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JSplitPane jSplitPane2;
@@ -2895,6 +3066,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JPanel panelChooseInstances;
     private javax.swing.JPanel panelChooseSolver;
     private javax.swing.JPanel panelClientBrowser;
+    private javax.swing.JPanel panelConfigurationScenario;
     private javax.swing.JPanel panelExperimentParams;
     private javax.swing.JPanel panelJobBrowser;
     private javax.swing.JPanel panelManageExperiment;
@@ -2907,6 +3079,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public javax.swing.JTable tableJobs;
     private javax.swing.JTable tableSolvers;
     private javax.swing.JTable tblClients;
+    private javax.swing.JTable tblConfigurationScenario;
     public javax.swing.JTable tblGenerateJobs;
     private javax.swing.JTable tblSolverConfigs;
     private javax.swing.JTextField txtJobsTimer;
@@ -3026,7 +3199,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             @Override
             public void run() {
                 jobsColumnSelector.setColumnVisiblity(jobsTableModel.getDefaultVisibility());
-            }  
+            }
         };
         if (SwingUtilities.isEventDispatchThread()) {
             runnable.run();
@@ -3068,6 +3241,34 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             runnable.run();
         } else {
             SwingUtilities.invokeLater(runnable);
+        }
+    }
+
+    public void loadConfigurationScenarioTab() {
+        if (expController.getActiveExperiment().isConfigurationExp()) {
+            comboConfigScenarioSolvers.removeAllItems();
+            comboConfigScenarioSolverBinaries.removeAllItems();
+            Solver solver = null;
+            SolverBinaries solverBinary = null;
+            ConfigurationScenario cs = expController.getConfigScenario();
+            try {
+                for (Solver s : SolverDAO.getAll()) {
+                    comboConfigScenarioSolvers.addItem(s);
+                    for (SolverBinaries sb : s.getSolverBinaries()) {
+                        if (cs != null && cs.getIdSolverBinary() == sb.getIdSolverBinary()) {
+                            solver = s;
+                            solverBinary = sb;
+                        }
+                    }
+                }
+            } catch (SQLException ex) {
+                this.createDatabaseErrorMessage(ex);
+            }
+            if (solver != null && solverBinary != null) {
+                comboConfigScenarioSolvers.setSelectedItem(solver);
+                comboConfigScenarioSolverBinaries.setSelectedItem(solverBinary);
+            }
+            manageExperimentPane.setEnabledAt(TAB_CONFIGURATIONSCENARIO, true);
         }
     }
 }
