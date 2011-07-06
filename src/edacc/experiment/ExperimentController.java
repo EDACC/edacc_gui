@@ -701,7 +701,7 @@ public class ExperimentController {
                     if (task.isCancelled()) {
                         throw new TaskCancelledException();
                     }
-                    task.setStatus("Adding job " + done + " of " + elements);
+                  //  task.setStatus("Adding job " + done + " of " + elements);
                     // check if job already exists
                     if (!experimentResultCache.contains(c.getId(), i.getId(), run)) {
                         if (solverConfigHasSeed.get(c.getId())) {

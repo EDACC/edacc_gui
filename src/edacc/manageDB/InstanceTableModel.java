@@ -33,11 +33,11 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
     private ArrayList<Property> properties;
     private String[] CONST_COLUMNS = {"Name", "MD5"};
     private boolean[] CONST_VISIBLE = {true, true};
-    private static String[] columns;
+    private String[] columns;
     protected Vector<Instance> instances;
     protected HashMap<Instance, LinkedList<Integer>> instanceClassIds;
 
-    public static String[] getAllColumnNames() {
+    public String[] getAllColumnNames() {
         return columns;
     }
 

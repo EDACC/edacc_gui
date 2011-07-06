@@ -2,10 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package edacc.properties;
 
 import edacc.EDACCComputeResultProperties;
+import edacc.manageDB.ProblemOccuredDuringPropertyComputation;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.Experiment;
 import edacc.model.NoConnectionToDBException;
@@ -28,11 +28,12 @@ import javax.swing.JTable;
  * @author rretz
  */
 public class ComputePropertiesController {
+
     EDACCComputeResultProperties main;
     JTable tableResultProperty;
-    Lock lock =  new ReentrantLock();
+    Lock lock = new ReentrantLock();
 
-    public ComputePropertiesController(EDACCComputeResultProperties main, JTable tableResultProperty){
+    public ComputePropertiesController(EDACCComputeResultProperties main, JTable tableResultProperty) {
         this.main = main;
         this.tableResultProperty = tableResultProperty;
     }
@@ -57,17 +58,21 @@ public class ComputePropertiesController {
         }
     }
 
-    public void computProperties(Vector<Property> toCalculate, boolean recompute, Experiment exp, Tasks task) {
+    public void computProperties(Vector<Property> toCalculate, boolean recompute, Experiment exp, Tasks task) throws ProblemOccuredDuringPropertyComputation {
         try {
             lock.lock();
             Condition condition = lock.newCondition();
-            Thread compute = new Thread(new PropertyComputationController(exp, toCalculate, recompute, task, lock));
+            PropertyComputationController comCon = new PropertyComputationController(exp, toCalculate, recompute, task, lock);
+            Thread compute = new Thread(comCon);
             compute.start();
             try {
                 condition.await();
-            } catch ( InterruptedException e ) {
+            } catch (InterruptedException e) {
             } finally {
                 lock.unlock();
+            }
+            if (!comCon.getExceptionCollector().isEmpty()) {
+                throw new ProblemOccuredDuringPropertyComputation(comCon.getExceptionCollector());
             }
         } catch (PropertyTypeNotExistException ex) {
             Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);

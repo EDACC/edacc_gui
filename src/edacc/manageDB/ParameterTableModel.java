@@ -22,9 +22,10 @@ public class ParameterTableModel extends AbstractTableModel{
     private final int HASVALUE = 3;
     private final int MANDATORY = 4;
     private final int SPACE = 5;
+    private final int ATTACHTOPREVIOUS = 6;
     private Solver currentSolver;
 
-    private String[] colums = {"Order", "Name", "Prefix", "Boolean", "Mandatory", "Space"};
+    private String[] colums = {"Order", "Name", "Prefix", "Boolean", "Mandatory", "Space", "Attach to previous"};
     private HashMap<Solver, Vector<Parameter>> parameters;
 
     public ParameterTableModel(){
@@ -92,6 +93,8 @@ public class ParameterTableModel extends AbstractTableModel{
                 return !p.isMandatory()?"":"\u2713";
             case SPACE:
                 return !p.getSpace()?"":"\u2713";
+            case ATTACHTOPREVIOUS:
+                return !p.isAttachToPrevious()?"":"\u2713";
         }
         return null;
     }

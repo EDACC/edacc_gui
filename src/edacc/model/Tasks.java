@@ -113,6 +113,13 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
     public static void startTask(TaskRunnable runnable, boolean withTaskView) {
         startTask(runnable, true, EDACCApp.getApplication().getMainFrame());
     }
+    /**
+     * This constructor is only for Unit-Tests. It creates a instance without any funktion.
+     * @author gregor
+     */
+    public Tasks() {
+        this(null);
+    }
 
     public static void startTask(TaskRunnable runnable, boolean withTaskView, JFrame parent) {
         if (withTaskView && taskView != null) {

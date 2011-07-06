@@ -27,7 +27,7 @@ public class ParameterDAO {
             return; 
         if (parameter.isSaved()) return;
         if (parameter.isNew()) {
-            final String insertQuery = "INSERT INTO Parameters (name, prefix, defaultValue, hasValue, Parameters.order, Solver_idSolver, mandatory, space) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            final String insertQuery = "INSERT INTO Parameters (name, prefix, defaultValue, hasValue, Parameters.order, Solver_idSolver, mandatory, space, attachToPrevious) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setString(1, parameter.getName());
             if (parameter.getPrefix() == null || parameter.getPrefix().equals(""))
@@ -41,6 +41,7 @@ public class ParameterDAO {
             ps.setInt(6, solver.getId());
             ps.setBoolean(7, parameter.isMandatory());
             ps.setBoolean(8, parameter.getSpace());
+            ps.setBoolean(9, parameter.isAttachToPrevious());
             ps.executeUpdate();
             // set id
             ResultSet rs = ps.getGeneratedKeys();
@@ -49,7 +50,7 @@ public class ParameterDAO {
             parameter.setSaved();
         }
         else if (parameter.isModified()) {
-            final String updateQuery = "UPDATE Parameters SET name=?, prefix=?, defaultValue=?, hasValue=?, Parameters.order=?, Solver_idSolver=?, mandatory=?, space=? WHERE idParameter=?";
+            final String updateQuery = "UPDATE Parameters SET name=?, prefix=?, defaultValue=?, hasValue=?, Parameters.order=?, Solver_idSolver=?, mandatory=?, space=?, attachToPrevious=? WHERE idParameter=?";
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
             ps.setString(1, parameter.getName());
             if (parameter.getPrefix() == null || parameter.getPrefix().equals(""))
@@ -62,7 +63,8 @@ public class ParameterDAO {
             ps.setInt(6, solver.getId());
             ps.setBoolean(7, parameter.isMandatory());
             ps.setBoolean(8, parameter.getSpace());
-            ps.setInt(9, parameter.getId());
+            ps.setBoolean(9, parameter.isAttachToPrevious());
+            ps.setInt(10, parameter.getId());
             ps.executeUpdate();
             parameter.setSaved();
         }
@@ -84,6 +86,7 @@ public class ParameterDAO {
         i.setHasValue(rs.getBoolean("hasValue"));
         i.setMandatory(rs.getBoolean("mandatory"));
         i.setSpace(rs.getBoolean("space"));
+        i.setAttachToPrevious(rs.getBoolean("attachToPrevious"));
         i.setIdSolver(rs.getInt("Solver_idSolver"));
         return i;
     }

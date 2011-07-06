@@ -12,14 +12,18 @@ package edacc;
 
 import edacc.events.TaskEvents;
 import edacc.manageDB.ManageDBInstances;
+import edacc.manageDB.ProblemOccuredDuringPropertyComputation;
 import edacc.model.Instance;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
 import edacc.model.Tasks;
+import java.lang.String;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.AbstractListModel;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -162,7 +166,22 @@ public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog impl
 
     @Override
     public void onTaskFailed(String methodName, Throwable e) {
-        e.printStackTrace();
+        if (methodName.equals("computeProperties")) {
+            if (e instanceof ProblemOccuredDuringPropertyComputation) {
+                Vector<Exception> data = ((ProblemOccuredDuringPropertyComputation)e).getExceptionsCollector();
+                String[][] tableData = new String[data.size()][1];
+                for (int i = 0; i < data.size(); i++) {
+                    tableData[i][0] = data.get(i).toString();
+                }
+                String[] columnName = {"Exception"};
+                DefaultTableModel tableModel = new DefaultTableModel(tableData, columnName);
+                EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS,
+                        EDACCApp.getApplication().getMainFrame(),
+                        "An error occured while computing the Properties. \n Please check the regular expression or computation methode of the Property",
+                        new JTable(tableModel));
+            }
+
+        }
     }
 
     private class PropertyListModel extends AbstractListModel {

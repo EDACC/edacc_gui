@@ -8,8 +8,6 @@ import edacc.EDACCAddInstanceToInstanceClass;
 import edacc.EDACCApp;
 import edacc.EDACCCreateEditInstanceClassDialog;
 import edacc.EDACCExtendedWarning;
-import edacc.EDACCManageDBInstanceFilter;
-import edacc.manageDB.InstanceParser.*;
 import edacc.EDACCManageDBMode;
 import edacc.experiment.ExperimentTableModel;
 import edacc.model.ComputationMethodDoesNotExistException;
@@ -22,7 +20,6 @@ import edacc.model.Instance;
 import edacc.model.InstanceAlreadyInDBException;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassDAO;
-import edacc.model.InstanceClassMustBeSourceException;
 
 import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasInstanceClass;
@@ -57,7 +54,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.RowFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
@@ -109,7 +105,7 @@ public class ManageDBInstances implements Observer {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
-        }  catch (PropertyNotInDBException ex) {
+        } catch (PropertyNotInDBException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (PropertyTypeNotExistException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
@@ -209,6 +205,7 @@ public class ManageDBInstances implements Observer {
                 InstanceDAO.delete(ins);
                 rem.add(ins);
                 tmp.add(ins);
+                main.instanceTableModel.remove(ins);
                 task.setStatus(i + " of " + toRemove.size() + " instances removed");
                 task.setTaskProgress((float) i / (float) toRemove.size());
             } catch (InstanceIsInExperimentException ex) {
@@ -217,11 +214,21 @@ public class ManageDBInstances implements Observer {
         }
         main.instanceTableModel.removeInstances(rem);
         if (!notRem.isEmpty()) {
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "Some of the selected instances couldn't be removed, because they are containing to a experiment.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            ExperimentTableModel expTableModel = new ExperimentTableModel(true);
+            ArrayList<Experiment> inExp = ExperimentHasInstanceDAO.getAllExperimentsByInstances(notRem);
+            expTableModel.setExperiments(inExp);
+            if (EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
+                    EDACCApp.getApplication().getMainFrame(),
+                    "If you remove the instance classes, instances used in den following experiments will be deleted too. \n"
+                    + "Do you really want to remove the selected instance classes?",
+                    new JTable(expTableModel))
+                    == EDACCExtendedWarning.RET_OK_OPTION) {
+                InstanceDAO.deleteAll(notRem);
+                main.instanceTableModel.removeInstances(notRem);
+            }
+
         }
+        main.instanceTableModel.fireTableDataChanged();
         Tasks.getTaskView().setCancelable(false);
     }
 
@@ -508,23 +515,19 @@ public class ManageDBInstances implements Observer {
             }
             try {
                 String md5 = calculateMD5(instanceFiles.get(i));
-                try {
-                    //Get all InstanceClasses of the Instance and assigne it to the corresponding InstanceClass
-                    InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
-                    String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, instanceFiles.get(i).getParent().length());
-                    String[] possibleInstanceClasses = rawPath.split("\\\\|/");
-                    if (possibleInstanceClasses.length != 1) {
-                        instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes, 0);
-                    } else {
-                        instanceClass = (InstanceClass) ((DefaultMutableTreeNode) nodes.getRoot()).getUserObject();
-                    }
-                    Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, md5);
-                    instances.add(temp);
-                    InstanceDAO.save(temp, compressBinary, instanceClass);
-                    this.tmp.add(temp);
-                } catch (InstanceException e) {
-                    errorsAdd.add(instanceFiles.get(i).getAbsolutePath());
+
+                //Get all InstanceClasses of the Instance and assigne it to the corresponding InstanceClass
+                String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, instanceFiles.get(i).getParent().length());
+                String[] possibleInstanceClasses = rawPath.split("\\\\|/");
+                if (possibleInstanceClasses.length != 1) {
+                    instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes, 0);
+                } else {
+                    instanceClass = (InstanceClass) ((DefaultMutableTreeNode) nodes.getRoot()).getUserObject();
                 }
+                Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), instanceFiles.get(i).getName(), md5);
+                instances.add(temp);
+                InstanceDAO.save(temp, compressBinary, instanceClass);
+                this.tmp.add(temp);
 
             } catch (InstanceAlreadyInDBException ex) {
                 errorsDB.add(instanceFiles.get(i).getAbsolutePath());
@@ -598,25 +601,21 @@ public class ManageDBInstances implements Observer {
             if (task.isCancelled()) {
                 throw new TaskCancelledException();
             }
+
+            String md5 = calculateMD5(instanceFiles.get(i));
             try {
-                String md5 = calculateMD5(instanceFiles.get(i));
-                try {
-                    //Get all InstanceClasses of the Instance and assigne it to the corresponding InstanceClass
-                    InstanceParser tempInstance = new InstanceParser(instanceFiles.get(i).getAbsolutePath());
-                    String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, instanceFiles.get(i).getParent().length());
-                    String[] possibleInstanceClasses = rawPath.split("\\\\|/");
-                    if (possibleInstanceClasses.length != 1) {
-                        instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes, 0);
-                    } else {
-                        instanceClass = (InstanceClass) ((DefaultMutableTreeNode) nodes.getRoot()).getUserObject();
-                    }
-                    Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), tempInstance.name, md5);
-                    instances.add(temp);
-                    InstanceDAO.save(temp, compressBinary, instanceClass);
-                    this.tmp.add(temp);
-                } catch (InstanceException e) {
-                    errorsAdd.add(instanceFiles.get(i).getAbsolutePath());
+                //Get all InstanceClasses of the Instance and assigne it to the corresponding InstanceClass    
+                String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, instanceFiles.get(i).getParent().length());
+                String[] possibleInstanceClasses = rawPath.split("\\\\|/");
+                if (possibleInstanceClasses.length != 1) {
+                    instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes, 0);
+                } else {
+                    instanceClass = (InstanceClass) ((DefaultMutableTreeNode) nodes.getRoot()).getUserObject();
                 }
+                Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), instanceFiles.get(i).getName(), md5);
+                instances.add(temp);
+                InstanceDAO.save(temp, compressBinary, instanceClass);
+                this.tmp.add(temp);
 
             } catch (InstanceAlreadyInDBException ex) {
                 errorsDB.add(instanceFiles.get(i).getAbsolutePath());
@@ -945,7 +944,7 @@ public class ManageDBInstances implements Observer {
         }
     }
 
-    public void computeProperties(Vector<Instance> instances, Vector<Property> properties, Tasks task) {
+    public void computeProperties(Vector<Instance> instances, Vector<Property> properties, Tasks task) throws ProblemOccuredDuringPropertyComputation {
         System.out.println(instances.size() + " instances, " + properties.size() + " properties.");
 
         lock.lock();
@@ -959,36 +958,40 @@ public class ManageDBInstances implements Observer {
         } finally {
             lock.unlock();
         }
+        if(!comCon.getExceptionCollector().isEmpty()){
+            throw new ProblemOccuredDuringPropertyComputation(comCon.getExceptionCollector());
+        }
         task.cancel(true);
+        
     }
 
     public void changeInstanceTable() {
-            main.updateInstanceTable();
-    /*    ((InstanceTableModel) tableInstances.getModel()).clearTable();
+        main.updateInstanceTable();
+        /*    ((InstanceTableModel) tableInstances.getModel()).clearTable();
         TreePath[] selected = main.getInstanceClassTree().getSelectionPaths();
         Vector<InstanceClass> choosen = new Vector<InstanceClass>();
         if (selected == null) {
-            return;
+        return;
         }
         for (int i = 0; i < selected.length; i++) {
-            choosen.addAll(getAllToEnd((DefaultMutableTreeNode) (selected[i].getLastPathComponent())));
-            /*  DefaultMutableTreeNode[] nodes = getPath()
-            
-            Enumeration<DefaultMutableTreeNode> tmp = nodes.children();
-            while(tmp.hasMoreElements()){
-            choosen.add((InstanceClass) tmp.nextElement().getUserObject());
-            }
-            choosen.add((InstanceClass) nodes.getUserObject());
+        choosen.addAll(getAllToEnd((DefaultMutableTreeNode) (selected[i].getLastPathComponent())));
+        /*  DefaultMutableTreeNode[] nodes = getPath()
+        
+        Enumeration<DefaultMutableTreeNode> tmp = nodes.children();
+        while(tmp.hasMoreElements()){
+        choosen.add((InstanceClass) tmp.nextElement().getUserObject());
+        }
+        choosen.add((InstanceClass) nodes.getUserObject());
         }
         if (!choosen.isEmpty()) {
-            try {
-                LinkedList<Instance> test = InstanceDAO.getAllByInstanceClasses(choosen);
-                ((InstanceTableModel) tableInstances.getModel()).addInstances(new Vector<Instance>(test));
-            } catch (NoConnectionToDBException ex) {
-                Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        try {
+        LinkedList<Instance> test = InstanceDAO.getAllByInstanceClasses(choosen);
+        ((InstanceTableModel) tableInstances.getModel()).addInstances(new Vector<Instance>(test));
+        } catch (NoConnectionToDBException ex) {
+        Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+        Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        }
         }
         main.updateInstanceTable();
         ((InstanceTableModel) tableInstances.getModel()).fireTableDataChanged();*/
@@ -1055,7 +1058,7 @@ public class ManageDBInstances implements Observer {
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }
-                loadInstanceClasses();
+                UpdateInstanceClasses();
 
             } catch (NoConnectionToDBException ex) {
                 JOptionPane.showMessageDialog(panelManageDBInstances,
@@ -1202,7 +1205,6 @@ public class ManageDBInstances implements Observer {
 
             String md5 = calculateMD5(errorsDBInstances.get(i));
             //Get all InstanceClasses of the Instance and assigne it to the corresponding InstanceClass
-            InstanceParser tempInstance = new InstanceParser(errorsDBInstances.get(i).getAbsolutePath());
             String rawPath = errorsDBInstances.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, errorsDBInstances.get(i).getParent().length());
             String[] possibleInstanceClasses = rawPath.split("\\\\|/");
             if (possibleInstanceClasses.length != 1) {

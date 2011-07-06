@@ -10,6 +10,7 @@
  */
 package edacc;
 
+import edacc.model.PropertyAlreadyInDBException;
 import edacc.properties.ManagePropertyDialogSourceListener;
 import edacc.properties.ManagePropertyDialogTypeListener;
 import edacc.model.ComputationMethod;
@@ -30,7 +31,6 @@ import edacc.satinstances.PropertyValueType;
 import edacc.satinstances.PropertyValueTypeManager;
 import java.awt.Component;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Vector;
@@ -622,6 +622,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             try {
                 if (radioBtnRegExpression.isSelected()) {
                     controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), textAreaRegularExpressions.getText(), null, "", (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String) comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
+
                 } else if (radioBtnComputationMethod.isSelected()) {
                     controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), "", (ComputationMethod) ComputationMethodDAO.getByName((String) comboBoxComputationMethod.getSelectedItem()), textFieldComputationmethodParameter.getText(), (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String) comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
                 }
@@ -641,6 +642,11 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ComputationMethodDoesNotExistException ex) {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (PropertyAlreadyInDBException ex) {
+                JOptionPane.showMessageDialog(this,
+                        "The name of the property is already used. \n Please change the name to create the new property.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_buttonSavePropertyActionPerformed
@@ -948,22 +954,29 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         this.textPropertyFieldName.setEnabled(true);
         this.textAreaPropertyDescription.setEnabled(true);
         this.buttonSaveProperty.setEnabled(true);
-        this.comboBoxComputationMethod.setEnabled(false);
-        this.checkBoxMultipleOccurrences.setEnabled(false);
+        this.comboBoxComputationMethod.setEnabled(true);
+        this.checkBoxMultipleOccurrences.setEnabled(true);
         this.comboBoxPropertySource.setEnabled(false);
         this.comboBoxPropertyType.setEnabled(false);
         this.comboBoxPropertyValuetype.setEnabled(false);
-        this.textAreaRegularExpressions.setEnabled(false);
-        this.textFieldComputationmethodParameter.setEnabled(false);
-        this.buttonNewComputationMethod.setEnabled(false);
+        this.textAreaRegularExpressions.setEnabled(true);
+        this.textFieldComputationmethodParameter.setEnabled(true);
+        this.buttonNewComputationMethod.setEnabled(true);
         this.buttonPropertyAddValueType.setEnabled(false);
-        this.radioBtnComputationMethod.setEnabled(false);
-        this.radioBtnRegExpression.setEnabled(false);
+        this.radioBtnComputationMethod.setEnabled(true);
+        this.radioBtnRegExpression.setEnabled(true);
     }
 
     public void disablePropertyEditFields() {
         this.textPropertyFieldName.setEnabled(false);
         this.textAreaPropertyDescription.setEnabled(false);
+        this.comboBoxComputationMethod.setEnabled(false);
+        this.checkBoxMultipleOccurrences.setEnabled(false);               
+        this.textAreaRegularExpressions.setEnabled(false);
+        this.textFieldComputationmethodParameter.setEnabled(false);
+        this.buttonNewComputationMethod.setEnabled(false);
+        this.radioBtnComputationMethod.setEnabled(false);
+        this.radioBtnRegExpression.setEnabled(false);
     }
 
     void loadComputationMethods() {
