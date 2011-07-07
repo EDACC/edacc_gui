@@ -6,7 +6,6 @@
 package edacc.parametergrapheditor;
 
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
-import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
@@ -18,10 +17,9 @@ import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxMultiplicity;
 import edacc.EDACCApp;
-import edacc.model.DatabaseConnector;
+import edacc.model.ParameterDAO;
 import edacc.model.ParameterGraphDAO;
 import edacc.model.Solver;
-import edacc.model.SolverDAO;
 import edacc.parameterspace.Parameter;
 import edacc.parameterspace.domain.*;
 import edacc.parameterspace.graph.AndNode;
@@ -45,7 +43,6 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.SwingConstants;
 import javax.xml.bind.JAXBException;
 
 /**
@@ -58,12 +55,20 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
     mxGraphComponent graphComponent;
     Solver solver;
     mxCell rootNode;
+    Set<Parameter> parameters;
+    ArrayList<String> solverParameters;
 
     /** Creates new form EDACCParameterGraphEditor */
     public ParameterGraphEditor(java.awt.Frame parent, boolean modal, Solver solver) throws SQLException, JAXBException {
         super(parent, modal);
         initComponents();
         this.solver = solver;
+        solverParameters = new ArrayList<String>();
+        for (edacc.model.Parameter param : ParameterDAO.getParameterFromSolverId(solver.getId())) {
+            if (!"instance".equals(param.getName()) && !"seed".equals(param.getName())) {
+                solverParameters.add(param.getName());
+            }
+        }
 
         graph = new mxGraph() {
 
@@ -222,35 +227,24 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                                                 Point graphLocation = graphComponent.getLocationOnScreen();
 
                                                 try {
-                                                    ICreateNodeDialog dialog = null;
+                                                    JDialog dialog = null;
                                                     Parameter parameter = null;
-                                                    if (child.getSource().getValue() instanceof AndNode) {
-                                                        dialog = new CreateOrNodeDialog(new javax.swing.JFrame(), true, ParameterGraphEditor.this.solver);
-                                                    } else {
-                                                        OrNode node = (OrNode) child.getSource().getValue();
-                                                        parameter = node.getParameter();
-                                                        dialog = new CreateAndNodeDialog(new javax.swing.JFrame(), true, node.getParameter(), node.getParameter().getDomain());
-                                                    }
                                                     Domain domain = null;
-                                                    ((JDialog) dialog).setLocationRelativeTo(ParameterGraphEditor.this);
-                                                    ((JDialog) dialog).setSize(new Dimension(800, 600));
-                                                    ((JDialog) dialog).setVisible(true);
-                                                    while (!dialog.isCancelled() && domain == null) {
-                                                        try {
-                                                            domain = dialog.getDomain();
-                                                            break;
-                                                        } catch (InvalidDomainException ex) {
-                                                            JOptionPane.showMessageDialog(ParameterGraphEditor.this, ex.getMessage(), "Invalid Domain", JOptionPane.ERROR_MESSAGE);
-                                                            ((JDialog) dialog).setVisible(true);
-                                                        }
+                                                    boolean cancelled = false;
+                                                    if (child.getSource().getValue() instanceof AndNode) {
+                                                        parameter = createOrNode();
+                                                        cancelled = parameter == null;
+                                                    } else {
+                                                        domain = createAndNode((OrNode) child.getSource().getValue());
+                                                        cancelled = domain == null;
                                                     }
                                                     graph.getModel().beginUpdate();
-                                                    if (domain != null) {
+                                                    if (!cancelled) {
                                                         Object node = null;
-                                                        if (parameter == null) {
-                                                            node = new OrNode(new Parameter(dialog.getParameterName(), domain));
+                                                        if (parameter != null) {
+                                                            node = new OrNode(parameter);
                                                         } else {
-                                                            node = new AndNode(parameter, domain);
+                                                            node = new AndNode(((OrNode)child.getSource().getValue()).getParameter(), domain);
                                                         }
                                                         mxCell vertex = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, node, mouse.x - graphLocation.x, mouse.y - graphLocation.y, 80, 30, null);
                                                         graph.updateCellSize(vertex);
@@ -328,12 +322,14 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         graph.setCellsDeletable(true);
         graph.setCellsCloneable(false);
         graph.setAllowNegativeCoordinates(false);
-        
+
         ParameterGraph parameterGraph = ParameterGraphDAO.loadParameterGraph(solver);
         if (parameterGraph == null) {
             // create root node:
             graph.updateCellSize(rootNode = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, new AndNode(null, null), 20, 20, 80, 30));
+            parameters = new HashSet<Parameter>();
         } else {
+            parameters = parameterGraph.parameters;
             graph.getModel().beginUpdate();
             HashMap<String, mxCell> mapNodeIdToCell = new HashMap<String, mxCell>();
             for (Node node : parameterGraph.nodes) {
@@ -344,16 +340,46 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                 graph.updateCellSize(cell);
                 mapNodeIdToCell.put(node.getId(), cell);
             }
-            
+
             for (Edge edge : parameterGraph.edges) {
                 graph.insertEdge(graph.getDefaultParent(), null, edge, mapNodeIdToCell.get(edge.getSource().getId()), mapNodeIdToCell.get(edge.getTarget().getId()));
             }
-            
+
             graph.getModel().endUpdate();
-            
+
             btnLayoutActionPerformed(null);
         }
-        
+
+    }
+
+    private Parameter createOrNode() {
+        CreateOrNodeDialog dialog = new CreateOrNodeDialog(new javax.swing.JFrame(), true, parameters);
+        dialog.setLocationRelativeTo(ParameterGraphEditor.this);
+        dialog.setVisible(true);
+        Parameter parameter;
+        if (!dialog.isCancelled()) {
+            parameter = dialog.getParameter();
+            return parameter;
+        }
+        return null;
+    }
+
+    private Domain createAndNode(OrNode node) {
+        CreateAndNodeDialog dialog = new CreateAndNodeDialog(new javax.swing.JFrame(), true, node.getParameter(), node.getParameter().getDomain());
+        dialog.setLocationRelativeTo(ParameterGraphEditor.this);
+        dialog.setSize(new Dimension(800, 600));
+        dialog.setVisible(true);
+        Domain domain = null;
+        while (!dialog.isCancelled() && domain == null) {
+            try {
+                domain = dialog.getDomain();
+                break;
+            } catch (InvalidDomainException ex) {
+                JOptionPane.showMessageDialog(ParameterGraphEditor.this, ex.getMessage(), "Invalid Domain", JOptionPane.ERROR_MESSAGE);
+                ((JDialog) dialog).setVisible(true);
+            }
+        }
+        return domain;
     }
 
     private String domainToString(Domain domain) {
@@ -424,6 +450,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         btnLayout = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
+        btnParameters = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -449,6 +476,14 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             }
         });
 
+        btnParameters.setText(resourceMap.getString("btnParameters.text")); // NOI18N
+        btnParameters.setName("btnParameters"); // NOI18N
+        btnParameters.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnParametersActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -456,7 +491,9 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnLayout)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 573, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnParameters)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 480, Short.MAX_VALUE)
                 .addComponent(btnSave)
                 .addContainerGap())
         );
@@ -465,7 +502,8 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnLayout)
-                    .addComponent(btnSave))
+                    .addComponent(btnSave)
+                    .addComponent(btnParameters))
                 .addContainerGap(14, Short.MAX_VALUE))
         );
 
@@ -492,7 +530,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
     private void btnLayoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLayoutActionPerformed
         mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
         layout.setInterRankCellSpacing(25);
-       // layout.setFixRoots(true);
+        // layout.setFixRoots(true);
         Object cell = graph.getSelectionCell();
 
         if (cell == null
@@ -536,7 +574,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
 
         List<mxCell> roots = findRoots();
-        
+
         if (roots.size() != 1) {
             JOptionPane.showMessageDialog(this, "Found " + roots.size() + " roots.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -549,11 +587,10 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         }
         Set<Node> nodes = new HashSet<Node>();
         List<Edge> edges = new LinkedList<Edge>();
-        Set<Parameter> parameters = new HashSet<Parameter>();
-        if (!buildParameterGraph(nodes, edges, parameters, root)) {
+        if (!buildParameterGraph(nodes, edges, root)) {
             // happens if not all leafs are AND nodes
             JOptionPane.showMessageDialog(this, "Invalid graph.", "Error", JOptionPane.ERROR_MESSAGE);
-            return ;
+            return;
         }
         ParameterGraph parameterGraph = new ParameterGraph(nodes, edges, parameters, (AndNode) root.getValue());
         try {
@@ -562,22 +599,50 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error while saving:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-        
+
     }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void btnParametersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnParametersActionPerformed
+        SpecifyDomainDialog dialog = new SpecifyDomainDialog(EDACCApp.getApplication().getMainFrame(), true, solverParameters, parameters);
+        dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+        EDACCApp.getApplication().show(dialog);
+        if (!dialog.isCancelled()) {
+            parameters = dialog.getParameters();
+            HashMap<String, Parameter> paramMap = new HashMap<String, Parameter>();
+            for (Parameter param : parameters) {
+                paramMap.put(param.getName(), param);
+            }
+            graph.getModel().beginUpdate();
+            Object[] cells = graph.getChildCells(graph.getDefaultParent());
+            for (Object o : cells) {
+                mxCell cell = (mxCell) o;
+                if (cell.getValue() instanceof OrNode) {
+                    String name = ((OrNode) cell.getValue()).getParameter().getName();
+                    // TODO: what if not... invalid param (deleted param) -> delete node? set default domain?
+                    if (paramMap.containsKey(name)) {
+                        ((OrNode) cell.getValue()).setParameter(paramMap.get(name));
+                        graph.getModel().setValue(cell, cell.getValue());
+                        graph.updateCellSize(cell);
+                    }
+                }
+            }
+            graph.getModel().endUpdate();
+        }
+    }//GEN-LAST:event_btnParametersActionPerformed
 
     public void evtKeyReleased(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_DELETE) {
             for (Object cell : graph.getSelectionCells()) {
                 // can't remove root node
                 if (cell != rootNode) {
-                    graph.removeCells(new Object[] {cell});
+                    graph.removeCells(new Object[]{cell});
                 }
             }
             e.consume();
         }
     }
 
-    public boolean buildParameterGraph(Set<Node> nodes, List<Edge> edges, Set<Parameter> parameters, mxCell currentCell) {
+    public boolean buildParameterGraph(Set<Node> nodes, List<Edge> edges, mxCell currentCell) {
         if (currentCell.isVertex()) {
             Node node = (Node) currentCell.getValue();
             node.setId(currentCell.getId());
@@ -585,9 +650,6 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             if (node instanceof OrNode) {
                 if (graph.getOutgoingEdges(currentCell).length == 0) {
                     return false;
-                }
-                if (((OrNode) node).getParameter() != null) {
-                parameters.add(((OrNode) node).getParameter());
                 }
             }
             for (Object o : graph.getOutgoingEdges(currentCell)) {
@@ -600,7 +662,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                     edge.setTarget((Node) cell.getTarget().getValue());
                     edges.add(edge);
                 }
-                if (!buildParameterGraph(nodes, edges, parameters, (mxCell) cell.getTarget())) {
+                if (!buildParameterGraph(nodes, edges, (mxCell) cell.getTarget())) {
                     return false;
                 }
             }
@@ -609,6 +671,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLayout;
+    private javax.swing.JButton btnParameters;
     private javax.swing.JButton btnSave;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;

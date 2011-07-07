@@ -50,7 +50,9 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnLayout" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="573" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="btnParameters" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="480" max="32767" attributes="0"/>
                   <Component id="btnSave" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -62,6 +64,7 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="btnLayout" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="btnSave" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnParameters" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="14" max="32767" attributes="0"/>
               </Group>
@@ -85,6 +88,15 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSaveActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="btnParameters">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="btnParameters.text"/>
+            <Property name="name" type="java.lang.String" value="btnParameters" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnParametersActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

@@ -96,4 +96,9 @@ public class SelectRealDomainPanel extends javax.swing.JPanel implements IDomain
             throw new InvalidDomainException("You have to specify real numbers for lower and upper limit for real domain.");
         }
     }
+
+    @Override
+    public void setDomain(Domain domain) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

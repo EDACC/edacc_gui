@@ -96,4 +96,9 @@ public class SelectIntegerDomainPanel extends javax.swing.JPanel implements IDom
             throw new InvalidDomainException("You have to specify integers for lower and upper limit for integer domain.");
         }
     }
+
+    @Override
+    public void setDomain(Domain domain) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

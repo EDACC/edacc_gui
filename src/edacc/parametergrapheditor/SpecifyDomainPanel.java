@@ -5,9 +5,7 @@
  */
 package edacc.parametergrapheditor;
 
-import edacc.parameterspace.domain.Domain;
-import edacc.parameterspace.domain.FlagDomain;
-import edacc.parameterspace.domain.OptionalDomain;
+import edacc.parameterspace.domain.*;
 import javax.swing.JPanel;
 
 /**
@@ -24,13 +22,18 @@ public class SpecifyDomainPanel extends javax.swing.JPanel implements IDomainPan
 
         comboDomain.removeAllItems();
         comboDomain.addItem("");
-        comboDomain.addItem("Categorical");
-        comboDomain.addItem("Flag");
-        comboDomain.addItem("Integer");
-        comboDomain.addItem("Mixed");
-        comboDomain.addItem("Optional");
-        comboDomain.addItem("Ordinal");
-        comboDomain.addItem("Real");
+        for (String name : Domain.names) {
+            comboDomain.addItem(name);
+        }
+    }
+
+    @Override
+    public void setDomain(Domain domain) {
+        comboDomain.setSelectedItem(domain.getName());
+        // null for Flag/Optional domain
+        if (pnlDomain != null) {
+            ((IDomainPanel) pnlDomain).setDomain(domain);
+        }
     }
 
     /** This method is called from within the constructor to
@@ -87,15 +90,15 @@ public class SpecifyDomainPanel extends javax.swing.JPanel implements IDomainPan
     }// </editor-fold>//GEN-END:initComponents
 
     private void comboDomainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboDomainActionPerformed
-        if ("Categorical".equals(comboDomain.getSelectedItem())) {
+        if (CategoricalDomain.name.equals(comboDomain.getSelectedItem())) {
             pnlDomain = new SpecifyCategoricalDomainPanel();
-        } else if ("Integer".equals(comboDomain.getSelectedItem())) {
+        } else if (IntegerDomain.name.equals(comboDomain.getSelectedItem())) {
             pnlDomain = new SpecifyIntegerDomainPanel();
-        } else if ("Mixed".equals(comboDomain.getSelectedItem())) {
+        } else if (MixedDomain.name.equals(comboDomain.getSelectedItem())) {
             pnlDomain = new SpecifyMixedDomainPanel();
-        } else if ("Ordinal".equals(comboDomain.getSelectedItem())) {
+        } else if (OrdinalDomain.name.equals(comboDomain.getSelectedItem())) {
             pnlDomain = new SpecifyOrdinalDomainPanel();
-        } else if ("Real".equals(comboDomain.getSelectedItem())) {
+        } else if (RealDomain.name.equals(comboDomain.getSelectedItem())) {
             pnlDomain = new SpecifyRealDomainPanel();
         } else {
             pnlDomain = null;
@@ -123,9 +126,9 @@ public class SpecifyDomainPanel extends javax.swing.JPanel implements IDomainPan
     public Domain getDomain() throws InvalidDomainException {
         if (pnlDomain != null) {
             return ((IDomainPanel) pnlDomain).getDomain();
-        } else if ("Flag".equals(comboDomain.getSelectedItem())) {
+        } else if (FlagDomain.name.equals(comboDomain.getSelectedItem())) {
             return new FlagDomain(true, true);
-        } else if ("Optional".equals(comboDomain.getSelectedItem())) {
+        } else if (OptionalDomain.name.equals(comboDomain.getSelectedItem())) {
             return new OptionalDomain();
         }
         throw new InvalidDomainException("No domain selected.");

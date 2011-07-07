@@ -8,6 +8,12 @@ import java.util.Set;
 
 public class FlagDomain extends Domain {
 	protected Set<FLAGS> values;
+
+    public static final String name = "Flag";
+    @Override
+    public String getName() {
+        return name;
+    }
 	
 	public static enum FLAGS {
 		ON {

@@ -5,32 +5,28 @@
  */
 package edacc.parametergrapheditor;
 
-import edacc.model.ParameterDAO;
-import edacc.model.Solver;
-import edacc.parameterspace.domain.Domain;
-import java.sql.SQLException;
-import javax.swing.JPanel;
+import edacc.parameterspace.Parameter;
+import java.util.Set;
 
 /**
  *
  * @author simon
  */
-public class CreateOrNodeDialog extends javax.swing.JDialog implements ICreateNodeDialog {
+public class CreateOrNodeDialog extends javax.swing.JDialog {
 
-    private JPanel pnlDomain;
     private boolean cancelled;
+
     /** Creates new form CreateOrNodeDialog */
-    public CreateOrNodeDialog(java.awt.Frame parent, boolean modal, Solver solver) throws SQLException {
+    public CreateOrNodeDialog(java.awt.Frame parent, boolean modal, Set<Parameter> parameters) {
         super(parent, modal);
         initComponents();
         cancelled = true;
-        
+
         comboParameter.removeAllItems();
-        for (edacc.model.Parameter param : ParameterDAO.getParameterFromSolverId(solver.getId())) {
-            comboParameter.addItem(param.getName());
+        for (Parameter param : parameters) {
+            comboParameter.addItem(new ComboParameterItem(param));
         }
-        pnlDomain = new SpecifyDomainPanel();
-        panel.setViewportView(pnlDomain);
+        pack();
     }
 
     /** This method is called from within the constructor to
@@ -47,7 +43,6 @@ public class CreateOrNodeDialog extends javax.swing.JDialog implements ICreateNo
         btnAccept = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
         comboParameter = new javax.swing.JComboBox();
-        panel = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(CreateOrNodeDialog.class);
@@ -80,7 +75,7 @@ public class CreateOrNodeDialog extends javax.swing.JDialog implements ICreateNo
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(421, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnCancel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnAccept)
@@ -98,8 +93,6 @@ public class CreateOrNodeDialog extends javax.swing.JDialog implements ICreateNo
         comboParameter.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         comboParameter.setName("comboParameter"); // NOI18N
 
-        panel.setName("panel"); // NOI18N
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -109,12 +102,8 @@ public class CreateOrNodeDialog extends javax.swing.JDialog implements ICreateNo
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(comboParameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(437, Short.MAX_VALUE))
+                .addContainerGap(26, Short.MAX_VALUE))
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
-                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -123,9 +112,7 @@ public class CreateOrNodeDialog extends javax.swing.JDialog implements ICreateNo
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(comboParameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -142,35 +129,43 @@ public class CreateOrNodeDialog extends javax.swing.JDialog implements ICreateNo
         setVisible(false);
     }//GEN-LAST:event_btnCancelActionPerformed
 
-    @Override
-    public Domain getDomain() throws InvalidDomainException {
-        return ((IDomainPanel) pnlDomain).getDomain();
+    public Parameter getParameter() {
+        if (comboParameter.getSelectedItem() == null) {
+            return null;
+        } 
+        return ((ComboParameterItem) comboParameter.getSelectedItem()).parameter;
     }
-    
-    @Override
-    public String getParameterName() {
-        return (String) comboParameter.getSelectedItem();
-    }
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAccept;
     private javax.swing.JButton btnCancel;
     private javax.swing.JComboBox comboParameter;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane panel;
     // End of variables declaration//GEN-END:variables
 
-    @Override
     public boolean isCancelled() {
         return cancelled;
     }
-    
+
     @Override
     public void setVisible(boolean b) {
         if (b) {
             cancelled = true;
         }
         super.setVisible(b);
+    }
+
+    private class ComboParameterItem {
+
+        Parameter parameter;
+
+        public ComboParameterItem(Parameter parameter) {
+            this.parameter = parameter;
+        }
+
+        @Override
+        public String toString() {
+            return parameter.getName();
+        }
     }
 }

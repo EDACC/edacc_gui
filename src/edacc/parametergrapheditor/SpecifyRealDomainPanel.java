@@ -94,4 +94,14 @@ public class SpecifyRealDomainPanel extends javax.swing.JPanel implements IDomai
             throw new InvalidDomainException("You have to specify real numbers for lower and upper limit for real domain.");
         }
     }
+
+    @Override
+    public void setDomain(Domain domain) {
+        if (!(domain instanceof RealDomain)) {
+            return;
+        }
+        RealDomain rDomain = (RealDomain) domain;
+        txtLow.setText("" + rDomain.getLow());
+        txtHigh.setText("" + rDomain.getHigh());
+    }
 }
