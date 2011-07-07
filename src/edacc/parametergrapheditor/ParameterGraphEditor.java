@@ -191,14 +191,27 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    System.out.println("Edit");
                     Object o = graph.getSelectionCell();
                     if (o instanceof mxCell) {
                         mxCell cell = (mxCell) o;
                         if (cell.isEdge()) {
-                            System.out.println("Edge: " + cell + " - " + cell.getSource() + " -> " + cell.getTarget());
+                            Edge edge = null;
+                            if (cell.getValue() == null || cell.getValue() instanceof String) {
+                                // will be changed when saved.
+                                edge = new Edge(null, null, 0);
+                            } else { 
+                                edge = (Edge) cell.getValue();
+                            }
+                            String group = JOptionPane.showInputDialog("Group:", edge.getGroup());
+                            if (group != null) {
+                                try {
+                                edge.setGroup(Integer.parseInt(group));
+                                } catch (NumberFormatException ex) {
+                                    JOptionPane.showMessageDialog(ParameterGraphEditor.this, "Invalid group: " + group, "Invalid Group", JOptionPane.ERROR_MESSAGE);
+                                }
+                            }
+                            graph.getModel().setValue(cell, edge);
                         } else if (cell.isVertex()) {
-                            System.out.println("Vertex: " + cell);
                         }
                     }
                 }
@@ -227,7 +240,6 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                                                 Point graphLocation = graphComponent.getLocationOnScreen();
 
                                                 try {
-                                                    JDialog dialog = null;
                                                     Parameter parameter = null;
                                                     Domain domain = null;
                                                     boolean cancelled = false;
