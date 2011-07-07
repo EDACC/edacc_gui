@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class OrdinalDomain extends Domain {
 	protected List<String> ordered_list;
-	
+	public static final String name = "Ordinal";
 	private OrdinalDomain() {
 		
 	}
@@ -61,4 +61,9 @@ public class OrdinalDomain extends Domain {
 		values.addAll(ordered_list);
 		return values;
 	}
+
+    @Override
+    public String getName() {
+        return name;
+    }
 }

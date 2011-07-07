@@ -8,7 +8,8 @@ import java.util.Set;
 
 public class CategoricalDomain extends Domain {
 	protected Set<String> categories;
-	
+	public static final String name = "Categorical";
+        
 	private CategoricalDomain() {
 		
 	}
@@ -67,4 +68,9 @@ public class CategoricalDomain extends Domain {
 		values.addAll(categories);
 		return values;
 	}
+
+    @Override
+    public String getName() {
+        return name;
+    }
 }

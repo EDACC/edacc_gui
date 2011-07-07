@@ -172,6 +172,11 @@ public class SelectCategoricalDomainPanel extends javax.swing.JPanel implements 
         return new CategoricalDomain(list.toArray(new String[0]));
     }
 
+    @Override
+    public void setDomain(Domain domain) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     private class CategoricalDomainTableModel extends DefaultTableModel {
 
         private final String[] columns = {"Category", "Selected"};

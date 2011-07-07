@@ -125,4 +125,15 @@ public class SpecifyCategoricalDomainPanel extends javax.swing.JPanel implements
         }
         return new CategoricalDomain(categories);
     }
+
+    @Override
+    public void setDomain(Domain domain) {
+        if (!(domain instanceof CategoricalDomain)) {
+            return;
+        }
+        model.clear();
+        for (String s : ((CategoricalDomain) domain).getCategories()) {
+            model.addElement(s);
+        }
+    }
 }

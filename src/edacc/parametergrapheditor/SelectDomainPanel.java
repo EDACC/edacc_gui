@@ -172,4 +172,9 @@ pnlDomainParameters.removeAll();
         }
         throw new InvalidDomainException("No domain selected.");
     }
+
+    @Override
+    public void setDomain(Domain domain) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

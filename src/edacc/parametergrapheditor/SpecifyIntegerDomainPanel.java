@@ -94,4 +94,14 @@ public class SpecifyIntegerDomainPanel extends javax.swing.JPanel implements IDo
             throw new InvalidDomainException("You have to specify integers for lower and upper limit for integer domain.");
         }
     }
+
+    @Override
+    public void setDomain(Domain domain) {
+        if (!(domain instanceof IntegerDomain)) {
+            return;
+        }
+        IntegerDomain iDomain = (IntegerDomain) domain;
+        txtLow.setText("" + iDomain.getLow());
+        txtHigh.setText("" + iDomain.getHigh());
+    }
 }

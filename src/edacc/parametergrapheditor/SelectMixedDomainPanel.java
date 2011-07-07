@@ -133,4 +133,9 @@ public class SelectMixedDomainPanel extends javax.swing.JPanel implements IDomai
         }
         return new MixedDomain(domains);
     }
+
+    @Override
+    public void setDomain(Domain domain) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class IntegerDomain extends Domain {
 	protected Integer low, high;
-	
+	public static final String name = "Integer";
 	private IntegerDomain() {
 		
 	}
@@ -65,4 +65,9 @@ public class IntegerDomain extends Domain {
 		}
 		return values;
 	}
+
+    @Override
+    public String getName() {
+        return name;
+    }
 }

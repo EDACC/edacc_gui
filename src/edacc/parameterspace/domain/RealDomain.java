@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class RealDomain extends Domain {
 	protected Double low, high;
-	
+	public static final String name = "Real";
 	private RealDomain() {
 		
 	}
@@ -69,4 +69,9 @@ public class RealDomain extends Domain {
 		}
 		return values;
 	}
+
+    @Override
+    public String getName() {
+        return name;
+    }
 }

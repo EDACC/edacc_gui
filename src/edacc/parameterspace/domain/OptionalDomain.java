@@ -5,6 +5,11 @@ import java.util.List;
 import java.util.Random;
 
 public class OptionalDomain extends Domain {
+    public static final String name = "Optional";
+    @Override
+    public String getName() {
+        return name;
+    }
 	public static enum OPTIONS {
 		NOT_SPECIFIED {
 			public String toString() {

@@ -7,12 +7,14 @@ package edacc.parametergrapheditor;
 
 import edacc.parameterspace.domain.Domain;
 import edacc.parameterspace.domain.MixedDomain;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
+import javax.swing.JComboBox;
 
 /**
  *
@@ -30,7 +32,7 @@ public class SpecifyMixedDomainPanel extends javax.swing.JPanel implements IDoma
         setLayout(layout);
         c = new GridBagConstraints();
         SpecifyDomainPanel panel = new SpecifyDomainPanel();
-        panel.comboDomain.removeItem("Mixed");
+        panel.comboDomain.removeItem(MixedDomain.name);
         panel.comboDomain.addActionListener(new ActionListener() {
 
             @Override
@@ -75,7 +77,7 @@ public class SpecifyMixedDomainPanel extends javax.swing.JPanel implements IDoma
         }
         if (!found) {
             SpecifyDomainPanel panel = new SpecifyDomainPanel();
-            panel.comboDomain.removeItem("Mixed");
+            panel.comboDomain.removeItem(MixedDomain.name);
             panel.comboDomain.addActionListener(new ActionListener() {
 
                 @Override
@@ -129,11 +131,27 @@ public class SpecifyMixedDomainPanel extends javax.swing.JPanel implements IDoma
             throw new InvalidDomainException("You must add at least one domain to a mixed domain.");
         }
         LinkedList<Domain> domains = new LinkedList<Domain>();
-        
+
         // last domain is an invalid domain (-1)
-        for (int i = 0; i < getComponentCount()-1; i++) {
+        for (int i = 0; i < getComponentCount() - 1; i++) {
             domains.add(((IDomainPanel) getComponent(i)).getDomain());
         }
         return new MixedDomain(domains);
+    }
+
+    @Override
+    public void setDomain(Domain domain) {
+        if (!(domain instanceof MixedDomain)) {
+            return;
+        }
+        for (Domain d : ((MixedDomain) domain).getDomains()) {
+            for (int i = getComponentCount() - 1; i >= 0; i--) {
+                if (getComponent(i) instanceof SpecifyDomainPanel && "".equals(((SpecifyDomainPanel) getComponent(i)).comboDomain.getSelectedItem())) {
+                    ((SpecifyDomainPanel) getComponent(i)).comboDomain.setSelectedItem(d.getName());
+                    ((SpecifyDomainPanel) getComponent(i)).setDomain(d);
+                    break;
+                }
+            }
+        }
     }
 }
