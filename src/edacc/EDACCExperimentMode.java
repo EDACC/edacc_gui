@@ -3267,6 +3267,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 comboConfigScenarioSolverBinaries.setSelectedItem(solverBinary);
             }
             manageExperimentPane.setEnabledAt(TAB_CONFIGURATIONSCENARIO, true);
+        } else {
+            manageExperimentPane.setEnabledAt(TAB_CONFIGURATIONSCENARIO, false);
         }
     }
 }
