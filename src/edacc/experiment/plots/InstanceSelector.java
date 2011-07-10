@@ -4,6 +4,7 @@ import edacc.EDACCApp;
 import edacc.experiment.InstanceTableModel;
 import edacc.EDACCInstanceFilter;
 import edacc.experiment.Util;
+import edacc.model.DatabaseConnector;
 import edacc.model.Instance;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -48,7 +49,7 @@ public class InstanceSelector extends JPanel {
         sorter = new TableRowSorter<InstanceTableModel>(tableModel);
         table.setRowSorter(sorter);
         Util.addSpaceSelection(table, InstanceTableModel.COL_SELECTED);
-        
+
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
@@ -137,6 +138,17 @@ public class InstanceSelector extends JPanel {
             }
         });
         updateTableColumnWidth = true;
+
+        boolean isCompetition;
+        try {
+            isCompetition = DatabaseConnector.getInstance().isCompetitionDB();
+        } catch (Exception ex) {
+            isCompetition = false;
+        }
+        // if it is no competition db, then remove the competition columns
+        if (!isCompetition) {
+            table.removeColumn(table.getColumnModel().getColumn(table.convertColumnIndexToView(InstanceTableModel.COL_BENCHTYPE)));
+        }
     }
 
     public void btnFilter() {

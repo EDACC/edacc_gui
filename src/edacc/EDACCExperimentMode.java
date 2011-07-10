@@ -3048,7 +3048,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
                 // if it is no competition db, then remove the competition columns
                 if (!isCompetition) {
-                    tableInstances.removeColumn(tableInstances.getColumnModel().getColumn(InstanceTableModel.COL_BENCHTYPE));
+                    tableInstances.removeColumn(tableInstances.getColumnModel().getColumn(tableInstances.convertColumnIndexToView(InstanceTableModel.COL_BENCHTYPE)));
                 }
                 boolean[] visibility = new boolean[tableInstances.getColumnCount()];
 
