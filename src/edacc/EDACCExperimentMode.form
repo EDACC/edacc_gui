@@ -506,7 +506,7 @@
                                       <Component id="btnReverseSolverSelection" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnChooseSolvers" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace pref="534" max="32767" attributes="0"/>
+                                      <EmptySpace pref="594" max="32767" attributes="0"/>
                                   </Group>
                                   <Component id="jScrollPane3" alignment="0" pref="1052" max="32767" attributes="1"/>
                               </Group>
@@ -515,7 +515,7 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="1" attributes="0">
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="jScrollPane3" pref="27" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane3" pref="29" max="32767" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="3" attributes="0">
                                           <Component id="btnSelectAllSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -557,7 +557,7 @@
                                 <Property name="toolTipText" type="java.lang.String" resourceKey="btnSelectAllSolvers.toolTipText"/>
                                 <Property name="name" type="java.lang.String" value="btnSelectAllSolvers" noResource="true"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 25]"/>
+                                  <Dimension value="[110, 23]"/>
                                 </Property>
                               </Properties>
                               <Events>
@@ -570,7 +570,7 @@
                                 <Property name="toolTipText" type="java.lang.String" resourceKey="btnDeselectAllSolvers.toolTipText"/>
                                 <Property name="name" type="java.lang.String" value="btnDeselectAllSolvers" noResource="true"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 25]"/>
+                                  <Dimension value="[110, 23]"/>
                                 </Property>
                               </Properties>
                               <Events>
@@ -583,7 +583,7 @@
                                 <Property name="toolTipText" type="java.lang.String" resourceKey="btnReverseSolverSelection.toolTipText"/>
                                 <Property name="name" type="java.lang.String" value="btnReverseSolverSelection" noResource="true"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 25]"/>
+                                  <Dimension value="[110, 23]"/>
                                 </Property>
                               </Properties>
                               <Events>
@@ -596,7 +596,7 @@
                                 <Property name="toolTipText" type="java.lang.String" resourceKey="btnChooseSolvers.toolTipText"/>
                                 <Property name="name" type="java.lang.String" value="btnChooseSolvers" noResource="true"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 25]"/>
+                                  <Dimension value="[110, 23]"/>
                                 </Property>
                               </Properties>
                               <Events>
@@ -636,7 +636,7 @@
                                       <Component id="btnInvertSolverConfigSelection" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnChooseSolverConfigs" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace pref="534" max="32767" attributes="0"/>
+                                      <EmptySpace pref="594" max="32767" attributes="0"/>
                                   </Group>
                                   <Component id="jScrollPane8" alignment="0" pref="1052" max="32767" attributes="1"/>
                               </Group>
@@ -645,7 +645,7 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="1" attributes="0">
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="jScrollPane8" pref="302" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane8" pref="304" max="32767" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="3" attributes="0">
                                           <Component id="btnSelectAllSolverConfigs" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -688,7 +688,7 @@
                                 <Property name="text" type="java.lang.String" resourceKey="btnChooseSolverConfigs.text"/>
                                 <Property name="name" type="java.lang.String" value="btnChooseSolverConfigs" noResource="true"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 25]"/>
+                                  <Dimension value="[110, 23]"/>
                                 </Property>
                               </Properties>
                               <Events>
@@ -700,7 +700,7 @@
                                 <Property name="text" type="java.lang.String" resourceKey="btnSelectAllSolverConfigs.text"/>
                                 <Property name="name" type="java.lang.String" value="btnSelectAllSolverConfigs" noResource="true"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 25]"/>
+                                  <Dimension value="[110, 23]"/>
                                 </Property>
                               </Properties>
                               <Events>
@@ -712,7 +712,7 @@
                                 <Property name="text" type="java.lang.String" resourceKey="btnDeselectAllSolverConfigs.text"/>
                                 <Property name="name" type="java.lang.String" value="btnDeselectAllSolverConfigs" noResource="true"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 25]"/>
+                                  <Dimension value="[110, 23]"/>
                                 </Property>
                               </Properties>
                               <Events>
@@ -724,7 +724,7 @@
                                 <Property name="text" type="java.lang.String" resourceKey="btnInvertSolverConfigSelection.text"/>
                                 <Property name="name" type="java.lang.String" value="btnInvertSolverConfigSelection" noResource="true"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 25]"/>
+                                  <Dimension value="[110, 23]"/>
                                 </Property>
                               </Properties>
                               <Events>

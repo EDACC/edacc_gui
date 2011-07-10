@@ -31,7 +31,7 @@
                       <Component id="txtSeedGroup" min="-2" pref="51" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnMassReplication" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace pref="16" max="32767" attributes="0"/>
                       <Component id="btnEditName" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnRemove" min="-2" max="-2" attributes="0"/>
@@ -54,7 +54,7 @@
                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane2" pref="144" max="32767" attributes="0"/>
+              <Component id="jScrollPane2" pref="146" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnReplicate" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -79,9 +79,6 @@
         <Property name="toolTipText" type="java.lang.String" resourceKey="btnReplicate.toolTipText"/>
         <Property name="actionCommand" type="java.lang.String" resourceKey="btnReplicate.actionCommand"/>
         <Property name="name" type="java.lang.String" value="btnReplicate" noResource="true"/>
-        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[77, 25]"/>
-        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="btnRemove">
@@ -99,7 +96,7 @@
         </Property>
         <Property name="name" type="java.lang.String" value="btnRemove" noResource="true"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[95, 25]"/>
+          <Dimension value="[90, 23]"/>
         </Property>
       </Properties>
     </Component>
@@ -142,7 +139,7 @@
         <Property name="text" type="java.lang.String" resourceKey="btnEditName.text"/>
         <Property name="name" type="java.lang.String" value="btnEditName" noResource="true"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[95, 25]"/>
+          <Dimension value="[90, 23]"/>
         </Property>
       </Properties>
       <Events>
@@ -153,9 +150,6 @@
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="btnMassReplication.text"/>
         <Property name="name" type="java.lang.String" value="btnMassReplication" noResource="true"/>
-        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[111, 25]"/>
-        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMassReplicationActionPerformed"/>
