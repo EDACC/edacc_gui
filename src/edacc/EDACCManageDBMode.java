@@ -160,7 +160,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         this.jSplitPane2.setDividerLocation(-1);*/
     }
 
-    void initialize() throws NoConnectionToDBException, SQLException {
+    public void initialize() throws NoConnectionToDBException, SQLException {
         manageDBSolvers.loadSolvers();
         manageDBParameters.loadParametersOfSolvers(solverTableModel.getSolvers());
         manageDBInstances.loadInstanceClasses();
@@ -1536,18 +1536,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     }//GEN-LAST:event_btnFilterInstancesActionPerformed
 
     private void btnSolverSaveToDBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverSaveToDBActionPerformed
-        try {
             manageDBSolvers.saveSolvers();
-            for (Solver s : solverTableModel.getSolvers()) {
-                manageDBParameters.saveParameters(s);
-            }
             unsavedChanges = false;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(panelManageDBSolver,
-                    "Solvers cannot be saved. There is a problem with the Database: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
     }//GEN-LAST:event_btnSolverSaveToDBActionPerformed
 
     private void btnSolverNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverNewActionPerformed
