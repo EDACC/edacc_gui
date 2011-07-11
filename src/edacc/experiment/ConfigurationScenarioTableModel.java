@@ -9,7 +9,6 @@ import edacc.model.SolverBinaries;
 import edacc.model.SolverDAO;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Vector;
 
 /**
@@ -43,6 +42,14 @@ public class ConfigurationScenarioTableModel extends ThreadSafeDefaultTableModel
             if (contains) {
                 for (ConfigurationScenarioParameter param : configurationScenario.getParameters()) {
                     configScenarioParameters.put(param.getIdParameter(), param);
+                }
+            }
+        }
+
+        for (Parameter param : parameters) {
+            if (param.isMandatory()) {
+                if (!configScenarioParameters.containsKey(param.getId())) {
+                    configScenarioParameters.put(param.getId(), new ConfigurationScenarioParameter());
                 }
             }
         }
@@ -86,12 +93,21 @@ public class ConfigurationScenarioTableModel extends ThreadSafeDefaultTableModel
     @Override
     public boolean isCellEditable(int row, int column) {
         if (column == COL_SELECTED) {
+            if (parameters.get(row).isMandatory()) {
+                return false;
+            }
             return true;
         }
         if ((Boolean) getValueAt(row, COL_SELECTED) && column == COL_FIXEDVALUE) {
+            if ("instance".equals(parameters.get(row).getName()) || "seed".equals(parameters.get(row).getName())) {
+                return false;
+            }
             return true;
         }
         if ((Boolean) getValueAt(row, COL_FIXEDVALUE) && column == COL_VALUE) {
+            if (!parameters.get(row).getHasValue()) {
+                return false;
+            }
             return true;
         }
         return false;
@@ -115,11 +131,10 @@ public class ConfigurationScenarioTableModel extends ThreadSafeDefaultTableModel
                 configScenarioParameters.get(parameters.get(row).getId()).setFixedValue(null);
             }
             configScenarioParameters.get(parameters.get(row).getId()).setConfigurable(!(Boolean) aValue);
-            fireTableCellUpdated(row, COL_VALUE);
         } else if (column == COL_VALUE) {
             configScenarioParameters.get(parameters.get(row).getId()).setFixedValue((String) aValue);
         }
-        fireTableCellUpdated(row, column);
+        fireTableRowsUpdated(row, row);
     }
 
     @Override
