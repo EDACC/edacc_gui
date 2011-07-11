@@ -417,6 +417,11 @@ public class ExperimentResultsBrowserTableModel extends ThreadSafeDefaultTableMo
         }
     }
 
+    @Override
+    public boolean isCellEditable(int row, int column) {
+        return false;
+    }
+
     /**
      * Returns the first column index which is a instance property column
      * @return the first instance property column
