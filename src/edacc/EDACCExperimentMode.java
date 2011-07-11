@@ -950,7 +950,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnSelectAllSolvers.setText(resourceMap.getString("btnSelectAllSolvers.text")); // NOI18N
         btnSelectAllSolvers.setToolTipText(resourceMap.getString("btnSelectAllSolvers.toolTipText")); // NOI18N
         btnSelectAllSolvers.setName("btnSelectAllSolvers"); // NOI18N
-        btnSelectAllSolvers.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnSelectAllSolvers.setPreferredSize(new java.awt.Dimension(110, 23));
         btnSelectAllSolvers.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSelectAllSolversActionPerformed(evt);
@@ -960,7 +960,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnDeselectAllSolvers.setText(resourceMap.getString("btnDeselectAllSolvers.text")); // NOI18N
         btnDeselectAllSolvers.setToolTipText(resourceMap.getString("btnDeselectAllSolvers.toolTipText")); // NOI18N
         btnDeselectAllSolvers.setName("btnDeselectAllSolvers"); // NOI18N
-        btnDeselectAllSolvers.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnDeselectAllSolvers.setPreferredSize(new java.awt.Dimension(110, 23));
         btnDeselectAllSolvers.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDeselectAllSolversActionPerformed(evt);
@@ -970,7 +970,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnReverseSolverSelection.setText(resourceMap.getString("btnReverseSolverSelection.text")); // NOI18N
         btnReverseSolverSelection.setToolTipText(resourceMap.getString("btnReverseSolverSelection.toolTipText")); // NOI18N
         btnReverseSolverSelection.setName("btnReverseSolverSelection"); // NOI18N
-        btnReverseSolverSelection.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnReverseSolverSelection.setPreferredSize(new java.awt.Dimension(110, 23));
         btnReverseSolverSelection.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnReverseSolverSelectionActionPerformed(evt);
@@ -980,7 +980,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnChooseSolvers.setText(resourceMap.getString("btnChooseSolvers.text")); // NOI18N
         btnChooseSolvers.setToolTipText(resourceMap.getString("btnChooseSolvers.toolTipText")); // NOI18N
         btnChooseSolvers.setName("btnChooseSolvers"); // NOI18N
-        btnChooseSolvers.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnChooseSolvers.setPreferredSize(new java.awt.Dimension(110, 23));
         btnChooseSolvers.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnChooseSolversActionPerformed(evt);
@@ -999,14 +999,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addComponent(btnReverseSolverSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnChooseSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(534, Short.MAX_VALUE))
+                .addContainerGap(594, Short.MAX_VALUE))
             .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 1052, Short.MAX_VALUE)
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSelectAllSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1039,7 +1039,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         btnChooseSolverConfigs.setText(resourceMap.getString("btnChooseSolverConfigs.text")); // NOI18N
         btnChooseSolverConfigs.setName("btnChooseSolverConfigs"); // NOI18N
-        btnChooseSolverConfigs.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnChooseSolverConfigs.setPreferredSize(new java.awt.Dimension(110, 23));
         btnChooseSolverConfigs.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnChooseSolverConfigsActionPerformed(evt);
@@ -1048,7 +1048,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         btnSelectAllSolverConfigs.setText(resourceMap.getString("btnSelectAllSolverConfigs.text")); // NOI18N
         btnSelectAllSolverConfigs.setName("btnSelectAllSolverConfigs"); // NOI18N
-        btnSelectAllSolverConfigs.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnSelectAllSolverConfigs.setPreferredSize(new java.awt.Dimension(110, 23));
         btnSelectAllSolverConfigs.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSelectAllSolverConfigsActionPerformed(evt);
@@ -1057,7 +1057,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         btnDeselectAllSolverConfigs.setText(resourceMap.getString("btnDeselectAllSolverConfigs.text")); // NOI18N
         btnDeselectAllSolverConfigs.setName("btnDeselectAllSolverConfigs"); // NOI18N
-        btnDeselectAllSolverConfigs.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnDeselectAllSolverConfigs.setPreferredSize(new java.awt.Dimension(110, 23));
         btnDeselectAllSolverConfigs.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDeselectAllSolverConfigsActionPerformed(evt);
@@ -1066,7 +1066,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         btnInvertSolverConfigSelection.setText(resourceMap.getString("btnInvertSolverConfigSelection.text")); // NOI18N
         btnInvertSolverConfigSelection.setName("btnInvertSolverConfigSelection"); // NOI18N
-        btnInvertSolverConfigSelection.setPreferredSize(new java.awt.Dimension(125, 25));
+        btnInvertSolverConfigSelection.setPreferredSize(new java.awt.Dimension(110, 23));
         btnInvertSolverConfigSelection.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnInvertSolverConfigSelectionActionPerformed(evt);
@@ -1085,14 +1085,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addComponent(btnInvertSolverConfigSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnChooseSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(534, Short.MAX_VALUE))
+                .addContainerGap(594, Short.MAX_VALUE))
             .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 1052, Short.MAX_VALUE)
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSelectAllSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -3048,7 +3048,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
                 // if it is no competition db, then remove the competition columns
                 if (!isCompetition) {
-                    tableInstances.removeColumn(tableInstances.getColumnModel().getColumn(InstanceTableModel.COL_BENCHTYPE));
+                    tableInstances.removeColumn(tableInstances.getColumnModel().getColumn(tableInstances.convertColumnIndexToView(InstanceTableModel.COL_BENCHTYPE)));
                 }
                 boolean[] visibility = new boolean[tableInstances.getColumnCount()];
 
