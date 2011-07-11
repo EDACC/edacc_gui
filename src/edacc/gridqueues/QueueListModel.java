@@ -41,7 +41,7 @@ public class QueueListModel extends AbstractListModel {
         queues = GridQueueDAO.getAll();
         checkBoxes = new ArrayList<JCheckBox>();
         for (GridQueue q : queues) {
-            JCheckBox checkBox = new JCheckBox(q.getName());
+            JCheckBox checkBox = new JCheckBox(q.getName() + " (" + q.getId() + ")");
             checkBoxes.add(checkBox);
             if (expController != null) {
                 ArrayList<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(expController.getActiveExperiment());

@@ -78,7 +78,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
                     return EDACCManageGridQueuesDialog.this.queueListModel.checkBoxes.get(index);
                 } else {
                     GridQueue queue = (GridQueue) value;
-                    JLabel lbl = new JLabel(queue.getName());
+                    JLabel lbl = new JLabel(queue.getName() + " (" + queue.getId() + ")");
                     lbl.setOpaque(true);
                     if (isSelected) {
                         lbl.setBackground(listQueues.getSelectionBackground());
@@ -354,7 +354,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             if (columnIndex == 0) {
-                return queues.get(rowIndex).getName();
+                return queues.get(rowIndex).getName() + "(" + queues.get(rowIndex).getId() + ")";
             }
             if (columnIndex == 1) {
                 return queues.get(rowIndex).getDescription();
