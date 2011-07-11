@@ -13,17 +13,15 @@ package edacc;
 
 import edacc.events.TaskEvents;
 import edacc.manageDB.ProblemOccuredDuringPropertyComputation;
-import edacc.model.Experiment;
+import edacc.model.ExperimentResult;
 import edacc.model.Property;
 import edacc.model.Tasks;
 import edacc.properties.ComputePropertiesController;
 import edacc.properties.PropertySelectionTableModel;
-import java.awt.Component;
+import java.util.ArrayList;
 import java.util.Vector;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -33,12 +31,12 @@ import javax.swing.table.DefaultTableModel;
 public class EDACCComputeResultProperties extends javax.swing.JDialog implements TaskEvents{
     ComputePropertiesController controller;
     PropertySelectionTableModel tableModel;
-    Experiment exp;
+    ArrayList<ExperimentResult> results;
     /** Creates new form EDACCComputeResultProperties */
-    public EDACCComputeResultProperties(java.awt.Frame parent, boolean modal, Experiment exp) {
+    public EDACCComputeResultProperties(java.awt.Frame parent, boolean modal, ArrayList<ExperimentResult> results) {
         super(parent, modal);
         initComponents();
-        this.exp = exp;
+        this.results = results;
         controller = new ComputePropertiesController(this, tableSelectResultProperties);
 
         // initate the result property table
@@ -172,7 +170,7 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog implements
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
         }else {
-            Tasks.startTask("computProperties", new Class[]{Vector.class, boolean.class, edacc.model.Experiment.class, edacc.model.Tasks.class}, new Object[]{toCalculate, this.checkBoxReCompute.isSelected(), exp, null}, controller, EDACCComputeResultProperties.this);
+            Tasks.startTask("computProperties", new Class[]{Vector.class, boolean.class, ArrayList.class, edacc.model.Tasks.class}, new Object[]{toCalculate, this.checkBoxReCompute.isSelected(), results, null}, controller, EDACCComputeResultProperties.this);
             //controller.computProperties(toCalculate, this.checkBoxReCompute.isSelected(), exp);
         }
     }//GEN-LAST:event_buttonComputeActionPerformed

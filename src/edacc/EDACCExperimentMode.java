@@ -2108,7 +2108,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }//GEN-LAST:event_txtJobsTimerKeyReleased
 
     private void btnComputeResultPropertiesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnComputeResultPropertiesActionPerformed
-        EDACCComputeResultProperties compute = new EDACCComputeResultProperties(EDACCApp.getApplication().getMainFrame(), true, expController.getActiveExperiment());
+        ArrayList<ExperimentResult> results = new ArrayList<ExperimentResult>();
+        for (int row = 0; row < tableJobs.getRowCount(); row++) {
+            results.add(jobsTableModel.getExperimentResult(tableJobs.convertRowIndexToModel(row)));
+        }
+        EDACCComputeResultProperties compute = new EDACCComputeResultProperties(EDACCApp.getApplication().getMainFrame(), true, results);
         compute.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         compute.setVisible(true);
         resultBrowserETA = null;
