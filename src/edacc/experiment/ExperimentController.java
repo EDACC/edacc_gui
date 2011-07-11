@@ -101,8 +101,8 @@ public class ExperimentController {
     public SolverConfigCache solverConfigCache;
     /** the cpu time property. Will be created when creating an experiment controller. */
     public static Property PROP_CPUTIME;
-
     private ConfigurationScenario configScenario;
+
     /**
      * Creates a new experiment Controller
      * @param experimentMode the experiment mode to be used
@@ -131,14 +131,14 @@ public class ExperimentController {
         StatusCodeDAO.initialize();
         ResultCodeDAO.initialize();
         ClientDAO.clearCache();
-        
+
         SolverBinariesDAO.clearCache();
         SolverDAO.clearCache();
         ParameterDAO.clearCache();
         ExperimentDAO.clearCache();
         SolverConfigurationDAO.clearCache();
         ParameterInstanceDAO.clearCache();
-        
+
         ArrayList<Experiment> experiments = new ArrayList<Experiment>();
         experiments.addAll(ExperimentDAO.getAll());
         main.expTableModel.setExperiments(experiments);
@@ -223,14 +223,13 @@ public class ExperimentController {
         experimentResultCache.updateExperimentResults();
 
         main.generateJobsTableModel.updateNumRuns();
-        
+
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
                 Util.updateTableColumnWidth(main.tblGenerateJobs);
             }
-            
         });
         if (activeExperiment.isConfigurationExp()) {
             configScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
@@ -709,7 +708,7 @@ public class ExperimentController {
                     if (task.isCancelled()) {
                         throw new TaskCancelledException();
                     }
-                  //  task.setStatus("Adding job " + done + " of " + elements);
+                    //  task.setStatus("Adding job " + done + " of " + elements);
                     // check if job already exists
                     if (!experimentResultCache.contains(c.getId(), i.getId(), run)) {
                         if (solverConfigHasSeed.get(c.getId())) {
@@ -824,7 +823,7 @@ public class ExperimentController {
                             }
                         }
                     }
-                    
+
                     SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
@@ -1729,6 +1728,36 @@ public class ExperimentController {
         } catch (Exception _) {
         }
         return res;
+    }
+
+    public boolean configurationScenarioIsModified() {
+        if (activeExperiment == null || !activeExperiment.isConfigurationExp()) {
+            return false;
+        }
+        try {
+            ConfigurationScenario savedScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
+            if (savedScenario == null) {
+                return true;
+            }
+            if (main.configScenarioTableModel.getSolverBinary() == null || savedScenario.getIdSolverBinary() != main.configScenarioTableModel.getSolverBinary().getId()) {
+                return true;
+            }
+            HashMap<Integer, ConfigurationScenarioParameter> configParameters = main.configScenarioTableModel.getConfigScenarioParameters();
+            if (configParameters == null) {
+                return true;
+            }
+            if (savedScenario.getParameters().size() != configParameters.size()) {
+                return true;
+            }
+            for (ConfigurationScenarioParameter param : configParameters.values()) {
+                if (!ConfigurationScenarioDAO.configurationScenarioParameterIsSaved(param)) {
+                    return true;
+                }
+            }
+        } catch (SQLException ex) {
+            return false;
+        }
+        return false;
     }
 
     /**
