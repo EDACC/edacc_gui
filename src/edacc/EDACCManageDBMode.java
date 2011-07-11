@@ -391,7 +391,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         ));
         tableParameters.setToolTipText(resourceMap.getString("tableParameters.toolTipText")); // NOI18N
         tableParameters.setName("tableParameters"); // NOI18N
-        tableParameters.setPreferredSize(new java.awt.Dimension(100, 72));
         tableParameters.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(tableParameters);
 
