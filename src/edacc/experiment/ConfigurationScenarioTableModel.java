@@ -49,7 +49,7 @@ public class ConfigurationScenarioTableModel extends ThreadSafeDefaultTableModel
         for (Parameter param : parameters) {
             if (param.isMandatory()) {
                 if (!configScenarioParameters.containsKey(param.getId())) {
-                    configScenarioParameters.put(param.getId(), new ConfigurationScenarioParameter());
+                    configScenarioParameters.put(param.getId(), new ConfigurationScenarioParameter(true, null, param));
                 }
             }
         }

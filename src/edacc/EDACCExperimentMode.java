@@ -1908,6 +1908,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
      * Updates the tab titles and the status text according to the state of the GUI. 
      */
     public void setTitles() {
+        if (expController.configurationScenarioIsModified()) {
+            manageExperimentPane.setTitleAt(TAB_CONFIGURATIONSCENARIO, "Configuration Scenario (modified)");
+        } else {
+            manageExperimentPane.setTitleAt(TAB_CONFIGURATIONSCENARIO, "Configuration Scenario");
+        }
         if (solverConfigPanel.isModified()) {
             manageExperimentPane.setTitleAt(TAB_SOLVERS, "Solvers (modified)");
         } else {
@@ -2871,6 +2876,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 createDatabaseErrorMessage(ex);
             }
         }
+        setTitles();
     }//GEN-LAST:event_comboConfigScenarioSolverBinariesActionPerformed
     
     private void btnConfigScenarioSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfigScenarioSaveActionPerformed
@@ -2879,6 +2885,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         } catch (SQLException ex) {
             this.createDatabaseErrorMessage(ex);
         }
+        setTitles();
     }//GEN-LAST:event_btnConfigScenarioSaveActionPerformed
     
     private void btnConfigScenarioUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfigScenarioUndoActionPerformed
