@@ -2017,6 +2017,46 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     }//GEN-LAST:event_btnSelectInstanceColumnsActionPerformed
 
     private void btnSolverEditBinaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverEditBinaryActionPerformed
+        // get selected binary which the user wants to edit
+        int selectedIndex = tableSolverBinaries.getSelectedRow();
+        if (selectedIndex < 0) // no binary selected
+            return;
+        SolverBinaries selectedBinary = solverBinariesTableModel.
+                getSolverBinaries(tableSolverBinaries.
+                convertRowIndexToModel(selectedIndex));
+        
+        try {
+            if (binaryFileChooser == null) {
+                binaryFileChooser = new JFileChooser();
+                binaryFileChooser.setMultiSelectionEnabled(true);
+                binaryFileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+            }
+
+            // show file chooser for binaries and save result
+            int fileChooserResult = binaryFileChooser.showDialog(this, "Edit Solver Binaries");
+            if (fileChooserResult == JFileChooser.APPROVE_OPTION) { 
+                // OK clicked -> change files to selected binaries
+                // show edit dialogs and perform modification (by calling controller)
+                manageDBSolvers.editSolverBinary(binaryFileChooser.getSelectedFiles(), selectedBinary);
+                unsavedChanges = true;
+            } else if (fileChooserResult == JFileChooser.CANCEL_OPTION) {
+                // cancel clicked -> use old files and only edit details
+                manageDBSolvers.editSolverBinaryDetails(selectedBinary);
+            }
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "The binary of the solver couldn't be found: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "An error occured while adding the binary of the solver: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        tableSolver.updateUI();
     }//GEN-LAST:event_btnSolverEditBinaryActionPerformed
 
     private void btnSolverDeleteBinaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverDeleteBinaryActionPerformed
@@ -2130,7 +2170,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         tfSolverAuthors.setEnabled(enabled);
         tfSolverVersion.setEnabled(enabled);
         btnSolverAddBinary.setEnabled(enabled);
-        btnSolverEditBinary.setEnabled(false); // TODO implement
+        btnSolverEditBinary.setEnabled(enabled); 
         btnSolverDeleteBinary.setEnabled(enabled);
         btnSolverAddCode.setEnabled(enabled);
         btnSolverExport.setEnabled(enabled);
