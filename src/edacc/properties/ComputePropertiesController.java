@@ -8,6 +8,7 @@ import edacc.EDACCComputeResultProperties;
 import edacc.manageDB.ProblemOccuredDuringPropertyComputation;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.Experiment;
+import edacc.model.ExperimentResult;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
@@ -15,6 +16,7 @@ import edacc.model.PropertyNotInDBException;
 import edacc.model.Tasks;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -58,11 +60,11 @@ public class ComputePropertiesController {
         }
     }
 
-    public void computProperties(Vector<Property> toCalculate, boolean recompute, Experiment exp, Tasks task) throws ProblemOccuredDuringPropertyComputation {
+    public void computProperties(Vector<Property> toCalculate, boolean recompute, ArrayList<ExperimentResult> results, Tasks task) throws ProblemOccuredDuringPropertyComputation {
         try {
             lock.lock();
             Condition condition = lock.newCondition();
-            PropertyComputationController comCon = new PropertyComputationController(exp, toCalculate, recompute, task, lock);
+            PropertyComputationController comCon = new PropertyComputationController(results, toCalculate, recompute, task, lock);
             Thread compute = new Thread(comCon);
             compute.start();
             try {
