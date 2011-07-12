@@ -1,5 +1,8 @@
 package edacc.model;
 
+import edacc.parameterspace.ParameterConfiguration;
+import edacc.parameterspace.domain.FlagDomain;
+import edacc.parameterspace.domain.OptionalDomain;
 import edacc.parameterspace.graph.ParameterGraph;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,7 +47,9 @@ public class ParameterGraphDAO {
         ResultSet rs = st.executeQuery("SELECT serializedGraph FROM ParameterGraph WHERE Solver_idSolver = " + solver.getId());
         try {
             if (rs.next()) {
-                return unmarshal(ParameterGraph.class, rs.getBlob("serializedGraph").getBinaryStream());
+                ParameterGraph p = unmarshal(ParameterGraph.class, rs.getBlob("serializedGraph").getBinaryStream());
+                p.buildAdjacencyList();
+                return p;
             }
         } finally {
             rs.close();
@@ -95,5 +100,65 @@ public class ParameterGraphDAO {
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         m.marshal(object, os);
         return new ByteArrayInputStream(os.toByteArray());
+    }
+
+    /**
+     * Creates a new solver configuration in the database for the experiment specified by the idExperiment argument.
+     * The solver binary of the configuration is determined by the configuration scenario that the user created in the GUI.
+     * The parameters values are assigned by looping over the parameters that were chosen in the GUI for the configuration scenario.
+     * Non-configurable parameters take on the value that the user specified as "fixed value" while configurable parameters
+     * take on the values that are specified in the ParameterConfiguration config that is passed to this function.
+     * @param idExperiment ID of the experiment for which to create a solver configuration.
+     * @param config parameter configuration object that specifies the values of parameters.
+     * @return unique database ID > 0 of the created solver configuration, 0 on errors.
+     */
+    public static int createSolverConfig(int idExperiment, ParameterConfiguration config, String name) {
+        try {
+            ConfigurationScenario cs = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(idExperiment);
+            SolverBinaries solver_binary = SolverBinariesDAO.getById(cs.getIdSolverBinary());
+            SolverConfiguration solver_config = SolverConfigurationDAO.createSolverConfiguration(solver_binary, idExperiment, 0, name);
+
+            for (ConfigurationScenarioParameter param : cs.getParameters()) {
+                if ("instance".equals(param.getParameter().getName()) || "seed".equals(param.getParameter().getName())) {
+                    ParameterInstance pi = ParameterInstanceDAO.createParameterInstance(param.getParameter().getId(), solver_config, "");
+                    ParameterInstanceDAO.save(pi);
+                } else if (!param.isConfigurable()) {
+                    if (param.getParameter().getHasValue()) {
+                        ParameterInstance pi = ParameterInstanceDAO.createParameterInstance(param.getParameter().getId(), solver_config, param.getFixedValue());
+                        ParameterInstanceDAO.save(pi);
+                    } else { // flag
+                        System.out.println("flag" + param.getParameter().getName());
+                        ParameterInstance pi = ParameterInstanceDAO.createParameterInstance(param.getParameter().getId(), solver_config, "");
+                        ParameterInstanceDAO.save(pi);
+                    }
+                } else if (param.isConfigurable()) {
+                    edacc.parameterspace.Parameter config_param = null;
+                    for (edacc.parameterspace.Parameter p : config.getParameter_instances().keySet()) {
+                        if (p.getName().equals(param.getParameter().getName())) {
+                            config_param = p;
+                            break;
+                        }
+                    }
+                    if (config_param == null) {
+                        System.out.println("no parameterspace param corresponding to " + param.getParameter().getName());
+                        continue;
+                    }
+
+                    if (OptionalDomain.OPTIONS.NOT_SPECIFIED.equals(config.getParameterValue(config_param))) {
+                        continue;
+                    } else if (FlagDomain.FLAGS.OFF.equals(config.getParameterValue(config_param))) {
+                        continue;
+                    } else {
+                        ParameterInstance pi = ParameterInstanceDAO.createParameterInstance(param.getParameter().getId(), solver_config, config.getParameterValue(config_param).toString());
+                        ParameterInstanceDAO.save(pi);
+                    }
+                }
+            }
+
+            return solver_config.getId();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
