@@ -29,6 +29,7 @@ import edacc.model.Client;
 import edacc.model.ClientDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.ConfigurationScenario;
+import edacc.model.ConfigurationScenarioDAO;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentResult;
@@ -36,15 +37,18 @@ import edacc.model.StatusCode;
 import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.ObjectCache;
+import edacc.model.ParameterGraphDAO;
 import edacc.model.PropertyNotInDBException;
 import edacc.model.Solver;
 import edacc.model.SolverBinaries;
+import edacc.model.SolverBinariesDAO;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import edacc.model.TaskCancelledException;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
+import edacc.parameterspace.graph.ParameterGraph;
 import edacc.properties.PropertyTypeNotExistException;
 import java.awt.Color;
 import java.awt.Component;
@@ -181,20 +185,20 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tableExperiments.setRowSorter(new TableRowSorter<ExperimentTableModel>(expTableModel));
         //tableExperiments.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "");
         tableExperiments.getDefaultEditor(Integer.class).addCellEditorListener(new CellEditorListener() {
-            
+
             @Override
             public void editingStopped(ChangeEvent e) {
                 tableExperimentsWasEditing = true;
             }
-            
+
             @Override
             public void editingCanceled(ChangeEvent e) {
                 tableExperimentsWasEditing = true;
             }
         });
-        
+
         tableExperiments.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            
+
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 boolean mod = false;
@@ -206,7 +210,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 btnLoadExperiment.setEnabled(mod);
             }
         });
-        
+
         experimentUpdateThread = new ExperimentUpdateThread(expTableModel);
 
         /* -------------------------------- end of experiment tab -------------------------------- */
@@ -227,6 +231,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         TableCellRenderer configurationScenarioTableCellRenderer = new TableCellRenderer() {
 
             private JCheckBox checkbox;
+
             {
                 checkbox = new JCheckBox();
                 checkbox.setHorizontalAlignment(SwingConstants.CENTER);
@@ -234,7 +239,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
 
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {               
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 if (isSelected) {
                     checkbox.setBackground(table.getSelectionBackground());
                 } else {
@@ -245,7 +250,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 return checkbox;
             }
         };
-        
+
         tblConfigurationScenario.setDefaultRenderer(Boolean.class, configurationScenarioTableCellRenderer);
         /* -------------------------------- end of configuration scenario tab -------------------------------- */
         /* -------------------------------- solver tab -------------------------------- */
@@ -256,7 +261,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         Util.addSpaceSelection(tableSolvers, SolverTableModel.COL_SELECTED);
         solverConfigPanel.setParent(this);
         solverConfigTableModel = new SolverConfigurationTableModel();
-        
+
         TableRowSorter tableSolverConfigurationsRowSorter = new TableRowSorter<SolverConfigurationTableModel>(solverConfigTableModel);
         solverConfigurationTableRowFilter = new SolverConfigurationTableRowFilter();
         tableSolverConfigurationsRowSorter.setRowFilter(solverConfigurationTableRowFilter);
@@ -264,7 +269,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tblSolverConfigs.setModel(solverConfigTableModel);
         Util.addSpaceSelection(tblSolverConfigs, SolverConfigurationTableModel.COL_SEL);
         tableSolvers.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            
+
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 solverConfigurationTableRowFilter.clearSolverBinaryIds();
@@ -273,7 +278,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     for (SolverBinaries sb : solTableModel.getSolver(rowModel).getSolverBinaries()) {
                         solverConfigurationTableRowFilter.addSolverBinaryId(sb.getId());
                     }
-                    
+
                 }
                 solverConfigTableModel.fireTableDataChanged();
                 tblSolverConfigs.repaint();
@@ -283,7 +288,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         /* -------------------------------- instances tab -------------------------------- */
         insTableModel = new InstanceTableModel();
         insTableModel.addTableModelListener(new TableModelListener() {
-            
+
             @Override
             public void tableChanged(TableModelEvent e) {
                 setTitles();
@@ -293,7 +298,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         sorter = new TableRowSorter<InstanceTableModel>(insTableModel);
         tableInstances.setRowSorter(sorter);
         SwingUtilities.invokeLater(new Runnable() {
-            
+
             @Override
             public void run() {
                 instanceFilter = new EDACCInstanceFilter(EDACCApp.getApplication().getMainFrame(), true, tableInstances, true);
@@ -312,7 +317,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tblGenerateJobs.setModel(generateJobsTableModel);
         tblGenerateJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeGenerateJobsTableCellRenderer());
         generateJobsTableModel.addTableModelListener(new TableModelListener() {
-            
+
             @Override
             public void tableChanged(TableModelEvent e) {
                 setGenerateJobsTitle();
@@ -321,26 +326,26 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         /* -------------------------------- end of generate jobs tab -------------------------------- */
         /* -------------------------------- jobs browser tab -------------------------------- */
         jobsTableModel = new ExperimentResultsBrowserTableModel();
-        
+
         tableJobs.setModel(jobsTableModel);
         resultsBrowserTableRowSorter = new ResultsBrowserTableRowSorter(jobsTableModel);
         resultsBrowserTableRowSorter.setSortsOnUpdates(true);
         tableJobs.setRowSorter(resultsBrowserTableRowSorter);
         SwingUtilities.invokeLater(new Runnable() {
-            
+
             @Override
             public void run() {
                 resultBrowserRowFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tableJobs, false);
             }
         });
-        
+
         tableJobsStringRenderer = new EDACCExperimentModeJobsCellRenderer();
         tableJobs.setDefaultRenderer(Object.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.setDefaultRenderer(String.class, tableJobsStringRenderer);
         tableJobs.setDefaultRenderer(Integer.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.setDefaultRenderer(Float.class, new EDACCExperimentModeJobsCellRenderer());
         tableJobs.addKeyListener(new java.awt.event.KeyAdapter() {
-            
+
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_U) {
@@ -362,7 +367,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         analysePanel = new AnalysisPanel(expController);
         panelAnalysis.setViewportView(analysePanel);
         /* -------------------------------- end of analyze tab -------------------------------- */
-        
+
         manageExperimentPane.setEnabledAt(TAB_CONFIGURATIONSCENARIO, false);
         manageExperimentPane.setEnabledAt(TAB_SOLVERS, false);
         manageExperimentPane.setEnabledAt(TAB_INSTANCES, false);
@@ -370,12 +375,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         manageExperimentPane.setEnabledAt(TAB_JOBBROWSER, false);
         manageExperimentPane.setEnabledAt(TAB_ANALYSIS, false);
         manageExperimentPane.setTitleAt(TAB_EXPERIMENTS, "Experiments");
-        
+
         btnDiscardExperiment.setEnabled(false);
         btnImport.setEnabled(false);
-        
+
         GridQueuesController.getInstance().addObserver(new Observer() {
-            
+
             @Override
             public void update(Observable o, Object arg) {
                 try {
@@ -390,7 +395,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         });
         DatabaseConnector.getInstance().addObserver(new Observer() {
-            
+
             @Override
             public void update(Observable o, Object arg) {
                 if (!DatabaseConnector.getInstance().isConnected()) {
@@ -405,7 +410,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         });
     }
-    
+
     private void jobsTableRepaintRow(int rowIndex) {
         final int cols1 = tableJobs.getColumnCount();
         Rectangle rect;
@@ -417,7 +422,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             tableJobs.repaint(rect);
         }
     }
-    
+
     private void tableJobsProcessMouseEvent(MouseEvent e) {
         final int eventId = e.getID();
         if (eventId == MouseEvent.MOUSE_EXITED || eventId == MouseEvent.MOUSE_ENTERED) {
@@ -446,7 +451,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         }
     }
-    
+
     private void tableJobsProcessMouseMotionEvent(MouseEvent e) {
         int col_view = tableJobs.columnAtPoint(e.getPoint());
         int col = tableJobs.convertColumnIndexToModel(col_view);
@@ -464,7 +469,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             tableJobsStringRenderer.markCol = col_view;
             tableJobsStringRenderer.markRow = row;
             jobsTableRepaintRow(row_view);
-            
+
         } else {
             tableJobs.setCursor(Cursor.getDefaultCursor());
             if (tableJobsStringRenderer.markRow != -1) {
@@ -565,7 +570,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         experimentUpdateThread.execute();
         SwingUtilities.invokeLater(new Runnable() {
-            
+
             @Override
             public void run() {
                 edacc.experiment.Util.updateTableColumnWidth(tableExperiments);
@@ -575,7 +580,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         // reload all columns
         solTableModel.fireTableStructureChanged();
-        
+
         boolean isCompetition = DatabaseConnector.getInstance().isCompetitionDB();
         // if it is no competition db, then remove the competition columns
         if (!isCompetition) {
@@ -623,6 +628,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tblConfigurationScenario = new javax.swing.JTable();
         btnConfigScenarioSave = new javax.swing.JButton();
         btnConfigScenarioUndo = new javax.swing.JButton();
+        btnConfigurationScenarioRandomSolverConfigs = new javax.swing.JButton();
         panelChooseSolver = new javax.swing.JPanel();
         splitPaneSolverSolverConfigs = new javax.swing.JSplitPane();
         jPanel2 = new javax.swing.JPanel();
@@ -1018,6 +1024,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         });
 
+        btnConfigurationScenarioRandomSolverConfigs.setText(resourceMap.getString("btnConfigurationScenarioRandomSolverConfigs.text")); // NOI18N
+        btnConfigurationScenarioRandomSolverConfigs.setName("btnConfigurationScenarioRandomSolverConfigs"); // NOI18N
+        btnConfigurationScenarioRandomSolverConfigs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConfigurationScenarioRandomSolverConfigsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelConfigurationScenarioLayout = new javax.swing.GroupLayout(panelConfigurationScenario);
         panelConfigurationScenario.setLayout(panelConfigurationScenarioLayout);
         panelConfigurationScenarioLayout.setHorizontalGroup(
@@ -1035,6 +1049,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                             .addComponent(comboConfigScenarioSolvers, 0, 1019, Short.MAX_VALUE)
                             .addComponent(comboConfigScenarioSolverBinaries, 0, 1019, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelConfigurationScenarioLayout.createSequentialGroup()
+                        .addComponent(btnConfigurationScenarioRandomSolverConfigs)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 793, Short.MAX_VALUE)
                         .addComponent(btnConfigScenarioUndo)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnConfigScenarioSave)))
@@ -1056,7 +1072,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelConfigurationScenarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnConfigScenarioSave)
-                    .addComponent(btnConfigScenarioUndo))
+                    .addComponent(btnConfigScenarioUndo)
+                    .addComponent(btnConfigurationScenarioRandomSolverConfigs))
                 .addContainerGap())
         );
 
@@ -1951,7 +1968,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public boolean generateJobsIsModified() {
         return expController.experimentResultsIsModified();
     }
-    
+
     private void manageExperimentPaneStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_manageExperimentPaneStateChanged
         switch (manageExperimentPane.getSelectedIndex()) {
             case TAB_EXPERIMENTS:
@@ -1974,7 +1991,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             case TAB_SOLVERS:
                 splitPaneSolverSolverConfigs.setDividerLocation(0.5);
                 splitPaneSolver.setDividerLocation(0.5);
-                
+
                 edacc.experiment.Util.updateTableColumnWidth(tableSolvers);
                 if (solverConfigUpdateThread == null || solverConfigUpdateThread.isDone()) {
                     solverConfigUpdateThread = new SolverConfigUpdateThread(expController.solverConfigCache);
@@ -2001,7 +2018,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 break;
             case TAB_JOBBROWSER:
                 final Rectangle rect = tableJobs.getVisibleRect();
-                
+
                 resultBrowserETA = null;
                 lblETA.setText("");
                 try {
@@ -2015,11 +2032,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
                 // first draw the results browser, then load the jobs (SwingUtilites)
                 SwingUtilities.invokeLater(new Runnable() {
-                    
+
                     @Override
                     public void run() {
                         Tasks.startTask(new TaskRunnable() {
-                            
+
                             @Override
                             public void run(Tasks task) {
                                 try {
@@ -2029,13 +2046,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                                 }
                                 tableJobs.scrollRectToVisible(rect);
                                 SwingUtilities.invokeLater(new Runnable() {
-                                    
+
                                     @Override
                                     public void run() {
                                         EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
                                     }
                                 });
-                                
+
                             }
                         });
                     }
@@ -2050,12 +2067,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
                 analysePanel.removeAll();
                 Tasks.startTask(new TaskRunnable() {
-                    
+
                     @Override
                     public void run(Tasks task) {
                         analysePanel.initialize();
                         SwingUtilities.invokeLater(new Runnable() {
-                            
+
                             @Override
                             public void run() {
                                 if (analysePanel.comboType.getItemCount() > 0) {
@@ -2063,7 +2080,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                                 }
                             }
                         });
-                        
+
                     }
                 }, false);
                 break;
@@ -2072,7 +2089,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             jobsTimerWasActive = jobsTimer != null;
             stopJobsTimer();
         }
-        
+
         if (experimentUpdateThread != null && manageExperimentPane.getSelectedIndex() != TAB_EXPERIMENTS) {
             experimentUpdateThread.cancel(true);
         }
@@ -2083,7 +2100,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             solverConfigUpdateThread.cancel(true);
         }
     }//GEN-LAST:event_manageExperimentPaneStateChanged
-    
+
     private ArrayList<Client> getSelectedClients() {
         ArrayList<Client> res = new ArrayList<Client>();
         if (tblClients.getSelectedRowCount() > 0) {
@@ -2093,7 +2110,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         return res;
     }
-    
+
     private void chkJobsTimerMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_chkJobsTimerMouseReleased
         if (chkJobsTimer.isSelected()) {
             resultBrowserETA = null;
@@ -2106,7 +2123,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     jobsTimer = new Timer();
                     final ExperimentResultsBrowserTableModel sync = jobsTableModel;
                     jobsTimer.scheduleAtFixedRate(new TimerTask() {
-                        
+
                         @Override
                         public void run() {
                             Tasks.startTask("loadJobs", expController, EDACCExperimentMode.this, false);
@@ -2122,13 +2139,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             stopJobsTimer();
         }
     }//GEN-LAST:event_chkJobsTimerMouseReleased
-    
+
     private void tableExperimentsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableExperimentsMouseClicked
         if (evt.getClickCount() == 2) {
             this.btnLoadExperimentActionPerformed(null);
         }
     }//GEN-LAST:event_tableExperimentsMouseClicked
-    
+
     private void txtJobsTimerKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtJobsTimerKeyReleased
         txtJobsTimer.setText(Util.getNumberText(txtJobsTimer.getText()));
         if (chkJobsTimer.isSelected()) {
@@ -2136,7 +2153,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             stopJobsTimer();
         }
     }//GEN-LAST:event_txtJobsTimerKeyReleased
-    
+
     private void btnComputeResultPropertiesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnComputeResultPropertiesActionPerformed
         ArrayList<ExperimentResult> results = new ArrayList<ExperimentResult>();
         for (int row = 0; row < tableJobs.getRowCount(); row++) {
@@ -2148,7 +2165,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         resultBrowserETA = null;
         Tasks.startTask("loadJobs", expController, this, false);
     }//GEN-LAST:event_btnComputeResultPropertiesActionPerformed
-    
+
     private void jTreeInstanceClassValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTreeInstanceClassValueChanged
         instanceFilter.clearInstanceClassIds();
         if (jTreeInstanceClass.getSelectionPaths() != null) {
@@ -2160,14 +2177,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             insTableModel.fireTableDataChanged();
         }
     }//GEN-LAST:event_jTreeInstanceClassValueChanged
-    
+
     private void btnGeneratePackage(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGeneratePackage
         EDACCGeneratePackageFileChooser packageFileChooser = new EDACCGeneratePackageFileChooser(EDACCApp.getApplication().getMainFrame(), true, expController);
         packageFileChooser.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         packageFileChooser.setName("EDACCGeneratePackageFileChooser");
         EDACCApp.getApplication().show(packageFileChooser);
 }//GEN-LAST:event_btnGeneratePackage
-    
+
     private void btnSetNumRunsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSetNumRunsActionPerformed
         MultipleCellSelectionTable table = (MultipleCellSelectionTable) tblGenerateJobs;
         EDACCExperimentModeNumRunsSetter dialogNumRuns = new EDACCExperimentModeNumRunsSetter(EDACCApp.getApplication().getMainFrame(), true, table.getSelectedCount() == 0);
@@ -2184,7 +2201,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             generateJobsTableModel.fireTableDataChanged();
         }
     }//GEN-LAST:event_btnSetNumRunsActionPerformed
-    
+
     private void btnChangeViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangeViewActionPerformed
         if (jScrollPane4.getViewport().getView() == solverConfigTablePanel) {
             jScrollPane4.setViewportView(solverConfigPanel);
@@ -2193,7 +2210,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             jScrollPane4.setViewportView(solverConfigTablePanel);
         }
     }//GEN-LAST:event_btnChangeViewActionPerformed
-    
+
     private void btnImportSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportSolverConfigsActionPerformed
         ObjectCache<SolverConfiguration> cache = SolverConfigurationDAO.cache;
         SolverConfigurationDAO.cache = new ObjectCache<SolverConfiguration>();
@@ -2212,16 +2229,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 javax.swing.JOptionPane.showMessageDialog(null, "Could not import solver configurations: " + e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
         }
-        
+
     }//GEN-LAST:event_btnImportSolverConfigsActionPerformed
-    
+
     private void tableExperimentsKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableExperimentsKeyReleased
         if (!tableExperimentsWasEditing && evt.getKeyCode() == KeyEvent.VK_ENTER) {
             btnLoadExperimentActionPerformed(null);
         }
         tableExperimentsWasEditing = false;
     }//GEN-LAST:event_tableExperimentsKeyReleased
-    
+
     private void tblClientsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblClientsMouseClicked
         if (evt.getClickCount() == 2) {
             if (tblClients.getSelectedRow() != -1) {
@@ -2232,7 +2249,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         }
     }//GEN-LAST:event_tblClientsMouseClicked
-    
+
     private void menuSendMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSendMessageActionPerformed
         ArrayList<Client> clients = getSelectedClients();
         if (clients.isEmpty()) {
@@ -2250,7 +2267,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         }
     }//GEN-LAST:event_menuSendMessageActionPerformed
-    
+
     private void menuKillSoftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuKillSoftActionPerformed
         ArrayList<Client> clients = getSelectedClients();
         if (clients.isEmpty()) {
@@ -2267,7 +2284,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         }
     }//GEN-LAST:event_menuKillSoftActionPerformed
-    
+
     private void menuKillHardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuKillHardActionPerformed
         ArrayList<Client> clients = getSelectedClients();
         if (clients.isEmpty()) {
@@ -2284,7 +2301,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         }
     }//GEN-LAST:event_menuKillHardActionPerformed
-    
+
     private void menuRemoveDeadClientsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuRemoveDeadClientsActionPerformed
         if (JOptionPane.showConfirmDialog(this, "This will remove all dead clients from the client table. Are you sure you want to continue?", "Delete Clients", JOptionPane.YES_NO_OPTION) == 0) {
             try {
@@ -2294,7 +2311,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         }
     }//GEN-LAST:event_menuRemoveDeadClientsActionPerformed
-    
+
     private void btnChooseSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseSolverConfigsActionPerformed
         try {
             for (int row = 0; row < tblSolverConfigs.getRowCount(); row++) {
@@ -2307,28 +2324,28 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             JOptionPane.showMessageDialog(this, "Error while saving solver configurations: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnChooseSolverConfigsActionPerformed
-    
+
     private void btnSelectAllSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllSolverConfigsActionPerformed
         for (int row = 0; row < tblSolverConfigs.getRowCount(); row++) {
             solverConfigTableModel.setValueAt(true, tblSolverConfigs.convertRowIndexToModel(row), SolverConfigurationTableModel.COL_SEL);
         }
         solverConfigTableModel.fireTableDataChanged();
     }//GEN-LAST:event_btnSelectAllSolverConfigsActionPerformed
-    
+
     private void btnDeselectAllSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeselectAllSolverConfigsActionPerformed
         for (int row = 0; row < tblSolverConfigs.getRowCount(); row++) {
             solverConfigTableModel.setValueAt(false, tblSolverConfigs.convertRowIndexToModel(row), SolverConfigurationTableModel.COL_SEL);
         }
         solverConfigTableModel.fireTableDataChanged();
     }//GEN-LAST:event_btnDeselectAllSolverConfigsActionPerformed
-    
+
     private void btnInvertSolverConfigSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInvertSolverConfigSelectionActionPerformed
         for (int row = 0; row < tblSolverConfigs.getRowCount(); row++) {
             solverConfigTableModel.setValueAt(!(Boolean) solverConfigTableModel.getValueAt(tblSolverConfigs.convertRowIndexToModel(row), SolverConfigurationTableModel.COL_SEL), tblSolverConfigs.convertRowIndexToModel(row), SolverConfigurationTableModel.COL_SEL);
         }
         solverConfigTableModel.fireTableDataChanged();
     }//GEN-LAST:event_btnInvertSolverConfigSelectionActionPerformed
-    
+
     private void btnImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportActionPerformed
         if (expController.getActiveExperiment() == null) {
             JOptionPane.showMessageDialog(this, "You have to load an experiment.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -2345,14 +2362,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         EDACCApp.getApplication().show(dialog);
         if (!dialog.isCancelled()) {
             Tasks.startTask(new TaskRunnable() {
-                
+
                 @Override
                 public void run(Tasks task) {
                     try {
                         expController.importData(task, dialog.getSelectedSolverConfigs(), dialog.getSelectedInstances(), dialog.getImportFinishedRuns());
                     } catch (final Exception ex) {
                         SwingUtilities.invokeLater(new Runnable() {
-                            
+
                             @Override
                             public void run() {
                                 JOptionPane.showMessageDialog(EDACCExperimentMode.this, "Error while importing data: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -2363,7 +2380,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             });
         }
     }//GEN-LAST:event_btnImportActionPerformed
-    
+
     private void btnInstanceColumnSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInstanceColumnSelectionActionPerformed
         List<SortKey> sortKeys = (List<SortKey>) tableInstances.getRowSorter().getSortKeys();
         List<String> columnNames = new ArrayList<String>();
@@ -2394,7 +2411,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         } catch (Exception e) {
         }
     }//GEN-LAST:event_btnInstanceColumnSelectionActionPerformed
-    
+
     private void btnLoadExperimentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadExperimentActionPerformed
         if (tableExperiments.getSelectedRow() != -1) {
             if (expController.getActiveExperiment() == null || !hasUnsavedChanges() || JOptionPane.showConfirmDialog(this,
@@ -2411,7 +2428,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         }
     }//GEN-LAST:event_btnLoadExperimentActionPerformed
-    
+
     private void btnCreateExperimentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateExperimentActionPerformed
         btnDiscardExperimentActionPerformed(null);
         if (expController.getActiveExperiment() != null) {
@@ -2436,7 +2453,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
             if (!dialogNewExp.canceled) {
                 Tasks.startTask(new TaskRunnable() {
-                    
+
                     @Override
                     public void run(Tasks task) {
                         Experiment newExp;
@@ -2473,14 +2490,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             dialogNewExp.dispose();
         }
     }//GEN-LAST:event_btnCreateExperimentActionPerformed
-    
+
     private void btnRemoveExperimentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveExperimentActionPerformed
         if (tableExperiments.getSelectedRow() != -1) {
             int removedIndex = tableExperiments.getSelectedRow();
             int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), "Do you really want to remove the experiment " + expTableModel.getValueAt(tableExperiments.convertRowIndexToModel(removedIndex), ExperimentTableModel.COL_NAME) + "?", "Remove experiment", javax.swing.JOptionPane.YES_NO_OPTION);
             if (userInput == JOptionPane.YES_OPTION) {
                 try {
-                    
+
                     Integer i = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow())).getId();
                     expController.removeExperiment(i);
                     if (removedIndex > this.tableExperiments.getRowCount() - 1) {
@@ -2505,7 +2522,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         }
     }//GEN-LAST:event_btnRemoveExperimentActionPerformed
-    
+
     private void btnChooseSolversActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseSolversActionPerformed
         solverConfigPanel.beginUpdate();
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
@@ -2521,48 +2538,48 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         setTitles();
     }//GEN-LAST:event_btnChooseSolversActionPerformed
-    
+
     private void btnSaveSolverConfigurationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveSolverConfigurationsActionPerformed
         Tasks.startTask(new TaskRunnable() {
-            
+
             @Override
             public void run(Tasks task) {
                 try {
                     expController.saveSolverConfigurations(task);
                 } catch (final Exception e) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        
+
                         @Override
                         public void run() {
                             EDACCExperimentMode.this.onTaskFailed("", e);
                         }
                     });
-                    
+
                 } finally {
                     SwingUtilities.invokeLater(new Runnable() {
-                        
+
                         @Override
                         public void run() {
                             setTitles();
                             setGenerateJobsTitle();
                         }
                     });
-                    
+
                 }
             }
         });
     }//GEN-LAST:event_btnSaveSolverConfigurationsActionPerformed
-    
+
     private void btnUndoSolverConfigurationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUndoSolverConfigurationsActionPerformed
         Tasks.startTask(new TaskRunnable() {
-            
+
             @Override
             public void run(Tasks task) {
                 try {
                     expController.undoSolverConfigurations(task);
                 } catch (final SQLException e) {
                     SwingUtilities.invokeLater(new Runnable() {
-                        
+
                         @Override
                         public void run() {
                             createDatabaseErrorMessage(e);
@@ -2571,59 +2588,59 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 } finally {
                     if (jScrollPane4.getViewport().getView() == solverConfigTablePanel) {
                         SwingUtilities.invokeLater(new Runnable() {
-                            
+
                             @Override
                             public void run() {
                                 solverConfigTablePanel.update();
                             }
                         });
-                        
+
                     }
                 }
             }
         });
     }//GEN-LAST:event_btnUndoSolverConfigurationsActionPerformed
-    
+
     private void btnSelectAllSolversActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllSolversActionPerformed
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
             solTableModel.setSelected(i, true);
         }
     }//GEN-LAST:event_btnSelectAllSolversActionPerformed
-    
+
     private void btnDeselectAllSolversActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeselectAllSolversActionPerformed
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
             solTableModel.setSelected(i, false);
         }
     }//GEN-LAST:event_btnDeselectAllSolversActionPerformed
-    
+
     private void btnReverseSolverSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReverseSolverSelectionActionPerformed
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
             solTableModel.setSelected(i, !solTableModel.isSelected(i));
         }
     }//GEN-LAST:event_btnReverseSolverSelectionActionPerformed
-    
+
     private void btnSaveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveInstancesActionPerformed
         Tasks.startTask("saveExperimentHasInstances", new Class[]{Tasks.class}, new Object[]{null}, expController, this);
     }//GEN-LAST:event_btnSaveInstancesActionPerformed
-    
+
     private void btnSelectAllInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllInstancesActionPerformed
         for (int i = 0; i < tableInstances.getRowCount(); i++) {
             tableInstances.setValueAt(true, i, tableInstances.convertColumnIndexToView(InstanceTableModel.COL_SELECTED));
         }
     }//GEN-LAST:event_btnSelectAllInstancesActionPerformed
-    
+
     private void btnDeselectAllInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeselectAllInstancesActionPerformed
         for (int i = 0; i < tableInstances.getRowCount(); i++) {
             tableInstances.setValueAt(false, i, tableInstances.convertColumnIndexToView(InstanceTableModel.COL_SELECTED));
         }
     }//GEN-LAST:event_btnDeselectAllInstancesActionPerformed
-    
+
     private void btnInvertSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInvertSelectionActionPerformed
         for (int i = 0; i < tableInstances.getRowCount(); i++) {
             tableInstances.setValueAt(!((Boolean) tableInstances.getValueAt(i, tableInstances.convertColumnIndexToView(InstanceTableModel.COL_SELECTED))), i, tableInstances.convertColumnIndexToView(InstanceTableModel.COL_SELECTED));
         }
     }//GEN-LAST:event_btnInvertSelectionActionPerformed
-    
+
     private void btnGenerateJobsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerateJobsActionPerformed
         if (hasUnsavedChanges()) {
             javax.swing.JOptionPane.showMessageDialog(null, "Please save all unsaved data first or reload the experiment before generating jobs.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
@@ -2646,7 +2663,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         } catch (final Exception ex) {
             SwingUtilities.invokeLater(new Runnable() {
-                
+
                 @Override
                 public void run() {
                     javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
@@ -2654,7 +2671,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             });
         }
     }//GEN-LAST:event_btnGenerateJobsActionPerformed
-    
+
     private void btnFilterInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterInstancesActionPerformed
         EDACCApp.getApplication().show(instanceFilter);
         insTableModel.fireTableDataChanged();
@@ -2664,12 +2681,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             setFilterStatus("");
         }
     }//GEN-LAST:event_btnFilterInstancesActionPerformed
-    
+
     private void btnRefreshJobsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshJobsActionPerformed
         resultBrowserETA = null;
         Tasks.startTask("loadJobs", expController, this, false);
     }//GEN-LAST:event_btnRefreshJobsActionPerformed
-    
+
     private void btnBrowserColumnSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBrowserColumnSelectionActionPerformed
         List<SortKey> sortKeys = (List<SortKey>) tableJobs.getRowSorter().getSortKeys();
         List<String> columnNames = new ArrayList<String>();
@@ -2691,35 +2708,35 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tableJobs.getRowSorter().setSortKeys(newSortKeys);
         Util.updateTableColumnWidth(tableJobs);
     }//GEN-LAST:event_btnBrowserColumnSelectionActionPerformed
-    
+
     private void btnFilterJobsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterJobsActionPerformed
         EDACCApp.getApplication().show(resultBrowserRowFilter);
         jobsTableModel.fireTableDataChanged();
         updateJobsFilterStatus();
     }//GEN-LAST:event_btnFilterJobsActionPerformed
-    
+
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
         stopJobsTimer();
         JFileChooser fc = new JFileChooser();
         FileFilter CSVFilter = new FileFilter() {
-            
+
             @Override
             public boolean accept(File f) {
                 return f.getName().toLowerCase().endsWith(".csv") || f.isDirectory();
             }
-            
+
             @Override
             public String getDescription() {
                 return "CSV Files (comma separated values)";
             }
         };
         FileFilter TeXFilter = new FileFilter() {
-            
+
             @Override
             public boolean accept(File f) {
                 return f.getName().toLowerCase().endsWith(".tex") || f.isDirectory();
             }
-            
+
             @Override
             public String getDescription() {
                 return "TeX Files (*.tex)";
@@ -2743,12 +2760,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             Tasks.startTask("exportTeX", new Class[]{File.class, edacc.model.Tasks.class}, new Object[]{new File(filename), null}, expController, this);
         }
     }//GEN-LAST:event_btnExportActionPerformed
-    
+
     private void btnUndoInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUndoInstancesActionPerformed
         insTableModel.undo();
         this.setTitles();
     }//GEN-LAST:event_btnUndoInstancesActionPerformed
-    
+
     private void btnDiscardExperimentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDiscardExperimentActionPerformed
         boolean unload = !hasUnsavedChanges() || (JOptionPane.showConfirmDialog(this,
                 "Discarding an experiment will make you lose all unsaved changes of the current experiment. Continue discarding the experiment?",
@@ -2759,7 +2776,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             tableExperiments.requestFocusInWindow();
         }
     }//GEN-LAST:event_btnDiscardExperimentActionPerformed
-    
+
     private void btnSelectQueueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectQueueActionPerformed
         try {
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
@@ -2771,10 +2788,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         } catch (SQLException ex) {
         }
     }//GEN-LAST:event_btnSelectQueueActionPerformed
-    
+
     private void btnEditExperimentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditExperimentActionPerformed
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        
+
         Experiment exp = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
         EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription(), exp.isConfigurationExp());
         dialogEditExp.setLocationRelativeTo(mainFrame);
@@ -2818,21 +2835,21 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             dialogEditExp.dispose();
         }
     }//GEN-LAST:event_btnEditExperimentActionPerformed
-    
+
     private void btnSelectedInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectedInstancesActionPerformed
         LinkedList<SortKey> sortKeys = new LinkedList<SortKey>();
         jTreeInstanceClass.setSelectionInterval(0, jTreeInstanceClass.getRowCount() - 1);
         sortKeys.add(new SortKey(InstanceTableModel.COL_SELECTED, SortOrder.DESCENDING));
         tableInstances.getRowSorter().setSortKeys(sortKeys);
     }//GEN-LAST:event_btnSelectedInstancesActionPerformed
-    
+
     private void btnRandomSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRandomSelectionActionPerformed
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
         EDACCExperimentModeRandomInstanceSelection random = new EDACCExperimentModeRandomInstanceSelection(mainFrame, true, this);
         random.setLocationRelativeTo(mainFrame);
         random.setVisible(true);
     }//GEN-LAST:event_btnRandomSelectionActionPerformed
-    
+
     private void btnSetPriorityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSetPriorityActionPerformed
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
         EDACCExperimentModePrioritySelection priorityDialog = new EDACCExperimentModePrioritySelection(mainFrame, true);
@@ -2841,7 +2858,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         final Integer priority = priorityDialog.getPriority();
         if (priority != null) {
             Tasks.startTask(new TaskRunnable() {
-                
+
                 @Override
                 public void run(Tasks task) {
                     try {
@@ -2851,10 +2868,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     }
                 }
             });
-            
+
         }
     }//GEN-LAST:event_btnSetPriorityActionPerformed
-    
+
     private void comboConfigScenarioSolversActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboConfigScenarioSolversActionPerformed
         comboConfigScenarioSolverBinaries.removeAllItems();
         if (!(comboConfigScenarioSolvers.getSelectedItem() instanceof Solver)) {
@@ -2864,7 +2881,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             comboConfigScenarioSolverBinaries.addItem(solverBinary);
         }
     }//GEN-LAST:event_comboConfigScenarioSolversActionPerformed
-    
+
     private void comboConfigScenarioSolverBinariesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboConfigScenarioSolverBinariesActionPerformed
         if (comboConfigScenarioSolverBinaries.getSelectedItem() instanceof SolverBinaries) {
             try {
@@ -2876,7 +2893,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         setTitles();
     }//GEN-LAST:event_comboConfigScenarioSolverBinariesActionPerformed
-    
+
     private void btnConfigScenarioSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfigScenarioSaveActionPerformed
         try {
             expController.saveConfigurationScenario();
@@ -2885,7 +2902,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         setTitles();
     }//GEN-LAST:event_btnConfigScenarioSaveActionPerformed
-    
+
     private void btnConfigScenarioUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfigScenarioUndoActionPerformed
         try {
             expController.reloadConfigurationScenario();
@@ -2894,6 +2911,53 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             createDatabaseErrorMessage(ex);
         }
     }//GEN-LAST:event_btnConfigScenarioUndoActionPerformed
+
+    private void btnConfigurationScenarioRandomSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfigurationScenarioRandomSolverConfigsActionPerformed
+        if (expController.configurationScenarioIsModified()) {
+            JOptionPane.showMessageDialog(this, "You have to save the configuration scneario before generating random solver configurations.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        String input = JOptionPane.showInputDialog("How many random solver configurations should be generated?");
+        if (input != null) {
+            try {
+                final int number = Integer.parseInt(input);
+                Tasks.startTask(new TaskRunnable() {
+
+                    @Override
+                    public void run(Tasks task) {
+                        try {
+                            task.setOperationName("Generating solver configurations");
+                            ConfigurationScenario scenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(expController.getActiveExperiment().getId());
+                            SolverBinaries sb = SolverBinariesDAO.getById(scenario.getIdSolverBinary());
+                            ParameterGraph graph = ParameterGraphDAO.loadParameterGraph(SolverDAO.getById(sb.getIdSolver()));
+                            Random random = new Random();
+                            for (int i = 0; i < number; i++) {
+                                task.setStatus("Processing solver configuration " + i + " of " + number);
+                                ParameterGraphDAO.createSolverConfig(expController.getActiveExperiment().getId(), graph.getRandomConfiguration(random), "Random " + i);
+                            }
+                            expController.solverConfigCache.synchronize();
+                        } catch (final Exception ex) {
+                            SwingUtilities.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    if (ex instanceof SQLException) {
+                                        createDatabaseErrorMessage((SQLException) ex);
+                                    } else {
+                                        JOptionPane.showMessageDialog(EDACCExperimentMode.this, "Unexpected error while generating random solver configurations:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Expected an integer for number of solver configurations.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+
+        }
+    }//GEN-LAST:event_btnConfigurationScenarioRandomSolverConfigsActionPerformed
 
     /**
      * Stops the jobs timer.
@@ -2913,13 +2977,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         reinitializeInstances();
         reinitializeJobBrowser();
         loadConfigurationScenarioTab();
-        
+
         manageExperimentPane.setEnabledAt(TAB_SOLVERS, true);
         manageExperimentPane.setEnabledAt(TAB_INSTANCES, true);
         manageExperimentPane.setEnabledAt(TAB_GENERATEJOBS, true);
         manageExperimentPane.setEnabledAt(TAB_JOBBROWSER, true);
         manageExperimentPane.setEnabledAt(TAB_ANALYSIS, true);
-        
+
         setTitles();
         btnDiscardExperiment.setEnabled(true);
         btnImport.setEnabled(true);
@@ -2939,7 +3003,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         setTitles();
         btnDiscardExperiment.setEnabled(false);
     }
-    
+
     private void createDatabaseErrorMessage(SQLException e) {
         javax.swing.JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "There was an error while communicating with the database: " + e, "Connection error", javax.swing.JOptionPane.ERROR_MESSAGE);
     }
@@ -2964,16 +3028,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         int jobsSuccessful = jobsTableModel.getJobsCount(StatusCode.SUCCESSFUL);
         int jobsWaiting = jobsTableModel.getJobsCount(StatusCode.NOT_STARTED);
         int jobsRunning = jobsTableModel.getJobsCount(StatusCode.RUNNING);
-        
+
         int jobsCrashed = jobsTableModel.getJobsCount(StatusCode.LAUNCHERCRASH)
                 + jobsTableModel.getJobsCount(StatusCode.SOLVERCRASH)
                 + jobsTableModel.getJobsCount(StatusCode.VERIFIERCRASH)
                 + jobsTableModel.getJobsCount(StatusCode.WATCHERCRASH);
-        
+
         int jobsNotSuccessful = jobsCount - jobsSuccessful - jobsWaiting - jobsRunning;
         double percentage = (double) (jobsSuccessful + jobsNotSuccessful) / jobsCount;
         percentage = Math.round(percentage * 100 * 100) / 100.;
-        
+
         int count = 0;
         double avgTime = 0.;
         int curRunningTime = 0;
@@ -2991,7 +3055,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         if (count > 0 && jobsRunning > 0) {
             avgTime /= count;
             int timeleft = (int) (Math.round((jobsWaiting + jobsRunning) * avgTime / jobsRunning) - curRunningTime / jobsRunning);
-            
+
             if (resultBrowserETA != null) {
                 int tmp = timeleft - resultBrowserETA;
                 timeleft = (int) Math.round(resultBrowserETA + (tmp * 0.2));
@@ -3025,6 +3089,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JButton btnComputeResultProperties;
     private javax.swing.JButton btnConfigScenarioSave;
     private javax.swing.JButton btnConfigScenarioUndo;
+    private javax.swing.JButton btnConfigurationScenarioRandomSolverConfigs;
     private javax.swing.JButton btnCreateExperiment;
     private javax.swing.JButton btnDeselectAllInstances;
     private javax.swing.JButton btnDeselectAllSolverConfigs;
@@ -3142,11 +3207,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         }
     }
-    
+
     @Override
     public void onTaskStart(String methodName) {
     }
-    
+
     @Override
     public void onTaskFailed(String methodName, Throwable e) {
         if (e instanceof TaskCancelledException) {
@@ -3191,7 +3256,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public void setFilterStatus(String status) {
         lblFilterStatus.setForeground(Color.red);
         lblFilterStatus.setText(status);
-        
+
     }
 
     /**
@@ -3224,10 +3289,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public void deinitialize() {
         reinitializeGUI();
     }
-    
+
     private void resetJobsColumnVisibility() {
         Runnable runnable = new Runnable() {
-            
+
             @Override
             public void run() {
                 jobsColumnSelector.setColumnVisiblity(jobsTableModel.getDefaultVisibility());
@@ -3239,10 +3304,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             SwingUtilities.invokeLater(runnable);
         }
     }
-    
+
     private void resetInstanceColumnVisibility() {
         Runnable runnable = new Runnable() {
-            
+
             @Override
             public void run() {
                 insTableModel.fireTableStructureChanged();
@@ -3258,7 +3323,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     tableInstances.removeColumn(tableInstances.getColumnModel().getColumn(tableInstances.convertColumnIndexToView(InstanceTableModel.COL_BENCHTYPE)));
                 }
                 boolean[] visibility = new boolean[tableInstances.getColumnCount()];
-                
+
                 int k = 0;
                 for (int i = 0; i < tmp.length; i++) {
                     if (isCompetition || i != InstanceTableModel.COL_BENCHTYPE) {
@@ -3275,7 +3340,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             SwingUtilities.invokeLater(runnable);
         }
     }
-    
+
     public void loadConfigurationScenarioTab() {
         if (expController.getActiveExperiment().isConfigurationExp()) {
             comboConfigScenarioSolvers.removeAllItems();
