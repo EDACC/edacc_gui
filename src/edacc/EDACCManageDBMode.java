@@ -1543,6 +1543,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
     private void btnSolverNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverNewActionPerformed
         manageDBSolvers.newSolver();
+        tableSolver.getRowSorter().setSortKeys(null);
         tableSolver.getSelectionModel().setSelectionInterval(tableSolver.getRowCount() - 1, tableSolver.getRowCount() - 1);
         tableSolver.updateUI();
         unsavedChanges = true;
