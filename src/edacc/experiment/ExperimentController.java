@@ -1190,7 +1190,7 @@ public class ExperimentController {
         }
 
         PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-        for (int i = 0; i < main.jobsTableModel.getColumnCount(); i++) {
+        for (int i = 0; i < main.tableJobs.getColumnCount(); i++) {
             int vis_col = main.tableJobs.convertColumnIndexToModel(i);
             out.write("\"" + main.jobsTableModel.getColumnName(vis_col) + "\"");
             if (i < main.jobsTableModel.getColumnCount() - 1) {
@@ -1210,7 +1210,7 @@ public class ExperimentController {
                 break;
             }
             task.setStatus("Exporting row " + done + " of " + total);
-            for (int col = 0; col < main.jobsTableModel.getColumnCount(); col++) {
+            for (int col = 0; col < main.tableJobs.getColumnCount(); col++) {
                 int vis_col = main.tableJobs.convertColumnIndexToModel(col);
                 if (main.jobsTableModel.getValueAt(vis, vis_col) == null) {
                     out.write("\"-\"");
@@ -1246,7 +1246,7 @@ public class ExperimentController {
 
         String format = "|";
         String columns = "";
-        for (int i = 0; i < main.jobsTableModel.getColumnCount(); i++) {
+        for (int i = 0; i < main.tableJobs.getColumnCount(); i++) {
             int vis_col = main.tableJobs.convertColumnIndexToModel(i);
             columns += main.jobsTableModel.getColumnName(vis_col);
             if (main.jobsTableModel.getColumnClass(vis_col) == Integer.class
@@ -1281,7 +1281,7 @@ public class ExperimentController {
                 break;
             }
             task.setStatus("Exporting row " + done + " of " + total);
-            for (int col = 0; col < main.jobsTableModel.getColumnCount(); col++) {
+            for (int col = 0; col < main.tableJobs.getColumnCount(); col++) {
                 int vis_col = main.tableJobs.convertColumnIndexToModel(col);
                 if (main.jobsTableModel.getValueAt(vis, vis_col) == null) {
                     out.write("-");
