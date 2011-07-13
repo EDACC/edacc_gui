@@ -2,6 +2,8 @@ package edacc;
 
 import java.awt.Component;
 import java.awt.Point;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashSet;
@@ -15,7 +17,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class MultipleCellSelectionTable extends JTable {
 
     private HashSet<Point> selectedCells;
-    
     private Point lastSelectedCell;
     private boolean ctrlDeactivate;
 
@@ -99,9 +100,36 @@ public class MultipleCellSelectionTable extends JTable {
                 MultipleCellSelectionTable.this.repaint();
             }
         };
-        
+
         this.addMouseMotionListener(mouseAdapter);
         this.addMouseListener(mouseAdapter);
+
+        this.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    e.consume();
+
+                    int col = MultipleCellSelectionTable.super.getSelectedColumn();
+                    int row = MultipleCellSelectionTable.super.getSelectedRow();
+                    int old_row = row;
+                    int old_col = col;
+                    col++;
+                    if (col >= MultipleCellSelectionTable.this.getColumnCount()) {
+                        col = 0;
+                        row++;
+                    }
+                    if (row >= MultipleCellSelectionTable.this.getRowCount()) {
+                        MultipleCellSelectionTable.this.changeSelection(old_row, old_col, true, false);
+                        MultipleCellSelectionTable.this.transferFocus();
+                    } else {
+                        MultipleCellSelectionTable.this.setRowSelectionInterval(row, row);
+                        MultipleCellSelectionTable.this.setColumnSelectionInterval(col, col);
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -111,7 +139,7 @@ public class MultipleCellSelectionTable extends JTable {
      * @return array of <code>Point</code>
      */
     public Point[] getSelectedCells() {
-        return (Point[]) selectedCells.toArray();
+        return selectedCells.toArray(new Point[0]);
     }
 
     /**
