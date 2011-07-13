@@ -11,7 +11,7 @@ CREATE  TABLE IF NOT EXISTS `ParameterGraph` (
   PRIMARY KEY (`idParameterGraph`) ,
   CONSTRAINT `fk_ParameterGraph_Solver1`
     FOREIGN KEY (`Solver_idSolver` )
-    REFERENCES `EDACC`.`Solver` (`idSolver` )
+    REFERENCES `Solver` (`idSolver` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
