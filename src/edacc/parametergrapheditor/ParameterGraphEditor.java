@@ -342,6 +342,9 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             parameters = new HashSet<Parameter>();
         } else {
             parameters = parameterGraph.parameters;
+            if (parameters == null) {
+                parameters = new HashSet<Parameter>();
+            }
             graph.getModel().beginUpdate();
             HashMap<String, mxCell> mapNodeIdToCell = new HashMap<String, mxCell>();
             for (Node node : parameterGraph.nodes) {
