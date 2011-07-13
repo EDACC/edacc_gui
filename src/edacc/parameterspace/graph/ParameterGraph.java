@@ -50,6 +50,9 @@ public class ParameterGraph {
 	
 	public void buildAdjacencyList() {
 		this.adjacent_edges = new HashMap<Node, List<Edge>>();
+                if (edges == null) {
+                    edges = new LinkedList<Edge>();
+                }
 		for (Edge e: edges) {
 			if (!this.adjacent_edges.containsKey(e.getSource())) this.adjacent_edges.put(e.getSource(), new LinkedList<Edge>());
 			this.adjacent_edges.get(e.getSource()).add(e);

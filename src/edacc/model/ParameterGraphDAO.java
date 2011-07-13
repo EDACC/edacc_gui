@@ -51,6 +51,8 @@ public class ParameterGraphDAO {
                 p.buildAdjacencyList();
                 return p;
             }
+        }catch (Exception ex) {
+            ex.printStackTrace();
         } finally {
             rs.close();
             st.close();
@@ -60,6 +62,7 @@ public class ParameterGraphDAO {
 
     public static void saveParameterGraph(ParameterGraph graph, Solver solver) throws SQLException, JAXBException {
         PreparedStatement st;
+        try {
         if (loadParameterGraph(solver) != null) {
             st = DatabaseConnector.getInstance().getConn().prepareStatement(UPDATE);
             st.setInt(2, solver.getId());
@@ -70,6 +73,9 @@ public class ParameterGraphDAO {
             st.setBinaryStream(2, marshall(ParameterGraph.class, graph));
         }
         st.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**
