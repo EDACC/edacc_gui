@@ -1,10 +1,13 @@
 package edacc.model;
 
 import java.io.File;
+import java.util.Random;
 import java.util.Vector;
 
 public class Solver extends BaseModel implements IntegerPKModel {
 
+    private static Random rand = new Random();
+    
     private int id;
     private String name;
     private String description;
@@ -16,6 +19,8 @@ public class Solver extends BaseModel implements IntegerPKModel {
     public Solver() {
         this.setNew();
         this.solverBinaries = new Vector<SolverBinaries>();
+        // set ID to random number
+        this.id = rand.nextInt();
     }
 
     public String getDescription() {

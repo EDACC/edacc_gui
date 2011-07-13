@@ -44,8 +44,8 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="buttonDone" alignment="1" min="-2" pref="80" max="-2" attributes="0"/>
-                  <Component id="panelManageProperty" alignment="1" pref="823" max="32767" attributes="0"/>
+                  <Component id="panelManageSolverPropertyShowButtons" alignment="0" max="32767" attributes="0"/>
+                  <Component id="panelManageProperty" alignment="0" pref="823" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -55,9 +55,9 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="panelManageProperty" pref="690" max="32767" attributes="0"/>
+              <Component id="panelManageProperty" pref="666" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="buttonDone" min="-2" max="-2" attributes="0"/>
+              <Component id="panelManageSolverPropertyShowButtons" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -85,10 +85,9 @@
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="panelManagerPropertyEdit" alignment="0" pref="787" max="32767" attributes="0"/>
-                      <Component id="panelManagePropertyEditInput" alignment="0" max="32767" attributes="0"/>
-                      <Component id="panelManageSolverPropertyShowButtons" alignment="0" max="32767" attributes="0"/>
                       <Component id="panelManageSolverPropertyTable" alignment="0" pref="787" max="32767" attributes="0"/>
+                      <Component id="panelManagePropertyEditInput" alignment="0" max="32767" attributes="0"/>
+                      <Component id="panelManagerPropertyEdit" alignment="0" pref="787" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -96,13 +95,11 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="panelManageSolverPropertyTable" pref="132" max="32767" attributes="0"/>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="panelManageSolverPropertyShowButtons" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="panelManagePropertyEditInput" max="32767" attributes="0"/>
+              <Group type="102" alignment="1" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="panelManageSolverPropertyTable" pref="231" max="32767" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Component id="panelManagePropertyEditInput" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="panelManagerPropertyEdit" min="-2" pref="29" max="-2" attributes="1"/>
                   <EmptySpace max="-2" attributes="0"/>
@@ -143,81 +140,6 @@
             </Component>
           </SubComponents>
         </Container>
-        <Container class="javax.swing.JPanel" name="panelManageSolverPropertyShowButtons">
-          <Properties>
-            <Property name="name" type="java.lang.String" value="panelManageSolverPropertyShowButtons" noResource="true"/>
-          </Properties>
-
-          <Layout>
-            <DimensionLayout dim="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="buttonNewProperty" linkSize="1" min="-2" pref="80" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="buttonRemoveProperty" linkSize="1" min="-2" pref="80" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="buttonExportProperty" linkSize="1" min="-2" pref="80" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="buttonImportProperty" linkSize="1" min="-2" pref="80" max="-2" attributes="0"/>
-                      <EmptySpace pref="419" max="32767" attributes="0"/>
-                  </Group>
-              </Group>
-            </DimensionLayout>
-            <DimensionLayout dim="1">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="buttonNewProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="buttonRemoveProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="buttonExportProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="buttonImportProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="32767" attributes="0"/>
-                  </Group>
-              </Group>
-            </DimensionLayout>
-          </Layout>
-          <SubComponents>
-            <Component class="javax.swing.JButton" name="buttonNewProperty">
-              <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="buttonNewProperty.text"/>
-                <Property name="name" type="java.lang.String" value="buttonNewProperty" noResource="true"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonNewPropertyActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="javax.swing.JButton" name="buttonRemoveProperty">
-              <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="buttonRemoveProperty.text"/>
-                <Property name="name" type="java.lang.String" value="buttonRemoveProperty" noResource="true"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonRemovePropertyActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="javax.swing.JButton" name="buttonExportProperty">
-              <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="buttonExportProperty.text"/>
-                <Property name="name" type="java.lang.String" value="buttonExportProperty" noResource="true"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonExportPropertyActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="javax.swing.JButton" name="buttonImportProperty">
-              <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="buttonImportProperty.text"/>
-                <Property name="name" type="java.lang.String" value="buttonImportProperty" noResource="true"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonImportPropertyActionPerformed"/>
-              </Events>
-            </Component>
-          </SubComponents>
-        </Container>
         <Container class="javax.swing.JPanel" name="panelManagePropertyEditInput">
           <Properties>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -232,96 +154,98 @@
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="labelPropertyType" min="-2" max="-2" attributes="0"/>
+                          <Component id="labelPropertyType" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="labelPropertyname" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="labelPropertyDescription" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="labelPropertySource" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="radioBtnRegExpression" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="radioBtnComputationMethod" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="labelPropertyValueType" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="labeMultipleOccurrences" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="labelPropertyValueType" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jScrollPane1" alignment="0" pref="569" max="32767" attributes="1"/>
-                          <Component id="jScrollPane2" alignment="0" pref="569" max="32767" attributes="0"/>
-                          <Component id="checkBoxMultipleOccurrences" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="textPropertyFieldName" alignment="0" pref="569" max="32767" attributes="1"/>
-                          <Group type="102" alignment="1" max="-2" attributes="0">
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="comboBoxPropertyValuetype" min="-2" pref="136" max="-2" attributes="0"/>
-                                  <Component id="comboBoxComputationMethod" alignment="1" min="-2" pref="136" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <Component id="buttonNewComputationMethod" linkSize="3" min="-2" pref="60" max="-2" attributes="1"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="labelComputationMethodParameters" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Component id="buttonPropertyAddValueType" linkSize="3" pref="60" max="32767" attributes="1"/>
-                              </Group>
-                              <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="textFieldComputationmethodParameter" pref="264" max="32767" attributes="0"/>
+                          <Component id="comboBoxPropertyType" linkSize="5" alignment="0" min="-2" pref="132" max="-2" attributes="0"/>
+                          <Component id="comboBoxPropertySource" linkSize="5" alignment="0" min="-2" pref="132" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="comboBoxComputationMethod" linkSize="5" min="-2" pref="136" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="buttonNewComputationMethod" linkSize="3" min="-2" pref="60" max="-2" attributes="1"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Component id="labelComputationMethodParameters" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="textFieldComputationmethodParameter" pref="269" max="32767" attributes="0"/>
                           </Group>
-                          <Component id="comboBoxPropertySource" alignment="0" min="-2" pref="132" max="-2" attributes="0"/>
-                          <Component id="comboBoxPropertyType" alignment="0" min="-2" pref="132" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="comboBoxPropertyValuetype" linkSize="5" min="-2" pref="136" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="buttonPropertyAddValueType" linkSize="3" pref="60" max="32767" attributes="1"/>
+                          </Group>
+                          <Component id="checkBoxMultipleOccurrences" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jScrollPane2" alignment="0" pref="586" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" alignment="0" pref="586" max="32767" attributes="1"/>
+                          <Component id="textPropertyFieldName" alignment="1" pref="586" max="32767" attributes="1"/>
                       </Group>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="labelPropertyType" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="comboBoxPropertyType" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="labelPropertyname" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="textPropertyFieldName" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="jScrollPane1" min="-2" pref="39" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="comboBoxPropertySource" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="labelPropertySource" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="45" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="2" attributes="0">
+                                  <Component id="labelPropertyname" alignment="2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="textPropertyFieldName" alignment="2" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="2" attributes="0">
+                                  <Component id="labelPropertyDescription" alignment="2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jScrollPane1" linkSize="4" alignment="2" min="-2" pref="39" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="2" attributes="0">
+                                  <Component id="labelPropertySource" alignment="2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="comboBoxPropertySource" alignment="2" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="2" attributes="0">
+                                  <Component id="radioBtnRegExpression" alignment="2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jScrollPane2" linkSize="4" alignment="2" min="-2" pref="50" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="2" attributes="0">
+                                  <Component id="radioBtnComputationMethod" alignment="2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="comboBoxComputationMethod" alignment="2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="textFieldComputationmethodParameter" alignment="2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="buttonNewComputationMethod" alignment="2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="labelComputationMethodParameters" alignment="2" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <Component id="labelPropertyDescription" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="2" attributes="0">
+                                  <Component id="labelPropertyType" alignment="2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="comboBoxPropertyType" alignment="2" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
                       </Group>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="radioBtnRegExpression" min="-2" max="-2" attributes="0"/>
-                          <Component id="jScrollPane2" min="-2" pref="65" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="2" attributes="0">
-                          <Component id="radioBtnComputationMethod" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="comboBoxComputationMethod" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="buttonNewComputationMethod" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="labelComputationMethodParameters" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="textFieldComputationmethodParameter" alignment="2" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="2" attributes="0">
                           <Component id="labelPropertyValueType" alignment="2" min="-2" max="-2" attributes="0"/>
                           <Component id="comboBoxPropertyValuetype" alignment="2" min="-2" max="-2" attributes="0"/>
                           <Component id="buttonPropertyAddValueType" alignment="2" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="checkBoxMultipleOccurrences" min="-2" max="-2" attributes="0"/>
-                          <Component id="labeMultipleOccurrences" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="2" attributes="0">
+                          <Component id="labeMultipleOccurrences" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="checkBoxMultipleOccurrences" alignment="2" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="45" max="32767" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -516,10 +440,9 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
+                      <EmptySpace pref="707" max="32767" attributes="0"/>
                       <Component id="buttonSaveProperty" min="-2" pref="80" max="-2" attributes="0"/>
-                      <EmptySpace pref="695" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -547,14 +470,92 @@
         </Container>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JButton" name="buttonDone">
+    <Container class="javax.swing.JPanel" name="panelManageSolverPropertyShowButtons">
       <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="buttonDone.text"/>
-        <Property name="name" type="java.lang.String" value="buttonDone" noResource="true"/>
+        <Property name="name" type="java.lang.String" value="panelManageSolverPropertyShowButtons" noResource="true"/>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonDoneActionPerformed"/>
-      </Events>
-    </Component>
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="buttonNewProperty" linkSize="1" min="-2" pref="80" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="buttonRemoveProperty" linkSize="1" min="-2" pref="80" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="buttonExportProperty" linkSize="1" min="-2" pref="80" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="buttonImportProperty" linkSize="1" min="-2" pref="80" max="-2" attributes="0"/>
+                  <EmptySpace pref="363" max="32767" attributes="0"/>
+                  <Component id="buttonDone" min="-2" pref="80" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="buttonNewProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="buttonRemoveProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="buttonExportProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="buttonImportProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="buttonDone" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="javax.swing.JButton" name="buttonNewProperty">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="buttonNewProperty.text"/>
+            <Property name="name" type="java.lang.String" value="buttonNewProperty" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonNewPropertyActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="buttonRemoveProperty">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="buttonRemoveProperty.text"/>
+            <Property name="name" type="java.lang.String" value="buttonRemoveProperty" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonRemovePropertyActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="buttonExportProperty">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="buttonExportProperty.text"/>
+            <Property name="name" type="java.lang.String" value="buttonExportProperty" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonExportPropertyActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="buttonImportProperty">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="buttonImportProperty.text"/>
+            <Property name="name" type="java.lang.String" value="buttonImportProperty" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonImportPropertyActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="buttonDone">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="buttonDone.text"/>
+            <Property name="name" type="java.lang.String" value="buttonDone" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonDoneActionPerformed"/>
+          </Events>
+        </Component>
+      </SubComponents>
+    </Container>
   </SubComponents>
 </Form>

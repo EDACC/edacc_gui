@@ -104,11 +104,6 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         panelManageProperty = new javax.swing.JPanel();
         panelManageSolverPropertyTable = new javax.swing.JScrollPane();
         tableProperty = new javax.swing.JTable();
-        panelManageSolverPropertyShowButtons = new javax.swing.JPanel();
-        buttonNewProperty = new javax.swing.JButton();
-        buttonRemoveProperty = new javax.swing.JButton();
-        buttonExportProperty = new javax.swing.JButton();
-        buttonImportProperty = new javax.swing.JButton();
         panelManagePropertyEditInput = new javax.swing.JPanel();
         textPropertyFieldName = new javax.swing.JTextField();
         labelPropertyname = new javax.swing.JLabel();
@@ -134,6 +129,11 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         textAreaRegularExpressions = new javax.swing.JTextArea();
         panelManagerPropertyEdit = new javax.swing.JPanel();
         buttonSaveProperty = new javax.swing.JButton();
+        panelManageSolverPropertyShowButtons = new javax.swing.JPanel();
+        buttonNewProperty = new javax.swing.JButton();
+        buttonRemoveProperty = new javax.swing.JButton();
+        buttonExportProperty = new javax.swing.JButton();
+        buttonImportProperty = new javax.swing.JButton();
         buttonDone = new javax.swing.JButton();
 
         jFileChooser1.setName("jFileChooser1"); // NOI18N
@@ -169,72 +169,6 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         tableProperty.setName("tableProperty"); // NOI18N
         tableProperty.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         panelManageSolverPropertyTable.setViewportView(tableProperty);
-
-        panelManageSolverPropertyShowButtons.setName("panelManageSolverPropertyShowButtons"); // NOI18N
-
-        buttonNewProperty.setText(resourceMap.getString("buttonNewProperty.text")); // NOI18N
-        buttonNewProperty.setName("buttonNewProperty"); // NOI18N
-        buttonNewProperty.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonNewPropertyActionPerformed(evt);
-            }
-        });
-
-        buttonRemoveProperty.setText(resourceMap.getString("buttonRemoveProperty.text")); // NOI18N
-        buttonRemoveProperty.setName("buttonRemoveProperty"); // NOI18N
-        buttonRemoveProperty.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonRemovePropertyActionPerformed(evt);
-            }
-        });
-
-        buttonExportProperty.setText(resourceMap.getString("buttonExportProperty.text")); // NOI18N
-        buttonExportProperty.setName("buttonExportProperty"); // NOI18N
-        buttonExportProperty.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonExportPropertyActionPerformed(evt);
-            }
-        });
-
-        buttonImportProperty.setText(resourceMap.getString("buttonImportProperty.text")); // NOI18N
-        buttonImportProperty.setName("buttonImportProperty"); // NOI18N
-        buttonImportProperty.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonImportPropertyActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout panelManageSolverPropertyShowButtonsLayout = new javax.swing.GroupLayout(panelManageSolverPropertyShowButtons);
-        panelManageSolverPropertyShowButtons.setLayout(panelManageSolverPropertyShowButtonsLayout);
-        panelManageSolverPropertyShowButtonsLayout.setHorizontalGroup(
-            panelManageSolverPropertyShowButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelManageSolverPropertyShowButtonsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(buttonNewProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(buttonRemoveProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(buttonExportProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(buttonImportProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(419, Short.MAX_VALUE))
-        );
-
-        panelManageSolverPropertyShowButtonsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {buttonExportProperty, buttonImportProperty, buttonNewProperty, buttonRemoveProperty});
-
-        panelManageSolverPropertyShowButtonsLayout.setVerticalGroup(
-            panelManageSolverPropertyShowButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelManageSolverPropertyShowButtonsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelManageSolverPropertyShowButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(buttonNewProperty)
-                    .addComponent(buttonRemoveProperty)
-                    .addComponent(buttonExportProperty)
-                    .addComponent(buttonImportProperty))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        panelManageSolverPropertyShowButtonsLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {buttonExportProperty, buttonImportProperty, buttonNewProperty, buttonRemoveProperty});
 
         panelManagePropertyEditInput.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         panelManagePropertyEditInput.setName("panelManagePropertyEditInput"); // NOI18N
@@ -344,75 +278,81 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                     .addComponent(labelPropertySource)
                     .addComponent(radioBtnRegExpression)
                     .addComponent(radioBtnComputationMethod)
-                    .addComponent(labelPropertyValueType)
-                    .addComponent(labeMultipleOccurrences))
-                .addGap(29, 29, 29)
+                    .addComponent(labeMultipleOccurrences)
+                    .addComponent(labelPropertyValueType))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
-                    .addComponent(checkBoxMultipleOccurrences)
-                    .addComponent(textPropertyFieldName, javax.swing.GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManagePropertyEditInputLayout.createSequentialGroup()
-                        .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(comboBoxPropertyValuetype, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(comboBoxComputationMethod, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panelManagePropertyEditInputLayout.createSequentialGroup()
-                                .addComponent(buttonNewComputationMethod, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(labelComputationMethodParameters))
-                            .addComponent(buttonPropertyAddValueType, javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(textFieldComputationmethodParameter, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE))
+                    .addComponent(comboBoxPropertyType, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(comboBoxPropertySource, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(comboBoxPropertyType, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelManagePropertyEditInputLayout.createSequentialGroup()
+                        .addComponent(comboBoxComputationMethod, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(buttonNewComputationMethod, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(labelComputationMethodParameters)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(textFieldComputationmethodParameter, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE))
+                    .addGroup(panelManagePropertyEditInputLayout.createSequentialGroup()
+                        .addComponent(comboBoxPropertyValuetype, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(buttonPropertyAddValueType, javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE))
+                    .addComponent(checkBoxMultipleOccurrences)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 586, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 586, Short.MAX_VALUE)
+                    .addComponent(textPropertyFieldName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 586, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
         panelManagePropertyEditInputLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {buttonNewComputationMethod, buttonPropertyAddValueType});
 
+        panelManagePropertyEditInputLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {comboBoxComputationMethod, comboBoxPropertySource, comboBoxPropertyType, comboBoxPropertyValuetype});
+
         panelManagePropertyEditInputLayout.setVerticalGroup(
             panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelManagePropertyEditInputLayout.createSequentialGroup()
-                .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelPropertyType)
-                    .addComponent(comboBoxPropertyType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelPropertyname)
-                    .addComponent(textPropertyFieldName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
                 .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelManagePropertyEditInputLayout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(comboBoxPropertySource, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(labelPropertySource)))
-                    .addComponent(labelPropertyDescription))
-                .addGap(18, 18, 18)
-                .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(radioBtnRegExpression)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(3, 3, 3)
-                .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(radioBtnComputationMethod)
-                    .addComponent(comboBoxComputationMethod, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(buttonNewComputationMethod)
-                    .addComponent(labelComputationMethodParameters)
-                    .addComponent(textFieldComputationmethodParameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(45, 45, 45)
+                        .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(labelPropertyname)
+                            .addComponent(textPropertyFieldName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(labelPropertyDescription)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(labelPropertySource)
+                            .addComponent(comboBoxPropertySource, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(radioBtnRegExpression)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(radioBtnComputationMethod)
+                            .addComponent(comboBoxComputationMethod, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(textFieldComputationmethodParameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(buttonNewComputationMethod)
+                            .addComponent(labelComputationMethodParameters)))
+                    .addGroup(panelManagePropertyEditInputLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(labelPropertyType)
+                            .addComponent(comboBoxPropertyType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(labelPropertyValueType)
                     .addComponent(comboBoxPropertyValuetype, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(buttonPropertyAddValueType))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(checkBoxMultipleOccurrences)
-                    .addComponent(labeMultipleOccurrences))
-                .addContainerGap(45, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelManagePropertyEditInputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(labeMultipleOccurrences)
+                    .addComponent(checkBoxMultipleOccurrences))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        panelManagePropertyEditInputLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jScrollPane1, jScrollPane2});
 
         panelManagerPropertyEdit.setName("panelManagerPropertyEdit"); // NOI18N
         panelManagerPropertyEdit.setPreferredSize(new java.awt.Dimension(780, 497));
@@ -430,10 +370,9 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         panelManagerPropertyEdit.setLayout(panelManagerPropertyEditLayout);
         panelManagerPropertyEditLayout.setHorizontalGroup(
             panelManagerPropertyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelManagerPropertyEditLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(buttonSaveProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(695, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManagerPropertyEditLayout.createSequentialGroup()
+                .addContainerGap(707, Short.MAX_VALUE)
+                .addComponent(buttonSaveProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         panelManagerPropertyEditLayout.setVerticalGroup(
             panelManagerPropertyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -449,25 +388,56 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManagePropertyLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelManagePropertyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(panelManagerPropertyEdit, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 787, Short.MAX_VALUE)
+                    .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 787, Short.MAX_VALUE)
                     .addComponent(panelManagePropertyEditInput, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelManageSolverPropertyShowButtons, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 787, Short.MAX_VALUE))
+                    .addComponent(panelManagerPropertyEdit, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 787, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelManagePropertyLayout.setVerticalGroup(
             panelManagePropertyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelManagePropertyLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManagePropertyLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelManageSolverPropertyShowButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelManagePropertyEditInput, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(panelManagePropertyEditInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelManagerPropertyEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
+
+        panelManageSolverPropertyShowButtons.setName("panelManageSolverPropertyShowButtons"); // NOI18N
+
+        buttonNewProperty.setText(resourceMap.getString("buttonNewProperty.text")); // NOI18N
+        buttonNewProperty.setName("buttonNewProperty"); // NOI18N
+        buttonNewProperty.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonNewPropertyActionPerformed(evt);
+            }
+        });
+
+        buttonRemoveProperty.setText(resourceMap.getString("buttonRemoveProperty.text")); // NOI18N
+        buttonRemoveProperty.setName("buttonRemoveProperty"); // NOI18N
+        buttonRemoveProperty.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonRemovePropertyActionPerformed(evt);
+            }
+        });
+
+        buttonExportProperty.setText(resourceMap.getString("buttonExportProperty.text")); // NOI18N
+        buttonExportProperty.setName("buttonExportProperty"); // NOI18N
+        buttonExportProperty.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonExportPropertyActionPerformed(evt);
+            }
+        });
+
+        buttonImportProperty.setText(resourceMap.getString("buttonImportProperty.text")); // NOI18N
+        buttonImportProperty.setName("buttonImportProperty"); // NOI18N
+        buttonImportProperty.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonImportPropertyActionPerformed(evt);
+            }
+        });
 
         buttonDone.setText(resourceMap.getString("buttonDone.text")); // NOI18N
         buttonDone.setName("buttonDone"); // NOI18N
@@ -477,6 +447,41 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             }
         });
 
+        javax.swing.GroupLayout panelManageSolverPropertyShowButtonsLayout = new javax.swing.GroupLayout(panelManageSolverPropertyShowButtons);
+        panelManageSolverPropertyShowButtons.setLayout(panelManageSolverPropertyShowButtonsLayout);
+        panelManageSolverPropertyShowButtonsLayout.setHorizontalGroup(
+            panelManageSolverPropertyShowButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelManageSolverPropertyShowButtonsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(buttonNewProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(buttonRemoveProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(buttonExportProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(buttonImportProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 363, Short.MAX_VALUE)
+                .addComponent(buttonDone, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        panelManageSolverPropertyShowButtonsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {buttonExportProperty, buttonImportProperty, buttonNewProperty, buttonRemoveProperty});
+
+        panelManageSolverPropertyShowButtonsLayout.setVerticalGroup(
+            panelManageSolverPropertyShowButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelManageSolverPropertyShowButtonsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelManageSolverPropertyShowButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(buttonNewProperty)
+                    .addComponent(buttonRemoveProperty)
+                    .addComponent(buttonExportProperty)
+                    .addComponent(buttonImportProperty)
+                    .addComponent(buttonDone))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        panelManageSolverPropertyShowButtonsLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {buttonExportProperty, buttonImportProperty, buttonNewProperty, buttonRemoveProperty});
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -484,17 +489,17 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(buttonDone, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(panelManageProperty, javax.swing.GroupLayout.DEFAULT_SIZE, 823, Short.MAX_VALUE))
+                    .addComponent(panelManageSolverPropertyShowButtons, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelManageProperty, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 823, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelManageProperty, javax.swing.GroupLayout.DEFAULT_SIZE, 690, Short.MAX_VALUE)
+                .addComponent(panelManageProperty, javax.swing.GroupLayout.DEFAULT_SIZE, 666, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(buttonDone)
+                .addComponent(panelManageSolverPropertyShowButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
