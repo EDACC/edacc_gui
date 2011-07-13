@@ -131,18 +131,21 @@ public class SelectCategoricalDomainPanel extends javax.swing.JPanel implements 
         for (int row = 0; row < tblCategories.getRowCount(); row++) {
             model.setSelected(tblCategories.convertRowIndexToModel(row), true);
         }
+        model.fireTableDataChanged();
     }//GEN-LAST:event_btnSelectAllActionPerformed
 
     private void btnDeselectAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeselectAllActionPerformed
         for (int row = 0; row < tblCategories.getRowCount(); row++) {
             model.setSelected(tblCategories.convertRowIndexToModel(row), false);
         }
+        model.fireTableDataChanged();
     }//GEN-LAST:event_btnDeselectAllActionPerformed
 
     private void btnInvertSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInvertSelectionActionPerformed
         for (int row = 0; row < tblCategories.getRowCount(); row++) {
             model.setSelected(tblCategories.convertRowIndexToModel(row), !model.isSelected(tblCategories.convertRowIndexToModel(row)));
         }
+        model.fireTableDataChanged();
     }//GEN-LAST:event_btnInvertSelectionActionPerformed
 
     protected List<String> getSelectedCategories() {
