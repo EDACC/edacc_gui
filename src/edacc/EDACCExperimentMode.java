@@ -2495,9 +2495,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         if (tableExperiments.getSelectedRow() != -1) {
             int removedIndex = tableExperiments.getSelectedRow();
             int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), "Do you really want to remove the experiment " + expTableModel.getValueAt(tableExperiments.convertRowIndexToModel(removedIndex), ExperimentTableModel.COL_NAME) + "?", "Remove experiment", javax.swing.JOptionPane.YES_NO_OPTION);
-            if (userInput == 1) {
-                return;
-            } else {
+            if (userInput == JOptionPane.YES_OPTION) {
                 try {
 
                     Integer i = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow())).getId();
