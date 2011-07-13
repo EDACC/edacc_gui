@@ -15,6 +15,7 @@ import edacc.manageDB.ManageDBSolvers;
 import edacc.manageDB.SolverBinariesListModel;
 import edacc.model.Solver;
 import edacc.model.SolverBinaries;
+import edacc.model.SolverBinariesDAO;
 import java.awt.Frame;
 import java.io.File;
 import java.sql.SQLException;
@@ -28,14 +29,21 @@ import javax.swing.JOptionPane;
  */
 public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
 
+    public enum DialogMode { CREATE_MODE, EDIT_MODE };
+    
     private SolverBinaries solverBin;
+    private SolverBinaries workingCopy;
     private ManageDBSolvers controller;
+    private DialogMode mode;
+    
 
     /** Creates new form EDACCSolverBinaryDlg */
-    public EDACCSolverBinaryDlg(Frame parent, boolean modal, SolverBinaries solverBin, ManageDBSolvers controller) {
-        super(parent, modal);
+    public EDACCSolverBinaryDlg(Frame parent, SolverBinaries solverBin, ManageDBSolvers controller, DialogMode mode) {
+        super(parent, true);
         this.solverBin = solverBin;
+        this.workingCopy = new SolverBinaries(solverBin);
         this.controller = controller;
+        this.mode = mode;
         setLocationRelativeTo(parent);
         initComponents();
         lbRunPath.setSelectedIndex(0);
@@ -58,8 +66,8 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
         tfRunCommand = new javax.swing.JTextField();
         lCommand = new javax.swing.JLabel();
         lCommandPreview = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        bAddBinary = new javax.swing.JButton();
+        bCancel = new javax.swing.JButton();
         lCaption = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         lbRunPath = new javax.swing.JList();
@@ -98,19 +106,19 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
         lCommandPreview.setText(resourceMap.getString("lCommandPreview.text")); // NOI18N
         lCommandPreview.setName("lCommandPreview"); // NOI18N
 
-        jButton1.setText(resourceMap.getString("jButton1.text")); // NOI18N
-        jButton1.setName("jButton1"); // NOI18N
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        bAddBinary.setText(resourceMap.getString("bAddBinary.text")); // NOI18N
+        bAddBinary.setName("bAddBinary"); // NOI18N
+        bAddBinary.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addBinary(evt);
             }
         });
 
-        jButton2.setText(resourceMap.getString("jButton2.text")); // NOI18N
-        jButton2.setName("jButton2"); // NOI18N
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        bCancel.setText(resourceMap.getString("bCancel.text")); // NOI18N
+        bCancel.setName("bCancel"); // NOI18N
+        bCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                bCancelActionPerformed(evt);
             }
         });
 
@@ -145,9 +153,9 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lCaption)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton2)
+                        .addComponent(bCancel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 395, Short.MAX_VALUE)
-                        .addComponent(jButton1))
+                        .addComponent(bAddBinary))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lRunCommand)
@@ -191,8 +199,8 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
                     .addComponent(tfVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(jButton1))
+                    .addComponent(bCancel)
+                    .addComponent(bAddBinary))
                 .addContainerGap())
         );
 
@@ -208,7 +216,10 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
         solverBin.setRunPath((String) lbRunPath.getModel().getElementAt(lbRunPath.getSelectedIndex()));
         solverBin.setVersion(tfVersion.getText());
         try {
-            controller.addSolverBinary(solverBin);
+            if (mode == DialogMode.CREATE_MODE) {
+                // in create mode: add the binary to the solver, in edit mode, do nothing
+                controller.addSolverBinary(solverBin);
+            }
             this.dispose();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "An error occured while adding Solver Binary: \n" + ex.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
@@ -223,13 +234,17 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
         updateRunCommandLine();
     }//GEN-LAST:event_lbRuntPathChanged
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void bCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bCancelActionPerformed
+        if (mode == DialogMode.EDIT_MODE) {
+            // reset object to working copy (status before editing)
+            solverBin.setAll(workingCopy);
+        }
         this.dispose();
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_bCancelActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton bAddBinary;
+    private javax.swing.JButton bCancel;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lBinaryName;
     private javax.swing.JLabel lCaption;
@@ -264,6 +279,13 @@ public class EDACCSolverBinaryDlg extends javax.swing.JDialog {
         if (selectedIndex < 0)
             selectedIndex = 0;
         lbRunPath.setSelectedIndex(selectedIndex);
+        if (mode == DialogMode.CREATE_MODE) {
+            this.setTitle("Add Solver Binary");
+            bAddBinary.setText("Add Binary");
+        } else if (mode == DialogMode.EDIT_MODE) {
+            this.setTitle("Edit Solver Binary");
+            bAddBinary.setText("Edit Binary");
+        }
     }
 
 }

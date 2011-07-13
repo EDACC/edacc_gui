@@ -32,6 +32,7 @@ public class SolverBinariesDAO {
     private static final String TABLE = "SolverBinaries";
     private static final String INSERT_QUERY = "INSERT INTO " + TABLE + " (idSolver, binaryName, binaryArchive, md5, version, runCommand, runPath) VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String UPDATE_QUERY = "UPDATE " + TABLE + " SET binaryName = ?, version = ?, runCommand = ?, runPath = ? WHERE idSolverBinary = ?";
+    private static final String UPDATE_FILES_QUERY = "UPDATE " + TABLE + " SET binaryArchive = ?, md5 = ? WHERE idSolverBinary = ?";
     private static final String DELETE_QUERY = "DELETE FROM " + TABLE + " WHERE idSolverBinary=?";
     private static ObjectCache<SolverBinaries> cache = new ObjectCache<SolverBinaries>();
 
@@ -95,6 +96,18 @@ public class SolverBinariesDAO {
                 s.setIdSolverBinary(rs.getInt(1));
             }
         }
+        
+        // modify files if necessary
+        if (s.isModified() && s.getBinaryFiles() != null && s.getBinaryFiles().length > 0) { // binary files have been changed validly
+            ps = DatabaseConnector.getInstance().getConn().prepareStatement(UPDATE_FILES_QUERY, PreparedStatement.RETURN_GENERATED_KEYS);
+            ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(s.getBinaryFiles(), new File(s.getRootDir()));
+            s.setMd5(Util.calculateMD5(new ByteArrayInputStream(zipped.toByteArray())));
+            ps.setBinaryStream(1, new ByteArrayInputStream(zipped.toByteArray()));
+            ps.setString(2, s.getMd5());
+            ps.setInt(3, s.getId());
+            ps.executeUpdate();
+        }
+        
         if (s.isDeleted()) {
             cache.remove(s);
             // remove SolverBinary from Vector in corresponding solver object
@@ -114,7 +127,8 @@ public class SolverBinariesDAO {
         b.setVersion(rs.getString("version"));
         b.setRunCommand(rs.getString("runCommand"));
         b.setRunPath(rs.getString("runPath"));
-
+        b.setBinaryArchive(null);
+        b.setRootDir(null);
         return b;
     }
 

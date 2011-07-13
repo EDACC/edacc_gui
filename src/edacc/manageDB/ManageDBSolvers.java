@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
@@ -220,8 +221,63 @@ public class ManageDBSolvers implements Observer {
         // TODO beim SPeichern wird momentan ein zweites Mal gezippt -> zwischenspeichern vom Stream!!
         ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(binary, new File(b.getRootDir()));
         b.setMd5(Util.calculateMD5(new ByteArrayInputStream(zipped.toByteArray())));
-        new EDACCSolverBinaryDlg(EDACCApp.getApplication().getMainFrame(), true, b, this).setVisible(true);
+        new EDACCSolverBinaryDlg(EDACCApp.getApplication().getMainFrame(), b, this, EDACCSolverBinaryDlg.DialogMode.CREATE_MODE).setVisible(true);
         gui.showSolverBinariesDetails(currentSolver.getSolverBinaries());
+    }
+    
+    /**
+     * Edits a solver binary with all details and changes also the file archive.
+     * @param binary
+     * @param solverBin
+     * @throws IOException
+     * @throws NoSuchAlgorithmException 
+     */
+    public void editSolverBinary(File[] binary, SolverBinaries solverBin) throws IOException, NoSuchAlgorithmException {
+        if (binary.length == 0) {
+            return;
+        }
+        solverBin.setBinaryArchive(binary);
+
+        Util.removeCommonPrefix(solverBin);
+
+        // TODO beim SPeichern wird momentan ein zweites Mal gezippt -> zwischenspeichern vom Stream!!
+        ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(binary, new File(solverBin.getRootDir()));
+        solverBin.setMd5(Util.calculateMD5(new ByteArrayInputStream(zipped.toByteArray())));
+        new EDACCSolverBinaryDlg(EDACCApp.getApplication().getMainFrame(), solverBin, this, EDACCSolverBinaryDlg.DialogMode.EDIT_MODE).setVisible(true);
+        gui.showSolverBinariesDetails(currentSolver.getSolverBinaries());
+    }
+    
+    /**
+     * Edits a solver binary but doesn't change the archive. Only the details
+     * like name, run command or run path are changed.
+     * @param solverBin
+     * @throws IOException
+     * @throws NoSuchAlgorithmException 
+     */
+    public void editSolverBinaryDetails(SolverBinaries solverBin) throws IOException, NoSuchAlgorithmException, SQLException {
+        // create file list of binary
+        setFileArrayOfSolverBinary(solverBin);
+        Util.removeCommonPrefix(solverBin);
+        new EDACCSolverBinaryDlg(EDACCApp.getApplication().getMainFrame(), solverBin, this, EDACCSolverBinaryDlg.DialogMode.EDIT_MODE).setVisible(true);
+        // reset binary archive
+        solverBin.setBinaryArchive(null);
+        // refresh gui
+        gui.showSolverBinariesDetails(currentSolver.getSolverBinaries());
+    }
+    
+    private void setFileArrayOfSolverBinary(SolverBinaries solverBin) throws SQLException, IOException {
+        // make temporary directory
+        File tmpDir = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "edacctmpdir");
+        tmpDir.mkdirs();
+        ZipInputStream zis = new ZipInputStream(SolverBinariesDAO.getZippedBinaryFile(solverBin));
+        LinkedList<File> bins = new LinkedList<File>(); // the binary files in the zip 
+        ZipEntry entry;
+        
+        while ((entry = zis.getNextEntry()) != null) {
+            bins.add(new File(tmpDir.getAbsolutePath() + System.getProperty("file.separator") + entry.getName()));
+        }
+        solverBin.setBinaryArchive(bins.toArray(new File[bins.size()]));
+        solverBin.setRootDir(tmpDir.getAbsolutePath());
     }
 
     public void addSolverBinary(SolverBinaries solverBin) throws SQLException, NoSolverBinarySpecifiedException, FileNotFoundException, IOException {

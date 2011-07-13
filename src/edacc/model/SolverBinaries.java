@@ -64,6 +64,29 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
         this.idSolver = idSolver;
         this.setNew();
     }
+    
+    /**
+     * Creates an identical clone of a Solver binary.
+     * @param b the solver binary to be cloned.
+     */
+    public SolverBinaries(SolverBinaries b) {
+        this.setAll(b);
+    }
+    
+    /**
+     * Sets all values of this object to the values of the given solverBinary.
+     * @param b the solverbinaries with the values to be copied.
+     */
+    public void setAll(SolverBinaries b) {
+        this.setBinaryArchive(b.getBinaryFiles());
+        this.setBinaryName(b.getBinaryName());
+        this.setIdSolver(b.getIdSolver());
+        this.setMd5(b.getMd5());
+        this.setRootDir(b.getRootDir());
+        this.setRunCommand(b.getRunCommand());
+        this.setRunPath(b.getRunPath());
+        this.setVersion(b.getVersion());
+    }
 
     /**
      * @return the idSolverBinary
@@ -212,5 +235,6 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
         } else {
             return binaryName + " " + version;
         }
+
     }
 }
