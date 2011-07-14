@@ -57,7 +57,9 @@ public class MixedDomain extends Domain {
 	@Override
 	public List<Object> getDiscreteValues() {
 		List<Object> values = new LinkedList<Object>();
-		values.addAll(domains);
+		for (Domain d: domains) {
+			values.addAll(d.getDiscreteValues());
+		}
 		return values;
 	}
 
