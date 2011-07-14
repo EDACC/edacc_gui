@@ -14,8 +14,8 @@ public class SolverConfigurationDAO {
 
     private static final String table = "SolverConfig";
     private static final String deleteQuery = "DELETE FROM " + table + " WHERE idSolverConfig=?";
-    private static final String insertQuery = "INSERT INTO " + table + " (SolverBinaries_IdSolverBinary, Experiment_IdExperiment, seed_group, name) VALUES (?,?,?,?)";
-    private static final String updateQuery = "UPDATE " + table + " SET SolverBinaries_IdSolverBinary = ?, seed_group=?, name=? WHERE idSolverConfig=?";
+    private static final String insertQuery = "INSERT INTO " + table + " (SolverBinaries_IdSolverBinary, Experiment_IdExperiment, seed_group, name, cost, cost_function, parameter_hash) VALUES (?,?,?,?,?,?,?)";
+    private static final String updateQuery = "UPDATE " + table + " SET SolverBinaries_IdSolverBinary = ?, seed_group=?, name=?, cost=?, cost_function=?, parameter_hash=? WHERE idSolverConfig=?";
     public static ObjectCache<SolverConfiguration> cache = new ObjectCache<SolverConfiguration>();
 
     private static SolverConfiguration getSolverConfigurationFromResultset(ResultSet rs) throws SQLException {
@@ -25,6 +25,9 @@ public class SolverConfigurationDAO {
         i.setId(rs.getInt("IdSolverConfig"));
         i.setSeed_group(rs.getInt("seed_group"));
         i.setName(rs.getString("name"));
+        i.setCost(rs.getFloat("cost"));
+        i.setCost_function(rs.getString("cost_function"));
+        i.setParameter_hash(rs.getString("parameter_hash"));
         return i;
     }
 
@@ -40,6 +43,14 @@ public class SolverConfigurationDAO {
             st.setInt(2, i.getExperiment_id());
             st.setInt(3, i.getSeed_group());
             st.setString(4, i.getName());
+            if (i.getCost() == null) {
+                st.setNull(5, java.sql.Types.FLOAT);
+            }
+            else {
+                st.setFloat(5, i.getCost());
+            }
+            st.setString(6, i.getCost_function());
+            st.setString(7, i.getParameter_hash());
             st.executeUpdate();
             ResultSet generatedKeys = st.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -52,7 +63,14 @@ public class SolverConfigurationDAO {
             st.setInt(1, i.getSolverBinary().getIdSolverBinary());
             st.setInt(2, i.getSeed_group());
             st.setString(3, i.getName());
-            st.setInt(4, i.getId());
+            if (i.getCost() == null) {
+                st.setNull(4, java.sql.Types.FLOAT);
+            } else {
+                st.setFloat(4, i.getCost());
+            }
+            st.setString(5, i.getCost_function());
+            st.setString(6, i.getParameter_hash());
+            st.setInt(7, i.getId());
             st.executeUpdate();
             i.setSaved();
         }
@@ -69,8 +87,12 @@ public class SolverConfigurationDAO {
     public static void removeSolverConfiguration(SolverConfiguration solverConfig) {
         solverConfig.setDeleted();
     }
-
+    
     public static SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int experimentId, int seed_group, String name) throws SQLException, Exception {
+        return createSolverConfiguration(solverBinary, experimentId, seed_group, name, null, null, null);
+    }
+
+    public static SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int experimentId, int seed_group, String name, Float cost, String cost_function, String parameter_hash) throws SQLException, Exception {
         if (solverBinary == null) {
             throw new Exception("Solver binary missing.");
         }
@@ -79,6 +101,9 @@ public class SolverConfigurationDAO {
         i.setExperiment_id(experimentId);
         i.setSeed_group(seed_group);
         i.setName(name);
+        i.setCost(cost);
+        i.setCost_function(cost_function);
+        i.setParameter_hash(parameter_hash);
         save(i);
         cache.cache(i);
         return i;
@@ -157,5 +182,24 @@ public class SolverConfigurationDAO {
         rs.close();
         st.close();
         return res;
+    }
+    
+    public static SolverConfiguration getByParameterHash(int experimentId, String parameter_hash) throws SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE parameter_hash=? AND Experiment_idExperiment=?");
+        st.setString(1, parameter_hash);
+        st.setInt(2, experimentId);
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            SolverConfiguration sc = getSolverConfigurationFromResultset(rs);
+            sc.setSaved();
+            cache.cache(sc);
+            sc.setSaved();
+            rs.close();
+            st.close();
+            return sc;
+        }
+        rs.close();
+        st.close();
+        return null;
     }
 }

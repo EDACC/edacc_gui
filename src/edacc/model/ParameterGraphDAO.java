@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -122,7 +123,8 @@ public class ParameterGraphDAO {
         try {
             ConfigurationScenario cs = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(idExperiment);
             SolverBinaries solver_binary = SolverBinariesDAO.getById(cs.getIdSolverBinary());
-            SolverConfiguration solver_config = SolverConfigurationDAO.createSolverConfiguration(solver_binary, idExperiment, 0, name);
+            config.updateChecksum();
+            SolverConfiguration solver_config = SolverConfigurationDAO.createSolverConfiguration(solver_binary, idExperiment, 0, name, null, null, toHex(config.getChecksum()));
 
             for (ConfigurationScenarioParameter param : cs.getParameters()) {
                 if ("instance".equals(param.getParameter().getName()) || "seed".equals(param.getParameter().getName())) {
@@ -166,5 +168,11 @@ public class ParameterGraphDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+    
+    public static String toHex(byte[] bytes) {
+        if (bytes == null) return "";
+        BigInteger bi = new BigInteger(1, bytes);
+        return String.format("%0" + (bytes.length << 1) + "X", bi);
     }
 }

@@ -10,6 +10,33 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
     private int id;
     private int seed_group;
     private String name;
+    private Float cost;
+    private String cost_function;
+    private String parameter_hash;
+
+    public Float getCost() {
+        return cost;
+    }
+
+    public void setCost(Float cost) {
+        this.cost = cost;
+    }
+
+    public String getCost_function() {
+        return cost_function;
+    }
+
+    public void setCost_function(String cost_function) {
+        this.cost_function = cost_function;
+    }
+
+    public String getParameter_hash() {
+        return parameter_hash;
+    }
+
+    public void setParameter_hash(String parameter_hash) {
+        this.parameter_hash = parameter_hash;
+    }
 
     public int getSeed_group() {
         return seed_group;
