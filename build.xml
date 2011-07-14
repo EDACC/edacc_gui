@@ -78,6 +78,7 @@
         <copy todir="${dist.dir}/bin">
             <fileset file="client/AUTHORS"/>
             <fileset file="client/client"/>
+            <fileset file="client/client_32bit"/>
             <fileset file="client/LICENSE"/>
             <fileset file="client/README"/>
             <fileset file="client/runsolver"/>
@@ -105,6 +106,7 @@
         <copy todir="${build.classes.dir}/bin">
             <fileset file="client/AUTHORS"/>
             <fileset file="client/client"/>
+            <fileset file="client/client_32bit"/>
             <fileset file="client/LICENSE"/>
             <fileset file="client/README"/>
             <fileset file="client/runsolver"/>
