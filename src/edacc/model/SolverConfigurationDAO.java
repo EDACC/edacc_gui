@@ -63,7 +63,11 @@ public class SolverConfigurationDAO {
             st.setInt(1, i.getSolverBinary().getIdSolverBinary());
             st.setInt(2, i.getSeed_group());
             st.setString(3, i.getName());
-            st.setFloat(4, i.getCost());
+            if (i.getCost() == null) {
+                st.setNull(4, java.sql.Types.FLOAT);
+            } else {
+                st.setFloat(4, i.getCost());
+            }
             st.setString(5, i.getCost_function());
             st.setString(6, i.getParameter_hash());
             st.setInt(7, i.getId());
