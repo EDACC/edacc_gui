@@ -83,16 +83,19 @@
             <fileset file="client/README"/>
             <fileset file="client/runsolver"/>
             <fileset file="client/runsolver_copyright.txt"/>
-            <fileset file="client/verifiers/SAT"/>
         </copy>
         <mkdir dir="${dist.dir}/bin/verifiers" />
         <copy todir="${dist.dir}/bin/verifiers">
             <fileset file="client/verifiers/SAT"/>
         </copy>
-        <echo>Copying Experiment Mode - README.txt</echo>
+        <echo>Copying dist-files</echo>
         <copy todir="${dist.dir}">
-            <fileset file="Experiment Mode - README.txt"/>
+            <fileset file="dist-files/Experiment Mode - README.txt"/>
+            <fileset file="dist-files/AUTHORS"/>
+            <fileset file="dist-files/LICENSE"/>
+            <fileset file="dist-files/README"/>
         </copy>
+        <copy overwrite="true" tofile="${dist.dir}/README.txt" file="dist-files/README" /> 
     </target>
 
     <target name="-pre-jar">
