@@ -30,6 +30,7 @@ import edacc.model.ClientDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.ConfigurationScenario;
 import edacc.model.ConfigurationScenarioDAO;
+import edacc.model.ConfigurationScenarioParameter;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentResult;
@@ -37,7 +38,11 @@ import edacc.model.StatusCode;
 import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.ObjectCache;
+import edacc.model.Parameter;
+import edacc.model.ParameterDAO;
 import edacc.model.ParameterGraphDAO;
+import edacc.model.ParameterInstance;
+import edacc.model.ParameterInstanceDAO;
 import edacc.model.PropertyNotInDBException;
 import edacc.model.Solver;
 import edacc.model.SolverBinaries;
@@ -61,6 +66,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
@@ -68,6 +74,7 @@ import java.util.Observer;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -2914,7 +2921,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     private void btnConfigurationScenarioRandomSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfigurationScenarioRandomSolverConfigsActionPerformed
         if (expController.configurationScenarioIsModified()) {
-            JOptionPane.showMessageDialog(this, "You have to save the configuration scneario before generating random solver configurations.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "You have to save the configuration scenario before generating random solver configurations.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         String input = JOptionPane.showInputDialog("How many random solver configurations should be generated?");
@@ -2929,11 +2936,52 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                             task.setOperationName("Generating solver configurations");
                             ConfigurationScenario scenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(expController.getActiveExperiment().getId());
                             SolverBinaries sb = SolverBinariesDAO.getById(scenario.getIdSolverBinary());
+                            HashMap<Integer, Parameter> params = new HashMap<Integer, Parameter>();
+                            Vector<Parameter> parameters = ParameterDAO.getParameterFromSolverId(sb.getIdSolver());
+                            for (ConfigurationScenarioParameter csp : scenario.getParameters()) {
+                                if (csp.isConfigurable()) {
+                                    for (Parameter p : parameters) {
+                                        if (p.getId() == csp.getIdParameter()) {
+                                            params.put(p.getId(), p);
+                                        }
+                                    }
+                                }
+                            }
+
+
                             ParameterGraph graph = ParameterGraphDAO.loadParameterGraph(SolverDAO.getById(sb.getIdSolver()));
                             Random random = new Random();
                             for (int i = 0; i < number; i++) {
                                 task.setStatus("Processing solver configuration " + i + " of " + number);
-                                ParameterGraphDAO.createSolverConfig(expController.getActiveExperiment().getId(), graph.getRandomConfiguration(random), "Random " + i);
+                                int id = ParameterGraphDAO.createSolverConfig(expController.getActiveExperiment().getId(), graph.getRandomConfiguration(random), "Random " + i);
+                                if (id > 0) {
+                                    SolverConfiguration solverConfig = SolverConfigurationDAO.getSolverConfigurationById(id);
+                                    ArrayList<ParameterInstance> pis = ParameterInstanceDAO.getBySolverConfig(solverConfig);
+                                    String name = "CP:";
+                                    for (ParameterInstance pi : pis) {
+                                        Parameter p = params.get(pi.getParameter_id());
+                                        if (p != null) {
+                                            name += " " + p.getPrefix();
+                                            if (p.getHasValue()) {
+                                                if (p.getSpace()) {
+                                                    name += " ";
+                                                }
+                                                name += " " + pi.getValue();
+                                            }
+                                        }
+                                    }
+
+                                    expController.solverConfigCache.synchronize();
+                                    for (SolverConfiguration sc : expController.solverConfigCache.getAll()) {
+                                        if (sc.getId() == solverConfig.getId()) {
+                                            sc.setName(name);
+                                            break;
+                                        }
+                                    }
+                                    expController.solverConfigCache.saveAll();
+                                } else {
+                                    // TODO: ERROR?
+                                }
                             }
                             expController.solverConfigCache.synchronize();
                         } catch (final Exception ex) {
