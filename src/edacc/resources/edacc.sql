@@ -196,9 +196,13 @@ CREATE  TABLE IF NOT EXISTS `SolverConfig` (
   `SolverBinaries_idSolverBinary` INT NOT NULL ,
   `seed_group` INT NULL DEFAULT 0 ,
   `name` VARCHAR(255) NOT NULL ,
+  `cost` FLOAT NULL ,
+  `cost_function` VARCHAR(255) NULL ,
+  `parameter_hash` VARCHAR(255) NULL ,
   PRIMARY KEY (`idSolverConfig`) ,
   INDEX `fk_SolverConfig_Experiment1` (`Experiment_idExperiment` ASC) ,
   INDEX `fk_SolverConfig_SolverBinaries1` (`SolverBinaries_idSolverBinary` ASC) ,
+  INDEX `parameter_hash_index` (`parameter_hash` ASC) ,
   CONSTRAINT `fk_SolverConfig_Experiment1`
     FOREIGN KEY (`Experiment_idExperiment` )
     REFERENCES `Experiment` (`idExperiment` )
