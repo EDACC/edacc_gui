@@ -418,6 +418,9 @@ public class EDACCView extends FrameView implements Observer {
                     } catch (IOException ex) {
                         processDownloadException(ex);
                         return;
+                    } catch (VersionException ex) {
+                        processDownloadException(ex);
+                        return;
                     }
                 } else {
                     SwingUtilities.invokeLater(new Runnable() {
