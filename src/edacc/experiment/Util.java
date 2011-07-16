@@ -315,4 +315,32 @@ public class Util {
             }
         });
     }
+    
+    /**
+     * Converts <code>bytes</code> to another unit (KiB, MiB, GiB, TiB) according to the number of bytes.
+     * @param bytes numer of bytes
+     * @return 
+     */
+    public static String convertUnit(int bytes) {
+        String unit = " B";
+        if (bytes <= 1024) {
+            return bytes + unit;
+        } else {
+            float f = bytes / (float) 1024;
+            unit = " KiB";
+            if (f > 1024) {
+                unit = " MiB";
+                f /= (float) 1024;
+            }
+            if (f > 1024) {
+                unit = " GiB";
+                f /= (float) 1024;
+            }
+            if (f > 1024) {
+                unit = " TiB";
+                f /= (float) 1024;
+            }
+            return (Math.round(f*100) / (float) 100) + unit;
+        }
+    }
 }

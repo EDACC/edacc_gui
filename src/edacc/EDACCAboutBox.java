@@ -11,7 +11,9 @@ public class EDACCAboutBox extends javax.swing.JDialog {
     public EDACCAboutBox(java.awt.Frame parent) {
         super(parent);
         initComponents();
+        setTitle("About: " + org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAboutBox.class).getString("Application.title") + " " + new Version().toString());
         getRootPane().setDefaultButton(closeButton);
+        
     }
 
     @Action public void closeAboutBox() {
@@ -38,8 +40,6 @@ public class EDACCAboutBox extends javax.swing.JDialog {
         javax.swing.JLabel imageLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAboutBox.class);
-        setTitle(resourceMap.getString("title")); // NOI18N
         setModal(true);
         setName("aboutBox"); // NOI18N
         setResizable(false);
@@ -49,6 +49,7 @@ public class EDACCAboutBox extends javax.swing.JDialog {
         closeButton.setName("closeButton"); // NOI18N
 
         appTitleLabel.setFont(appTitleLabel.getFont().deriveFont(appTitleLabel.getFont().getStyle() | java.awt.Font.BOLD, appTitleLabel.getFont().getSize()+4));
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAboutBox.class);
         appTitleLabel.setText(resourceMap.getString("Application.title")); // NOI18N
         appTitleLabel.setName("appTitleLabel"); // NOI18N
 
@@ -56,7 +57,7 @@ public class EDACCAboutBox extends javax.swing.JDialog {
         versionLabel.setText(resourceMap.getString("versionLabel.text")); // NOI18N
         versionLabel.setName("versionLabel"); // NOI18N
 
-        appVersionLabel.setText(resourceMap.getString("Application.version")); // NOI18N
+        appVersionLabel.setText(new Version().toString());
         appVersionLabel.setName("appVersionLabel"); // NOI18N
 
         vendorLabel.setFont(vendorLabel.getFont().deriveFont(vendorLabel.getFont().getStyle() | java.awt.Font.BOLD));
@@ -94,12 +95,12 @@ public class EDACCAboutBox extends javax.swing.JDialog {
                                 .add(org.jdesktop.layout.GroupLayout.LEADING, vendorLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .add(org.jdesktop.layout.GroupLayout.LEADING, homepageLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(appVendorLabel)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(appVendorLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .add(appHomepageLabel)
-                            .add(appVersionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 16, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                            .add(appVersionLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, appTitleLabel)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, appDescLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, appDescLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
                     .add(closeButton))
                 .addContainerGap())
         );
@@ -110,7 +111,7 @@ public class EDACCAboutBox extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(appTitleLabel)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(appDescLabel)
+                .add(appDescLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(versionLabel)
@@ -123,7 +124,7 @@ public class EDACCAboutBox extends javax.swing.JDialog {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(homepageLabel)
                     .add(appHomepageLabel))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 33, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 56, Short.MAX_VALUE)
                 .add(closeButton)
                 .addContainerGap())
         );

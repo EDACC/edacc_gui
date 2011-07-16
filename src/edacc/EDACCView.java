@@ -6,8 +6,11 @@ package edacc;
 import edacc.model.DatabaseConnector;
 import edacc.model.NoConnectionToDBException;
 import java.awt.Component;
+import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.Observable;
+import javax.xml.parsers.ParserConfigurationException;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
@@ -25,12 +28,13 @@ import javax.swing.SwingUtilities;
 import edacc.manageDB.Util;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
-import edacc.satinstances.PropertyValueTypeManager;
+import edacc.updates.UpdateController;
 import java.io.IOException;
 import java.net.URL;
 import javax.help.HelpSet;
 import javax.help.JHelp;
 import javax.swing.UIManager;
+import org.xml.sax.SAXException;
 
 /**
  * The application's main frame.
@@ -45,7 +49,6 @@ public class EDACCView extends FrameView implements Observer {
 
     public EDACCView(SingleFrameApplication app) {
         super(app);
-
         initComponents();
 
         UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
@@ -178,11 +181,12 @@ public class EDACCView extends FrameView implements Observer {
         modusMenu = new javax.swing.JMenu();
         manageDBModeMenuItem = new javax.swing.JRadioButtonMenuItem();
         manageExperimentModeMenuItem = new javax.swing.JRadioButtonMenuItem();
-        javax.swing.JMenu helpMenu = new javax.swing.JMenu();
-        javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
-        helpMenuItem = new javax.swing.JMenuItem();
         propertyMenu = new javax.swing.JMenu();
         ManagePropertyMenuItem = new javax.swing.JMenuItem();
+        javax.swing.JMenu helpMenu = new javax.swing.JMenu();
+        helpMenuItem = new javax.swing.JMenuItem();
+        updatesMenuItem = new javax.swing.JMenuItem();
+        javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
         statusPanel = new javax.swing.JPanel();
         javax.swing.JSeparator statusPanelSeparator = new javax.swing.JSeparator();
         statusMessageLabel = new javax.swing.JLabel();
@@ -200,7 +204,7 @@ public class EDACCView extends FrameView implements Observer {
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 682, Short.MAX_VALUE)
+            .add(0, 687, Short.MAX_VALUE)
         );
 
         menuBar.setAutoscrolls(true);
@@ -264,27 +268,6 @@ public class EDACCView extends FrameView implements Observer {
 
         menuBar.add(modusMenu);
 
-        helpMenu.setMnemonic('H');
-        helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
-        helpMenu.setName("helpMenu"); // NOI18N
-
-        aboutMenuItem.setAction(actionMap.get("showAboutBox")); // NOI18N
-        aboutMenuItem.setName("aboutMenuItem"); // NOI18N
-        helpMenu.add(aboutMenuItem);
-
-        helpMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK));
-        helpMenuItem.setMnemonic('H');
-        helpMenuItem.setText(resourceMap.getString("helpMenuItem.text")); // NOI18N
-        helpMenuItem.setName("helpMenuItem"); // NOI18N
-        helpMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                helpMenuItemActionPerformed(evt);
-            }
-        });
-        helpMenu.add(helpMenuItem);
-
-        menuBar.add(helpMenu);
-
         propertyMenu.setText(resourceMap.getString("propertyMenu.text")); // NOI18N
         propertyMenu.setName("propertyMenu"); // NOI18N
 
@@ -299,6 +282,36 @@ public class EDACCView extends FrameView implements Observer {
         propertyMenu.add(ManagePropertyMenuItem);
 
         menuBar.add(propertyMenu);
+
+        helpMenu.setMnemonic('H');
+        helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
+        helpMenu.setName("helpMenu"); // NOI18N
+
+        helpMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_MASK));
+        helpMenuItem.setMnemonic('H');
+        helpMenuItem.setText(resourceMap.getString("helpMenuItem.text")); // NOI18N
+        helpMenuItem.setName("helpMenuItem"); // NOI18N
+        helpMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                helpMenuItemActionPerformed(evt);
+            }
+        });
+        helpMenu.add(helpMenuItem);
+
+        updatesMenuItem.setText(resourceMap.getString("updatesMenuItem.text")); // NOI18N
+        updatesMenuItem.setName("updatesMenuItem"); // NOI18N
+        updatesMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updatesMenuItemActionPerformed(evt);
+            }
+        });
+        helpMenu.add(updatesMenuItem);
+
+        aboutMenuItem.setAction(actionMap.get("showAboutBox")); // NOI18N
+        aboutMenuItem.setName("aboutMenuItem"); // NOI18N
+        helpMenu.add(aboutMenuItem);
+
+        menuBar.add(helpMenu);
 
         statusPanel.setName("statusPanel"); // NOI18N
 
@@ -370,6 +383,110 @@ public class EDACCView extends FrameView implements Observer {
         manageSolverProperties.setVisible(true);
     }//GEN-LAST:event_ManagePropertyMenuItemActionPerformed
 
+    private void updatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updatesMenuItemActionPerformed
+        Tasks.startTask(new TaskRunnable() {
+
+            @Override
+            public void run(Tasks task) {
+                Version v = null;
+                try {
+                    v = UpdateController.getInstance().getNewestVersion();
+                } catch (ParserConfigurationException ex) {
+                    processGetNewestVersionException(ex);
+                    return;
+                } catch (MalformedURLException ex) {
+                    processGetNewestVersionException(ex);
+                    return;
+                } catch (IOException ex) {
+                    processGetNewestVersionException(ex);
+                    return;
+                } catch (SAXException ex) {
+                    processGetNewestVersionException(ex);
+                    return;
+                }
+                Version current_version = new Version();
+                if (v.compareTo(current_version) != 0) {
+                    int userinput = JOptionPane.showConfirmDialog(Tasks.getTaskView(), "New Version available: " + v + ". Update?", "Update available", JOptionPane.YES_NO_OPTION);
+                    if (userinput == JOptionPane.NO_OPTION) {
+                        return;
+                    }
+                    try {
+                        UpdateController.getInstance().download(task, v);
+                    } catch (MalformedURLException ex) {
+                        processDownloadException(ex);
+                        return;
+                    } catch (IOException ex) {
+                        processDownloadException(ex);
+                        return;
+                    }
+                } else {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "No updates available.", "Check for Updates", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                        
+                    });
+                    return;
+                }
+                try {
+                    UpdateController.getInstance().startUpdater();
+
+                } catch (FileNotFoundException ex) {
+                    processStartUpdaterException(ex);
+                    return;
+                } catch (IOException ex) {
+                    processStartUpdaterException(ex);
+                    return;
+                } catch (ClassNotFoundException ex) {
+                    processStartUpdaterException(ex);
+                    return;
+                }
+            }
+
+            private void processGetNewestVersionException(final Exception ex) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if (ex instanceof ParserConfigurationException || ex instanceof SAXException) {
+                            JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Couldn't initialize XML parser.", "Error", JOptionPane.ERROR_MESSAGE);
+                        } else if (ex instanceof MalformedURLException) {
+                            JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Invalid update URL.", "Error", JOptionPane.ERROR_MESSAGE);
+                        } else if (ex instanceof IOException) {
+                            JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "I/O-Exception: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                });
+
+            }
+
+            private void processStartUpdaterException(Exception ex) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Couldn't start updater.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+            }
+
+            private void processDownloadException(final Exception ex) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Error while downloading update: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+            }
+        });
+
+    }//GEN-LAST:event_updatesMenuItemActionPerformed
+
     @Action
     public void btnConnectToDB() {
         if (databaseSettings == null) {
@@ -422,7 +539,7 @@ public class EDACCView extends FrameView implements Observer {
                 public void run(Tasks task) {
                     try {
                         DatabaseConnector.getInstance().createDBSchema(task);
-                        
+
                         SwingUtilities.invokeLater(new Runnable() {
 
                             @Override
@@ -602,6 +719,7 @@ public class EDACCView extends FrameView implements Observer {
     private javax.swing.JLabel statusAnimationLabel;
     private javax.swing.JLabel statusMessageLabel;
     private javax.swing.JPanel statusPanel;
+    private javax.swing.JMenuItem updatesMenuItem;
     // End of variables declaration//GEN-END:variables
     private final Timer messageTimer;
     private final Timer busyIconTimer;

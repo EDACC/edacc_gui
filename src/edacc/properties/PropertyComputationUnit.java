@@ -4,7 +4,6 @@
  */
 package edacc.properties;
 
-import com.sun.corba.se.impl.encoding.CodeSetConversion.CTBConverter;
 import edacc.model.ComputationMethodDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.DatabaseConnector;
