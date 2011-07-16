@@ -2,6 +2,7 @@ package edacc.updates;
 
 import edacc.EDACCApp;
 import edacc.Version;
+import edacc.VersionException;
 import edacc.model.Tasks;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.NoSuchAlgorithmException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.xml.parsers.DocumentBuilder;
@@ -50,6 +52,7 @@ public class UpdateController {
             Node node = root.getChildNodes().item(i);
             String version = null;
             String v_url = null;
+            String md5 = null;
             if ("version".equals(node.getNodeName())) {
                 for (int j = 0; j < node.getChildNodes().getLength(); j++) {
                     Node n = node.getChildNodes().item(j);
@@ -57,11 +60,13 @@ public class UpdateController {
                         version = n.getTextContent();
                     } else if ("location".equals(n.getNodeName())) {
                         v_url = n.getTextContent();
+                    } else if ("md5".equals(n.getNodeName())) {
+                        md5 = n.getTextContent();
                     }
                 }
                 Version v = null;
                 try {
-                    v = new Version(version, v_url);
+                    v = new Version(version, v_url, md5);
                 } catch (Exception ex) {
                 }
                 if (v != null && new_version.compareTo(v) < 0) {
@@ -72,8 +77,8 @@ public class UpdateController {
 
         return new_version;
     }
-    
-    public void download(Tasks task, Version v) throws MalformedURLException, IOException {
+
+    public void download(Tasks task, Version v) throws MalformedURLException, IOException, VersionException {
         task.setOperationName("Downloading EDACC " + v);
         java.net.URL url = new java.net.URL(v.getLocation());
 
@@ -94,6 +99,18 @@ public class UpdateController {
         bout.close();
         fos.close();
         in.close();
+        task.setTaskProgress(0f);
+        task.setStatus("Validating update.zip");
+        try {
+            String md5 = edacc.manageDB.Util.calculateMD5(new File(edacc.experiment.Util.getPath() + System.getProperty("file.separator") + "update.zip"));
+            if (v.getMd5() == null || !v.getMd5().equals(md5)) {
+                throw new VersionException("Error while validating md5 checksum. Please try again.");
+            }
+        } catch (FileNotFoundException ex) {
+            throw new VersionException("Error while validating md5 checksum. Please try again.");
+        } catch (NoSuchAlgorithmException ex) {
+            throw new VersionException("Error while validating md5 checksum. Please try again.");
+        }
     }
 
     public void startUpdater() throws FileNotFoundException, IOException, ClassNotFoundException {

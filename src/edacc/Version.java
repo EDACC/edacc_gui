@@ -13,6 +13,7 @@ public class Version {
     private int major,minor,patch;
     private String branch;
     private String location;
+    private String md5;
     
     public Version() {
         
@@ -23,7 +24,7 @@ public class Version {
         branch = resourceMap.getString("version.branch");
     }
     
-    public Version(String str_version, String location) {
+    public Version(String str_version, String location, String md5) {
         Matcher m = pattern.matcher(str_version);
         if (m.matches()) {
             major = Integer.parseInt(m.group(1));
@@ -31,6 +32,7 @@ public class Version {
             patch = m.group(3) == null ? 0 : Integer.parseInt(m.group(3));
         }
         this.location = location;
+        this.md5 = md5;
         branch = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(Version.class).getString("version.branch");
     }
     
@@ -53,6 +55,10 @@ public class Version {
 
     public String getLocation() {
         return location;
+    }
+
+    public String getMd5() {
+        return md5;
     }
 
     @Override
