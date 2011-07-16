@@ -49,6 +49,12 @@ public class EDACCApp extends SingleFrameApplication {
      * Main method launching the application.
      */
     public static void main(String[] args) {
+        // clean Updater.class
+        File updater = new File(edacc.experiment.Util.getPath() + System.getProperty("file.separator") + "Updater.class");
+        if (updater.exists()) {
+            updater.delete();
+        }
+        
         // find application directory
         // when running from netbeans this is "build/classes"
         // when running from a JAR it's the directory containing the JAR
