@@ -440,7 +440,14 @@ public class ExperimentController {
         solverConfigCache.saveAll();
         getExperimentResults().updateExperimentResults();
         main.generateJobsTableModel.updateNumRuns();
-        Util.updateTableColumnWidth(main.tblGenerateJobs);
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                Util.updateTableColumnWidth(main.tblGenerateJobs);
+            }
+            
+        });
         if (invalidSeedGroup) {
             SwingUtilities.invokeAndWait(new Runnable() {
 
@@ -521,7 +528,14 @@ public class ExperimentController {
         }
         main.insTableModel.setExperimentHasInstances(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
         main.generateJobsTableModel.updateNumRuns();
-        Util.updateTableColumnWidth(main.tblGenerateJobs);
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                Util.updateTableColumnWidth(main.tblGenerateJobs);
+            }
+            
+        });
     }
 
     /**
