@@ -3,7 +3,6 @@ package edacc.experiment;
 import edacc.satinstances.ConvertException;
 import java.sql.SQLException;
 import java.util.LinkedList;
-import javax.swing.table.AbstractTableModel;
 import edacc.model.ExperimentResult;
 import edacc.model.ExperimentResultHasProperty;
 import edacc.model.StatusCode;
@@ -327,9 +326,11 @@ public class ExperimentResultsBrowserTableModel extends ThreadSafeDefaultTableMo
                     return "-";
                 }
             case COL_PARAMETERS:
+                solver = getSolver(rowIndex);
+                if (solver == null) return "";
                 String params = parameters.get(j.getSolverConfigId());
                 if (params == null) {
-                    params = Util.getParameterString(getParameters(rowIndex));
+                    params = Util.getParameterString(getParameters(rowIndex), solver);
                     parameters.put(j.getSolverConfigId(), params);
                 }
                 return params;
