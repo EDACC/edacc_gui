@@ -207,4 +207,16 @@ public class SolverConfigEntryTableModel extends ThreadSafeDefaultTableModel {
         }
         return res;
     }
+    
+    public boolean isSelected(int row) {
+        return selected[row];
+    }
+    
+    public Parameter getParameterAt(int row) {
+        return parameters[row];
+    }
+    
+    public String getValueAt(int row) {
+        return values[row];
+    }
 }
