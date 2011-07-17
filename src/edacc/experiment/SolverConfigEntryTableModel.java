@@ -171,7 +171,7 @@ public class SolverConfigEntryTableModel extends ThreadSafeDefaultTableModel {
                 if (parameters[rowIndex].getHasValue()) {
                     return values[rowIndex];
                 } else {
-                    return "togglable flag";
+                    return "toggleable flag";
                 }
             case 4:
                 return parameters[rowIndex].getOrder();

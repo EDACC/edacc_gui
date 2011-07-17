@@ -83,6 +83,9 @@ public class ConfigurationScenarioTableModel extends ThreadSafeDefaultTableModel
                 ConfigurationScenarioParameter p = configScenarioParameters.get(parameters.get(row).getId());
                 return p == null ? false : !p.isConfigurable();
             case COL_VALUE:
+                if (!parameters.get(row).getHasValue()) {
+                    return "toggleable flag";
+                }
                 p = configScenarioParameters.get(parameters.get(row).getId());
                 return p == null ? "" : (p.getFixedValue() == null ? "" : p.getFixedValue());
             default:
