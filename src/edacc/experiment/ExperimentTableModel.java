@@ -12,7 +12,7 @@ import java.sql.SQLException;
 public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
 
     /** Column count if used as simple table */
-    public static final int COL_COUNT_SIMPLE = 3;
+    public static final int COL_COUNT_SIMPLE = 2;
     /** Index of the name column */
     public static final int COL_NAME = 0;
     /** Index of the date column */
