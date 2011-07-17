@@ -127,30 +127,34 @@ public class ExperimentController {
         StatusCodeDAO.initialize();
         ResultCodeDAO.initialize();
         ClientDAO.clearCache();
-        
+
         SolverBinariesDAO.clearCache();
         SolverDAO.clearCache();
         ParameterDAO.clearCache();
         ExperimentDAO.clearCache();
         SolverConfigurationDAO.clearCache();
         ParameterInstanceDAO.clearCache();
-        
+
         ArrayList<Experiment> experiments = new ArrayList<Experiment>();
         experiments.addAll(ExperimentDAO.getAll());
         main.expTableModel.setExperiments(experiments);
-        try {
-            DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getAllAsTreeFast();
-            main.instanceClassTreeModel.setRoot(root);
-            ArrayList<Instance> instances = new ArrayList<Instance>();
-            instances.addAll(InstanceDAO.getAll());
-            main.insTableModel.setInstances(instances, true, true);
-            if (!DatabaseConnector.getInstance().isCompetitionDB()) {
-                main.tableInstances.removeColumn(main.tableInstances.getColumnModel().getColumn(InstanceTableModel.COL_BENCHTYPE));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getAllAsTreeFast();
+        main.instanceClassTreeModel.setRoot(root);
+        ArrayList<Instance> instances = new ArrayList<Instance>();
+        instances.addAll(InstanceDAO.getAll());
+        main.insTableModel.setInstances(instances, true, true);
 
+        final boolean isCompetitionDB = DatabaseConnector.getInstance().isCompetitionDB();
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                if (!isCompetitionDB) {
+                    main.tableInstances.removeColumn(main.tableInstances.getColumnModel().getColumn(InstanceTableModel.COL_BENCHTYPE));
+                }
+            }
+        });
     }
 
     /**
@@ -219,14 +223,13 @@ public class ExperimentController {
         experimentResultCache.updateExperimentResults();
 
         main.generateJobsTableModel.updateNumRuns();
-        
+
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
                 Util.updateTableColumnWidth(main.tblGenerateJobs);
             }
-            
         });
         main.afterExperimentLoaded();
     }
@@ -446,7 +449,6 @@ public class ExperimentController {
             public void run() {
                 Util.updateTableColumnWidth(main.tblGenerateJobs);
             }
-            
         });
         if (invalidSeedGroup) {
             SwingUtilities.invokeAndWait(new Runnable() {
@@ -534,7 +536,6 @@ public class ExperimentController {
             public void run() {
                 Util.updateTableColumnWidth(main.tblGenerateJobs);
             }
-            
         });
     }
 
@@ -715,7 +716,7 @@ public class ExperimentController {
                     if (task.isCancelled()) {
                         throw new TaskCancelledException();
                     }
-                  //  task.setStatus("Adding job " + done + " of " + elements);
+                    //  task.setStatus("Adding job " + done + " of " + elements);
                     // check if job already exists
                     if (!experimentResultCache.contains(c.getId(), i.getId(), run)) {
                         if (solverConfigHasSeed.get(c.getId())) {
@@ -830,7 +831,7 @@ public class ExperimentController {
                             }
                         }
                     }
-                    
+
                     SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
