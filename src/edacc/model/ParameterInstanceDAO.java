@@ -57,6 +57,7 @@ public class ParameterInstanceDAO {
                     }
                 }
             }
+            st.close();
         } else if (i.isModified()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
             st.setString(1, i.getValue());
@@ -64,6 +65,7 @@ public class ParameterInstanceDAO {
             st.setInt(3, i.getParameter_id());
             st.executeUpdate();
             i.setSaved();
+            st.close();
         } else if (i.isNew()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
             st.setInt(1, i.getSolverConfiguration().getId());
@@ -76,6 +78,7 @@ public class ParameterInstanceDAO {
             if (pi != null) {
                 pi.add(i);
             }
+            st.close();
         }
 
     }
@@ -135,6 +138,8 @@ public class ParameterInstanceDAO {
             res.add(i);
         }
         cacheParameterInstances(sc, res);
+        rs.close();
+        st.close();
         return res;
     }
 

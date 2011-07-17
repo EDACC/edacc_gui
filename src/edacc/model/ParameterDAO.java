@@ -112,6 +112,8 @@ public class ParameterDAO {
             i.setSaved();
         }
         cache.put(id, res);
+        st.close();
+        rs.close();
         return res;
     }
 

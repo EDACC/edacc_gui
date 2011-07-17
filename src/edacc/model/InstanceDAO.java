@@ -337,7 +337,7 @@ public class InstanceDAO {
             }
         }
         rs.close();
-
+        st.close();
 
         return res;
     }
