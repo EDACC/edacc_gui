@@ -142,19 +142,23 @@ public class ExperimentController {
         ArrayList<Experiment> experiments = new ArrayList<Experiment>();
         experiments.addAll(ExperimentDAO.getAll());
         main.expTableModel.setExperiments(experiments);
-        try {
-            DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getAllAsTreeFast();
-            main.instanceClassTreeModel.setRoot(root);
-            ArrayList<Instance> instances = new ArrayList<Instance>();
-            instances.addAll(InstanceDAO.getAll());
-            main.insTableModel.setInstances(instances, true, true);
-            if (!DatabaseConnector.getInstance().isCompetitionDB()) {
-                main.tableInstances.removeColumn(main.tableInstances.getColumnModel().getColumn(InstanceTableModel.COL_BENCHTYPE));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getAllAsTreeFast();
+        main.instanceClassTreeModel.setRoot(root);
+        ArrayList<Instance> instances = new ArrayList<Instance>();
+        instances.addAll(InstanceDAO.getAll());
+        main.insTableModel.setInstances(instances, true, true);
 
+        final boolean isCompetitionDB = DatabaseConnector.getInstance().isCompetitionDB();
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                if (!isCompetitionDB) {
+                    main.tableInstances.removeColumn(main.tableInstances.getColumnModel().getColumn(InstanceTableModel.COL_BENCHTYPE));
+                }
+            }
+        });
     }
 
     /**
@@ -453,7 +457,6 @@ public class ExperimentController {
             public void run() {
                 Util.updateTableColumnWidth(main.tblGenerateJobs);
             }
-            
         });
         if (invalidSeedGroup) {
             SwingUtilities.invokeAndWait(new Runnable() {
@@ -541,7 +544,6 @@ public class ExperimentController {
             public void run() {
                 Util.updateTableColumnWidth(main.tblGenerateJobs);
             }
-            
         });
     }
 
