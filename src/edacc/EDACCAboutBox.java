@@ -4,6 +4,9 @@
 
 package edacc;
 
+import java.awt.Desktop;
+import java.net.URI;
+import javax.swing.JOptionPane;
 import org.jdesktop.application.Action;
 
 public class EDACCAboutBox extends javax.swing.JDialog {
@@ -12,8 +15,7 @@ public class EDACCAboutBox extends javax.swing.JDialog {
         super(parent);
         initComponents();
         setTitle("About: " + org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAboutBox.class).getString("Application.title") + " " + new Version().toString());
-        getRootPane().setDefaultButton(closeButton);
-        
+        getRootPane().setDefaultButton(closeButton);        
     }
 
     @Action public void closeAboutBox() {
@@ -35,7 +37,7 @@ public class EDACCAboutBox extends javax.swing.JDialog {
         javax.swing.JLabel vendorLabel = new javax.swing.JLabel();
         javax.swing.JLabel appVendorLabel = new javax.swing.JLabel();
         javax.swing.JLabel homepageLabel = new javax.swing.JLabel();
-        javax.swing.JLabel appHomepageLabel = new javax.swing.JLabel();
+        appHomepageLabel = new javax.swing.JLabel();
         javax.swing.JLabel appDescLabel = new javax.swing.JLabel();
         javax.swing.JLabel imageLabel = new javax.swing.JLabel();
 
@@ -72,7 +74,13 @@ public class EDACCAboutBox extends javax.swing.JDialog {
         homepageLabel.setName("homepageLabel"); // NOI18N
 
         appHomepageLabel.setText(resourceMap.getString("Application.homepage")); // NOI18N
+        appHomepageLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         appHomepageLabel.setName("appHomepageLabel"); // NOI18N
+        appHomepageLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                appHomepageLabelMouseClicked(evt);
+            }
+        });
 
         appDescLabel.setText(resourceMap.getString("appDescLabel.text")); // NOI18N
         appDescLabel.setName("appDescLabel"); // NOI18N
@@ -97,7 +105,7 @@ public class EDACCAboutBox extends javax.swing.JDialog {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                             .add(appVendorLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(appHomepageLabel)
+                            .add(appHomepageLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(appVersionLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, appTitleLabel)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, appDescLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
@@ -123,7 +131,7 @@ public class EDACCAboutBox extends javax.swing.JDialog {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(homepageLabel)
-                    .add(appHomepageLabel))
+                    .add(appHomepageLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 56, Short.MAX_VALUE)
                 .add(closeButton)
                 .addContainerGap())
@@ -131,8 +139,18 @@ public class EDACCAboutBox extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void appHomepageLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_appHomepageLabelMouseClicked
+        try {
+            String url = appHomepageLabel.getText().replaceAll("(<u>|</u>|<html>|</html>)", "");
+            Desktop.getDesktop().browse(new URI(url));
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Couldn't browse URL: " + appHomepageLabel.getText(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_appHomepageLabelMouseClicked
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel appHomepageLabel;
     private javax.swing.JButton closeButton;
     // End of variables declaration//GEN-END:variables
     
