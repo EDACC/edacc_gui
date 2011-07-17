@@ -5,6 +5,8 @@
  */
 package edacc;
 
+import edacc.experiment.SolverConfigEntryTableModel;
+import edacc.model.ParameterInstance;
 import edacc.model.ParameterInstanceDAO;
 import edacc.model.Solver;
 import edacc.model.SolverConfigCache;
@@ -209,6 +211,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            update();
         }
     }//GEN-LAST:event_itemEditActionPerformed
 
@@ -236,15 +239,17 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
 
     private class TableModel extends DefaultTableModel {
 
-        private String[] columns = new String[]{"Solver", "Solver Configuration"};
+        private String[] columns = new String[]{"Solver", "Solver Configuration", "Parameters"};
         ArrayList<String> solverConfigNames;
         ArrayList<Solver> solvers;
+        ArrayList<String> parameterStrings;
         ArrayList<EDACCSolverConfigEntry> entries;
 
         public void update() {
             solverConfigNames = new ArrayList<String>();
             solvers = new ArrayList<Solver>();
             entries = new ArrayList<EDACCSolverConfigEntry>();
+            parameterStrings = new ArrayList<String>();
             for (EDACCSolverConfigPanelSolver pnlSolver : solverConfigPanel.getAllSolverConfigSolverPanels()) {
                 for (EDACCSolverConfigEntry entry : pnlSolver.getAllSolverConfigEntries()) {
                     Solver solver = null;
@@ -259,6 +264,17 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
                     }
                     solvers.add(solver);
                     entries.add(entry);
+                    ArrayList<ParameterInstance> pis = new ArrayList<ParameterInstance>();
+                    SolverConfigEntryTableModel model = entry.solverConfigEntryTableModel;
+                    for (int row = 0; row < model.getRowCount(); row++) {
+                        if (model.isSelected(row)) {
+                            ParameterInstance pi = new ParameterInstance();
+                            pi.setParameter_id(model.getParameterAt(row).getId());
+                            pi.setValue(model.getValueAt(row));
+                            pis.add(pi);
+                        }
+                    }
+                    parameterStrings.add(edacc.experiment.Util.getParameterString(pis, solver));
                 }
             }
             fireTableDataChanged();
@@ -291,6 +307,8 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
                         return solvers.get(row);
                     case 1:
                         return solverConfigNames.get(row);
+                    case 2:
+                        return parameterStrings.get(row);
                     default:
                         return "";
                 }

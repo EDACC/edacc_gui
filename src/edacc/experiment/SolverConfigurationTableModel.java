@@ -2,6 +2,7 @@ package edacc.experiment;
 
 import edacc.model.ParameterInstance;
 import edacc.model.ParameterInstanceDAO;
+import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverDAO;
 import java.sql.SQLException;
@@ -76,8 +77,14 @@ public class SolverConfigurationTableModel extends ThreadSafeDefaultTableModel {
             case COL_SOLVERBINARY:
                 return solverConfigurations.get(rowIndex).getSolverBinary().toString();
             case COL_PARAMETERS:
+                Solver solver = null;
+                try {
+                    solver = SolverDAO.getById(solverConfigurations.get(rowIndex).getSolverBinary().getIdSolver());
+                } catch (Exception ex) {
+                    return "";
+                }
                 SolverConfiguration sc = solverConfigurations.get(rowIndex);
-                return Util.getParameterString(getParametersBySolverConfig(sc));
+                return Util.getParameterString(getParametersBySolverConfig(sc), solver);
         }
         return "";
     }

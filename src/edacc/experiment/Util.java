@@ -5,6 +5,7 @@ import edacc.model.InstanceClass;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstance;
+import edacc.model.Solver;
 import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -117,12 +118,12 @@ public class Util {
      * @param params the parameter instances
      * @return null if an error occurred
      */
-    public static String getParameterString(ArrayList<ParameterInstance> params) {
+    public static String getParameterString(ArrayList<ParameterInstance> params, Solver solver) {
         try {
             if (params == null || params.isEmpty()) {
                 return "";
             }
-            Vector<Parameter> solverParams = ParameterDAO.getParameterFromSolverId(params.get(0).getSolverConfiguration().getSolverBinary().getIdSolver());
+            Vector<Parameter> solverParams = ParameterDAO.getParameterFromSolverId(solver.getId());
             final HashMap<Integer, Parameter> solverParamsMap = new HashMap<Integer, Parameter>();
             for (Parameter p : solverParams) {
                 solverParamsMap.put(p.getId(), p);
@@ -132,30 +133,26 @@ public class Util {
 
                 @Override
                 public int compare(ParameterInstance o1, ParameterInstance o2) {
-                        Parameter sp1 = solverParamsMap.get(o1.getParameter_id());
+                    Parameter sp1 = solverParamsMap.get(o1.getParameter_id());
 
-                        Parameter sp2 = solverParamsMap.get(o2.getParameter_id());
-                        if (sp1.getOrder() > sp2.getOrder()) {
-                            return 1;
-                        } else if (sp1.getOrder() == sp2.getOrder()) {
-                            return 0;
-                        } else {
-                            return -1;
-                        }
+                    Parameter sp2 = solverParamsMap.get(o2.getParameter_id());
+                    if (sp1.getOrder() > sp2.getOrder()) {
+                        return 1;
+                    } else if (sp1.getOrder() == sp2.getOrder()) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
                 }
             });
             for (ParameterInstance param : params) {
                 Parameter solverParameter = solverParamsMap.get(param.getParameter_id());
-                if (solverParameter.getHasValue()) {
-                    String value;
-                    if ("instance".equals(solverParameter.getName().toLowerCase())) {
-                        value = "<instance>";
-                    } else if ("seed".equals(solverParameter.getName().toLowerCase())) {
-                        value = "<seed>";
-                    } else {
-                        value = param.getValue();
-                    }
-                    paramString += solverParameter.getPrefix() == null ? value : (solverParameter.getPrefix() + (solverParameter.getSpace() ? " " : "")) + value;
+                if ("instance".equals(solverParameter.getName().toLowerCase())) {
+                    paramString += solverParameter.getPrefix() == null ? "<instance>" : (solverParameter.getPrefix() + (solverParameter.getSpace() ? " " : "")) + "<instance>";
+                } else if ("seed".equals(solverParameter.getName().toLowerCase())) {
+                    paramString += solverParameter.getPrefix() == null ? "<seed>" : (solverParameter.getPrefix() + (solverParameter.getSpace() ? " " : "")) + "<seed>";
+                } else if (solverParameter.getHasValue()) {
+                    paramString += solverParameter.getPrefix() == null ? param.getValue() : (solverParameter.getPrefix() + (solverParameter.getSpace() ? " " : "")) + param.getValue();
                 } else {
                     paramString += solverParameter.getPrefix() == null ? "" : (solverParameter.getPrefix());
                 }
@@ -315,7 +312,7 @@ public class Util {
             }
         });
     }
-    
+
     /**
      * Converts <code>bytes</code> to another unit (KiB, MiB, GiB, TiB) according to the number of bytes.
      * @param bytes numer of bytes
@@ -340,7 +337,7 @@ public class Util {
                 unit = " TiB";
                 f /= (float) 1024;
             }
-            return (Math.round(f*100) / (float) 100) + unit;
+            return (Math.round(f * 100) / (float) 100) + unit;
         }
     }
 }
