@@ -622,6 +622,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         menuKillHard = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         menuRemoveDeadClients = new javax.swing.JMenuItem();
+        popupInstanceClassTree = new javax.swing.JPopupMenu();
+        menuExpandAll = new javax.swing.JMenuItem();
+        menuCollapseAll = new javax.swing.JMenuItem();
         manageExperimentPane = new javax.swing.JTabbedPane();
         panelManageExperiment = new javax.swing.JPanel();
         scrollPaneExperimentsTable = new javax.swing.JScrollPane();
@@ -771,6 +774,26 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         });
         popupTblClients.add(menuRemoveDeadClients);
+
+        popupInstanceClassTree.setName("popupInstanceClassTree"); // NOI18N
+
+        menuExpandAll.setText(resourceMap.getString("menuExpandAll.text")); // NOI18N
+        menuExpandAll.setName("menuExpandAll"); // NOI18N
+        menuExpandAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuExpandAllActionPerformed(evt);
+            }
+        });
+        popupInstanceClassTree.add(menuExpandAll);
+
+        menuCollapseAll.setText(resourceMap.getString("menuCollapseAll.text")); // NOI18N
+        menuCollapseAll.setName("menuCollapseAll"); // NOI18N
+        menuCollapseAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuCollapseAllActionPerformed(evt);
+            }
+        });
+        popupInstanceClassTree.add(menuCollapseAll);
 
         setName("Form"); // NOI18N
 
@@ -1188,7 +1211,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSelectAllSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1274,7 +1297,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSelectAllSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1390,6 +1413,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         jScrollPane5.setName("jScrollPane5"); // NOI18N
 
+        jTreeInstanceClass.setComponentPopupMenu(popupInstanceClassTree);
         jTreeInstanceClass.setName("jTreeInstanceClass"); // NOI18N
         jTreeInstanceClass.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
@@ -3018,6 +3042,18 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
     }//GEN-LAST:event_btnConfigurationScenarioRandomSolverConfigsActionPerformed
 
+    private void menuExpandAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuExpandAllActionPerformed
+        for (int row = 0; row < jTreeInstanceClass.getRowCount(); row++) {
+            jTreeInstanceClass.expandRow(row);
+        }
+    }//GEN-LAST:event_menuExpandAllActionPerformed
+
+    private void menuCollapseAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCollapseAllActionPerformed
+        for (int row = jTreeInstanceClass.getRowCount()-1; row >= 0; row--) {
+            jTreeInstanceClass.collapseRow(row);
+        } 
+    }//GEN-LAST:event_menuCollapseAllActionPerformed
+
     /**
      * Stops the jobs timer.
      */
@@ -3214,6 +3250,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JLabel lblFilterStatus;
     private javax.swing.JLabel lblJobsFilterStatus;
     private javax.swing.JTabbedPane manageExperimentPane;
+    private javax.swing.JMenuItem menuCollapseAll;
+    private javax.swing.JMenuItem menuExpandAll;
     private javax.swing.JMenuItem menuKillHard;
     private javax.swing.JMenuItem menuKillSoft;
     private javax.swing.JMenuItem menuRemoveDeadClients;
@@ -3226,6 +3264,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JPanel panelExperimentParams;
     private javax.swing.JPanel panelJobBrowser;
     private javax.swing.JPanel panelManageExperiment;
+    private javax.swing.JPopupMenu popupInstanceClassTree;
     private javax.swing.JPopupMenu popupTblClients;
     private javax.swing.JScrollPane scrollPaneExperimentsTable;
     private javax.swing.JSplitPane splitPaneSolver;
