@@ -848,6 +848,7 @@ INSERT INTO StatusCodes VALUES
 (-1, 'not started'),
 (0, 'running'),
 (1, 'finished'),
+(20, 'terminated by user'),
 (21, 'time limit exceeded'),
 (22, 'wallclock time limit'),
 (23, 'memory limit'),
