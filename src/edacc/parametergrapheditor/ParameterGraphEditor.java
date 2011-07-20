@@ -118,61 +118,6 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             }
         };
 
-        /*          graph.setModel(new mxGraphModel() {
-        
-        @Override
-        public Object add(Object o, Object o1, int i) {
-        return super.add(o, o1, i);
-        }
-        
-        @Override
-        protected void cellAdded(Object o) {
-        super.cellAdded(o);
-        System.out.println("CELL ADDED " + o.getClass());
-        if (o instanceof mxCell) {
-        mxCell cell = (mxCell) o;
-        if (cell.isEdge()) {
-        System.out.println("Edge added " + cell.getSource());
-        // if ("AND".equals(cell.get)) {
-        //      System.out.println("SOURCE AND");
-        // }
-        } else if (cell.isVertex()) {
-        System.out.println("Vertex added");
-        }
-        }
-        
-        }
-        
-        
-        
-        @Override
-        protected void cellRemoved(Object o) {
-        super.cellRemoved(o);
-        }
-        
-        @Override
-        public void updateEdgeParent(Object o, Object o1) {
-        System.out.println("UPDATE EDGE PARENT " + o + " -> " + o1);
-        super.updateEdgeParent(o, o1);
-        }
-        
-        @Override
-        public void updateEdgeParents(Object o) {
-        super.updateEdgeParents(o);
-        }
-        
-        @Override
-        public void updateEdgeParents(Object o, Object o1) {
-        super.updateEdgeParents(o, o1);
-        }
-        
-        
-        
-        
-        
-        });*/
-        //graph.insertVertex(graph.getDefaultParent(),null, "Hello", 20, 20, 80, 30);
-
         graphComponent = new mxGraphComponent(graph);
 
         graphComponent.addKeyListener(new KeyAdapter() {
@@ -185,7 +130,6 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
 
         jScrollPane1.setViewportView(graphComponent);
 
-        // graphComponent.getGraphControl().setComponentPopupMenu(jPopupMenu1);
         graphComponent.getGraphControl().addMouseListener(new MouseAdapter() {
 
             @Override
@@ -199,13 +143,13 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                             if (cell.getValue() == null || cell.getValue() instanceof String) {
                                 // will be changed when saved.
                                 edge = new Edge(null, null, 0);
-                            } else { 
+                            } else {
                                 edge = (Edge) cell.getValue();
                             }
                             String group = JOptionPane.showInputDialog("Group:", edge.getGroup());
                             if (group != null) {
                                 try {
-                                edge.setGroup(Integer.parseInt(group));
+                                    edge.setGroup(Integer.parseInt(group));
                                 } catch (NumberFormatException ex) {
                                     JOptionPane.showMessageDialog(ParameterGraphEditor.this, "Invalid group: " + group, "Invalid Group", JOptionPane.ERROR_MESSAGE);
                                 }
@@ -256,7 +200,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                                                         if (parameter != null) {
                                                             node = new OrNode(parameter);
                                                         } else {
-                                                            node = new AndNode(((OrNode)child.getSource().getValue()).getParameter(), domain);
+                                                            node = new AndNode(((OrNode) child.getSource().getValue()).getParameter(), domain);
                                                         }
                                                         mxCell vertex = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, node, mouse.x - graphLocation.x, mouse.y - graphLocation.y, 80, 30, null);
                                                         graph.updateCellSize(vertex);
