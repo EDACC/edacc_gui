@@ -189,6 +189,7 @@ public class SolverBinariesDAO {
             res = b;
             b.setSaved();
         }
+        ps.close();
         rs.close();
         return res;
     }
