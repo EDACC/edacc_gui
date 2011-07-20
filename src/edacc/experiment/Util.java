@@ -318,7 +318,7 @@ public class Util {
      * @param bytes numer of bytes
      * @return 
      */
-    public static String convertUnit(int bytes) {
+    public static String convertUnit(long bytes) {
         String unit = " B";
         if (bytes <= 1024) {
             return bytes + unit;
@@ -338,6 +338,37 @@ public class Util {
                 f /= (float) 1024;
             }
             return (Math.round(f * 100) / (float) 100) + unit;
+        }
+    }
+
+    public static Comparator<ValueUnit> getValueUnitComparator() {
+        return new Comparator<ValueUnit>() {
+
+            @Override
+            public int compare(ValueUnit o1, ValueUnit o2) {
+                if (o1.longValue < o2.longValue) {
+                    return -1;
+                } else if (o1.longValue == o2.longValue) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            }
+        };
+    }
+    static class ValueUnit {
+
+        String stringValue;
+        long longValue;
+
+        public ValueUnit(long bytes) {
+            longValue = bytes;
+            stringValue = Util.convertUnit(bytes);
+        }
+        
+        @Override
+        public String toString() {
+            return stringValue;
         }
     }
 }

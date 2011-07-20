@@ -65,6 +65,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -235,6 +236,27 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         /* -------------------------------- client browser tab -------------------------------- */
         clientTableModel = new ClientTableModel();
         tblClients.setModel(clientTableModel);
+        TableRowSorter<ClientTableModel> clientTableRowSorter = new TableRowSorter<ClientTableModel>() {
+
+            @Override
+            protected boolean useToString(int column) {
+                if (column == ClientTableModel.COL_MEMORY || column == ClientTableModel.COL_MEMORYFREE) {
+                    return false;
+                }
+                return super.useToString(column);
+            }
+
+            @Override
+            public Comparator<?> getComparator(int column) {
+                if (column == ClientTableModel.COL_MEMORY || column == ClientTableModel.COL_MEMORYFREE) {
+                    return edacc.experiment.Util.getValueUnitComparator();
+                }
+                return super.getComparator(column);
+            }
+        };
+        clientTableRowSorter.setModel(clientTableModel);
+        clientTableRowSorter.setSortsOnUpdates(true);
+        tblClients.setRowSorter(clientTableRowSorter);
         tblClients.setDefaultRenderer(Object.class, new EDACCExperimentModeClientCellRenderer());
         tblClients.setDefaultRenderer(String.class, new EDACCExperimentModeClientCellRenderer());
         tblClients.setDefaultRenderer(Integer.class, new EDACCExperimentModeClientCellRenderer());
@@ -3049,9 +3071,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }//GEN-LAST:event_menuExpandAllActionPerformed
 
     private void menuCollapseAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCollapseAllActionPerformed
-        for (int row = jTreeInstanceClass.getRowCount()-1; row >= 0; row--) {
+        for (int row = jTreeInstanceClass.getRowCount() - 1; row >= 0; row--) {
             jTreeInstanceClass.collapseRow(row);
-        } 
+        }
     }//GEN-LAST:event_menuCollapseAllActionPerformed
 
     /**

@@ -115,9 +115,9 @@ public class ClientTableModel extends ThreadSafeDefaultTableModel implements Obs
             case COL_CACHESIZE:
                 return clients.get(row).getCacheSize();
             case COL_MEMORY:
-                return clients.get(row).getMemory();
+                return new edacc.experiment.Util.ValueUnit(clients.get(row).getMemory());
             case COL_MEMORYFREE:
-                return clients.get(row).getMemoryFree();
+                return new edacc.experiment.Util.ValueUnit(clients.get(row).getMemoryFree());
             default:
                 return null;
         }
@@ -125,6 +125,9 @@ public class ClientTableModel extends ThreadSafeDefaultTableModel implements Obs
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
+        if (columnIndex == COL_MEMORY || columnIndex == COL_MEMORYFREE) {
+            return edacc.experiment.Util.ValueUnit.class;
+        }
         return (getRowCount() > 0 ? (getValueAt(0, columnIndex) != null ? getValueAt(0, columnIndex).getClass() : null) : String.class);
     }
 
