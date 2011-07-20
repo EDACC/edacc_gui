@@ -34,6 +34,7 @@ public class SolverConfigurationDAO {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
             st.setInt(1, i.getId());
             st.executeUpdate();
+            st.close();
         } else if (i.isNew()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
             st.setInt(1, i.getSolverBinary().getId());
@@ -45,8 +46,10 @@ public class SolverConfigurationDAO {
             if (generatedKeys.next()) {
                 i.setId(generatedKeys.getInt(1));
             }
+            generatedKeys.close();
             i.setSaved();
             cache.cache(i);
+            st.close();
         } else if (i.isModified()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
             st.setInt(1, i.getSolverBinary().getIdSolverBinary());
@@ -55,6 +58,7 @@ public class SolverConfigurationDAO {
             st.setInt(4, i.getId());
             st.executeUpdate();
             i.setSaved();
+            st.close();
         }
     }
 
@@ -119,8 +123,11 @@ public class SolverConfigurationDAO {
             sc.setSaved();
             cache.cache(sc);
             sc.setSaved();
+            st.close();
+            rs.close();
             return sc;
         }
+        st.close();
         rs.close();
         return null;
     }

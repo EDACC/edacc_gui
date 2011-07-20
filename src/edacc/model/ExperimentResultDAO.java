@@ -99,6 +99,7 @@ public class ExperimentResultDAO {
                 v.get(i).setId(rs.getInt(1));
                 i++;
             }
+            rs.close();
             st.close();
 
             st = DatabaseConnector.getInstance().getConn().prepareStatement(insertOutputsQuery);
@@ -577,9 +578,12 @@ public class ExperimentResultDAO {
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
         if (!rs.next()) {
+            rs.close();
+            ps.close();
             throw new ExperimentResultNotInDBException();
         }
         ExperimentResult er = getExperimentResultFromResultSet(rs);
+        rs.close();
         ps.close();
         ExperimentResultHasPropertyDAO.assign(er);
         return er;
@@ -601,11 +605,15 @@ public class ExperimentResultDAO {
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
         if (!rs.next()) {
+            rs.close();
+            ps.close();
             throw new ExperimentResultNotInDBException();
         }
         ExperimentResult er = getExperimentResultFromResultSet(rs);
-        ArrayList<ExperimentResult> tmp = new ArrayList<ExperimentResult>();
-        tmp.add(er);
+        //ArrayList<ExperimentResult> tmp = new ArrayList<ExperimentResult>();
+        //tmp.add(er);
+        rs.close();
+        ps.close();
         //ExperimentResultHasPropertyDAO.assign(tmp, er.getExperimentId());
         return er;
     }
