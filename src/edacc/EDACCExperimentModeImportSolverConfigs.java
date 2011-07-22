@@ -11,10 +11,14 @@ import edacc.experiment.SolverConfigurationTableModel;
 import edacc.model.Experiment;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
+import java.awt.Component;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import javax.swing.JLabel;
+import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  *
@@ -39,6 +43,17 @@ public class EDACCExperimentModeImportSolverConfigs extends javax.swing.JDialog 
         experimentTableModel.setExperiments(expController.getExperiments());
 
         initComponents();
+        
+        tblExperiments.setDefaultRenderer(char.class, new DefaultTableCellRenderer() {
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                lbl.setHorizontalAlignment(JLabel.CENTER);
+                return lbl;
+            }
+        });
 
         tblExperiments.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
