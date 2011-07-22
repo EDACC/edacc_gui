@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -152,6 +153,17 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
         tblSolverConfigs.setDefaultRenderer(Integer.class, renderer);
         tblSolverConfigs.setDefaultRenderer(Float.class, renderer);
         tblSolverConfigs.setDefaultRenderer(Double.class, renderer);
+        
+        tblExperiments.setDefaultRenderer(char.class, new DefaultTableCellRenderer() {
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                lbl.setHorizontalAlignment(JLabel.CENTER);
+                return lbl;
+            }
+        });
         
         Util.addSpaceSelection(tblInstances, InstanceTableModel.COL_SELECTED);
         Util.addSpaceSelection(tblSolverConfigs, SolverConfigurationTableModel.COL_SEL);
