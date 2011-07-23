@@ -8,13 +8,16 @@ package edacc;
 import edacc.experiment.ExperimentTableModel;
 import edacc.experiment.InstanceTableModel;
 import edacc.experiment.SolverConfigurationTableModel;
+import edacc.experiment.ThreadSafeDefaultTableModel;
 import edacc.experiment.Util;
 import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
+import edacc.model.ExperimentDAO.StatusCount;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
+import edacc.model.StatusCode;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
 import java.awt.Color;
@@ -41,6 +44,7 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
     private ExperimentTableModel expTableModel;
     private SolverConfigurationTableModel solverConfigTableModel;
     private InstanceTableModel instanceTableModel;
+    private ImportRunsTableModel importRunsTableModel;
     private HashMap<Integer, ArrayList<Instance>> instances;
     private HashMap<Integer, ArrayList<SolverConfiguration>> solverConfigs;
     private Experiment experiment;
@@ -50,7 +54,8 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
     private boolean cancelled;
     private ArrayList<SolverConfiguration> selectedSolverConfigs;
     private ArrayList<Instance> selectedInstances;
-    private boolean importFinishedRuns;
+    private HashMap<Integer, ArrayList<StatusCount>> statusCounts;
+    private ArrayList<StatusCode> selectedStatusCodes;
 
     /** Creates new form EDACCExperimentModeImport */
     public EDACCExperimentModeImport(java.awt.Frame parent, boolean modal, Experiment experiment) {
@@ -62,17 +67,20 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
         expTableModel = new ExperimentTableModel(true);
         solverConfigTableModel = new SolverConfigurationTableModel();
         instanceTableModel = new InstanceTableModel();
+        importRunsTableModel = new ImportRunsTableModel();
 
         tblExperiments.setModel(expTableModel);
         tblSolverConfigs.setModel(solverConfigTableModel);
         tblInstances.setModel(instanceTableModel);
-
+        tblImportRuns.setModel(importRunsTableModel);
 
         instances = new HashMap<Integer, ArrayList<Instance>>();
         solverConfigs = new HashMap<Integer, ArrayList<SolverConfiguration>>();
 
         instanceIds = new HashSet<Integer>();
         solverConfigIds = new HashSet<Integer>();
+        
+        statusCounts = new HashMap<Integer, ArrayList<StatusCount>>();
 
         defaultBooleanCellRenderer = tblExperiments.getDefaultRenderer(Boolean.class);
 
@@ -82,12 +90,14 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
             public void valueChanged(ListSelectionEvent e) {
                 ArrayList<SolverConfiguration> scs = new ArrayList<SolverConfiguration>();
                 ArrayList<Instance> inst = new ArrayList<Instance>();
+                ArrayList<StatusCount> sCount = new ArrayList<StatusCount>();
                 HashSet<Integer> instanceIds = new HashSet<Integer>();
                 for (int viewRow : tblExperiments.getSelectedRows()) {
                     int row = tblExperiments.convertRowIndexToModel(viewRow);
                     Experiment exp = expTableModel.getExperimentAt(row);
                     ArrayList<SolverConfiguration> listScs = solverConfigs.get(exp.getId());
                     ArrayList<Instance> listInst = instances.get(exp.getId());
+                    ArrayList<StatusCount> listscount = statusCounts.get(exp.getId());
                     if (listScs != null) {
                         scs.addAll(listScs);
                     }
@@ -99,11 +109,26 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
                             }
                         }
                     }
+                    if (listscount != null) {
+                        for (StatusCount stat : listscount) {
+                            boolean contains = false;
+                            for (StatusCount stat2 : sCount) {
+                                if (stat2.getStatusCode() == stat.getStatusCode()) {
+                                    sCount.add(new StatusCount(stat2.getStatusCode(), stat2.getCount() + stat.getCount()));
+                                    sCount.remove(stat2);
+                                    contains = true;
+                                    break;
+                                }
+                            }
+                            if (!contains) {
+                                sCount.add(stat);
+                            }
+                        }
+                    }
                 }
                 solverConfigTableModel.setSolverConfigurations(scs);
                 instanceTableModel.setInstances(inst, false, false);
-                solverConfigTableModel.fireTableDataChanged();
-                instanceTableModel.fireTableDataChanged();
+                importRunsTableModel.setStatusCount(sCount);
             }
         });
 
@@ -153,7 +178,7 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
         tblSolverConfigs.setDefaultRenderer(Integer.class, renderer);
         tblSolverConfigs.setDefaultRenderer(Float.class, renderer);
         tblSolverConfigs.setDefaultRenderer(Double.class, renderer);
-        
+
         tblExperiments.setDefaultRenderer(char.class, new DefaultTableCellRenderer() {
 
             @Override
@@ -164,9 +189,10 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
                 return lbl;
             }
         });
-        
+
         Util.addSpaceSelection(tblInstances, InstanceTableModel.COL_SELECTED);
         Util.addSpaceSelection(tblSolverConfigs, SolverConfigurationTableModel.COL_SEL);
+        Util.addSpaceSelection(tblImportRuns, importRunsTableModel.COL_SELECTED);
     }
 
     public void initializeData() {
@@ -214,6 +240,12 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
                             }
                         }
                     }
+
+                    for (Experiment exp : exps) {
+                        ArrayList<StatusCount> statusCount = ExperimentDAO.getJobCountForExperiment(exp);
+                        statusCounts.put(exp.getId(), statusCount);
+                    }
+
                     SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
@@ -222,6 +254,7 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
                             Util.updateTableColumnWidth(tblExperiments);
                             Util.updateTableColumnWidth(tblInstances);
                             Util.updateTableColumnWidth(tblSolverConfigs);
+                            Util.updateTableColumnWidth(tblImportRuns);
                         }
                     });
                 } catch (final Exception ex) {
@@ -233,7 +266,6 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
                             EDACCExperimentModeImport.this.cancelled = true;
                             EDACCExperimentModeImport.this.setVisible(false);
                         }
-                        
                     });
                 }
             }
@@ -258,9 +290,11 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
         jScrollPane3 = new javax.swing.JScrollPane();
         tblInstances = new javax.swing.JTable();
         btnImport = new javax.swing.JButton();
-        chkImportFinishedRuns = new javax.swing.JCheckBox();
         btnCancel = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tblImportRuns = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentModeImport.class);
@@ -273,6 +307,7 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
 
         jScrollPane1.setName("jScrollPane1"); // NOI18N
 
+        tblExperiments.setAutoCreateRowSorter(true);
         tblExperiments.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -294,6 +329,7 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
 
         jScrollPane2.setName("jScrollPane2"); // NOI18N
 
+        tblSolverConfigs.setAutoCreateRowSorter(true);
         tblSolverConfigs.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -312,6 +348,7 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
 
         jScrollPane3.setName("jScrollPane3"); // NOI18N
 
+        tblInstances.setAutoCreateRowSorter(true);
         tblInstances.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -338,9 +375,6 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
             }
         });
 
-        chkImportFinishedRuns.setText(resourceMap.getString("chkImportFinishedRuns.text")); // NOI18N
-        chkImportFinishedRuns.setName("chkImportFinishedRuns"); // NOI18N
-
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
@@ -352,35 +386,65 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
         jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
         jLabel1.setName("jLabel1"); // NOI18N
 
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel1.border.title"))); // NOI18N
+        jPanel1.setName("jPanel1"); // NOI18N
+
+        jScrollPane4.setName("jScrollPane4"); // NOI18N
+
+        tblImportRuns.setAutoCreateRowSorter(true);
+        tblImportRuns.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tblImportRuns.setName("tblImportRuns"); // NOI18N
+        jScrollPane4.setViewportView(tblImportRuns);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 625, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(splitExperiment, javax.swing.GroupLayout.DEFAULT_SIZE, 633, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnCancel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 487, Short.MAX_VALUE)
+                .addComponent(btnImport)
+                .addContainerGap())
+            .addComponent(splitExperiment, javax.swing.GroupLayout.DEFAULT_SIZE, 637, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addContainerGap(217, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btnCancel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 358, Short.MAX_VALUE)
-                .addComponent(chkImportFinishedRuns)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnImport)
-                .addContainerGap())
+                .addContainerGap(221, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(splitExperiment, javax.swing.GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
+                .addComponent(splitExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnImport)
-                        .addComponent(chkImportFinishedRuns))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnImport)
                     .addComponent(btnCancel))
                 .addContainerGap())
         );
@@ -392,7 +456,7 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
         selectedSolverConfigs = solverConfigTableModel.getSelectedSolverConfigurations();
         selectedInstances = instanceTableModel.getSelectedInstances();
         cancelled = false;
-        importFinishedRuns = chkImportFinishedRuns.isSelected();
+        selectedStatusCodes = importRunsTableModel.getSelectedStatusCodes();
         setVisible(false);
     }//GEN-LAST:event_btnImportActionPerformed
 
@@ -405,8 +469,8 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
         return cancelled;
     }
 
-    public boolean getImportFinishedRuns() {
-        return importFinishedRuns;
+    public ArrayList<StatusCode> getSelectedStatusCodes() {
+        return selectedStatusCodes;
     }
 
     public ArrayList<Instance> getSelectedInstances() {
@@ -416,17 +480,102 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
     public ArrayList<SolverConfiguration> getSelectedSolverConfigs() {
         return selectedSolverConfigs;
     }
+
+    class ImportRunsTableModel extends ThreadSafeDefaultTableModel {
+
+        private final int COL_STATUS = 0;
+        private final int COL_SELECTED = 1;
+        private final String[] columns = {"Status", "Selected"};
+        private ArrayList<StatusCount> statusCount;
+        private boolean[] selected;
+
+        public void setStatusCount(ArrayList<StatusCount> statusCount) {
+            this.statusCount = statusCount;
+            selected = new boolean[statusCount.size()];
+            for (int i = 0; i < selected.length; i++) {
+                selected[i] = false;
+            }
+            this.fireTableDataChanged();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return columns.length;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            return columns[column];
+        }
+
+        @Override
+        public int getRowCount() {
+            return statusCount == null ? 0 : statusCount.size();
+        }
+
+        @Override
+        public Object getValueAt(int row, int column) {
+            switch (column) {
+                case COL_STATUS:
+                    return statusCount.get(row).getStatusCode().getDescription();
+                case COL_SELECTED:
+                    return selected[row];
+                default:
+                    return "";
+            }
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            if (column == COL_SELECTED) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            switch (columnIndex) {
+                case COL_STATUS:
+                    return String.class;
+                case COL_SELECTED:
+                    return Boolean.class;
+                default:
+                    return String.class;
+            }
+        }
+
+        @Override
+        public void setValueAt(Object aValue, int row, int column) {
+            if (column == COL_SELECTED) {
+                selected[row] = (Boolean) aValue;
+                this.fireTableCellUpdated(row, column);
+            }
+        }
+        
+        public ArrayList<StatusCode> getSelectedStatusCodes() {
+            ArrayList<StatusCode> res = new ArrayList<StatusCode>();
+            for (int i = 0; i < getRowCount(); i++) {
+                if (selected[i]) {
+                    res.add(statusCount.get(i).getStatusCode());
+                }
+            }
+            return res;
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnImport;
-    private javax.swing.JCheckBox chkImportFinishedRuns;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JSplitPane splitExperiment;
     private javax.swing.JTable tblExperiments;
+    private javax.swing.JTable tblImportRuns;
     private javax.swing.JTable tblInstances;
     private javax.swing.JTable tblSolverConfigs;
     // End of variables declaration//GEN-END:variables

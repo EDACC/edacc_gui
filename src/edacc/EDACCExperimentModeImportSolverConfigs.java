@@ -130,6 +130,7 @@ public class EDACCExperimentModeImportSolverConfigs extends javax.swing.JDialog 
 
         jScrollPane2.setName("jScrollPane2"); // NOI18N
 
+        tblSolverConfigs.setAutoCreateRowSorter(true);
         tblSolverConfigs.setModel(solverConfigTableModel);
         tblSolverConfigs.setName("tblSolverConfigs"); // NOI18N
         jScrollPane2.setViewportView(tblSolverConfigs);
