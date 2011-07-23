@@ -39,11 +39,11 @@ public class JTableTooltipInformation extends JTable {
     
 
     private void updateToolTipText() {
-        int rows = JTableTooltipInformation.this.getSelectedRowCount();
         String text = "<html>";
-        if (!"".equals(defaultToolTip)) {
+        if (defaultToolTip != null && !"".equals(defaultToolTip)) {
             text += defaultToolTip + "<br/>";
         }
+        int rows = JTableTooltipInformation.this.getSelectedRowCount();
         text += rows + " / " + JTableTooltipInformation.this.getRowCount() + " selected</html>";
         JTableTooltipInformation.super.setToolTipText(text);
     }
