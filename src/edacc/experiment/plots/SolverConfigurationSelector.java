@@ -1,5 +1,6 @@
 package edacc.experiment.plots;
 
+import edacc.JTableTooltipInformation;
 import edacc.experiment.SolverConfigurationTableModel;
 import edacc.experiment.Util;
 import edacc.model.SolverConfiguration;
@@ -38,7 +39,7 @@ public class SolverConfigurationSelector extends JPanel {
         Dimension dimensionButton = new Dimension(125, 25);
         
         tableModel = new SolverConfigurationTableModel();
-        table = new JTable(tableModel);
+        table = new JTableTooltipInformation(tableModel);
         sorter = new TableRowSorter<SolverConfigurationTableModel>(tableModel);
         table.setRowSorter(sorter);
         Util.addSpaceSelection(table, SolverConfigurationTableModel.COL_SEL);

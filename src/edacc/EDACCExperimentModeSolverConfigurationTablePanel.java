@@ -72,7 +72,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
         itemEdit = new javax.swing.JMenuItem();
         itemRemove = new javax.swing.JMenuItem();
         jScrollPane1 = new javax.swing.JScrollPane();
-        table = new javax.swing.JTable();
+        table = table = new JTableTooltipInformation();
 
         popupMenu.setName("popupMenu"); // NOI18N
 

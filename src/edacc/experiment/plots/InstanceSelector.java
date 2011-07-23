@@ -3,6 +3,7 @@ package edacc.experiment.plots;
 import edacc.EDACCApp;
 import edacc.experiment.InstanceTableModel;
 import edacc.EDACCInstanceFilter;
+import edacc.JTableTooltipInformation;
 import edacc.experiment.Util;
 import edacc.model.DatabaseConnector;
 import edacc.model.Instance;
@@ -44,7 +45,7 @@ public class InstanceSelector extends JPanel {
         super(new GridBagLayout());
         Dimension dimensionButton = new Dimension(125, 25);
         tableModel = new InstanceTableModel();
-        table = new JTable(tableModel);
+        table = new JTableTooltipInformation(tableModel);
         table.moveColumn(0, 1);
         sorter = new TableRowSorter<InstanceTableModel>(tableModel);
         table.setRowSorter(sorter);
