@@ -419,7 +419,6 @@ public class ExperimentController {
             } else {
                 task.setStatus("Deleting jobs..");
                 ExperimentResultDAO.deleteExperimentResults(deletedJobs);
-                activeExperiment.invalidateNumJobs();
             }
         }
         task.setStatus("Saving solver configurations..");
@@ -521,7 +520,6 @@ public class ExperimentController {
             } else {
                 task.setStatus("Deleting jobs..");
                 ExperimentResultDAO.deleteExperimentResults(deletedJobs);
-                activeExperiment.invalidateNumJobs();
             }
         }
         task.setStatus("Saving instances..");
@@ -759,7 +757,6 @@ public class ExperimentController {
         }
         task.removePropertyChangeListener(cancelExperimentResultDAOStatementListener);
         experimentResultCache.updateExperimentResults();
-        activeExperiment.invalidateNumJobs();
         main.generateJobsTableModel.updateNumRuns();
         SwingUtilities.invokeLater(new Runnable() {
 
@@ -1697,7 +1694,6 @@ public class ExperimentController {
                 main.generateJobsTableModel.updateNumRuns();
                 // no use of seed here because seeds are given by seed groups if jobs have to be generated
                 generateJobs(task, -1, -1, -1, -1, -1, -1, 0);
-                activeExperiment.invalidateNumJobs();
             }
             DatabaseConnector.getInstance().getConn().setAutoCommit(true);
         } catch (Exception ex) {
