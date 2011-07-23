@@ -102,6 +102,7 @@ public class ExperimentController {
     /** the cpu time property. Will be created when creating an experiment controller. */
     public static Property PROP_CPUTIME;
     private ConfigurationScenario configScenario;
+    private ConfigurationScenario savedScenario;
 
     /**
      * Creates a new experiment Controller
@@ -142,7 +143,7 @@ public class ExperimentController {
         ArrayList<Experiment> experiments = new ArrayList<Experiment>();
         experiments.addAll(ExperimentDAO.getAll());
         main.expTableModel.setExperiments(experiments);
-        
+
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getAllAsTreeFast();
         main.instanceClassTreeModel.setRoot(root);
         ArrayList<Instance> instances = new ArrayList<Instance>();
@@ -237,6 +238,8 @@ public class ExperimentController {
         });
         if (activeExperiment.isConfigurationExp()) {
             configScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
+            // we need a new instance for this
+            savedScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
         }
         main.afterExperimentLoaded();
     }
@@ -1753,28 +1756,23 @@ public class ExperimentController {
         if (activeExperiment == null || !activeExperiment.isConfigurationExp()) {
             return false;
         }
-        try {
-            ConfigurationScenario savedScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
-            if (savedScenario == null) {
+        if (savedScenario == null) {
+            return true;
+        }
+        if (main.configScenarioTableModel.getSolverBinary() == null || savedScenario.getIdSolverBinary() != main.configScenarioTableModel.getSolverBinary().getId()) {
+            return true;
+        }
+        HashMap<Integer, ConfigurationScenarioParameter> configParameters = main.configScenarioTableModel.getConfigScenarioParameters();
+        if (configParameters == null) {
+            return true;
+        }
+        if (savedScenario.getParameters().size() != configParameters.size()) {
+            return true;
+        }
+        for (ConfigurationScenarioParameter param : configParameters.values()) {
+            if (!ConfigurationScenarioDAO.configurationScenarioParameterIsSaved(param)) {
                 return true;
             }
-            if (main.configScenarioTableModel.getSolverBinary() == null || savedScenario.getIdSolverBinary() != main.configScenarioTableModel.getSolverBinary().getId()) {
-                return true;
-            }
-            HashMap<Integer, ConfigurationScenarioParameter> configParameters = main.configScenarioTableModel.getConfigScenarioParameters();
-            if (configParameters == null) {
-                return true;
-            }
-            if (savedScenario.getParameters().size() != configParameters.size()) {
-                return true;
-            }
-            for (ConfigurationScenarioParameter param : configParameters.values()) {
-                if (!ConfigurationScenarioDAO.configurationScenarioParameterIsSaved(param)) {
-                    return true;
-                }
-            }
-        } catch (SQLException ex) {
-            return false;
         }
         return false;
     }
@@ -1932,6 +1930,8 @@ public class ExperimentController {
         configScenario.getParameters().clear();
         configScenario.getParameters().addAll(main.configScenarioTableModel.getConfigScenarioParameters().values());
         ConfigurationScenarioDAO.save(configScenario);
+        // we need a new instance for this
+        savedScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
     }
 
     public ConfigurationScenario getConfigScenario() {
