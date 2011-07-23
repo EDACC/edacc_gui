@@ -17,41 +17,26 @@ public class JTableTooltipInformation extends JTable {
     public JTableTooltipInformation() {
         super();
         defaultToolTip = "";
-        this.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                updateToolTipText();
-            }
-        });
     }
 
     public JTableTooltipInformation(TableModel tableModel) {
-        this();
-        this.setModel(tableModel);
+        super(tableModel);
+        defaultToolTip = "";
     }
 
     @Override
     public void setToolTipText(String text) {
         defaultToolTip = text;
-        updateToolTipText();
     }
-    
-    
 
-    private void updateToolTipText() {
-        String text = "<html>";
+    @Override
+    public String getToolTipText() {
+                String text = "<html>";
         if (defaultToolTip != null && !"".equals(defaultToolTip)) {
             text += defaultToolTip + "<br/>";
         }
         int rows = JTableTooltipInformation.this.getSelectedRowCount();
         text += rows + " / " + JTableTooltipInformation.this.getRowCount() + " selected</html>";
-        JTableTooltipInformation.super.setToolTipText(text);
-    }
-
-    @Override
-    public void tableChanged(TableModelEvent e) {
-        super.tableChanged(e);
-        updateToolTipText();
-    }
+        return text;
+    }    
 }

@@ -66,6 +66,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -75,6 +76,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -171,6 +174,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private ExperimentUpdateThread experimentUpdateThread;
     private ClientUpdateThread clientUpdateThread;
     private SolverConfigUpdateThread solverConfigUpdateThread;
+    private UpdateTitlesThread updateTitleThread;
     /**
      * The table model for the solver configuration table. Will be created on object construction and never be recreated.
      */
@@ -186,7 +190,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     /** Creates new form EDACCExperimentMode */
     @SuppressWarnings("LeakingThisInConstructor")
     public EDACCExperimentMode() {
+        updateTitleThread = new UpdateTitlesThread();
+        updateTitleThread.start();
+
         initComponents();
+
         expController = new ExperimentController(this, solverConfigPanel);
         /* -------------------------------- experiment tab -------------------------------- */
         expTableModel = new ExperimentTableModel(false);
@@ -1991,29 +1999,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
      * Updates the tab titles and the status text according to the state of the GUI. 
      */
     public void setTitles() {
-        if (expController.configurationScenarioIsModified()) {
-            manageExperimentPane.setTitleAt(TAB_CONFIGURATIONSCENARIO, "Configuration Scenario (modified)");
-        } else {
-            manageExperimentPane.setTitleAt(TAB_CONFIGURATIONSCENARIO, "Configuration Scenario");
-        }
-        if (solverConfigPanel.isModified()) {
-            manageExperimentPane.setTitleAt(TAB_SOLVERS, "Solvers (modified)");
-        } else {
-            manageExperimentPane.setTitleAt(TAB_SOLVERS, "Solvers");
-        }
-        if (insTableModel.isModified()) {
-            manageExperimentPane.setTitleAt(TAB_INSTANCES, "Instances (modified)");
-        } else {
-            manageExperimentPane.setTitleAt(TAB_INSTANCES, "Instances");
-        }
-        if (expController.getActiveExperiment() == null) {
-            manageExperimentPane.setTitleAt(TAB_EXPERIMENTS, "Experiments");
-            ((EDACCView) EDACCApp.getApplication().getMainView()).setStatusText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
-        } else {
-            manageExperimentPane.setTitleAt(TAB_EXPERIMENTS, "Experiments (Active: " + expController.getActiveExperiment().getName() + ")");
-            ((EDACCView) EDACCApp.getApplication().getMainView()).setStatusText("MANAGE EXPERIMENT MODE (Active: " + expController.getActiveExperiment().getName() + ") - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
-        }
-        manageExperimentPane.invalidate();
+        updateTitleThread.updateTitles();
     }
 
     /**
@@ -3490,6 +3476,68 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             manageExperimentPane.setEnabledAt(TAB_CONFIGURATIONSCENARIO, true);
         } else {
             manageExperimentPane.setEnabledAt(TAB_CONFIGURATIONSCENARIO, false);
+        }
+    }
+
+    private class UpdateTitlesThread extends Thread {
+
+        Date date;
+
+        public UpdateTitlesThread() {
+            date = null;
+        }
+
+        public synchronized void updateTitles() {
+            date = new Date();
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                synchronized (this) {
+                    if (date != null && new Date().getTime() - date.getTime() >= 1000) {
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                doUpdateTitles();
+                            }
+                        });
+                        date = null;
+                    }
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    // break?
+                }
+            }
+        }
+
+        private void doUpdateTitles() {
+            if (expController.configurationScenarioIsModified()) {
+                manageExperimentPane.setTitleAt(TAB_CONFIGURATIONSCENARIO, "Configuration Scenario (modified)");
+            } else {
+                manageExperimentPane.setTitleAt(TAB_CONFIGURATIONSCENARIO, "Configuration Scenario");
+            }
+            if (solverConfigPanel.isModified()) {
+                manageExperimentPane.setTitleAt(TAB_SOLVERS, "Solvers (modified)");
+            } else {
+                manageExperimentPane.setTitleAt(TAB_SOLVERS, "Solvers");
+            }
+            if (insTableModel.isModified()) {
+                manageExperimentPane.setTitleAt(TAB_INSTANCES, "Instances (modified)");
+            } else {
+                manageExperimentPane.setTitleAt(TAB_INSTANCES, "Instances");
+            }
+            if (expController.getActiveExperiment() == null) {
+                manageExperimentPane.setTitleAt(TAB_EXPERIMENTS, "Experiments");
+                ((EDACCView) EDACCApp.getApplication().getMainView()).setStatusText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+            } else {
+                manageExperimentPane.setTitleAt(TAB_EXPERIMENTS, "Experiments (Active: " + expController.getActiveExperiment().getName() + ")");
+                ((EDACCView) EDACCApp.getApplication().getMainView()).setStatusText("MANAGE EXPERIMENT MODE (Active: " + expController.getActiveExperiment().getName() + ") - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+            }
+            manageExperimentPane.invalidate();
         }
     }
 }
