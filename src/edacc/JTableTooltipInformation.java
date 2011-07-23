@@ -27,7 +27,8 @@ public class JTableTooltipInformation extends JTable {
     }
 
     public JTableTooltipInformation(TableModel tableModel) {
-        super(tableModel);
+        this();
+        this.setModel(tableModel);
     }
 
     @Override
