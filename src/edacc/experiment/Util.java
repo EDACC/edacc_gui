@@ -83,7 +83,7 @@ public class Util {
                     // get the component which represents the value and determine its witdth
                     int len = table.getCellRenderer(row, col).getTableCellRendererComponent(table, table.getValueAt(row, col), false, true, row, col).getPreferredSize().width;
                     if (len > width[col]) {
-                        width[col] = len;
+                        width[col] = len + 5;
                     }
                 }
                 width[col] += table.getIntercellSpacing().width;

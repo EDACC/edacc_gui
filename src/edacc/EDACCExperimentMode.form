@@ -1492,6 +1492,7 @@
                       </Table>
                     </Property>
                     <Property name="toolTipText" type="java.lang.String" resourceKey="tableJobs.toolTipText"/>
+                    <Property name="autoResizeMode" type="int" value="0"/>
                     <Property name="name" type="java.lang.String" value="tableJobs" noResource="true"/>
                   </Properties>
                   <AuxValues>
