@@ -1,14 +1,12 @@
 package edacc.model;
 
 import java.sql.Date;
-import java.sql.SQLException;
 
 public class Experiment extends BaseModel implements IntegerPKModel {
 
     private int id;
     private String description;
     private Date date;
-    private Integer numJobs;
     private String name;
     private int priority;
     private boolean configurationExp;
@@ -107,20 +105,5 @@ public class Experiment extends BaseModel implements IntegerPKModel {
         if (this.isSaved()) {
             this.setModified();
         }
-    }
-
-    public int getNumJobs() {
-        if (numJobs == null) {
-            try {
-                numJobs = ExperimentDAO.getJobCount(this);
-            } catch (SQLException ex) {
-                numJobs = 0;
-            }
-        }
-        return numJobs;
-    }
-
-    public void invalidateNumJobs() {
-        numJobs = null;
     }
 }

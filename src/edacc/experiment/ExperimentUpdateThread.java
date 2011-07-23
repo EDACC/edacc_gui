@@ -38,7 +38,9 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
                 int finished = 0;
                 int failed = 0;
                 int not_started = 0;
+                int count = 0;
                 for (StatusCount stat : statusCount) {
+                    count += stat.getCount();
                     if (stat.getStatusCode() != StatusCode.NOT_STARTED && stat.getStatusCode() != StatusCode.RUNNING) {
                         finished += stat.getCount();
                     }
@@ -52,7 +54,7 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
                         not_started = stat.getCount();
                     }
                 }
-                publish(new ExperimentStatus(exp, finished, running, failed, not_started));
+                publish(new ExperimentStatus(exp, count, finished, running, failed, not_started));
             }
             Thread.sleep(10000);
         }
@@ -64,6 +66,7 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
         for (ExperimentStatus status: chunks) {
             for (int i = 0; i < model.getRowCount(); i++) {
                 if (model.getExperimentAt(i) == status.experiment) {
+                    model.setNumRunsAt(i, status.count);
                     model.setFailedAt(i, status.failed);
                     model.setFinishedAt(i, status.finished);
                     model.setNotStartedAt(i, status.not_started);
@@ -76,13 +79,15 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
     class ExperimentStatus {
 
         Experiment experiment;
+        int count;
         int finished;
         int running;
         int failed;
         int not_started;
         
-        ExperimentStatus(Experiment exp, int finished, int running, int failed, int not_started) {
+        ExperimentStatus(Experiment exp, int count, int finished, int running, int failed, int not_started) {
             this.experiment = exp;
+            this.count = count;
             this.finished = finished;
             this.running = running;
             this.failed = failed;

@@ -37,6 +37,7 @@ public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
     private Integer[] finished;
     private Integer[] failed;
     private Integer[] not_started;
+    private Integer[] numruns;
     private boolean simple;
     
     /**
@@ -59,11 +60,13 @@ public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
             finished = new Integer[experiments.size()];
             failed = new Integer[experiments.size()];
             not_started = new Integer[experiments.size()];
+            numruns = new Integer[experiments.size()];
         } else {
             running = null;
             finished = null;
             failed = null;
             not_started = null;
+            numruns = null;
         }
         this.fireTableDataChanged();
     }
@@ -85,7 +88,7 @@ public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
 
     @Override
     public Class getColumnClass(int col) {
-        if (col == COL_RUNNING || col == COL_FINISHED || col == COL_FAILED || col == COL_NOTSTARTED) {
+        if (col == COL_NUMRUNS || col == COL_RUNNING || col == COL_FINISHED || col == COL_FAILED || col == COL_NOTSTARTED) {
             return Integer.class;
         }
         if (experiments == null || experiments.isEmpty()) {
@@ -105,7 +108,7 @@ public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
             case COL_DATE:
                 return experiments.get(rowIndex).getDate();
             case COL_NUMRUNS:
-                return experiments.get(rowIndex).getNumJobs();
+                return numruns[rowIndex];
             case COL_NOTSTARTED:
                 return not_started[rowIndex];
             case COL_RUNNING:
@@ -182,6 +185,16 @@ public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
     public void setNotStartedAt(int rowIndex, Integer value) {
         not_started[rowIndex] = value;
         this.fireTableCellUpdated(rowIndex, COL_NOTSTARTED);
+    }
+    
+    /**
+     * Sets number of runs at the <code>rowIndex</code>
+     * @param rowIndex the row index
+     * @param value the number of runs
+     */
+    public void setNumRunsAt(int rowIndex, Integer value) {
+        numruns[rowIndex] = value;
+        this.fireTableCellUpdated(rowIndex, COL_NUMRUNS);
     }
 
     /**
