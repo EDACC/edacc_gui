@@ -1801,6 +1801,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         ));
         tableJobs.setToolTipText(resourceMap.getString("tableJobs.toolTipText")); // NOI18N
+        tableJobs.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         tableJobs.setName("tableJobs"); // NOI18N
         jScrollPane6.setViewportView(tableJobs);
 

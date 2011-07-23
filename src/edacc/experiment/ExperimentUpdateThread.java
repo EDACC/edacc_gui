@@ -46,7 +46,6 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
                     modifiedExperiments.clear();
                 }
             }
-            System.out.println(experiments.size());
             for (Experiment exp : experiments) {
                 ArrayList<StatusCount> statusCount = ExperimentDAO.getJobCountForExperiment(exp);
                 int running = 0;
