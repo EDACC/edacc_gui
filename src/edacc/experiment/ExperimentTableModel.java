@@ -163,6 +163,10 @@ public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
         running[rowIndex] = value;
         this.fireTableCellUpdated(rowIndex, COL_RUNNING);
     }
+    
+    public Integer getRunningAt(int rowIndex) {
+        return running[rowIndex];
+    }
 
     /**
      * Sets finished at the <code>rowIndex</code>
@@ -173,7 +177,11 @@ public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
         finished[rowIndex] = value;
         this.fireTableCellUpdated(rowIndex, COL_FINISHED);
     }
-
+    
+    public Integer getFinishedAt(int rowIndex) {
+        return finished[rowIndex];
+    }
+    
     /**
      * Sets failed at the <code>rowIndex</code>
      * @param rowIndex the row index
@@ -182,6 +190,10 @@ public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
     public void setFailedAt(int rowIndex, Integer value) {
         failed[rowIndex] = value;
         this.fireTableCellUpdated(rowIndex, COL_FAILED);
+    }
+    
+    public Integer getFailedAt(int rowIndex) {
+        return failed[rowIndex];
     }
     
     /**
@@ -194,6 +206,10 @@ public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
         this.fireTableCellUpdated(rowIndex, COL_NOTSTARTED);
     }
     
+    public Integer getNotStartedAt(int rowIndex) {
+        return not_started[rowIndex];
+    }
+    
     /**
      * Sets number of runs at the <code>rowIndex</code>
      * @param rowIndex the row index
@@ -202,6 +218,10 @@ public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
     public void setNumRunsAt(int rowIndex, Integer value) {
         numruns[rowIndex] = value;
         this.fireTableCellUpdated(rowIndex, COL_NUMRUNS);
+    }
+    
+    public Integer getNumRunsAt(int rowIndex) {
+        return numruns[rowIndex];
     }
 
     /**

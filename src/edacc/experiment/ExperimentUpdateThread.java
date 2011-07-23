@@ -16,8 +16,10 @@ import javax.swing.SwingWorker;
  * @author simon
  */
 public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> {
+
     private ExperimentTableModel model;
-    
+    private ArrayList<Experiment> modifiedExperiments;
+
     /**
      * Creates a new experiment update thread.
      * @param model the model to be used
@@ -25,13 +27,26 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
     public ExperimentUpdateThread(ExperimentTableModel model) {
         super();
         this.model = model;
+        modifiedExperiments = new ArrayList<Experiment>();
     }
 
     @Override
     @SuppressWarnings("SleepWhileInLoop")
     protected Void doInBackground() throws Exception {
-        LinkedList<Experiment> experiments = ExperimentDAO.getAll();
+        int sleep_count = 10000;
         while (!this.isCancelled()) {
+            LinkedList<Experiment> experiments;
+            if (sleep_count >= 10000) {
+                experiments = ExperimentDAO.getAll();
+                sleep_count = 0;
+            } else {
+                experiments = new LinkedList<Experiment>();
+                synchronized (modifiedExperiments) {
+                    experiments.addAll(modifiedExperiments);
+                    modifiedExperiments.clear();
+                }
+            }
+            System.out.println(experiments.size());
             for (Experiment exp : experiments) {
                 ArrayList<StatusCount> statusCount = ExperimentDAO.getJobCountForExperiment(exp);
                 int running = 0;
@@ -56,21 +71,43 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
                 }
                 publish(new ExperimentStatus(exp, count, finished, running, failed, not_started));
             }
-            Thread.sleep(10000);
+            Thread.sleep(2000);
+            sleep_count += 2000;
         }
         return null;
     }
 
     @Override
     protected void process(List<ExperimentStatus> chunks) {
-        for (ExperimentStatus status: chunks) {
+        for (ExperimentStatus status : chunks) {
             for (int i = 0; i < model.getRowCount(); i++) {
                 if (model.getExperimentAt(i) == status.experiment) {
-                    model.setNumRunsAt(i, status.count);
-                    model.setFailedAt(i, status.failed);
-                    model.setFinishedAt(i, status.finished);
-                    model.setNotStartedAt(i, status.not_started);
-                    model.setRunningAt(i, status.running);
+                    boolean modified = false;
+                    if (model.getNumRunsAt(i) == null || model.getNumRunsAt(i) != status.count) {
+                        model.setNumRunsAt(i, status.count);
+                        modified = true;
+                    }
+                    if (model.getFailedAt(i) == null || model.getFailedAt(i) != status.failed) {
+                        model.setFailedAt(i, status.failed);
+                        modified = true;
+                    }
+                    if (model.getFinishedAt(i) == null || model.getFinishedAt(i) != status.finished) {
+                        model.setFinishedAt(i, status.finished);
+                        modified = true;
+                    }
+                    if (model.getNotStartedAt(i) == null || model.getNotStartedAt(i) != status.not_started) {
+                        model.setNotStartedAt(i, status.not_started);
+                        modified = true;
+                    }
+                    if (model.getRunningAt(i) == null || model.getRunningAt(i) != status.running) {
+                        model.setRunningAt(i, status.running);
+                        modified = true;
+                    }
+                    if (modified) {
+                        synchronized (modifiedExperiments) {
+                            modifiedExperiments.add(status.experiment);
+                        }
+                    }
                 }
             }
         }
@@ -84,7 +121,7 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
         int running;
         int failed;
         int not_started;
-        
+
         ExperimentStatus(Experiment exp, int count, int finished, int running, int failed, int not_started) {
             this.experiment = exp;
             this.count = count;
@@ -95,4 +132,3 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
         }
     }
 }
-
