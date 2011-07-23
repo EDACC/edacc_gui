@@ -2430,7 +2430,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 @Override
                 public void run(Tasks task) {
                     try {
-                        expController.importData(task, dialog.getSelectedSolverConfigs(), dialog.getSelectedInstances(), dialog.getImportFinishedRuns());
+                        expController.importData(task, dialog.getSelectedSolverConfigs(), dialog.getSelectedInstances(), dialog.getSelectedStatusCodes());
                     } catch (final Exception ex) {
                         SwingUtilities.invokeLater(new Runnable() {
 

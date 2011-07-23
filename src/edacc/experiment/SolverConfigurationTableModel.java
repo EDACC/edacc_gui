@@ -121,6 +121,7 @@ public class SolverConfigurationTableModel extends ThreadSafeDefaultTableModel {
             selected[i] = false;
         }
         this.solverConfigurations = solverConfigurations;
+        this.fireTableDataChanged();
     }
 
     /**

@@ -1590,15 +1590,15 @@ public class ExperimentController {
     }
 
     /**
-     * Imports data from the specified solver configs, instances and runs (if <code>importFinishedRuns</code> is true) to the active experiment.
+     * Imports data from the specified solver configs, instances and runs (if <code>statusCodes</code> is not empty) to the active experiment.
      * @param task
      * @param selectedSolverConfigs the solver configs to import
      * @param selectedInstances the instances to import
-     * @param importFinishedRuns also imports finished runs if this is true
+     * @param statusCodes also import runs with status code in this list
      * @throws SQLException
      * @throws Exception 
      */
-    public void importData(Tasks task, ArrayList<SolverConfiguration> selectedSolverConfigs, ArrayList<Instance> selectedInstances, boolean importFinishedRuns) throws SQLException, Exception {
+    public void importData(Tasks task, ArrayList<SolverConfiguration> selectedSolverConfigs, ArrayList<Instance> selectedInstances, ArrayList<StatusCode> statusCodes) throws SQLException, Exception {
         if (main.hasUnsavedChanges()) {
             throw new IllegalArgumentException("Assertion failure: Has unsaved changes.");
         }
@@ -1655,7 +1655,7 @@ public class ExperimentController {
             }
 
             // import jobs
-            if (importFinishedRuns) {
+            if (!statusCodes.isEmpty()) {
 
 
                 ArrayList<ExperimentResult> resultsToImport = new ArrayList<ExperimentResult>();
@@ -1675,7 +1675,14 @@ public class ExperimentController {
                             firstRun = ExperimentResultDAO.getMaxRunForSeedGroupByExperimentIdAndInstanceId(solverConfig.getSeed_group(), activeExperiment.getId(), i.getId()) + 1;
                         }
                         for (ExperimentResult er : tmp) {
-                            if (er.getStatus().equals(StatusCode.SUCCESSFUL)) {
+                            boolean contains = false;
+                            for (StatusCode stat : statusCodes) {
+                                if (er.getStatus().equals(stat)) {
+                                    contains = true;
+                                    break;
+                                }
+                            }
+                            if (contains) {
                                 resultsToImport.add(er);
                                 importedResults.add(ExperimentResultDAO.createExperimentResult(firstRun++, er.getPriority(), er.getComputeQueue(), er.getStatus(), er.getSeed(), er.getResultCode(), er.getResultTime(), mapHisScToMySc.get(sc.getId()), activeExperiment.getId(), er.getInstanceId(), er.getStartTime(), er.getCPUTimeLimit(), er.getMemoryLimit(), er.getWallClockTimeLimit(), er.getStackSizeLimit(), er.getOutputSizeLimitFirst(), er.getOutputSizeLimitLast()));
                             }
@@ -1689,7 +1696,7 @@ public class ExperimentController {
 
             solverConfigCache.reload();
 
-            if (importFinishedRuns) {
+            if (!statusCodes.isEmpty()) {
                 experimentResultCache.updateExperimentResults();
                 main.generateJobsTableModel.updateNumRuns();
                 // no use of seed here because seeds are given by seed groups if jobs have to be generated
