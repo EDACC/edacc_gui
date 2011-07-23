@@ -13,6 +13,7 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
     private Float cost;
     private String cost_function;
     private String parameter_hash;
+    private Integer semanticsHash = null;
 
     public Float getCost() {
         return cost;
@@ -147,7 +148,26 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
                     }
                 }
             }
-        } 
+        }
         return equal;
+    }
+
+    public Integer getSemanticsHashCode() throws SQLException {
+        if (semanticsHash == null) {
+            semanticsHash = 3;
+            semanticsHash = 97 * semanticsHash + solverBinary.getId();
+            ArrayList<ParameterInstance> myParamInstances = ParameterInstanceDAO.getBySolverConfig(this);
+            semanticsHash = 97 * semanticsHash + myParamInstances.size();
+            for (ParameterInstance myPi : myParamInstances) {
+                semanticsHash = 97 * semanticsHash + myPi.getParameter_id();
+                if (myPi.getValue() == null) {
+                    semanticsHash = 97 * semanticsHash + 3;
+                } else {
+                semanticsHash = 97 * semanticsHash + myPi.getValue().hashCode();
+                }
+            }
+
+        }
+        return semanticsHash;
     }
 }
