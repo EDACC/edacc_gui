@@ -283,18 +283,18 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
 
         splitExperiment = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblExperiments = new javax.swing.JTable();
+        tblExperiments = tblExperiments = new JTableTooltipInformation();
         jSplitPane2 = new javax.swing.JSplitPane();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tblSolverConfigs = new javax.swing.JTable();
+        tblSolverConfigs = tblSolverConfigs = new JTableTooltipInformation();
         jScrollPane3 = new javax.swing.JScrollPane();
-        tblInstances = new javax.swing.JTable();
+        tblInstances = tblInstances = new JTableTooltipInformation();
         btnImport = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        tblImportRuns = new javax.swing.JTable();
+        tblImportRuns = tblImportRuns = new JTableTooltipInformation();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentModeImport.class);

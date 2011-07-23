@@ -86,10 +86,10 @@ public class EDACCExperimentModeImportSolverConfigs extends javax.swing.JDialog 
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblExperiments = new javax.swing.JTable();
+        tblExperiments = tblExperiments = new JTableTooltipInformation();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tblSolverConfigs = new javax.swing.JTable();
+        tblSolverConfigs = tblSolverConfigs = new JTableTooltipInformation();
         btnImport = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
 

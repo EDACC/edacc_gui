@@ -96,6 +96,9 @@
                 </Property>
                 <Property name="name" type="java.lang.String" value="tblExperiments" noResource="true"/>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="tblExperiments = new JTableTooltipInformation();"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>
@@ -140,6 +143,9 @@
                     </Property>
                     <Property name="name" type="java.lang.String" value="tblSolverConfigs" noResource="true"/>
                   </Properties>
+                  <AuxValues>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="tblSolverConfigs = new JTableTooltipInformation();"/>
+                  </AuxValues>
                 </Component>
               </SubComponents>
             </Container>
@@ -171,6 +177,9 @@
                     </Property>
                     <Property name="name" type="java.lang.String" value="tblInstances" noResource="true"/>
                   </Properties>
+                  <AuxValues>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="tblInstances = new JTableTooltipInformation();"/>
+                  </AuxValues>
                 </Component>
               </SubComponents>
             </Container>
@@ -250,6 +259,9 @@
                 </Property>
                 <Property name="name" type="java.lang.String" value="tblImportRuns" noResource="true"/>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="tblImportRuns = new JTableTooltipInformation();"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>

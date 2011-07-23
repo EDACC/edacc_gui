@@ -650,7 +650,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         manageExperimentPane = new javax.swing.JTabbedPane();
         panelManageExperiment = new javax.swing.JPanel();
         scrollPaneExperimentsTable = new javax.swing.JScrollPane();
-        tableExperiments = new javax.swing.JTable();
+        tableExperiments = tableExperiments = new JTableTooltipInformation();
         jPanel7 = new javax.swing.JPanel();
         btnDiscardExperiment = new javax.swing.JButton();
         btnRemoveExperiment = new javax.swing.JButton();
@@ -660,7 +660,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnImport = new javax.swing.JButton();
         panelClientBrowser = new javax.swing.JPanel();
         jScrollPane7 = new javax.swing.JScrollPane();
-        tblClients = new javax.swing.JTable();
+        tblClients = tblClients = new JTableTooltipInformation();
         panelConfigurationScenario = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -668,7 +668,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         comboConfigScenarioSolvers = new javax.swing.JComboBox();
         jPanel10 = new javax.swing.JPanel();
         jScrollPane9 = new javax.swing.JScrollPane();
-        tblConfigurationScenario = new javax.swing.JTable();
+        tblConfigurationScenario = tblConfigurationScenario = new JTableTooltipInformation();
         btnConfigScenarioSave = new javax.swing.JButton();
         btnConfigScenarioUndo = new javax.swing.JButton();
         btnConfigurationScenarioRandomSolverConfigs = new javax.swing.JButton();
@@ -678,14 +678,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         splitPaneSolver = new javax.swing.JSplitPane();
         jPanel8 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        tableSolvers = new javax.swing.JTable();
+        tableSolvers = tableSolvers = new JTableTooltipInformation();
         btnSelectAllSolvers = new javax.swing.JButton();
         btnDeselectAllSolvers = new javax.swing.JButton();
         btnReverseSolverSelection = new javax.swing.JButton();
         btnChooseSolvers = new javax.swing.JButton();
         jPanel9 = new javax.swing.JPanel();
         jScrollPane8 = new javax.swing.JScrollPane();
-        tblSolverConfigs = new javax.swing.JTable();
+        tblSolverConfigs = tblSolverConfigs = new JTableTooltipInformation();
         btnChooseSolverConfigs = new javax.swing.JButton();
         btnSelectAllSolverConfigs = new javax.swing.JButton();
         btnDeselectAllSolverConfigs = new javax.swing.JButton();
@@ -702,7 +702,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jTreeInstanceClass = new javax.swing.JTree();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tableInstances = new javax.swing.JTable();
+        tableInstances = tableInstances = new JTableTooltipInformation();
         jPanel5 = new javax.swing.JPanel();
         btnSaveInstances = new javax.swing.JButton();
         btnFilterInstances = new javax.swing.JButton();
@@ -725,7 +725,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnSetNumRuns = new javax.swing.JButton();
         panelJobBrowser = new javax.swing.JPanel();
         jScrollPane6 = new javax.swing.JScrollPane();
-        tableJobs = tableJobs = new JTable() {
+        tableJobs = tableJobs = new JTableTooltipInformation() {
 
             @Override
             protected void processMouseEvent(MouseEvent e) {
@@ -844,6 +844,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
             }
         ));
+        tableExperiments.setToolTipText(resourceMap.getString("tableExperiments.toolTipText")); // NOI18N
         tableExperiments.setName("tableExperiments"); // NOI18N
         tableExperiments.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tableExperiments.addMouseListener(new java.awt.event.MouseAdapter() {

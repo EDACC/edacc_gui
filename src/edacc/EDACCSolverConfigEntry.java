@@ -255,7 +255,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         btnReplicate = new javax.swing.JButton();
         btnRemove = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        parameterTable = new javax.swing.JTable();
+        parameterTable = parameterTable = new JTableTooltipInformation();
         lblSeedGroup = new javax.swing.JLabel();
         txtSeedGroup = new javax.swing.JTextField();
         btnEditName = new javax.swing.JButton();

@@ -52,7 +52,7 @@ public class EDACCSolverConfigReplicateUsingFiles extends javax.swing.JDialog {
         btnChooseDirectory = new javax.swing.JButton();
         pnlParameters = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblParameters = new javax.swing.JTable();
+        tblParameters = tblParameters = new JTableTooltipInformation();
         btnReplicate = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
 

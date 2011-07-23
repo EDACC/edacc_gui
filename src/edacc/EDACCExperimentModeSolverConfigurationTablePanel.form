@@ -81,6 +81,9 @@
           <Events>
             <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tableMouseClicked"/>
           </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="table = new JTableTooltipInformation();"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

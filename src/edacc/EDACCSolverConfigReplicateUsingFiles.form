@@ -141,6 +141,9 @@
                 </Property>
                 <Property name="name" type="java.lang.String" value="tblParameters" noResource="true"/>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="tblParameters = new JTableTooltipInformation();"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>

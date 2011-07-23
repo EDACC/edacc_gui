@@ -114,6 +114,9 @@
             </Property>
             <Property name="name" type="java.lang.String" value="solverParameters" noResource="true"/>
           </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="parameterTable = new JTableTooltipInformation();"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>
