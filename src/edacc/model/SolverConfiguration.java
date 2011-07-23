@@ -10,6 +10,7 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
     private int id;
     private int seed_group;
     private String name;
+    private Integer semanticsHash = null;
 
     public int getSeed_group() {
         return seed_group;
@@ -120,7 +121,26 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
                     }
                 }
             }
-        } 
+        }
         return equal;
+    }
+
+    public Integer getSemanticsHashCode() throws SQLException {
+        if (semanticsHash == null) {
+            semanticsHash = 3;
+            semanticsHash = 97 * semanticsHash + solverBinary.getId();
+            ArrayList<ParameterInstance> myParamInstances = ParameterInstanceDAO.getBySolverConfig(this);
+            semanticsHash = 97 * semanticsHash + myParamInstances.size();
+            for (ParameterInstance myPi : myParamInstances) {
+                semanticsHash = 97 * semanticsHash + myPi.getParameter_id();
+                if (myPi.getValue() == null) {
+                    semanticsHash = 97 * semanticsHash + 3;
+                } else {
+                semanticsHash = 97 * semanticsHash + myPi.getValue().hashCode();
+                }
+            }
+
+        }
+        return semanticsHash;
     }
 }

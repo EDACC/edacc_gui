@@ -176,21 +176,19 @@ public class ExperimentController {
         task.setStatus("Loading solver configurations..");
 
         // only use solver configurations with different semantics in the solver config model
-        ArrayList<SolverConfiguration> scs = new ArrayList<SolverConfiguration>();
         ArrayList<SolverConfiguration> allScs = SolverConfigurationDAO.getAll();
         ParameterInstanceDAO.cacheParameterInstances(allScs);
+
+        HashMap<Integer, SolverConfiguration> hashSc = new HashMap<Integer, SolverConfiguration>();
+
         for (SolverConfiguration sc : allScs) {
-            boolean equal = false;
-            for (SolverConfiguration sc2 : scs) {
-                if (sc2.hasEqualSemantics(sc)) {
-                    equal = true;
-                    break;
-                }
-            }
-            if (!equal) {
-                scs.add(sc);
+            SolverConfiguration sc2 = hashSc.get(sc.getSemanticsHashCode());
+            if (sc2 == null || !sc2.hasEqualSemantics(sc)) {
+                hashSc.put(sc.getSemanticsHashCode(), sc);
             }
         }
+        ArrayList<SolverConfiguration> scs = new ArrayList<SolverConfiguration>();
+        scs.addAll(hashSc.values());
         main.solverConfigTableModel.setSolverConfigurations(scs);
         // don't show solver configurations of the current experiment
         main.solverConfigurationTableRowFilter.clearExcludedExperiments();
