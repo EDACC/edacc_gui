@@ -33,7 +33,7 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jPanel1" alignment="1" max="32767" attributes="2"/>
+                  <Component id="jPanel1" alignment="0" max="32767" attributes="2"/>
                   <Component id="jPanelButtons" alignment="0" max="32767" attributes="2"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -43,11 +43,11 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="jPanel1" max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jPanelButtons" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -64,7 +64,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jButtonCancel" linkSize="1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="227" max="32767" attributes="0"/>
+                  <EmptySpace pref="230" max="32767" attributes="0"/>
                   <Component id="jButtonOk" linkSize="1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -119,17 +119,16 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="chkAutoClass" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" alignment="0" pref="353" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" alignment="0" pref="356" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jLabelExtension" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkCompress" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jTextFieldExtension" alignment="0" min="-2" pref="47" max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="chkCompress" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="jLabelExtension" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="jTextFieldExtension" min="-2" pref="47" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -139,21 +138,21 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="chkAutoClass" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="jScrollPane1" min="-2" pref="220" max="-2" attributes="0"/>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="chkCompress" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel1" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+                  <Component id="jScrollPane1" pref="220" max="32767" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="2" attributes="0">
+                      <Component id="jLabel1" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkCompress" alignment="2" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jLabelExtension" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jTextFieldExtension" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="2" attributes="0">
+                      <Component id="jLabelExtension" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="jTextFieldExtension" alignment="2" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

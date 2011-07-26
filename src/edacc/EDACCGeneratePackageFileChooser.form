@@ -3,6 +3,9 @@
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
+    <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+      <Dimension value="[765, 550]"/>
+    </Property>
     <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
   </Properties>
   <SyntheticProperties>
@@ -30,9 +33,10 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Component id="jPanel1" max="32767" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
+              <Component id="jPanel1" min="-2" pref="175" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+              <Component id="jPanel2" max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -47,6 +51,9 @@
             </TitledBorder>
           </Border>
         </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[750, 0]"/>
+        </Property>
         <Property name="name" type="java.lang.String" value="jPanel1" noResource="true"/>
       </Properties>
 
@@ -56,54 +63,59 @@
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="chkInstances" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="chkSolvers" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="chkRunsolver" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="chkConfig" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" alignment="1" attributes="0">
+                      <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkClient" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkVerifier" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkInstances" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkSolvers" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="chkClient" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                                  <Component id="txtClientLocation" pref="556" max="32767" attributes="0"/>
+                                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtClientLocation" pref="479" max="32767" attributes="0"/>
-                              <Component id="txtVerifierLocation" alignment="0" pref="479" max="32767" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnChooseClientBinary" min="-2" max="-2" attributes="1"/>
                       </Group>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                      <Component id="btnChooseVerifierBinary" min="0" pref="0" max="32767" attributes="1"/>
-                      <Component id="btnChooseClientBinary" alignment="1" max="32767" attributes="1"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkRunsolver" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkConfig" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkVerifier" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="txtVerifierLocation" pref="557" max="32767" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnChooseVerifierBinary" min="-2" pref="48" max="-2" attributes="1"/>
+                      </Group>
                   </Group>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" attributes="0">
                   <Component id="chkInstances" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="chkSolvers" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="chkClient" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnChooseClientBinary" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtClientLocation" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="2" attributes="0">
+                      <Component id="chkClient" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtClientLocation" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnChooseClientBinary" alignment="2" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="6" max="32767" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="chkVerifier" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnChooseVerifierBinary" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtVerifierLocation" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="2" attributes="0">
+                      <Component id="chkVerifier" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtVerifierLocation" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnChooseVerifierBinary" alignment="2" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="chkRunsolver" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="chkConfig" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -196,12 +208,12 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="packageFileChooser" alignment="1" pref="669" max="32767" attributes="0"/>
+              <Component id="packageFileChooser" alignment="1" pref="746" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="packageFileChooser" alignment="0" pref="324" max="32767" attributes="0"/>
+              <Component id="packageFileChooser" alignment="0" pref="326" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -210,6 +222,9 @@
           <Properties>
             <Property name="dialogType" type="int" value="1"/>
             <Property name="fileSelectionMode" type="int" value="1"/>
+            <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[500, 245]"/>
+            </Property>
             <Property name="name" type="java.lang.String" value="packageFileChooser" noResource="true"/>
           </Properties>
           <Events>

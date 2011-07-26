@@ -68,6 +68,7 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog implements
         buttonCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(320, 300));
         setName("Form"); // NOI18N
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCComputeResultProperties.class);
@@ -101,7 +102,7 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog implements
                 .addContainerGap()
                 .addGroup(panelMainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(checkBoxReCompute)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelMainLayout.setVerticalGroup(
@@ -139,7 +140,7 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog implements
                     .addComponent(panelMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(buttonCancel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 271, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 135, Short.MAX_VALUE)
                         .addComponent(buttonCompute)))
                 .addContainerGap())
         );
@@ -147,12 +148,12 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog implements
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelMain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(panelMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttonCancel)
                     .addComponent(buttonCompute))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();

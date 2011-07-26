@@ -100,11 +100,11 @@ public class EDACCExtWarningErrorDialog extends javax.swing.JDialog {
         jPanelTable.setLayout(jPanelTableLayout);
         jPanelTableLayout.setHorizontalGroup(
             jPanelTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelTableLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelTableLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanelTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE)
-                    .addComponent(jLabelMessage, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE))
+                .addGroup(jPanelTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabelMessage, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanelTableLayout.setVerticalGroup(
@@ -113,7 +113,7 @@ public class EDACCExtWarningErrorDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jLabelMessage)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -139,20 +139,16 @@ public class EDACCExtWarningErrorDialog extends javax.swing.JDialog {
         jPanelButtons.setLayout(jPanelButtonsLayout);
         jPanelButtonsLayout.setHorizontalGroup(
             jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelButtonsLayout.createSequentialGroup()
-                .addContainerGap()
+            .addGroup(jPanelButtonsLayout.createSequentialGroup()
                 .addComponent(jButtonCancel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 259, Short.MAX_VALUE)
-                .addComponent(jButtonOk)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 317, Short.MAX_VALUE)
+                .addComponent(jButtonOk))
         );
         jPanelButtonsLayout.setVerticalGroup(
             jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelButtonsLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonOk)
-                    .addComponent(jButtonCancel)))
+            .addGroup(jPanelButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jButtonCancel)
+                .addComponent(jButtonOk))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

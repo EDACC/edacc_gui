@@ -111,6 +111,7 @@ public class EDACCInstanceColumnSelection extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCInstanceColumnSelection.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
+        setMinimumSize(new java.awt.Dimension(400, 300));
         setName("Form"); // NOI18N
 
         jScrollPane1.setMaximumSize(new java.awt.Dimension(32767, 100));
@@ -129,7 +130,7 @@ public class EDACCInstanceColumnSelection extends javax.swing.JDialog {
         pnlBasicColumns.setLayout(pnlBasicColumnsLayout);
         pnlBasicColumnsLayout.setHorizontalGroup(
             pnlBasicColumnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 301, Short.MAX_VALUE)
+            .addGap(0, 451, Short.MAX_VALUE)
         );
         pnlBasicColumnsLayout.setVerticalGroup(
             pnlBasicColumnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -151,7 +152,7 @@ public class EDACCInstanceColumnSelection extends javax.swing.JDialog {
         pnlInstancePropertyColumns.setLayout(pnlInstancePropertyColumnsLayout);
         pnlInstancePropertyColumnsLayout.setHorizontalGroup(
             pnlInstancePropertyColumnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 301, Short.MAX_VALUE)
+            .addGap(0, 451, Short.MAX_VALUE)
         );
         pnlInstancePropertyColumnsLayout.setVerticalGroup(
             pnlInstancePropertyColumnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -190,7 +191,7 @@ public class EDACCInstanceColumnSelection extends javax.swing.JDialog {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 160, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 310, Short.MAX_VALUE)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );

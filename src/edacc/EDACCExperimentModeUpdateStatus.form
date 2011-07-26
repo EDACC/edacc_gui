@@ -4,6 +4,7 @@
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
     <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
+    <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -31,7 +32,7 @@
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="comboStatus" min="-2" pref="124" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="txtStatus" pref="59" max="32767" attributes="0"/>
+                      <Component id="txtStatus" pref="84" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="jButton2" min="-2" max="-2" attributes="0"/>
@@ -52,12 +53,12 @@
                   <Component id="comboStatus" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txtStatus" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jButton2" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
               <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jButton2" min="-2" max="-2" attributes="0"/>
+                  <Component id="jButton1" alignment="0" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
