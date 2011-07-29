@@ -561,6 +561,53 @@ public class ExperimentResultDAO {
             }
         }
     }
+    
+    /**
+     * returns the experiment results with job IDs that are in the
+     * passed list.
+     * @param ids
+     * @return
+     * @throws Exception 
+     */
+    public static List<ExperimentResult> getByIds(List<Integer> ids) throws Exception {
+        final int SINGLE_BATCH = 1;
+        final int SMALL_BATCH = 50;
+        final int MEDIUM_BATCH = 1000;
+        final int LARGE_BATCH = 10000;
+        int totalNumberOfValuesLeftToBatch = ids.size();
+    
+        List<ExperimentResult> results = new ArrayList<ExperimentResult>();
+        while ( totalNumberOfValuesLeftToBatch > 0 ) {
+            int batchSize = SINGLE_BATCH;
+            if ( totalNumberOfValuesLeftToBatch >= LARGE_BATCH ) {
+              batchSize = LARGE_BATCH;
+            } else if ( totalNumberOfValuesLeftToBatch >= MEDIUM_BATCH ) {
+              batchSize = MEDIUM_BATCH;
+            } else if ( totalNumberOfValuesLeftToBatch >= SMALL_BATCH ) {
+              batchSize = SMALL_BATCH;
+            }
+            
+            StringBuilder inClause = new StringBuilder();
+
+            for (int i=0; i < batchSize; i++) {
+              inClause.append('?');
+              if (i < batchSize - 1) inClause.append(",");
+            }
+            PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                selectQuery + " WHERE idJob IN (" + inClause.toString() + ");");
+            for (int i = 1; i <= batchSize; i++) {
+                ps.setInt(i, ids.get(totalNumberOfValuesLeftToBatch - i));
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                results.add(getExperimentResultFromResultSet(rs));
+            }
+            rs.close();
+            ps.close();
+            totalNumberOfValuesLeftToBatch -= batchSize; ;
+        }
+        return results;
+    }
 
     /**
      *
