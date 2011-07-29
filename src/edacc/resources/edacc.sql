@@ -130,6 +130,7 @@ CREATE  TABLE IF NOT EXISTS `Experiment` (
   `configurationExp` TINYINT(1)  NULL ,
   `priority` INT NULL ,
   `active` TINYINT(1)  NOT NULL COMMENT 'is the experiment activ? should the jobs be taken into consideration?' ,
+  `countUnprocessedJobs` INT NOT NULL DEFAULT 0 ,
   PRIMARY KEY (`idExperiment`) )
 ENGINE = InnoDB, 
 COMMENT = 'Properties of an experiment.' ;
@@ -331,7 +332,6 @@ CREATE  TABLE IF NOT EXISTS `ExperimentResults` (
   INDEX `fk_ExperimentResults_SolverConfig1` (`SolverConfig_idSolverConfig` ASC) ,
   INDEX `fk_ExperimentResults_Experiment1` (`Experiment_idExperiment` ASC) ,
   INDEX `fk_ExperimentResults_Instances1` (`Instances_idInstance` ASC) ,
-  INDEX `status` (`status` ASC) ,
   INDEX `computeQueue` (`computeQueue` ASC) ,
   INDEX `priority` (`priority` ASC) ,
   INDEX `fk_ExperimentResults_ResultCodes1` (`resultCode` ASC) ,
@@ -904,6 +904,30 @@ CREATE TRIGGER ExperimentResult_has_PropertyValueUpdateTrigger AFTER INSERT ON E
   END;
 $$
 
+DROP TRIGGER IF EXISTS `ExperimentResultsDeleteTrigger` $$
+CREATE TRIGGER ExperimentResultsDeleteTrigger AFTER DELETE ON ExperimentResults
+  FOR EACH ROW BEGIN
+    IF OLD.status=-1 AND OLD.priority>=0 THEN UPDATE Experiment SET countUnprocessedJobs = countUnprocessedJobs - 1 WHERE idExperiment=OLD.Experiment_idExperiment; END IF;
+  END;
+$$
+
+DROP TRIGGER IF EXISTS `ExperimentResultsNewTrigger` $$
+CREATE TRIGGER ExperimentResultsNewTrigger AFTER INSERT ON ExperimentResults
+  FOR EACH ROW BEGIN
+    IF NEW.status=-1 AND new.priority>=0 THEN UPDATE Experiment SET countUnprocessedJobs = countUnprocessedJobs + 1 WHERE idExperiment=NEW.Experiment_idExperiment; END IF;
+  END;
+$$
+
+DROP TRIGGER IF EXISTS `ExperimentResultsUpdateTrigger` $$
+CREATE TRIGGER ExperimentResultsUpdateTrigger AFTER UPDATE ON ExperimentResults
+  FOR EACH ROW BEGIN
+    IF (OLD.status = -1 AND NEW.status != -1) OR (OLD.priority >= 0 AND NEW.priority < 0 AND OLD.status = -1) THEN
+      UPDATE Experiment SET countUnprocessedJobs = countUnprocessedJobs - 1 WHERE idExperiment=OLD.Experiment_idExperiment;
+    ELSEIF (OLD.status != -1 AND NEW.status = -1) OR (OLD.priority < 0 AND NEW.priority >= 0 AND NEW.status=-1) THEN 
+      UPDATE Experiment SET countUnprocessedJobs = countUnprocessedJobs + 1 WHERE idExperiment=OLD.Experiment_idExperiment;
+    END IF;
+  END;
+$$
 
 DELIMITER ;
 
