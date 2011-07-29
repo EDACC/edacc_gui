@@ -1,6 +1,6 @@
 package edacc.model;
 
-public class ConfigurationScenarioParameter extends BaseModel {
+public class ConfigurationScenarioParameter extends BaseModel implements Comparable<ConfigurationScenarioParameter> {
 
     private int idConfigurationScenario;
     private int idParameter;
@@ -66,5 +66,10 @@ public class ConfigurationScenarioParameter extends BaseModel {
 
     protected void setParameter(Parameter parameter) {
         this.parameter = parameter;
+    }
+
+    @Override
+    public int compareTo(ConfigurationScenarioParameter o) {
+        return this.getParameter().getName().compareTo(o.getParameter().getName());
     }
 }
