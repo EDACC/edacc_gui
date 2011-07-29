@@ -1015,4 +1015,18 @@ public class ExperimentResultDAO {
             this.value = value;
         }
     }
+    
+    public static int getNumJobsBySolverConfigurationId(int idSolverConfig) throws SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT COUNT(idJob) FROM " + table + " WHERE SolverConfig_idSolverConfig=?");
+        st.setInt(1, idSolverConfig);
+        ResultSet rs = st.executeQuery();
+        int count = 0;
+        if (rs.next()) {
+            count = rs.getInt(1);
+        }
+        rs.close();
+        st.close();
+        return count;
+    }
 }

@@ -3,6 +3,9 @@
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
+    <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+      <Dimension value="[280, 200]"/>
+    </Property>
     <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
   </Properties>
   <SyntheticProperties>
@@ -26,10 +29,10 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane1" alignment="0" pref="261" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" alignment="0" pref="216" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="bCancel" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="121" max="32767" attributes="0"/>
+                      <EmptySpace pref="76" max="32767" attributes="0"/>
                       <Component id="bCompute" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>

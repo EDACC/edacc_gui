@@ -12,26 +12,28 @@ import java.sql.SQLException;
 public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
 
     /** Column count if used as simple table */
-    public static final int COL_COUNT_SIMPLE = 2;
+    public static final int COL_COUNT_SIMPLE = 3;
     /** Index of the name column */
     public static final int COL_NAME = 0;
     /** Index of the date column */
     public static final int COL_DATE = 1;
+    /** Index of the configuration experiment column */
+    public static final int COL_CONFIGURATIONEXPERIMENT = 2;
     /** Index of the number of runs column */
-    public static final int COL_NUMRUNS = 2;
+    public static final int COL_NUMRUNS = 3;
     /** Index of the not started count column */
-    public static final int COL_NOTSTARTED = 3;
+    public static final int COL_NOTSTARTED = 4;
     /** Index of the running count column */
-    public static final int COL_RUNNING = 4;
+    public static final int COL_RUNNING = 5;
     /** Index of the finished count column */
-    public static final int COL_FINISHED = 5;
+    public static final int COL_FINISHED = 6;
     /** Index of the failed count column */
-    public static final int COL_FAILED = 6;
+    public static final int COL_FAILED = 7;
     /** Index of the priority column */
-    public static final int COL_PRIORITY = 7;
+    public static final int COL_PRIORITY = 8;
     /** Index of the active column */
-    public static final int COL_ACTIVE = 8;
-    private String[] columns = {"Name", "Date", "Number of jobs", "Not started", "Running", "Finished", "Failed", "Priority", "Active"};
+    public static final int COL_ACTIVE = 9;
+    private String[] columns = {"Name", "Date", "Configuration Experiment", "Number of jobs", "Not started", "Running", "Finished", "Failed", "Priority", "Active"};
     private ArrayList<Experiment> experiments;
     private Integer[] running;
     private Integer[] finished;
@@ -91,6 +93,9 @@ public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
         if (col == COL_NUMRUNS || col == COL_RUNNING || col == COL_FINISHED || col == COL_FAILED || col == COL_NOTSTARTED) {
             return Integer.class;
         }
+        if (col == COL_CONFIGURATIONEXPERIMENT) {
+            return char.class;
+        }
         if (experiments == null || experiments.isEmpty()) {
             return String.class;
         }
@@ -107,6 +112,8 @@ public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
                 return experiments.get(rowIndex).getName();
             case COL_DATE:
                 return experiments.get(rowIndex).getDate();
+            case COL_CONFIGURATIONEXPERIMENT:
+                return experiments.get(rowIndex).isConfigurationExp() ? '\u2713' : ' ';
             case COL_NUMRUNS:
                 return numruns[rowIndex];
             case COL_NOTSTARTED:

@@ -59,7 +59,7 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAddInstanceToInstanceClass.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
-        setMinimumSize(new java.awt.Dimension(350, 500));
+        setMinimumSize(new java.awt.Dimension(350, 300));
         setModal(true);
         setName("Form"); // NOI18N
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -92,9 +92,9 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
         jPanelButton.setLayout(jPanelButtonLayout);
         jPanelButtonLayout.setHorizontalGroup(
             jPanelButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelButtonLayout.createSequentialGroup()
+            .addGroup(jPanelButtonLayout.createSequentialGroup()
                 .addComponent(jButtonOk)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 301, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 200, Short.MAX_VALUE)
                 .addComponent(jButtonCancel))
         );
 
@@ -102,15 +102,14 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
 
         jPanelButtonLayout.setVerticalGroup(
             jPanelButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelButtonLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanelButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonCancel)
-                    .addComponent(jButtonOk)))
+            .addGroup(jPanelButtonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jButtonOk)
+                .addComponent(jButtonCancel))
         );
 
         jScrollPane2.setName("jScrollPane2"); // NOI18N
 
+        jTreeClass.setMaximumSize(new java.awt.Dimension(32000, 32000));
         jTreeClass.setName("jTreeClass"); // NOI18N
         jScrollPane2.setViewportView(jTreeClass);
 
@@ -121,7 +120,7 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
                     .addComponent(jPanelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -129,10 +128,10 @@ public class EDACCAddInstanceToInstanceClass extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanelButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();

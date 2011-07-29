@@ -65,6 +65,7 @@ public class EDACCExperimentModePrioritySelection extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
+        setResizable(false);
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentModePrioritySelection.class);
         jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N

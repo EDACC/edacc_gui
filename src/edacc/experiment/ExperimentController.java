@@ -7,6 +7,9 @@ import edacc.EDACCSolverConfigPanel;
 import edacc.EDACCSolverConfigPanelSolver;
 import edacc.model.ClientDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
+import edacc.model.ConfigurationScenario;
+import edacc.model.ConfigurationScenarioDAO;
+import edacc.model.ConfigurationScenarioParameter;
 import edacc.model.DatabaseConnector;
 import edacc.model.ExpResultHasSolvPropertyNotInDBException;
 import edacc.model.Experiment;
@@ -98,6 +101,8 @@ public class ExperimentController {
     public SolverConfigCache solverConfigCache;
     /** the cpu time property. Will be created when creating an experiment controller. */
     public static Property PROP_CPUTIME;
+    private ConfigurationScenario configScenario;
+    private ConfigurationScenario savedScenario;
 
     /**
      * Creates a new experiment Controller
@@ -138,7 +143,7 @@ public class ExperimentController {
         ArrayList<Experiment> experiments = new ArrayList<Experiment>();
         experiments.addAll(ExperimentDAO.getAll());
         main.expTableModel.setExperiments(experiments);
-        
+
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getAllAsTreeFast();
         main.instanceClassTreeModel.setRoot(root);
         ArrayList<Instance> instances = new ArrayList<Instance>();
@@ -229,6 +234,11 @@ public class ExperimentController {
                 Util.updateTableColumnWidth(main.tblGenerateJobs);
             }
         });
+        if (activeExperiment.isConfigurationExp()) {
+            configScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
+            // we need a new instance for this
+            savedScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
+        }
         main.afterExperimentLoaded();
     }
 
@@ -283,6 +293,7 @@ public class ExperimentController {
      * instances and solvers
      * @param name
      * @param description
+     * @param configurationExp
      * @return the newly created experiment
      * @throws SQLException
      * @throws InstanceClassMustBeSourceException
@@ -292,9 +303,9 @@ public class ExperimentController {
      * @throws PropertyTypeNotExistException
      * @throws ComputationMethodDoesNotExistException 
      */
-    public Experiment createExperiment(String name, String description) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
+    public Experiment createExperiment(String name, String description, boolean configurationExp) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         java.util.Date d = new java.util.Date();
-        Experiment res = ExperimentDAO.createExperiment(name, new Date(d.getTime()), description);
+        Experiment res = ExperimentDAO.createExperiment(name, new Date(d.getTime()), description, configurationExp);
         initialize();
         return res;
     }
@@ -1739,6 +1750,31 @@ public class ExperimentController {
         return res;
     }
 
+    public boolean configurationScenarioIsModified() {
+        if (activeExperiment == null || !activeExperiment.isConfigurationExp()) {
+            return false;
+        }
+        if (savedScenario == null) {
+            return true;
+        }
+        if (main.configScenarioTableModel.getSolverBinary() == null || savedScenario.getIdSolverBinary() != main.configScenarioTableModel.getSolverBinary().getId()) {
+            return true;
+        }
+        HashMap<Integer, ConfigurationScenarioParameter> configParameters = main.configScenarioTableModel.getConfigScenarioParameters();
+        if (configParameters == null) {
+            return true;
+        }
+        if (savedScenario.getParameters().size() != configParameters.size()) {
+            return true;
+        }
+        for (ConfigurationScenarioParameter param : configParameters.values()) {
+            if (!ConfigurationScenarioDAO.configurationScenarioParameterIsSaved(param)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Returns a double value for the given property value type and the string value
      * @param type
@@ -1875,5 +1911,32 @@ public class ExperimentController {
         ArrayList<Property> res = new ArrayList<Property>();
         res.addAll(PropertyDAO.getAllInstanceProperties());
         return res;
+    }
+
+    public void updateConfigScenarioTable(SolverBinaries solverBinary) throws SQLException {
+        main.configScenarioTableModel.setConfigurationScenario(solverBinary, configScenario);
+    }
+
+    public void saveConfigurationScenario() throws SQLException {
+        SolverBinaries solverBinary = main.configScenarioTableModel.getSolverBinary();
+        if (configScenario == null) {
+            configScenario = new ConfigurationScenario();
+            configScenario.setIdExperiment(activeExperiment.getId());
+            configScenario.setNew();
+        }
+        configScenario.setIdSolverBinary(solverBinary.getId());
+        configScenario.getParameters().clear();
+        configScenario.getParameters().addAll(main.configScenarioTableModel.getConfigScenarioParameters().values());
+        ConfigurationScenarioDAO.save(configScenario);
+        // we need a new instance for this
+        savedScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
+    }
+
+    public ConfigurationScenario getConfigScenario() {
+        return configScenario;
+    }
+
+    public void reloadConfigurationScenario() throws SQLException {
+        configScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
     }
 }

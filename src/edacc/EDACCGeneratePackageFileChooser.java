@@ -79,10 +79,12 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
         packageFileChooser = new javax.swing.JFileChooser();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(765, 550));
         setName("Form"); // NOI18N
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCGeneratePackageFileChooser.class);
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel1.border.title"))); // NOI18N
+        jPanel1.setMinimumSize(new java.awt.Dimension(750, 0));
         jPanel1.setName("jPanel1"); // NOI18N
 
         chkInstances.setText(resourceMap.getString("chkInstances.text")); // NOI18N
@@ -136,23 +138,27 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkInstances)
-                    .addComponent(chkSolvers)
-                    .addComponent(chkRunsolver)
-                    .addComponent(chkConfig)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkClient)
-                            .addComponent(chkVerifier))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(chkInstances)
+                            .addComponent(chkSolvers)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(chkClient)
+                                .addGap(12, 12, 12)
+                                .addComponent(txtClientLocation, javax.swing.GroupLayout.DEFAULT_SIZE, 556, Short.MAX_VALUE)
+                                .addGap(6, 6, 6)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnChooseClientBinary))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtClientLocation, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
-                            .addComponent(txtVerifierLocation, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE))
-                        .addGap(6, 6, 6)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(btnChooseVerifierBinary, 0, 0, Short.MAX_VALUE)
-                    .addComponent(btnChooseClientBinary, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(chkRunsolver)
+                            .addComponent(chkConfig)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(chkVerifier)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtVerifierLocation, javax.swing.GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnChooseVerifierBinary, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -161,20 +167,19 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkSolvers)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(chkClient)
-                    .addComponent(btnChooseClientBinary)
-                    .addComponent(txtClientLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtClientLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnChooseClientBinary))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(chkVerifier)
-                    .addComponent(btnChooseVerifierBinary)
-                    .addComponent(txtVerifierLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtVerifierLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnChooseVerifierBinary))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkRunsolver)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkConfig)
-                .addGap(10, 10, 10))
+                .addComponent(chkConfig))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel2.border.title"))); // NOI18N
@@ -182,6 +187,7 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
 
         packageFileChooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
         packageFileChooser.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
+        packageFileChooser.setMinimumSize(new java.awt.Dimension(500, 245));
         packageFileChooser.setName("packageFileChooser"); // NOI18N
         packageFileChooser.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -193,11 +199,11 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(packageFileChooser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 669, Short.MAX_VALUE)
+            .addComponent(packageFileChooser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 746, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(packageFileChooser, javax.swing.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
+            .addComponent(packageFileChooser, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -210,9 +216,10 @@ public class EDACCGeneratePackageFileChooser extends javax.swing.JDialog impleme
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
