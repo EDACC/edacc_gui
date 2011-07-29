@@ -10,8 +10,24 @@ import javax.swing.table.DefaultTableModel;
  */
 public class ThreadSafeDefaultTableModel extends DefaultTableModel {
 
+    private boolean update = false;
+
+    public synchronized void beginUpdate() {
+        update = true;
+    }
+
+    public synchronized void endUpdate() {
+        update = false;
+        fireTableDataChanged();
+    }
+
     @Override
     public void fireTableCellUpdated(final int row, final int column) {
+        synchronized (this) {
+            if (update) {
+                return;
+            }
+        }
         if (SwingUtilities.isEventDispatchThread()) {
             super.fireTableCellUpdated(row, column);
         } else {
@@ -27,6 +43,11 @@ public class ThreadSafeDefaultTableModel extends DefaultTableModel {
 
     @Override
     public void fireTableChanged(final TableModelEvent e) {
+        synchronized (this) {
+            if (update) {
+                return;
+            }
+        }
         if (SwingUtilities.isEventDispatchThread()) {
             super.fireTableChanged(e);
         } else {
@@ -42,6 +63,11 @@ public class ThreadSafeDefaultTableModel extends DefaultTableModel {
 
     @Override
     public void fireTableDataChanged() {
+        synchronized (this) {
+            if (update) {
+                return;
+            }
+        }
         if (SwingUtilities.isEventDispatchThread()) {
             super.fireTableDataChanged();
         } else {
@@ -57,6 +83,11 @@ public class ThreadSafeDefaultTableModel extends DefaultTableModel {
 
     @Override
     public void fireTableRowsDeleted(final int firstRow, final int lastRow) {
+        synchronized (this) {
+            if (update) {
+                return;
+            }
+        }
         if (SwingUtilities.isEventDispatchThread()) {
             super.fireTableRowsDeleted(firstRow, lastRow);
         } else {
@@ -72,6 +103,11 @@ public class ThreadSafeDefaultTableModel extends DefaultTableModel {
 
     @Override
     public void fireTableRowsInserted(final int firstRow, final int lastRow) {
+        synchronized (this) {
+            if (update) {
+                return;
+            }
+        }
         if (SwingUtilities.isEventDispatchThread()) {
             super.fireTableRowsInserted(firstRow, lastRow);
         } else {
@@ -87,6 +123,11 @@ public class ThreadSafeDefaultTableModel extends DefaultTableModel {
 
     @Override
     public void fireTableRowsUpdated(final int firstRow, final int lastRow) {
+        synchronized (this) {
+            if (update) {
+                return;
+            }
+        }
         if (SwingUtilities.isEventDispatchThread()) {
             super.fireTableRowsUpdated(firstRow, lastRow);
         } else {
@@ -102,6 +143,11 @@ public class ThreadSafeDefaultTableModel extends DefaultTableModel {
 
     @Override
     public void fireTableStructureChanged() {
+        synchronized (this) {
+            if (update) {
+                return;
+            }
+        }
         if (SwingUtilities.isEventDispatchThread()) {
             super.fireTableStructureChanged();
         } else {

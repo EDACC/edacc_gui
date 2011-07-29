@@ -303,9 +303,15 @@ public class Util {
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                     TableModel model = table.getModel();
+                    if (model instanceof ThreadSafeDefaultTableModel) {
+                        ((ThreadSafeDefaultTableModel) model).beginUpdate();
+                    }
                     for (int row : table.getSelectedRows()) {
                         int rowModel = table.convertRowIndexToModel(row);
                         model.setValueAt(!(Boolean) model.getValueAt(rowModel, column), rowModel, column);
+                    }
+                    if (model instanceof ThreadSafeDefaultTableModel) {
+                        ((ThreadSafeDefaultTableModel) model).endUpdate();
                     }
                     e.consume();
                 }
@@ -356,6 +362,7 @@ public class Util {
             }
         };
     }
+
     static class ValueUnit {
 
         String stringValue;
@@ -365,7 +372,7 @@ public class Util {
             longValue = bytes;
             stringValue = Util.convertUnit(bytes);
         }
-        
+
         @Override
         public String toString() {
             return stringValue;

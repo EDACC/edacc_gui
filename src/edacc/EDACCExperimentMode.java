@@ -3495,7 +3495,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         public void run() {
             while (true) {
                 synchronized (this) {
-                    if (date != null && new Date().getTime() - date.getTime() >= 1000) {
+                    if (date != null && new Date().getTime() - date.getTime() >= 200) {
                         SwingUtilities.invokeLater(new Runnable() {
 
                             @Override
@@ -3507,7 +3507,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     }
                 }
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(200);
                 } catch (InterruptedException ex) {
                     // break?
                 }
