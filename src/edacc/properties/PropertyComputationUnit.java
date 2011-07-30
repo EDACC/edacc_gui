@@ -166,6 +166,7 @@ public class PropertyComputationUnit implements Runnable {
 
         try {
             ArrayList<ExperimentResult> er = ExperimentResultDAO.getAllByInstanceId(ihp.getInstance().getId());
+            System.out.println("found " + er.size() + " results for this instance");
             ObjectOutputStream os = new ObjectOutputStream(p.getOutputStream());
             os.writeUnshared(er);
             os.flush();
@@ -204,7 +205,7 @@ public class PropertyComputationUnit implements Runnable {
         }
         // Read first line of program output
         String value = in.readLine();
-
+        System.out.println("Value: " + value);
         // set the value and save it
         ihp.setValue(value);
         InstanceHasPropertyDAO.save(ihp);
@@ -227,6 +228,9 @@ public class PropertyComputationUnit implements Runnable {
                 String prefix = "";
                 if (System.getProperty("os.name") != null && System.getProperty("os.name").contains("Windows")) {
                     prefix = "cmd /c ";
+                }
+                if (bin.getAbsolutePath().endsWith(".jar")) {
+                    prefix += "java -jar ";
                 }
                 Process p = Runtime.getRuntime().exec(prefix + bin.getAbsolutePath() + " " + property.getComputationMethodParameters());
                 InputStream is = input;

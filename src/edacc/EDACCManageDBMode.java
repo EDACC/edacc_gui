@@ -1911,7 +1911,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     private void bComputePropertyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bComputePropertyActionPerformed
         Vector<Instance> instances = new Vector<Instance>();
         for (int i : tableInstances.getSelectedRows()) {
-            instances.add(instanceTableModel.getInstance(i));
+            instances.add(instanceTableModel.getInstance(tableInstances.convertRowIndexToModel(i)));
         }
         computeInstancePropertyDlg = new EDACCComputeInstancePropertyDialog(EDACCApp.getApplication().getMainFrame(), manageDBInstances, instances);
         computeInstancePropertyDlg.setLocationRelativeTo(this);
