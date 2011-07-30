@@ -112,6 +112,7 @@ public class PropertyComputationUnit implements Runnable {
                         try {
                             InputStream inputStream = InstanceDAO.getBinary(ihp.getInstance().getId());
                             compute(inputStream);
+                            inputStream.close();
                         } catch (InstanceNotInDBException ex) {
                             Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -267,12 +268,16 @@ public class PropertyComputationUnit implements Runnable {
 
                 // check, if already an error occured
                 if (err.ready()) {
+                    in.close();
+                    err.close();
                     throw new ErrorInExternalProgramException(err.readLine());
                 }
                 // check, if program already has terminated
                 try {
                     int exit;
                     if ((exit = p.exitValue()) != 0) {
+                        in.close();
+                        err.close();
                         throw new ErrorInExternalProgramException("External program exited with errors! Exit value: " + exit);
                     }
                 } catch (IllegalThreadStateException e) {
@@ -301,6 +306,8 @@ public class PropertyComputationUnit implements Runnable {
                 }
                 // if no value is available after waitng time, kill the program
                 if (!in.ready()) {
+                    err.close();
+                    in.close();
                     p.destroy();
                     throw new ErrorInExternalProgramException("Time limit of external calculation exceeded! The external program has been terminated!");
                 }
@@ -311,6 +318,8 @@ public class PropertyComputationUnit implements Runnable {
                 ihp.setValue(value);
                 System.out.println(value);
                 InstanceHasPropertyDAO.save(ihp);
+                err.close();
+                in.close();
             } else if (erhp != null) {
                 File bin = ComputationMethodDAO.getBinaryOfComputationMethod(property.getComputationMethod());
                 bin.setExecutable(true);
