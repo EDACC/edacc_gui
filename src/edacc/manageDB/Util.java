@@ -69,6 +69,7 @@ public class Util {
         while ((read = is.read(buffer)) > 0) {
             digest.update(buffer, 0, read);
         }
+        is.close();
         byte[] md5sum = digest.digest();
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < md5sum.length; i++) {

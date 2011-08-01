@@ -87,6 +87,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.JViewport;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
@@ -202,7 +203,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         expTableModel = new ExperimentTableModel(false);
         tableExperiments.setModel(expTableModel);
         tableExperiments.setRowSorter(new TableRowSorter<ExperimentTableModel>(expTableModel));
-        //tableExperiments.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "");
+        tableExperiments.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "");
         tableExperiments.getDefaultEditor(Integer.class).addCellEditorListener(new CellEditorListener() {
 
             @Override

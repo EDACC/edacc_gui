@@ -112,6 +112,7 @@ public class PropertyComputationUnit implements Runnable {
                         try {
                             InputStream inputStream = InstanceDAO.getBinary(ihp.getInstance().getId());
                             compute(inputStream);
+                            inputStream.close();
                         } catch (InstanceNotInDBException ex) {
                             Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -166,6 +167,7 @@ public class PropertyComputationUnit implements Runnable {
 
         try {
             ArrayList<ExperimentResult> er = ExperimentResultDAO.getAllByInstanceId(ihp.getInstance().getId());
+            System.out.println("found " + er.size() + " results for this instance");
             ObjectOutputStream os = new ObjectOutputStream(p.getOutputStream());
             os.writeUnshared(er);
             os.flush();
@@ -204,7 +206,7 @@ public class PropertyComputationUnit implements Runnable {
         }
         // Read first line of program output
         String value = in.readLine();
-
+        System.out.println("Value: " + value);
         // set the value and save it
         ihp.setValue(value);
         InstanceHasPropertyDAO.save(ihp);
@@ -227,6 +229,9 @@ public class PropertyComputationUnit implements Runnable {
                 String prefix = "";
                 if (System.getProperty("os.name") != null && System.getProperty("os.name").contains("Windows")) {
                     prefix = "cmd /c ";
+                }
+                if (bin.getAbsolutePath().endsWith(".jar")) {
+                    prefix += "java -jar ";
                 }
                 Process p = Runtime.getRuntime().exec(prefix + bin.getAbsolutePath() + " " + property.getComputationMethodParameters());
                 InputStream is = input;
@@ -263,12 +268,16 @@ public class PropertyComputationUnit implements Runnable {
 
                 // check, if already an error occured
                 if (err.ready()) {
+                    in.close();
+                    err.close();
                     throw new ErrorInExternalProgramException(err.readLine());
                 }
                 // check, if program already has terminated
                 try {
                     int exit;
                     if ((exit = p.exitValue()) != 0) {
+                        in.close();
+                        err.close();
                         throw new ErrorInExternalProgramException("External program exited with errors! Exit value: " + exit);
                     }
                 } catch (IllegalThreadStateException e) {
@@ -297,6 +306,8 @@ public class PropertyComputationUnit implements Runnable {
                 }
                 // if no value is available after waitng time, kill the program
                 if (!in.ready()) {
+                    err.close();
+                    in.close();
                     p.destroy();
                     throw new ErrorInExternalProgramException("Time limit of external calculation exceeded! The external program has been terminated!");
                 }
@@ -307,6 +318,8 @@ public class PropertyComputationUnit implements Runnable {
                 ihp.setValue(value);
                 System.out.println(value);
                 InstanceHasPropertyDAO.save(ihp);
+                err.close();
+                in.close();
             } else if (erhp != null) {
                 File bin = ComputationMethodDAO.getBinaryOfComputationMethod(property.getComputationMethod());
                 bin.setExecutable(true);
