@@ -823,20 +823,27 @@ public class ExperimentController {
                 } else {
                     // repaint the table: updates the currently visible rectangle, otherwise there might be duplicates of rows.
                     final boolean[] urows = updateRows;
-                    int beg = -1;
-                    for (int i = 0; i < urows.length; i++) {
-                        if (urows[i]) {
-                            if (beg == -1) {
-                                beg = i;
-                            }
-                        } else {
-                            if (beg != -1) {
-                                // this will be invoked later by the ThreadSafeDefaultTableModel.
-                                main.jobsTableModel.fireTableRowsUpdated(beg, i);
-                                beg = -1;
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            int beg = -1;
+                            for (int i = 0; i < urows.length; i++) {
+                                if (urows[i]) {
+                                    if (beg == -1) {
+                                        beg = i;
+                                    }
+                                } else {
+                                    if (beg != -1) {
+                                        // this will be invoked later by the ThreadSafeDefaultTableModel.
+                                        main.jobsTableModel.fireTableRowsUpdated(beg, i);
+                                        beg = -1;
+                                    }
+                                }
                             }
                         }
-                    }
+                    });
+
 
                     SwingUtilities.invokeLater(new Runnable() {
 

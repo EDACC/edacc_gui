@@ -24,21 +24,7 @@ public class ClientUpdateThread extends SwingWorker<Void, Client> {
         super();
         ids = new HashSet<Integer>();
         this.model = model;
-        if (!SwingUtilities.isEventDispatchThread()) {
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        model.clearClients();
-                    }
-                    
-                });
-            } catch (Exception ex) {
-            }
-        } else {
-            model.clearClients();
-        }
+        model.clearClients();
     }
 
     @Override

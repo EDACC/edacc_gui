@@ -194,20 +194,20 @@ public class DatabaseConnector extends Observable {
                 // try to find the connection of this thread: every thread can only have one connection at a time
                 for (ThreadConnection tconn : connections) {
                     if (tconn.thread == Thread.currentThread()) {
-                      //  if (tconn.conn.isValid(10)) {
+                        if (tconn.conn.isValid(10)) {
                             tconn.time = System.currentTimeMillis();
                             return tconn.conn;
-                      //  }
+                        }
                     }
                 }
                 // try to take a connection from a dead thread
                 for (ThreadConnection tconn : connections) {
                     if (tconn.thread == null || !tconn.thread.isAlive()) {
                         tconn.thread = Thread.currentThread();
-                      //  if (tconn.conn.isValid(10)) {
+                        if (tconn.conn.isValid(10)) {
                             tconn.time = System.currentTimeMillis();
                             return tconn.conn;
-                      //  }
+                        }
                     }
                 }
                 // create new connection if max connection count isn't reached

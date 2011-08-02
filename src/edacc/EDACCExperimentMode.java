@@ -2188,12 +2188,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                         throw new NumberFormatException();
                     }
                     jobsTimer = new Timer();
-                    final ExperimentResultsBrowserTableModel sync = jobsTableModel;
                     jobsTimer.scheduleAtFixedRate(new TimerTask() {
 
                         @Override
                         public void run() {
-                            Tasks.startTask("loadJobs", expController, EDACCExperimentMode.this, false);
+                            if (!Tasks.isTaskRunning()) {
+                                Tasks.startTask("loadJobs", expController, EDACCExperimentMode.this, false);
+                            } 
                         }
                     }, 0, period * 1000);
                 } catch (NumberFormatException e) {

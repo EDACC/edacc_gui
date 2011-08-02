@@ -23,6 +23,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
     private TaskRunnable runnable;
     private static final Object syncTasks = new Object();
     private static EDACCTaskView taskView;
+    private static boolean taskRunning;
 
     /**
      * Starts a new Task for a method specified in methodName and signature.
@@ -113,6 +114,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
     public static void startTask(TaskRunnable runnable, boolean withTaskView) {
         startTask(runnable, true, EDACCApp.getApplication().getMainFrame());
     }
+
     /**
      * This constructor is only for Unit-Tests. It creates a instance without any funktion.
      * @author gregor
@@ -175,15 +177,24 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
     @Override
     protected Void doInBackground() {
         synchronized (syncTasks) {
+            synchronized (Tasks.class) {
+                taskRunning = true;
+            }
             if (runnable != null) {
                 try {
-                    runnable.run(this);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if (taskView != null) {
-                    taskView.dispose();
-                    taskView = null;
+                    try {
+                        runnable.run(this);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (taskView != null) {
+                        taskView.dispose();
+                        taskView = null;
+                    }
+                } finally {
+                    synchronized (Tasks.class) {
+                        taskRunning = false;
+                    }
                 }
                 DatabaseConnector.getInstance().releaseConnection();
                 return null;
@@ -230,6 +241,10 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
                 } catch (Exception e) {
                     System.out.println("This should not happen. Called a method which should not be called. Be sure that your method is declared as public. Exception as follows: " + e);
                     EDACCApp.getLogger().logException(e);
+                } finally {
+                    synchronized (Tasks.class) {
+                        taskRunning = false;
+                    }
                 }
                 return null;
             }
@@ -256,9 +271,8 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
                     taskView.setProgress(ff);
                 }
             }
-
         });
-        
+
     }
 
     /**
@@ -271,12 +285,12 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
 
             @Override
             public void run() {
-                if (taskView != null)
+                if (taskView != null) {
                     taskView.setMessage(s);
+                }
             }
-
         });
-        
+
     }
 
     /**
@@ -293,5 +307,9 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
      */
     public static EDACCTaskView getTaskView() {
         return taskView;
+    }
+
+    public synchronized static boolean isTaskRunning() {
+        return taskRunning;
     }
 }
