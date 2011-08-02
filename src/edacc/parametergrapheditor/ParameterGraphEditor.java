@@ -410,6 +410,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         btnLayout = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
         btnParameters = new javax.swing.JButton();
+        btnDefaultGraph = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -443,6 +444,15 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             }
         });
 
+        btnDefaultGraph.setText(resourceMap.getString("btnDefaultGraph.text")); // NOI18N
+        btnDefaultGraph.setToolTipText(resourceMap.getString("btnDefaultGraph.toolTipText")); // NOI18N
+        btnDefaultGraph.setName("btnDefaultGraph"); // NOI18N
+        btnDefaultGraph.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDefaultGraphActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -452,7 +462,9 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                 .addComponent(btnLayout)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnParameters)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 480, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnDefaultGraph)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 353, Short.MAX_VALUE)
                 .addComponent(btnSave)
                 .addContainerGap())
         );
@@ -462,7 +474,8 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnLayout)
                     .addComponent(btnSave)
-                    .addComponent(btnParameters))
+                    .addComponent(btnParameters)
+                    .addComponent(btnDefaultGraph))
                 .addContainerGap(14, Short.MAX_VALUE))
         );
 
@@ -473,7 +486,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 715, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 751, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -589,6 +602,46 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnParametersActionPerformed
 
+    private void btnDefaultGraphActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDefaultGraphActionPerformed
+        if (parameters == null || parameters.size() == 0) {
+            JOptionPane.showMessageDialog(this, "No parameters specified yet.", "Parameters missing", JOptionPane.INFORMATION_MESSAGE);
+        }
+        graph.removeCells(graph.getChildVertices(graph.getDefaultParent()));
+        Set<Node> nodes = new HashSet<Node>();
+        List<Edge> edges = new LinkedList<Edge>();
+        AndNode startNode = new AndNode(null, null);
+        nodes.add(startNode);
+        for (Parameter parameter: parameters) {
+            OrNode orNode = new OrNode(parameter);
+            AndNode andNode = new AndNode(parameter, parameter.getDomain());
+            edges.add(new Edge(startNode, orNode, 0));
+            edges.add(new Edge(orNode, andNode, 0));
+            nodes.add(orNode);
+            nodes.add(andNode);
+        }
+        ParameterGraph parameterGraph = new ParameterGraph(nodes, edges, parameters, startNode);
+        
+        graph.getModel().beginUpdate();
+        HashMap<String, mxCell> mapNodeIdToCell = new HashMap<String, mxCell>();
+        for (Node node : parameterGraph.nodes) {
+            mxCell cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, node, 20, 20, 80, 30);
+            if (node == parameterGraph.startNode) {
+                rootNode = cell;
+            }
+            graph.updateCellSize(cell);
+            node.setId(cell.getId());
+            mapNodeIdToCell.put(cell.getId(), cell);
+        }
+
+        for (Edge edge : parameterGraph.edges) {
+            graph.insertEdge(graph.getDefaultParent(), null, edge, mapNodeIdToCell.get(edge.getSource().getId()), mapNodeIdToCell.get(edge.getTarget().getId()));
+        }
+
+        graph.getModel().endUpdate();
+
+        btnLayoutActionPerformed(null);
+    }//GEN-LAST:event_btnDefaultGraphActionPerformed
+
     public void evtKeyReleased(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_DELETE) {
             for (Object cell : graph.getSelectionCells()) {
@@ -629,6 +682,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         return true;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnDefaultGraph;
     private javax.swing.JButton btnLayout;
     private javax.swing.JButton btnParameters;
     private javax.swing.JButton btnSave;
