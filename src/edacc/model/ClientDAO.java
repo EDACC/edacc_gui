@@ -63,20 +63,21 @@ public class ClientDAO {
         }
 
         if (!idsModified.isEmpty()) {
-            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idClient, message, TIMESTAMPDIFF(SECOND, lastReport, NOW()) > 20 AS dead FROM " + table + " WHERE idClient IN " + getIntArray(idsModified));
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idClient, message, jobs_wait_time, current_wait_time, TIMESTAMPDIFF(SECOND, lastReport, NOW()) > 20 AS dead FROM " + table + " WHERE idClient IN " + getIntArray(idsModified));
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-
                 Client c = cache.getCached(rs.getInt("idClient"));
                 c.setMessage(rs.getString("message"));
                 c.setDead(rs.getBoolean("dead"));
+                c.setWait_time(rs.getInt("jobs_wait_time"));
+                c.setCurrent_wait_time(rs.getInt("current_wait_time"));
             }
             rs.close();
             st.close();
         }
 
         if (!clientIds.isEmpty()) {
-            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idClient, numCores, numThreads, hyperthreading, turboboost, CPUName, cacheSize, cpuflags, memory, memoryFree, cpuinfo, meminfo, message, gridQueue_idgridQueue, lastReport, TIMESTAMPDIFF(SECOND, lastReport, NOW()) > 20 AS dead FROM " + table + " WHERE idClient IN " + getIntArray(clientIds));
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idClient, numCores, numThreads, hyperthreading, turboboost, CPUName, cacheSize, cpuflags, memory, memoryFree, cpuinfo, meminfo, message, gridQueue_idgridQueue, lastReport, TIMESTAMPDIFF(SECOND, lastReport, NOW()) > 20 AS dead, jobs_wait_time, current_wait_time FROM " + table + " WHERE idClient IN " + getIntArray(clientIds));
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 Client c = new Client(rs);

@@ -30,6 +30,8 @@ public class Client extends BaseModel implements IntegerPKModel {
     private int gridQueueId;
     private Timestamp lastReport;
     private boolean dead;
+    private int wait_time;
+    private int current_wait_time;
     private HashMap<Experiment, Integer> computingExperiments;
     private Observable observable;
 
@@ -50,6 +52,8 @@ public class Client extends BaseModel implements IntegerPKModel {
         this.gridQueueId = rs.getInt("gridQueue_idgridQueue");
         this.lastReport = rs.getTimestamp("lastReport");
         this.dead = rs.getBoolean("dead");
+        this.wait_time = rs.getInt("jobs_wait_time");
+        this.current_wait_time = rs.getInt("current_wait_time");
         computingExperiments = new HashMap<Experiment, Integer>();
         observable = new Observable() {
 
@@ -204,5 +208,27 @@ public class Client extends BaseModel implements IntegerPKModel {
             this.setModified();
         }
         this.computingExperiments = computingExperiments;
+    }
+
+    public int getCurrent_wait_time() {
+        return current_wait_time;
+    }
+
+    public void setCurrent_wait_time(int current_wait_time) {
+        if (this.current_wait_time != current_wait_time) {
+            this.setModified();
+        }
+        this.current_wait_time = current_wait_time;
+    }
+
+    public int getWait_time() {
+        return wait_time;
+    }
+
+    public void setWait_time(int wait_time) {
+        if (this.wait_time != wait_time) {
+            this.setModified();
+        }
+        this.wait_time = wait_time;
     }
 }

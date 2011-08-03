@@ -17,23 +17,25 @@ public class ClientTableModel extends ThreadSafeDefaultTableModel implements Obs
     public static final int COL_COMPUTENODE = 0;
     /** The index of the status column */
     public static final int COL_STATUS = 1;
+    /** The index of the wait time column */
+    public static final int COL_WAITTIME = 2;
     /** The index of the cores column */
-    public static final int COL_CORES = 2;
+    public static final int COL_CORES = 3;
     /** The index of the threads column */
-    public static final int COL_THREADS = 3;
+    public static final int COL_THREADS = 4;
     /** The index of the hyperthreading column */
-    public static final int COL_HYPERTHREADING = 4;
+    public static final int COL_HYPERTHREADING = 5;
     /** The index of the turboboost column */
-    public static final int COL_TURBOBOOST = 5;
+    public static final int COL_TURBOBOOST = 6;
     /** The index of the cpu name column */
-    public static final int COL_CPUNAME = 6;
+    public static final int COL_CPUNAME = 7;
     /** The index of the cache size column */
-    public static final int COL_CACHESIZE = 7;
+    public static final int COL_CACHESIZE = 8;
     /** The index of the memory column */
-    public static final int COL_MEMORY = 8;
+    public static final int COL_MEMORY = 9;
     /** The index of the free memory column */
-    public static final int COL_MEMORYFREE = 9;
-    private static final String[] columns = {"Compute Node", "Status", "Cores", "Threads", "Hyperthreading", "Turboboost", "CPU Name", "Cache Size", "Memory", "Free Memory"};
+    public static final int COL_MEMORYFREE = 10;
+    private static final String[] columns = {"Compute Node", "Status", "Wait Time", "Cores", "Threads", "Hyperthreading", "Turboboost", "CPU Name", "Cache Size", "Memory", "Free Memory"};
     private ArrayList<Client> clients;
 
     /** Creates the client table model */
@@ -102,6 +104,8 @@ public class ClientTableModel extends ThreadSafeDefaultTableModel implements Obs
                     computeCores += cores;
                 }
                 return "" + computeCores + " threads computing " + clients.get(row).getComputingExperiments().size() + " experiments";
+            case COL_WAITTIME:
+                return "" + clients.get(row).getCurrent_wait_time() + " sec / " + clients.get(row).getWait_time() + " sec";
             case COL_CORES:
                 return clients.get(row).getNumCores();
             case COL_THREADS:

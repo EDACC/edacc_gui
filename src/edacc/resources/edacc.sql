@@ -290,6 +290,8 @@ CREATE  TABLE IF NOT EXISTS `Client` (
   `message` VARCHAR(255) NULL ,
   `gridQueue_idgridQueue` INT NOT NULL ,
   `lastReport` TIMESTAMP NULL ,
+  `jobs_wait_time` INT NULL ,
+  `current_wait_time` INT NULL ,
   PRIMARY KEY (`idClient`) ,
   INDEX `fk_Client_gridQueue1` (`gridQueue_idgridQueue` ASC) ,
   CONSTRAINT `fk_Client_gridQueue1`
@@ -298,7 +300,6 @@ CREATE  TABLE IF NOT EXISTS `Client` (
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
-
 
 -- -----------------------------------------------------
 -- Table `ExperimentResults`
