@@ -174,6 +174,11 @@ public class SpecifyCategoricalDomainPanel extends javax.swing.JPanel implements
     }//GEN-LAST:event_btnCopyToClipboardActionPerformed
 
     private void btnUseDomainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUseDomainActionPerformed
+        useDomain();
+    }//GEN-LAST:event_btnUseDomainActionPerformed
+
+    
+    public void useDomain() {
         UseDomainDialog dialog = new UseDomainDialog(EDACCApp.getApplication().getMainFrame(), true, main.getParameters(), CategoricalDomain.class);
         dialog.setName("UseDomainDialog");
         EDACCApp.getApplication().show(dialog);
@@ -181,8 +186,8 @@ public class SpecifyCategoricalDomainPanel extends javax.swing.JPanel implements
         if ((p = dialog.getSelectedItem()) != null && p.getDomain() instanceof CategoricalDomain) {
             this.setDomain(p.getDomain());
         }
-    }//GEN-LAST:event_btnUseDomainActionPerformed
-
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnAddMultiple;
