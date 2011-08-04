@@ -30,7 +30,7 @@ public class SpecifyDomainDialog extends javax.swing.JDialog {
         domainPanels = new HashMap<String, SpecifyDomainPanel>();
 
         for (Parameter param : savedParams) {
-            SpecifyDomainPanel domainPanel = new SpecifyDomainPanel();
+            SpecifyDomainPanel domainPanel = new SpecifyDomainPanel(this);
             domainPanels.put(param.getName(), domainPanel);
             domainPanel.setDomain(param.getDomain());
         }
@@ -53,8 +53,8 @@ public class SpecifyDomainDialog extends javax.swing.JDialog {
 
         jLabel1 = new javax.swing.JLabel();
         panel = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnAccept = new javax.swing.JButton();
+        btnCancel = new javax.swing.JButton();
         comboParameter = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -77,19 +77,19 @@ public class SpecifyDomainDialog extends javax.swing.JDialog {
             .addGap(0, 223, Short.MAX_VALUE)
         );
 
-        jButton1.setText(resourceMap.getString("jButton1.text")); // NOI18N
-        jButton1.setName("jButton1"); // NOI18N
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnAccept.setText(resourceMap.getString("btnAccept.text")); // NOI18N
+        btnAccept.setName("btnAccept"); // NOI18N
+        btnAccept.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnAcceptActionPerformed(evt);
             }
         });
 
-        jButton2.setText(resourceMap.getString("jButton2.text")); // NOI18N
-        jButton2.setName("jButton2"); // NOI18N
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
+        btnCancel.setName("btnCancel"); // NOI18N
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnCancelActionPerformed(evt);
             }
         });
 
@@ -113,9 +113,9 @@ public class SpecifyDomainDialog extends javax.swing.JDialog {
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(254, Short.MAX_VALUE)
-                .addComponent(jButton2)
+                .addComponent(btnCancel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
+                .addComponent(btnAccept)
                 .addContainerGap())
             .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -130,8 +130,8 @@ public class SpecifyDomainDialog extends javax.swing.JDialog {
                 .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
+                    .addComponent(btnAccept)
+                    .addComponent(btnCancel))
                 .addContainerGap())
         );
 
@@ -145,7 +145,7 @@ public class SpecifyDomainDialog extends javax.swing.JDialog {
         String param = (String) comboParameter.getSelectedItem();
         SpecifyDomainPanel domainPanel = domainPanels.get(param);
         if (domainPanel == null) {
-            domainPanel = new SpecifyDomainPanel();
+            domainPanel = new SpecifyDomainPanel(this);
             domainPanels.put(param, domainPanel);
         }
         panel.removeAll();
@@ -155,15 +155,15 @@ public class SpecifyDomainDialog extends javax.swing.JDialog {
         panel.repaint();
     }//GEN-LAST:event_comboParameterActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         cancelled = true;
         setVisible(false);
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnCancelActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnAcceptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAcceptActionPerformed
         cancelled = false;
         setVisible(false);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnAcceptActionPerformed
 
     public boolean isCancelled() {
         return cancelled;
@@ -182,9 +182,9 @@ public class SpecifyDomainDialog extends javax.swing.JDialog {
         return res;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAccept;
+    private javax.swing.JButton btnCancel;
     private javax.swing.JComboBox comboParameter;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel panel;
     // End of variables declaration//GEN-END:variables

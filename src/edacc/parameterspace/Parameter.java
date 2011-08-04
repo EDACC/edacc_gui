@@ -60,7 +60,7 @@ public class Parameter implements Comparable<Parameter> {
 
     @Override
     public String toString() {
-        return "Parameter{" + "name=" + name + ", domain=" + domain + '}';
+        return name;
     }
 
 	@Override

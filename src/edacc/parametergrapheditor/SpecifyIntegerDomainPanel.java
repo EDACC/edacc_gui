@@ -5,6 +5,8 @@
  */
 package edacc.parametergrapheditor;
 
+import edacc.EDACCApp;
+import edacc.parameterspace.Parameter;
 import edacc.parameterspace.domain.Domain;
 import edacc.parameterspace.domain.IntegerDomain;
 
@@ -13,10 +15,11 @@ import edacc.parameterspace.domain.IntegerDomain;
  * @author simon
  */
 public class SpecifyIntegerDomainPanel extends javax.swing.JPanel implements IDomainPanel {
-
+    SpecifyDomainDialog main;
     /** Creates new form SpecifyIntegerDomainPanel */
-    public SpecifyIntegerDomainPanel() {
+    public SpecifyIntegerDomainPanel(SpecifyDomainDialog main) {
         initComponents();
+        this.main = main;
     }
 
     /** This method is called from within the constructor to
@@ -32,6 +35,7 @@ public class SpecifyIntegerDomainPanel extends javax.swing.JPanel implements IDo
         jLabel2 = new javax.swing.JLabel();
         txtLow = new javax.swing.JTextField();
         txtHigh = new javax.swing.JTextField();
+        btnUseDomain = new javax.swing.JButton();
 
         setName("Form"); // NOI18N
 
@@ -48,6 +52,14 @@ public class SpecifyIntegerDomainPanel extends javax.swing.JPanel implements IDo
         txtHigh.setText(resourceMap.getString("txtHigh.text")); // NOI18N
         txtHigh.setName("txtHigh"); // NOI18N
 
+        btnUseDomain.setText(resourceMap.getString("btnUseDomain.text")); // NOI18N
+        btnUseDomain.setName("btnUseDomain"); // NOI18N
+        btnUseDomain.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUseDomainActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -55,12 +67,15 @@ public class SpecifyIntegerDomainPanel extends javax.swing.JPanel implements IDo
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addGap(8, 8, 8)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtHigh, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
-                    .addComponent(txtLow, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2))
+                        .addGap(8, 8, 8)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtHigh, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
+                            .addComponent(txtLow, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)))
+                    .addComponent(btnUseDomain))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -74,10 +89,24 @@ public class SpecifyIntegerDomainPanel extends javax.swing.JPanel implements IDo
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(txtHigh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnUseDomain)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnUseDomainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUseDomainActionPerformed
+        UseDomainDialog dialog = new UseDomainDialog(EDACCApp.getApplication().getMainFrame(), true, main.getParameters(), IntegerDomain.class);
+        dialog.setName("UseDomainDialog");
+        EDACCApp.getApplication().show(dialog);
+        Parameter p;
+        if ((p = dialog.getSelectedItem()) != null && p.getDomain() instanceof IntegerDomain) {
+            this.setDomain(p.getDomain());
+        }
+    }//GEN-LAST:event_btnUseDomainActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnUseDomain;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JTextField txtHigh;

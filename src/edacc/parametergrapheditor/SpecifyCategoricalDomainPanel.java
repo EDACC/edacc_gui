@@ -5,8 +5,13 @@
  */
 package edacc.parametergrapheditor;
 
+import edacc.EDACCApp;
+import edacc.parameterspace.Parameter;
 import edacc.parameterspace.domain.CategoricalDomain;
 import edacc.parameterspace.domain.Domain;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
@@ -17,10 +22,11 @@ import javax.swing.JOptionPane;
 public class SpecifyCategoricalDomainPanel extends javax.swing.JPanel implements IDomainPanel {
 
     DefaultListModel model;
-
+    SpecifyDomainDialog main;
     /** Creates new form SpecifyCategoricalDomainPanel */
-    public SpecifyCategoricalDomainPanel() {
+    public SpecifyCategoricalDomainPanel(SpecifyDomainDialog main) {
         initComponents();
+        this.main = main;
         model = new DefaultListModel();
         model.clear();
         listCategories.setModel(model);
@@ -39,6 +45,9 @@ public class SpecifyCategoricalDomainPanel extends javax.swing.JPanel implements
         listCategories = new javax.swing.JList();
         btnAdd = new javax.swing.JButton();
         btnRemove = new javax.swing.JButton();
+        btnAddMultiple = new javax.swing.JButton();
+        btnCopyToClipboard = new javax.swing.JButton();
+        btnUseDomain = new javax.swing.JButton();
 
         setName("Form"); // NOI18N
 
@@ -69,17 +78,47 @@ public class SpecifyCategoricalDomainPanel extends javax.swing.JPanel implements
             }
         });
 
+        btnAddMultiple.setText(resourceMap.getString("btnAddMultiple.text")); // NOI18N
+        btnAddMultiple.setName("btnAddMultiple"); // NOI18N
+        btnAddMultiple.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddMultipleActionPerformed(evt);
+            }
+        });
+
+        btnCopyToClipboard.setText(resourceMap.getString("btnCopyToClipboard.text")); // NOI18N
+        btnCopyToClipboard.setName("btnCopyToClipboard"); // NOI18N
+        btnCopyToClipboard.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCopyToClipboardActionPerformed(evt);
+            }
+        });
+
+        btnUseDomain.setText(resourceMap.getString("btnUseDomain.text")); // NOI18N
+        btnUseDomain.setName("btnUseDomain"); // NOI18N
+        btnUseDomain.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUseDomainActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(262, Short.MAX_VALUE)
+                .addContainerGap()
                 .addComponent(btnRemove)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                .addComponent(btnUseDomain)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCopyToClipboard)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnAddMultiple)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnAdd)
                 .addContainerGap())
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -88,14 +127,17 @@ public class SpecifyCategoricalDomainPanel extends javax.swing.JPanel implements
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAdd)
-                    .addComponent(btnRemove))
+                    .addComponent(btnRemove)
+                    .addComponent(btnAddMultiple)
+                    .addComponent(btnCopyToClipboard)
+                    .addComponent(btnUseDomain))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         String cat = JOptionPane.showInputDialog("Category:");
-        if (cat != null) {
+        if (cat != null && !"".equals(cat)) {
             if (!model.contains(cat)) {
                 model.addElement(cat);
             }
@@ -107,9 +149,46 @@ public class SpecifyCategoricalDomainPanel extends javax.swing.JPanel implements
             model.removeElement(o);
         }
     }//GEN-LAST:event_btnRemoveActionPerformed
+
+    private void btnAddMultipleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddMultipleActionPerformed
+        MultipleCategoriesDialog dialog = new MultipleCategoriesDialog(EDACCApp.getApplication().getMainFrame(), true);
+        dialog.setName("MultipleCategoriesDialog");
+        EDACCApp.getApplication().show(dialog);
+        List<String> categories;
+        if ((categories = dialog.getCategories()) != null) {
+            for (String s : categories) {
+                if (!"".equals(s) && !model.contains(s)) {
+                    model.addElement(s);
+                }
+            }
+        }
+    }//GEN-LAST:event_btnAddMultipleActionPerformed
+
+    private void btnCopyToClipboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCopyToClipboardActionPerformed
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < model.size(); i++) {
+            sb.append((String) model.getElementAt(i)).append('\n');
+        }
+        StringSelection ss = new StringSelection(sb.toString());
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, null);
+    }//GEN-LAST:event_btnCopyToClipboardActionPerformed
+
+    private void btnUseDomainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUseDomainActionPerformed
+        UseDomainDialog dialog = new UseDomainDialog(EDACCApp.getApplication().getMainFrame(), true, main.getParameters(), CategoricalDomain.class);
+        dialog.setName("UseDomainDialog");
+        EDACCApp.getApplication().show(dialog);
+        Parameter p;
+        if ((p = dialog.getSelectedItem()) != null && p.getDomain() instanceof CategoricalDomain) {
+            this.setDomain(p.getDomain());
+        }
+    }//GEN-LAST:event_btnUseDomainActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
+    private javax.swing.JButton btnAddMultiple;
+    private javax.swing.JButton btnCopyToClipboard;
     private javax.swing.JButton btnRemove;
+    private javax.swing.JButton btnUseDomain;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JList listCategories;
     // End of variables declaration//GEN-END:variables

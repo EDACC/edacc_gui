@@ -24,14 +24,15 @@ public class SpecifyMixedDomainPanel extends javax.swing.JPanel implements IDoma
 
     GridBagConstraints c;
     GridBagLayout layout;
-
+    SpecifyDomainDialog main;
     /** Creates new form SpecifyMixedDomainPanel */
-    public SpecifyMixedDomainPanel() {
+    public SpecifyMixedDomainPanel(SpecifyDomainDialog main) {
         initComponents();
+        this.main = main;
         layout = new GridBagLayout();
         setLayout(layout);
         c = new GridBagConstraints();
-        SpecifyDomainPanel panel = new SpecifyDomainPanel();
+        SpecifyDomainPanel panel = new SpecifyDomainPanel(main);
         panel.comboDomain.removeItem(MixedDomain.name);
         panel.comboDomain.addActionListener(new ActionListener() {
 
@@ -76,7 +77,7 @@ public class SpecifyMixedDomainPanel extends javax.swing.JPanel implements IDoma
             }
         }
         if (!found) {
-            SpecifyDomainPanel panel = new SpecifyDomainPanel();
+            SpecifyDomainPanel panel = new SpecifyDomainPanel(main);
             panel.comboDomain.removeItem(MixedDomain.name);
             panel.comboDomain.addActionListener(new ActionListener() {
 

@@ -15,11 +15,12 @@ import javax.swing.JPanel;
 public class SpecifyDomainPanel extends javax.swing.JPanel implements IDomainPanel {
 
     JPanel pnlDomain;
+    SpecifyDomainDialog main;
 
     /** Creates new form SpecifyDomainPanel */
-    public SpecifyDomainPanel() {
+    public SpecifyDomainPanel(SpecifyDomainDialog main) {
         initComponents();
-
+        this.main = main;
         comboDomain.removeAllItems();
         comboDomain.addItem("");
         for (String name : Domain.names) {
@@ -91,15 +92,15 @@ public class SpecifyDomainPanel extends javax.swing.JPanel implements IDomainPan
 
     private void comboDomainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboDomainActionPerformed
         if (CategoricalDomain.name.equals(comboDomain.getSelectedItem())) {
-            pnlDomain = new SpecifyCategoricalDomainPanel();
+            pnlDomain = new SpecifyCategoricalDomainPanel(main);
         } else if (IntegerDomain.name.equals(comboDomain.getSelectedItem())) {
-            pnlDomain = new SpecifyIntegerDomainPanel();
+            pnlDomain = new SpecifyIntegerDomainPanel(main);
         } else if (MixedDomain.name.equals(comboDomain.getSelectedItem())) {
-            pnlDomain = new SpecifyMixedDomainPanel();
+            pnlDomain = new SpecifyMixedDomainPanel(main);
         } else if (OrdinalDomain.name.equals(comboDomain.getSelectedItem())) {
-            pnlDomain = new SpecifyOrdinalDomainPanel();
+            pnlDomain = new SpecifyOrdinalDomainPanel(main);
         } else if (RealDomain.name.equals(comboDomain.getSelectedItem())) {
-            pnlDomain = new SpecifyRealDomainPanel();
+            pnlDomain = new SpecifyRealDomainPanel(main);
         } else {
             pnlDomain = null;
         }

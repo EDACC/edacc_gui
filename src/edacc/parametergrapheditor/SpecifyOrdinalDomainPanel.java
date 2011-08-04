@@ -9,8 +9,8 @@ import java.util.LinkedList;
  * @author simon
  */
 public class SpecifyOrdinalDomainPanel extends SpecifyCategoricalDomainPanel {
-    public SpecifyOrdinalDomainPanel() {
-        super();
+    public SpecifyOrdinalDomainPanel(SpecifyDomainDialog main) {
+        super(main);
     }
 
     @Override
