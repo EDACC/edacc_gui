@@ -792,9 +792,8 @@ public class ExperimentController {
             synchronized (sync) {
 
                 ArrayList<ExperimentResult> results = main.jobsTableModel.getJobs();
-                boolean[] updateRows = null;
+                final HashSet<Integer> changedRows = new HashSet<Integer>();
                 if (results != null) {
-                    updateRows = new boolean[results.size()];
                     if (results.size() != experimentResultCache.size()) {
                         results = null;
                     } else {
@@ -806,7 +805,7 @@ public class ExperimentController {
                                 break;
                             } else if (!er.getDatemodified().equals(tmp.getDatemodified())) {
                                 results.set(i, tmp);
-                                updateRows[i] = true;
+                                changedRows.add(i);
                             }
                         }
                         if (results != null && results.size() != experimentResultCache.size()) {
@@ -821,25 +820,12 @@ public class ExperimentController {
                     main.resultBrowserRowFilter.updateFilterTypes();
                     main.jobsTableModel.fireTableDataChanged();
                 } else {
-                    // repaint the table: updates the currently visible rectangle, otherwise there might be duplicates of rows.
-                    final boolean[] urows = updateRows;
                     SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
                         public void run() {
-                            int beg = -1;
-                            for (int i = 0; i < urows.length; i++) {
-                                if (urows[i]) {
-                                    if (beg == -1) {
-                                        beg = i;
-                                    }
-                                } else {
-                                    if (beg != -1) {
-                                        // this will be invoked later by the ThreadSafeDefaultTableModel.
-                                        main.jobsTableModel.fireTableRowsUpdated(beg, i);
-                                        beg = -1;
-                                    }
-                                }
+                            for (Integer i : changedRows) {
+                                main.jobsTableModel.fireTableRowsUpdated(i, i);
                             }
                         }
                     });

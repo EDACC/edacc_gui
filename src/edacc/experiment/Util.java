@@ -79,7 +79,7 @@ public class Util {
                 }
                 minwidth[col] = width[col];
                 minwidthsum += width[col];
-                for (int row = 0; row < table.getRowCount(); row++) {
+                for (int row = 0; row < Math.min(10000, table.getRowCount()); row++) {
                     // get the component which represents the value and determine its witdth
                     int len = table.getCellRenderer(row, col).getTableCellRendererComponent(table, table.getValueAt(row, col), false, true, row, col).getPreferredSize().width;
                     if (len > width[col]) {
