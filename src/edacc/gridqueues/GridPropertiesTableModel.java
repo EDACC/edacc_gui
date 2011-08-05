@@ -38,7 +38,6 @@ public class GridPropertiesTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        System.out.println("Queue: " + q);
         if (q == null)
             return null;
         if (columnIndex == 0)
@@ -66,7 +65,6 @@ public class GridPropertiesTableModel extends AbstractTableModel {
     }
 
     public void setGridQueue(GridQueue q) {
-        System.out.println("+++QUEUE: " + q);
         this.q = q;
         fireTableDataChanged();
     }

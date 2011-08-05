@@ -11,12 +11,18 @@ import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
 import edacc.model.NoConnectionToDBException;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.FocusEvent;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.text.JTextComponent;
 import org.jdesktop.application.Action;
 
@@ -37,6 +43,33 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         super(parent, modal);
         this.tableModel = new GridPropertiesTableModel(currentQueue);
         initComponents();
+
+        TableCellRenderer renderer = new DefaultTableCellRenderer() {
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (c instanceof JLabel && value instanceof String) {
+                    JLabel label = (JLabel) c;
+                    String text = "<html>" + ((String) value).replaceAll("\n", "<br/>") + "</html>";
+                    label.setText(text);
+                    int max = Math.max(label.getPreferredSize().height, table.getRowHeight(row));
+                    if (table.getRowHeight(row) != max) {
+                        table.setRowHeight(row, Math.max(label.getPreferredSize().height, table.getRowHeight(row)));
+                    }
+
+                }
+                if (c instanceof JLabel) {
+                    JLabel label = ((JLabel) c);
+                    label.setVerticalAlignment(SwingConstants.TOP);
+                }
+                return c;
+
+            }
+        };
+        tQueueProperties.setDefaultRenderer(String.class, renderer);
+        tQueueProperties.setDefaultRenderer(Object.class, renderer);
+        jScrollPane2.getVerticalScrollBar().setUnitIncrement(15);
         this.manageGridQueuesDialog = manageGridQueuesDialog;
         setLocationRelativeTo(manageGridQueuesDialog);
     }
@@ -264,13 +297,15 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
      * @param evt
      */
     private void tcSelectOnFocus(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tcSelectOnFocus
-        if (!(evt.getSource() instanceof JTextComponent))
+        if (!(evt.getSource() instanceof JTextComponent)) {
             return;
+        }
         JTextComponent src = (JTextComponent) evt.getSource();
-        if (evt.getID() == FocusEvent.FOCUS_GAINED)
+        if (evt.getID() == FocusEvent.FOCUS_GAINED) {
             src.selectAll();
-        else if (evt.getID() == FocusEvent.FOCUS_LOST)
+        } else if (evt.getID() == FocusEvent.FOCUS_LOST) {
             src.setSelectionEnd(0);
+        }
     }//GEN-LAST:event_tcSelectOnFocus
 
     /**
@@ -296,7 +331,7 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
         if (q == null) {
             return;
         }
-        
+
         // if (q != null) {
         txtName.setText(q.getName());
         txtLocation.setText(q.getLocation());
@@ -354,18 +389,18 @@ public class EDACCGridSettingsView extends javax.swing.JDialog {
     public void checkInputs() {
         boolean error = false;
         GridQueue queueWithSameName = GridQueueDAO.queueWithSameNameExistsInCache(txtName.getText());
-        
+
         if (txtName.getText().equals("") || (queueWithSameName != null && queueWithSameName != currentQueue)) {
             txtName.setBackground(BAD);
             error = true;
         } else {
             txtName.setBackground(GOOD);
         }
-        
+
         if (!checkIntegerTextField(txtNumCPUs)) {
             error = true;
         }
-        
+
         btnOk.setEnabled(!error);
     }
 
