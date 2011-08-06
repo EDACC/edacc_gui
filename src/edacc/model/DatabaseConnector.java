@@ -476,8 +476,12 @@ public class DatabaseConnector extends Observable {
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
             isCompetitionDB = rs.getBoolean("competition");
+            rs.close();
+            ps.close();
             return isCompetitionDB;
         }
+        rs.close();
+        ps.close();
         return false;
     }
 
@@ -491,6 +495,8 @@ public class DatabaseConnector extends Observable {
         if (rs.next()) {
             version = rs.getInt(1);
         }
+        rs.close();
+        st.close();
         modelVersion = version;
         return modelVersion;
     }

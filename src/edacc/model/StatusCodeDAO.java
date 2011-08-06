@@ -37,8 +37,12 @@ public class StatusCodeDAO {
             if (rs.next()) {
                 StatusCode status = new StatusCode(statusCode, rs.getString("description"));
                 cache.put(statusCode, status);
+                rs.close();
+                st.close();
                 return status;
             } else {
+                rs.close();
+                st.close();
                 throw new StatusCodeNotInDBException();
             }
         }

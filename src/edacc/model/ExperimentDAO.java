@@ -240,6 +240,8 @@ public class ExperimentDAO {
         while (rs.next()) {
             res.add(new StatusCount(StatusCodeDAO.getByStatusCode(rs.getInt(1)), rs.getInt(2)));
         }
+        rs.close();
+        ps.close();
         return res;
     }
     

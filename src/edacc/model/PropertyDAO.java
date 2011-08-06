@@ -263,6 +263,8 @@ public class PropertyDAO {
         while (rs.next()) {
             res.add(PropertyDAO.getById(rs.getInt("idProperty")));
         }
+        rs.close();
+        ps.close();
         return res;
     }
 
@@ -318,6 +320,8 @@ public class PropertyDAO {
         while (rs.next()) {
             res.add(rs.getString(1));
         }
+        rs.close();
+        ps.close();
         return res;
     }
 

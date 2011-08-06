@@ -221,6 +221,8 @@ public class InstanceHasInstanceClassDAO {
                 classes.add(i.getInstanceClass().getId());
             }
         }
+        rs.close();
+        st.close();
     }
 
     public static LinkedList<Integer> getRelatedInstanceClasses(int id) throws SQLException {

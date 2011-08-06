@@ -163,11 +163,12 @@ public class ParameterInstanceDAO {
                 return o1.getId() - o2.getId();
             }
         });
-        String idString = "(";
+        StringBuilder sb = new StringBuilder("(");
         for (int i = 0; i < scs.size() - 1; i++) {
-            idString += "" + scs.get(i).getId() + ",";
+            sb.append(scs.get(i).getId()).append(',');
         }
-        idString += "" + scs.get(scs.size() - 1).getId() + ")";
+        sb.append(scs.get(scs.size() -1).getId()).append(')');
+        String idString = sb.toString();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE SolverConfig_idSolverConfig IN " + idString + " ORDER BY SolverConfig_idSolverConfig ASC");
         int cur_idx = 0;
         ArrayList<ParameterInstance> cur = new ArrayList<ParameterInstance>();
@@ -185,6 +186,8 @@ public class ParameterInstanceDAO {
             i.setSaved();
             cur.add(i);
         }
+        rs.close();
+        st.close();
         cacheParameterInstances(cur_sc, cur);
     }
 

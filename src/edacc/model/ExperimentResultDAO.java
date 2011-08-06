@@ -412,9 +412,9 @@ public class ExperimentResultDAO {
             v.add(er);
             er.setSaved();
         }
-        ExperimentResultHasPropertyDAO.assign(v, id);
         rs.close();
         st.close();
+        ExperimentResultHasPropertyDAO.assign(v, id);
         return v;
     }
 

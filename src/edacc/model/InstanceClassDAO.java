@@ -240,6 +240,8 @@ public class InstanceClassDAO {
                 idList.add(id);
             }
         }
+        rs.close();
+        st.close();
         while (toIterate.size() > 0) {
             DefaultMutableTreeNode node = toIterate.pop();
             InstanceClass i = (InstanceClass) node.getUserObject();

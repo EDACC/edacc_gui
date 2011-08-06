@@ -312,6 +312,7 @@ public class InstanceDAO {
             res.add(i);
         }
         rs.close();
+        st.close();
         return res;
     }
 

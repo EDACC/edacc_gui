@@ -37,8 +37,12 @@ public class ResultCodeDAO {
             if (rs.next()) {
                 ResultCode result = new ResultCode(resultCode, rs.getString("description"));
                 cache.put(resultCode, result);
+                rs.close();
+                st.close();
                 return result;
             } else {
+                rs.close();
+                st.close();
                 throw new ResultCodeNotInDBException();
             }
         }
