@@ -34,6 +34,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +45,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 import javax.xml.bind.JAXBException;
 
 /**
@@ -280,6 +285,12 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         graph.setAllowNegativeCoordinates(false);
 
         ParameterGraph parameterGraph = ParameterGraphDAO.loadParameterGraph(solver);
+        loadParameterGraph(parameterGraph);
+
+    }
+
+    private void loadParameterGraph(ParameterGraph parameterGraph) {
+        graph.removeCells(graph.getChildCells(graph.getDefaultParent()));
         if (parameterGraph == null) {
             // create root node:
             graph.updateCellSize(rootNode = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, new AndNode(null, null), 20, 20, 80, 30));
@@ -308,7 +319,6 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
 
             btnLayoutActionPerformed(null);
         }
-
     }
 
     private Parameter createOrNode() {
@@ -411,6 +421,8 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         btnSave = new javax.swing.JButton();
         btnParameters = new javax.swing.JButton();
         btnDefaultGraph = new javax.swing.JButton();
+        btnSaveToFile = new javax.swing.JButton();
+        btnLoadFromFile = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -453,6 +465,22 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             }
         });
 
+        btnSaveToFile.setText(resourceMap.getString("btnSaveToFile.text")); // NOI18N
+        btnSaveToFile.setName("btnSaveToFile"); // NOI18N
+        btnSaveToFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveToFileActionPerformed(evt);
+            }
+        });
+
+        btnLoadFromFile.setText(resourceMap.getString("btnLoadFromFile.text")); // NOI18N
+        btnLoadFromFile.setName("btnLoadFromFile"); // NOI18N
+        btnLoadFromFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoadFromFileActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -464,7 +492,11 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                 .addComponent(btnParameters)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDefaultGraph)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 353, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnSaveToFile)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnLoadFromFile)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 211, Short.MAX_VALUE)
                 .addComponent(btnSave)
                 .addContainerGap())
         );
@@ -475,7 +507,9 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                     .addComponent(btnLayout)
                     .addComponent(btnSave)
                     .addComponent(btnParameters)
-                    .addComponent(btnDefaultGraph))
+                    .addComponent(btnDefaultGraph)
+                    .addComponent(btnSaveToFile)
+                    .addComponent(btnLoadFromFile))
                 .addContainerGap(14, Short.MAX_VALUE))
         );
 
@@ -544,34 +578,17 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
     }
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-
-        List<mxCell> roots = findRoots();
-
-        if (roots.size() != 1) {
-            JOptionPane.showMessageDialog(this, "Found " + roots.size() + " roots.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        mxCell root = (mxCell) roots.get(0);
-        if (!(root.getValue() instanceof AndNode) || root != rootNode) {
-            // should never happen
-            JOptionPane.showMessageDialog(this, "Invalid root node.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        Set<Node> nodes = new HashSet<Node>();
-        List<Edge> edges = new LinkedList<Edge>();
-        if (!buildParameterGraph(nodes, edges, root)) {
-            // happens if not all leafs are AND nodes
-            JOptionPane.showMessageDialog(this, "Invalid graph.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        ParameterGraph parameterGraph = new ParameterGraph(nodes, edges, parameters, (AndNode) root.getValue());
         try {
-            ParameterGraphDAO.saveParameterGraph(parameterGraph, solver);
-            JOptionPane.showMessageDialog(this, "Saved.", "Information", JOptionPane.INFORMATION_MESSAGE);
+            ParameterGraph parameterGraph = getParameterGraph();
+            try {
+                ParameterGraphDAO.saveParameterGraph(parameterGraph, solver);
+                JOptionPane.showMessageDialog(this, "Saved.", "Information", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error while saving:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error while saving:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnParametersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnParametersActionPerformed
@@ -603,7 +620,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
     }//GEN-LAST:event_btnParametersActionPerformed
 
     private void btnDefaultGraphActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDefaultGraphActionPerformed
-        if (parameters == null || parameters.size() == 0) {
+        if (parameters == null || parameters.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No parameters specified yet.", "Parameters missing", JOptionPane.INFORMATION_MESSAGE);
         }
         graph.removeCells(graph.getChildVertices(graph.getDefaultParent()));
@@ -611,7 +628,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         List<Edge> edges = new LinkedList<Edge>();
         AndNode startNode = new AndNode(null, null);
         nodes.add(startNode);
-        for (Parameter parameter: parameters) {
+        for (Parameter parameter : parameters) {
             OrNode orNode = new OrNode(parameter);
             AndNode andNode = new AndNode(parameter, parameter.getDomain());
             edges.add(new Edge(startNode, orNode, 0));
@@ -620,7 +637,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             nodes.add(andNode);
         }
         ParameterGraph parameterGraph = new ParameterGraph(nodes, edges, parameters, startNode);
-        
+
         graph.getModel().beginUpdate();
         HashMap<String, mxCell> mapNodeIdToCell = new HashMap<String, mxCell>();
         for (Node node : parameterGraph.nodes) {
@@ -641,6 +658,85 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
 
         btnLayoutActionPerformed(null);
     }//GEN-LAST:event_btnDefaultGraphActionPerformed
+
+    private void btnSaveToFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveToFileActionPerformed
+        JFileChooser fc = new JFileChooser();
+        fc.setFileFilter(new FileFilter() {
+
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory() || f.getAbsolutePath().endsWith(".graph");
+            }
+
+            @Override
+            public String getDescription() {
+                return "EDACC Graph File (.graph)";
+            }
+        });
+        fc.showSaveDialog(this);
+        File f;
+
+        if ((f = fc.getSelectedFile()) != null) {
+
+            if (!f.getAbsolutePath().endsWith(".graph")) {
+                f = new File(f.getAbsolutePath().concat(".graph"));
+            }
+            if (f.exists()) {
+                int input = JOptionPane.showConfirmDialog(this, "File " + f.getAbsoluteFile() + " exists. Overwrite?", "File exists", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                if (input != JOptionPane.YES_OPTION) {
+                    return ;
+                }
+            }
+            ParameterGraph parameterGraph;
+            try {
+                parameterGraph = getParameterGraph();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                ParameterGraphDAO.saveParameterGraph(f, parameterGraph);
+                JOptionPane.showMessageDialog(this, "Saved.", "Saved", JOptionPane.INFORMATION_MESSAGE);
+            } catch (JAXBException ex) {
+                JOptionPane.showMessageDialog(this, "Error while generating XML file. Graph invalid?", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (FileNotFoundException ex) {
+                JOptionPane.showMessageDialog(this, "File not found: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "Error while writing file.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnSaveToFileActionPerformed
+
+    private void btnLoadFromFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadFromFileActionPerformed
+        JFileChooser fc = new JFileChooser();
+        fc.setFileFilter(new FileFilter() {
+
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory() || f.getAbsolutePath().endsWith(".graph");
+            }
+
+            @Override
+            public String getDescription() {
+                return "EDACC Graph File (.graph)";
+            }
+        });
+        fc.showOpenDialog(this);
+        File f;
+        if ((f = fc.getSelectedFile()) != null) {
+            ParameterGraph parameterGraph;
+            try {
+                parameterGraph = ParameterGraphDAO.loadParameterGraph(f);
+                loadParameterGraph(parameterGraph);
+                JOptionPane.showMessageDialog(this, "Graph has been loaded.", "Loaded", JOptionPane.INFORMATION_MESSAGE);
+            } catch (FileNotFoundException ex) {
+                JOptionPane.showMessageDialog(this, "File not found: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (JAXBException ex) {
+                JOptionPane.showMessageDialog(this, "Error while loading XML file. File invalid?", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        }
+    }//GEN-LAST:event_btnLoadFromFileActionPerformed
 
     public void evtKeyReleased(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_DELETE) {
@@ -681,11 +777,33 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         }
         return true;
     }
+
+    private ParameterGraph getParameterGraph() throws Exception {
+        List<mxCell> roots = findRoots();
+
+        if (roots.size() != 1) {
+            throw new Exception("Found " + roots.size() + " roots.");
+        }
+        mxCell root = (mxCell) roots.get(0);
+        if (!(root.getValue() instanceof AndNode) || root != rootNode) {
+            // should never happen
+            throw new Exception("Invalid root node.");
+        }
+        Set<Node> nodes = new HashSet<Node>();
+        List<Edge> edges = new LinkedList<Edge>();
+        if (!buildParameterGraph(nodes, edges, root)) {
+            // happens if not all leafs are AND nodes
+            throw new Exception("Invalid graph.");
+        }
+        return new ParameterGraph(nodes, edges, parameters, (AndNode) root.getValue());
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDefaultGraph;
     private javax.swing.JButton btnLayout;
+    private javax.swing.JButton btnLoadFromFile;
     private javax.swing.JButton btnParameters;
     private javax.swing.JButton btnSave;
+    private javax.swing.JButton btnSaveToFile;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables

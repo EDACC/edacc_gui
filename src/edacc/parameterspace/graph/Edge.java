@@ -1,8 +1,9 @@
 package edacc.parameterspace.graph;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlIDREF;
 
-public class Edge {
+public class Edge implements Serializable {
 	protected Node source;
 	protected Node target;
 	protected int group;

@@ -7,24 +7,20 @@ import edacc.parameterspace.graph.ParameterGraph;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.math.BigInteger;
-import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 /**
  *
@@ -52,7 +48,7 @@ public class ParameterGraphDAO {
                 p.buildAdjacencyList();
                 return p;
             }
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
             rs.close();
@@ -61,9 +57,25 @@ public class ParameterGraphDAO {
         return null;
     }
 
+    public static ParameterGraph loadParameterGraph(File file) throws FileNotFoundException, JAXBException {
+        FileInputStream input = new FileInputStream(file);
+        return unmarshal(ParameterGraph.class, input);
+    }
+
+    public static void saveParameterGraph(File file, ParameterGraph graph) throws JAXBException, FileNotFoundException, IOException {
+        InputStream stream = marshall(ParameterGraph.class, graph);
+        FileOutputStream fo = new FileOutputStream(file);
+        byte[] buf = new byte[2048];
+        int len;
+        while ((len = stream.read(buf)) > 0) {
+            fo.write(buf, 0, len);
+        }
+        fo.close();
+        stream.close();
+    }
+
     public static void saveParameterGraph(ParameterGraph graph, Solver solver) throws SQLException, JAXBException {
         PreparedStatement st;
-        try {
         if (loadParameterGraph(solver) != null) {
             st = DatabaseConnector.getInstance().getConn().prepareStatement(UPDATE);
             st.setInt(2, solver.getId());
@@ -74,9 +86,6 @@ public class ParameterGraphDAO {
             st.setBinaryStream(2, marshall(ParameterGraph.class, graph));
         }
         st.executeUpdate();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 
     /**
@@ -169,9 +178,11 @@ public class ParameterGraphDAO {
         }
         return 0;
     }
-    
+
     public static String toHex(byte[] bytes) {
-        if (bytes == null) return "";
+        if (bytes == null) {
+            return "";
+        }
         BigInteger bi = new BigInteger(1, bytes);
         return String.format("%0" + (bytes.length << 1) + "X", bi);
     }

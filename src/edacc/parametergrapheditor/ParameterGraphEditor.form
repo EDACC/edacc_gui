@@ -54,7 +54,11 @@
                   <Component id="btnParameters" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnDefaultGraph" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="411" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="btnSaveToFile" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="btnLoadFromFile" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="211" max="32767" attributes="0"/>
                   <Component id="btnSave" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -68,6 +72,8 @@
                       <Component id="btnSave" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="btnParameters" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="btnDefaultGraph" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnSaveToFile" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnLoadFromFile" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="14" max="32767" attributes="0"/>
               </Group>
@@ -110,6 +116,24 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDefaultGraphActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="btnSaveToFile">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="btnSaveToFile.text"/>
+            <Property name="name" type="java.lang.String" value="btnSaveToFile" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSaveToFileActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="btnLoadFromFile">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="btnLoadFromFile.text"/>
+            <Property name="name" type="java.lang.String" value="btnLoadFromFile" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnLoadFromFileActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
