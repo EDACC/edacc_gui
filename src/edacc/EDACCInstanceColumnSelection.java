@@ -25,8 +25,12 @@ public class EDACCInstanceColumnSelection extends javax.swing.JDialog {
     private TableColumnSelector selector;
     private JCheckBox[] checkboxes;
 
-    /** Creates new form EDACCResultsBrowserColumnSelection */
     public EDACCInstanceColumnSelection(java.awt.Frame parent, boolean modal, TableColumnSelector selector) {
+        this(parent, modal, selector, InstanceTableModel.COL_PROP);
+    }
+    
+    /** Creates new form EDACCResultsBrowserColumnSelection */
+    public EDACCInstanceColumnSelection(java.awt.Frame parent, boolean modal, TableColumnSelector selector, int COL_PROP) {
         super(parent, modal);
         this.selector = selector;
         initComponents();
@@ -61,7 +65,6 @@ public class EDACCInstanceColumnSelection extends javax.swing.JDialog {
         instancePropertyColumnsConstraints.gridwidth = 1;
         instancePropertyColumnsConstraints.anchor = GridBagConstraints.WEST;
 
-        int COL_PROP = InstanceTableModel.COL_PROP;
         boolean isCompetitionDB;
         try {
             isCompetitionDB = DatabaseConnector.getInstance().isCompetitionDB();

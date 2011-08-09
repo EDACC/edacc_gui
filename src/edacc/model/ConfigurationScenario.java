@@ -8,7 +8,8 @@ public class ConfigurationScenario extends BaseModel implements IntegerPKModel {
     private int idExperiment;
     private int idSolverBinary;
     private ArrayList<ConfigurationScenarioParameter> parameters;
-
+    private Course course;
+    
     public ConfigurationScenario() {
         parameters = new ArrayList<ConfigurationScenarioParameter>();
     }
@@ -40,6 +41,17 @@ public class ConfigurationScenario extends BaseModel implements IntegerPKModel {
 
     public int getIdSolverBinary() {
         return idSolverBinary;
+    }
+    
+    protected void setCourse(Course course) {
+        if (this.course != null) {
+            throw new IllegalArgumentException("Configuration Scenario already has a course.");
+        }
+        this.course = course;
+    }
+    
+    public Course getCourse() {
+        return course;
     }
 
     public void setIdSolverBinary(int idSolverBinary) {

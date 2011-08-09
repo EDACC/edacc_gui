@@ -251,6 +251,14 @@ public class InstanceTableModel extends ThreadSafeDefaultTableModel {
 
     @Override
     public Class getColumnClass(int col) {
+        switch (col) {
+            case COL_NAME:
+                return String.class;
+            case COL_BENCHTYPE:
+                return String.class;
+            case COL_SELECTED:
+                return Boolean.class;
+        }
         if (this.getRowCount() == 0) {
             return String.class;
         } else {
@@ -262,7 +270,7 @@ public class InstanceTableModel extends ThreadSafeDefaultTableModel {
                     return String.class;
                 }
             }
-            return getValueAt(0, col).getClass();
+            return String.class;
         }
     }
 

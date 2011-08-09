@@ -551,7 +551,7 @@ public class ExperimentController {
      * referenced by this.rnd
      * @return integer between 0 and max inclusively
      */
-    private int generateSeed(int max) {
+    public int generateSeed(int max) {
         return rnd.nextInt(max + 1);
     }
 

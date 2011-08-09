@@ -799,6 +799,7 @@ CREATE  TABLE IF NOT EXISTS `ConfigurationScenario` (
   `idConfigurationScenario` INT NOT NULL AUTO_INCREMENT ,
   `SolverBinaries_idSolverBinary` INT NOT NULL ,
   `Experiment_idExperiment` INT NOT NULL ,
+  `initial_course_length` INT NULL ,
   PRIMARY KEY (`idConfigurationScenario`) ,
   INDEX `fk_ConfigurationScenario_SolverBinaries1` (`SolverBinaries_idSolverBinary` ASC) ,
   INDEX `fk_ConfigurationScenario_Experiment1` (`Experiment_idExperiment` ASC) ,
@@ -836,6 +837,31 @@ CREATE  TABLE IF NOT EXISTS `ConfigurationScenario_has_Parameters` (
   CONSTRAINT `fk_ConfigurationScenario_has_Parameters_Parameters1`
     FOREIGN KEY (`Parameters_idParameter` )
     REFERENCES `Parameters` (`idParameter` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `Course`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Course` ;
+
+CREATE  TABLE IF NOT EXISTS `Course` (
+  `ConfigurationScenario_idConfigurationScenario` INT NOT NULL ,
+  `Instances_idInstance` INT NOT NULL ,
+  `seed` INT NOT NULL ,
+  `order` INT NOT NULL ,
+  INDEX `fk_Course_ConfigurationScenario1` (`ConfigurationScenario_idConfigurationScenario` ASC) ,
+  INDEX `fk_Course_Instances1` (`Instances_idInstance` ASC) ,
+  PRIMARY KEY (`order`, `ConfigurationScenario_idConfigurationScenario`) ,
+  CONSTRAINT `fk_Course_ConfigurationScenario1`
+    FOREIGN KEY (`ConfigurationScenario_idConfigurationScenario` )
+    REFERENCES `ConfigurationScenario` (`idConfigurationScenario` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Course_Instances1`
+    FOREIGN KEY (`Instances_idInstance` )
+    REFERENCES `Instances` (`idInstance` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;

@@ -34,8 +34,10 @@ import edacc.model.ConfigurationScenarioParameter;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentResult;
+import edacc.model.Instance;
 import edacc.model.StatusCode;
 import edacc.model.InstanceClassMustBeSourceException;
+import edacc.model.InstanceSeed;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.ObjectCache;
 import edacc.model.Parameter;
@@ -76,8 +78,6 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -361,7 +361,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jTreeInstanceClass.setRootVisible(false);
         jTreeInstanceClass.setShowsRootHandles(true);
         instanceColumnSelector = new TableColumnSelector(tableInstances);
-        
+
         jTreeInstanceClass.setCellRenderer(new DefaultTreeCellRenderer() {
 
             @Override
@@ -370,9 +370,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 this.setLeafIcon(this.getDefaultOpenIcon());
                 return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             }
-            
         });
-        
+
         Util.addSpaceSelection(tableInstances, InstanceTableModel.COL_SELECTED);
         /* -------------------------------- end of instances tab -------------------------------- */
         /* -------------------------------- generate jobs tab -------------------------------- */
@@ -683,7 +682,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnImport = new javax.swing.JButton();
         panelClientBrowser = new javax.swing.JPanel();
         jScrollPane7 = new javax.swing.JScrollPane();
-        tblClients = new JTableTooltipInformation();
+        tblClients = tblClients = new JTableTooltipInformation();
         panelConfigurationScenario = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -695,6 +694,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnConfigScenarioSave = new javax.swing.JButton();
         btnConfigScenarioUndo = new javax.swing.JButton();
         btnConfigurationScenarioRandomSolverConfigs = new javax.swing.JButton();
+        btnDefineCourse = new javax.swing.JButton();
         panelChooseSolver = new javax.swing.JPanel();
         splitPaneSolverSolverConfigs = new javax.swing.JSplitPane();
         jPanel2 = new javax.swing.JPanel();
@@ -1119,6 +1119,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         });
 
+        btnDefineCourse.setText(resourceMap.getString("btnDefineCourse.text")); // NOI18N
+        btnDefineCourse.setName("btnDefineCourse"); // NOI18N
+        btnDefineCourse.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDefineCourseActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelConfigurationScenarioLayout = new javax.swing.GroupLayout(panelConfigurationScenario);
         panelConfigurationScenario.setLayout(panelConfigurationScenarioLayout);
         panelConfigurationScenarioLayout.setHorizontalGroup(
@@ -1137,7 +1145,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                             .addComponent(comboConfigScenarioSolverBinaries, 0, 1019, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelConfigurationScenarioLayout.createSequentialGroup()
                         .addComponent(btnConfigurationScenarioRandomSolverConfigs)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 793, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnDefineCourse)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 610, Short.MAX_VALUE)
                         .addComponent(btnConfigScenarioUndo)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnConfigScenarioSave)))
@@ -1160,7 +1170,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addGroup(panelConfigurationScenarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnConfigScenarioSave)
                     .addComponent(btnConfigScenarioUndo)
-                    .addComponent(btnConfigurationScenarioRandomSolverConfigs))
+                    .addComponent(btnConfigurationScenarioRandomSolverConfigs)
+                    .addComponent(btnDefineCourse))
                 .addContainerGap())
         );
 
@@ -2055,6 +2066,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     clientUpdateThread.execute();
                 }
                 break;
+            case TAB_CONFIGURATIONSCENARIO:
+                String text = "Define Instance, Seed-Course";
+                if (expController.getConfigScenario() != null && expController.getConfigScenario().getCourse() != null && expController.getConfigScenario().getCourse().getInitialLength() != 0) {
+                    text = "Show Instance, Seed-Course";
+                }
+                btnDefineCourse.setText(text);
             case TAB_SOLVERS:
                 splitPaneSolverSolverConfigs.setDividerLocation(0.5);
                 splitPaneSolver.setDividerLocation(0.5);
@@ -2194,7 +2211,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                         public void run() {
                             if (!Tasks.isTaskRunning()) {
                                 Tasks.startTask("loadJobs", expController, EDACCExperimentMode.this, false);
-                            } 
+                            }
                         }
                     }, 0, period * 1000);
                 } catch (NumberFormatException e) {
@@ -3080,6 +3097,58 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
     }//GEN-LAST:event_menuCollapseAllActionPerformed
 
+    private void btnDefineCourseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDefineCourseActionPerformed
+        if (expController.getConfigScenario() != null && expController.getConfigScenario().getCourse() != null && expController.getConfigScenario().getCourse().getInitialLength() != 0) {
+            ArrayList<InstanceSeed> list = new ArrayList<InstanceSeed>();
+            for (int i = 0; i < expController.getConfigScenario().getCourse().getLength(); i++) {
+                list.add(expController.getConfigScenario().getCourse().get(i));
+            }
+            EDACCCourse dialog = new EDACCCourse(EDACCApp.getApplication().getMainFrame(), true, list, false);
+            EDACCApp.getApplication().show(dialog);
+            return;
+        }
+
+        if (expController.getConfigScenario() == null || expController.configurationScenarioIsModified()) {
+            JOptionPane.showMessageDialog(this, "You have to save the configuration scenario before generating an (instance, seed) - course.", "Information", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        ArrayList<InstanceSeed> list = new ArrayList<InstanceSeed>();
+        ArrayList<Instance> instances;
+        try {
+            instances = expController.getInstances();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            // TODO: error
+            return;
+        }
+        
+        if (instances.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "You have to select instances in order to generate an (instance, seed) - course.", "Information", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        Random rand = new Random();
+        for (Instance i : instances) {
+            list.add(rand.nextInt(list.size() + 1), new InstanceSeed(i, expController.generateSeed(2147483646)));
+        }
+
+        EDACCCourse dialog = new EDACCCourse(EDACCApp.getApplication().getMainFrame(), true, list, true);
+        EDACCApp.getApplication().show(dialog);
+        if (!dialog.isCancelled()) {
+            expController.getConfigScenario().getCourse().clear();
+            for (InstanceSeed is : dialog.getInstanceSeedList()) {
+                expController.getConfigScenario().getCourse().add(is);
+            }
+            try {
+                expController.saveConfigurationScenario();
+                JOptionPane.showMessageDialog(this, "Generated.", "Information", JOptionPane.INFORMATION_MESSAGE);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Error while saving (instance, seed) - course: \n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnDefineCourseActionPerformed
+
     /**
      * Stops the jobs timer.
      */
@@ -3212,6 +3281,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JButton btnConfigScenarioUndo;
     private javax.swing.JButton btnConfigurationScenarioRandomSolverConfigs;
     private javax.swing.JButton btnCreateExperiment;
+    private javax.swing.JButton btnDefineCourse;
     private javax.swing.JButton btnDeselectAllInstances;
     private javax.swing.JButton btnDeselectAllSolverConfigs;
     private javax.swing.JButton btnDeselectAllSolvers;

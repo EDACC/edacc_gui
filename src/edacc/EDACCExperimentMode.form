@@ -448,7 +448,9 @@
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="btnConfigurationScenarioRandomSolverConfigs" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="793" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btnDefineCourse" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace pref="610" max="32767" attributes="0"/>
                               <Component id="btnConfigScenarioUndo" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnConfigScenarioSave" min="-2" max="-2" attributes="0"/>
@@ -478,6 +480,7 @@
                           <Component id="btnConfigScenarioSave" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnConfigScenarioUndo" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnConfigurationScenarioRandomSolverConfigs" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnDefineCourse" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -609,6 +612,15 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConfigurationScenarioRandomSolverConfigsActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="btnDefineCourse">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="btnDefineCourse.text"/>
+                <Property name="name" type="java.lang.String" value="btnDefineCourse" noResource="true"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDefineCourseActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
