@@ -30,6 +30,15 @@ public class InstanceHasInstanceClassDAO {
      * @return new InstanceHasInstanceClass object
      */
     public static InstanceHasInstanceClass createInstanceHasInstance(Instance instance, InstanceClass instanceClass) throws SQLException {
+        String query = "SELECT * FROM " + table + " WHERE Instances_idInstance=? AND instanceClass_idinstanceClass=?;";
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        st.setInt(1, instance.getId());
+        st.setInt(2, instanceClass.getInstanceClassID());
+        ResultSet rs = st.executeQuery();
+        if(rs.next()){
+            return getInstanceHasInstanceClass(instanceClass, instance);
+        }
+        
         InstanceHasInstanceClass i = new InstanceHasInstanceClass(instance, instanceClass);
         i.setNew();
         save(i);
