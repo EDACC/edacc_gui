@@ -17,6 +17,7 @@ import edacc.model.InstanceClassDAO;
 import edacc.model.InstanceDAO;
 import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstanceDAO;
+import edacc.model.PropertyDAO;
 import edacc.model.SolverBinaries;
 import edacc.model.SolverDAO;
 import edacc.model.Tasks;
@@ -269,6 +270,7 @@ public class Util {
         SolverDAO.clearCache();
         ParameterInstanceDAO.clearCache();
         ParameterDAO.clearCache();
+        PropertyDAO.clearCache();
     }
 
     /* public static void sevenZipEncode(File input, File output) throws FileNotFoundException, Exception {

@@ -392,4 +392,8 @@ public class PropertyDAO {
             PropertyDAO.save(prop);
         }
     }
+
+    public static void clearCache() {
+        cache.clear();
+    }
 }
