@@ -749,13 +749,6 @@ CREATE  TABLE IF NOT EXISTS `SolverDownloads` (
   PRIMARY KEY (`idSolver`, `filesystemID`) )
 ENGINE = InnoDB;
 
-ALTER TABLE `Parameters` 
-  ADD CONSTRAINT `fk_Parameters_Solver`
-  FOREIGN KEY (`Solver_idSolver` )
-  REFERENCES `Solver` (`idSolver` )
-  ON DELETE CASCADE
-  ON UPDATE CASCADE;
-  
 -- -----------------------------------------------------
 
 -- Table `EDACC`.`ParameterGraph`
