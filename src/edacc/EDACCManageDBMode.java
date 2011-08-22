@@ -1818,11 +1818,13 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 selectedRowsInstance[i] = tableInstances.convertRowIndexToModel(selectedRowsInstance[i]);
             }
             manageDBInstances.addInstancesToClass(selectedRowsInstance);
-            unsavedChanges = true;
+            tableInstances.clearSelection();
+            instanceTableModel.fireTableDataChanged();
             tableInstances.requestFocus();
             if (instanceTableModel.getRowCount() != 0) {
                 tableInstances.addRowSelectionInterval(0, 0);
             }
+            
         } catch (IOException ex) {
             Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
         }

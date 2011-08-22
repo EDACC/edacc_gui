@@ -945,6 +945,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     }
 
     public void disablePropertyEditFields() {
+        clearPropertyEditField();
         this.textPropertyFieldName.setEnabled(false);
         this.textAreaPropertyDescription.setEnabled(false);
         this.comboBoxComputationMethod.setEnabled(false);

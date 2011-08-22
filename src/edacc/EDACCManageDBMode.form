@@ -137,7 +137,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="767" max="32767" attributes="0"/>
+              <Component id="manageDBPane" pref="480" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -186,7 +186,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jPanel3" alignment="1" max="32767" attributes="0"/>
-                          <Component id="jSplitPane2" alignment="1" pref="742" max="32767" attributes="0"/>
+                          <Component id="jSplitPane2" alignment="1" pref="702" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -699,7 +699,7 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="1" attributes="0">
                                       <Component id="jPanel1" alignment="0" max="32767" attributes="1"/>
-                                      <Component id="jScrollPane2" alignment="0" pref="424" max="32767" attributes="2"/>
+                                      <Component id="jScrollPane2" alignment="0" pref="356" max="32767" attributes="2"/>
                                       <Component id="panelSolverButtons" alignment="1" max="32767" attributes="2"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -780,10 +780,10 @@
                                                       <Component id="btnSolverAddBinary" min="-2" pref="72" max="-2" attributes="2"/>
                                                       <EmptySpace max="-2" attributes="0"/>
                                                       <Component id="btnSolverEditBinary" min="-2" pref="77" max="-2" attributes="0"/>
-                                                      <EmptySpace pref="74" max="32767" attributes="0"/>
+                                                      <EmptySpace max="32767" attributes="0"/>
                                                       <Component id="btnSolverDeleteBinary" min="-2" pref="76" max="-2" attributes="0"/>
                                                   </Group>
-                                                  <Component id="jScrollPane4" alignment="0" pref="305" max="32767" attributes="1"/>
+                                                  <Component id="jScrollPane4" alignment="0" pref="237" max="32767" attributes="1"/>
                                               </Group>
                                           </Group>
                                           <Group type="102" alignment="1" attributes="0">
@@ -808,14 +808,14 @@
                                                   <Component id="jlSolverAuthors" alignment="0" min="-2" max="-2" attributes="0"/>
                                               </Group>
                                               <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="tfSolverAuthors" pref="305" max="32767" attributes="1"/>
-                                                  <Component id="jScrollPane3" pref="305" max="32767" attributes="2"/>
-                                                  <Component id="tfSolverName" alignment="0" pref="305" max="32767" attributes="2"/>
+                                                  <Component id="tfSolverAuthors" pref="237" max="32767" attributes="1"/>
+                                                  <Component id="jScrollPane3" pref="237" max="32767" attributes="2"/>
+                                                  <Component id="tfSolverName" alignment="0" pref="237" max="32767" attributes="2"/>
                                                   <Group type="102" alignment="0" attributes="0">
                                                       <EmptySpace max="-2" attributes="0"/>
                                                       <Group type="103" groupAlignment="0" attributes="0">
                                                           <Component id="btnSolverAddCode" alignment="0" min="-2" max="-2" attributes="0"/>
-                                                          <Component id="tfSolverVersion" alignment="0" pref="305" max="32767" attributes="0"/>
+                                                          <Component id="tfSolverVersion" alignment="0" pref="237" max="32767" attributes="0"/>
                                                       </Group>
                                                   </Group>
                                               </Group>
@@ -1042,7 +1042,7 @@
                                       <Component id="btnSolverNew" linkSize="1" min="-2" pref="81" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnSolverDelete" linkSize="1" min="-2" pref="81" max="-2" attributes="0"/>
-                                      <EmptySpace pref="246" max="32767" attributes="0"/>
+                                      <EmptySpace pref="178" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                             </DimensionLayout>
@@ -1112,7 +1112,7 @@
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnSolverRefresh" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="429" max="32767" attributes="0"/>
+                          <EmptySpace pref="389" max="32767" attributes="0"/>
                           <Component id="btnSolverExport" min="-2" pref="79" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="btnSolverSaveToDB" min="-2" max="-2" attributes="0"/>
