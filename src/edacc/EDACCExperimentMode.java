@@ -277,6 +277,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         clientUpdateThread = new ClientUpdateThread(clientTableModel);
         /* -------------------------------- end of client browser tab -------------------------------- */
         /* -------------------------------- configuration scenario tab -------------------------------- */
+        Util.addSpaceSelection(tblConfigurationScenario, configScenarioTableModel.COL_SELECTED);
         configScenarioTableModel = new ConfigurationScenarioTableModel();
         tblConfigurationScenario.setModel(configScenarioTableModel);
         TableCellRenderer configurationScenarioTableCellRenderer = new TableCellRenderer() {
@@ -3410,7 +3411,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Override
     public void onTaskFailed(String methodName, Throwable e) {
-        e.printStackTrace();
         if (e instanceof TaskCancelledException) {
             javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         } else if (e instanceof SQLException) {
