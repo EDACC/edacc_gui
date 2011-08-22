@@ -1,5 +1,6 @@
 package edacc.experiment;
 
+import com.mysql.jdbc.exceptions.MySQLStatementCancelledException;
 import edacc.model.SolverConfigCache;
 import edacc.EDACCExperimentMode;
 import edacc.EDACCSolverConfigEntry;
@@ -169,7 +170,7 @@ public class ExperimentController {
      * @throws SQLException
      * @throws Exception 
      */
-    public void loadExperiment(Experiment exp, Tasks task) throws SQLException, Exception {
+    public void loadExperiment(Experiment exp, final Tasks task) throws SQLException, Exception {
         main.reinitializeSolvers();
         activeExperiment = exp;
         ArrayList<Solver> vs = new ArrayList<Solver>();
@@ -223,8 +224,36 @@ public class ExperimentController {
         task.setTaskProgress(.75f);
         task.setStatus("Loading experiment results..");
         experimentResultCache = new ExperimentResultCache(activeExperiment);
-        experimentResultCache.updateExperimentResults();
 
+        PropertyChangeListener cancelExperimentResultDAOStatementListener = null;
+        if (Tasks.getTaskView() != null) {
+            Tasks.getTaskView().setCancelable(true);
+            cancelExperimentResultDAOStatementListener = new PropertyChangeListener() {
+
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if ("state".equals(evt.getPropertyName()) && task.isCancelled()) {
+                        try {
+                            ExperimentResultDAO.cancelStatement();
+                        } catch (SQLException ex) {
+                        }
+                    }
+                }
+            };
+            task.addPropertyChangeListener(cancelExperimentResultDAOStatementListener);
+        }
+        try {
+            experimentResultCache.updateExperimentResults();
+        } catch (MySQLStatementCancelledException ex) {
+            throw new TaskCancelledException();
+        } finally {
+            if (Tasks.getTaskView() != null) {
+                Tasks.getTaskView().setCancelable(false);
+            }
+            if (cancelExperimentResultDAOStatementListener != null) {
+                task.removePropertyChangeListener(cancelExperimentResultDAOStatementListener);
+            }
+        }
         main.generateJobsTableModel.updateNumRuns();
 
         SwingUtilities.invokeLater(new Runnable() {
@@ -657,7 +686,7 @@ public class ExperimentController {
                     ExperimentResultDAO.batchUpdateRun(updateJobs);
                 } catch (Exception ex) {
                     DatabaseConnector.getInstance().getConn().rollback();
-                    if (ex.getMessage() != null && ex.getMessage().contains("cancelled")) {
+                    if (ex instanceof MySQLStatementCancelledException) {
                         throw new TaskCancelledException();
                     }
                     if (ex instanceof SQLException) {

@@ -2210,8 +2210,20 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
                         @Override
                         public void run() {
+                            expController.loadJobs();
                             if (!Tasks.isTaskRunning()) {
-                                Tasks.startTask("loadJobs", expController, EDACCExperimentMode.this, false);
+                                Tasks.startTask(new TaskRunnable() {
+
+                                    @Override
+                                    public void run(Tasks task) {
+                                        try {
+                                            expController.loadJobs();
+                                            EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
+                                        } catch (Throwable ex) {
+                                            EDACCExperimentMode.this.onTaskFailed("loadJobs", ex);
+                                        }
+                                    }
+                                }, false);
                             }
                         }
                     }, 0, period * 1000);
@@ -3124,12 +3136,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             // TODO: error
             return;
         }
-        
+
         if (instances.isEmpty()) {
             JOptionPane.showMessageDialog(this, "You have to select instances in order to generate an (instance, seed) - course.", "Information", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        
+
         Random rand = new Random();
         for (Instance i : instances) {
             list.add(rand.nextInt(list.size() + 1), new InstanceSeed(i, expController.generateSeed(2147483646)));

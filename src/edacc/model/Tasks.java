@@ -112,7 +112,7 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
     }
 
     public static void startTask(TaskRunnable runnable, boolean withTaskView) {
-        startTask(runnable, true, EDACCApp.getApplication().getMainFrame());
+        startTask(runnable, withTaskView, EDACCApp.getApplication().getMainFrame());
     }
 
     /**
