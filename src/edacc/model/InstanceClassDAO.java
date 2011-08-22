@@ -420,7 +420,9 @@ public class InstanceClassDAO {
      */
     private static void addToTmpTreeBranch(InstanceClass i, InstanceClass parent) {
         if (parent == null) {
-            tmpTreeBranch = new DefaultMutableTreeNode(null);
+            if(tmpTreeBranch.getDepth() == 0){
+                tmpTreeBranch = new DefaultMutableTreeNode(null);
+            }
             tmpTreeBranch.add(new DefaultMutableTreeNode(i));
         } else if (tmpTreeBranch.isLeaf()) {
             tmpTreeBranch = new DefaultMutableTreeNode(parent);
@@ -449,8 +451,9 @@ public class InstanceClassDAO {
 
     public static void addTmpTreeBranchToTreeCache() {
         if (((DefaultMutableTreeNode) tmpTreeBranch.getRoot()).getUserObject() == null) {
-            for (int i = 0; i < tmpTreeBranch.getChildCount(); i++) {
-                DefaultMutableTreeNode tmp = (DefaultMutableTreeNode) tmpTreeBranch.getChildAt(i);
+            int j = tmpTreeBranch.getChildCount();
+            for (int i = 0; i < j; i++) {
+                DefaultMutableTreeNode tmp = (DefaultMutableTreeNode) tmpTreeBranch.getFirstChild();
                 treeCache.add(tmp);
             }
         } else {

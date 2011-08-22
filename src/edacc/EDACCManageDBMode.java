@@ -1499,22 +1499,19 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     Tasks.startTask("addInstances", new Class[]{edacc.model.InstanceClass.class, java.io.File.class, edacc.model.Tasks.class, String.class, Boolean.class, Boolean.class}, new Object[]{input, ret, null, fileExtension, compress, autoClass}, manageDBInstances, EDACCManageDBMode.this);
                 }
+                
             }
-            input = null;
-            unsavedChanges = true;
-
+                        input = null;
         } catch (NoConnectionToDBException ex) {
             Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
         }
-        jTreeInstanceClass.clearSelection();
-        tableInstances.clearSelection();
-        this.instanceClassTreeModel.reload();
-        this.instanceTableModel.fireTableDataChanged();
+
 
     }//GEN-LAST:event_btnAddInstancesActionPerformed
 
+    
     private void btnRemoveInstancesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveInstancesActionPerformed
         if (tableInstances.getSelectedRows().length == 0) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
@@ -1924,22 +1921,18 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
         if (instanceGenKCNF == null) {
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            this.instanceGenKCNF = new EDACCInstanceGeneratorUnifKCNF(mainFrame, true);
+            this.instanceGenKCNF = new EDACCInstanceGeneratorUnifKCNF(mainFrame, true, manageDBInstances);
             this.instanceGenKCNF.setLocationRelativeTo(mainFrame);
         }
         EDACCApp.getApplication().show(this.instanceGenKCNF);
-        try {
-            manageDBInstances.loadInstanceClasses();
-            jTreeInstanceClass.updateUI();
+
+          
             //try {
             /* } catch (NoConnectionToDBException ex) {
             Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
             Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
             }*/
-        } catch (SQLException ex) {
-            Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
-        }
 
         //try {
 
@@ -2466,8 +2459,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
     public void onTaskSuccessful(String methodName, Object result) {
         if (methodName.equals("addInstances")) {
-            this.instanceTableModel.fireTableDataChanged();
+            jTreeInstanceClass.clearSelection();
+            tableInstances.clearSelection();
             this.instanceClassTreeModel.reload();
+            this.instanceTableModel.fireTableDataChanged();
+            unsavedChanges = true;
         } else if (methodName.equals("exportInstancnes")) {
         } else if (methodName.equals("TryToRemoveInstances")) {
             this.instanceTableModel.fireTableDataChanged();

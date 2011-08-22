@@ -30,7 +30,6 @@ public class instanceGeneratorUnifKCNFController {
     public synchronized void generate(int k, double r, int n, boolean series, int step, int stop, int num, boolean genClass, InstanceClass parent, final Tasks task) throws SQLException, InstanceClassAlreadyInDBException, TaskCancelledException {
         Tasks.getTaskView().setCancelable(true);
         unifRandomKSAT instance;
-        InstanceDAO instanceController = new InstanceDAO();
         InstanceClass ic;
         //parent classe braucht man noch
         String className = "";
@@ -69,7 +68,7 @@ public class instanceGeneratorUnifKCNFController {
                 count++;
                 //add instance to the specified class
                 try {
-                    instanceController.createInstance(instance.suggestedFN(), instance.toDIMACS(), ic);
+                    InstanceDAO.createInstance(instance.suggestedFN(), instance.toDIMACS(), ic);
                 } catch (Exception ex) {
                     Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
                 }

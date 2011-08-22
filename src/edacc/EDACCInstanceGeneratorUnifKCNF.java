@@ -11,6 +11,7 @@
 package edacc;
 
 import edacc.events.TaskEvents;
+import edacc.manageDB.ManageDBInstances;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceClassAlreadyInDBException;
 import edacc.model.InstanceClassDAO;
@@ -18,6 +19,7 @@ import edacc.model.NoConnectionToDBException;
 import edacc.model.Tasks;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import edacc.model.instanceGeneratorUnifKCNFController;
 import java.sql.SQLException;
@@ -33,9 +35,28 @@ import javax.swing.tree.DefaultTreeModel;
 public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog implements TaskEvents{
 
     private InstanceClass parentClass;
+    private ManageDBInstances manageDBInstances;
 
     /** Creates new form EDACCInstanceGeneratorUnifKCNF */
-    public EDACCInstanceGeneratorUnifKCNF(java.awt.Frame parent, boolean modal) {
+    public EDACCInstanceGeneratorUnifKCNF(java.awt.Frame parent, boolean modal, ManageDBInstances manageDBInstances) {
+
+        super(parent, modal);
+        this.manageDBInstances = manageDBInstances;
+        this.setTitle("Genrate uniform random k-SAT Formulas");
+        this.setResizable(false);
+        initComponents();
+        this.cbSeries.setSelected(false);
+        this.jLabel2.setEnabled(false);
+        this.tfVStep.setEnabled(false);
+        this.jLabel3.setEnabled(false);
+        this.tfVStop.setEnabled(false);
+        this.tfNV.setText("1");
+        this.lbParentClass.setText("");
+
+        //Nur zahlen möglich und nur positive
+    }
+    
+      public EDACCInstanceGeneratorUnifKCNF(java.awt.Frame parent, boolean modal) {
 
         super(parent, modal);
         this.setTitle("Genrate uniform random k-SAT Formulas");
@@ -49,10 +70,9 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog implemen
         this.tfNV.setText("1");
         this.lbParentClass.setText("");
 
-
-
         //Nur zahlen möglich und nur positive
     }
+
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -381,7 +401,7 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog implemen
                     //call Controller to generate and add instances
 
                     Tasks.startTask("generate", new Class[]{int.class, double.class, int.class, boolean.class, int.class, int.class, int.class, boolean.class, InstanceClass.class, edacc.model.Tasks.class}, new Object[]{k, r, n, series, step, stop, num, genClass, this.parentClass, null}, controller, EDACCInstanceGeneratorUnifKCNF.this);
-                                        
+                    
                     this.setVisible(false);
                 } catch (ParseException ex) {
                     Logger.getLogger(EDACCInstanceGeneratorUnifKCNF.class.getName()).log(Level.SEVERE, null, ex);
@@ -548,7 +568,10 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog implemen
 
     @Override
     public void onTaskSuccessful(String methodName, Object result) {
-        
+        if(methodName.equals("generate")){
+            manageDBInstances.UpdateInstanceClasses();
+            manageDBInstances.loadInstances();    
+        }
     }
 
     @Override
