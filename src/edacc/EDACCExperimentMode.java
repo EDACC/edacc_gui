@@ -672,7 +672,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         manageExperimentPane = new javax.swing.JTabbedPane();
         panelManageExperiment = new javax.swing.JPanel();
         scrollPaneExperimentsTable = new javax.swing.JScrollPane();
-        tableExperiments = tableExperiments = new JTableTooltipInformation();
+        tableExperiments = new JTableTooltipInformation();
         jPanel7 = new javax.swing.JPanel();
         btnDiscardExperiment = new javax.swing.JButton();
         btnRemoveExperiment = new javax.swing.JButton();
@@ -682,7 +682,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnImport = new javax.swing.JButton();
         panelClientBrowser = new javax.swing.JPanel();
         jScrollPane7 = new javax.swing.JScrollPane();
-        tblClients = tblClients = new JTableTooltipInformation();
+        tblClients = new JTableTooltipInformation();
         panelConfigurationScenario = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -690,7 +690,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         comboConfigScenarioSolvers = new javax.swing.JComboBox();
         jPanel10 = new javax.swing.JPanel();
         jScrollPane9 = new javax.swing.JScrollPane();
-        tblConfigurationScenario = tblConfigurationScenario = new JTableTooltipInformation();
+        tblConfigurationScenario = new JTableTooltipInformation();
         btnConfigScenarioSave = new javax.swing.JButton();
         btnConfigScenarioUndo = new javax.swing.JButton();
         btnConfigurationScenarioRandomSolverConfigs = new javax.swing.JButton();
@@ -701,14 +701,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         splitPaneSolver = new javax.swing.JSplitPane();
         jPanel8 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        tableSolvers = tableSolvers = new JTableTooltipInformation();
+        tableSolvers = new JTableTooltipInformation();
         btnSelectAllSolvers = new javax.swing.JButton();
         btnDeselectAllSolvers = new javax.swing.JButton();
         btnReverseSolverSelection = new javax.swing.JButton();
         btnChooseSolvers = new javax.swing.JButton();
         jPanel9 = new javax.swing.JPanel();
         jScrollPane8 = new javax.swing.JScrollPane();
-        tblSolverConfigs = tblSolverConfigs = new JTableTooltipInformation();
+        tblSolverConfigs = new JTableTooltipInformation();
         btnChooseSolverConfigs = new javax.swing.JButton();
         btnSelectAllSolverConfigs = new javax.swing.JButton();
         btnDeselectAllSolverConfigs = new javax.swing.JButton();
@@ -725,7 +725,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jTreeInstanceClass = new javax.swing.JTree();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tableInstances = tableInstances = new JTableTooltipInformation();
+        tableInstances = new JTableTooltipInformation();
         jPanel5 = new javax.swing.JPanel();
         btnSaveInstances = new javax.swing.JButton();
         btnFilterInstances = new javax.swing.JButton();
@@ -748,7 +748,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnSetNumRuns = new javax.swing.JButton();
         panelJobBrowser = new javax.swing.JPanel();
         jScrollPane6 = new javax.swing.JScrollPane();
-        tableJobs = tableJobs = new JTableTooltipInformation() {
+        tableJobs = new JTableTooltipInformation() {
 
             @Override
             protected void processMouseEvent(MouseEvent e) {
@@ -3104,6 +3104,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 list.add(expController.getConfigScenario().getCourse().get(i));
             }
             EDACCCourse dialog = new EDACCCourse(EDACCApp.getApplication().getMainFrame(), true, list, false);
+            dialog.setName("EDACCCourse");
             EDACCApp.getApplication().show(dialog);
             return;
         }
@@ -3134,6 +3135,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
 
         EDACCCourse dialog = new EDACCCourse(EDACCApp.getApplication().getMainFrame(), true, list, true);
+        dialog.setName("EDACCCourse");
         EDACCApp.getApplication().show(dialog);
         if (!dialog.isCancelled()) {
             expController.getConfigScenario().getCourse().clear();
@@ -3408,6 +3410,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Override
     public void onTaskFailed(String methodName, Throwable e) {
+        e.printStackTrace();
         if (e instanceof TaskCancelledException) {
             javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         } else if (e instanceof SQLException) {

@@ -824,8 +824,12 @@ public class ExperimentController {
 
                         @Override
                         public void run() {
-                            for (Integer i : changedRows) {
-                                main.jobsTableModel.fireTableRowsUpdated(i, i);
+                            if (changedRows.size() > 1000) {
+                                main.jobsTableModel.fireTableDataChanged();
+                            } else {
+                                for (Integer i : changedRows) {
+                                    main.jobsTableModel.fireTableRowsUpdated(i, i);
+                                }
                             }
                         }
                     });

@@ -212,7 +212,7 @@
                     <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tableExperimentsKeyReleased"/>
                   </Events>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="tableExperiments = new JTableTooltipInformation();"/>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTableTooltipInformation()"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -409,7 +409,7 @@
                     <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tblClientsMouseClicked"/>
                   </Events>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="tblClients = new JTableTooltipInformation();"/>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTableTooltipInformation()"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -580,7 +580,7 @@
                         <Property name="name" type="java.lang.String" value="tblConfigurationScenario" noResource="true"/>
                       </Properties>
                       <AuxValues>
-                        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="tblConfigurationScenario = new JTableTooltipInformation();"/>
+                        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTableTooltipInformation()"/>
                       </AuxValues>
                     </Component>
                   </SubComponents>
@@ -794,7 +794,7 @@
                                     <Property name="name" type="java.lang.String" value="tableSolvers" noResource="true"/>
                                   </Properties>
                                   <AuxValues>
-                                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="tableSolvers = new JTableTooltipInformation();"/>
+                                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTableTooltipInformation()"/>
                                   </AuxValues>
                                 </Component>
                               </SubComponents>
@@ -929,7 +929,7 @@
                                     <Property name="name" type="java.lang.String" value="tblSolverConfigs" noResource="true"/>
                                   </Properties>
                                   <AuxValues>
-                                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="tblSolverConfigs = new JTableTooltipInformation();"/>
+                                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTableTooltipInformation()"/>
                                   </AuxValues>
                                 </Component>
                               </SubComponents>
@@ -1220,7 +1220,7 @@
                             <Property name="name" type="java.lang.String" value="tableInstances" noResource="true"/>
                           </Properties>
                           <AuxValues>
-                            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="tableInstances = new JTableTooltipInformation();"/>
+                            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTableTooltipInformation()"/>
                             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
                           </AuxValues>
                         </Component>
@@ -1719,7 +1719,7 @@
                     <Property name="name" type="java.lang.String" value="tableJobs" noResource="true"/>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="tableJobs = new JTableTooltipInformation() {&#xa;&#xa;    @Override&#xa;    protected void processMouseEvent(MouseEvent e) {&#xa;        super.processMouseEvent(e);&#xa;        tableJobsProcessMouseEvent(e);&#xa;    }&#xa;&#xa;    @Override&#xa;    protected void processMouseMotionEvent(MouseEvent e) {&#xa;        super.processMouseMotionEvent(e);&#xa;        tableJobsProcessMouseMotionEvent(e);&#xa;    }&#xa;}"/>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTableTooltipInformation() {&#xa;&#xa;    @Override&#xa;    protected void processMouseEvent(MouseEvent e) {&#xa;        super.processMouseEvent(e);&#xa;        tableJobsProcessMouseEvent(e);&#xa;    }&#xa;&#xa;    @Override&#xa;    protected void processMouseMotionEvent(MouseEvent e) {&#xa;        super.processMouseMotionEvent(e);&#xa;        tableJobsProcessMouseMotionEvent(e);&#xa;    }&#xa;}"/>
                     <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
                   </AuxValues>
                 </Component>
