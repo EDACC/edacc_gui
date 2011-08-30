@@ -14,7 +14,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import javax.swing.border.TitledBorder;
+import javax.swing.JLabel;
 
 /**
  *
@@ -38,7 +38,9 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
         layout = new GridBagLayout();
         this.setLayout(layout);
         this.solver = solver;
-        ((TitledBorder) this.getBorder()).setTitle(solver.toString());
+        JLabel title = new JLabel(solver.toString());
+        this.add(title); 
+       // ((TitledBorder) this.getBorder()).setTitle(solver.toString());
     }
 
     /** Creates new form EDACCSolverConfigPanelSolver */
@@ -48,7 +50,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
         this.parent = parent;
         EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solver, 1);
         entry.setParent(this);
-        this.add(entry, 0);
+        this.add(entry, 1);
         parent.getSolTableModel().setSolverSelected(solver.getId(), true);
         setGridBagConstraints();
         doRepaint();
@@ -119,7 +121,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
      * @throws SQLException
      */
     public void replicateEntry(EDACCSolverConfigEntry entry) throws SQLException {
-        EDACCSolverConfigEntry repl = new EDACCSolverConfigEntry(SolverDAO.getById(entry.getSolverId()), this.getComponentCount() + 1);
+        EDACCSolverConfigEntry repl = new EDACCSolverConfigEntry(SolverDAO.getById(entry.getSolverId()), this.getComponentCount());
         repl.setParent(this);
         repl.assign(entry);
         int pos = 0;
@@ -162,6 +164,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
         // we will deselect the solver in the solvers table
         boolean lastSolver = true;
         for (Component c : this.getComponents()) {
+            if (!(c instanceof EDACCSolverConfigEntry)) continue;
             if (((EDACCSolverConfigEntry) c).getSolverId() == entry.getSolverId()) {
                 lastSolver = false;
                 break;
@@ -196,8 +199,12 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
             }
         }
         int currentIndex = 0;
-        for (int i = 0; i < this.getComponents().length; i++) {
-            EDACCSolverConfigEntry entry = (EDACCSolverConfigEntry) this.getComponents()[i];
+        Component[] components = this.getComponents();
+        for (int i = 0; i < components.length; i++) {
+            if (!(components[i] instanceof EDACCSolverConfigEntry)) {
+                continue;
+            }
+            EDACCSolverConfigEntry entry = (EDACCSolverConfigEntry) components[i];
             for (int j = currentIndex; j < solverOrder.length; j++) {
                 if (entry.getSolverId() == solverOrder[j]) {
                     currentIndex = j;
@@ -208,7 +215,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
                 return i;
             }
         }
-        return this.getComponentCount();
+        return getComponentCount();
     }
 
     /**
@@ -260,24 +267,23 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         setName("Form"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 388, Short.MAX_VALUE)
+            .addGap(0, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 287, Short.MAX_VALUE)
+            .addGap(0, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     public void removeAll(boolean markAsDeleted) {
-        while (this.getComponents().length > 0) {
-            removeEntry((EDACCSolverConfigEntry) this.getComponent(0), markAsDeleted);
+        while (this.getComponents().length > 1) {
+            removeEntry((EDACCSolverConfigEntry) this.getComponent(1), markAsDeleted);
         }        
     }
     

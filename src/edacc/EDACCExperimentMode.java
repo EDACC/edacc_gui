@@ -306,7 +306,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         tblConfigurationScenario.setDefaultRenderer(Boolean.class, configurationScenarioTableCellRenderer);
         /* -------------------------------- end of configuration scenario tab -------------------------------- */
         /* -------------------------------- solver tab -------------------------------- */
-        jScrollPane4.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
+        //jScrollPane4.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
         solverConfigTablePanel = new EDACCExperimentModeSolverConfigurationTablePanel(solverConfigPanel);
         solTableModel = new SolverTableModel();
         tableSolvers.setModel(solTableModel);
