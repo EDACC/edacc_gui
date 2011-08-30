@@ -171,6 +171,7 @@ public class ExperimentController {
      * @throws Exception 
      */
     public void loadExperiment(Experiment exp, final Tasks task) throws SQLException, Exception {
+        unloadExperiment();
         main.reinitializeSolvers();
         activeExperiment = exp;
         ArrayList<Solver> vs = new ArrayList<Solver>();
