@@ -17,6 +17,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.lang.Integer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
@@ -61,11 +62,12 @@ public class EDACCFilter extends javax.swing.JDialog {
         }
         this.table = table;
         rowSorter = (TableRowSorter<? extends TableModel>) table.getRowSorter();
+        final RowFilter oldRowFilter = rowSorter.getRowFilter();
         rowFilter = new RowFilter<Object, Object>() {
 
             @Override
             public boolean include(Entry<? extends Object, ? extends Object> entry) {
-                return EDACCFilter.this.include(entry);
+                return (oldRowFilter == null || oldRowFilter.include(entry)) && EDACCFilter.this.include(entry);
             }
         };
         rowSorter.setRowFilter(rowFilter);
@@ -400,11 +402,11 @@ public class EDACCFilter extends javax.swing.JDialog {
             FilterInterface filter = null;
             if (filterType.clazz == Integer.class || filterType.clazz == Float.class || filterType.clazz == Double.class) {
                 filter = new NumberFilter(filterType.name);
-            } else if (filterType.clazz == String.class) {
-                filter = new StringFilter(filterType.name);
             } else if (filterType.clazz == Boolean.class) {
                 filter = new BooleanFilter(filterType.name);
-            }
+            } else if (filterType.clazz == String.class || Object.class.isAssignableFrom(filterType.clazz)) {
+                filter = new StringFilter(filterType.name);
+            } 
             if (filter == null) {
                 return;
             }

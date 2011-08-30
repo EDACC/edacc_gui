@@ -73,6 +73,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
         itemRemove = new javax.swing.JMenuItem();
         jScrollPane1 = new javax.swing.JScrollPane();
         table = table = new JTableTooltipInformation();
+        lblFilterStatus = new javax.swing.JLabel();
 
         popupMenu.setName("popupMenu"); // NOI18N
 
@@ -116,15 +117,22 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
         });
         jScrollPane1.setViewportView(table);
 
+        lblFilterStatus.setText(resourceMap.getString("lblFilterStatus.text")); // NOI18N
+        lblFilterStatus.setName("lblFilterStatus"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(lblFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(lblFilterStatus)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -233,8 +241,9 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
     private javax.swing.JMenuItem itemEdit;
     private javax.swing.JMenuItem itemRemove;
     private javax.swing.JScrollPane jScrollPane1;
+    protected javax.swing.JLabel lblFilterStatus;
     private javax.swing.JPopupMenu popupMenu;
-    private javax.swing.JTable table;
+    protected javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables
 
     private class TableModel extends DefaultTableModel {

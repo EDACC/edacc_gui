@@ -646,7 +646,9 @@
                           <Component id="splitPaneSolverSolverConfigs" alignment="0" pref="1096" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="btnImportSolverConfigs" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="632" max="32767" attributes="0"/>
+                              <EmptySpace pref="517" max="32767" attributes="0"/>
+                              <Component id="btnSolverTabFilterSolverConfigs" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnChangeView" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnUndoSolverConfigurations" min="-2" max="-2" attributes="0"/>
@@ -669,6 +671,7 @@
                           <Component id="btnUndoSolverConfigurations" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnChangeView" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnImportSolverConfigs" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnSolverTabFilterSolverConfigs" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -749,24 +752,29 @@
                                       <Component id="btnDeselectAllSolvers" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnReverseSolverSelection" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                                      <Component id="btnSolverTabFilterSolvers" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnChooseSolvers" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace pref="594" max="32767" attributes="0"/>
+                                      <EmptySpace pref="478" max="32767" attributes="0"/>
                                   </Group>
+                                  <Component id="lblSolverFilterStatus" alignment="0" pref="1052" max="32767" attributes="0"/>
                                   <Component id="jScrollPane3" alignment="0" pref="1052" max="32767" attributes="1"/>
                               </Group>
                             </DimensionLayout>
                             <DimensionLayout dim="1">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="1" attributes="0">
+                                      <Component id="lblSolverFilterStatus" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="jScrollPane3" pref="27" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane3" pref="32" max="32767" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="3" attributes="0">
                                           <Component id="btnSelectAllSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="btnDeselectAllSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="btnReverseSolverSelection" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="btnChooseSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="btnSolverTabFilterSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
@@ -783,6 +791,7 @@
                               <SubComponents>
                                 <Component class="javax.swing.JTable" name="tableSolvers">
                                   <Properties>
+                                    <Property name="autoCreateRowSorter" type="boolean" value="true"/>
                                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                                       <Table columnCount="4" rowCount="4">
                                         <Column editable="true" title="Title 1" type="java.lang.Object"/>
@@ -851,6 +860,33 @@
                                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnChooseSolversActionPerformed"/>
                               </Events>
                             </Component>
+                            <Component class="javax.swing.JButton" name="btnSolverTabFilterSolvers">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="btnSolverTabFilterSolvers.text"/>
+                                <Property name="name" type="java.lang.String" value="btnSolverTabFilterSolvers" noResource="true"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[110, 23]"/>
+                                </Property>
+                              </Properties>
+                              <Events>
+                                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverTabFilterSolversActionPerformed"/>
+                              </Events>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="lblSolverFilterStatus">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="lblSolverFilterStatus.text"/>
+                                <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[0, 0]"/>
+                                </Property>
+                                <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[0, 0]"/>
+                                </Property>
+                                <Property name="name" type="java.lang.String" value="lblSolverFilterStatus" noResource="true"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[0, 0]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
                           </SubComponents>
                         </Container>
                         <Container class="javax.swing.JPanel" name="jPanel9">
@@ -882,24 +918,29 @@
                                       <Component id="btnDeselectAllSolverConfigs" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnInvertSolverConfigSelection" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                                      <Component id="btnSolverTabFilterExistingSolverConfigs" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnChooseSolverConfigs" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace pref="594" max="32767" attributes="0"/>
+                                      <EmptySpace pref="478" max="32767" attributes="0"/>
                                   </Group>
                                   <Component id="jScrollPane8" alignment="0" pref="1052" max="32767" attributes="1"/>
+                                  <Component id="lblExistingSolverConfigFilterStatus" alignment="0" pref="1052" max="32767" attributes="0"/>
                               </Group>
                             </DimensionLayout>
                             <DimensionLayout dim="1">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="1" attributes="0">
+                                      <Component id="lblExistingSolverConfigFilterStatus" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="jScrollPane8" pref="306" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane8" pref="311" max="32767" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="3" attributes="0">
                                           <Component id="btnSelectAllSolverConfigs" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="btnDeselectAllSolverConfigs" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="btnInvertSolverConfigSelection" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="btnChooseSolverConfigs" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="btnSolverTabFilterExistingSolverConfigs" alignment="3" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
@@ -982,6 +1023,24 @@
                                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnInvertSolverConfigSelectionActionPerformed"/>
                               </Events>
                             </Component>
+                            <Component class="javax.swing.JButton" name="btnSolverTabFilterExistingSolverConfigs">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="btnSolverTabFilterExistingSolverConfigs.text"/>
+                                <Property name="name" type="java.lang.String" value="btnSolverTabFilterExistingSolverConfigs" noResource="true"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[110, 23]"/>
+                                </Property>
+                              </Properties>
+                              <Events>
+                                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverTabFilterExistingSolverConfigsActionPerformed"/>
+                              </Events>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="lblExistingSolverConfigFilterStatus">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="lblExistingSolverConfigFilterStatus.text"/>
+                                <Property name="name" type="java.lang.String" value="lblExistingSolverConfigFilterStatus" noResource="true"/>
+                              </Properties>
+                            </Component>
                           </SubComponents>
                         </Container>
                       </SubComponents>
@@ -1055,6 +1114,18 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnImportSolverConfigsActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="btnSolverTabFilterSolverConfigs">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="btnSolverTabFilterSolverConfigs.text"/>
+                <Property name="name" type="java.lang.String" value="btnSolverTabFilterSolverConfigs" noResource="true"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[109, 25]"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSolverTabFilterSolverConfigsActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
