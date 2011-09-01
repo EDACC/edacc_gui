@@ -135,6 +135,34 @@ public class ExperimentResultDAO {
         }
 
     }
+    
+    /*
+     * Updates the CPUTimeLimit property of given list of jobs
+     * @param v list of the jobs to update
+     * @throws SQLException
+     */
+    public static void batchUpdateCPUTimeLimit(List<ExperimentResult> v) throws SQLException {
+        boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
+        try {
+            DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+            final String query = "UPDATE " + table + " SET CPUTimeLimit=? WHERE idJob=?";
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+            curSt = st;
+            for (ExperimentResult r : v) {
+                st.setInt(1, r.getCPUTimeLimit());
+                st.setInt(2, r.getId());
+                st.addBatch();
+            }
+            st.executeBatch();
+            st.close();
+        } catch (SQLException e) {
+            DatabaseConnector.getInstance().getConn().rollback();
+            throw e;
+        } finally {
+            curSt = null;
+            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+        }
+    }
 
     /**
      * Updates the run property of the ExperimentResults at once (batch).
