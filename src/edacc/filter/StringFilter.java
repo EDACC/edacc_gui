@@ -12,7 +12,9 @@ import java.awt.event.KeyListener;
  * @author simon
  */
 public class StringFilter extends javax.swing.JPanel implements FilterInterface {
+
     private String regExp;
+
     /** Creates new form StringFilter */
     public StringFilter(String name) {
         initComponents();
@@ -71,15 +73,17 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
 
     @Override
     public boolean include(Object value) {
+        String val;
         if (value instanceof String) {
-            String val = (String) value;
-            try {
-                return val.matches(regExp);
-            } catch (Exception e) {
-                return false;
-            }
+            val = (String) value;
+        } else {
+            val = value.toString();
         }
-        return true;
+        try {
+            return val.matches(regExp);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public static boolean accept(Class<?> clazz) {
@@ -99,5 +103,4 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
     public void undo() {
         txtRegexp.setText(regExp);
     }
-
 }

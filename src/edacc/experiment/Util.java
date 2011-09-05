@@ -10,7 +10,6 @@ import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -297,22 +296,35 @@ public class Util {
      * @param column the column which has values of boolean class and is editable
      */
     public static void addSpaceSelection(final JTable table, final int column) {
+        table.putClientProperty("JTable.autoStartsEdit", Boolean.FALSE);
         table.addKeyListener(new KeyAdapter() {
 
             @Override
             public void keyReleased(KeyEvent e) {
+                
                 if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                     TableModel model = table.getModel();
-                    if (model instanceof ThreadSafeDefaultTableModel) {
-                        ((ThreadSafeDefaultTableModel) model).beginUpdate();
-                    }
+                    /*
+                     * TODO: improve performance if needed
+                     * 
+                     * notes:
+                     * beginUpdate + endUpdate will improve performance
+                     * but will deselect all selected rows after endUpdate 
+                     * is called. Therefore currently not used due to unexpected
+                     * behaviour.
+                     */
+                    //if (model instanceof ThreadSafeDefaultTableModel) {
+                    //    ((ThreadSafeDefaultTableModel) model).beginUpdate();
+                    //}
                     for (int row : table.getSelectedRows()) {
                         int rowModel = table.convertRowIndexToModel(row);
-                        model.setValueAt(!(Boolean) model.getValueAt(rowModel, column), rowModel, column);
+                        if (model.isCellEditable(rowModel, column)) {
+                            model.setValueAt(!(Boolean) model.getValueAt(rowModel, column), rowModel, column);
+                        }
                     }
-                    if (model instanceof ThreadSafeDefaultTableModel) {
-                        ((ThreadSafeDefaultTableModel) model).endUpdate();
-                    }
+                    //if (model instanceof ThreadSafeDefaultTableModel) {
+                    //    ((ThreadSafeDefaultTableModel) model).endUpdate();
+                    //}
                     e.consume();
                 }
             }

@@ -71,6 +71,7 @@ public class SolverTableModel extends ThreadSafeDefaultTableModel {
                 }
             }
         } 
+        this.fireTableDataChanged();
     }
 
     @Override
@@ -90,6 +91,9 @@ public class SolverTableModel extends ThreadSafeDefaultTableModel {
 
     @Override
     public Class getColumnClass(int col) {
+        if (getRowCount() == 0) {
+            return String.class;
+        }
         return getValueAt(0, col).getClass();
     }
 
@@ -136,7 +140,7 @@ public class SolverTableModel extends ThreadSafeDefaultTableModel {
         for (int i = 0; i < solvers.size(); i++) {
             if (solvers.get(i).getId() == solverId) {
                 selected[i] = value;
-                this.fireTableCellUpdated(i, 5);
+                this.fireTableCellUpdated(i, COL_SELECTED);
                 break;
             }
         }

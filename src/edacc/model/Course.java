@@ -53,4 +53,8 @@ public class Course extends BaseModel {
         }
         instanceSeedList.clear();
     }
+    
+    public List<InstanceSeed> getInstanceSeedList() {
+        return instanceSeedList;
+    }
 }

@@ -135,6 +135,34 @@ public class ExperimentResultDAO {
         }
 
     }
+    
+    /*
+     * Updates the CPUTimeLimit property of given list of jobs
+     * @param v list of the jobs to update
+     * @throws SQLException
+     */
+    public static void batchUpdateCPUTimeLimit(List<ExperimentResult> v) throws SQLException {
+        boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
+        try {
+            DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+            final String query = "UPDATE " + table + " SET CPUTimeLimit=? WHERE idJob=?";
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+            curSt = st;
+            for (ExperimentResult r : v) {
+                st.setInt(1, r.getCPUTimeLimit());
+                st.setInt(2, r.getId());
+                st.addBatch();
+            }
+            st.executeBatch();
+            st.close();
+        } catch (SQLException e) {
+            DatabaseConnector.getInstance().getConn().rollback();
+            throw e;
+        } finally {
+            curSt = null;
+            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+        }
+    }
 
     /**
      * Updates the run property of the ExperimentResults at once (batch).
@@ -400,13 +428,20 @@ public class ExperimentResultDAO {
      * @throws PropertyTypeNotExistException
      */
     public static ArrayList<ExperimentResult> getAllModifiedByExperimentId(int id, Timestamp modified) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
+
         ArrayList<ExperimentResult> v = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery
                 + "WHERE Experiment_idExperiment=? AND IF(status = " + StatusCode.RUNNING.getStatusCode() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) >= ?;");
         st.setInt(1, id);
         st.setTimestamp(2, modified);
-        ResultSet rs = st.executeQuery();
+        curSt = st;
+        ResultSet rs;
+        try {
+            rs = st.executeQuery();
+        } finally {
+            curSt = null;
+        }
         while (rs.next()) {
             ExperimentResult er = getExperimentResultFromResultSet(rs);
             v.add(er);
@@ -561,7 +596,7 @@ public class ExperimentResultDAO {
             }
         }
     }
-    
+
     /**
      * returns the experiment results with job IDs that are in the
      * passed list.
@@ -575,26 +610,28 @@ public class ExperimentResultDAO {
         final int MEDIUM_BATCH = 1000;
         final int LARGE_BATCH = 10000;
         int totalNumberOfValuesLeftToBatch = ids.size();
-    
+
         List<ExperimentResult> results = new ArrayList<ExperimentResult>();
-        while ( totalNumberOfValuesLeftToBatch > 0 ) {
+        while (totalNumberOfValuesLeftToBatch > 0) {
             int batchSize = SINGLE_BATCH;
-            if ( totalNumberOfValuesLeftToBatch >= LARGE_BATCH ) {
-              batchSize = LARGE_BATCH;
-            } else if ( totalNumberOfValuesLeftToBatch >= MEDIUM_BATCH ) {
-              batchSize = MEDIUM_BATCH;
-            } else if ( totalNumberOfValuesLeftToBatch >= SMALL_BATCH ) {
-              batchSize = SMALL_BATCH;
+            if (totalNumberOfValuesLeftToBatch >= LARGE_BATCH) {
+                batchSize = LARGE_BATCH;
+            } else if (totalNumberOfValuesLeftToBatch >= MEDIUM_BATCH) {
+                batchSize = MEDIUM_BATCH;
+            } else if (totalNumberOfValuesLeftToBatch >= SMALL_BATCH) {
+                batchSize = SMALL_BATCH;
             }
-            
+
             StringBuilder inClause = new StringBuilder();
 
-            for (int i=0; i < batchSize; i++) {
-              inClause.append('?');
-              if (i < batchSize - 1) inClause.append(",");
+            for (int i = 0; i < batchSize; i++) {
+                inClause.append('?');
+                if (i < batchSize - 1) {
+                    inClause.append(",");
+                }
             }
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                selectQuery + " WHERE idJob IN (" + inClause.toString() + ");");
+                    selectQuery + " WHERE idJob IN (" + inClause.toString() + ");");
             for (int i = 1; i <= batchSize; i++) {
                 ps.setInt(i, ids.get(totalNumberOfValuesLeftToBatch - i));
             }
@@ -604,7 +641,7 @@ public class ExperimentResultDAO {
             }
             rs.close();
             ps.close();
-            totalNumberOfValuesLeftToBatch -= batchSize; ;
+            totalNumberOfValuesLeftToBatch -= batchSize;;
         }
         return results;
     }
@@ -1062,7 +1099,7 @@ public class ExperimentResultDAO {
             this.value = value;
         }
     }
-    
+
     public static int getNumJobsBySolverConfigurationId(int idSolverConfig) throws SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT COUNT(idJob) FROM " + table + " WHERE SolverConfig_idSolverConfig=?");
