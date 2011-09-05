@@ -402,6 +402,7 @@ public class ManageDBInstances implements Observer {
         EDACCCreateEditInstanceClassDialog dialog = new EDACCCreateEditInstanceClassDialog(mainFrame, true, main.getInstanceClassTree());
         dialog.setLocationRelativeTo(mainFrame);
         EDACCApp.getApplication().show(dialog);
+
     }
 
     /**
