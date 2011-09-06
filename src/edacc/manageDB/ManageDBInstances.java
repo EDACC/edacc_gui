@@ -362,7 +362,7 @@ public class ManageDBInstances implements Observer {
                         errors.add(toRemove.get(i));
                     }
                 }
-                ReloadInstanceClasses();
+                //ReloadInstanceClasses();
                 if (!errors.isEmpty()) {
                     tableModel = new AddInstanceInstanceClassTableModel();
                     tableModel.addClasses(errors);

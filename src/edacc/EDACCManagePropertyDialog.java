@@ -599,12 +599,20 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                     JOptionPane.ERROR_MESSAGE);
         } else {
             try {
+                int selectedRow = -1;
+                if(controller.getEditId() != -1){
+                    selectedRow = tableProperty.getSelectedRow();
+                }
                 if (radioBtnRegExpression.isSelected()) {
                     controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), textAreaRegularExpressions.getText(), null, "", (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String) comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
 
                 } else if (radioBtnComputationMethod.isSelected()) {
                     controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), "", (ComputationMethod) ComputationMethodDAO.getByName((String) comboBoxComputationMethod.getSelectedItem()), textFieldComputationmethodParameter.getText(), (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String) comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
                 }
+                if(selectedRow == -1){
+                    selectedRow = tableProperty.getRowCount()-1;
+                }
+                tableProperty.setRowSelectionInterval(selectedRow, selectedRow);
             } catch (IOException ex) {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (NoConnectionToDBException ex) {
