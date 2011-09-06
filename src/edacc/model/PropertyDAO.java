@@ -77,6 +77,7 @@ public class PropertyDAO {
         }
         r.setNew();
         save(r);
+        cache.cache(r);
         return r;
     }
 
@@ -203,7 +204,6 @@ public class PropertyDAO {
             generatedKeys.close();
             ps.close();
             r.setSaved();
-            cache.cache(r);
             if (r.getRegularExpression() != null) {
                 setRegularExpressions(r.getRegularExpression(), r.getId());
             }

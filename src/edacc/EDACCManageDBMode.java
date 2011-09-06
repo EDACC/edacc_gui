@@ -1996,6 +1996,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     }//GEN-LAST:event_chkSpaceChanged
 
     private void btnSelectInstanceColumnsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectInstanceColumnsActionPerformed
+        instanceTableModel.updateProperties();
         List<SortKey> sortKeys = (List<SortKey>) tableInstances.getRowSorter().getSortKeys();
         List<String> columnNames = new ArrayList<String>();
         for (SortKey sk : sortKeys) {

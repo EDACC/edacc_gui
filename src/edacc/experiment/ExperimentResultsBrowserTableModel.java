@@ -103,14 +103,13 @@ public class ExperimentResultsBrowserTableModel extends ThreadSafeDefaultTableMo
 
     /** 
      * Updates the properties. 
-     * @return true, iff something has changed (new properties or properties were removed)
+     * @return true, if something has changed (new properties or properties were removed)
      */
     public boolean updateProperties() {
         ArrayList<Property> tmp = new ArrayList<Property>();
         try {
             tmp.addAll(PropertyDAO.getAllResultProperties());
             firstInstancePropertyColumn = COL_PROPERTY + tmp.size();
-            tmp.addAll(PropertyDAO.getAllInstanceProperties());
             for (int i = tmp.size() - 1; i >= 0; i--) {
                 if (tmp.get(i).isMultiple()) {
                     tmp.remove(i);

@@ -43,7 +43,7 @@ public class ComputePropertiesController {
     public void loadResultProperties() {
         try {
             try {
-                ((PropertySelectionTableModel) tableResultProperty.getModel()).addProperties(PropertyDAO.getAll());
+                ((PropertySelectionTableModel) tableResultProperty.getModel()).addProperties(PropertyDAO.getAllResultProperties());
             } catch (ComputationMethodDoesNotExistException ex) {
                 Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
             }

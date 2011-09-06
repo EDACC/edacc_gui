@@ -12,6 +12,7 @@
 package edacc;
 
 import edacc.events.TaskEvents;
+import edacc.experiment.ExperimentController;
 import edacc.manageDB.ProblemOccuredDuringPropertyComputation;
 import edacc.model.ExperimentResult;
 import edacc.model.Property;
@@ -32,10 +33,13 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog implements
     ComputePropertiesController controller;
     PropertySelectionTableModel tableModel;
     ArrayList<ExperimentResult> results;
+    ExperimentController expController;
+    
     /** Creates new form EDACCComputeResultProperties */
-    public EDACCComputeResultProperties(java.awt.Frame parent, boolean modal, ArrayList<ExperimentResult> results) {
+    public EDACCComputeResultProperties(java.awt.Frame parent, boolean modal, ArrayList<ExperimentResult> results, ExperimentController expController) {
         super(parent, modal);
         initComponents();
+        this.expController = expController;
         this.results = results;
         controller = new ComputePropertiesController(this, tableSelectResultProperties);
 
@@ -208,6 +212,9 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog implements
 
     @Override
     public void onTaskSuccessful(String methodName, Object result) {
+        if(methodName.equals("computeProperties")){
+            Tasks.startTask("loadJobs", expController, this, false);
+        }
     }
 
     @Override
