@@ -575,6 +575,7 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog implemen
         if (methodName.equals("generate")) {
             manageDBInstances.UpdateInstanceClasses();
             manageDBInstances.loadInstances();
+            manageDBInstances.restoreExpandedState();
         }
     }
 

@@ -740,7 +740,6 @@ public class ManageDBInstances implements Observer {
                     for (int i = 0; i < selectedRows.length; i++) {
                         InstanceHasInstanceClassDAO.createInstanceHasInstance(toChange.get(i), input);
                     }
-                    loadInstanceClasses();
                 }
             } catch (NoConnectionToDBException ex) {
                 JOptionPane.showMessageDialog(panelManageDBInstances,
@@ -870,8 +869,10 @@ public class ManageDBInstances implements Observer {
     }
 
     public void onTaskSuccessful(String methodName, Object result) {
-        if (methodName.equals("TryToRemoveInstances")) {
+        if (methodName.equals("TryToRemoveInstances")) {          
             main.instanceTableModel.fireTableDataChanged();
+            UpdateInstanceClasses();
+            restoreExpandedState();
         }
     }
 
@@ -1231,5 +1232,9 @@ public class ManageDBInstances implements Observer {
         main.instanceClassTreeModel.setRoot(root);
         main.getInstanceClassTree().setRootVisible(false);
         main.instanceClassTreeModel.reload();
+    }
+
+    public void restoreExpandedState() {
+        main.restoreExpandedState();
     }
 }
