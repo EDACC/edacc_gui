@@ -1698,10 +1698,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     JOptionPane.ERROR_MESSAGE);
         } else {
             int returnVal = jFileChooserManageDBExportInstance.showOpenDialog(panelManageDBInstances);
-            String path = jFileChooserManageDBExportInstance.getSelectedFile().getAbsolutePath();
-            Tasks.startTask("exportInstances", new Class[]{int[].class, String.class, edacc.model.Tasks.class}, new Object[]{tableInstances.getSelectedRows(), path, null}, manageDBInstances, EDACCManageDBMode.this);
+            if(returnVal == JFileChooser.APPROVE_OPTION){
+                String path = jFileChooserManageDBExportInstance.getSelectedFile().getAbsolutePath();
+                Tasks.startTask("exportInstances", new Class[]{int[].class, String.class, edacc.model.Tasks.class}, new Object[]{tableInstances.getSelectedRows(), path, null}, manageDBInstances, EDACCManageDBMode.this);
+            }    
         }
-
     }//GEN-LAST:event_btnExportInstancesActionPerformed
 
     private void btnEditInstanceClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditInstanceClassActionPerformed
@@ -1815,14 +1816,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 selectedRowsInstance[i] = tableInstances.convertRowIndexToModel(selectedRowsInstance[i]);
             }
             manageDBInstances.addInstancesToClass(selectedRowsInstance);
-            tableInstances.clearSelection();
-            instanceTableModel.fireTableDataChanged();
-            tableInstances.requestFocus();
-
-            if (tableInstances.getRowCount() != 0) {
-                tableInstances.addRowSelectionInterval(0, 0);
-            }
-
+            jTreeInstanceClass.setSelectionPath(null);
+            this.instanceTableModel.fireTableDataChanged();
+            restoreExpandedState();
+            tableInstances.requestFocus();        
         } catch (IOException ex) {
             Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1953,9 +1950,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             return;
         } else {
             int returnVal = jFileChooserManageDBExportInstance.showOpenDialog(panelManageDBInstances);
-            String path = jFileChooserManageDBExportInstance.getSelectedFile().getAbsolutePath();
-
-            Tasks.startTask("exportInstanceClass", new Class[]{DefaultMutableTreeNode.class, String.class, edacc.model.Tasks.class}, new Object[]{(DefaultMutableTreeNode) jTreeInstanceClass.getSelectionPath().getLastPathComponent(), path, null}, manageDBInstances, EDACCManageDBMode.this);
+            if(returnVal == JFileChooser.APPROVE_OPTION){
+                String path = jFileChooserManageDBExportInstance.getSelectedFile().getAbsolutePath();
+                Tasks.startTask("exportInstanceClass", new Class[]{DefaultMutableTreeNode.class, String.class, edacc.model.Tasks.class}, new Object[]{(DefaultMutableTreeNode) jTreeInstanceClass.getSelectionPath().getLastPathComponent(), path, null}, manageDBInstances, EDACCManageDBMode.this);
+            }         
         }
     }//GEN-LAST:event_btnExportInstanceClassActionPerformed
 
