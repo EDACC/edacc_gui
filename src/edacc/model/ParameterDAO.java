@@ -26,6 +26,8 @@ public class ParameterDAO {
         if (!solver.isSaved())
             return; 
         if (parameter.isSaved()) return;
+        if (parameter.getName().equals(""))
+            parameter.setName(null);
         if (parameter.isNew()) {
             final String insertQuery = "INSERT INTO Parameters (name, prefix, defaultValue, hasValue, Parameters.order, Solver_idSolver, mandatory, space, attachToPrevious) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);

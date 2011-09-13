@@ -2550,6 +2550,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         if (show) {
             // set the color of the TextField to a nice red
             tfParametersName.setBackground(new Color(255, 102, 102));
+            
         } else {
             tfParametersName.setBackground(Color.white);
         }
