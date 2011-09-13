@@ -15,11 +15,11 @@ import javax.swing.table.AbstractTableModel;
  */
 public class SolverTableModel extends AbstractTableModel {
     private final int NAME = 0;
-    private final int DESCRIPTION = 1;
+    private final int VERSION = 1;
     private final int AUTHORS = 2;
-    private final int VERSION = 3;
+    private final int DESCRIPTION = 3;
 
-    private String[] columns = {"Name", "Description", "Authors", "Version"};
+    private String[] columns = {"Name", "Version", "Authors", "Description"};
     private Vector<Solver> solvers;
 
     public SolverTableModel() {
