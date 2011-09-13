@@ -329,6 +329,7 @@ public class ExperimentResultHasPropertyDAO {
                 erhp.getValue().add(value);
             }
         }
+        rs.close();
         ps.close();
     }
 

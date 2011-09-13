@@ -397,10 +397,18 @@ public class ExperimentController {
         }
 
         // check for deleted solver configurations (jobs have to be deleted)
+        experimentResultCache.updateExperimentResults();
+        
         ArrayList<SolverConfiguration> deletedSolverConfigurations = solverConfigCache.getAllDeleted();
         final ArrayList<ExperimentResult> deletedJobs = new ArrayList<ExperimentResult>();
+        final HashSet<Integer> scIds = new HashSet<Integer>();
         for (SolverConfiguration sc : deletedSolverConfigurations) {
-            deletedJobs.addAll(ExperimentResultDAO.getAllBySolverConfiguration(sc));
+            scIds.add(sc.getId());
+        }
+        for (ExperimentResult job : experimentResultCache.values()) {
+            if (scIds.contains(job.getSolverConfigId())) {
+                deletedJobs.add(job);
+            }
         }
 
         // check for modified solver configurations (jobs have to be deleted)

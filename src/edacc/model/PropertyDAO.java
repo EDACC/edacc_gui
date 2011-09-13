@@ -287,6 +287,8 @@ public class PropertyDAO {
         while (rs.next()) {
             res.add(PropertyDAO.getById(rs.getInt("idProperty")));
         }
+        rs.close();
+        ps.close();
         return res;
     }
 
