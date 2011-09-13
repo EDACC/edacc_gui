@@ -44,6 +44,10 @@ public class ManagePropertyController {
     private JTable tableSolverProperty;
     private int editId;
 
+    public int getEditId() {
+        return editId;
+    }
+
     /**
      * Constructor of the ManagePropertyController
      * @param manage the EDACCManagePropertyDialog to controll

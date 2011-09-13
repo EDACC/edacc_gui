@@ -50,34 +50,20 @@ public class EDACCResultsBrowserColumnSelection extends javax.swing.JDialog {
         resultPropertyColumnsConstraints.gridheight = 1;
         resultPropertyColumnsConstraints.gridwidth = 1;
         resultPropertyColumnsConstraints.anchor = GridBagConstraints.WEST;
-
-        GridBagConstraints instancePropertyColumnsConstraints = new GridBagConstraints();
-        instancePropertyColumnsConstraints.gridx = 0;
-        instancePropertyColumnsConstraints.weightx = 1;
-        instancePropertyColumnsConstraints.fill = GridBagConstraints.HORIZONTAL;
-        instancePropertyColumnsConstraints.gridy = 0;
-        instancePropertyColumnsConstraints.gridheight = 1;
-        instancePropertyColumnsConstraints.gridwidth = 1;
-        instancePropertyColumnsConstraints.anchor = GridBagConstraints.WEST;
         pnlResultPropertyColumns.setLayout(new GridBagLayout());
-        pnlInstancePropertyColumns.setLayout(new GridBagLayout());
+
         for (int i = 0; i < checkboxes.length; i++) {
             checkboxes[i] = new JCheckBox(selector.getColumnName(i), visibility[i]);
             checkboxes[i].setVisible(true);
             if (i < ExperimentResultsBrowserTableModel.COL_PROPERTY) {
                 pnlBasicColumns.add(checkboxes[i], basicColumnsConstraints);
                 basicColumnsConstraints.gridy++;
-            } else if (i < model.getFirstInstancePropertyColumn()) {
+            } else {
                 pnlResultPropertyColumns.add(checkboxes[i], resultPropertyColumnsConstraints);
                 resultPropertyColumnsConstraints.gridy++;
-            } else {
-                pnlInstancePropertyColumns.add(checkboxes[i], instancePropertyColumnsConstraints);
-                instancePropertyColumnsConstraints.gridy++;
             }
         }
-        instancePropertyColumnsConstraints.weighty = 10000;
-        pnlInstancePropertyColumns.add(new JPanel(), instancePropertyColumnsConstraints);
-        jPanel1.setPreferredSize(new Dimension(0, pnlBasicColumns.getPreferredSize().height + pnlInstancePropertyColumns.getPreferredSize().height + pnlResultPropertyColumns.getPreferredSize().height));
+        jPanel1.setPreferredSize(new Dimension(0, pnlBasicColumns.getPreferredSize().height + pnlResultPropertyColumns.getPreferredSize().height));
     }
 
     /** This method is called from within the constructor to
@@ -94,7 +80,6 @@ public class EDACCResultsBrowserColumnSelection extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         pnlBasicColumns = new javax.swing.JPanel();
         pnlResultPropertyColumns = new javax.swing.JPanel();
-        pnlInstancePropertyColumns = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -156,29 +141,6 @@ public class EDACCResultsBrowserColumnSelection extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         jPanel1.add(pnlResultPropertyColumns, gridBagConstraints);
-
-        pnlInstancePropertyColumns.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("pnlInstancePropertyColumns.border.title"))); // NOI18N
-        pnlInstancePropertyColumns.setName("pnlInstancePropertyColumns"); // NOI18N
-
-        javax.swing.GroupLayout pnlInstancePropertyColumnsLayout = new javax.swing.GroupLayout(pnlInstancePropertyColumns);
-        pnlInstancePropertyColumns.setLayout(pnlInstancePropertyColumnsLayout);
-        pnlInstancePropertyColumnsLayout.setHorizontalGroup(
-            pnlInstancePropertyColumnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 301, Short.MAX_VALUE)
-        );
-        pnlInstancePropertyColumnsLayout.setVerticalGroup(
-            pnlInstancePropertyColumnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 219, Short.MAX_VALUE)
-        );
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(pnlInstancePropertyColumns, gridBagConstraints);
 
         jScrollPane1.setViewportView(jPanel1);
 
@@ -244,7 +206,6 @@ public class EDACCResultsBrowserColumnSelection extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel pnlBasicColumns;
-    private javax.swing.JPanel pnlInstancePropertyColumns;
     private javax.swing.JPanel pnlResultPropertyColumns;
     // End of variables declaration//GEN-END:variables
 }

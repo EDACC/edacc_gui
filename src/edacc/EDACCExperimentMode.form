@@ -767,7 +767,7 @@
                                   <Group type="102" alignment="1" attributes="0">
                                       <Component id="lblSolverFilterStatus" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="jScrollPane3" pref="32" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane3" pref="27" max="32767" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="3" attributes="0">
                                           <Component id="btnSelectAllSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -875,16 +875,7 @@
                             <Component class="javax.swing.JLabel" name="lblSolverFilterStatus">
                               <Properties>
                                 <Property name="text" type="java.lang.String" resourceKey="lblSolverFilterStatus.text"/>
-                                <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[0, 0]"/>
-                                </Property>
-                                <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[0, 0]"/>
-                                </Property>
                                 <Property name="name" type="java.lang.String" value="lblSolverFilterStatus" noResource="true"/>
-                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[0, 0]"/>
-                                </Property>
                               </Properties>
                             </Component>
                           </SubComponents>
@@ -933,7 +924,7 @@
                                   <Group type="102" alignment="1" attributes="0">
                                       <Component id="lblExistingSolverConfigFilterStatus" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="jScrollPane8" pref="311" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane8" pref="316" max="32767" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="3" attributes="0">
                                           <Component id="btnSelectAllSolverConfigs" alignment="3" min="-2" max="-2" attributes="0"/>

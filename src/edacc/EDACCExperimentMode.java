@@ -2335,7 +2335,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         for (int row = 0; row < tableJobs.getRowCount(); row++) {
             results.add(jobsTableModel.getExperimentResult(tableJobs.convertRowIndexToModel(row)));
         }
-        EDACCComputeResultProperties compute = new EDACCComputeResultProperties(EDACCApp.getApplication().getMainFrame(), true, results);
+        EDACCComputeResultProperties compute = new EDACCComputeResultProperties(EDACCApp.getApplication().getMainFrame(), true, results, expController);
         compute.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         compute.setVisible(true);
         resultBrowserETA = null;
@@ -2866,11 +2866,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }//GEN-LAST:event_btnRefreshJobsActionPerformed
 
     private void btnBrowserColumnSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBrowserColumnSelectionActionPerformed
+       jobsTableModel.updateProperties();
+       jobsColumnSelector = new TableColumnSelector(tableJobs);
+        resetJobsColumnVisibility();
         List<SortKey> sortKeys = (List<SortKey>) tableJobs.getRowSorter().getSortKeys();
         List<String> columnNames = new ArrayList<String>();
         for (SortKey sk : sortKeys) {
             columnNames.add(tableJobs.getColumnName(tableJobs.convertColumnIndexToView(sk.getColumn())));
-        }
+        }      
         EDACCResultsBrowserColumnSelection dialog = new EDACCResultsBrowserColumnSelection(EDACCApp.getApplication().getMainFrame(), true, jobsColumnSelector, jobsTableModel);
         dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         dialog.setVisible(true);
