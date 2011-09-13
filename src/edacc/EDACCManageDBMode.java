@@ -1827,6 +1827,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     private void btnRemoveFromClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveFromClassActionPerformed
         saveExpandedState();
         manageDBInstances.RemoveInstanceFromInstanceClass(tableInstances.getSelectedRows(), jTreeInstanceClass.getSelectionPaths());
+        instanceTableModel.resetColumnVisibility();
         jTreeInstanceClass.setSelectionPath(null);
         this.instanceTableModel.fireTableDataChanged();
         restoreExpandedState();

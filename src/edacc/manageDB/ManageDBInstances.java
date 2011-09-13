@@ -1051,6 +1051,8 @@ public class ManageDBInstances implements Observer {
                             }
                         }
                     }
+                    main.instanceTableModel.removeInstances(toRemove);
+                    main.instanceTableModel.addInstances(toRemove);
                 }
 
                 if (isSource) {
