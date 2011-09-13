@@ -69,7 +69,7 @@ public class ConfigurationScenarioDAO {
                     cs.getCourse().setInitialLength(cs.getCourse().getLength());
                 }
                 cs.getCourse().setSaved();
-            } else {
+            } else if (cs.getCourse() == null) {
                 cs.setCourse(new Course());
             }
         } catch (Exception ex) {
