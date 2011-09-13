@@ -136,6 +136,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
         tableSolver.getSelectionModel().addListSelectionListener(new SolverTableSelectionListener(tableSolver, manageDBSolvers));
         tableParameters.getSelectionModel().addListSelectionListener(new ParameterTableSelectionListener(tableParameters, manageDBParameters));
+        tableSolverBinaries.getSelectionModel().addListSelectionListener(new SolverBinariesTableSelectionListener(tableSolverBinaries, manageDBSolvers));
         showSolverDetails(null);
         tableParameters.setDefaultRenderer(tableParameters.getColumnClass(2), new DefaultTableCellRenderer() {
 
@@ -2200,6 +2201,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             manageDBParameters.setCurrentSolver(currentSolver);
             tableParameters.updateUI();
         }
+        if (!enabled) // if no solver is chosen don't activate buttons for solver binaries. Otherwise enable them, if a binary is selected (see SolverBinariesTableSelectionListener)
+            enableSolverBinaryButtons(false);
         jlSolverName.setEnabled(enabled);
         jlSolverDescription.setEnabled(enabled);
         jlSolverAuthors.setEnabled(enabled);
@@ -2210,12 +2213,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         taSolverDescription.setEnabled(enabled);
         tfSolverAuthors.setEnabled(enabled);
         tfSolverVersion.setEnabled(enabled);
-        btnSolverAddBinary.setEnabled(enabled);
-        btnSolverEditBinary.setEnabled(enabled);
-        btnSolverDeleteBinary.setEnabled(enabled);
         btnSolverAddCode.setEnabled(enabled);
         btnSolverExport.setEnabled(enabled);
-
+        btnSolverAddBinary.setEnabled(enabled);
 
         if (currentSolver != null) {
             parameterTableModel.setCurrentSolver(currentSolver);
@@ -2551,6 +2551,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             }
             instanceTableModel.fireTableDataChanged();
         }
+    }
+
+    public void enableSolverBinaryButtons(boolean selected) {
+        btnSolverChangeBinaryFiles.setEnabled(selected);
+        btnSolverEditBinary.setEnabled(selected);
+        btnSolverDeleteBinary.setEnabled(selected);
     }
 
     /**
