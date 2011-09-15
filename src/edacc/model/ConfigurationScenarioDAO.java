@@ -139,6 +139,8 @@ public class ConfigurationScenarioDAO {
             while (rs3.next()) {
                 course.add(new InstanceSeed(InstanceDAO.getById(rs3.getInt("Instances_idInstance")), rs3.getInt("seed")));
             }
+            st3.close();
+            rs3.close();
             course.setSaved();
             cs.setCourse(course);
         } else {
