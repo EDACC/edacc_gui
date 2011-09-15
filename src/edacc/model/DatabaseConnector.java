@@ -57,7 +57,7 @@ public class DatabaseConnector extends Observable {
      * @throws ClassNotFoundException if the driver couldn't be found.
      * @throws SQLException if an error occurs while trying to establish the connection.
      */
-    public void connect(String hostname, int port, String username, String database, String password, boolean useSSL, boolean compress, int maxconnections, boolean doCheckVersion) throws ClassNotFoundException, SQLException, DBVersionException, DBVersionUnknownException, DBEmptyException {
+    public void connect(String hostname, int port, String username, String database, String password, boolean useSSL, boolean compress, int maxconnections, boolean doCheckVersion, boolean rewriteBatchStatements) throws ClassNotFoundException, SQLException, DBVersionException, DBVersionUnknownException, DBEmptyException {
         while (connections.size() > 0) {
             ThreadConnection tconn = connections.pop();
             tconn.conn.close();
@@ -76,7 +76,9 @@ public class DatabaseConnector extends Observable {
             properties = new Properties();
             properties.put("user", username);
             properties.put("password", password);
-            properties.put("rewriteBatchedStatements", "true");
+            if (rewriteBatchStatements) {
+                properties.put("rewriteBatchedStatements", "true");
+            }
             //properties.put("profileSQL", "true");
             //properties.put("traceProtocol", "true");
             //properties.put("logger", "edacc.model.MysqlLogger");
@@ -114,7 +116,7 @@ public class DatabaseConnector extends Observable {
      * overloaded connect method with implicit version check, see connect() above.
      */
     public void connect(String hostname, int port, String username, String database, String password, boolean useSSL, boolean compress, int maxconnections) throws ClassNotFoundException, SQLException, DBVersionException, DBVersionUnknownException, DBEmptyException {
-        connect(hostname, port, username, database, password, useSSL, compress, maxconnections, true);
+        connect(hostname, port, username, database, password, useSSL, compress, maxconnections, true, true);
     }
 
     private Connection getNewConnection() throws SQLException {
