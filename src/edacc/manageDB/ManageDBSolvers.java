@@ -412,4 +412,8 @@ public class ManageDBSolvers implements Observer {
     public void removeSolverBinaries(Solver s) throws SQLException {
         SolverBinariesDAO.removeBinariesOfSolver(s);
     }
+
+    void selectSolverBinary(boolean selected) {
+        gui.enableSolverBinaryButtons(selected);
+    }
 }
