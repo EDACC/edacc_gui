@@ -6,6 +6,7 @@
 package edacc;
 
 import edacc.experiment.SolverConfigEntryTableModel;
+import edacc.model.Experiment;
 import edacc.model.ParameterInstance;
 import edacc.model.ParameterInstanceDAO;
 import edacc.model.Solver;
@@ -37,7 +38,8 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
 
     private EDACCSolverConfigPanel solverConfigPanel;
     private TableModel tableModel;
-
+    private Experiment experiment;
+    
     /** Creates new form EDACCExperimentModeSolverConfigurationTablePanel */
     public EDACCExperimentModeSolverConfigurationTablePanel(EDACCSolverConfigPanel solverConfigPanel) {
         initComponents();
@@ -139,6 +141,10 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
     public void setSolverConfigCache(SolverConfigCache solverConfigCache) {
         solverConfigCache.addObserver(this);
     }
+    
+    public void setExperiment(Experiment experiment) {
+        this.experiment = experiment;
+    }
 
     @Override
     public void update(Observable o, Object arg) {
@@ -200,9 +206,9 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
             try {
                 EDACCSolverConfigEntry copy;
                 if (entry.getSolverConfiguration() != null) {
-                    copy = new EDACCSolverConfigEntry(entry.getSolverConfiguration(), ParameterInstanceDAO.getBySolverConfig(entry.getSolverConfiguration()));
+                    copy = new EDACCSolverConfigEntry(entry.getSolverConfiguration(), ParameterInstanceDAO.getBySolverConfig(entry.getSolverConfiguration()), experiment);
                 } else {
-                    copy = new EDACCSolverConfigEntry(SolverDAO.getById(entry.getSolverId()), entry.getTitle());
+                    copy = new EDACCSolverConfigEntry(SolverDAO.getById(entry.getSolverId()), entry.getTitle(), experiment);
                 }
                 copy.assign(entry);
                 copy.removeButtons();

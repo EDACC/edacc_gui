@@ -203,10 +203,15 @@ public class ExperimentController {
 
         // now load solver configs of the current experiment
         if (solverConfigCache != null) {
+            solverConfigPanel.setExperiment(activeExperiment);
+            main.solverConfigTablePanel.setExperiment(activeExperiment);
+            
             solverConfigCache.changeExperiment(activeExperiment);
         } else {
             solverConfigCache = new SolverConfigCache(activeExperiment);
+            solverConfigPanel.setExperiment(activeExperiment);
             solverConfigPanel.setSolverConfigCache(solverConfigCache);
+            main.solverConfigTablePanel.setExperiment(activeExperiment);
             main.solverConfigTablePanel.setSolverConfigCache(solverConfigCache);
             solverConfigCache.reload();
         }
@@ -476,12 +481,12 @@ public class ExperimentController {
                     invalidSeedGroup = true;
                 }
                 if (entry.getSolverConfiguration() == null) {
-                    entry.setSolverConfiguration(solverConfigCache.createSolverConfiguration(entry.getSolverBinary(), activeExperiment.getId(), seed_group, entry.getTitle()));
+                    entry.setSolverConfiguration(solverConfigCache.createSolverConfiguration(entry.getSolverBinary(), activeExperiment.getId(), seed_group, entry.getTitle(), entry.getHint()));
                 } else {
                     entry.getSolverConfiguration().setSolverBinary(entry.getSolverBinary());
                     entry.getSolverConfiguration().setName(entry.getTitle());
                     entry.getSolverConfiguration().setSeed_group(seed_group);
-
+                    entry.getSolverConfiguration().setHint(entry.getHint());
                 }
                 entry.saveParameterInstances();
             }
@@ -1669,7 +1674,7 @@ public class ExperimentController {
             // save solver configurations which doesn't exist
             for (SolverConfiguration sc : selectedSolverConfigs) {
                 if (!mapHisScToMySc.containsKey(sc.getId())) {
-                    SolverConfiguration sc2 = solverConfigCache.createSolverConfiguration(sc.getSolverBinary(), activeExperiment.getId(), seed_group++, sc.getName());
+                    SolverConfiguration sc2 = solverConfigCache.createSolverConfiguration(sc.getSolverBinary(), activeExperiment.getId(), seed_group++, sc.getName(), sc.getHint());
                     for (ParameterInstance pi : ParameterInstanceDAO.getBySolverConfig(sc)) {
                         ParameterInstanceDAO.createParameterInstance(pi.getParameter_id(), sc2, pi.getValue());
                     }

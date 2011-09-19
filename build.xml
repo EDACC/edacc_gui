@@ -119,4 +119,19 @@
             <fileset file="client/verifiers/SAT"/>
         </copy>
     </target>
+    
+    <target depends="clean,init,compile" name="model">
+        <echo>Generating jar file</echo>
+        <jar destfile="${dist.dir}/EDACC_model.jar">
+            <fileset dir="${build.classes.dir}" defaultexcludes="true">
+                <include name="edacc/model/**"/>
+                <include name="edacc/properties/**"/>
+                <include name="edacc/satinstances/**"/>
+                <include name="**/*Exception*"/>
+            </fileset>
+            <fileset dir="${src.dir}" defaultexcludes="true">
+                <include name="edacc/model/**"/>
+            </fileset>
+        </jar>
+    </target>
 </project>

@@ -1,0 +1,1 @@
+ALTER TABLE `SolverConfig` ADD COLUMN `hint` VARCHAR(1024) NOT NULL;

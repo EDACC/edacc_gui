@@ -13,6 +13,7 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
     private Float cost;
     private String cost_function;
     private String parameter_hash;
+    private String hint;
 
     public Float getCost() {
         return cost;
@@ -89,6 +90,17 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
             this.setModified();
         }
         this.name = name;
+    }
+    
+    public void setHint(String hint) {
+        if (!hint.equals(this.hint) && this.isSaved()) {
+            this.setModified();
+        }
+        this.hint = hint;
+    }
+    
+    public String getHint() {
+        return hint;
     }
 
     @Override

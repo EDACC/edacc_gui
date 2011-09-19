@@ -4,7 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 
 /**
  *
@@ -14,8 +13,8 @@ public class SolverConfigurationDAO {
 
     private static final String table = "SolverConfig";
     private static final String deleteQuery = "DELETE FROM " + table + " WHERE idSolverConfig=?";
-    private static final String insertQuery = "INSERT INTO " + table + " (SolverBinaries_IdSolverBinary, Experiment_IdExperiment, seed_group, name, cost, cost_function, parameter_hash) VALUES (?,?,?,?,?,?,?)";
-    private static final String updateQuery = "UPDATE " + table + " SET SolverBinaries_IdSolverBinary = ?, seed_group=?, name=?, cost=?, cost_function=?, parameter_hash=? WHERE idSolverConfig=?";
+    private static final String insertQuery = "INSERT INTO " + table + " (SolverBinaries_IdSolverBinary, Experiment_IdExperiment, seed_group, name, cost, cost_function, parameter_hash, hint) VALUES (?,?,?,?,?,?,?,?)";
+    private static final String updateQuery = "UPDATE " + table + " SET SolverBinaries_IdSolverBinary = ?, seed_group=?, name=?, cost=?, cost_function=?, parameter_hash=?, hint=? WHERE idSolverConfig=?";
     public static ObjectCache<SolverConfiguration> cache = new ObjectCache<SolverConfiguration>();
 
     private static SolverConfiguration getSolverConfigurationFromResultset(ResultSet rs) throws SQLException {
@@ -28,6 +27,7 @@ public class SolverConfigurationDAO {
         i.setCost(rs.getFloat("cost"));
         i.setCost_function(rs.getString("cost_function"));
         i.setParameter_hash(rs.getString("parameter_hash"));
+        i.setHint(rs.getString("hint"));
         return i;
     }
 
@@ -52,6 +52,7 @@ public class SolverConfigurationDAO {
             }
             st.setString(6, i.getCost_function());
             st.setString(7, i.getParameter_hash());
+            st.setString(8, i.getHint());
             st.executeUpdate();
             ResultSet generatedKeys = st.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -73,7 +74,8 @@ public class SolverConfigurationDAO {
             }
             st.setString(5, i.getCost_function());
             st.setString(6, i.getParameter_hash());
-            st.setInt(7, i.getId());
+            st.setString(7, i.getHint());
+            st.setInt(8, i.getId());
             st.executeUpdate();
             i.setSaved();
             st.close();
@@ -92,11 +94,11 @@ public class SolverConfigurationDAO {
         solverConfig.setDeleted();
     }
     
-    public static SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int experimentId, int seed_group, String name) throws SQLException, Exception {
-        return createSolverConfiguration(solverBinary, experimentId, seed_group, name, null, null, null);
+    public static SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int experimentId, int seed_group, String name, String hint) throws SQLException, Exception {
+        return createSolverConfiguration(solverBinary, experimentId, seed_group, name, hint, null, null, null);
     }
 
-    public static SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int experimentId, int seed_group, String name, Float cost, String cost_function, String parameter_hash) throws SQLException, Exception {
+    public static SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int experimentId, int seed_group, String name, String hint, Float cost, String cost_function, String parameter_hash) throws SQLException, Exception {
         if (solverBinary == null) {
             throw new Exception("Solver binary missing.");
         }
@@ -105,6 +107,7 @@ public class SolverConfigurationDAO {
         i.setExperiment_id(experimentId);
         i.setSeed_group(seed_group);
         i.setName(name);
+        i.setHint(hint);
         i.setCost(cost);
         i.setCost_function(cost_function);
         i.setParameter_hash(parameter_hash);

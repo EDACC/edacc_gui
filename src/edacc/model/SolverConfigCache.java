@@ -29,8 +29,8 @@ public class SolverConfigCache extends Observable {
         return res;
     }
 
-    public synchronized SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int expId, int seed_group, String title) throws SQLException, Exception {
-        SolverConfiguration sc = SolverConfigurationDAO.createSolverConfiguration(solverBinary, expId, seed_group, title);
+    public synchronized SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int expId, int seed_group, String title, String hint) throws SQLException, Exception {
+        SolverConfiguration sc = SolverConfigurationDAO.createSolverConfiguration(solverBinary, expId, seed_group, title, hint);
         solverConfigs.put(sc.getId(), sc);
         return sc;
     }

@@ -5,6 +5,7 @@
  */
 package edacc;
 
+import edacc.model.Experiment;
 import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverDAO;
@@ -26,8 +27,10 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
     protected EDACCSolverConfigPanel parent;
     private GridBagConstraints gridBagConstraints;
     private GridBagLayout layout;
+    private Experiment experiment;
 
-    private EDACCSolverConfigPanelSolver(Solver solver) {
+    private EDACCSolverConfigPanelSolver(Solver solver, Experiment experiment) {
+        this.experiment = experiment;
         initComponents();
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -45,10 +48,10 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
 
     /** Creates new form EDACCSolverConfigPanelSolver */
     @SuppressWarnings("LeakingThisInConstructor")
-    public EDACCSolverConfigPanelSolver(Solver solver, EDACCSolverConfigPanel parent) throws SQLException {
-        this(solver);
+    public EDACCSolverConfigPanelSolver(Solver solver, EDACCSolverConfigPanel parent, Experiment experiment) throws SQLException {
+        this(solver, experiment);
         this.parent = parent;
-        EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solver, 1);
+        EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solver, 1, experiment);
         entry.setParent(this);
         this.add(entry, 1);
         parent.getSolTableModel().setSolverSelected(solver.getId(), true);
@@ -56,8 +59,8 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
         doRepaint();
     }
 
-    public EDACCSolverConfigPanelSolver(SolverConfiguration solverConfiguration, EDACCSolverConfigPanel parent, boolean useSolverConfiguration) throws SQLException {
-        this(SolverDAO.getById(solverConfiguration.getSolverBinary().getIdSolver()));
+    public EDACCSolverConfigPanelSolver(SolverConfiguration solverConfiguration, EDACCSolverConfigPanel parent, boolean useSolverConfiguration, Experiment experiment) throws SQLException {
+        this(SolverDAO.getById(solverConfiguration.getSolverBinary().getIdSolver()), experiment);
         this.parent = parent;
         addSolverConfiguration(solverConfiguration, useSolverConfiguration);
     }
@@ -102,7 +105,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
                 }
             }
         }
-        EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solverConfiguration, parent.getSolverConfigs().getSolverConfigurationParameters(solverConfiguration));
+        EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solverConfiguration, parent.getSolverConfigs().getSolverConfigurationParameters(solverConfiguration), experiment);
         entry.setParent(this);
         if (!useSolverConfiguration) {
             entry.solver = SolverDAO.getById(entry.solverConfiguration.getSolverBinary().getIdSolver());
@@ -121,7 +124,7 @@ public class EDACCSolverConfigPanelSolver extends javax.swing.JPanel {
      * @throws SQLException
      */
     public void replicateEntry(EDACCSolverConfigEntry entry) throws SQLException {
-        EDACCSolverConfigEntry repl = new EDACCSolverConfigEntry(SolverDAO.getById(entry.getSolverId()), this.getComponentCount());
+        EDACCSolverConfigEntry repl = new EDACCSolverConfigEntry(SolverDAO.getById(entry.getSolverId()), this.getComponentCount(), experiment);
         repl.setParent(this);
         repl.assign(entry);
         int pos = 0;

@@ -133,7 +133,7 @@ public class ParameterGraphDAO {
             ConfigurationScenario cs = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(idExperiment);
             SolverBinaries solver_binary = SolverBinariesDAO.getById(cs.getIdSolverBinary());
             config.updateChecksum();
-            SolverConfiguration solver_config = SolverConfigurationDAO.createSolverConfiguration(solver_binary, idExperiment, 0, name, null, null, toHex(config.getChecksum()));
+            SolverConfiguration solver_config = SolverConfigurationDAO.createSolverConfiguration(solver_binary, idExperiment, 0, name, "", null, null, toHex(config.getChecksum()));
 
             for (ConfigurationScenarioParameter param : cs.getParameters()) {
                 if ("instance".equals(param.getParameter().getName()) || "seed".equals(param.getParameter().getName())) {

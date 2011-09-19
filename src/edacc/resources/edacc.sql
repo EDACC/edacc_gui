@@ -194,6 +194,7 @@ CREATE  TABLE IF NOT EXISTS `SolverConfig` (
   `cost` FLOAT NULL ,
   `cost_function` VARCHAR(255) NULL ,
   `parameter_hash` VARCHAR(255) NULL ,
+  `hint` VARCHAR(1024) NOT NULL ,
   PRIMARY KEY (`idSolverConfig`) ,
   INDEX `fk_SolverConfig_Experiment1` (`Experiment_idExperiment` ASC) ,
   INDEX `fk_SolverConfig_SolverBinaries1` (`SolverBinaries_idSolverBinary` ASC) ,

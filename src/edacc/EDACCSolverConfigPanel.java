@@ -7,10 +7,10 @@ package edacc;
 
 import edacc.model.SolverConfigCache;
 import edacc.experiment.SolverTableModel;
+import edacc.model.Experiment;
 import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
 import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -31,6 +31,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel implements Observ
     private EDACCExperimentMode parent;
     private boolean update;
     private SolverConfigCache solverConfigs;
+    private Experiment experiment;
 
     /** Creates new form EDACCSolverConfigPanel */
     public EDACCSolverConfigPanel() {
@@ -45,6 +46,10 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel implements Observ
         layout = new GridBagLayout();
         this.setLayout(layout);
         this.update = false;
+    }
+
+    public void setExperiment(Experiment experiment) {
+        this.experiment = experiment;
     }
 
     public void setParent(EDACCExperimentMode parent) {
@@ -101,7 +106,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel implements Observ
                 return;
             }
             try {
-                EDACCSolverConfigPanelSolver entry = new EDACCSolverConfigPanelSolver(solver, this);
+                EDACCSolverConfigPanelSolver entry = new EDACCSolverConfigPanelSolver(solver, this, experiment);
                 gridBagConstraints.gridy++;
                 this.add(entry, getIndex(solver.getId()));
                 setGridBagConstraints();
@@ -112,7 +117,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel implements Observ
                 e.printStackTrace();
             }
         }
-    }   
+    }
 
     /**
      * Generates a new <code>EDACCSolverConfigPanelSolver</code> for a solver configuration or uses an existing one to add the solver configuration.
@@ -130,7 +135,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel implements Observ
                 return;
             }
         }
-        EDACCSolverConfigPanelSolver entry = new EDACCSolverConfigPanelSolver(solverConfiguration, this, useSolverConfiguration);
+        EDACCSolverConfigPanelSolver entry = new EDACCSolverConfigPanelSolver(solverConfiguration, this, useSolverConfiguration, experiment);
         this.add(entry, getIndex(solverConfiguration.getSolverBinary().getIdSolver()));
         parent.solTableModel.setSolverSelected(solverConfiguration.getSolverBinary().getIdSolver(), true);
         setGridBagConstraints();
@@ -241,7 +246,7 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel implements Observ
         }
         doRepaint();
     }
-    
+
     @Override
     public void removeAll() {
         removeAll(false);
@@ -306,24 +311,25 @@ public class EDACCSolverConfigPanel extends javax.swing.JPanel implements Observ
         } else {
             if (arg instanceof SolverConfiguration) {
                 SolverConfiguration sc = (SolverConfiguration) arg;
-                if (!solverConfigs.isDeleted(sc)) {
-                    try {
-                        addSolverConfiguration(sc);
-                    } catch (SQLException ex) {
-                        // no one wants to catch this one
-                    }
-                } else {
-                    for (EDACCSolverConfigPanelSolver scp : this.getAllSolverConfigSolverPanels()) {
-                        if (scp.getSolver().getId() == sc.getSolverBinary().getIdSolver()) {
-                            for (EDACCSolverConfigEntry entry : scp.getAllSolverConfigEntries()) {
-                                if (entry.getSolverConfiguration() != null && entry.getSolverConfiguration().getId() == sc.getId()) {
-                                    entry.btnRemove();
+                if (sc.getExperiment_id() == experiment.getId()) {
+                    if (!solverConfigs.isDeleted(sc)) {
+                        try {
+                            addSolverConfiguration(sc);
+                        } catch (SQLException ex) {
+                            // no one wants to catch this one
+                        }
+                    } else {
+                        for (EDACCSolverConfigPanelSolver scp : this.getAllSolverConfigSolverPanels()) {
+                            if (scp.getSolver().getId() == sc.getSolverBinary().getIdSolver()) {
+                                for (EDACCSolverConfigEntry entry : scp.getAllSolverConfigEntries()) {
+                                    if (entry.getSolverConfiguration() != null && entry.getSolverConfiguration().getId() == sc.getId()) {
+                                        entry.btnRemove();
+                                    }
                                 }
                             }
                         }
                     }
                 }
-
             }
         }
     }
