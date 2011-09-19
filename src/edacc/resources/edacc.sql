@@ -17,8 +17,7 @@ CREATE  TABLE IF NOT EXISTS `User` (
   `postal_address` VARCHAR(255) NULL ,
   `affiliation` VARCHAR(255) NULL ,
   PRIMARY KEY (`idUser`) )
-ENGINE = InnoDB, 
-COMMENT = 'Stores user infos in a competition database' ;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -28,11 +27,11 @@ DROP TABLE IF EXISTS `Solver` ;
 
 CREATE  TABLE IF NOT EXISTS `Solver` (
   `idSolver` INT NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(255) NOT NULL COMMENT 'The name of the Solver' ,
-  `description` TEXT NULL COMMENT 'Description of the solver.' ,
-  `code` LONGBLOB NULL COMMENT 'An archiv containing the code files of the solvers. ' ,
-  `version` VARCHAR(255) NULL COMMENT 'The version of the solver.' ,
-  `authors` VARCHAR(255) NULL COMMENT 'The author/s of the solver.' ,
+  `name` VARCHAR(255) NOT NULL ,
+  `description` TEXT NULL ,
+  `code` LONGBLOB NULL ,
+  `version` VARCHAR(255) NULL ,
+  `authors` VARCHAR(255) NULL ,
   `User_idUser` INT NULL ,
   PRIMARY KEY (`idSolver`) ,
   UNIQUE INDEX `name` (`name` ASC, `version` ASC) ,
@@ -42,8 +41,7 @@ CREATE  TABLE IF NOT EXISTS `Solver` (
     REFERENCES `User` (`idUser` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB, 
-COMMENT = 'All relevent information for a solver.' ;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -53,11 +51,11 @@ DROP TABLE IF EXISTS `Parameters` ;
 
 CREATE  TABLE IF NOT EXISTS `Parameters` (
   `idParameter` INT NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(255) NOT NULL COMMENT 'User friendly description of the Parameter' ,
-  `prefix` VARCHAR(255) NULL COMMENT 'The prefix of the parmater as it is used in the command line of the binary.' ,
-  `hasValue` TINYINT(1)  NOT NULL COMMENT 'If the parameter has no value this column should be false. For example parameters like -h dont\'t need a value.' ,
-  `defaultValue` VARCHAR(4096) NULL COMMENT 'A predifined value of a parameter.' ,
-  `order` INT NOT NULL COMMENT 'Specifies the order for the parameters, if there exists one. Parameters with the same order represent a sort of order-class and within this class there exists no order. ' ,
+  `name` VARCHAR(255) NOT NULL ,
+  `prefix` VARCHAR(255) NULL ,
+  `hasValue` TINYINT(1)  NOT NULL ,
+  `defaultValue` VARCHAR(4096) NULL ,
+  `order` INT NOT NULL ,
   `Solver_idSolver` INT NOT NULL ,
   `mandatory` TINYINT(1)  NULL ,
   `space` TINYINT(1)  NULL ,
@@ -71,8 +69,7 @@ CREATE  TABLE IF NOT EXISTS `Parameters` (
     REFERENCES `Solver` (`idSolver` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB, 
-COMMENT = 'Information abaout the parameters of a solver. ' ;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -101,9 +98,9 @@ DROP TABLE IF EXISTS `Instances` ;
 
 CREATE  TABLE IF NOT EXISTS `Instances` (
   `idInstance` INT NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(255) NOT NULL COMMENT 'Name of the file containing the instance.' ,
-  `instance` LONGBLOB NOT NULL COMMENT 'The instance itself.' ,
-  `md5` VARCHAR(60) NOT NULL COMMENT 'The MD5-cheksum of the file.' ,
+  `name` VARCHAR(255) NOT NULL ,
+  `instance` LONGBLOB NOT NULL ,
+  `md5` VARCHAR(60) NOT NULL ,
   `BenchmarkType_idBenchmarkType` INT NULL ,
   PRIMARY KEY (`idInstance`) ,
   UNIQUE INDEX `name` (`name` ASC) ,
@@ -113,8 +110,7 @@ CREATE  TABLE IF NOT EXISTS `Instances` (
     REFERENCES `BenchmarkType` (`idBenchmarkType` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB, 
-COMMENT = 'Contains information about the instances. ' ;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -124,16 +120,15 @@ DROP TABLE IF EXISTS `Experiment` ;
 
 CREATE  TABLE IF NOT EXISTS `Experiment` (
   `idExperiment` INT NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(255) NULL COMMENT 'Name of experiment.' ,
-  `description` TEXT NULL COMMENT 'Description of the Experiment.' ,
-  `date` DATE NOT NULL COMMENT 'The date when it was created.' ,
+  `name` VARCHAR(255) NULL ,
+  `description` TEXT NULL ,
+  `date` DATE NOT NULL ,
   `configurationExp` TINYINT(1)  NULL ,
   `priority` INT NULL ,
-  `active` TINYINT(1)  NOT NULL COMMENT 'is the experiment activ? should the jobs be taken into consideration?' ,
+  `active` TINYINT(1)  NOT NULL ,
   `countUnprocessedJobs` INT NOT NULL DEFAULT 0 ,
   PRIMARY KEY (`idExperiment`) )
-ENGINE = InnoDB, 
-COMMENT = 'Properties of an experiment.' ;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -158,8 +153,7 @@ CREATE  TABLE IF NOT EXISTS `Experiment_has_Instances` (
     REFERENCES `Instances` (`idInstance` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB, 
-COMMENT = 'Specifies the instances used in an experiment.' ;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -214,8 +208,7 @@ CREATE  TABLE IF NOT EXISTS `SolverConfig` (
     REFERENCES `SolverBinaries` (`idSolverBinary` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB, 
-COMMENT = 'Parameter configuration of a solvers of an experiment.' ;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -227,8 +220,7 @@ CREATE  TABLE IF NOT EXISTS `ResultCodes` (
   `resultCode` INT NOT NULL ,
   `description` VARCHAR(255) NOT NULL ,
   PRIMARY KEY (`resultCode`) )
-ENGINE = InnoDB, 
-COMMENT = 'The codes of the verifier together with a description.\n' ;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -250,10 +242,10 @@ DROP TABLE IF EXISTS `gridQueue` ;
 
 CREATE  TABLE IF NOT EXISTS `gridQueue` (
   `idgridQueue` INT NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(255) NOT NULL COMMENT 'The name of the queue.' ,
-  `location` VARCHAR(255) NULL COMMENT 'Location of the queue.' ,
-  `numCPUs` INT NOT NULL COMMENT 'Number of available CPUS per node/system.\n' ,
-  `description` TEXT NULL COMMENT 'Description of the queue.' ,
+  `name` VARCHAR(255) NOT NULL ,
+  `location` VARCHAR(255) NULL ,
+  `numCPUs` INT NOT NULL ,
+  `description` TEXT NULL ,
   `numCores` INT NULL ,
   `numThreads` INT NULL ,
   `hyperthreading` TINYINT(1)  NULL ,
@@ -265,8 +257,7 @@ CREATE  TABLE IF NOT EXISTS `gridQueue` (
   `cpuinfo` VARCHAR(4096) NULL ,
   `meminfo` VARCHAR(4096) NULL ,
   PRIMARY KEY (`idgridQueue`) )
-ENGINE = InnoDB, 
-COMMENT = 'Contains the properties of a queue.' ;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -311,13 +302,13 @@ CREATE  TABLE IF NOT EXISTS `ExperimentResults` (
   `Experiment_idExperiment` INT NOT NULL ,
   `Instances_idInstance` INT NOT NULL ,
   `idJob` INT NOT NULL AUTO_INCREMENT ,
-  `run` INT NOT NULL COMMENT 'The run of a (solver,instance) tupple.' ,
-  `seed` INT NULL COMMENT 'The seed for the solver. ' ,
-  `status` INT NOT NULL COMMENT 'status of the job\n-5: launcher crash\n-4: watcher crash\n-3: solver crash\n-2: verifier crash\n-1: not started \n0: running\n1: finished normaly by solver\n2x: terminated by limit x' ,
-  `startTime` DATETIME NULL COMMENT 'The start-time of the job.' ,
-  `resultTime` FLOAT NULL COMMENT 'The CPU-time the job needed to complete.' ,
-  `resultCode` INT NOT NULL COMMENT '11: SAT\n10: UNSAT\n0: UNKNOWN\n-1: wrong answer\n-2: limit exceeded\n-21: cpu-time\n-22: wall clock-time\n-23: memory\n-24: stack-size\n-25: output-size\n-3xx: received signal:xx stands for the signal-code' ,
-  `computeQueue` INT NULL COMMENT 'ID of the queue where the results where computed.' ,
+  `run` INT NOT NULL ,
+  `seed` INT NULL ,
+  `status` INT NOT NULL ,
+  `startTime` DATETIME NULL ,
+  `resultTime` FLOAT NULL ,
+  `resultCode` INT NOT NULL ,
+  `computeQueue` INT NULL ,
   `date_modified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP ,
   `priority` INT NOT NULL DEFAULT 0 ,
   `computeNode` VARCHAR(255) NULL ,
@@ -369,8 +360,7 @@ CREATE  TABLE IF NOT EXISTS `ExperimentResults` (
     REFERENCES `Client` (`idClient` )
     ON DELETE SET NULL
     ON UPDATE CASCADE)
-ENGINE = InnoDB, 
-COMMENT = 'Stores the jobs of an experiment and their properties.' ;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -381,7 +371,7 @@ DROP TABLE IF EXISTS `SolverConfig_has_Parameters` ;
 CREATE  TABLE IF NOT EXISTS `SolverConfig_has_Parameters` (
   `SolverConfig_idSolverConfig` INT NOT NULL ,
   `Parameters_idParameter` INT NOT NULL ,
-  `value` VARCHAR(4096) NULL COMMENT 'The value of the parameter for this solver configuration. ' ,
+  `value` VARCHAR(4096) NULL ,
   PRIMARY KEY (`SolverConfig_idSolverConfig`, `Parameters_idParameter`) ,
   INDEX `fk_SolverConfig_has_Parameters_SolverConfig1` (`SolverConfig_idSolverConfig` ASC) ,
   INDEX `fk_SolverConfig_has_Parameters_Parameters1` (`Parameters_idParameter` ASC) ,
@@ -395,8 +385,7 @@ CREATE  TABLE IF NOT EXISTS `SolverConfig_has_Parameters` (
     REFERENCES `Parameters` (`idParameter` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB, 
-COMMENT = 'Parameters used for a certain configuration their value' ;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -420,8 +409,7 @@ CREATE  TABLE IF NOT EXISTS `Experiment_has_gridQueue` (
     REFERENCES `gridQueue` (`idgridQueue` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB, 
-COMMENT = 'Specifies the gridQueues used for an experiment.' ;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -431,8 +419,8 @@ DROP TABLE IF EXISTS `instanceClass` ;
 
 CREATE  TABLE IF NOT EXISTS `instanceClass` (
   `idinstanceClass` INT NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(255) NULL COMMENT 'The name of the class. (Unique)' ,
-  `description` TEXT NULL COMMENT 'teh description should contain the source-url of the instances.\n' ,
+  `name` VARCHAR(255) NULL ,
+  `description` TEXT NULL ,
   `User_idUser` INT NULL ,
   `parent` INT NULL ,
   PRIMARY KEY (`idinstanceClass`) ,
@@ -442,8 +430,7 @@ CREATE  TABLE IF NOT EXISTS `instanceClass` (
     REFERENCES `User` (`idUser` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB, 
-COMMENT = 'Enables to manage instances into classes.' ;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -467,8 +454,7 @@ CREATE  TABLE IF NOT EXISTS `Instances_has_instanceClass` (
     REFERENCES `instanceClass` (`idinstanceClass` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
-COMMENT = 'Which instance belongs to which class.';
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -481,8 +467,7 @@ CREATE  TABLE IF NOT EXISTS `DBConfiguration` (
   `competition` TINYINT(1)  NOT NULL ,
   `competitionPhase` INT NULL ,
   PRIMARY KEY (`id`) )
-ENGINE = InnoDB, 
-COMMENT = 'Should only contain 1 row with id 0' ;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
