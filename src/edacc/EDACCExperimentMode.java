@@ -2380,8 +2380,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     private void btnChangeViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangeViewActionPerformed
         if (jScrollPane4.getViewport().getView() == solverConfigTablePanel) {
+            EDACCSolverConfigEntry entry = solverConfigTablePanel.getSelectedSolverConfigEntry();
             jScrollPane4.setViewportView(solverConfigPanel);
             btnSolverTabFilterSolverConfigs.setVisible(false);
+            if (entry != null) {
+                Rectangle b = entry.getBounds();
+                b.y += jScrollPane4.getHeight() - entry.getHeight();
+                solverConfigPanel.scrollRectToVisible(b);
+            }
         } else {
             solverConfigTablePanel.update();
             jScrollPane4.setViewportView(solverConfigTablePanel);

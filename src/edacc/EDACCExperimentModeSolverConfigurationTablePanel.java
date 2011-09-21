@@ -346,4 +346,13 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
             return false;
         }
     }
+    
+    public EDACCSolverConfigEntry getSelectedSolverConfigEntry() {
+        int row;
+        if ((row = table.getSelectedRow()) == -1) {
+            return null;
+        }
+        row = table.convertRowIndexToModel(row);
+        return tableModel.getEntry(row);
+    }
 }
