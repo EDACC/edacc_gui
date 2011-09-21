@@ -3292,11 +3292,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         manageExperimentPane.setEnabledAt(TAB_SOLVERS, true);
         manageExperimentPane.setEnabledAt(TAB_INSTANCES, true);
-        if (expController.getActiveExperiment().isConfigurationExp()) {
-            manageExperimentPane.setEnabledAt(TAB_GENERATEJOBS, false);
-        } else {
-            manageExperimentPane.setEnabledAt(TAB_GENERATEJOBS, true);
-        }
+        manageExperimentPane.setEnabledAt(TAB_GENERATEJOBS, true);
         manageExperimentPane.setEnabledAt(TAB_JOBBROWSER, true);
         manageExperimentPane.setEnabledAt(TAB_ANALYSIS, true);
 
