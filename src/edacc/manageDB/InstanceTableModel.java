@@ -66,6 +66,15 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
     public void initInstances(Vector<Instance> instances){
         clearTable();
         this.instances = instances;
+        
+         for (Instance i : instances) {
+            instanceClassIds.put(i, new LinkedList<Integer>());
+        }
+        try {
+            InstanceHasInstanceClassDAO.fillInstanceClassIds(instanceClassIds);
+        } catch (SQLException ex) {
+            // TODO: error
+        }
     }
     
     public void addInstances(Vector<Instance> instances) {
