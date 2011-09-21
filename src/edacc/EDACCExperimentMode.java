@@ -2873,8 +2873,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     private void btnBrowserColumnSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBrowserColumnSelectionActionPerformed
        jobsTableModel.updateProperties();
-       jobsColumnSelector = new TableColumnSelector(tableJobs);
-        resetJobsColumnVisibility();
+   //    jobsColumnSelector = new TableColumnSelector(tableJobs);
+    //    resetJobsColumnVisibility();
         List<SortKey> sortKeys = (List<SortKey>) tableJobs.getRowSorter().getSortKeys();
         List<String> columnNames = new ArrayList<String>();
         for (SortKey sk : sortKeys) {
@@ -3292,7 +3292,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         manageExperimentPane.setEnabledAt(TAB_SOLVERS, true);
         manageExperimentPane.setEnabledAt(TAB_INSTANCES, true);
-        manageExperimentPane.setEnabledAt(TAB_GENERATEJOBS, true);
+        if (expController.getActiveExperiment().isConfigurationExp()) {
+            manageExperimentPane.setEnabledAt(TAB_GENERATEJOBS, false);
+        } else {
+            manageExperimentPane.setEnabledAt(TAB_GENERATEJOBS, true);
+        }
         manageExperimentPane.setEnabledAt(TAB_JOBBROWSER, true);
         manageExperimentPane.setEnabledAt(TAB_ANALYSIS, true);
 
