@@ -63,6 +63,11 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
         return instances;
     }
 
+    public void initInstances(Vector<Instance> instances){
+        clearTable();
+        this.instances = instances;
+    }
+    
     public void addInstances(Vector<Instance> instances) {
         for (int i = 0; i < instances.size(); i++) {
             addInstance(instances.get(i));

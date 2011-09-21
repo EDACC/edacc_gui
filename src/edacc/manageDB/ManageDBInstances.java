@@ -100,7 +100,7 @@ public class ManageDBInstances implements Observer {
     public void loadInstances() {
         try {
             main.instanceTableModel.instances.clear();
-            main.instanceTableModel.addInstances(new Vector<Instance>(InstanceDAO.getAll()));
+            main.instanceTableModel.initInstances(new Vector<Instance>(InstanceDAO.getAll()));
         } catch (SQLException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
