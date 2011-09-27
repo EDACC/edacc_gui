@@ -15,6 +15,7 @@ import edacc.model.ExperimentDAO;
 import edacc.model.GridQueueDAO;
 import edacc.model.InstanceClassDAO;
 import edacc.model.InstanceDAO;
+import edacc.model.InstanceHasPropertyDAO;
 import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstanceDAO;
 import edacc.model.PropertyDAO;
@@ -271,6 +272,7 @@ public class Util {
         ParameterInstanceDAO.clearCache();
         ParameterDAO.clearCache();
         PropertyDAO.clearCache();
+        InstanceHasPropertyDAO.clearCache();
     }
 
     /* public static void sevenZipEncode(File input, File output) throws FileNotFoundException, Exception {

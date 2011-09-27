@@ -29,6 +29,7 @@ import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.MD5CheckFailedException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
+import edacc.model.PropertyDAO;
 import edacc.model.PropertyNotInDBException;
 import edacc.model.TaskCancelledException;
 import edacc.model.Tasks;
@@ -1238,5 +1239,21 @@ public class ManageDBInstances implements Observer {
 
     public void restoreExpandedState() {
         main.restoreExpandedState();
+    }
+
+    public void loadProperties() {
+        try {
+            PropertyDAO.init();
+        } catch (SQLException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (PropertyTypeNotExistException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ComputationMethodDoesNotExistException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (PropertyNotInDBException ex) {
+            Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

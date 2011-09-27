@@ -22,6 +22,7 @@ import edacc.model.InstanceSourceClassHasInstance;
 import edacc.model.MD5CheckFailedException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
+import edacc.model.PropertyDAO;
 import edacc.model.Solver;
 import edacc.model.SolverBinaries;
 import edacc.model.SolverDAO;
@@ -163,11 +164,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         this.jSplitPane2.setDividerLocation(-1);*/
     }
 
-    public void initialize() throws NoConnectionToDBException, SQLException {
+    public void initialize() throws NoConnectionToDBException, SQLException {              
         manageDBSolvers.loadSolvers();
         manageDBParameters.loadParametersOfSolvers(solverTableModel.getSolvers());
         manageDBInstances.loadInstanceClasses();
         manageDBInstances.loadInstances();
+        manageDBInstances.loadProperties();
         instanceTableModel.updateProperties();
         instanceTableModel.fireTableDataChanged();
         jTreeInstanceClass.updateUI();

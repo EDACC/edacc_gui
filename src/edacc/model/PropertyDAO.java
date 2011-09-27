@@ -57,7 +57,7 @@ public class PropertyDAO {
                 "SELECT name  FROM " + table + " WHERE name=?");
         ps.setString(1, name);
         ResultSet rs = ps.executeQuery();
-        if(rs.next()){
+        if (rs.next()) {
             throw new PropertyAlreadyInDBException();
         }
         r.setName(name);
@@ -397,5 +397,43 @@ public class PropertyDAO {
 
     public static void clearCache() {
         cache.clear();
+    }
+
+    public static void init() throws SQLException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, PropertyNotInDBException {
+        InstanceHasPropertyDAO.init();
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT idProperty, name, description, propertyType, propertySource ,propertyValueType, multipleOccourence, idComputationMethod, "
+                + "computationMethodParameters, isDefault FROM " + table);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            Property res = new Property();
+            res.setId(rs.getInt(1));
+            res.setName(rs.getString(2));
+            res.setDescription(rs.getString(3));
+            res.setType(rs.getInt(4));
+            res.setPropertySource(rs.getInt(5));
+            if (!res.getPropertySource().equals(PropertySource.Parameter)) {
+                res.setRegularExpression(getRegularExpressions(res.getId()));
+                res.setValueType(PropertyValueTypeManager.getInstance().getPropertyValueTypeByName(rs.getString(6)));
+                res.setMultiple(rs.getBoolean(7));
+                if (res.getRegularExpression().isEmpty()) {
+                    res.setComputationMethod(ComputationMethodDAO.getById(rs.getInt(8)));
+                } else {
+                    res.setComputationMethod(null);
+                }
+                res.setComputationMethodParameters(rs.getString(9));
+            } else {
+                res.setRegularExpression(new Vector<String>());
+                res.setValueType(null);
+                res.setMultiple(false);
+                res.setComputationMethod(null);
+                res.setComputationMethodParameters("");
+            }
+            res.setIsDefault(rs.getBoolean(10));
+            res.setSaved();
+            cache.cache(res);
+            return;
+        }
+
     }
 }
