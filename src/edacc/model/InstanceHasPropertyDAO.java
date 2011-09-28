@@ -273,6 +273,7 @@ public class InstanceHasPropertyDAO {
             Property p = PropertyDAO.getById(rs.getInt("idProperty"));
             String value = rs.getString("value");
             InstanceHasProperty i = new InstanceHasProperty(in, p, value);
+            i.setId(rs.getInt("id"));
             cache.cache(i);
             if (idCache.get(i.getInstance().getId()) == null) {
                 Hashtable tmp = new Hashtable();

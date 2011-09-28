@@ -36,7 +36,8 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
     private String[] columns;
     protected Vector<Instance> instances;
     protected HashMap<Instance, LinkedList<Integer>> instanceClassIds;
-
+    private int[] trans;    
+    
     public String[] getAllColumnNames() {
         return columns;
     }
@@ -45,9 +46,11 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
         this.instances = new Vector<Instance>();
         columns = new String[CONST_COLUMNS.length];
         visible = new boolean[columns.length];
+        trans = new int[columns.length];
         for (int i = 0; i < columns.length; i++) {
             columns[i] = CONST_COLUMNS[i];
             visible[i] = CONST_VISIBLE[i];
+            trans[i] = i;
         }
         instanceClassIds = new HashMap<Instance, LinkedList<Integer>>();
     }
@@ -130,7 +133,7 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
 
     @Override
     public String getColumnName(int col) {
-        return columns[col];
+        return columns[trans[col]];
     }
 
     @Override
@@ -161,7 +164,8 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
         if (columnIndex != -1) {
             columnIndex = getIndexForColumn(columnIndex);
         }
-
+        int oldColumnIndex = columnIndex;
+        columnIndex = trans[columnIndex];
         switch (columnIndex) {
             case 0:
                 return instances.get(rowIndex).getName();
@@ -204,6 +208,13 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
             return;
         }
         this.visible = visibility;
+        int j = 0;
+        for(int i = 0; i < visible.length; i++){
+            if(visible[i]){
+                trans[j] = i;
+                j++;
+            }
+        }
         if (updateTable) {
             this.fireTableStructureChanged();
         }
@@ -244,6 +255,10 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
         System.arraycopy(CONST_VISIBLE, 0, visible, 0, CONST_VISIBLE.length);
         for (int i = CONST_VISIBLE.length; i < visible.length; i++) {
             visible[i] = false;
+        }
+        trans = new int[columns.length];
+        for(int i = 0; i < trans.length; i++){
+            trans[i] = i;
         }
         fireTableStructureChanged();
     }
