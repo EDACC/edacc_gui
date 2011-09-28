@@ -36,8 +36,8 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
     private String[] columns;
     protected Vector<Instance> instances;
     protected HashMap<Instance, LinkedList<Integer>> instanceClassIds;
-    private int[] trans;    
-    
+    private int[] trans;
+
     public String[] getAllColumnNames() {
         return columns;
     }
@@ -66,11 +66,11 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
         return instances;
     }
 
-    public void initInstances(Vector<Instance> instances){
+    public void initInstances(Vector<Instance> instances) {
         clearTable();
         this.instances = instances;
-        
-         for (Instance i : instances) {
+
+        for (Instance i : instances) {
             instanceClassIds.put(i, new LinkedList<Integer>());
         }
         try {
@@ -79,7 +79,7 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
             // TODO: error
         }
     }
-    
+
     public void addInstances(Vector<Instance> instances) {
         for (int i = 0; i < instances.size(); i++) {
             addInstance(instances.get(i));
@@ -165,7 +165,7 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
             columnIndex = getIndexForColumn(columnIndex);
         }
         int oldColumnIndex = columnIndex;
-        columnIndex = trans[columnIndex];
+        //columnIndex = trans[columnIndex];
         switch (columnIndex) {
             case 0:
                 return instances.get(rowIndex).getName();
@@ -209,8 +209,13 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
         }
         this.visible = visibility;
         int j = 0;
-        for(int i = 0; i < visible.length; i++){
-            if(visible[i]){
+        trans = new int[visible.length];
+
+        for (int i = 0; i < trans.length; i++) {
+            trans[i] = i;
+        }
+        for (int i = 0; i < visible.length; i++) {
+            if (visible[i]) {
                 trans[j] = i;
                 j++;
             }
@@ -257,7 +262,7 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
             visible[i] = false;
         }
         trans = new int[columns.length];
-        for(int i = 0; i < trans.length; i++){
+        for (int i = 0; i < trans.length; i++) {
             trans[i] = i;
         }
         fireTableStructureChanged();
