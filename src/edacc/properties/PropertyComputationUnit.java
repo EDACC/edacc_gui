@@ -315,6 +315,9 @@ public class PropertyComputationUnit implements Runnable {
                 String value = in.readLine();
 
                 // set the value and save it
+                if(value.isEmpty()){
+                    value = null;
+                }
                 ihp.setValue(value);
                 System.out.println(value);
                 InstanceHasPropertyDAO.save(ihp);
