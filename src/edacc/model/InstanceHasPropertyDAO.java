@@ -64,7 +64,7 @@ public class InstanceHasPropertyDAO {
             cache.cache(i);
             i.setSaved();
             if (idCache.get(i.getInstance().getId()) == null) {
-                Hashtable tmp = new Hashtable();
+                Hashtable tmp = new Hashtable<Integer, Integer>();
                 tmp.put(i.getProperty().getId(), i.getId());
                 idCache.put(i.getInstance().getId(), tmp);
             } else {
@@ -230,6 +230,7 @@ public class InstanceHasPropertyDAO {
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
         res = getInstanceHasInstancePropertyFromResultSet(rs);
+        res.setSaved();
         cache.cache(res);
         idCache.get(res.getInstance().getId()).put(res.getProperty().getId(), res.getId());
         return res;
@@ -270,8 +271,12 @@ public class InstanceHasPropertyDAO {
             Instance in = InstanceDAO.getById(rs.getInt("idInstance"));
             Property p = PropertyDAO.getById(rs.getInt("idProperty"));
             String value = rs.getString("value");
-            InstanceHasProperty i = new InstanceHasProperty(in, p, value);
+            InstanceHasProperty i = new InstanceHasProperty();
+            i.setValue(value);
+            i.setInstance(in);
+            i.setInstanceProperty(p);
             i.setId(rs.getInt("id"));
+            i.setSaved();
             cache.cache(i);
             if (idCache.get(i.getInstance().getId()) == null) {
                 Hashtable tmp = new Hashtable();

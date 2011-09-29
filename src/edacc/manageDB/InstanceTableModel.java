@@ -288,9 +288,6 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
         }
 
         updateProperties();
-        for (Instance i : instances) {
-            instanceClassIds.put(i, new LinkedList<Integer>());
-        }
         try {
             InstanceHasInstanceClassDAO.fillInstanceClassIds(instanceClassIds);
         } catch (SQLException ex) {

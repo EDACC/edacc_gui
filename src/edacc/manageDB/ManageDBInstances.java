@@ -140,7 +140,6 @@ public class ManageDBInstances implements Observer {
                 Vector<Instance> instances;
                 instances = buildInstancesAutogenerateClass(instanceFiles, ret, task, compress);
                 main.instanceTableModel.addNewInstances(instances);
-                loadInstanceClasses();
             } else {
                 Vector<Instance> instances;
                 if (autoClass) {
