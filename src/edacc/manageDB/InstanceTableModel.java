@@ -138,6 +138,7 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
 
     @Override
     public Class getColumnClass(int col) {
+        col = trans[col];
         if (this.getRowCount() == 0) {
             return String.class;
         } else {
@@ -162,10 +163,8 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (columnIndex != -1) {
-            columnIndex = getIndexForColumn(columnIndex);
+            columnIndex = trans[columnIndex];
         }
-        int oldColumnIndex = columnIndex;
-        //columnIndex = trans[columnIndex];
         switch (columnIndex) {
             case 0:
                 return instances.get(rowIndex).getName();
@@ -174,24 +173,22 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
             default:
                 int propertyIdx = columnIndex - COL_PROP;
                 Property prop = properties.get(propertyIdx);
-                if (prop.getType().equals(PropertyType.InstanceProperty)) {
-                    InstanceHasProperty ihp = null;
-                    try {
-                        ihp = InstanceHasPropertyDAO.getByInstanceAndProperty(instances.get(rowIndex), prop);
-                    } catch (Exception e) {
-                    }
-                    if (ihp == null) {
-                        return null;
-                    } else {
-                        try {
-                            return prop.getPropertyValueType().getJavaTypeRepresentation(ihp.getValue());
-                        } catch (ConvertException ex) {
-                            return "";
-                        }
-                    }
-                } else {
-                    return "";
+
+                InstanceHasProperty ihp = null;
+                try {
+                    ihp = InstanceHasPropertyDAO.getByInstanceAndProperty(instances.get(rowIndex), prop);
+                } catch (Exception e) {
                 }
+                if (ihp == null || ihp.getValue() == null) {
+                    return null;
+                } else {
+                    try {
+                        return prop.getPropertyValueType().getJavaTypeRepresentation(ihp.getValue());
+                    } catch (ConvertException ex) {
+                        return null;
+                    }
+                }
+
         }
     }
 
@@ -290,7 +287,7 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
             addNewInstance(instances.get(i));
         }
 
-
+        updateProperties();
         for (Instance i : instances) {
             instanceClassIds.put(i, new LinkedList<Integer>());
         }

@@ -164,7 +164,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         this.jSplitPane2.setDividerLocation(-1);*/
     }
 
-    public void initialize() throws NoConnectionToDBException, SQLException {              
+    public void initialize() throws NoConnectionToDBException, SQLException {
         manageDBSolvers.loadSolvers();
         manageDBParameters.loadParametersOfSolvers(solverTableModel.getSolvers());
         manageDBInstances.loadInstanceClasses();
@@ -1710,10 +1710,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     JOptionPane.ERROR_MESSAGE);
         } else {
             int returnVal = jFileChooserManageDBExportInstance.showOpenDialog(panelManageDBInstances);
-            if(returnVal == JFileChooser.APPROVE_OPTION){
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
                 String path = jFileChooserManageDBExportInstance.getSelectedFile().getAbsolutePath();
                 Tasks.startTask("exportInstances", new Class[]{int[].class, String.class, edacc.model.Tasks.class}, new Object[]{tableInstances.getSelectedRows(), path, null}, manageDBInstances, EDACCManageDBMode.this);
-            }    
+            }
         }
     }//GEN-LAST:event_btnExportInstancesActionPerformed
 
@@ -1831,7 +1831,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             jTreeInstanceClass.setSelectionPath(null);
             this.instanceTableModel.fireTableDataChanged();
             restoreExpandedState();
-            tableInstances.requestFocus();        
+            tableInstances.requestFocus();
         } catch (IOException ex) {
             Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1963,10 +1963,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             return;
         } else {
             int returnVal = jFileChooserManageDBExportInstance.showOpenDialog(panelManageDBInstances);
-            if(returnVal == JFileChooser.APPROVE_OPTION){
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
                 String path = jFileChooserManageDBExportInstance.getSelectedFile().getAbsolutePath();
                 Tasks.startTask("exportInstanceClass", new Class[]{DefaultMutableTreeNode.class, String.class, edacc.model.Tasks.class}, new Object[]{(DefaultMutableTreeNode) jTreeInstanceClass.getSelectionPath().getLastPathComponent(), path, null}, manageDBInstances, EDACCManageDBMode.this);
-            }         
+            }
         }
     }//GEN-LAST:event_btnExportInstanceClassActionPerformed
 
@@ -2203,7 +2203,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             tableParameters.updateUI();
         }
         if (!enabled) // if no solver is chosen don't activate buttons for solver binaries. Otherwise enable them, if a binary is selected (see SolverBinariesTableSelectionListener)
+        {
             enableSolverBinaryButtons(false);
+        }
         jlSolverName.setEnabled(enabled);
         jlSolverDescription.setEnabled(enabled);
         jlSolverAuthors.setEnabled(enabled);
@@ -2587,7 +2589,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         if (show) {
             // set the color of the TextField to a nice red
             tfParametersName.setBackground(new Color(255, 102, 102));
-            
+
         } else {
             tfParametersName.setBackground(Color.white);
         }
