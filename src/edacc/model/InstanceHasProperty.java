@@ -13,6 +13,14 @@ public class InstanceHasProperty extends BaseModel implements IntegerPKModel {
 
     private int id;
     private Instance instance;
+
+    public void setInstance(Instance instance) {
+        this.instance = instance;
+    }
+
+    public void setInstanceProperty(Property instanceProperty) {
+        this.instanceProperty = instanceProperty;
+    }
     private Property instanceProperty;
     private String value;
 
@@ -20,6 +28,9 @@ public class InstanceHasProperty extends BaseModel implements IntegerPKModel {
         this.instance = instance;
         this.instanceProperty = instanceProperty;
         this.value = value;
+    }
+
+    protected InstanceHasProperty() {
     }
     
     public String getValue() {
