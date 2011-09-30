@@ -6,6 +6,7 @@ import edacc.EDACCExperimentMode;
 import edacc.EDACCSolverConfigEntry;
 import edacc.EDACCSolverConfigPanel;
 import edacc.EDACCSolverConfigPanelSolver;
+import edacc.api.costfunctions.*;
 import edacc.model.ClientDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.ConfigurationScenario;
@@ -205,7 +206,7 @@ public class ExperimentController {
         if (solverConfigCache != null) {
             solverConfigPanel.setExperiment(activeExperiment);
             main.solverConfigTablePanel.setExperiment(activeExperiment);
-            
+
             solverConfigCache.changeExperiment(activeExperiment);
         } else {
             solverConfigCache = new SolverConfigCache(activeExperiment);
@@ -403,7 +404,7 @@ public class ExperimentController {
 
         // check for deleted solver configurations (jobs have to be deleted)
         experimentResultCache.updateExperimentResults();
-        
+
         ArrayList<SolverConfiguration> deletedSolverConfigurations = solverConfigCache.getAllDeleted();
         final ArrayList<ExperimentResult> deletedJobs = new ArrayList<ExperimentResult>();
         final HashSet<Integer> scIds = new HashSet<Integer>();
@@ -1978,5 +1979,61 @@ public class ExperimentController {
 
     public void reloadConfigurationScenario() throws SQLException {
         configScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
+    }
+
+    /**
+     * Returns an instance of a cost function from the given database representation,
+     * or null, if no such cost function exists.
+     * @param databaseRepresentation
+     * @return
+     */
+    public CostFunction costFunctionByName(String databaseRepresentation) {
+        if ("average".equals(databaseRepresentation)) {
+            return new Average();
+        } else if ("median".equals(databaseRepresentation)) {
+            return new Median();
+        } else if (databaseRepresentation != null && databaseRepresentation.startsWith("par")) {
+            try {
+                int penaltyFactor = Integer.valueOf(databaseRepresentation.substring(3));
+                return new PARX(penaltyFactor);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Calculates the costs for the specified solver configurations. Persists all changes to db.<br/>
+     * @param costFunction
+     * @param solverConfigs
+     * @throws Exception 
+     */
+    public void calculateCosts(Tasks task, String costFunction, ArrayList<SolverConfiguration> solverConfigs) throws Exception {
+        task.setOperationName("Calculating cost for " + costFunction);
+        if (costFunction == null) {
+            throw new IllegalArgumentException("cost function cannot be null");
+        } else if (solverConfigs == null || solverConfigs.isEmpty()) {
+            throw new IllegalArgumentException("no solver configurations for cost calculation selected");
+        } else if (activeExperiment == null) {
+            throw new IllegalArgumentException("no experiment loaded");
+        }
+        for (SolverConfiguration solverConfig : solverConfigs) {
+            if (solverConfig.getExperiment_id() != activeExperiment.getId()) {
+                throw new IllegalArgumentException("calculating costs for other experiments than the loaded experiment is currently not supported");
+            }
+        }
+        CostFunction cFunction = costFunctionByName(costFunction);
+        if (cFunction == null) {
+            throw new Exception("invalid cost function");
+        }
+        task.setStatus("Updating jobs..");
+        experimentResultCache.updateExperimentResults();
+        task.setStatus("Calculating..");
+        for (SolverConfiguration solverConfig : solverConfigs) {
+            Float cost = cFunction.calculateCost(experimentResultCache.getResults(solverConfig.getId()));
+            solverConfig.setCost(cost);
+            solverConfig.setCost_function(cFunction.databaseRepresentation());
+        }
     }
 }

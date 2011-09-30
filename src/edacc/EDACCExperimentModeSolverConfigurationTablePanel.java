@@ -5,13 +5,17 @@
  */
 package edacc;
 
+import edacc.experiment.ExperimentController;
 import edacc.experiment.SolverConfigEntryTableModel;
 import edacc.model.Experiment;
 import edacc.model.ParameterInstance;
 import edacc.model.ParameterInstanceDAO;
 import edacc.model.Solver;
 import edacc.model.SolverConfigCache;
+import edacc.model.SolverConfiguration;
 import edacc.model.SolverDAO;
+import edacc.model.TaskRunnable;
+import edacc.model.Tasks;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -27,7 +31,9 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -39,10 +45,12 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
     private EDACCSolverConfigPanel solverConfigPanel;
     private TableModel tableModel;
     private Experiment experiment;
-    
+    private ExperimentController expController;
+
     /** Creates new form EDACCExperimentModeSolverConfigurationTablePanel */
-    public EDACCExperimentModeSolverConfigurationTablePanel(EDACCSolverConfigPanel solverConfigPanel) {
+    public EDACCExperimentModeSolverConfigurationTablePanel(EDACCSolverConfigPanel solverConfigPanel, ExperimentController expController) {
         initComponents();
+        this.expController = expController;
         this.solverConfigPanel = solverConfigPanel;
         tableModel = new TableModel();
         table.setModel(tableModel);
@@ -72,6 +80,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
 
         popupMenu = new javax.swing.JPopupMenu();
         itemEdit = new javax.swing.JMenuItem();
+        itemCalculateCosts = new javax.swing.JMenuItem();
         itemRemove = new javax.swing.JMenuItem();
         jScrollPane1 = new javax.swing.JScrollPane();
         table = table = new JTableTooltipInformation();
@@ -88,6 +97,15 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
             }
         });
         popupMenu.add(itemEdit);
+
+        itemCalculateCosts.setText(resourceMap.getString("itemCalculateCosts.text")); // NOI18N
+        itemCalculateCosts.setName("itemCalculateCosts"); // NOI18N
+        itemCalculateCosts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemCalculateCostsActionPerformed(evt);
+            }
+        });
+        popupMenu.add(itemCalculateCosts);
 
         itemRemove.setText(resourceMap.getString("itemRemove.text")); // NOI18N
         itemRemove.setName("itemRemove"); // NOI18N
@@ -141,7 +159,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
     public void setSolverConfigCache(SolverConfigCache solverConfigCache) {
         solverConfigCache.addObserver(this);
     }
-    
+
     public void setExperiment(Experiment experiment) {
         this.experiment = experiment;
     }
@@ -157,7 +175,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
 
         public SolverConfigDialog(EDACCSolverConfigEntry entry) {
             super();
-            
+
             setTitle("Edit Solver Configuration");
             JButton btnCancel = new JButton("Cancel");
             JButton btnApply = new JButton("Apply");
@@ -243,7 +261,53 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
         }
     }//GEN-LAST:event_tableMouseClicked
 
+    private void itemCalculateCostsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCalculateCostsActionPerformed
+        final ArrayList<SolverConfiguration> selected = new ArrayList<SolverConfiguration>();
+        for (int row : table.getSelectedRows()) {
+            EDACCSolverConfigEntry entry = tableModel.getEntry(table.convertRowIndexToModel(row));
+            if (entry.getSolverConfiguration() != null) {
+                selected.add(entry.getSolverConfiguration());
+            }
+        }
+        if (selected.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No saved solver configurations for cost calculations selected.", "Information", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            final String costFunction = JOptionPane.showInputDialog("Cost function");
+            if (costFunction == null) {
+                JOptionPane.showMessageDialog(this, "No cost function selected.", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                Tasks.startTask(new TaskRunnable() {
+
+                    @Override
+                    public void run(Tasks task) {
+                        try {
+                            expController.calculateCosts(task, costFunction, selected);
+                            SwingUtilities.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    tableModel.fireTableDataChanged();
+                                    solverConfigPanel.setTitles();
+                                }
+                            });
+
+                        } catch (final Exception e) {
+                            SwingUtilities.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    JOptionPane.showMessageDialog(EDACCExperimentModeSolverConfigurationTablePanel.this, "Error while calculating costs:\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        }
+    }//GEN-LAST:event_itemCalculateCostsActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem itemCalculateCosts;
     private javax.swing.JMenuItem itemEdit;
     private javax.swing.JMenuItem itemRemove;
     private javax.swing.JScrollPane jScrollPane1;
@@ -254,7 +318,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
 
     private class TableModel extends DefaultTableModel {
 
-        private String[] columns = new String[]{"Solver", "Solver Configuration", "Parameters"};
+        private String[] columns = new String[]{"Solver", "Solver Configuration", "Cost", "Cost Function", "Parameters"};
         ArrayList<String> solverConfigNames;
         ArrayList<Solver> solvers;
         ArrayList<String> parameterStrings;
@@ -323,6 +387,10 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
                     case 1:
                         return solverConfigNames.get(row);
                     case 2:
+                        return entries.get(row).getSolverConfiguration() != null ? entries.get(row).getSolverConfiguration().getCost() : null;
+                    case 3:
+                        return entries.get(row).getSolverConfiguration() != null ? entries.get(row).getSolverConfiguration().getCost_function() : null;
+                    case 4:
                         return parameterStrings.get(row);
                     default:
                         return "";
@@ -334,10 +402,17 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
 
         @Override
         public Class<?> getColumnClass(int columnIndex) {
-            if (getRowCount() == 0) {
-                return String.class;
-            } else {
-                return getValueAt(0, columnIndex).getClass();
+            switch (columnIndex) {
+                case 2:
+                    return Float.class;
+                case 3:
+                    return String.class;
+                default:
+                    if (getRowCount() == 0) {
+                        return String.class;
+                    } else {
+                        return getValueAt(0, columnIndex).getClass();
+                    }
             }
         }
 
@@ -346,7 +421,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
             return false;
         }
     }
-    
+
     public EDACCSolverConfigEntry getSelectedSolverConfigEntry() {
         int row;
         if ((row = table.getSelectedRow()) == -1) {

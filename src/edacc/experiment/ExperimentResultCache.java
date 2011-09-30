@@ -154,6 +154,22 @@ public class ExperimentResultCache {
         Integer numRuns = runMap.get(new SolverConfigInstanceIdentifier(solverConfigId, instanceId));
         return numRuns == null ? 0 : (numRuns + 1);
     }
+    
+    /**
+     * Returns all experiment result with the specified solver config id.<br/>
+     * updateExperimentResults() should be called first.
+     * @param idSolverConfig
+     * @return 
+     */
+    public synchronized ArrayList<ExperimentResult> getResults(int idSolverConfig) {
+        ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
+        for (ExperimentResult er : resultMap.values()) {
+            if (er.getSolverConfigId() == idSolverConfig) {
+                res.add(er);
+            }
+        }
+        return res;
+    } 
 
     /**
      * Returns all experiment results with any run in the given list for the active experiment.<br/>

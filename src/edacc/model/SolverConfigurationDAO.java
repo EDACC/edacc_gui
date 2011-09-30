@@ -25,7 +25,13 @@ public class SolverConfigurationDAO {
         i.setSeed_group(rs.getInt("seed_group"));
         i.setName(rs.getString("name"));
         i.setCost(rs.getFloat("cost"));
+        if (rs.wasNull()) {
+            i.setCost(null);
+        }
         i.setCost_function(rs.getString("cost_function"));
+        if (rs.wasNull()) {
+            i.setCost_function(null);
+        }
         i.setParameter_hash(rs.getString("parameter_hash"));
         i.setHint(rs.getString("hint"));
         return i;

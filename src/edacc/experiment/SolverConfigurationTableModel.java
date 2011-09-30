@@ -20,11 +20,15 @@ public class SolverConfigurationTableModel extends ThreadSafeDefaultTableModel {
     public static final int COL_SOLVER = 1;
     /** The index for the name column */
     public static final int COL_NAME = 2;
+    /** The index for the cost column */
+    public static final int COL_COST = 3;
+    /** The index for the cost function column */
+    public static final int COL_COSTFUNCTION = 4;
     /** The index for the solver binary column */
-    public static final int COL_SOLVERBINARY = 3;
+    public static final int COL_SOLVERBINARY = 5;
     /** The index for the parameters column */
-    public static final int COL_PARAMETERS = 4;
-    private String[] columns = {"Selected", "Solver", "Solver Configuration", "Solver Binary", "Parameters"};
+    public static final int COL_PARAMETERS = 6;
+    private String[] columns = {"Selected", "Solver", "Solver Configuration", "Cost", "Cost Function", "Solver Binary", "Parameters"};
     /** The selection of the rows */
     public boolean[] selected;
     private ArrayList<SolverConfiguration> solverConfigurations;
@@ -74,6 +78,10 @@ public class SolverConfigurationTableModel extends ThreadSafeDefaultTableModel {
                 }
             case COL_NAME:
                 return solverConfigurations.get(rowIndex).getName();
+            case COL_COST:
+                return solverConfigurations.get(rowIndex).getCost();
+            case COL_COSTFUNCTION:
+                return solverConfigurations.get(rowIndex).getCost_function();
             case COL_SOLVERBINARY:
                 return solverConfigurations.get(rowIndex).getSolverBinary().toString();
             case COL_PARAMETERS:
@@ -91,10 +99,23 @@ public class SolverConfigurationTableModel extends ThreadSafeDefaultTableModel {
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        if (solverConfigurations == null || solverConfigurations.isEmpty()) {
-            return String.class;
-        } else {
-            return getValueAt(0, columnIndex).getClass();
+        switch (columnIndex) {
+            case COL_SEL:
+                return Boolean.class;
+            case COL_SOLVER:
+                return String.class;
+            case COL_NAME:
+                return String.class;
+            case COL_COST:
+                return Float.class;
+            case COL_COSTFUNCTION:
+                return String.class;
+            case COL_SOLVERBINARY:
+                return String.class;
+            case COL_PARAMETERS:
+                return String.class;
+            default:
+                return String.class;
         }
     }
 

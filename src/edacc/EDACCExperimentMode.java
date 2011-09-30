@@ -311,7 +311,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         /* -------------------------------- solver tab -------------------------------- */
         //jScrollPane4.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
         btnSolverTabFilterSolverConfigs.setVisible(false);
-        solverConfigTablePanel = new EDACCExperimentModeSolverConfigurationTablePanel(solverConfigPanel);
+        solverConfigTablePanel = new EDACCExperimentModeSolverConfigurationTablePanel(solverConfigPanel, expController);
         lblSolverFilterStatus.setPreferredSize(null);
         solTableModel = new SolverTableModel();
         tableSolvers.setModel(solTableModel);

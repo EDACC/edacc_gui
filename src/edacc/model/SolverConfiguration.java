@@ -21,6 +21,9 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
 
     public void setCost(Float cost) {
         this.cost = cost;
+        if (this.isSaved() && (cost == null || !cost.equals(this.cost))) {
+            this.setModified();
+        }
     }
 
     public String getCost_function() {
@@ -28,7 +31,11 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
     }
 
     public void setCost_function(String cost_function) {
+        if (this.isSaved() && (cost_function == null || !cost_function.equals(this.cost_function))) {
+            this.setModified();
+        }
         this.cost_function = cost_function;
+
     }
 
     public String getParameter_hash() {
