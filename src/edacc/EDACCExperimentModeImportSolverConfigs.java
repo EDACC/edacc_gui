@@ -101,8 +101,8 @@ public class EDACCExperimentModeImportSolverConfigs extends javax.swing.JDialog 
 
             @Override
             public void run() {
-                existingSolverConfigFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tblSolverConfigsByExperiments, true);
-                //  solverFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tableSolvers, true);
+                existingSolverConfigFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tblSolverConfigsBySolvers, true);
+                solverFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tableSolvers, true);
             }
         });
         TableRowSorter tableSolverConfigurationsRowSorterByExperiments = new TableRowSorter<SolverConfigurationTableModel>(solverConfigTableModelByExperiments);
@@ -138,6 +138,7 @@ public class EDACCExperimentModeImportSolverConfigs extends javax.swing.JDialog 
 
                 }
                 solverConfigTableModelBySolvers.fireTableDataChanged();
+                updateExistingSolverConfigFilterStatus();
             }
         });
 
@@ -614,7 +615,7 @@ public class EDACCExperimentModeImportSolverConfigs extends javax.swing.JDialog 
         lblExistingSolverConfigFilterStatus.setForeground(Color.red);
         String status = "";
         if (existingSolverConfigFilter.hasFiltersApplied()) {
-            status += "This list of solver configurations has filters applied to it. Use the filter button below to modify. Showing " + tblSolverConfigsByExperiments.getRowCount() + " solver configurations.";
+            status += "This list of solver configurations has filters applied to it. Use the filter button below to modify. Showing " + tblSolverConfigsBySolvers.getRowCount() + " solver configurations.";
         }
         lblExistingSolverConfigFilterStatus.setText(status);
     }

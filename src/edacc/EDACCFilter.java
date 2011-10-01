@@ -61,6 +61,7 @@ public class EDACCFilter extends javax.swing.JDialog {
             throw new IllegalArgumentException("Expected TableRowSorter.");
         }
         this.table = table;
+        filterArguments = new LinkedList<ArgumentPanel>();
         rowSorter = (TableRowSorter<? extends TableModel>) table.getRowSorter();
         final RowFilter oldRowFilter = rowSorter.getRowFilter();
         rowFilter = new RowFilter<Object, Object>() {
@@ -82,7 +83,7 @@ public class EDACCFilter extends javax.swing.JDialog {
         parser = new Parser();
         this.updateFilterTypes = autoUpdateFilterTypes;
         expression = "";
-        filterArguments = new LinkedList<ArgumentPanel>();
+        
     }
 
     /**
