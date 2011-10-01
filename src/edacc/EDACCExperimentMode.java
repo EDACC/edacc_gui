@@ -161,7 +161,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public DefaultTreeModel instanceClassTreeModel;
     private EDACCInstanceFilter instanceFilter;
     private EDACCFilter solverConfigFilter;
-    private EDACCFilter existingSolverConfigFilter;
     private EDACCFilter solverFilter;
     private EDACCOutputViewer outputViewer;
     private EDACCExperimentModeJobsCellRenderer tableJobsStringRenderer;
@@ -188,7 +187,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     /**
      * The filter for the solver configuration table. Will be created on object construction and never be recreated.
      */
-    public SolverConfigurationTableRowFilter solverConfigurationTableRowFilter;
     private TableColumnSelector jobsColumnSelector;
     private TableColumnSelector instanceColumnSelector;
     public ConfigurationScenarioTableModel configScenarioTableModel;
@@ -319,39 +317,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         solverConfigPanel.setParent(this);
         solverConfigTableModel = new SolverConfigurationTableModel();
 
-        TableRowSorter tableSolverConfigurationsRowSorter = new TableRowSorter<SolverConfigurationTableModel>(solverConfigTableModel);
-        solverConfigurationTableRowFilter = new SolverConfigurationTableRowFilter();
-        tableSolverConfigurationsRowSorter.setRowFilter(solverConfigurationTableRowFilter);
-        tblSolverConfigs.setRowSorter(tableSolverConfigurationsRowSorter);
-        tblSolverConfigs.setModel(solverConfigTableModel);
-        Util.addSpaceSelection(tblSolverConfigs, SolverConfigurationTableModel.COL_SEL);
-        tableSolvers.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                solverConfigurationTableRowFilter.clearSolverBinaryIds();
-                for (int rowView : tableSolvers.getSelectedRows()) {
-                    int rowModel = tableSolvers.convertRowIndexToModel(rowView);
-                    for (SolverBinaries sb : solTableModel.getSolver(rowModel).getSolverBinaries()) {
-                        solverConfigurationTableRowFilter.addSolverBinaryId(sb.getId());
-                    }
-
-                }
-                solverConfigTableModel.fireTableDataChanged();
-                tblSolverConfigs.repaint();
-            }
-        });
-        
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
                 solverConfigFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, solverConfigTablePanel.table, true);
-                existingSolverConfigFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tblSolverConfigs, true);
                 solverFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tableSolvers, true);
             }
         });
-
         /* -------------------------------- end of solver tab -------------------------------- */
         /* -------------------------------- instances tab -------------------------------- */
         insTableModel = new InstanceTableModel();
@@ -613,10 +586,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jScrollPane4.setViewportView(solverConfigPanel);
         btnSolverTabFilterSolverConfigs.setVisible(false);
         solverConfigFilter.clearFilters();
-        existingSolverConfigFilter.clearFilters();
         solverFilter.clearFilters();
         updateSolverConfigFilterStatus();
-        updateExistingSolverConfigFilterStatus();
         updateSolverFilterStatus();
     }
 
@@ -721,8 +692,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnDefineCourse = new javax.swing.JButton();
         panelChooseSolver = new javax.swing.JPanel();
         splitPaneSolverSolverConfigs = new javax.swing.JSplitPane();
-        jPanel2 = new javax.swing.JPanel();
-        splitPaneSolver = new javax.swing.JSplitPane();
         jPanel8 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tableSolvers = new JTableTooltipInformation();
@@ -732,15 +701,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnChooseSolvers = new javax.swing.JButton();
         btnSolverTabFilterSolvers = new javax.swing.JButton();
         lblSolverFilterStatus = new javax.swing.JLabel();
-        jPanel9 = new javax.swing.JPanel();
-        jScrollPane8 = new javax.swing.JScrollPane();
-        tblSolverConfigs = new JTableTooltipInformation();
-        btnChooseSolverConfigs = new javax.swing.JButton();
-        btnSelectAllSolverConfigs = new javax.swing.JButton();
-        btnDeselectAllSolverConfigs = new javax.swing.JButton();
-        btnInvertSolverConfigSelection = new javax.swing.JButton();
-        btnSolverTabFilterExistingSolverConfigs = new javax.swing.JButton();
-        lblExistingSolverConfigFilterStatus = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         btnSaveSolverConfigurations = new javax.swing.JButton();
         btnUndoSolverConfigurations = new javax.swing.JButton();
@@ -1212,11 +1172,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         splitPaneSolverSolverConfigs.setName("splitPaneSolverSolverConfigs"); // NOI18N
         splitPaneSolverSolverConfigs.setPreferredSize(new java.awt.Dimension(0, 0));
 
-        jPanel2.setName("jPanel2"); // NOI18N
-
-        splitPaneSolver.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-        splitPaneSolver.setName("splitPaneSolver"); // NOI18N
-
         jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel8.border.title"))); // NOI18N
         jPanel8.setName("jPanel8"); // NOI18N
         jPanel8.setPreferredSize(new java.awt.Dimension(0, 0));
@@ -1289,10 +1244,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         });
 
         lblSolverFilterStatus.setText(resourceMap.getString("lblSolverFilterStatus.text")); // NOI18N
-        lblSolverFilterStatus.setMaximumSize(new java.awt.Dimension(0, 0));
-        lblSolverFilterStatus.setMinimumSize(new java.awt.Dimension(0, 0));
         lblSolverFilterStatus.setName("lblSolverFilterStatus"); // NOI18N
-        lblSolverFilterStatus.setPreferredSize(new java.awt.Dimension(0, 0));
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
@@ -1308,16 +1260,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addComponent(btnSolverTabFilterSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnChooseSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(478, Short.MAX_VALUE))
-            .addComponent(lblSolverFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 1052, Short.MAX_VALUE)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 1052, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(lblSolverFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
-                .addComponent(lblSolverFilterStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblSolverFilterStatus)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSelectAllSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1327,123 +1279,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     .addComponent(btnSolverTabFilterSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
-        splitPaneSolver.setLeftComponent(jPanel8);
-
-        jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel9.border.title"))); // NOI18N
-        jPanel9.setName("jPanel9"); // NOI18N
-        jPanel9.setPreferredSize(new java.awt.Dimension(0, 0));
-
-        jScrollPane8.setName("jScrollPane8"); // NOI18N
-
-        tblSolverConfigs.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tblSolverConfigs.setName("tblSolverConfigs"); // NOI18N
-        jScrollPane8.setViewportView(tblSolverConfigs);
-
-        btnChooseSolverConfigs.setText(resourceMap.getString("btnChooseSolverConfigs.text")); // NOI18N
-        btnChooseSolverConfigs.setName("btnChooseSolverConfigs"); // NOI18N
-        btnChooseSolverConfigs.setPreferredSize(new java.awt.Dimension(110, 23));
-        btnChooseSolverConfigs.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnChooseSolverConfigsActionPerformed(evt);
-            }
-        });
-
-        btnSelectAllSolverConfigs.setText(resourceMap.getString("btnSelectAllSolverConfigs.text")); // NOI18N
-        btnSelectAllSolverConfigs.setName("btnSelectAllSolverConfigs"); // NOI18N
-        btnSelectAllSolverConfigs.setPreferredSize(new java.awt.Dimension(110, 23));
-        btnSelectAllSolverConfigs.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSelectAllSolverConfigsActionPerformed(evt);
-            }
-        });
-
-        btnDeselectAllSolverConfigs.setText(resourceMap.getString("btnDeselectAllSolverConfigs.text")); // NOI18N
-        btnDeselectAllSolverConfigs.setName("btnDeselectAllSolverConfigs"); // NOI18N
-        btnDeselectAllSolverConfigs.setPreferredSize(new java.awt.Dimension(110, 23));
-        btnDeselectAllSolverConfigs.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDeselectAllSolverConfigsActionPerformed(evt);
-            }
-        });
-
-        btnInvertSolverConfigSelection.setText(resourceMap.getString("btnInvertSolverConfigSelection.text")); // NOI18N
-        btnInvertSolverConfigSelection.setName("btnInvertSolverConfigSelection"); // NOI18N
-        btnInvertSolverConfigSelection.setPreferredSize(new java.awt.Dimension(110, 23));
-        btnInvertSolverConfigSelection.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnInvertSolverConfigSelectionActionPerformed(evt);
-            }
-        });
-
-        btnSolverTabFilterExistingSolverConfigs.setText(resourceMap.getString("btnSolverTabFilterExistingSolverConfigs.text")); // NOI18N
-        btnSolverTabFilterExistingSolverConfigs.setName("btnSolverTabFilterExistingSolverConfigs"); // NOI18N
-        btnSolverTabFilterExistingSolverConfigs.setPreferredSize(new java.awt.Dimension(110, 23));
-        btnSolverTabFilterExistingSolverConfigs.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSolverTabFilterExistingSolverConfigsActionPerformed(evt);
-            }
-        });
-
-        lblExistingSolverConfigFilterStatus.setText(resourceMap.getString("lblExistingSolverConfigFilterStatus.text")); // NOI18N
-        lblExistingSolverConfigFilterStatus.setName("lblExistingSolverConfigFilterStatus"); // NOI18N
-
-        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
-        jPanel9.setLayout(jPanel9Layout);
-        jPanel9Layout.setHorizontalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel9Layout.createSequentialGroup()
-                .addComponent(btnSelectAllSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnDeselectAllSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnInvertSolverConfigSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(6, 6, 6)
-                .addComponent(btnSolverTabFilterExistingSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnChooseSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(478, Short.MAX_VALUE))
-            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 1052, Short.MAX_VALUE)
-            .addComponent(lblExistingSolverConfigFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 1052, Short.MAX_VALUE)
-        );
-        jPanel9Layout.setVerticalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
-                .addComponent(lblExistingSolverConfigFilterStatus)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSelectAllSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnDeselectAllSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnInvertSolverConfigSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnChooseSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSolverTabFilterExistingSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-        );
-
-        splitPaneSolver.setRightComponent(jPanel9);
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(splitPaneSolver, javax.swing.GroupLayout.DEFAULT_SIZE, 1066, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(splitPaneSolver, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
-        );
-
-        splitPaneSolverSolverConfigs.setLeftComponent(jPanel2);
+        splitPaneSolverSolverConfigs.setLeftComponent(jPanel8);
 
         jScrollPane4.setToolTipText(resourceMap.getString("jScrollPane4.toolTipText")); // NOI18N
         jScrollPane4.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -2153,7 +1989,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 btnDefineCourse.setText(text);
             case TAB_SOLVERS:
                 splitPaneSolverSolverConfigs.setDividerLocation(0.5);
-                splitPaneSolver.setDividerLocation(0.5);
 
                 edacc.experiment.Util.updateTableColumnWidth(tableSolvers);
                 if (solverConfigUpdateThread == null || solverConfigUpdateThread.isDone()) {
@@ -2396,23 +2231,36 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }//GEN-LAST:event_btnChangeViewActionPerformed
 
     private void btnImportSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportSolverConfigsActionPerformed
-        ObjectCache<SolverConfiguration> cache = SolverConfigurationDAO.cache;
-        SolverConfigurationDAO.cache = new ObjectCache<SolverConfiguration>();
-        EDACCExperimentModeImportSolverConfigs dialog = new EDACCExperimentModeImportSolverConfigs(EDACCApp.getApplication().getMainFrame(), true, expController);
-        dialog.setName("EDACCExperimentModeImportSolverConfigs");
-        dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
-        EDACCApp.getApplication().show(dialog);
-        SolverConfigurationDAO.cache = cache;
-        if (!dialog.isCancelled()) {
-            try {
-                for (SolverConfiguration sc : dialog.getSelectedSolverConfigurations()) {
-                    solverConfigPanel.addSolverConfiguration(sc, false);
-                }
-                solverConfigTablePanel.update();
-            } catch (Exception e) {
-                javax.swing.JOptionPane.showMessageDialog(null, "Could not import solver configurations: " + e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        Tasks.startTask(new TaskRunnable() {
+
+            @Override
+            public void run(Tasks task) {
+                final ObjectCache<SolverConfiguration> cache = SolverConfigurationDAO.cache;
+                SolverConfigurationDAO.cache = new ObjectCache<SolverConfiguration>();
+                final EDACCExperimentModeImportSolverConfigs dialog = new EDACCExperimentModeImportSolverConfigs(EDACCApp.getApplication().getMainFrame(), true, expController);
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        dialog.setName("EDACCExperimentModeImportSolverConfigs");
+                        dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+                        EDACCApp.getApplication().show(dialog);
+                        SolverConfigurationDAO.cache = cache;
+                        if (!dialog.isCancelled()) {
+                            try {
+                                for (SolverConfiguration sc : dialog.getSelectedSolverConfigurations()) {
+                                    solverConfigPanel.addSolverConfiguration(sc, false);
+                                }
+                                solverConfigTablePanel.update();
+                            } catch (Exception e) {
+                                javax.swing.JOptionPane.showMessageDialog(null, "Could not import solver configurations: " + e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    }
+                });
             }
-        }
+        });
+
 
     }//GEN-LAST:event_btnImportSolverConfigsActionPerformed
 
@@ -2495,40 +2343,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         }
     }//GEN-LAST:event_menuRemoveDeadClientsActionPerformed
-
-    private void btnChooseSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseSolverConfigsActionPerformed
-        try {
-            for (int row = 0; row < tblSolverConfigs.getRowCount(); row++) {
-                if (solverConfigTableModel.isSelected(tblSolverConfigs.convertRowIndexToModel(row))) {
-                    solverConfigPanel.addSolverConfiguration(solverConfigTableModel.getSolverConfigurationAt(tblSolverConfigs.convertRowIndexToModel(row)), false);
-                }
-            }
-            solverConfigTablePanel.update();
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error while saving solver configurations: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_btnChooseSolverConfigsActionPerformed
-
-    private void btnSelectAllSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAllSolverConfigsActionPerformed
-        for (int row = 0; row < tblSolverConfigs.getRowCount(); row++) {
-            solverConfigTableModel.setValueAt(true, tblSolverConfigs.convertRowIndexToModel(row), SolverConfigurationTableModel.COL_SEL);
-        }
-        solverConfigTableModel.fireTableDataChanged();
-    }//GEN-LAST:event_btnSelectAllSolverConfigsActionPerformed
-
-    private void btnDeselectAllSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeselectAllSolverConfigsActionPerformed
-        for (int row = 0; row < tblSolverConfigs.getRowCount(); row++) {
-            solverConfigTableModel.setValueAt(false, tblSolverConfigs.convertRowIndexToModel(row), SolverConfigurationTableModel.COL_SEL);
-        }
-        solverConfigTableModel.fireTableDataChanged();
-    }//GEN-LAST:event_btnDeselectAllSolverConfigsActionPerformed
-
-    private void btnInvertSolverConfigSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInvertSolverConfigSelectionActionPerformed
-        for (int row = 0; row < tblSolverConfigs.getRowCount(); row++) {
-            solverConfigTableModel.setValueAt(!(Boolean) solverConfigTableModel.getValueAt(tblSolverConfigs.convertRowIndexToModel(row), SolverConfigurationTableModel.COL_SEL), tblSolverConfigs.convertRowIndexToModel(row), SolverConfigurationTableModel.COL_SEL);
-        }
-        solverConfigTableModel.fireTableDataChanged();
-    }//GEN-LAST:event_btnInvertSolverConfigSelectionActionPerformed
 
     private void btnImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportActionPerformed
         if (expController.getActiveExperiment() == null) {
@@ -2872,14 +2686,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }//GEN-LAST:event_btnRefreshJobsActionPerformed
 
     private void btnBrowserColumnSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBrowserColumnSelectionActionPerformed
-       jobsTableModel.updateProperties();
-   //    jobsColumnSelector = new TableColumnSelector(tableJobs);
-    //    resetJobsColumnVisibility();
+        jobsTableModel.updateProperties();
+        //    jobsColumnSelector = new TableColumnSelector(tableJobs);
+        //    resetJobsColumnVisibility();
         List<SortKey> sortKeys = (List<SortKey>) tableJobs.getRowSorter().getSortKeys();
         List<String> columnNames = new ArrayList<String>();
         for (SortKey sk : sortKeys) {
             columnNames.add(tableJobs.getColumnName(tableJobs.convertColumnIndexToView(sk.getColumn())));
-        }      
+        }
         EDACCResultsBrowserColumnSelection dialog = new EDACCResultsBrowserColumnSelection(EDACCApp.getApplication().getMainFrame(), true, jobsColumnSelector, jobsTableModel);
         dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         dialog.setVisible(true);
@@ -3265,12 +3079,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         updateSolverFilterStatus();
     }//GEN-LAST:event_btnSolverTabFilterSolversActionPerformed
 
-    private void btnSolverTabFilterExistingSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverTabFilterExistingSolverConfigsActionPerformed
-        EDACCApp.getApplication().show(existingSolverConfigFilter);
-        solverConfigTableModel.fireTableDataChanged();
-        updateExistingSolverConfigFilterStatus();
-    }//GEN-LAST:event_btnSolverTabFilterExistingSolverConfigsActionPerformed
-
     /**
      * Stops the jobs timer.
      */
@@ -3396,7 +3204,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBrowserColumnSelection;
     private javax.swing.JButton btnChangeView;
-    private javax.swing.JButton btnChooseSolverConfigs;
     private javax.swing.JButton btnChooseSolvers;
     private javax.swing.JButton btnComputeResultProperties;
     private javax.swing.JButton btnConfigScenarioSave;
@@ -3405,7 +3212,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JButton btnCreateExperiment;
     private javax.swing.JButton btnDefineCourse;
     private javax.swing.JButton btnDeselectAllInstances;
-    private javax.swing.JButton btnDeselectAllSolverConfigs;
     private javax.swing.JButton btnDeselectAllSolvers;
     private javax.swing.JButton btnDiscardExperiment;
     private javax.swing.JButton btnEditExperiment;
@@ -3418,7 +3224,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JButton btnImportSolverConfigs;
     private javax.swing.JButton btnInstanceColumnSelection;
     private javax.swing.JButton btnInvertSelection;
-    private javax.swing.JButton btnInvertSolverConfigSelection;
     private javax.swing.JButton btnLoadExperiment;
     private javax.swing.JButton btnRandomSelection;
     private javax.swing.JButton btnRefreshJobs;
@@ -3427,13 +3232,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JButton btnSaveInstances;
     private javax.swing.JButton btnSaveSolverConfigurations;
     private javax.swing.JButton btnSelectAllInstances;
-    private javax.swing.JButton btnSelectAllSolverConfigs;
     private javax.swing.JButton btnSelectAllSolvers;
     private javax.swing.JButton btnSelectQueue;
     private javax.swing.JButton btnSelectedInstances;
     private javax.swing.JButton btnSetNumRuns;
     private javax.swing.JButton btnSetPriority;
-    private javax.swing.JButton btnSolverTabFilterExistingSolverConfigs;
     private javax.swing.JButton btnSolverTabFilterSolverConfigs;
     private javax.swing.JButton btnSolverTabFilterSolvers;
     private javax.swing.JButton btnUndoInstances;
@@ -3446,14 +3249,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -3461,14 +3262,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
-    private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JTree jTreeInstanceClass;
     private javax.swing.JLabel lblETA;
-    private javax.swing.JLabel lblExistingSolverConfigFilterStatus;
     private javax.swing.JLabel lblFilterStatus;
     private javax.swing.JLabel lblJobsFilterStatus;
     private javax.swing.JLabel lblSolverFilterStatus;
@@ -3490,7 +3289,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JPopupMenu popupInstanceClassTree;
     private javax.swing.JPopupMenu popupTblClients;
     private javax.swing.JScrollPane scrollPaneExperimentsTable;
-    private javax.swing.JSplitPane splitPaneSolver;
     private javax.swing.JSplitPane splitPaneSolverSolverConfigs;
     private javax.swing.JTable tableExperiments;
     public javax.swing.JTable tableInstances;
@@ -3499,7 +3297,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JTable tblClients;
     private javax.swing.JTable tblConfigurationScenario;
     public javax.swing.JTable tblGenerateJobs;
-    private javax.swing.JTable tblSolverConfigs;
     private javax.swing.JTextField txtJobsTimer;
     // End of variables declaration//GEN-END:variables
 
@@ -3564,34 +3361,25 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         lblJobsFilterStatus.setText(status);
     }
-    
+
     public void updateSolverFilterStatus() {
         lblSolverFilterStatus.setForeground(Color.red);
         String status = "";
         if (solverFilter.hasFiltersApplied()) {
             status += "This list of solvers has filters applied to it. Use the filter button below to modify. Showing " + tableSolvers.getRowCount() + " solvers.";
         }
-        lblSolverFilterStatus.setText(status); 
-    }
-    
-    public void updateExistingSolverConfigFilterStatus() {
-        lblExistingSolverConfigFilterStatus.setForeground(Color.red);
-        String status = "";
-        if (existingSolverConfigFilter.hasFiltersApplied()) {
-            status += "This list of solver configurations has filters applied to it. Use the filter button below to modify. Showing " + tblSolverConfigs.getRowCount() + " solver configurations.";
-        }
-        lblExistingSolverConfigFilterStatus.setText(status);         
+        lblSolverFilterStatus.setText(status);
     }
 
     public void updateSolverConfigFilterStatus() {
         solverConfigTablePanel.lblFilterStatus.setForeground(Color.red);
         String status = "";
-        if (existingSolverConfigFilter.hasFiltersApplied()) {
+        if (solverConfigFilter.hasFiltersApplied()) {
             status += "This list of solver configurations has filters applied to it. Use the filter button below to modify. Showing " + solverConfigTablePanel.table.getRowCount() + " solver configurations.";
         }
-        solverConfigTablePanel.lblFilterStatus.setText(status);    
+        solverConfigTablePanel.lblFilterStatus.setText(status);
     }
-    
+
     /**
      * Returns the jobs table of the job browser tab.
      * @return the jobs table

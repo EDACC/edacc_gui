@@ -13,18 +13,20 @@ import javax.swing.RowFilter.Entry;
 public class SolverConfigurationTableRowFilter extends RowFilter<SolverConfigurationTableModel, Integer> {
     private HashSet<Integer> solverBinaryIds;
     private HashSet<Integer> excludeExperiments;
+    private HashSet<Integer> includeExperiments;
     
     /** Creates a new solver configuration table row filter */
     public SolverConfigurationTableRowFilter() {
         super();
         solverBinaryIds = new HashSet<Integer>();
         excludeExperiments = new HashSet<Integer>();
+        includeExperiments = new HashSet<Integer>();
     }
     
     @Override
     public boolean include(Entry<? extends SolverConfigurationTableModel, ? extends Integer> entry) {
         SolverConfiguration sc = entry.getModel().getSolverConfigurationAt(entry.getIdentifier());
-        return !excludeExperiments.contains(sc.getExperiment_id()) && solverBinaryIds.contains(sc.getSolverBinary().getId());
+        return includeExperiments.contains(sc.getExperiment_id()) || (!excludeExperiments.contains(sc.getExperiment_id()) && solverBinaryIds.contains(sc.getSolverBinary().getId()));
     }
 
     /**
@@ -40,6 +42,14 @@ public class SolverConfigurationTableRowFilter extends RowFilter<SolverConfigura
      */
     public void clearExcludedExperiments() {
         excludeExperiments.clear();
+    }
+    
+    public void includeExperiment(int id) {
+        includeExperiments.add(id);
+    }
+    
+    public void clearIncludedExperiments() {
+        includeExperiments.clear();
     }
     
     /**
