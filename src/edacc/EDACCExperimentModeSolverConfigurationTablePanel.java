@@ -403,16 +403,18 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
         @Override
         public Class<?> getColumnClass(int columnIndex) {
             switch (columnIndex) {
+                case 0:
+                    return String.class;
+                case 1:
+                    return Solver.class;
                 case 2:
                     return Float.class;
                 case 3:
                     return String.class;
+                case 4:
+                    return String.class;
                 default:
-                    if (getRowCount() == 0) {
-                        return String.class;
-                    } else {
-                        return getValueAt(0, columnIndex).getClass();
-                    }
+                    return String.class;
             }
         }
 
