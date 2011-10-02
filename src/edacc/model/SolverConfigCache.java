@@ -78,6 +78,11 @@ public class SolverConfigCache extends Observable {
         for (SolverConfiguration sc : SolverConfigurationDAO.getSolverConfigurationByExperimentId(experiment.getId())) {
             solverConfigs.put(sc.getId(), sc);
         }
+        ArrayList<SolverConfiguration> tmp = new ArrayList<SolverConfiguration>();
+        for (SolverConfiguration sc : solverConfigs.values()) {
+            tmp.add(sc);
+        }
+        ParameterInstanceDAO.cacheParameterInstances(tmp);
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -143,7 +144,7 @@ public class ParameterInstanceDAO {
         return res;
     }
 
-    public static void cacheParameterInstances(ArrayList<SolverConfiguration> p_scs) throws SQLException {
+    public static void cacheParameterInstances(List<SolverConfiguration> p_scs) throws SQLException {
         if (p_scs == null) {
             return;
         }
