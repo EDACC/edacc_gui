@@ -31,10 +31,12 @@ public class ExperimentResultDAO {
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idJob=?";
     protected static final String selectQuery = "SELECT SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance, "
             + "idJob, run, seed, status, resultTime, resultCode, "
-            + "solverExitCode, watcherExitCode, verifierExitCode, computeQueue, TIMESTAMPDIFF(SECOND, startTime, NOW()) AS runningTime, "
+         //   + "solverExitCode, watcherExitCode, verifierExitCode, "
+            + "computeQueue, TIMESTAMPDIFF(SECOND, startTime, NOW()) AS runningTime, "
             + "IF(status = " + StatusCode.RUNNING.getStatusCode() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) AS date_modified,"
             + "priority, startTime, CPUTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast, computeNode, computeNodeIP, Client_idClient "
-            + "FROM " + table + " LEFT JOIN ExperimentResultsOutput ON (idJob = ExperimentResults_idJob) ";
+            + "FROM " + table + " ";
+           // + "LEFT JOIN ExperimentResultsOutput ON (idJob = ExperimentResults_idJob) ";
     protected static final String copyOutputQuery = "UPDATE ExperimentResultsOutput as dest, ExperimentResultsOutput as src "
             + "SET "
             + "dest.solverOutput = src.solverOutput, "
@@ -368,9 +370,9 @@ public class ExperimentResultDAO {
         r.setStatus(StatusCodeDAO.getByStatusCode(rs.getInt("status")));
         r.setResultTime(rs.getFloat("resultTime"));
         r.setResultCode(ResultCodeDAO.getByResultCode(rs.getInt("resultCode")));
-        r.setSolverExitCode(rs.getInt("solverExitCode"));
-        r.setWatcherExitCode(rs.getInt("watcherExitCode"));
-        r.setVerifierExitCode(rs.getInt("verifierExitCode"));
+       // r.setSolverExitCode(rs.getInt("solverExitCode"));
+       // r.setWatcherExitCode(rs.getInt("watcherExitCode"));
+       // r.setVerifierExitCode(rs.getInt("verifierExitCode"));
         r.setComputeQueue(rs.getInt("computeQueue"));
         r.setPriority(rs.getInt("priority"));
         r.setStartTime(rs.getTimestamp("startTime"));
