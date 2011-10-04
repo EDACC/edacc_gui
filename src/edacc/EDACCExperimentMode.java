@@ -1291,7 +1291,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jPanel2.setName("jPanel2"); // NOI18N
 
         jScrollPane4.setToolTipText(resourceMap.getString("jScrollPane4.toolTipText")); // NOI18N
-        jScrollPane4.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane4.setName("jScrollPane4"); // NOI18N
         solverConfigPanel = new edacc.experiment.tabs.solver.gui.EDACCSolverConfigComponent(expController);
         jScrollPane4.setViewportView(solverConfigPanel);

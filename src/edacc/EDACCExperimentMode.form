@@ -895,7 +895,6 @@
                     <Container class="javax.swing.JScrollPane" name="jScrollPane4">
                       <Properties>
                         <Property name="toolTipText" type="java.lang.String" resourceKey="jScrollPane4.toolTipText"/>
-                        <Property name="verticalScrollBarPolicy" type="int" value="22"/>
                         <Property name="name" type="java.lang.String" value="jScrollPane4" noResource="true"/>
                       </Properties>
                       <AuxValues>
