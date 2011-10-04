@@ -431,9 +431,9 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
         public Class<?> getColumnClass(int columnIndex) {
             switch (columnIndex) {
                 case 0:
-                    return String.class;
-                case 1:
                     return Solver.class;
+                case 1:
+                    return String.class;
                 case 2:
                     return Float.class;
                 case 3:
