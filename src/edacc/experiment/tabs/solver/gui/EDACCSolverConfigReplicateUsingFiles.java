@@ -3,9 +3,10 @@
  *
  * Created on 16.02.2011, 12:25:58
  */
-package edacc;
+package edacc.experiment.tabs.solver.gui;
 
-import edacc.experiment.SolverConfigEntryTableModel;
+import edacc.JTableTooltipInformation;
+import edacc.experiment.tabs.solver.SolverConfigEntryTableModel;
 import edacc.model.Parameter;
 import java.io.File;
 import java.util.ArrayList;
@@ -31,11 +32,12 @@ public class EDACCSolverConfigReplicateUsingFiles extends javax.swing.JDialog {
         txtDirectory.setText(fileChooser.getCurrentDirectory().getAbsolutePath());
         chosenFolder = null;
         model = (ParameterTableModel) tblParameters.getModel();
-        model.setParameters(entry.getParameters());
+        // TODO: fix!
+     /*   model.setParameters(entry.getParameters());
         for (int i = 0; i < model.getRowCount(); i++) {
             model.setValueAt(entry.getModel().getValueAt(i, 3), i, 3);
             model.setValueAt(entry.getModel().getValueAt(i, 0), i, 0);
-        }
+        }*/
     }
 
     /** This method is called from within the constructor to

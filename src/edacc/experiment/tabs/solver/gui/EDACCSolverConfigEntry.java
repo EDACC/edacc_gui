@@ -3,30 +3,19 @@
  *
  * Created on 30.12.2009, 20:11:16
  */
-package edacc;
+package edacc.experiment.tabs.solver.gui;
 
-import edacc.experiment.SolverConfigEntryTableModel;
-import edacc.model.Experiment;
-import edacc.model.Parameter;
-import edacc.model.ParameterDAO;
-import edacc.model.ParameterInstance;
-import edacc.model.ParameterInstanceDAO;
-import edacc.model.Solver;
+import edacc.EDACCApp;
+import edacc.JTableTooltipInformation;
+import edacc.experiment.tabs.solver.EDACCSolverConfigEntryListener;
+import edacc.experiment.tabs.solver.SolverConfigurationEntry;
 import edacc.model.SolverBinaries;
 import edacc.model.SolverConfiguration;
-import edacc.model.SolverDAO;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.LinkedList;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -44,43 +33,32 @@ import org.jdesktop.application.Action;
  */
 public class EDACCSolverConfigEntry extends javax.swing.JPanel {
 
-    protected SolverConfigEntryTableModel solverConfigEntryTableModel;
     private TitledBorder border;
-    private Experiment experiment;
-    protected SolverConfiguration solverConfiguration;
-    protected Solver solver;
-    protected EDACCSolverConfigPanelSolver parent;
     private boolean updateTableColumnWidth;
+    private SolverConfigurationEntry model;
+    private EDACCSolverConfigEntryListener listener;
 
-    private EDACCSolverConfigEntry(int solverId, Experiment experiment) throws SQLException {
-        solverConfigEntryTableModel = new SolverConfigEntryTableModel();
-        this.experiment = experiment;
+    protected EDACCSolverConfigEntry(final SolverConfigurationEntry model, EDACCSolverConfigEntryListener listener) {
+        if (model == null) {
+            throw new IllegalArgumentException("Model cannot be null.");
+        }
+        if (listener == null) {
+            throw new IllegalArgumentException("Listener cannot be null.");
+        }
+        
+        this.model = model;
         initComponents();
-        if (!experiment.isConfigurationExp()) {
+        if (!model.getExperiment().isConfigurationExp()) {
             jLabel2.setVisible(false);
             txtHint.setVisible(false);
         }
         this.border = new TitledBorder("");
         this.setBorder(border);
-        ArrayList<Parameter> params = new ArrayList<Parameter>();
-        params.addAll(ParameterDAO.getParameterFromSolverId(solverId));
-        solverConfigEntryTableModel.setParameters(params);
 
-        ArrayList<SolverBinaries> solverBinaries = new ArrayList<SolverBinaries>();
-        solverBinaries.addAll(SolverDAO.getById(solverId).getSolverBinaries());
-        for (SolverBinaries sb : solverBinaries) {
+        for (SolverBinaries sb : model.getSolver().getSolverBinaries()) {
             comboSolverBinaries.addItem(sb);
         }
 
-        solverConfigEntryTableModel.addTableModelListener(new TableModelListener() {
-
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                if (parent != null) {
-                    parent.setTitles();
-                }
-            }
-        });
         parameterTable.setRowSelectionAllowed(false);
         parameterTable.setCellSelectionEnabled(false);
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
@@ -89,7 +67,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 JLabel lbl = (JLabel) comp;
-                lbl.setEnabled((Boolean) solverConfigEntryTableModel.getValueAt(row, 0));
+                lbl.setEnabled((Boolean) model.getTableModel().getValueAt(row, 0));
                 return comp;
             }
         };
@@ -108,7 +86,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 checkBox.setBackground(comp.getBackground());
-                checkBox.setEnabled(!solverConfigEntryTableModel.getParameters().get(row).isMandatory());
+                checkBox.setEnabled(!model.getTableModel().getParameters().get(row).isMandatory());
                 checkBox.setSelected((Boolean) value);
                 return checkBox;
             }
@@ -117,24 +95,25 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         parameterTable.setDefaultRenderer(String.class, renderer);
         parameterTable.setDefaultRenderer(Integer.class, renderer);
         parameterTable.setDefaultRenderer(Boolean.class, booleanRenderer);
+
         updateTableColumnWidth = true;
+
+        model.getTableModel().addTableModelListener(new TableModelListener() {
+
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                fireParametersChanged();
+            }
+        });
+        update();
+        this.listener = listener;
     }
-
-    /**
-     * Creates a new form EDACCSolverConfigEntry. Uses a solver configuration
-     * to fill the parameter table.
-     * @param solverConfiguration
-     * @throws SQLException
-     */
-    public EDACCSolverConfigEntry(SolverConfiguration solverConfiguration, ArrayList<ParameterInstance> params, Experiment experiment) throws SQLException {
-        this(solverConfiguration.getSolverBinary().getIdSolver(), experiment);
-        this.solverConfiguration = solverConfiguration;
-
-        solverConfigEntryTableModel.setParameterInstances(params);
-        txtSeedGroup.setText(String.valueOf(solverConfiguration.getSeed_group()));
-        txtHint.setText(solverConfiguration.getHint());
-        border.setTitle(solverConfiguration.getName());
-        comboSolverBinaries.setSelectedItem(solverConfiguration.getSolverBinary());
+    
+    public void update() {
+        txtSeedGroup.setText("" + model.getSeedGroup());
+        txtHint.setText(model.getHint());
+        border.setTitle(model.getName());
+        comboSolverBinaries.setSelectedItem(model.getSolverBinary());
     }
 
     /**
@@ -143,18 +122,15 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
      * @param solver
      * @throws SQLException
      */
-    public EDACCSolverConfigEntry(Solver solver, int num, Experiment experiment) throws SQLException {
-        this(solver, num > 1 ? solver.getName() + " (" + num + ")" : solver.getName(), experiment);
-    }
-
+    /* public EDACCSolverConfigEntry(Solver solver, int num, Experiment experiment) throws SQLException {
+    this(solver, num > 1 ? solver.getName() + " (" + num + ")" : solver.getName(), experiment);
+    }*/
     public SolverBinaries getSolverBinary() {
         return (SolverBinaries) comboSolverBinaries.getSelectedItem();
     }
 
-    public EDACCSolverConfigEntry(Solver solver, String name, Experiment experiment) throws SQLException {
-        this(solver.getId(), experiment);
-        this.solver = solver;
-        border.setTitle(name);
+    public SolverConfigurationEntry getModel() {
+        return model;
     }
 
     @Override
@@ -170,85 +146,16 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         return border.getTitle();
     }
 
-    /**
-     * Assigns all parameter values/selections from entry.
-     * @param entry
-     */
-    public void assign(EDACCSolverConfigEntry entry) {
-        txtSeedGroup.setText(entry.getSeedGroup().getText());
-        txtHint.setText(entry.getHint());
-        for (int i = 0; i < entry.solverConfigEntryTableModel.getRowCount(); i++) {
-            solverConfigEntryTableModel.setValueAt(entry.solverConfigEntryTableModel.getValueAt(i, 3), i, 3);
-            solverConfigEntryTableModel.setValueAt(entry.solverConfigEntryTableModel.getValueAt(i, 0), i, 0);
-        }
-        comboSolverBinaries.setSelectedIndex(entry.comboSolverBinaries.getSelectedIndex());
-        updateTableColumnWidth = true;
-    }
-
     public int getSolverId() {
-        if (solver != null) {
-            return solver.getId();
-        }
-        if (solverConfiguration != null) {
-            return solverConfiguration.getSolverBinary().getIdSolver();
-        }
-        return -1;
+        return model.getSolver().getId();
     }
 
     public SolverConfiguration getSolverConfiguration() {
-        return solverConfiguration;
-    }
-
-    /*
-     * Updates the solver configuration if there is currently no solver configuration
-     * specified and sets its name.
-     */
-    public void setSolverConfiguration(SolverConfiguration solverConfiguration) {
-        if (this.solverConfiguration == null) {
-            this.solverConfiguration = solverConfiguration;
-            solverConfiguration.setName(border.getTitle());
-        }
-    }
-
-    public void setParent(EDACCSolverConfigPanelSolver parent) {
-        this.parent = parent;
+        return model.getSolverConfig();
     }
 
     public javax.swing.JTextField getSeedGroup() {
         return txtSeedGroup;
-    }
-
-    /**
-     * Saves all new and modified parameter instances to the database.
-     * @throws SQLException
-     */
-    public void saveParameterInstances() throws SQLException {
-        ArrayList<ParameterInstance> parameterVector = new ArrayList<ParameterInstance>();
-        for (int i = 0; i < solverConfigEntryTableModel.getRowCount(); i++) {
-            if ((Boolean) solverConfigEntryTableModel.getValueAt(i, 0)) {
-                Parameter p = (Parameter) solverConfigEntryTableModel.getValueAt(i, 5);
-                ParameterInstance pi = (ParameterInstance) solverConfigEntryTableModel.getValueAt(i, 6);
-                if (pi == null) {
-                    pi = ParameterInstanceDAO.createParameterInstance(p.getId(), solverConfiguration, (String) solverConfigEntryTableModel.getValueAt(i, 2));
-                    parameterVector.add(pi);
-                }
-                if (!pi.getValue().equals((String) solverConfigEntryTableModel.getValueAt(i, 3))) {
-                    pi.setValue((String) solverConfigEntryTableModel.getValueAt(i, 3));
-                    ParameterInstanceDAO.setModified(pi);
-                    ParameterInstanceDAO.save(pi);
-                }
-            } else {
-                ParameterInstance pi = (ParameterInstance) solverConfigEntryTableModel.getValueAt(i, 6);
-                if (pi != null) {
-                    ParameterInstanceDAO.setDeleted(pi);
-                    ParameterInstanceDAO.save(pi);
-                    solverConfigEntryTableModel.removeParameterInstance(pi);
-                }
-            }
-        }
-        if (parameterVector.size() > 0) {
-            solverConfigEntryTableModel.setParameterInstances(parameterVector);
-        }
     }
 
     /** This method is called from within the constructor to
@@ -275,14 +182,18 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
 
         setName("Form"); // NOI18N
 
-        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCSolverConfigEntry.class, this);
-        btnReplicate.setAction(actionMap.get("btnReplicate")); // NOI18N
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCSolverConfigEntry.class);
         btnReplicate.setText(resourceMap.getString("btnReplicate.text")); // NOI18N
         btnReplicate.setToolTipText(resourceMap.getString("btnReplicate.toolTipText")); // NOI18N
         btnReplicate.setActionCommand(resourceMap.getString("btnReplicate.actionCommand")); // NOI18N
         btnReplicate.setName("btnReplicate"); // NOI18N
+        btnReplicate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReplicateActionPerformed(evt);
+            }
+        });
 
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getActionMap(EDACCSolverConfigEntry.class, this);
         btnRemove.setAction(actionMap.get("btnRemove")); // NOI18N
         btnRemove.setText(resourceMap.getString("btnRemove.text")); // NOI18N
         btnRemove.setToolTipText(resourceMap.getString("btnRemove.toolTipText")); // NOI18N
@@ -293,7 +204,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
 
         jScrollPane2.setName("jScrollPane2"); // NOI18N
 
-        parameterTable.setModel(solverConfigEntryTableModel);
+        parameterTable.setModel(model.getTableModel());
         parameterTable.setName("solverParameters"); // NOI18N
         jScrollPane2.setViewportView(parameterTable);
 
@@ -427,113 +338,128 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     }//GEN-LAST:event_txtSeedGroupKeyReleased
 
     private void txtSeedGroupFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtSeedGroupFocusLost
-        parent.setTitles();
+        int oldSeedGroup = model.getSeedGroup();
+        try {
+            model.setSeedGroup(Integer.parseInt(txtSeedGroup.getText()));
+            fireSeedGroupChanged(oldSeedGroup, model.getSeedGroup());
+        } catch (Exception ex) {
+        }
     }//GEN-LAST:event_txtSeedGroupFocusLost
 
     private void btnEditNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditNameActionPerformed
         EDACCSolverConfigEntryEditName editNameDialog = new EDACCSolverConfigEntryEditName(EDACCApp.getApplication().getMainFrame(), true, border.getTitle());
         EDACCApp.getApplication().show(editNameDialog);
         String newName = editNameDialog.getNameText();
+        String oldName = model.getName();
         border.setTitle(newName);
-        parent.setTitles();
+        model.setName(newName);
         this.invalidate();
         this.revalidate();
         this.repaint();
+        fireNameChanged(oldName, newName);
     }//GEN-LAST:event_btnEditNameActionPerformed
 
     private void btnMassReplicationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMassReplicationActionPerformed
-        EDACCSolverConfigReplicateUsingFiles replicator = new EDACCSolverConfigReplicateUsingFiles(EDACCApp.getApplication().getMainFrame(), true, this);
+        // TODO: fix!
+        /*  EDACCSolverConfigReplicateUsingFiles replicator = new EDACCSolverConfigReplicateUsingFiles(EDACCApp.getApplication().getMainFrame(), true, this);
         replicator.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         EDACCApp.getApplication().show(replicator);
         File dir;
         if ((dir = replicator.getChosenFolder()) != null) {
-            File[] files = dir.listFiles();
-            SolverConfigEntryTableModel model = replicator.getModel();
-            Pattern[] patterns = new Pattern[model.getRowCount()];
-            String[] values = new String[model.getRowCount()];
-            for (int i = 0; i < model.getRowCount(); i++) {
-                if ((Boolean) model.getValueAt(i, 0)) {
-                    // is selected
-                    if ((Boolean) model.getValueAt(i, 6)) {
-                        // is regex
-                        patterns[i] = Pattern.compile((String) model.getValueAt(i, 3));
-                    }
-                }
-            }
-            for (File file : files) {
-                if (!file.isFile()) {
-                    continue;
-                }
-                for (int i = 0; i < model.getRowCount(); i++) {
-                    if ((Boolean) model.getValueAt(i, 0)) {
-                        if (!(Boolean) model.getValueAt(i, 6)) {
-                            values[i] = (String) model.getValueAt(i, 3);
-                        } else {
-                            values[i] = null;
-                        }
-                    }
-                }
-                BufferedReader input = null;
-
-                try {
-                    input = new BufferedReader(new FileReader(file));
-                    String line;
-                    while ((line = input.readLine()) != null) {
-                        for (int i = 0; i < model.getRowCount(); i++) {
-                            if (patterns[i] != null) {
-                                Matcher m = patterns[i].matcher(line);
-                                if (m.matches()) {
-                                    if (m.groupCount() > 0) {
-                                        if (values[i] != null || m.groupCount() > 1) {
-                                            // TODO: WARNING
-                                        } else {
-                                            values[i] = m.group(1);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (solver == null) {
-                        solver = SolverDAO.getById(this.getSolverId());
-                    }
-                    EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solver, ((TitledBorder) this.getBorder()).getTitle() + "-" + file.getName(), experiment);
-                    entry.txtSeedGroup.setText(getSeedGroup().getText());
-                    for (int i = 0; i < model.getRowCount(); i++) {
-                        if (values[i] != null) {
-                            entry.solverConfigEntryTableModel.setValueAt(values[i], i, 3);
-                            entry.solverConfigEntryTableModel.setValueAt(true, i, 0);
-                        }
-                    }
-                    entry.setParent(parent);
-                    parent.addEntryAfterEntry(entry, this);
-                } catch (FileNotFoundException ex) {
-                    // TODO: error
-                } catch (IOException ex) {
-                    // TODO: error
-                } catch (SQLException ex) {
-                    // TODO: error
-                } finally {
-                    if (input != null) {
-                        try {
-                            input.close();
-                        } catch (IOException ex) {
-                        }
-                    }
-                }
-            }
+        File[] files = dir.listFiles();
+        SolverConfigEntryTableModel model = replicator.getModel();
+        Pattern[] patterns = new Pattern[model.getRowCount()];
+        String[] values = new String[model.getRowCount()];
+        for (int i = 0; i < model.getRowCount(); i++) {
+        if ((Boolean) model.getValueAt(i, 0)) {
+        // is selected
+        if ((Boolean) model.getValueAt(i, 6)) {
+        // is regex
+        patterns[i] = Pattern.compile((String) model.getValueAt(i, 3));
         }
+        }
+        }
+        for (File file : files) {
+        if (!file.isFile()) {
+        continue;
+        }
+        for (int i = 0; i < model.getRowCount(); i++) {
+        if ((Boolean) model.getValueAt(i, 0)) {
+        if (!(Boolean) model.getValueAt(i, 6)) {
+        values[i] = (String) model.getValueAt(i, 3);
+        } else {
+        values[i] = null;
+        }
+        }
+        }
+        BufferedReader input = null;
+        
+        try {
+        input = new BufferedReader(new FileReader(file));
+        String line;
+        while ((line = input.readLine()) != null) {
+        for (int i = 0; i < model.getRowCount(); i++) {
+        if (patterns[i] != null) {
+        Matcher m = patterns[i].matcher(line);
+        if (m.matches()) {
+        if (m.groupCount() > 0) {
+        if (values[i] != null || m.groupCount() > 1) {
+        // TODO: WARNING
+        } else {
+        values[i] = m.group(1);
+        }
+        }
+        }
+        }
+        }
+        }
+        
+        if (solver == null) {
+        solver = SolverDAO.getById(this.getSolverId());
+        }
+        EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solver, ((TitledBorder) this.getBorder()).getTitle() + "-" + file.getName(), experiment);
+        entry.txtSeedGroup.setText(getSeedGroup().getText());
+        for (int i = 0; i < model.getRowCount(); i++) {
+        if (values[i] != null) {
+        entry.solverConfigEntryTableModel.setValueAt(values[i], i, 3);
+        entry.solverConfigEntryTableModel.setValueAt(true, i, 0);
+        }
+        }
+        entry.setParent(parent);
+        parent.addEntryAfterEntry(entry, this);
+        } catch (FileNotFoundException ex) {
+        // TODO: error
+        } catch (IOException ex) {
+        // TODO: error
+        } catch (SQLException ex) {
+        // TODO: error
+        } finally {
+        if (input != null) {
+        try {
+        input.close();
+        } catch (IOException ex) {
+        }
+        }
+        }
+        }
+        }*/
     }//GEN-LAST:event_btnMassReplicationActionPerformed
 
     private void comboSolverBinariesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboSolverBinariesActionPerformed
-        if (parent != null) {
-            parent.setTitles();
+        // we check if listener != null because when creating this object, this 
+        // method will be called for every solver binary added to this combo box
+        if (comboSolverBinaries.getSelectedItem() instanceof SolverBinaries && listener != null) {
+            SolverBinaries oldSolverBinary = model.getSolverBinary();
+            model.setSolverBinary((SolverBinaries) comboSolverBinaries.getSelectedItem());
+            fireSolverBinaryChanged(oldSolverBinary, model.getSolverBinary());
         }
+        
     }//GEN-LAST:event_comboSolverBinariesActionPerformed
 
     private void txtHintFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtHintFocusLost
-        parent.setTitles();
+        String oldHint = model.getHint();
+        model.setHint(txtHint.getText());
+        fireHintChanged(oldHint, model.getHint());
     }//GEN-LAST:event_txtHintFocusLost
 
     private void txtHintKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtHintKeyReleased
@@ -541,17 +467,14 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
             txtHint.transferFocus();
         }
     }//GEN-LAST:event_txtHintKeyReleased
-    @Action
-    public void btnReplicate() {
-        try {
-            parent.replicateEntry(this);
-        } catch (SQLException ex) {
-        }
-    }
+
+    private void btnReplicateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReplicateActionPerformed
+        fireReplicateRequest();
+    }//GEN-LAST:event_btnReplicateActionPerformed
 
     @Action
     public void btnRemove() {
-        parent.removeEntry(this, true);
+        fireRemoveRequest();
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEditName;
@@ -568,18 +491,6 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     private javax.swing.JTextField txtSeedGroup;
     // End of variables declaration//GEN-END:variables
 
-    public ArrayList<Parameter> getParameters() {
-        return solverConfigEntryTableModel.getParameters();
-    }
-
-    public ArrayList<ParameterInstance> getParameterInstances() {
-        return solverConfigEntryTableModel.getParameterInstances();
-    }
-
-    public SolverConfigEntryTableModel getModel() {
-        return solverConfigEntryTableModel;
-    }
-
     public void removeButtons() {
         btnReplicate.setVisible(false);
         btnRemove.setVisible(false);
@@ -587,48 +498,35 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         btnEditName.setVisible(false);
     }
 
-    /**
-     * Checks for unsaved data, i.e. checks iff the seed group, the parameter instances or the idx have been changed.<br/>
-     * If the seed group is not a valid integer it will be substituted and used as 0.
-     * @param idx the idx to check the equality. If <code>idx == -1</code> the idx and name of the solver configuration will not be checked
-     * @return <code>true</code>, if and only if data is unsaved, false otherwise
-     */
-    public boolean isModified() {
-        int seedGroup = 0;
-        try {
-            seedGroup = Integer.parseInt(txtSeedGroup.getText());
-        } catch (NumberFormatException _) {
-            txtSeedGroup.setText("0");
-        }
-        if (solverConfiguration == null
-                || solverConfiguration.getSeed_group() != seedGroup
-                || !border.getTitle().equals(solverConfiguration.getName())
-                || solverConfiguration.getSolverBinary() != this.getSolverBinary()
-                || !txtHint.getText().equals(solverConfiguration.getHint())) {
-            return true;
-        }
-        return solverConfigEntryTableModel.isModified();
-    }
-
-    public boolean hasEmptyValues() {
-        for (int i = 0; i < solverConfigEntryTableModel.getRowCount(); i++) {
-            if ("instance".equals((String) solverConfigEntryTableModel.getValueAt(i, 1))
-                    || "seed".equals((String) solverConfigEntryTableModel.getValueAt(i, 1))) {
-                continue;
-            }
-            if ((Boolean) solverConfigEntryTableModel.getValueAt(i, 0)) {
-                if (solverConfigEntryTableModel.getParameters().get(i).getHasValue()) {
-                    if ("".equals(solverConfigEntryTableModel.getValueAt(i, 3))) {
-                        return true;
-                    }
-                }
-
-            }
-        }
-        return false;
-    }
-
     public String getHint() {
         return txtHint.getText();
+    }
+
+    public void fireNameChanged(String oldName, String newName) {
+        listener.onNameChanged(this, oldName, newName);
+    }
+
+    public void fireHintChanged(String oldHint, String newHint) {
+        listener.onHintChanged(this, oldHint, newHint);
+    }
+
+    public void fireSeedGroupChanged(int oldSeedGroup, int newSeedGroup) {
+        listener.onSeedGroupChanged(this, oldSeedGroup, newSeedGroup);
+    }
+
+    public void fireParametersChanged() {
+        listener.onParametersChanged(this);
+    }
+    
+    public void fireSolverBinaryChanged(SolverBinaries oldSolverBinary, SolverBinaries newSolverBinary) {
+        listener.onSolverBinaryChanged(this, oldSolverBinary, newSolverBinary);
+    }
+    
+    public void fireReplicateRequest() {
+        listener.onReplicateRequest(this);
+    }
+    
+    public void fireRemoveRequest() {
+        listener.onRemoveRequest(this);
     }
 }

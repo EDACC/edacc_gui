@@ -17,7 +17,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.lang.Integer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.regex.Matcher;

@@ -4,7 +4,7 @@
  * Created on 31.01.2011, 13:43:29
  */
 
-package edacc;
+package edacc.experiment.tabs.solver.gui;
 
 /**
  *

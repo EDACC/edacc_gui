@@ -3,17 +3,19 @@
  *
  * Created on 17.03.2011, 19:44:10
  */
-package edacc;
+package edacc.experiment.tabs.solver.gui;
 
+import edacc.EDACCApp;
+import edacc.JTableTooltipInformation;
 import edacc.experiment.ExperimentController;
-import edacc.experiment.SolverConfigEntryTableModel;
-import edacc.model.Experiment;
+import edacc.experiment.tabs.solver.EDACCSolverConfigEntryListener;
+import edacc.experiment.tabs.solver.SolverConfigurationEntry;
+import edacc.experiment.tabs.solver.SolverConfigurationEntryModel;
+import edacc.experiment.tabs.solver.SolverConfigurationEntryModelListener;
 import edacc.model.ParameterInstance;
-import edacc.model.ParameterInstanceDAO;
 import edacc.model.Solver;
-import edacc.model.SolverConfigCache;
+import edacc.model.SolverBinaries;
 import edacc.model.SolverConfiguration;
-import edacc.model.SolverDAO;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
 import java.awt.BorderLayout;
@@ -24,8 +26,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -40,18 +40,17 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author simon
  */
-public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swing.JPanel implements Observer {
-
-    private EDACCSolverConfigPanel solverConfigPanel;
+public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swing.JPanel implements SolverConfigurationEntryModelListener {
     private TableModel tableModel;
-    private Experiment experiment;
     private ExperimentController expController;
+    private SolverConfigurationEntryModel model;
 
     /** Creates new form EDACCExperimentModeSolverConfigurationTablePanel */
-    public EDACCExperimentModeSolverConfigurationTablePanel(EDACCSolverConfigPanel solverConfigPanel, ExperimentController expController) {
+    public EDACCExperimentModeSolverConfigurationTablePanel(ExperimentController expController) {
         initComponents();
         this.expController = expController;
-        this.solverConfigPanel = solverConfigPanel;
+        this.model = expController.getSolverConfigurationEntryModel();
+        model.addSolverConfigurationEntryModelListener(this);
         tableModel = new TableModel();
         table.setModel(tableModel);
         table.addMouseListener(new MouseAdapter() {
@@ -63,10 +62,6 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
                 }
             }
         });
-    }
-
-    public void update() {
-        tableModel.update();
     }
 
     /** This method is called from within the constructor to
@@ -156,17 +151,14 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    public void setSolverConfigCache(SolverConfigCache solverConfigCache) {
-        solverConfigCache.addObserver(this);
-    }
-
-    public void setExperiment(Experiment experiment) {
-        this.experiment = experiment;
+    @Override
+    public void onDataChanged() {
+        tableModel.update();
     }
 
     @Override
-    public void update(Observable o, Object arg) {
-        tableModel.update();
+    public void onEntryChanged(SolverConfigurationEntry entry) {
+        tableModel.updateEntry(entry);
     }
 
     private class SolverConfigDialog extends JDialog {
@@ -220,19 +212,51 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
     private void itemEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemEditActionPerformed
         if (table.getSelectedRow() != -1) {
             // TODO: fix
-            EDACCSolverConfigEntry entry = tableModel.getEntry(table.convertRowIndexToModel(table.getSelectedRow()));
+            SolverConfigurationEntry entry = tableModel.getEntry(table.convertRowIndexToModel(table.getSelectedRow()));
             try {
-                EDACCSolverConfigEntry copy;
-                if (entry.getSolverConfiguration() != null) {
-                    copy = new EDACCSolverConfigEntry(entry.getSolverConfiguration(), ParameterInstanceDAO.getBySolverConfig(entry.getSolverConfiguration()), experiment);
+                SolverConfigurationEntry copy = new SolverConfigurationEntry(entry);
+                /*if (entry.getSolverConfig() != null) {
+                    copy = new SolverConfigurationEntry(entry.getSolverConfig(), entry.getExperiment());
                 } else {
-                    copy = new EDACCSolverConfigEntry(SolverDAO.getById(entry.getSolverId()), entry.getTitle(), experiment);
-                }
-                copy.assign(entry);
-                copy.removeButtons();
-                copy.setParent(entry.parent);
+                    copy = new SolverConfigurationEntry(entry.getSolver(), entry.getExperiment());
+                }*/
+                
+                EDACCSolverConfigEntry entryDialog = new EDACCSolverConfigEntry(copy, new EDACCSolverConfigEntryListener() {
 
-                SolverConfigDialog dialog = new SolverConfigDialog(copy);
+                    @Override
+                    public void onNameChanged(EDACCSolverConfigEntry entry, String oldName, String newName) {
+                    }
+
+                    @Override
+                    public void onSeedGroupChanged(EDACCSolverConfigEntry entry, int oldSeedGroup, int newSeedGroup) {
+                    }
+
+                    @Override
+                    public void onHintChanged(EDACCSolverConfigEntry entry, String oldHint, String newHint) {
+                    }
+
+                    @Override
+                    public void onSolverBinaryChanged(EDACCSolverConfigEntry entry, SolverBinaries oldSolverBinary, SolverBinaries newSolverBinary) {
+
+                    }
+
+                    @Override
+                    public void onParametersChanged(EDACCSolverConfigEntry entry) {
+                    }
+
+                    @Override
+                    public void onReplicateRequest(EDACCSolverConfigEntry entry) {
+                        // not supported here
+                    }
+
+                    @Override
+                    public void onRemoveRequest(EDACCSolverConfigEntry entry) {
+                        // not supported here
+                    }
+                    
+                });
+
+                SolverConfigDialog dialog = new SolverConfigDialog(entryDialog);
                 dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
                 dialog.setModal(true);
                 EDACCApp.getApplication().show(dialog);
@@ -243,15 +267,15 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            update();
+            model.fireEntryChanged(entry);
         }
     }//GEN-LAST:event_itemEditActionPerformed
 
     private void itemRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemRemoveActionPerformed
         for (int row : table.getSelectedRows()) {
-            tableModel.getEntry(table.convertRowIndexToModel(row)).btnRemove();
+            model.removeSolverConfigurationEntry(tableModel.getEntry(table.convertRowIndexToModel(row)));
         }
-        tableModel.update();
+        model.fireDataChanged();
     }//GEN-LAST:event_itemRemoveActionPerformed
 
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
@@ -262,11 +286,11 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
     }//GEN-LAST:event_tableMouseClicked
 
     private void itemCalculateCostsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCalculateCostsActionPerformed
-        final ArrayList<SolverConfiguration> selected = new ArrayList<SolverConfiguration>();
+         final ArrayList<SolverConfiguration> selected = new ArrayList<SolverConfiguration>();
         for (int row : table.getSelectedRows()) {
-            EDACCSolverConfigEntry entry = tableModel.getEntry(table.convertRowIndexToModel(row));
-            if (entry.getSolverConfiguration() != null) {
-                selected.add(entry.getSolverConfiguration());
+            SolverConfigurationEntry entry = tableModel.getEntry(table.convertRowIndexToModel(row));
+            if (entry.getSolverConfig() != null) {
+                selected.add(entry.getSolverConfig());
             }
         }
         if (selected.isEmpty()) {
@@ -286,8 +310,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
 
                                 @Override
                                 public void run() {
-                                    tableModel.fireTableDataChanged();
-                                    solverConfigPanel.setTitles();
+                                    model.fireDataChanged();
                                 }
                             });
 
@@ -311,45 +334,30 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
     private javax.swing.JMenuItem itemEdit;
     private javax.swing.JMenuItem itemRemove;
     private javax.swing.JScrollPane jScrollPane1;
-    protected javax.swing.JLabel lblFilterStatus;
+    public javax.swing.JLabel lblFilterStatus;
     private javax.swing.JPopupMenu popupMenu;
-    protected javax.swing.JTable table;
+    public javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables
 
     private class TableModel extends DefaultTableModel {
 
         private String[] columns = new String[]{"Solver", "Solver Configuration", "Cost", "Cost Function", "Parameters"};
-        ArrayList<String> solverConfigNames;
-        ArrayList<Solver> solvers;
         ArrayList<String> parameterStrings;
-        ArrayList<EDACCSolverConfigEntry> entries;
+        ArrayList<SolverConfigurationEntry> entries;
 
         public void update() {
-            solverConfigNames = new ArrayList<String>();
-            solvers = new ArrayList<Solver>();
-            entries = new ArrayList<EDACCSolverConfigEntry>();
+            // TODO: fix!
+            entries = new ArrayList<SolverConfigurationEntry>();
             parameterStrings = new ArrayList<String>();
-            for (EDACCSolverConfigPanelSolver pnlSolver : solverConfigPanel.getAllSolverConfigSolverPanels()) {
-                for (EDACCSolverConfigEntry entry : pnlSolver.getAllSolverConfigEntries()) {
-                    Solver solver = null;
-                    try {
-                        if (entry.getSolverConfiguration() != null) {
-                            solver = SolverDAO.getById(entry.getSolverConfiguration().getSolverBinary().getIdSolver());
-                        } else {
-                            solver = SolverDAO.getById(entry.getSolverId());
-                        }
-                        solverConfigNames.add(entry.getTitle());
-                    } catch (Exception e) {
-                    }
-                    solvers.add(solver);
+            for (Solver solver : model.getSolvers()) {
+                for (SolverConfigurationEntry entry : model.getEntries(solver)) {
                     entries.add(entry);
                     ArrayList<ParameterInstance> pis = new ArrayList<ParameterInstance>();
-                    SolverConfigEntryTableModel model = entry.solverConfigEntryTableModel;
-                    for (int row = 0; row < model.getRowCount(); row++) {
-                        if (model.isSelected(row)) {
+                    for (int row = 0; row < entry.getTableModel().getRowCount(); row++) {
+                        if (entry.getTableModel().isSelected(row)) {
                             ParameterInstance pi = new ParameterInstance();
-                            pi.setParameter_id(model.getParameterAt(row).getId());
-                            pi.setValue(model.getValueAt(row));
+                            pi.setParameter_id(entry.getTableModel().getParameterAt(row).getId());
+                            pi.setValue(entry.getTableModel().getValueAt(row));
                             pis.add(pi);
                         }
                     }
@@ -358,8 +366,27 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
             }
             fireTableDataChanged();
         }
+        
+        public void updateEntry(SolverConfigurationEntry entry) {
+            for (int i = 0; i < entries.size(); i++) {
+                if (entries.get(i) == entry) {
+                    ArrayList<ParameterInstance> pis = new ArrayList<ParameterInstance>();
+                    for (int row = 0; row < entry.getTableModel().getRowCount(); row++) {
+                        if (entry.getTableModel().isSelected(row)) {
+                            ParameterInstance pi = new ParameterInstance();
+                            pi.setParameter_id(entry.getTableModel().getParameterAt(row).getId());
+                            pi.setValue(entry.getTableModel().getValueAt(row));
+                            pis.add(pi);
+                        }
+                    }
+                    parameterStrings.set(i, edacc.experiment.Util.getParameterString(pis, entry.getSolver()));
+                    fireTableRowsUpdated(i, i);
+                    break;
+                }
+            }
+        }
 
-        public EDACCSolverConfigEntry getEntry(int row) {
+        public SolverConfigurationEntry getEntry(int row) {
             return entries.get(row);
         }
 
@@ -375,7 +402,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
 
         @Override
         public int getRowCount() {
-            return solverConfigNames == null ? 0 : solverConfigNames.size();
+            return entries == null ? 0 : entries.size();
         }
 
         @Override
@@ -383,13 +410,13 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
             try {
                 switch (column) {
                     case 0:
-                        return solvers.get(row);
+                        return entries.get(row).getSolver();
                     case 1:
-                        return solverConfigNames.get(row);
+                        return entries.get(row).getName();
                     case 2:
-                        return entries.get(row).getSolverConfiguration() != null ? entries.get(row).getSolverConfiguration().getCost() : null;
+                        return entries.get(row).getSolverConfig() != null ? entries.get(row).getSolverConfig().getCost() : null;
                     case 3:
-                        return entries.get(row).getSolverConfiguration() != null ? entries.get(row).getSolverConfiguration().getCost_function() : null;
+                        return entries.get(row).getSolverConfig() != null ? entries.get(row).getSolverConfig().getCost_function() : null;
                     case 4:
                         return parameterStrings.get(row);
                     default:
@@ -424,7 +451,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
         }
     }
 
-    public EDACCSolverConfigEntry getSelectedSolverConfigEntry() {
+    public SolverConfigurationEntry getSelectedSolverConfigEntry() {
         int row;
         if ((row = table.getSelectedRow()) == -1) {
             return null;

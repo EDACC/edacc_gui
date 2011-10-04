@@ -856,7 +856,7 @@
                     <Property name="name" type="java.lang.String" value="jScrollPane4" noResource="true"/>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="solverConfigPanel = new EDACCSolverConfigPanel();&#xa;jScrollPane4.setViewportView(solverConfigPanel);&#xa;jScrollPane4.getVerticalScrollBar().setUnitIncrement(30);"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="solverConfigPanel = new edacc.experiment.tabs.solver.gui.EDACCSolverConfigComponent(expController);&#xa;jScrollPane4.setViewportView(solverConfigPanel);&#xa;jScrollPane4.getVerticalScrollBar().setUnitIncrement(30);"/>
                   </AuxValues>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">

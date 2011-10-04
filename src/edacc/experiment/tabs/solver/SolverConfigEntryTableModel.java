@@ -1,5 +1,6 @@
-package edacc.experiment;
+package edacc.experiment.tabs.solver;
 
+import edacc.experiment.ThreadSafeDefaultTableModel;
 import edacc.model.Parameter;
 import edacc.model.ParameterInstance;
 import java.util.ArrayList;

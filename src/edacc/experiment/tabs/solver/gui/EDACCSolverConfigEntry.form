@@ -83,14 +83,14 @@
   <SubComponents>
     <Component class="javax.swing.JButton" name="btnReplicate">
       <Properties>
-        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-          <action class="edacc.EDACCSolverConfigEntry" id="btnReplicate" methodName="btnReplicate"/>
-        </Property>
         <Property name="text" type="java.lang.String" resourceKey="btnReplicate.text"/>
         <Property name="toolTipText" type="java.lang.String" resourceKey="btnReplicate.toolTipText"/>
         <Property name="actionCommand" type="java.lang.String" resourceKey="btnReplicate.actionCommand"/>
         <Property name="name" type="java.lang.String" value="btnReplicate" noResource="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnReplicateActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnRemove">
       <Properties>
@@ -121,12 +121,12 @@
         <Component class="javax.swing.JTable" name="parameterTable">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="solverConfigEntryTableModel" type="code"/>
+              <Connection code="model.getTableModel()" type="code"/>
             </Property>
             <Property name="name" type="java.lang.String" value="solverParameters" noResource="true"/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="parameterTable = new JTableTooltipInformation();"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="parameterTable = new JTableTooltipInformation()"/>
           </AuxValues>
         </Component>
       </SubComponents>

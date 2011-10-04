@@ -3,10 +3,10 @@ package edacc.experiment;
 import com.mysql.jdbc.exceptions.MySQLStatementCancelledException;
 import edacc.model.SolverConfigCache;
 import edacc.EDACCExperimentMode;
-import edacc.EDACCSolverConfigEntry;
-import edacc.EDACCSolverConfigPanel;
-import edacc.EDACCSolverConfigPanelSolver;
+import edacc.experiment.tabs.solver.gui.EDACCSolverConfigComponent;
 import edacc.api.costfunctions.*;
+import edacc.experiment.tabs.solver.SolverConfigurationEntry;
+import edacc.experiment.tabs.solver.SolverConfigurationEntryModel;
 import edacc.model.ClientDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.ConfigurationScenario;
@@ -94,7 +94,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 public class ExperimentController {
 
     EDACCExperimentMode main;
-    EDACCSolverConfigPanel solverConfigPanel;
     private Experiment activeExperiment;
     private static RandomNumberGenerator rnd = new JavaRandom();
     // caching experiments
@@ -105,15 +104,15 @@ public class ExperimentController {
     public static Property PROP_CPUTIME;
     private ConfigurationScenario configScenario;
     private ConfigurationScenario savedScenario;
-
+    private SolverConfigurationEntryModel solverConfigurationEntryModel;
     /**
      * Creates a new experiment Controller
      * @param experimentMode the experiment mode to be used
      * @param solverConfigPanel the solver config panel to be used
      */
-    public ExperimentController(EDACCExperimentMode experimentMode, EDACCSolverConfigPanel solverConfigPanel) {
+    public ExperimentController(EDACCExperimentMode experimentMode) {
         this.main = experimentMode;
-        this.solverConfigPanel = solverConfigPanel;
+        solverConfigurationEntryModel = new SolverConfigurationEntryModel();
         PROP_CPUTIME = new Property();
         PROP_CPUTIME.setName("CPU-Time (s)");
 
@@ -185,24 +184,23 @@ public class ExperimentController {
 
         // now load solver configs of the current experiment
         if (solverConfigCache != null) {
-            solverConfigPanel.setExperiment(activeExperiment);
-            main.solverConfigTablePanel.setExperiment(activeExperiment);
+         //   solverConfigPanel.setExperiment(activeExperiment);
+         //   main.solverConfigTablePanel.setExperiment(activeExperiment);
 
             solverConfigCache.changeExperiment(activeExperiment);
         } else {
             solverConfigCache = new SolverConfigCache(activeExperiment);
-            solverConfigPanel.setExperiment(activeExperiment);
-            solverConfigPanel.setSolverConfigCache(solverConfigCache);
-            main.solverConfigTablePanel.setExperiment(activeExperiment);
-            main.solverConfigTablePanel.setSolverConfigCache(solverConfigCache);
+           // solverConfigPanel.setExperiment(activeExperiment);
+           // solverConfigPanel.setSolverConfigCache(solverConfigCache);
+           // main.solverConfigTablePanel.setExperiment(activeExperiment);
+           // main.solverConfigTablePanel.setSolverConfigCache(solverConfigCache);
             solverConfigCache.reload();
         }
-
-        //vss.addAll(SolverConfigurationDAO.getSolverConfigurationByExperimentId(exp.getId()));
-        // for (int i = 0; i < vss.size(); i++) {
-        //     main.solverConfigPanel.addSolverConfiguration(vss.get(i));
-        // }
-        // main.solverConfigPanel.endUpdate();
+        solverConfigurationEntryModel.clear();
+        for (SolverConfiguration solverConfig : solverConfigCache.getAll()) {
+            solverConfigurationEntryModel.add(new SolverConfigurationEntry(solverConfig, activeExperiment));
+        }
+        solverConfigurationEntryModel.fireDataChanged();
         task.setTaskProgress(.5f);
         task.setStatus("Loading instances..");
         // select instances for the experiment
@@ -356,16 +354,17 @@ public class ExperimentController {
      */
     public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException, Exception {
         // TODO: there are some points where this task should never be canceled (by an application crash or lost db connection)... fix them!
+        
         task.setStatus("Checking jobs..");
 
         // check for solver configurations with no value for parameters which must have values
         boolean yta = false;
-        for (EDACCSolverConfigPanelSolver solPanel : solverConfigPanel.getAllSolverConfigSolverPanels()) {
-            for (EDACCSolverConfigEntry entry : solPanel.getAllSolverConfigEntries()) {
+        for (Solver solver : solverConfigurationEntryModel.getSolvers()) {
+            for (SolverConfigurationEntry entry : solverConfigurationEntryModel.getEntries(solver)) {
                 if (entry.isModified() && entry.hasEmptyValues()) {
                     String[] options = {"Yes", "Yes to all", "No"};
                     int userinput = JOptionPane.showOptionDialog(Tasks.getTaskView(),
-                            "The solver configuration " + entry.getTitle() + " has no value for a parameter which must have a value.\nDo you want to continue?",
+                            "The solver configuration " + entry.getName() + " has no value for a parameter which must have a value.\nDo you want to continue?",
                             "Warning",
                             JOptionPane.DEFAULT_OPTION,
                             JOptionPane.WARNING_MESSAGE,
@@ -402,7 +401,7 @@ public class ExperimentController {
         // this will append (to deletedJobs) all modified solver configurations, i.e. the solver configurations are not marked as deleted and
         //  * the seed group of the solver configurations has been changed or
         //  * some parameter instances have been modified/deleted or added
-        ArrayList<SolverConfiguration> modifiedSolverConfigurations = solverConfigPanel.getModifiedSolverConfigurations();
+        ArrayList<SolverConfiguration> modifiedSolverConfigurations = solverConfigurationEntryModel.getModifiedSolverConfigurations();
         yta = false;
         boolean nta = false;
         for (SolverConfiguration sc : modifiedSolverConfigurations) {
@@ -448,27 +447,18 @@ public class ExperimentController {
             }
         }
         task.setStatus("Saving solver configurations..");
-        boolean invalidSeedGroup = false;
 
-        for (EDACCSolverConfigPanelSolver solPanel : solverConfigPanel.getAllSolverConfigSolverPanels()) {
+        for (Solver s : solverConfigurationEntryModel.getSolvers()) {
             // iterate over solvers
-            for (EDACCSolverConfigEntry entry : solPanel.getAllSolverConfigEntries()) {
+            for (SolverConfigurationEntry entry : solverConfigurationEntryModel.getEntries(s)) {
                 // iterate over solver configs
-                int seed_group = 0;
-                try {
-                    seed_group = Integer.valueOf(entry.getSeedGroup().getText());
-                } catch (NumberFormatException e) {
-                    seed_group = 0;
-                    entry.getSeedGroup().setText("0");
-                    invalidSeedGroup = true;
-                }
-                if (entry.getSolverConfiguration() == null) {
-                    entry.setSolverConfiguration(solverConfigCache.createSolverConfiguration(entry.getSolverBinary(), activeExperiment.getId(), seed_group, entry.getTitle(), entry.getHint()));
+                if (entry.getSolverConfig() == null) {
+                    entry.setSolverConfig(solverConfigCache.createSolverConfiguration(entry.getSolverBinary(), activeExperiment.getId(), entry.getSeedGroup(), entry.getName(), entry.getHint()));
                 } else {
-                    entry.getSolverConfiguration().setSolverBinary(entry.getSolverBinary());
-                    entry.getSolverConfiguration().setName(entry.getTitle());
-                    entry.getSolverConfiguration().setSeed_group(seed_group);
-                    entry.getSolverConfiguration().setHint(entry.getHint());
+                    entry.getSolverConfig().setSolverBinary(entry.getSolverBinary());
+                    entry.getSolverConfig().setName(entry.getName());
+                    entry.getSolverConfig().setSeed_group(entry.getSeedGroup());
+                    entry.getSolverConfig().setHint(entry.getHint());
                 }
                 entry.saveParameterInstances();
             }
@@ -483,15 +473,6 @@ public class ExperimentController {
                 Util.updateTableColumnWidth(main.tblGenerateJobs);
             }
         });
-        if (invalidSeedGroup) {
-            SwingUtilities.invokeAndWait(new Runnable() {
-
-                @Override
-                public void run() {
-                    javax.swing.JOptionPane.showMessageDialog(Tasks.getTaskView(), "Seed groups have to be integers, defaulted to 0", "Expected integer for seed groups", javax.swing.JOptionPane.ERROR_MESSAGE);
-                }
-            });
-        }
     }
 
     /**
@@ -501,6 +482,11 @@ public class ExperimentController {
      */
     public void undoSolverConfigurations(Tasks task) throws SQLException {
         solverConfigCache.reload();
+        solverConfigurationEntryModel.clear();
+        for (SolverConfiguration solverConfig : solverConfigCache.getAll()) {
+            solverConfigurationEntryModel.add(new SolverConfigurationEntry(solverConfig, activeExperiment));
+        }
+        solverConfigurationEntryModel.fireDataChanged();
         main.setTitles();
     }
 
@@ -1796,6 +1782,10 @@ public class ExperimentController {
         }
         return false;
     }
+    
+    public boolean solverConfigsIsModified() {
+        return (solverConfigCache != null && solverConfigCache.isModified()) || (solverConfigurationEntryModel == null ? false : solverConfigurationEntryModel.isModified());
+    }
 
     /**
      * Returns a double value for the given property value type and the string value
@@ -1960,6 +1950,10 @@ public class ExperimentController {
 
     public void reloadConfigurationScenario() throws SQLException {
         configScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
+    }
+    
+    public SolverConfigurationEntryModel getSolverConfigurationEntryModel() {
+        return solverConfigurationEntryModel;
     }
 
     /**
