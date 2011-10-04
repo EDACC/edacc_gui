@@ -2,6 +2,7 @@ package edacc.experiment.tabs.solver;
 
 import edacc.model.Solver;
 import edacc.model.SolverConfiguration;
+import edacc.util.Pair;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -155,5 +156,54 @@ public class SolverConfigurationEntryModel {
             }
         }
         return res;
+    }
+
+    public Object getValueAt(Pair<Solver, Integer> p, int col) {
+        SolverConfigurationEntry entry = getEntry(p.getFirst(), p.getSecond());
+        switch (col) {
+            case 0:
+                return entry.getName();
+            case 1:
+                return entry.getSolver().toString();
+            case 2:
+                return entry.getHint();
+            case 3:
+                return entry.getSolverBinary().getBinaryName();
+            case 4:
+                return entry.getSeedGroup();
+            default:
+                return "";
+
+        }
+    }
+    
+    public int getColumnCount() {
+        return 5;
+    }
+    
+    public Class getColumnClass(int col) {
+        switch (col) {
+            case 4:
+                return Integer.class;
+            default:
+                return String.class;
+        }
+    }
+
+    public String getColumnName(int col) {
+        switch (col) {
+            case 0:
+                return "Name";
+            case 1:
+                return "Solver";
+            case 2:
+                return "Hint";
+            case 3:
+                return "Solver Binary";
+            case 4:
+                return "Seed Group";
+            default:
+                return "";
+        }
     }
 }

@@ -12,6 +12,7 @@ import edacc.experiment.tabs.solver.SolverConfigurationEntryModel;
 import edacc.experiment.tabs.solver.SolverConfigurationEntryModelListener;
 import edacc.model.Solver;
 import edacc.model.SolverBinaries;
+import edacc.util.Pair;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -24,36 +25,47 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.RowFilter;
+import javax.swing.RowFilter.Entry;
 
 /**
  *
  * @author simon
  */
 public class EDACCSolverConfigComponent extends JComponent implements SolverConfigurationEntryModelListener, EDACCSolverConfigEntryListener {
+
     private static final int entryHeight = 265;
     private static final int maxSolverConfigEntries = 50;
     private static final int labelSpace = 5;
     private static final int entrySpace = 10;
+    private int size;
     public EDACCExperimentMode parent;
     private boolean update;
     protected SolverConfigurationEntryModel model;
     private LinkedList<SolverLabel> labels;
     private LinkedList<EntryAdded> temporaryEntries;
     private ExperimentController expController;
+    private RowFilter<SolverConfigurationEntryModel, Pair<Solver, Integer>> rowFilter;
 
     public EDACCSolverConfigComponent(ExperimentController expController) {
         this.expController = expController;
+        this.rowFilter = null;
         this.model = expController.getSolverConfigurationEntryModel();
         model.addSolverConfigurationEntryModelListener(this);
         this.update = false;
         labels = new LinkedList<SolverLabel>();
         temporaryEntries = new LinkedList<EntryAdded>();
+        size = 0;
     }
 
     public void setParent(EDACCExperimentMode parent) {
         this.parent = parent;
     }
 
+    public SolverConfigurationEntryModel getModel() {
+        return model;
+    }
+    
     public void setTitles() {
         if (!update && parent != null) {
             parent.setTitles();
@@ -91,8 +103,8 @@ public class EDACCSolverConfigComponent extends JComponent implements SolverConf
         if (model == null || labels.isEmpty()) {
             return new Dimension(0, 0);
         }
-        
-        return new Dimension(0, model.getSize() * (entryHeight + entrySpace) + labels.size() * (labels.get(0).label.getPreferredSize().height + labelSpace));
+
+        return new Dimension(0, size * (entryHeight + entrySpace) + labels.size() * (labels.get(0).label.getPreferredSize().height + labelSpace));
     }
 
     @Override
@@ -123,7 +135,7 @@ public class EDACCSolverConfigComponent extends JComponent implements SolverConf
                 for (int i = start; i < sl.entries.size(); i++) {
                     if (y <= rect.y + rect.height + 1000) {
                         if (sl.entries.get(i).entry == null) {
-                            sl.entries.get(i).entry = new EDACCSolverConfigEntry(model.getEntry(sl.solver, i), this);
+                            sl.entries.get(i).entry = new EDACCSolverConfigEntry(sl.entries.get(i).model, this);
                             temporaryEntries.add(sl.entries.get(i));
                         }
                         sl.entries.get(i).entry.setBounds(10, y, this.getWidth() - 20, entryHeight);
@@ -171,11 +183,12 @@ public class EDACCSolverConfigComponent extends JComponent implements SolverConf
                 return o1.getId() - o2.getId();
             }
         });
-        
+
         // TODO: don't select solvers here. Parent should do this.
         for (int i = 0; i < parent.solTableModel.getRowCount(); i++) {
             parent.solTableModel.setSolverSelected(parent.solTableModel.getSolver(i).getId(), false);
         }
+        size = 0;
 
         for (Solver s : solvers) {
             parent.solTableModel.setSolverSelected(s.getId(), true);
@@ -183,7 +196,33 @@ public class EDACCSolverConfigComponent extends JComponent implements SolverConf
             JLabel label = new JLabel(s.toString());
             labels.add(new SolverLabel(s, label, entries));
             for (int i = 0; i < model.getSize(labels.get(labels.size() - 1).solver); i++) {
-                entries.add(new EntryAdded(null));
+                final Solver solver = s;
+                final int index = i;
+                if (rowFilter == null || rowFilter.include(new Entry<SolverConfigurationEntryModel, Pair<Solver, Integer>>() {
+
+                    @Override
+                    public SolverConfigurationEntryModel getModel() {
+                        return model;
+                    }
+
+                    @Override
+                    public int getValueCount() {
+                        return model.getColumnCount();
+                    }
+
+                    @Override
+                    public Object getValue(int i) {
+                        return model.getValueAt(new Pair<Solver, Integer>(solver, index), i);
+                    }
+
+                    @Override
+                    public Pair<Solver, Integer> getIdentifier() {
+                        return new Pair<Solver, Integer>(solver, index);
+                    }
+                })) {
+                    entries.add(new EntryAdded(model.getEntry(s, i), null));
+                    size++;
+                }
             }
         }
         this.invalidate();
@@ -203,7 +242,7 @@ public class EDACCSolverConfigComponent extends JComponent implements SolverConf
     }
 
     public Rectangle getBoundsOf(SolverConfigurationEntry entry) {
-        
+
         int y = 0;
         if (labels.size() == 0) {
             return null;
@@ -211,8 +250,8 @@ public class EDACCSolverConfigComponent extends JComponent implements SolverConf
         int labelHeight = labels.get(0).label.getPreferredSize().height;
         for (SolverLabel sl : labels) {
             y += labelHeight + labelSpace;
-            for (int i = 0 ; i < sl.entries.size(); i++) {
-                if (model.getEntry(sl.solver, i) == entry) {
+            for (int i = 0; i < sl.entries.size(); i++) {
+                if (sl.entries.get(i).model == entry) {
                     return new Rectangle(10, y, this.getWidth() - 20, entryHeight);
                 }
                 y += entryHeight + entrySpace;
@@ -255,10 +294,19 @@ public class EDACCSolverConfigComponent extends JComponent implements SolverConf
     public void onRemoveRequest(EDACCSolverConfigEntry entry) {
         removeEntry(entry, true);
     }
-    
+
     private void notifyEntryChanged(EDACCSolverConfigEntry entry) {
         model.fireEntryChanged(entry.getModel());
         setTitles();
+    }
+
+    public void setFilter(RowFilter<SolverConfigurationEntryModel, Pair<Solver, Integer>> rowFilter) {
+        this.rowFilter = rowFilter;
+        onDataChanged();
+    }
+
+    public int getRowCount() {
+        return size;
     }
 
     private class SolverLabel {
@@ -276,10 +324,12 @@ public class EDACCSolverConfigComponent extends JComponent implements SolverConf
 
     private class EntryAdded {
 
+        SolverConfigurationEntry model;
         EDACCSolverConfigEntry entry;
         boolean added;
 
-        public EntryAdded(EDACCSolverConfigEntry entry) {
+        public EntryAdded(SolverConfigurationEntry model, EDACCSolverConfigEntry entry) {
+            this.model = model;
             this.added = false;
             this.entry = entry;
         }

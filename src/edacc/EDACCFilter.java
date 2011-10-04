@@ -5,12 +5,16 @@
  */
 package edacc;
 
+import edacc.experiment.tabs.solver.SolverConfigurationEntryModel;
+import edacc.experiment.tabs.solver.gui.EDACCSolverConfigComponent;
 import edacc.filter.ArgumentPanel;
 import edacc.filter.BooleanFilter;
 import edacc.filter.FilterInterface;
 import edacc.filter.NumberFilter;
 import edacc.filter.Parser;
 import edacc.filter.StringFilter;
+import edacc.model.Solver;
+import edacc.util.Pair;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -36,6 +40,7 @@ import org.jdesktop.application.Action;
 public class EDACCFilter extends javax.swing.JDialog {
 
     private JTable table;
+    private EDACCSolverConfigComponent solverConfigComponent;
     private TableRowSorter<? extends TableModel> rowSorter;
     private RowFilter<Object, Object> rowFilter;
     private HashMap<Integer, FilterType> colFilter;
@@ -46,6 +51,22 @@ public class EDACCFilter extends javax.swing.JDialog {
     private LinkedList<ArgumentPanel> filterArguments;
     private boolean updateFilterTypes;
 
+    private EDACCFilter(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
+        initComponents();
+        filterArguments = new LinkedList<ArgumentPanel>();
+        colFilter = new HashMap<Integer, FilterType>();
+        argumentLayout = new GridBagLayout();
+        pnlArguments.setLayout(argumentLayout);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.weightx = 1000;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(6, 6, 6, 6);
+        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        parser = new Parser();
+        expression = "";
+    }
+
     /**
      * Creates new form EDACCFilter. If the table has no instance of TableRowSorter a IllegalArgumentException is thrown.
      * @param parent The parent for this dialog
@@ -54,13 +75,11 @@ public class EDACCFilter extends javax.swing.JDialog {
      * @param autoUpdateFilterTypes if this is set to true, the filter will updated the classes of the columns on each setVisible(true)
      */
     public EDACCFilter(java.awt.Frame parent, boolean modal, JTable table, boolean autoUpdateFilterTypes) {
-        super(parent, modal);
-        initComponents();
+        this(parent, modal);
         if (!(table.getRowSorter() instanceof TableRowSorter)) {
             throw new IllegalArgumentException("Expected TableRowSorter.");
         }
         this.table = table;
-        filterArguments = new LinkedList<ArgumentPanel>();
         rowSorter = (TableRowSorter<? extends TableModel>) table.getRowSorter();
         final RowFilter oldRowFilter = rowSorter.getRowFilter();
         rowFilter = new RowFilter<Object, Object>() {
@@ -71,18 +90,21 @@ public class EDACCFilter extends javax.swing.JDialog {
             }
         };
         rowSorter.setRowFilter(rowFilter);
-        colFilter = new HashMap<Integer, FilterType>();
-        argumentLayout = new GridBagLayout();
-        pnlArguments.setLayout(argumentLayout);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.weightx = 1000;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(6, 6, 6, 6);
-        gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-        parser = new Parser();
         this.updateFilterTypes = autoUpdateFilterTypes;
-        expression = "";
-        
+    }
+
+    public EDACCFilter(java.awt.Frame parent, boolean modal, EDACCSolverConfigComponent component) {
+        this(parent, modal);
+        this.table = null;
+        this.solverConfigComponent = component;
+        component.setFilter(new RowFilter<SolverConfigurationEntryModel, Pair<Solver, Integer>>() {
+
+            @Override
+            public boolean include(Entry<? extends SolverConfigurationEntryModel, ? extends Pair<Solver, Integer>> entry) {
+                return EDACCFilter.this.include(entry);
+            }
+        });
+        updateFilterTypesForSolverConfigComponent();
     }
 
     /**
@@ -91,8 +113,17 @@ public class EDACCFilter extends javax.swing.JDialog {
      * @param col
      * @return the value object
      */
-    public Object getValueAt(int row, int col) {
-        return table.getModel().getValueAt(row, col);
+    public Object getValueAt(Object identifier, int col) {
+        if (table != null && identifier instanceof Integer) {
+            return table.getModel().getValueAt((Integer) identifier, col);
+        } else if (solverConfigComponent != null && identifier instanceof Pair) {
+            return solverConfigComponent.getModel().getValueAt((Pair<Solver, Integer>) identifier, col);
+        }
+        return null;
+    }
+
+    public Object getValueAt(Solver solver, int index, int col) {
+        return null;
     }
 
     /**
@@ -103,7 +134,7 @@ public class EDACCFilter extends javax.swing.JDialog {
     public synchronized boolean include(Entry<? extends Object, ? extends Object> entry) {
         HashMap<Integer, Boolean> arguments = new HashMap<Integer, Boolean>();
         for (ArgumentPanel panel : filterArguments) {
-            arguments.put(panel.getArgNum(), panel.getFilterInterface().include(getValueAt((Integer) entry.getIdentifier(), panel.getColumn())));
+            arguments.put(panel.getArgNum(), panel.getFilterInterface().include(getValueAt(entry.getIdentifier(), panel.getColumn())));
         }
         try {
             return parser.eval(expression, arguments);
@@ -138,6 +169,14 @@ public class EDACCFilter extends javax.swing.JDialog {
      * Updates the classes of the columns to generate the filters. Can be overwritten but should then call updateFilterTypes(Class<?>[], String[]).
      */
     public void updateFilterTypes() {
+        if (table != null) {
+            updateFilterTypesForTable();
+        } else if (solverConfigComponent != null) {
+            updateFilterTypesForSolverConfigComponent();
+        }
+    }
+
+    private void updateFilterTypesForTable() {
         // create to arrays with the column classes and the column names
         Class<?>[] classes = new Class<?>[table.getModel().getColumnCount()];
         String[] columnNames = new String[table.getModel().getColumnCount()];
@@ -147,6 +186,16 @@ public class EDACCFilter extends javax.swing.JDialog {
             columnNames[i] = table.getModel().getColumnName(i);
         }
         // update the filter types with that data
+        updateFilterTypes(classes, columnNames);
+    }
+
+    private void updateFilterTypesForSolverConfigComponent() {
+        Class<?>[] classes = new Class<?>[solverConfigComponent.getModel().getColumnCount()];
+        String[] columnNames = new String[solverConfigComponent.getModel().getColumnCount()];
+        for (int i = 0; i < solverConfigComponent.getModel().getColumnCount(); i++) {
+            classes[i] = solverConfigComponent.getModel().getColumnClass(i);
+            columnNames[i] = solverConfigComponent.getModel().getColumnName(i);
+        }
         updateFilterTypes(classes, columnNames);
     }
 
@@ -243,11 +292,10 @@ public class EDACCFilter extends javax.swing.JDialog {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addComponent(comboFilterTypes, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addComponent(comboFilterTypes, 0, 449, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnAdd)
-                .addContainerGap(355, Short.MAX_VALUE))
+                .addComponent(btnAdd))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -350,7 +398,6 @@ public class EDACCFilter extends javax.swing.JDialog {
             btnApply();
         }
     }//GEN-LAST:event_txtExpressionKeyReleased
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnApply;
@@ -366,6 +413,7 @@ public class EDACCFilter extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
 
     class FilterType {
+
         int column;
         String name;
         Class<?> clazz;
@@ -406,7 +454,7 @@ public class EDACCFilter extends javax.swing.JDialog {
                 filter = new BooleanFilter(filterType.name);
             } else if (filterType.clazz == String.class || Object.class.isAssignableFrom(filterType.clazz)) {
                 filter = new StringFilter(filterType.name);
-            } 
+            }
             if (filter == null) {
                 return;
             }
@@ -421,10 +469,9 @@ public class EDACCFilter extends javax.swing.JDialog {
                             btnApply();
                         }
                     }
-                    
                 });
             }
-            
+
             pnlArguments.add(new ArgumentPanel(this, filter, argNum, filterType.column));
             // replace the expression by `$argNum` iff the current expression will always validate to true
             // add `&& $argNum` to the expression iff there is currently a valid expression and this expression will not always validate to true
@@ -486,7 +533,7 @@ public class EDACCFilter extends javax.swing.JDialog {
         String expr = txtExpression.getText();
         Matcher matcher = Pattern.compile("\\$" + arg + "([^0-9]|\n)").matcher(expr + "\n");
         while (matcher.find()) {
-            expr = expr.substring(0, matcher.start()) + "true" + expr.substring(matcher.start()+arg.length()+1, expr.length());
+            expr = expr.substring(0, matcher.start()) + "true" + expr.substring(matcher.start() + arg.length() + 1, expr.length());
             matcher = Pattern.compile("\\$" + arg + "([^0-9]|\n)").matcher(expr + "\n");
         }
         txtExpression.setText(expr);

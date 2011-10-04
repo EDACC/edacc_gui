@@ -162,6 +162,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
      */
     public DefaultTreeModel instanceClassTreeModel;
     private EDACCInstanceFilter instanceFilter;
+    private EDACCFilter solverConfigComponentFilter;
     private EDACCFilter solverConfigFilter;
     private EDACCFilter solverFilter;
     private EDACCOutputViewer outputViewer;
@@ -199,10 +200,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         updateTitleThread = new UpdateTitlesThread();
         updateTitleThread.start();
         expController = new ExperimentController(this);
-        
+
         initComponents();
 
-        
+
         /* -------------------------------- experiment tab -------------------------------- */
         expTableModel = new ExperimentTableModel(false);
         tableExperiments.setModel(expTableModel);
@@ -311,7 +312,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         /* -------------------------------- end of configuration scenario tab -------------------------------- */
         /* -------------------------------- solver tab -------------------------------- */
         //jScrollPane4.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
-        btnSolverTabFilterSolverConfigs.setVisible(false);
         solverConfigTablePanel = new EDACCExperimentModeSolverConfigurationTablePanel(expController);
         lblSolverFilterStatus.setPreferredSize(null);
         solTableModel = new SolverTableModel();
@@ -326,6 +326,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             public void run() {
                 solverConfigFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, solverConfigTablePanel.table, true);
                 solverFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tableSolvers, true);
+                solverConfigComponentFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, solverConfigPanel);
             }
         });
         /* -------------------------------- end of solver tab -------------------------------- */
@@ -587,8 +588,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
      */
     public void reinitializeSolvers() {
         jScrollPane4.setViewportView(solverConfigPanel);
-        btnSolverTabFilterSolverConfigs.setVisible(false);
         solverConfigFilter.clearFilters();
+        solverConfigComponentFilter.clearFilters();
         solverFilter.clearFilters();
         updateSolverConfigFilterStatus();
         updateSolverFilterStatus();
@@ -704,12 +705,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnChooseSolvers = new javax.swing.JButton();
         btnSolverTabFilterSolvers = new javax.swing.JButton();
         lblSolverFilterStatus = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
+        lblSolverConfigFilterStatus = new javax.swing.JLabel();
+        btnChangeView = new javax.swing.JButton();
+        btnSolverTabFilterSolverConfigs = new javax.swing.JButton();
         btnSaveSolverConfigurations = new javax.swing.JButton();
         btnUndoSolverConfigurations = new javax.swing.JButton();
-        btnChangeView = new javax.swing.JButton();
         btnImportSolverConfigs = new javax.swing.JButton();
-        btnSolverTabFilterSolverConfigs = new javax.swing.JButton();
         panelChooseInstances = new javax.swing.JPanel();
         jSplitPane2 = new javax.swing.JSplitPane();
         jPanel4 = new javax.swing.JPanel();
@@ -1272,7 +1275,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
                 .addComponent(lblSolverFilterStatus)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSelectAllSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1284,13 +1287,64 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         splitPaneSolverSolverConfigs.setLeftComponent(jPanel8);
 
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel2.border.title"))); // NOI18N
+        jPanel2.setName("jPanel2"); // NOI18N
+
         jScrollPane4.setToolTipText(resourceMap.getString("jScrollPane4.toolTipText")); // NOI18N
         jScrollPane4.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane4.setName("jScrollPane4"); // NOI18N
         solverConfigPanel = new edacc.experiment.tabs.solver.gui.EDACCSolverConfigComponent(expController);
         jScrollPane4.setViewportView(solverConfigPanel);
         jScrollPane4.getVerticalScrollBar().setUnitIncrement(30);
-        splitPaneSolverSolverConfigs.setRightComponent(jScrollPane4);
+
+        lblSolverConfigFilterStatus.setText(resourceMap.getString("lblSolverConfigFilterStatus.text")); // NOI18N
+        lblSolverConfigFilterStatus.setName("lblSolverConfigFilterStatus"); // NOI18N
+
+        btnChangeView.setText(resourceMap.getString("btnChangeView.text")); // NOI18N
+        btnChangeView.setName("btnChangeView"); // NOI18N
+        btnChangeView.setPreferredSize(new java.awt.Dimension(109, 23));
+        btnChangeView.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnChangeViewActionPerformed(evt);
+            }
+        });
+
+        btnSolverTabFilterSolverConfigs.setText(resourceMap.getString("btnSolverTabFilterSolverConfigs.text")); // NOI18N
+        btnSolverTabFilterSolverConfigs.setName("btnSolverTabFilterSolverConfigs"); // NOI18N
+        btnSolverTabFilterSolverConfigs.setPreferredSize(new java.awt.Dimension(109, 23));
+        btnSolverTabFilterSolverConfigs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolverTabFilterSolverConfigsActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(lblSolverConfigFilterStatus)
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addGap(289, 289, 289)
+                .addComponent(btnSolverTabFilterSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnChangeView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(lblSolverConfigFilterStatus)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnChangeView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSolverTabFilterSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+
+        splitPaneSolverSolverConfigs.setRightComponent(jPanel2);
 
         btnSaveSolverConfigurations.setText(resourceMap.getString("btnSaveSolverConfigurations.text")); // NOI18N
         btnSaveSolverConfigurations.setToolTipText(resourceMap.getString("btnSaveSolverConfigurations.toolTipText")); // NOI18N
@@ -1312,30 +1366,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         });
 
-        btnChangeView.setText(resourceMap.getString("btnChangeView.text")); // NOI18N
-        btnChangeView.setName("btnChangeView"); // NOI18N
-        btnChangeView.setPreferredSize(new java.awt.Dimension(109, 25));
-        btnChangeView.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnChangeViewActionPerformed(evt);
-            }
-        });
-
         btnImportSolverConfigs.setText(resourceMap.getString("btnImportSolverConfigs.text")); // NOI18N
         btnImportSolverConfigs.setName("btnImportSolverConfigs"); // NOI18N
         btnImportSolverConfigs.setPreferredSize(new java.awt.Dimension(125, 25));
         btnImportSolverConfigs.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnImportSolverConfigsActionPerformed(evt);
-            }
-        });
-
-        btnSolverTabFilterSolverConfigs.setText(resourceMap.getString("btnSolverTabFilterSolverConfigs.text")); // NOI18N
-        btnSolverTabFilterSolverConfigs.setName("btnSolverTabFilterSolverConfigs"); // NOI18N
-        btnSolverTabFilterSolverConfigs.setPreferredSize(new java.awt.Dimension(109, 25));
-        btnSolverTabFilterSolverConfigs.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSolverTabFilterSolverConfigsActionPerformed(evt);
             }
         });
 
@@ -1346,14 +1382,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             .addGroup(panelChooseSolverLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelChooseSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(splitPaneSolverSolverConfigs, javax.swing.GroupLayout.DEFAULT_SIZE, 1096, Short.MAX_VALUE)
+                    .addComponent(splitPaneSolverSolverConfigs, javax.swing.GroupLayout.DEFAULT_SIZE, 1128, Short.MAX_VALUE)
                     .addGroup(panelChooseSolverLayout.createSequentialGroup()
                         .addComponent(btnImportSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 517, Short.MAX_VALUE)
-                        .addComponent(btnSolverTabFilterSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnChangeView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 779, Short.MAX_VALUE)
                         .addComponent(btnUndoSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSaveSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -1363,14 +1395,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             panelChooseSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelChooseSolverLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(splitPaneSolverSolverConfigs, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
+                .addComponent(splitPaneSolverSolverConfigs, javax.swing.GroupLayout.DEFAULT_SIZE, 528, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelChooseSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSaveSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnUndoSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnChangeView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnImportSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSolverTabFilterSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnImportSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -2220,11 +2250,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         if (jScrollPane4.getViewport().getView() == solverConfigTablePanel) {
             SolverConfigurationEntry entry = solverConfigTablePanel.getSelectedSolverConfigEntry();
             jScrollPane4.setViewportView(solverConfigPanel);
-            btnSolverTabFilterSolverConfigs.setVisible(false);
             if (entry != null) {
                 Rectangle b = solverConfigPanel.getBoundsOf(entry);
                 if (b != null) {
-                    Rectangle r = new Rectangle(0,0,10,10);
+                    Rectangle r = new Rectangle(0, 0, 10, 10);
                     solverConfigPanel.scrollRectToVisible(r);
                     b.y += jScrollPane4.getHeight() - b.height;
                     solverConfigPanel.scrollRectToVisible(b);
@@ -2232,8 +2261,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         } else {
             jScrollPane4.setViewportView(solverConfigTablePanel);
-            btnSolverTabFilterSolverConfigs.setVisible(true);
         }
+        updateSolverConfigFilterStatus();
     }//GEN-LAST:event_btnChangeViewActionPerformed
 
     private void btnImportSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportSolverConfigsActionPerformed
@@ -2530,13 +2559,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }//GEN-LAST:event_btnRemoveExperimentActionPerformed
 
     private void btnChooseSolversActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseSolversActionPerformed
-     // TODO: fix!
-        
         for (int i = 0; i < solTableModel.getRowCount(); i++) {
             Solver s = solTableModel.getSolver(i);
             if (solTableModel.isSelected(i) && !expController.getSolverConfigurationEntryModel().solverExists(s)) {
                 try {
-                expController.getSolverConfigurationEntryModel().add(new SolverConfigurationEntry(s, expController.getActiveExperiment()));
+                    expController.getSolverConfigurationEntryModel().add(new SolverConfigurationEntry(s, expController.getActiveExperiment()));
                 } catch (Exception ex) {
                     // TODO: error
                 }
@@ -2600,7 +2627,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                             createDatabaseErrorMessage(e);
                         }
                     });
-                } 
+                }
             }
         });
     }//GEN-LAST:event_btnUndoSolverConfigurationsActionPerformed
@@ -3074,8 +3101,13 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }//GEN-LAST:event_btnDefineCourseActionPerformed
 
     private void btnSolverTabFilterSolverConfigsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverTabFilterSolverConfigsActionPerformed
-        EDACCApp.getApplication().show(solverConfigFilter);
-        ((DefaultTableModel) solverConfigTablePanel.table.getModel()).fireTableDataChanged();
+        if (jScrollPane4.getViewport().getView() == solverConfigTablePanel) {
+            EDACCApp.getApplication().show(solverConfigFilter);
+            ((DefaultTableModel) solverConfigTablePanel.table.getModel()).fireTableDataChanged();
+        } else if (jScrollPane4.getViewport().getView() == solverConfigPanel) {
+            EDACCApp.getApplication().show(solverConfigComponentFilter);
+            solverConfigPanel.getModel().fireDataChanged();
+        }
         updateSolverConfigFilterStatus();
     }//GEN-LAST:event_btnSolverTabFilterSolverConfigsActionPerformed
 
@@ -3255,6 +3287,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -3276,6 +3309,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JLabel lblETA;
     private javax.swing.JLabel lblFilterStatus;
     private javax.swing.JLabel lblJobsFilterStatus;
+    private javax.swing.JLabel lblSolverConfigFilterStatus;
     private javax.swing.JLabel lblSolverFilterStatus;
     private javax.swing.JTabbedPane manageExperimentPane;
     private javax.swing.JMenuItem menuCollapseAll;
@@ -3378,12 +3412,18 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }
 
     public void updateSolverConfigFilterStatus() {
-        solverConfigTablePanel.lblFilterStatus.setForeground(Color.red);
         String status = "";
-        if (solverConfigFilter.hasFiltersApplied()) {
-            status += "This list of solver configurations has filters applied to it. Use the filter button below to modify. Showing " + solverConfigTablePanel.table.getRowCount() + " solver configurations.";
+        if (jScrollPane4.getViewport().getView() == solverConfigTablePanel) {
+            if (solverConfigFilter.hasFiltersApplied()) {
+                status += "This list of solver configurations has filters applied to it. Use the filter button below to modify. Showing " + solverConfigTablePanel.table.getRowCount() + " solver configurations.";
+            }
+        } else if (jScrollPane4.getViewport().getView() == solverConfigPanel) {
+            if (solverConfigComponentFilter.hasFiltersApplied()) {
+                status += "This list of solver configurations has filters applied to it. Use the filter button below to modify. Showing " + solverConfigPanel.getRowCount() + " solver configurations.";
+            }
         }
-        solverConfigTablePanel.lblFilterStatus.setText(status);
+        lblSolverConfigFilterStatus.setForeground(Color.red);
+        lblSolverConfigFilterStatus.setText(status);
     }
 
     /**
