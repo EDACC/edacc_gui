@@ -3,7 +3,6 @@ package edacc.experiment;
 import com.mysql.jdbc.exceptions.MySQLStatementCancelledException;
 import edacc.model.SolverConfigCache;
 import edacc.EDACCExperimentMode;
-import edacc.experiment.tabs.solver.gui.EDACCSolverConfigComponent;
 import edacc.api.costfunctions.*;
 import edacc.experiment.tabs.solver.SolverConfigurationEntry;
 import edacc.experiment.tabs.solver.SolverConfigurationEntryModel;
@@ -184,16 +183,9 @@ public class ExperimentController {
 
         // now load solver configs of the current experiment
         if (solverConfigCache != null) {
-         //   solverConfigPanel.setExperiment(activeExperiment);
-         //   main.solverConfigTablePanel.setExperiment(activeExperiment);
-
             solverConfigCache.changeExperiment(activeExperiment);
         } else {
             solverConfigCache = new SolverConfigCache(activeExperiment);
-           // solverConfigPanel.setExperiment(activeExperiment);
-           // solverConfigPanel.setSolverConfigCache(solverConfigCache);
-           // main.solverConfigTablePanel.setExperiment(activeExperiment);
-           // main.solverConfigTablePanel.setSolverConfigCache(solverConfigCache);
             solverConfigCache.reload();
         }
         solverConfigurationEntryModel.clear();
@@ -798,7 +790,14 @@ public class ExperimentController {
      */
     public synchronized void loadJobs() {
         try {
-            experimentResultCache.updateExperimentResults();
+            boolean autocommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
+            DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+            try {
+                experimentResultCache.updateExperimentResults();
+                //solverConfigCache.synchronize();
+            } finally {
+                DatabaseConnector.getInstance().getConn().setAutoCommit(autocommit);
+            }
             final ExperimentResultsBrowserTableModel sync = main.jobsTableModel;
             synchronized (sync) {
 
@@ -865,6 +864,7 @@ public class ExperimentController {
                 });
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }

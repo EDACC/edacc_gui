@@ -273,7 +273,11 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
 
     private void itemRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemRemoveActionPerformed
         for (int row : table.getSelectedRows()) {
-            model.removeSolverConfigurationEntry(tableModel.getEntry(table.convertRowIndexToModel(row)));
+            SolverConfigurationEntry entry = tableModel.getEntry(table.convertRowIndexToModel(row));
+            model.removeSolverConfigurationEntry(entry);
+            if (entry.getSolverConfig() != null) {
+                expController.solverConfigCache.markAsDeleted(entry.getSolverConfig());
+            }
         }
         model.fireDataChanged();
     }//GEN-LAST:event_itemRemoveActionPerformed

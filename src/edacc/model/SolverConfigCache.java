@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Observable;
 import javax.swing.SwingUtilities;
 
@@ -64,7 +65,9 @@ public class SolverConfigCache extends Observable {
             }
             ids.add(sc.getId());
         }
-        for (SolverConfiguration sc : solverConfigs.values()) {
+        LinkedList<SolverConfiguration> scs = new LinkedList<SolverConfiguration>();
+        scs.addAll(solverConfigs.values());
+        for (SolverConfiguration sc : scs) {
             if (!ids.contains(sc.getId())) {
                 markAsDeleted(sc);
                 solverConfigs.remove(sc.getId());

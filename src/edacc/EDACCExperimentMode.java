@@ -172,7 +172,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     /**
      * The panel for the solver configurations in the solvers tab. Will be created on object construction and never be recreated.
      */
-    public EDACCExperimentModeSolverConfigurationTablePanel solverConfigTablePanel;
+    private EDACCExperimentModeSolverConfigurationTablePanel solverConfigTablePanel;
     private AnalysisPanel analysePanel;
     private Timer jobsTimer = null;
     private Integer resultBrowserETA;
