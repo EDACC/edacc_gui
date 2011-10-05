@@ -7,6 +7,7 @@ package edacc.experiment.tabs.solver.gui;
 
 import edacc.JTableTooltipInformation;
 import edacc.experiment.tabs.solver.SolverConfigEntryTableModel;
+import edacc.experiment.tabs.solver.SolverConfigurationEntry;
 import edacc.model.Parameter;
 import java.io.File;
 import java.util.ArrayList;
@@ -18,26 +19,23 @@ import javax.swing.JFileChooser;
  */
 public class EDACCSolverConfigReplicateUsingFiles extends javax.swing.JDialog {
 
-    private EDACCSolverConfigEntry entry;
     private JFileChooser fileChooser;
     private File chosenFolder;
     private ParameterTableModel model;
 
     /** Creates new form EDACCSolverConfigReplicateUsingFile */
-    public EDACCSolverConfigReplicateUsingFiles(java.awt.Frame parent, boolean modal, EDACCSolverConfigEntry entry) {
+    public EDACCSolverConfigReplicateUsingFiles(java.awt.Frame parent, boolean modal, SolverConfigurationEntry entry) {
         super(parent, modal);
         initComponents();
-        this.entry = entry;
         fileChooser = new JFileChooser();
         txtDirectory.setText(fileChooser.getCurrentDirectory().getAbsolutePath());
         chosenFolder = null;
         model = (ParameterTableModel) tblParameters.getModel();
-        // TODO: fix!
-     /*   model.setParameters(entry.getParameters());
+        model.setParameters(entry.getTableModel().getParameters());
         for (int i = 0; i < model.getRowCount(); i++) {
-            model.setValueAt(entry.getModel().getValueAt(i, 3), i, 3);
-            model.setValueAt(entry.getModel().getValueAt(i, 0), i, 0);
-        }*/
+            model.setValueAt(entry.getTableModel().getValueAt(i, 3), i, 3);
+            model.setValueAt(entry.getTableModel().getValueAt(i, 0), i, 0);
+        }
     }
 
     /** This method is called from within the constructor to

@@ -4,9 +4,11 @@
  */
 package edacc.experiment.tabs.solver.gui;
 
+import edacc.EDACCApp;
 import edacc.EDACCExperimentMode;
 import edacc.experiment.ExperimentController;
 import edacc.experiment.tabs.solver.EDACCSolverConfigEntryListener;
+import edacc.experiment.tabs.solver.SolverConfigEntryTableModel;
 import edacc.experiment.tabs.solver.SolverConfigurationEntry;
 import edacc.experiment.tabs.solver.SolverConfigurationEntryModel;
 import edacc.experiment.tabs.solver.SolverConfigurationEntryModelListener;
@@ -17,12 +19,19 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.RowFilter;
@@ -65,7 +74,7 @@ public class EDACCSolverConfigComponent extends JComponent implements SolverConf
     public SolverConfigurationEntryModel getModel() {
         return model;
     }
-    
+
     public void setTitles() {
         if (!update && parent != null) {
             parent.setTitles();
@@ -307,6 +316,92 @@ public class EDACCSolverConfigComponent extends JComponent implements SolverConf
 
     public int getRowCount() {
         return size;
+    }
+
+    @Override
+    public void onMassReplicationRequest(EDACCSolverConfigEntry entry) {
+        EDACCSolverConfigReplicateUsingFiles replicator = new EDACCSolverConfigReplicateUsingFiles(EDACCApp.getApplication().getMainFrame(), true, entry.getModel());
+        replicator.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+        EDACCApp.getApplication().show(replicator);
+        File dir;
+        int index = model.getSolverIndex(entry.getModel());
+        
+        if ((dir = replicator.getChosenFolder()) != null) {
+            File[] files = dir.listFiles();
+            SolverConfigEntryTableModel replModel = replicator.getModel();
+            Pattern[] patterns = new Pattern[replModel.getRowCount()];
+            String[] values = new String[replModel.getRowCount()];
+            for (int i = 0; i < replModel.getRowCount(); i++) {
+                if ((Boolean) replModel.getValueAt(i, 0)) {
+                    // is selected
+                    if ((Boolean) replModel.getValueAt(i, 6)) {
+                        // is regex
+                        patterns[i] = Pattern.compile((String) replModel.getValueAt(i, 3));
+                    }
+                }
+            }
+            for (File file : files) {
+                if (!file.isFile()) {
+                    continue;
+                }
+                for (int i = 0; i < replModel.getRowCount(); i++) {
+                    if ((Boolean) replModel.getValueAt(i, 0)) {
+                        if (!(Boolean) replModel.getValueAt(i, 6)) {
+                            values[i] = (String) replModel.getValueAt(i, 3);
+                        } else {
+                            values[i] = null;
+                        }
+                    }
+                }
+                BufferedReader input = null;
+
+                try {
+                    input = new BufferedReader(new FileReader(file));
+                    String line;
+                    while ((line = input.readLine()) != null) {
+                        for (int i = 0; i < replModel.getRowCount(); i++) {
+                            if (patterns[i] != null) {
+                                Matcher m = patterns[i].matcher(line);
+                                if (m.matches()) {
+                                    if (m.groupCount() > 0) {
+                                        if (values[i] != null || m.groupCount() > 1) {
+                                            // TODO: WARNING
+                                        } else {
+                                            values[i] = m.group(1);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    SolverConfigurationEntry newEntry = new SolverConfigurationEntry(entry.getModel().getSolver(), entry.getModel().getExperiment()); 
+                    newEntry.setName(entry.getName() + "-" + file.getName());
+                    newEntry.setSeedGroup(entry.getModel().getSeedGroup());
+                    for (int i = 0; i < replModel.getRowCount(); i++) {
+                        if (values[i] != null) {
+                            newEntry.getTableModel().setValueAt(values[i], i, 3);
+                            newEntry.getTableModel().setValueAt(true, i, 0);
+                        }
+                    }
+                    model.insert(newEntry, newEntry.getSolver(), ++index);
+                } catch (FileNotFoundException ex) {
+                    // TODO: error
+                } catch (IOException ex) {
+                    // TODO: error
+                } catch (SQLException ex) {
+                    // TODO: error
+                } finally {
+                    if (input != null) {
+                        try {
+                            input.close();
+                        } catch (IOException ex) {
+                        }
+                    }
+                }
+            }
+            model.fireDataChanged();
+        }
     }
 
     private class SolverLabel {

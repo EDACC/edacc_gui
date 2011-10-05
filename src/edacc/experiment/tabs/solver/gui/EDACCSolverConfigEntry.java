@@ -360,89 +360,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     }//GEN-LAST:event_btnEditNameActionPerformed
 
     private void btnMassReplicationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMassReplicationActionPerformed
-        // TODO: fix!
-        /*  EDACCSolverConfigReplicateUsingFiles replicator = new EDACCSolverConfigReplicateUsingFiles(EDACCApp.getApplication().getMainFrame(), true, this);
-        replicator.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
-        EDACCApp.getApplication().show(replicator);
-        File dir;
-        if ((dir = replicator.getChosenFolder()) != null) {
-        File[] files = dir.listFiles();
-        SolverConfigEntryTableModel model = replicator.getModel();
-        Pattern[] patterns = new Pattern[model.getRowCount()];
-        String[] values = new String[model.getRowCount()];
-        for (int i = 0; i < model.getRowCount(); i++) {
-        if ((Boolean) model.getValueAt(i, 0)) {
-        // is selected
-        if ((Boolean) model.getValueAt(i, 6)) {
-        // is regex
-        patterns[i] = Pattern.compile((String) model.getValueAt(i, 3));
-        }
-        }
-        }
-        for (File file : files) {
-        if (!file.isFile()) {
-        continue;
-        }
-        for (int i = 0; i < model.getRowCount(); i++) {
-        if ((Boolean) model.getValueAt(i, 0)) {
-        if (!(Boolean) model.getValueAt(i, 6)) {
-        values[i] = (String) model.getValueAt(i, 3);
-        } else {
-        values[i] = null;
-        }
-        }
-        }
-        BufferedReader input = null;
-        
-        try {
-        input = new BufferedReader(new FileReader(file));
-        String line;
-        while ((line = input.readLine()) != null) {
-        for (int i = 0; i < model.getRowCount(); i++) {
-        if (patterns[i] != null) {
-        Matcher m = patterns[i].matcher(line);
-        if (m.matches()) {
-        if (m.groupCount() > 0) {
-        if (values[i] != null || m.groupCount() > 1) {
-        // TODO: WARNING
-        } else {
-        values[i] = m.group(1);
-        }
-        }
-        }
-        }
-        }
-        }
-        
-        if (solver == null) {
-        solver = SolverDAO.getById(this.getSolverId());
-        }
-        EDACCSolverConfigEntry entry = new EDACCSolverConfigEntry(solver, ((TitledBorder) this.getBorder()).getTitle() + "-" + file.getName(), experiment);
-        entry.txtSeedGroup.setText(getSeedGroup().getText());
-        for (int i = 0; i < model.getRowCount(); i++) {
-        if (values[i] != null) {
-        entry.solverConfigEntryTableModel.setValueAt(values[i], i, 3);
-        entry.solverConfigEntryTableModel.setValueAt(true, i, 0);
-        }
-        }
-        entry.setParent(parent);
-        parent.addEntryAfterEntry(entry, this);
-        } catch (FileNotFoundException ex) {
-        // TODO: error
-        } catch (IOException ex) {
-        // TODO: error
-        } catch (SQLException ex) {
-        // TODO: error
-        } finally {
-        if (input != null) {
-        try {
-        input.close();
-        } catch (IOException ex) {
-        }
-        }
-        }
-        }
-        }*/
+        fireMassReplicationRequest();
     }//GEN-LAST:event_btnMassReplicationActionPerformed
 
     private void comboSolverBinariesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboSolverBinariesActionPerformed
@@ -528,5 +446,9 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
     
     public void fireRemoveRequest() {
         listener.onRemoveRequest(this);
+    }
+    
+    public void fireMassReplicationRequest() {
+        listener.onMassReplicationRequest(this);
     }
 }

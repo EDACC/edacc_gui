@@ -8,13 +8,12 @@ package edacc.experiment.tabs.solver.gui;
 import edacc.EDACCApp;
 import edacc.JTableTooltipInformation;
 import edacc.experiment.ExperimentController;
-import edacc.experiment.tabs.solver.EDACCSolverConfigEntryListener;
+import edacc.experiment.tabs.solver.EDACCSolverConfigEntryAdapter;
 import edacc.experiment.tabs.solver.SolverConfigurationEntry;
 import edacc.experiment.tabs.solver.SolverConfigurationEntryModel;
 import edacc.experiment.tabs.solver.SolverConfigurationEntryModelListener;
 import edacc.model.ParameterInstance;
 import edacc.model.Solver;
-import edacc.model.SolverBinaries;
 import edacc.model.SolverConfiguration;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
@@ -214,47 +213,8 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
             // TODO: fix
             SolverConfigurationEntry entry = tableModel.getEntry(table.convertRowIndexToModel(table.getSelectedRow()));
             try {
-                SolverConfigurationEntry copy = new SolverConfigurationEntry(entry);
-                /*if (entry.getSolverConfig() != null) {
-                    copy = new SolverConfigurationEntry(entry.getSolverConfig(), entry.getExperiment());
-                } else {
-                    copy = new SolverConfigurationEntry(entry.getSolver(), entry.getExperiment());
-                }*/
-                
-                EDACCSolverConfigEntry entryDialog = new EDACCSolverConfigEntry(copy, new EDACCSolverConfigEntryListener() {
-
-                    @Override
-                    public void onNameChanged(EDACCSolverConfigEntry entry, String oldName, String newName) {
-                    }
-
-                    @Override
-                    public void onSeedGroupChanged(EDACCSolverConfigEntry entry, int oldSeedGroup, int newSeedGroup) {
-                    }
-
-                    @Override
-                    public void onHintChanged(EDACCSolverConfigEntry entry, String oldHint, String newHint) {
-                    }
-
-                    @Override
-                    public void onSolverBinaryChanged(EDACCSolverConfigEntry entry, SolverBinaries oldSolverBinary, SolverBinaries newSolverBinary) {
-
-                    }
-
-                    @Override
-                    public void onParametersChanged(EDACCSolverConfigEntry entry) {
-                    }
-
-                    @Override
-                    public void onReplicateRequest(EDACCSolverConfigEntry entry) {
-                        // not supported here
-                    }
-
-                    @Override
-                    public void onRemoveRequest(EDACCSolverConfigEntry entry) {
-                        // not supported here
-                    }
-                    
-                });
+                SolverConfigurationEntry copy = new SolverConfigurationEntry(entry);                
+                EDACCSolverConfigEntry entryDialog = new EDACCSolverConfigEntry(copy, new EDACCSolverConfigEntryAdapter());
 
                 SolverConfigDialog dialog = new SolverConfigDialog(entryDialog);
                 dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());

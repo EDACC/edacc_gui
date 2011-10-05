@@ -15,4 +15,5 @@ public interface EDACCSolverConfigEntryListener {
     public void onParametersChanged(EDACCSolverConfigEntry entry);
     public void onReplicateRequest(EDACCSolverConfigEntry entry);
     public void onRemoveRequest(EDACCSolverConfigEntry entry);
+    public void onMassReplicationRequest(EDACCSolverConfigEntry entry);
 }
