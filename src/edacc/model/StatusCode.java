@@ -22,7 +22,7 @@ public class StatusCode extends BaseModel implements Serializable {
 
     private int statusCode;
     private String description;
-    protected StatusCode (int statusCode, String description) {
+    public StatusCode (int statusCode, String description) {
         this.statusCode = statusCode;
         this.description = description;
     }

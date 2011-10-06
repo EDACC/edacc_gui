@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  *
@@ -13,6 +14,7 @@ public class StatusCodeDAO {
     protected static final String table = "StatusCodes";
     protected static final String insertQuery = "INSERT INTO " + table + " (statusCode, description) VALUES (?, ?)";
     protected static final String selectQuery = "SELECT * FROM " + table + " WHERE statusCode = ?";
+    protected static final String selectAllQuery = "SELECT * FROM " + table;
     protected static final HashMap<Integer, StatusCode> cache = new HashMap<Integer, StatusCode>();
 
     public static void save(StatusCode status) throws SQLException {
@@ -46,6 +48,24 @@ public class StatusCodeDAO {
                 throw new StatusCodeNotInDBException();
             }
         }
+    }
+
+    public static LinkedList<StatusCode> getAll() throws SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(selectAllQuery);
+        ResultSet rs = st.executeQuery();
+        LinkedList<StatusCode> codes = new LinkedList<StatusCode>();
+        if (rs.next()) {
+            int statusCode = rs.getInt("statusCode");
+            StatusCode status = new StatusCode(statusCode, rs.getString("description"));
+            cache.put(statusCode, status);
+            rs.close();
+            st.close();
+            codes.add(status);
+        } else {
+            rs.close();
+            st.close();
+        }
+        return codes;
     }
 
     public static void initialize() throws SQLException {
