@@ -7,8 +7,8 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project name="instanceSolvableMethod" default="default" basedir=".">
-    <description>Builds, tests, and runs the project instanceSolvableMethod.</description>
+<project name="InstanceAvgSolvedTime" default="default" basedir=".">
+    <description>Builds, tests, and runs the project InstanceAvgSolvedTime.</description>
     <import file="nbproject/build-impl.xml"/>
     <!--
 
@@ -59,7 +59,7 @@
 
     An example of overriding the target for project execution could look like this:
 
-        <target name="run" depends="instanceSolvableMethod-impl.jar">
+        <target name="run" depends="InstanceAvgSolvedTime-impl.jar">
             <exec dir="bin" executable="launcher.exe">
                 <arg file="${dist.jar}"/>
             </exec>
@@ -77,7 +77,7 @@
         <echo>Copying contents of ${edacc.jar.resolved} to ${dist.jar.resolved}</echo>
         
         <jar update="yes" jarfile="${dist.jar.resolved}">
-            <zipfileset src="${edacc.jar.resolved}" includes="edacc/model/**"/>
+            <zipfileset src="${edacc.jar.resolved}" includes="edacc/**"/>
         </jar>
     </target>
 </project>
