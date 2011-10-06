@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.LinkedList;
@@ -123,7 +124,16 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         parameterTableModel = new ParameterTableModel();
         manageDBParameters = new ManageDBParameters(this, parameterTableModel);
         tableParameters.setModel(parameterTableModel);
-        tableParameters.setRowSorter(new TableRowSorter<ParameterTableModel>(parameterTableModel));
+        TableRowSorter<ParameterTableModel> paramSorter = new TableRowSorter<ParameterTableModel>(parameterTableModel);
+        paramSorter.setComparator(ParameterTableModel.ORDER, new Comparator<Integer>() {
+
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return o1.compareTo(o2);
+            }
+
+        });
+        tableParameters.setRowSorter(paramSorter);
 
         // initialize the solver binaries table
         solverBinariesTableModel = new SolverBinariesTableModel();

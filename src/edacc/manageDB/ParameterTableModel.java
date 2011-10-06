@@ -16,13 +16,13 @@ import javax.swing.table.AbstractTableModel;
  * @author gregor
  */
 public class ParameterTableModel extends AbstractTableModel{
-    private final int ORDER = 0;
-    private final int NAME = 1;
-    private final int PREFIX = 2;
-    private final int HASVALUE = 3;
-    private final int MANDATORY = 4;
-    private final int SPACE = 5;
-    private final int ATTACHTOPREVIOUS = 6;
+    public static final int ORDER = 0;
+    public static final int NAME = 1;
+    public static final int PREFIX = 2;
+    public static final int HASVALUE = 3;
+    public static final int MANDATORY = 4;
+    public static final int SPACE = 5;
+    public static final int ATTACHTOPREVIOUS = 6;
     private Solver currentSolver;
 
     private String[] colums = {"Order", "Name", "Prefix", "Boolean", "Mandatory", "Space", "Attach to previous"};
@@ -30,7 +30,6 @@ public class ParameterTableModel extends AbstractTableModel{
 
     public ParameterTableModel(){
         parameters = new HashMap<Solver, Vector<Parameter>>();
-
     }
 
     /**
