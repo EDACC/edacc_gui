@@ -964,7 +964,6 @@ public class ManageDBInstances implements Observer {
             throw new ProblemOccuredDuringPropertyComputation(comCon.getExceptionCollector());
         }
         task.cancel(true);
-        
     }
 
     public void changeInstanceTable() {

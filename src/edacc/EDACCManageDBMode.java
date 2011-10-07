@@ -131,7 +131,6 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             public int compare(Integer o1, Integer o2) {
                 return o1.compareTo(o2);
             }
-
         });
         tableParameters.setRowSorter(paramSorter);
 
@@ -1940,6 +1939,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         computeInstancePropertyDlg = new EDACCComputeInstancePropertyDialog(EDACCApp.getApplication().getMainFrame(), manageDBInstances, instances);
         computeInstancePropertyDlg.setLocationRelativeTo(this);
         computeInstancePropertyDlg.setVisible(true);
+        manageDBInstances.loadProperties();
+        instanceTableModel.updateProperties();
+        instanceTableModel.fireTableDataChanged();
     }//GEN-LAST:event_bComputePropertyActionPerformed
 
     private void btnGenerateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerateActionPerformed
