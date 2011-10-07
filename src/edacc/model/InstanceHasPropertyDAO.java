@@ -236,24 +236,13 @@ public class InstanceHasPropertyDAO {
         return res;
     }
 
-    public static InstanceHasProperty getByInstanceAndProperty(Instance instance, Property property) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, InstanceHasPropertyNotInDBException {   
-        System.out.println("instance vorahnden");    
-        HashMap<Integer, Integer> test = new HashMap<Integer, Integer>();
-            test = (HashMap<Integer, Integer>) idCache.get(instance.getId()).clone();
-            if(idCache.containsKey(instance.getId())){
-                System.out.println("instance vorahnden");
-            }
-            if (test != null) { 
-             Integer tester = idCache.get(instance.getId()).get(property.getId());
-            if ( tester != null) {
+    public static InstanceHasProperty getByInstanceAndProperty(Instance instance, Property property) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, InstanceHasPropertyNotInDBException {
+        if (idCache.containsKey(instance.getId())) {
+            if (idCache.get(instance.getId()).containsKey(property.getId())) {
                 return getById(idCache.get(instance.getId()).get(property.getId()));
-            } else{
-               throw new InstanceHasPropertyNotInDBException(); 
             }
-                
-        } else {
-            throw new InstanceHasPropertyNotInDBException();
         }
+        throw new InstanceHasPropertyNotInDBException();
 
         /*PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
         "SELECT id, value FROM " + table + " WHERE idInstance=? AND idProperty=?;");
