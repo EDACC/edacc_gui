@@ -167,8 +167,7 @@ public class PropertyComputationUnit implements Runnable {
 
         try {
             ArrayList<ExperimentResult> er = ExperimentResultDAO.getAllByInstanceId(ihp.getInstance().getId());
-            System.out.println("found " + er.size() + " results for this instance");
-            ObjectOutputStream os = new ObjectOutputStream(p.getOutputStream());
+            System.out.println("found " + er.size() + " results for this instance");            ObjectOutputStream os = new ObjectOutputStream(p.getOutputStream());
             os.writeUnshared(er);
             os.flush();
             os.close();

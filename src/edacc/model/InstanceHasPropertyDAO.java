@@ -28,7 +28,7 @@ public class InstanceHasPropertyDAO {
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idInstance=? AND idProperty=?";
     private static String updateQuery = "UPDATE " + table + " SET value=? WHERE idInstance=? AND idProperty=?";
     // idCache is a Hashtable <InstanceId, Hashtable<PropertyId, id>
-    private static Hashtable<Integer, Hashtable<Integer, Integer>> idCache = new Hashtable<Integer, Hashtable<Integer, Integer>>();
+    private static HashMap<Integer, HashMap<Integer, Integer>> idCache = new HashMap<Integer, HashMap<Integer, Integer>>();
     private static final ObjectCache<InstanceHasProperty> cache = new ObjectCache<InstanceHasProperty>();
 
     /**
@@ -64,7 +64,7 @@ public class InstanceHasPropertyDAO {
             cache.cache(i);
             i.setSaved();
             if (idCache.get(i.getInstance().getId()) == null) {
-                Hashtable tmp = new Hashtable<Integer, Integer>();
+                HashMap tmp = new HashMap<Integer, Integer>();
                 tmp.put(i.getProperty().getId(), i.getId());
                 idCache.put(i.getInstance().getId(), tmp);
             } else {
@@ -146,7 +146,7 @@ public class InstanceHasPropertyDAO {
                 i.setSaved();
                 cache.cache(i);
                 if (idCache.get(i.getInstance().getId()) == null) {
-                    Hashtable tmp = new Hashtable();
+                    HashMap tmp = new HashMap();
                     tmp.put(i.getProperty().getId(), i.getId());
                     idCache.put(i.getInstance().getId(), tmp);
                 } else {
@@ -195,7 +195,7 @@ public class InstanceHasPropertyDAO {
                     ihip = new InstanceHasProperty(instance, ip, value);
                     cache.cache(ihip);
                     if (idCache.get(ihip.getInstance().getId()) == null) {
-                        Hashtable tmp = new Hashtable();
+                        HashMap tmp = new HashMap();
                         tmp.put(ihip.getProperty().getId(), ihip.getId());
                         idCache.put(ihip.getInstance().getId(), tmp);
                     } else {
@@ -236,13 +236,17 @@ public class InstanceHasPropertyDAO {
         return res;
     }
 
-    public static InstanceHasProperty getByInstanceAndProperty(Instance instance, Property property) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, InstanceHasPropertyNotInDBException {
-        Hashtable<Integer, Integer> tester = new Hashtable<Integer, Integer>();
-        
-        if ((tester = idCache.get(instance.getId())) != null) {
-            if (tester.get(property.getId()) != null) {
-                int test = tester.get(property.getId());
-                return getById(test);
+    public static InstanceHasProperty getByInstanceAndProperty(Instance instance, Property property) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, InstanceHasPropertyNotInDBException {   
+        System.out.println("instance vorahnden");    
+        HashMap<Integer, Integer> test = new HashMap<Integer, Integer>();
+            test = (HashMap<Integer, Integer>) idCache.get(instance.getId()).clone();
+            if(idCache.containsKey(instance.getId())){
+                System.out.println("instance vorahnden");
+            }
+            if (test != null) { 
+             Integer tester = idCache.get(instance.getId()).get(property.getId());
+            if ( tester != null) {
+                return getById(idCache.get(instance.getId()).get(property.getId()));
             } else{
                throw new InstanceHasPropertyNotInDBException(); 
             }
@@ -287,7 +291,7 @@ public class InstanceHasPropertyDAO {
             i.setSaved();
             cache.cache(i);
             if (idCache.get(i.getInstance().getId()) == null) {
-                Hashtable<Integer, Integer> tmp = new Hashtable<Integer, Integer>();
+                HashMap<Integer, Integer> tmp = new HashMap<Integer, Integer>();
                 tmp.put(i.getProperty().getId(), i.getId());
                 idCache.put(i.getInstance().getId(), tmp);
             } else {
