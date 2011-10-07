@@ -65,7 +65,7 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
-        if (args.length != 1) {
+        if (args.length < 1) {
             printHelp();
         } else {
             if ("--help".equals(args[0])) {

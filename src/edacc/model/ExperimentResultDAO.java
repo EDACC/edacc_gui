@@ -981,17 +981,26 @@ public class ExperimentResultDAO {
 
     public static ArrayList<ExperimentResult> getAllByInstanceId(int id) throws NoConnectionToDBException, SQLException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         ArrayList<ExperimentResult> v = new ArrayList<ExperimentResult>();
+        HashMap<Integer, ExperimentResult> expResultsMap = new HashMap<Integer, ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery
                 + "WHERE Instances_idInstance=?;");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
-        while (rs.next()) {
+        /*while (rs.next()) {
             ExperimentResult er = getExperimentResultFromResultSet(rs);
             ExperimentResultHasPropertyDAO.assign(er);
             v.add(er);
             er.setSaved();
+        }*/
+        while(rs.next()){
+            ExperimentResult er = getExperimentResultFromResultSet(rs);
+            er.setSaved();
+            expResultsMap.put(er.getId(), er);
+            v.add(er);
         }
+        ExperimentResultHasPropertyDAO.assign(expResultsMap ,v);
+
         rs.close();
         st.close();
         return v;

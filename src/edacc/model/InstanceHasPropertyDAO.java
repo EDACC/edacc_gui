@@ -237,8 +237,16 @@ public class InstanceHasPropertyDAO {
     }
 
     public static InstanceHasProperty getByInstanceAndProperty(Instance instance, Property property) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, InstanceHasPropertyNotInDBException {
-        if (idCache.get(instance.getId()) != null) {
-            return getById(idCache.get(instance.getId()).get(property.getId()));
+        Hashtable<Integer, Integer> tester = new Hashtable<Integer, Integer>();
+        
+        if ((tester = idCache.get(instance.getId())) != null) {
+            if (tester.get(property.getId()) != null) {
+                int test = tester.get(property.getId());
+                return getById(test);
+            } else{
+               throw new InstanceHasPropertyNotInDBException(); 
+            }
+                
         } else {
             throw new InstanceHasPropertyNotInDBException();
         }
@@ -279,7 +287,7 @@ public class InstanceHasPropertyDAO {
             i.setSaved();
             cache.cache(i);
             if (idCache.get(i.getInstance().getId()) == null) {
-                Hashtable tmp = new Hashtable();
+                Hashtable<Integer, Integer> tmp = new Hashtable<Integer, Integer>();
                 tmp.put(i.getProperty().getId(), i.getId());
                 idCache.put(i.getInstance().getId(), tmp);
             } else {

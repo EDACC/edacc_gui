@@ -919,10 +919,12 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         this.textPropertyFieldName.setText(toShow.getName());
         this.textAreaPropertyDescription.setText(toShow.getDescription());
         if (toShow.getComputationMethod() != null) {
+            textAreaRegularExpressions.setText("");
             this.radioBtnComputationMethod.setSelected(true);
-            this.comboBoxComputationMethod.setSelectedItem(toShow.getComputationMethod());
+            this.comboBoxComputationMethod.setSelectedItem(toShow.getComputationMethod().getName());
             this.textFieldComputationmethodParameter.setText(toShow.getComputationMethodParameters());
         } else if (!toShow.getRegularExpression().equals("")) {
+            this.textFieldComputationmethodParameter.setText("");
             this.radioBtnRegExpression.setSelected(true);
             String toAdd = "";
             for (int i = 0; i < toShow.getRegularExpression().size(); i++) {
