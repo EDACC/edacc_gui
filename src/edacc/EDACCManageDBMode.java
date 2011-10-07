@@ -2549,9 +2549,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     }
 
     public void reinitialize() {
-        tableInstances.clearSelection();
-        instanceTableModel.clearTable();
         jTreeInstanceClass.clearSelection();
+        instanceTableModel.clearTable();
     }
 
     public void JTreeStateChanged() {
