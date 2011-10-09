@@ -1943,6 +1943,11 @@ public class ExperimentController {
         // we need a new instance for this
         savedScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
     }
+    
+    public ConfigurationScenario getConfigurationScenarioForExperiment(Experiment exp) throws SQLException {
+        ConfigurationScenario scenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(exp.getId());
+        return scenario;
+    }
 
     public ConfigurationScenario getConfigScenario() {
         return configScenario;

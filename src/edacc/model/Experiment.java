@@ -106,4 +106,9 @@ public class Experiment extends BaseModel implements IntegerPKModel {
             this.setModified();
         }
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

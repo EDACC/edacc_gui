@@ -152,4 +152,8 @@ public class ConfigurationScenarioTableModel extends ThreadSafeDefaultTableModel
     public HashMap<Integer, ConfigurationScenarioParameter> getConfigScenarioParameters() {
         return configScenarioParameters;
     }
+    
+    public Parameter getParameterAt(int row) {
+        return parameters.get(row);
+    }
 }

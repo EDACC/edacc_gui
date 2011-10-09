@@ -447,10 +447,12 @@
                               </Group>
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
+                              <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnConfigurationScenarioRandomSolverConfigs" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnDefineCourse" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="610" max="32767" attributes="0"/>
+                              <EmptySpace pref="415" max="32767" attributes="0"/>
                               <Component id="btnConfigScenarioUndo" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnConfigScenarioSave" min="-2" max="-2" attributes="0"/>
@@ -481,6 +483,7 @@
                           <Component id="btnConfigScenarioUndo" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnConfigurationScenarioRandomSolverConfigs" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnDefineCourse" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -618,9 +621,24 @@
               <Properties>
                 <Property name="text" type="java.lang.String" resourceKey="btnDefineCourse.text"/>
                 <Property name="name" type="java.lang.String" value="btnDefineCourse" noResource="true"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[183, 23]"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDefineCourseActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="jButton1">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="jButton1.text"/>
+                <Property name="name" type="java.lang.String" value="jButton1" noResource="true"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[183, 23]"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
@@ -660,7 +678,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="splitPaneSolverSolverConfigs" pref="528" max="32767" attributes="0"/>
+                      <Component id="splitPaneSolverSolverConfigs" pref="476" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="btnSaveSolverConfigurations" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -730,7 +748,7 @@
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="lblSolverFilterStatus" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jScrollPane3" pref="464" max="32767" attributes="0"/>
+                              <Component id="jScrollPane3" pref="412" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="btnSelectAllSolvers" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -881,7 +899,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="lblSolverConfigFilterStatus" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jScrollPane4" pref="464" max="32767" attributes="0"/>
+                              <Component id="jScrollPane4" pref="412" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="btnChangeView" alignment="3" min="-2" max="-2" attributes="0"/>
