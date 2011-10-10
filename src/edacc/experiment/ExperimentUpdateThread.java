@@ -6,6 +6,7 @@ import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentDAO.StatusCount;
 import edacc.model.StatusCode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.SwingWorker;
@@ -18,7 +19,7 @@ import javax.swing.SwingWorker;
 public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> {
 
     private ExperimentTableModel model;
-    private ArrayList<Experiment> modifiedExperiments;
+    private HashMap<Integer, Experiment> modifiedExperiments;
 
     /**
      * Creates a new experiment update thread.
@@ -27,7 +28,7 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
     public ExperimentUpdateThread(ExperimentTableModel model) {
         super();
         this.model = model;
-        modifiedExperiments = new ArrayList<Experiment>();
+        modifiedExperiments = new HashMap<Integer, Experiment>();
     }
 
     @Override
@@ -42,7 +43,7 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
             } else {
                 experiments = new LinkedList<Experiment>();
                 synchronized (modifiedExperiments) {
-                    experiments.addAll(modifiedExperiments);
+                    experiments.addAll(modifiedExperiments.values());
                     modifiedExperiments.clear();
                 }
             }
@@ -104,7 +105,7 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
                     }
                     if (modified) {
                         synchronized (modifiedExperiments) {
-                            modifiedExperiments.add(status.experiment);
+                            modifiedExperiments.put(status.experiment.getId(), status.experiment);
                         }
                     }
                 }

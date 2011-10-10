@@ -51,6 +51,7 @@ public class SolverConfigCache extends Observable {
     public synchronized void synchronize() throws SQLException {
         HashSet<Integer> ids = new HashSet<Integer>();
         for (final SolverConfiguration sc : SolverConfigurationDAO.getSolverConfigurationByExperimentId(experiment.getId())) {
+            
             if (solverConfigs.get(sc.getId()) == null) {
                 solverConfigs.put(sc.getId(), sc);
                 SwingUtilities.invokeLater(new Runnable() {

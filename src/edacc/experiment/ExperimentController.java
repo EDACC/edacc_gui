@@ -794,6 +794,8 @@ public class ExperimentController {
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
             try {
                 experimentResultCache.updateExperimentResults();
+                // TODO: also update solver config cache if needed and cache parameter instances of solver configs
+                //       maybe this should be done in experimentResultCache?
                 //solverConfigCache.synchronize();
             } finally {
                 DatabaseConnector.getInstance().getConn().setAutoCommit(autocommit);
