@@ -40,6 +40,19 @@ public class ParameterInstanceDAO {
         save(i);
         return i;
     }
+    
+    public static void saveBatch(List<ParameterInstance> parameters) throws SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
+        for (ParameterInstance pi: parameters) {
+            st.setInt(1, pi.getSolverConfiguration().getId());
+            st.setInt(2, pi.getParameter_id());
+            st.setString(3, pi.getValue());
+            pi.setSaved();
+            st.addBatch();
+        }
+        st.executeBatch();
+        st.close();
+    }
 
     public static void save(ParameterInstance i) throws SQLException {
         ArrayList<ParameterInstance> pi = getCached(i.getSolverConfiguration());
