@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
+import javax.swing.JTable;
 import javax.xml.bind.JAXBException;
 
 /**
@@ -161,5 +162,90 @@ public class ManageDBParameters implements Observer {
         ParameterGraphEditor dialog = new ParameterGraphEditor(EDACCApp.getApplication().getMainFrame(), true, parameterTableModel.getCurrentSolver());
         dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         EDACCApp.getApplication().show(dialog);
+    }
+
+    public void moveUp(int[] selectedIndices, JTable paramTable) {
+        if (selectedIndices == null || selectedIndices.length < 1)
+            return;
+        int minIndex = selectedIndices[0]; // index of the first selected element
+        int maxIndex = selectedIndices[selectedIndices.length - 1]; // index of the last selected element
+        Parameter first = parameterTableModel.getParameter(minIndex); // first selected element
+        Parameter last = parameterTableModel.getParameter(maxIndex); // last selected element
+        int aboveIndex = -1;
+        Parameter above = null;
+        try { // try to find element above the first selected element
+            aboveIndex = paramTable.convertRowIndexToModel(paramTable.convertRowIndexToView(minIndex) - 1);
+            above = parameterTableModel.getParameter(aboveIndex);
+        } catch (IndexOutOfBoundsException e) { // first element is already the highest element
+            return; // => do nothing
+        }
+
+        
+        int diff; // difference between first parameter and the parameter above the selected block
+        while ((diff = first.getOrder() - above.getOrder()) == 0) { // if difference equals zero, nothing would happen => find next higher element with smaller order
+            try {
+                aboveIndex = paramTable.convertRowIndexToModel(paramTable.convertRowIndexToView(aboveIndex) - 1);
+                above = parameterTableModel.getParameter(aboveIndex);
+            } catch (IndexOutOfBoundsException e) { // found element is the highest element
+                above = null;
+                break;
+            }
+        }
+        if (above != null) { 
+            // switch orders of first parameter and the parameter above the block
+            int lastOrder = last.getOrder();
+            first.setOrder(above.getOrder());
+            above.setOrder(lastOrder);
+        } else { // no element above the first selected element with smaller order found => decrease order
+            first.setOrder(first.getOrder() - 1);
+            diff = 1;
+        }
+        if (selectedIndices.length >= 2)
+            for (int i = 1; i < selectedIndices.length; i++) {
+                Parameter p = parameterTableModel.getParameter(selectedIndices[i]);
+                p.setOrder(p.getOrder() - diff);
+            }
+        parameterTableModel.fireTableDataChanged();
+    }
+
+    public void moveDown(int[] selectedIndices, JTable paramTable) {
+        if (selectedIndices == null || selectedIndices.length < 1)
+            return;
+        int minIndex = selectedIndices[0]; // index of the first selected element
+        int maxIndex = selectedIndices[selectedIndices.length - 1]; // index of the last selected element
+        Parameter first = parameterTableModel.getParameter(minIndex); // first selected element
+        Parameter last = parameterTableModel.getParameter(maxIndex); // last selected element
+        int belowIndex = -1;
+        Parameter below = null;
+        try { // try to find element above the first selected element
+            belowIndex = paramTable.convertRowIndexToModel(paramTable.convertRowIndexToView(maxIndex) + 1);
+            below = parameterTableModel.getParameter(belowIndex);
+        } catch (IndexOutOfBoundsException e) { // first element is already the highest element
+            return; // => do nothing
+        }
+        
+        int diff; // difference between first parameter and the parameter above the selected block
+        while ((diff = last.getOrder() - below.getOrder()) == 0) { // if difference equals zero, nothing would happen => find next higher element with smaller order
+            try {
+                belowIndex = paramTable.convertRowIndexToModel(paramTable.convertRowIndexToView(belowIndex) + 1);
+                below = parameterTableModel.getParameter(belowIndex);
+            } catch (IndexOutOfBoundsException e) { // found element is the highest element
+                below = null;
+                break;
+            }
+        }
+        if (below != null) {
+            // switch orders of first parameter and the parameter above the block
+            int firstOrder = first.getOrder();
+            below.setOrder(firstOrder);
+        } else { // no element above the first selected element with smaller order found => decrease order
+            first.setOrder(first.getOrder() - 1);
+            diff = 1;
+        }
+        for (int i = 0; i < selectedIndices.length; i++) {
+            Parameter p = parameterTableModel.getParameter(selectedIndices[i]);
+            p.setOrder(p.getOrder() - diff);
+        }
+        parameterTableModel.fireTableDataChanged();
     }
 }

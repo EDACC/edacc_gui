@@ -133,6 +133,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             }
         });
         tableParameters.setRowSorter(paramSorter);
+        tableParameters.addMouseListener(new ParameterTableMouseListener(jPMParameterTable));
 
         // initialize the solver binaries table
         solverBinariesTableModel = new SolverBinariesTableModel();
@@ -205,6 +206,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         jMIEditInstanceClass = new javax.swing.JMenuItem();
         jMIRemoveInstanceClass = new javax.swing.JMenuItem();
         jMIExportInstanceClass = new javax.swing.JMenuItem();
+        jPMParameterTable = new javax.swing.JPopupMenu();
+        jMIMoveUp = new javax.swing.JMenuItem();
+        jMIMoveDown = new javax.swing.JMenuItem();
         manageDBPane = new javax.swing.JTabbedPane();
         panelManageDBSolver = new javax.swing.JPanel();
         jSplitPane2 = new javax.swing.JSplitPane();
@@ -368,6 +372,27 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         });
         jPMInstanceTreeInstanceClass.add(jMIExportInstanceClass);
 
+        jPMParameterTable.setName("jPMParameterTable"); // NOI18N
+
+        jMIMoveUp.setActionCommand(resourceMap.getString("Move Up.actionCommand")); // NOI18N
+        jMIMoveUp.setLabel(resourceMap.getString("Move Up.label")); // NOI18N
+        jMIMoveUp.setName("Move Up"); // NOI18N
+        jMIMoveUp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIMoveUpActionPerformed(evt);
+            }
+        });
+        jPMParameterTable.add(jMIMoveUp);
+
+        jMIMoveDown.setLabel(resourceMap.getString("Move Down.label")); // NOI18N
+        jMIMoveDown.setName("Move Down"); // NOI18N
+        jMIMoveDown.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIMoveDownActionPerformed(evt);
+            }
+        });
+        jPMParameterTable.add(jMIMoveDown);
+
         setMinimumSize(new java.awt.Dimension(0, 0));
         setName("Form"); // NOI18N
         setPreferredSize(new java.awt.Dimension(500, 591));
@@ -407,7 +432,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         ));
         tableParameters.setToolTipText(resourceMap.getString("tableParameters.toolTipText")); // NOI18N
         tableParameters.setName("tableParameters"); // NOI18N
-        tableParameters.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tableParameters.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         jScrollPane1.setViewportView(tableParameters);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -2164,12 +2189,30 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         parameterChanged();
     }//GEN-LAST:event_chkAttachToPreviousActionPerformed
 
+    private void jMIMoveUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIMoveUpActionPerformed
+        int[] selRows = tableParameters.getSelectedRows();
+        for (int i = 0; i < selRows.length; i++)
+            selRows[i] = tableParameters.convertRowIndexToModel(selRows[i]);
+        manageDBParameters.moveUp(selRows, tableParameters);
+        tableParameters.updateUI();
+    }//GEN-LAST:event_jMIMoveUpActionPerformed
+
+    private void jMIMoveDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIMoveDownActionPerformed
+        int[] selRows = tableParameters.getSelectedRows();
+        for (int i = 0; i < selRows.length; i++)
+            selRows[i] = tableParameters.convertRowIndexToModel(selRows[i]);
+        manageDBParameters.moveDown(selRows, tableParameters);
+        tableParameters.updateUI();
+    }//GEN-LAST:event_jMIMoveDownActionPerformed
+
     private void parameterChanged() {
         int selectedRow = tableParameters.getSelectedRow();
 
         if (selectedRow == -1) {
             return;
         }
+        if (tableParameters.getSelectedRowCount() > 1)
+            return;
         selectedRow = tableParameters.convertRowIndexToModel(selectedRow);
         Parameter p = parameterTableModel.getParameter(selectedRow);
         p.setName(tfParametersName.getText());
@@ -2331,11 +2374,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     private javax.swing.JMenuItem jMIEditInstanceClass;
     private javax.swing.JMenuItem jMIExportInstance;
     private javax.swing.JMenuItem jMIExportInstanceClass;
+    private javax.swing.JMenuItem jMIMoveDown;
+    private javax.swing.JMenuItem jMIMoveUp;
     private javax.swing.JMenuItem jMINewInstanceClass;
     private javax.swing.JMenuItem jMIRemoveInstance;
     private javax.swing.JMenuItem jMIRemoveInstanceClass;
     private javax.swing.JPopupMenu jPMInstanceTable;
     private javax.swing.JPopupMenu jPMInstanceTreeInstanceClass;
+    private javax.swing.JPopupMenu jPMParameterTable;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
