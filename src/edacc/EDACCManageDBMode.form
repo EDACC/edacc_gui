@@ -1224,7 +1224,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane1" pref="964" max="32767" attributes="0"/>
+                      <Component id="jSplitPane1" pref="1063" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -1428,12 +1428,12 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="panelInstanceTable" alignment="0" pref="489" max="32767" attributes="2"/>
+                                  <Component id="panelInstanceTable" alignment="0" pref="588" max="32767" attributes="2"/>
                                   <Group type="102" attributes="0">
                                       <Component id="btnFilterInstances" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="lblFilterStatus" alignment="0" pref="402" max="32767" attributes="0"/>
+                                          <Component id="lblFilterStatus" alignment="0" pref="501" max="32767" attributes="0"/>
                                           <Component id="btnSelectInstanceColumns" alignment="1" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
@@ -1543,18 +1543,18 @@
                                           <Component id="btnAddToClass" linkSize="9" min="-2" pref="151" max="-2" attributes="0"/>
                                           <EmptySpace type="separate" max="-2" attributes="0"/>
                                           <Component id="btnRemoveFromClass" linkSize="9" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="32767" attributes="0"/>
+                                          <EmptySpace pref="105" max="32767" attributes="0"/>
                                           <Component id="bComputeProperty" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="1">
                                           <Component id="btnAddInstances" linkSize="8" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                           <Component id="btnRemoveInstances" linkSize="8" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                                          <Component id="btnAddInstances1" min="-2" pref="100" max="-2" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="btnAddInstances1" pref="97" max="32767" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
                                           <Component id="btnGenerate" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <EmptySpace pref="94" max="32767" attributes="0"/>
                                           <Component id="btnExportInstances" linkSize="10" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
@@ -1569,8 +1569,8 @@
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="btnAddInstances" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnRemoveInstances" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="btnExportInstances" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnAddInstances1" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="btnExportInstances" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnGenerate" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>

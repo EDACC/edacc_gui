@@ -752,6 +752,8 @@ public class ManageDBInstances implements Observer {
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
+                UpdateInstanceClasses();
+                main.updateInstanceTable();
         }
     }
 
@@ -869,7 +871,7 @@ public class ManageDBInstances implements Observer {
     }
 
     public void onTaskSuccessful(String methodName, Object result) {
-        if (methodName.equals("TryToRemoveInstances")) {          
+        if (methodName.equals("TryToRemoveInstances")) {
             main.instanceTableModel.fireTableDataChanged();
             UpdateInstanceClasses();
             restoreExpandedState();
@@ -960,7 +962,7 @@ public class ManageDBInstances implements Observer {
         } finally {
             lock.unlock();
         }
-        if(!comCon.getExceptionCollector().isEmpty()){
+        if (!comCon.getExceptionCollector().isEmpty()) {
             throw new ProblemOccuredDuringPropertyComputation(comCon.getExceptionCollector());
         }
         task.cancel(true);
