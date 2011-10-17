@@ -1566,7 +1566,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     JOptionPane.WARNING_MESSAGE);
         } else {
             try {
-                manageDBInstances.removeInstances(tableInstances.getSelectedRows());
+                manageDBInstances.removeInstances(jTreeInstanceClass.getSelectionPaths(), tableInstances.getSelectedRows());
                 jTreeInstanceClass.setSelectionPath(null);
                 instanceTableModel.fireTableDataChanged();
             } catch (NoConnectionToDBException ex) {

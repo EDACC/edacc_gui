@@ -2,16 +2,17 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package edacc.model;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -35,10 +36,10 @@ public class InstanceHasInstanceClassDAO {
         st.setInt(1, instance.getId());
         st.setInt(2, instanceClass.getInstanceClassID());
         ResultSet rs = st.executeQuery();
-        if(rs.next()){
+        if (rs.next()) {
             return getInstanceHasInstanceClass(instanceClass, instance);
         }
-        
+
         InstanceHasInstanceClass i = new InstanceHasInstanceClass(instance, instanceClass);
         i.setNew();
         save(i);
@@ -131,7 +132,7 @@ public class InstanceHasInstanceClassDAO {
         return res;
     }
 
-     private static Vector<InstanceHasInstanceClass> getInstanceHasInstanceClassByInstanceId(int id) throws SQLException, InstanceClassMustBeSourceException {
+    private static Vector<InstanceHasInstanceClass> getInstanceHasInstanceClassByInstanceId(int id) throws SQLException, InstanceClassMustBeSourceException {
         Vector<InstanceHasInstanceClass> res = new Vector<InstanceHasInstanceClass>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE Instances_idInstance=?");
         st.setInt(1, id);
@@ -181,13 +182,13 @@ public class InstanceHasInstanceClassDAO {
 
     public static InstanceHasInstanceClass getInstanceHasInstanceClass(InstanceClass tempInstanceClass,
             Instance tempInstance) throws NoConnectionToDBException, SQLException {
-        String query = "SELECT * FROM " + table + " WHERE instanceClass_idinstanceClass=? " +
-                "AND Instances_idInstance = ?";
+        String query = "SELECT * FROM " + table + " WHERE instanceClass_idinstanceClass=? "
+                + "AND Instances_idInstance = ?";
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         st.setInt(1, tempInstanceClass.getInstanceClassID());
         st.setInt(2, tempInstance.getId());
         ResultSet rs = st.executeQuery();
-        if(rs.next()) {
+        if (rs.next()) {
             InstanceHasInstanceClass i = getInstanceHasInstanceClassFromResultset(rs);
             return i;
         }
@@ -199,11 +200,11 @@ public class InstanceHasInstanceClassDAO {
      * @param instances 
      * @return the intersection of all instanc classes of the given instances
      */
-     public static Vector<InstanceClass> getIntersectionOfInstances(Vector<Instance> instances) throws NoConnectionToDBException, SQLException {
+    public static Vector<InstanceClass> getIntersectionOfInstances(Vector<Instance> instances) throws NoConnectionToDBException, SQLException {
 
-        String queryUser =  "SELECT instanceClass_idinstanceClass, COUNT(instanceClass_idinstanceClass) " +
-                "FROM " + table + " WHERE Instances_idInstance = " + instances.firstElement().getId();
-        for(int i = 1; i < instances.size(); i++){
+        String queryUser = "SELECT instanceClass_idinstanceClass, COUNT(instanceClass_idinstanceClass) "
+                + "FROM " + table + " WHERE Instances_idInstance = " + instances.firstElement().getId();
+        for (int i = 1; i < instances.size(); i++) {
             queryUser += " OR Instances_idInstance = " + instances.get(i).getId();
         }
         queryUser += " GROUP BY instanceClass_idinstanceClass";
@@ -212,14 +213,14 @@ public class InstanceHasInstanceClassDAO {
 
         Vector<InstanceClass> instanceClasses = new Vector<InstanceClass>();
 
-        while(rsUser.next()){
-            if(rsUser.getInt("COUNT(instanceClass_idinstanceClass)") == instances.size())
+        while (rsUser.next()) {
+            if (rsUser.getInt("COUNT(instanceClass_idinstanceClass)") == instances.size()) {
                 instanceClasses.add(InstanceClassDAO.getById(rsUser.getInt("instanceClass_idinstanceClass")));
+            }
         }
         return instanceClasses;
     }
-     
-     
+
     public static void fillInstanceClassIds(HashMap<Instance, LinkedList<Integer>> instanceClassIds) throws SQLException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM " + table);
@@ -238,10 +239,41 @@ public class InstanceHasInstanceClassDAO {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE Instances_idInstance=" + id);
         LinkedList<Integer> classes = new LinkedList<Integer>();
-        while(rs.next()){
+        while (rs.next()) {
             InstanceHasInstanceClass i = getInstanceHasInstanceClassFromResultset(rs);
             classes.add(i.getInstanceClass().getId());
         }
         return classes;
+    }
+
+    /**
+     * 
+     * @param instances
+     * @return ArrayList of instances, just related to an single InstanceClass
+     * @throws SQLException 
+     */
+    public static ArrayList<Instance> checkIfLastOccurrence(ArrayList<Instance> instances) throws SQLException {
+        ArrayList<Instance> result = new ArrayList<Instance> (); 
+        
+        // Create the sql statement
+        String query = "SELECT `Instances_idInstance` "
+                + "FROM "
+                    + "( SELECT `Instances_idInstance`, COUNT(`instanceClass_idinstanceClass`) as c "
+                    + "FROM " + table + " WHERE `Instances_idInstance` = " + instances.get(0);
+
+        for (int i = 1; i < instances.size(); i++) {
+            query += " OR `Instances_idInstance` = " + instances.get(i);
+        }
+        
+        query +=    " GROUP BY `Instances_idInstance` ) as sub"
+                + "WHERE sub.c = 1";
+        
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+        ResultSet rs = st.executeQuery(query);
+        while(rs.next()){
+            result.add(InstanceDAO.getById(rs.getInt("Instances_idInstance")));
+        }
+        
+        return result;
     }
 }

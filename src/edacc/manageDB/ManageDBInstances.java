@@ -1256,4 +1256,12 @@ public class ManageDBInstances implements Observer {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    /**
+     * 
+     * @param selectionPaths
+     * @param selectedRows 
+     */
+    public void removeInstances(TreePath[] selectionPaths, int[] selectedRows) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
 }
