@@ -14,9 +14,7 @@ public class Median implements CostFunction {
 			return 0;
 		List<Float> vals = new ArrayList<Float>();
 		for (ExperimentResult res : results) {
-			if (res.getStatus().getStatusCode() > 0) {
 				vals.add(res.getResultTime());
-			}
 		}
 		Collections.sort(vals);
 		return vals.get(vals.size() / 2);
