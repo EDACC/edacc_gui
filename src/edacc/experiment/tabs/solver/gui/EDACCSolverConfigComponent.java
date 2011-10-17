@@ -15,7 +15,6 @@ import edacc.experiment.tabs.solver.SolverConfigurationEntryModelListener;
 import edacc.model.Solver;
 import edacc.model.SolverBinaries;
 import edacc.util.Pair;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -321,12 +320,17 @@ public class EDACCSolverConfigComponent extends JComponent implements SolverConf
     @Override
     public void onMassReplicationRequest(EDACCSolverConfigEntry entry) {
         EDACCSolverConfigReplicateUsingFiles replicator = new EDACCSolverConfigReplicateUsingFiles(EDACCApp.getApplication().getMainFrame(), true, entry.getModel());
+        replicator.setName("EDACCSolverConfigReplicateUsingFiles");
         replicator.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         EDACCApp.getApplication().show(replicator);
         File dir;
         int index = model.getSolverIndex(entry.getModel());
-        
+
         if ((dir = replicator.getChosenFolder()) != null) {
+            boolean multipleSC = replicator.parseMultipleSolverConfigurations();
+            String solverConfigName = replicator.getSolverConfigurationName();
+            Pattern regexGroupsFromFilename = Pattern.compile(replicator.getRegexGroupsFromFilename());
+            Pattern regexGroupsFromLines = Pattern.compile(replicator.getRegexGroupsFromLines());
             File[] files = dir.listFiles();
             SolverConfigEntryTableModel replModel = replicator.getModel();
             Pattern[] patterns = new Pattern[replModel.getRowCount()];
@@ -358,7 +362,11 @@ public class EDACCSolverConfigComponent extends JComponent implements SolverConf
                 try {
                     input = new BufferedReader(new FileReader(file));
                     String line;
+                    ArrayList<String> lineGroups = new ArrayList<String>();
                     while ((line = input.readLine()) != null) {
+                        if (multipleSC) {
+                            lineGroups.clear();
+                        }
                         for (int i = 0; i < replModel.getRowCount(); i++) {
                             if (patterns[i] != null) {
                                 Matcher m = patterns[i].matcher(line);
@@ -372,19 +380,70 @@ public class EDACCSolverConfigComponent extends JComponent implements SolverConf
                                     }
                                 }
                             }
-                        }
-                    }
 
-                    SolverConfigurationEntry newEntry = new SolverConfigurationEntry(entry.getModel().getSolver(), entry.getModel().getExperiment()); 
-                    newEntry.setName(entry.getName() + "-" + file.getName());
-                    newEntry.setSeedGroup(entry.getModel().getSeedGroup());
-                    for (int i = 0; i < replModel.getRowCount(); i++) {
-                        if (values[i] != null) {
-                            newEntry.getTableModel().setValueAt(values[i], i, 3);
-                            newEntry.getTableModel().setValueAt(true, i, 0);
+                        }
+                        Matcher m = regexGroupsFromLines.matcher(line);
+                        if (m.matches()) {
+                            for (int k = 1; k <= m.groupCount(); k++) {
+                                lineGroups.add(m.group(k));
+                            }
+                        }
+                        if (multipleSC) {
+                            SolverConfigurationEntry newEntry = new SolverConfigurationEntry(entry.getModel().getSolver(), entry.getModel().getExperiment());
+                            m = regexGroupsFromFilename.matcher(file.getName());
+                            ArrayList<String> filenameGroups = new ArrayList<String>();
+                            if (m.matches()) {
+                                for (int i = 1; i <= m.groupCount(); i++) {
+                                    filenameGroups.add(m.group(i));
+                                }
+                            }
+                            String name = solverConfigName;
+                            for (int i = 0; i < lineGroups.size(); i++) {
+                                name = name.replaceAll("\\$l\\[" + (i + 1) + "\\]", lineGroups.get(i));
+                            }
+                            for (int i = 0; i < filenameGroups.size(); i++) {
+                                name = name.replaceAll("\\$f\\[" + (i + 1) + "\\]", filenameGroups.get(i));
+                            }
+                            newEntry.setName(name);
+                            newEntry.setSeedGroup(entry.getModel().getSeedGroup());
+                            for (int i = 0; i < replModel.getRowCount(); i++) {
+                                if (values[i] != null) {
+                                    newEntry.getTableModel().setValueAt(values[i], i, 3);
+                                    newEntry.getTableModel().setValueAt(true, i, 0);
+                                    if (patterns[i] != null) {
+                                        values[i] = null;
+                                    }
+                                }
+                            }
+                            model.insert(newEntry, newEntry.getSolver(), ++index);
                         }
                     }
-                    model.insert(newEntry, newEntry.getSolver(), ++index);
+                    if (!multipleSC) {
+                        SolverConfigurationEntry newEntry = new SolverConfigurationEntry(entry.getModel().getSolver(), entry.getModel().getExperiment());
+                        ArrayList<String> filenameGroups = new ArrayList<String>();
+                        Matcher m = regexGroupsFromFilename.matcher(file.getName());
+                        if (m.matches()) {
+                            for (int i = 1; i <= m.groupCount(); i++) {
+                                filenameGroups.add(m.group(i));
+                            }
+                        }
+                        String name = solverConfigName;
+                        for (int i = 0; i < lineGroups.size(); i++) {
+                            name = name.replaceAll("\\$l\\[" + (i + 1) + "\\]", lineGroups.get(i));
+                        }
+                        for (int i = 0; i < filenameGroups.size(); i++) {
+                            name = name.replaceAll("\\$f\\[" + (i + 1) + "\\]", filenameGroups.get(i));
+                        }
+                        newEntry.setName(name);
+                        newEntry.setSeedGroup(entry.getModel().getSeedGroup());
+                        for (int i = 0; i < replModel.getRowCount(); i++) {
+                            if (values[i] != null) {
+                                newEntry.getTableModel().setValueAt(values[i], i, 3);
+                                newEntry.getTableModel().setValueAt(true, i, 0);
+                            }
+                        }
+                        model.insert(newEntry, newEntry.getSolver(), ++index);
+                    }
                 } catch (FileNotFoundException ex) {
                     // TODO: error
                 } catch (IOException ex) {

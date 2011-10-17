@@ -11,8 +11,6 @@ import edacc.model.SolverConfiguration;
 import edacc.model.SolverDAO;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 
 /**
  *

@@ -81,6 +81,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -2578,8 +2580,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             if (solTableModel.isSelected(i) && !expController.getSolverConfigurationEntryModel().solverExists(s)) {
                 try {
                     expController.getSolverConfigurationEntryModel().add(new SolverConfigurationEntry(s, expController.getActiveExperiment()));
-                } catch (Exception ex) {
-                    // TODO: error
+                } catch (SQLException ex) {
+                    createDatabaseErrorMessage(ex);
                 }
             } else if (!solTableModel.isSelected(i)) {
                 for (int k = 0; k < expController.getSolverConfigurationEntryModel().getSize(s); k++) {
@@ -3082,8 +3084,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         try {
             instances = expController.getInstances();
         } catch (Exception ex) {
-            ex.printStackTrace();
-            // TODO: error
+            JOptionPane.showMessageDialog(this, "Error while loading instances: \n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -3132,21 +3133,21 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     }//GEN-LAST:event_btnSolverTabFilterSolversActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        
-        LinkedList<Experiment> experiments; 
+
+        LinkedList<Experiment> experiments;
         try {
             experiments = ExperimentDAO.getAll();
         } catch (SQLException ex) {
-            // TODO: ERROR
+            JOptionPane.showMessageDialog(this, "Database connection error while loading experiments: \n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        for (int i = experiments.size()-1; i >= 0; i--) {
+        for (int i = experiments.size() - 1; i >= 0; i--) {
             if (!experiments.get(i).isConfigurationExp()) {
                 experiments.remove(i);
             }
         }
         if (experiments.isEmpty()) {
-            // TODO: ERROR
+            JOptionPane.showMessageDialog(this, "No suitable experiments are available.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         EDACCImportConfigurationScenario dialog = new EDACCImportConfigurationScenario(EDACCApp.getApplication().getMainFrame(), true, experiments);
@@ -3155,27 +3156,27 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         if (!dialog.isCancelled()) {
             Experiment exp = dialog.getSelectedExperiment();
             if (exp == null) {
-                // TODO: ERROR
+                JOptionPane.showMessageDialog(this, "Chosen experiment is invalid.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             ConfigurationScenario scenario;
             try {
                 scenario = expController.getConfigurationScenarioForExperiment(exp);
-            } catch (Exception ex) {
-                // TODO: Error
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Database connection error while loading configuration scenario: \n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (scenario == null) {
-                // TODO: Error
+                JOptionPane.showMessageDialog(this, "Chosen experiment has no saved configuration scenario.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             SolverBinaries sb;
             Solver solver;
             try {
-            sb = SolverBinariesDAO.getById(scenario.getIdSolverBinary());
-            solver = SolverDAO.getById(sb.getIdSolver());
-            } catch (Exception ex) {
-                // TODO: Error
+                sb = SolverBinariesDAO.getById(scenario.getIdSolverBinary());
+                solver = SolverDAO.getById(sb.getIdSolver());
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Database connection error while loading data: \n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             comboConfigScenarioSolvers.setSelectedItem(solver);
@@ -3187,7 +3188,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                         if (!param.isConfigurable()) {
                             configScenarioTableModel.setValueAt(true, row, ConfigurationScenarioTableModel.COL_FIXEDVALUE);
                             configScenarioTableModel.setValueAt(param.getFixedValue(), row, ConfigurationScenarioTableModel.COL_VALUE);
-                        } 
+                        }
                     }
                 }
             }
