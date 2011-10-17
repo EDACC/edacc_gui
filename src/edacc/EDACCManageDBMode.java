@@ -1564,6 +1564,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     "No instances selected.",
                     "Warning",
                     JOptionPane.WARNING_MESSAGE);
+        } else if (jTreeInstanceClass.getSelectionPaths() == null) {
+            JOptionPane.showMessageDialog(panelManageDBInstances,
+                    "No instance class selected.",
+                    "Warning",
+                    JOptionPane.WARNING_MESSAGE);
         } else {
             try {
                 manageDBInstances.removeInstances(jTreeInstanceClass.getSelectionPaths(), tableInstances.getSelectedRows());
@@ -1765,7 +1770,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         } else {
             saveExpandedState();
             manageDBInstances.editInstanceClass();
-            manageDBInstances.UpdateInstanceClasses();
+            manageDBInstances.updateInstanceClasses();
             jTreeInstanceClass.setSelectionPath(null);
             jTreeInstanceClass.setExpandsSelectedPaths(true);
             restoreExpandedState();
@@ -1845,7 +1850,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         saveExpandedState();
         jTreeInstanceClass.setSelectionPath(null);
         manageDBInstances.addInstanceClasses();
-        manageDBInstances.UpdateInstanceClasses();
+        manageDBInstances.updateInstanceClasses();
         jTreeInstanceClass.setExpandsSelectedPaths(true);
         restoreExpandedState();
     }//GEN-LAST:event_btnNewInstanceClassActionPerformed
@@ -1874,7 +1879,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     }//GEN-LAST:event_btnAddToClassActionPerformed
     private void btnRemoveFromClassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveFromClassActionPerformed
         saveExpandedState();
-        manageDBInstances.RemoveInstanceFromInstanceClass(tableInstances.getSelectedRows(), jTreeInstanceClass.getSelectionPaths());
+        manageDBInstances.removeInstanceFromInstanceClass(tableInstances.getSelectedRows(), jTreeInstanceClass.getSelectionPaths());
         instanceTableModel.resetColumnVisibility();
         jTreeInstanceClass.setSelectionPath(null);
         this.instanceTableModel.fireTableDataChanged();
@@ -1920,10 +1925,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         } else {
             saveExpandedState();
             try {
-                manageDBInstances.RemoveInstanceClass((DefaultMutableTreeNode) jTreeInstanceClass.getSelectionPath().getLastPathComponent());
+                manageDBInstances.removeInstanceClass((DefaultMutableTreeNode) jTreeInstanceClass.getSelectionPath().getLastPathComponent());
                 tableInstances.clearSelection();
                 instanceTableModel.fireTableDataChanged();
-                manageDBInstances.UpdateInstanceClasses();
+                manageDBInstances.updateInstanceClasses();
             } catch (InstanceIsInExperimentException ex) {
                 Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
                 //instanceClassTableModel.fireTableDataChanged();                 ;
@@ -2193,16 +2198,18 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
     private void jMIMoveUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIMoveUpActionPerformed
         int[] selRows = tableParameters.getSelectedRows();
-        for (int i = 0; i < selRows.length; i++)
+        for (int i = 0; i < selRows.length; i++) {
             selRows[i] = tableParameters.convertRowIndexToModel(selRows[i]);
+        }
         manageDBParameters.moveUp(selRows, tableParameters);
         tableParameters.updateUI();
     }//GEN-LAST:event_jMIMoveUpActionPerformed
 
     private void jMIMoveDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIMoveDownActionPerformed
         int[] selRows = tableParameters.getSelectedRows();
-        for (int i = 0; i < selRows.length; i++)
+        for (int i = 0; i < selRows.length; i++) {
             selRows[i] = tableParameters.convertRowIndexToModel(selRows[i]);
+        }
         manageDBParameters.moveDown(selRows, tableParameters);
         tableParameters.updateUI();
     }//GEN-LAST:event_jMIMoveDownActionPerformed
@@ -2213,8 +2220,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         if (selectedRow == -1) {
             return;
         }
-        if (tableParameters.getSelectedRowCount() > 1)
+        if (tableParameters.getSelectedRowCount() > 1) {
             return;
+        }
         selectedRow = tableParameters.convertRowIndexToModel(selectedRow);
         Parameter p = parameterTableModel.getParameter(selectedRow);
         p.setName(tfParametersName.getText());
@@ -2549,7 +2557,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             jTreeInstanceClass.setSelectionPath(null);
             tableInstances.clearSelection();
             this.instanceTableModel.fireTableDataChanged();
-            manageDBInstances.UpdateInstanceClasses();
+            manageDBInstances.updateInstanceClasses();
             restoreExpandedState();
         } else if (methodName.equals("exportInstances")) {
         }

@@ -74,6 +74,7 @@ public class InstanceHasInstanceClassDAO {
             st.setInt(1, i.getInstance().getId());
             st.setInt(2, i.getInstanceClass().getInstanceClassID());
             st.executeUpdate();
+            
             cache.remove(i);
         } else if (i.isNew()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -259,14 +260,14 @@ public class InstanceHasInstanceClassDAO {
         String query = "SELECT `Instances_idInstance` "
                 + "FROM "
                     + "( SELECT `Instances_idInstance`, COUNT(`instanceClass_idinstanceClass`) as c "
-                    + "FROM " + table + " WHERE `Instances_idInstance` = " + instances.get(0);
+                    + "FROM " + table + " WHERE `Instances_idInstance` = " + instances.get(0).getId();
 
         for (int i = 1; i < instances.size(); i++) {
-            query += " OR `Instances_idInstance` = " + instances.get(i);
+            query += " OR `Instances_idInstance` = " + instances.get(i).getId();
         }
         
         query +=    " GROUP BY `Instances_idInstance` ) as sub"
-                + "WHERE sub.c = 1";
+                + " WHERE sub.c = 1";
         
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
         ResultSet rs = st.executeQuery(query);

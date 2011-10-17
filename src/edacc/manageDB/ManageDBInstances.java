@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
@@ -150,7 +151,7 @@ public class ManageDBInstances implements Observer {
 
 
                 main.instanceTableModel.addNewInstances(instances);
-                UpdateInstanceClasses();
+                updateInstanceClasses();
                 main.updateInstanceTable();
                 Tasks.getTaskView().setCancelable(false);
             }
@@ -191,7 +192,7 @@ public class ManageDBInstances implements Observer {
      * Remove the given rows from the instanceTableModel
      * @param rows the rows which have to be deleted
      */
-    public void TryToRemoveInstances(Vector<Instance> toRemove, Tasks task) throws NoConnectionToDBException, SQLException, TaskCancelledException {
+    public void tryToRemoveInstances(Vector<Instance> toRemove, Tasks task) throws NoConnectionToDBException, SQLException, TaskCancelledException {
         Tasks.getTaskView().setCancelable(true);
         task.setOperationName("Removing instances");
         Vector<Instance> rem = new Vector<Instance>();
@@ -310,7 +311,7 @@ public class ManageDBInstances implements Observer {
     /**
      * Sets all checkboxes of the instanceclass table true.
      */
-    public void SelectAllInstanceClass(Tasks task) {
+    public void selectAllInstanceClass(Tasks task) {
         /*   for(int i = 0; i < main.instanceClassTableModel.getRowCount(); i++){
         task.setStatus(i + " of " + main.instanceClassTableModel.getRowCount() + " instance classes are loaded.");
         task.setTaskProgress((float)i/(float)main.instanceClassTableModel.getRowCount());
@@ -338,7 +339,7 @@ public class ManageDBInstances implements Observer {
      * @throws NoConnectionToDBException
      * @throws InstanceSourceClassHasInstance if one of the selected classes are a source class which has a refernce to an Instance.
      */
-    public void RemoveInstanceClass(DefaultMutableTreeNode node) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance, InstanceIsInExperimentException {
+    public void removeInstanceClass(DefaultMutableTreeNode node) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance, InstanceIsInExperimentException {
         Vector<InstanceClass> toRemove = new Vector<InstanceClass>();
         toRemove = getAllToEnd(node);
         AddInstanceInstanceClassTableModel tableModel = new AddInstanceInstanceClassTableModel();
@@ -752,8 +753,8 @@ public class ManageDBInstances implements Observer {
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
-                UpdateInstanceClasses();
-                main.updateInstanceTable();
+            updateInstanceClasses();
+            main.updateInstanceTable();
         }
     }
 
@@ -763,7 +764,7 @@ public class ManageDBInstances implements Observer {
      * @param selectedRowsInstance the instances to remove
      * @param selectedRowsInstanceClass rows of the InstanceClasses from which the selected instances have to be removed
      */
-    public void RemoveInstanceFromInstanceClass(int[] selectedRowsInstance, int[] selectedRowsInstanceClass) {
+    public void removeInstanceFromInstanceClass(int[] selectedRowsInstance, int[] selectedRowsInstanceClass) {
         /*  // check if a instance is selected, if not notify the user
         if(tableInstances.getSelectedRows().length == 0){
         JOptionPane.showMessageDialog(panelManageDBInstances,
@@ -873,7 +874,7 @@ public class ManageDBInstances implements Observer {
     public void onTaskSuccessful(String methodName, Object result) {
         if (methodName.equals("TryToRemoveInstances")) {
             main.instanceTableModel.fireTableDataChanged();
-            UpdateInstanceClasses();
+            updateInstanceClasses();
             restoreExpandedState();
         }
     }
@@ -1009,7 +1010,7 @@ public class ManageDBInstances implements Observer {
         return ret;
     }
 
-    public void RemoveInstanceFromInstanceClass(int[] selectedRows, TreePath[] selected) {
+    public void removeInstanceFromInstanceClass(int[] selectedRows, TreePath[] selected) {
         if (tableInstances.getSelectedRows().length == 0) {
             JOptionPane.showMessageDialog(panelManageDBInstances,
                     "No instances selected.",
@@ -1063,7 +1064,7 @@ public class ManageDBInstances implements Observer {
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }
-                UpdateInstanceClasses();
+                updateInstanceClasses();
 
             } catch (NoConnectionToDBException ex) {
                 JOptionPane.showMessageDialog(panelManageDBInstances,
@@ -1222,7 +1223,7 @@ public class ManageDBInstances implements Observer {
         }
     }
 
-    public void UpdateInstanceClasses() {
+    public void updateInstanceClasses() {
         InstanceClassDAO.addTmpTreeBranchToTreeCache();
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getTreeCache();
         main.instanceClassTreeModel.setRoot(root);
@@ -1230,7 +1231,7 @@ public class ManageDBInstances implements Observer {
         main.instanceClassTreeModel.reload();
     }
 
-    private void ReloadInstanceClasses() {
+    private void reloadInstanceClasses() {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getTreeCache();
         main.instanceClassTreeModel.setRoot(root);
         main.getInstanceClassTree().setRootVisible(false);
@@ -1256,12 +1257,121 @@ public class ManageDBInstances implements Observer {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     /**
      * 
      * @param selectionPaths
-     * @param selectedRows 
+     * @param selectedRows
+     * @throws SQLException 
      */
-    public void removeInstances(TreePath[] selectionPaths, int[] selectedRows) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    public void removeInstances(TreePath[] selectionPaths, int[] selectedRows) throws SQLException {
+        HashMap<Integer, Instance> selectedToRemove = new HashMap<Integer, Instance>();
+
+        for (int i = 0; i < selectedRows.length; i++) {
+            Instance tmp = (Instance) main.instanceTableModel.getInstance(tableInstances.convertRowIndexToModel(selectedRows[i]));
+            selectedToRemove.put(tmp.getId(), tmp);
+        }
+
+        InstanceTableModel tableModel = new InstanceTableModel();
+        tableModel.addInstances(new Vector<Instance>(selectedToRemove.values()));
+
+        //Check if user really wants to delete the selected instances
+        if (EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
+                EDACCApp.getApplication().getMainFrame(),
+                "Do you really want to remove the listed instances from the selected instance classes?",
+                new JTable(tableModel))
+                == EDACCExtendedWarning.RET_OK_OPTION) {
+
+            //Check if one of the selected instances is dangered being deleted complety from the database and inform and ask user
+
+            ArrayList<Instance> lastOccurrence = InstanceHasInstanceClassDAO.checkIfLastOccurrence(new ArrayList<Instance>(selectedToRemove.values()));
+            if (!lastOccurrence.isEmpty()) {
+                for (Instance inst : lastOccurrence) {
+                    selectedToRemove.remove(inst.getId());
+                }
+                tableModel.addInstances(new Vector<Instance>(lastOccurrence));
+                if (EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
+                        EDACCApp.getApplication().getMainFrame(),
+                        "The listed instances will be deleted complete from your edacc database. \n "
+                        + "Do you really want to remove them?",
+                        new JTable(tableModel))
+                        != EDACCExtendedWarning.RET_OK_OPTION) {
+                    lastOccurrence.clear();
+                }
+
+            }
+
+            //Get the selected instance classes
+            ArrayList<InstanceClass> classes = new ArrayList<InstanceClass>();
+            for (int j = 0; j < selectionPaths.length; j++) {
+                classes.addAll(getAllToEnd((DefaultMutableTreeNode) (selectionPaths[j].getLastPathComponent())));
+            }
+
+            ArrayList<Instance> toRemove = new ArrayList<Instance>(selectedToRemove.values());
+            Tasks.startTask("tryToRemoveInstances", new Class[]{ArrayList.class, ArrayList.class, ArrayList.class, edacc.model.Tasks.class}, new Object[]{toRemove, lastOccurrence, classes, null}, this, this.main);
+        }
+    }
+
+    /**
+     * Remove the given rows from the instanceTableModel
+     * @param rows the rows which have to be deleted
+     */
+    public void tryToRemoveInstances(ArrayList<Instance> toRemove, ArrayList<Instance> finallyRemove, ArrayList<InstanceClass> classes, Tasks task) throws NoConnectionToDBException, SQLException, TaskCancelledException {
+        Tasks.getTaskView().setCancelable(true);
+        task.setOperationName("Removing instances");
+        int count = 0;
+        int all = toRemove.size() + finallyRemove.size();
+
+        for (int i = 0; i < toRemove.size(); i++) {
+            for (int j = 0; j < classes.size(); j++) {
+                InstanceClass tempInstanceClass = classes.get(j);
+                InstanceHasInstanceClass rem = InstanceHasInstanceClassDAO.getInstanceHasInstanceClass(tempInstanceClass, toRemove.get(i));
+                if (rem != null) {
+                    InstanceHasInstanceClassDAO.removeInstanceHasInstanceClass(rem);
+                }
+            }
+            task.setStatus(count + " of " + all + " instances removed");
+            task.setTaskProgress((float) count / (float) all);
+            count++;
+        }
+        main.instanceTableModel.removeInstances(new Vector<Instance>(toRemove));
+        main.instanceTableModel.addInstances(new Vector<Instance>(toRemove));
+
+        Vector<Instance> rem = new Vector<Instance>();
+        Vector<Instance> notRem = new Vector<Instance>();
+
+        for (Instance remove : finallyRemove) {
+            try {
+                InstanceDAO.delete(remove);
+                rem.add(remove);
+                tmp.add(remove);
+                main.instanceTableModel.remove(remove);
+                count++;
+                task.setStatus(count + " of " + all + " instances removed");
+                task.setTaskProgress((float) count / (float) all);
+            } catch (InstanceIsInExperimentException ex) {
+                notRem.add(remove);
+            }
+        }
+
+        main.instanceTableModel.removeInstances(rem);
+        if (!notRem.isEmpty()) {
+            ExperimentTableModel expTableModel = new ExperimentTableModel(true);
+            ArrayList<Experiment> inExp = ExperimentHasInstanceDAO.getAllExperimentsByInstances(notRem);
+            expTableModel.setExperiments(inExp);
+            if (EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
+                    EDACCApp.getApplication().getMainFrame(),
+                    "If you remove the instance classes, instances used in den following experiments will be deleted too. \n"
+                    + "Do you really want to remove the selected instance?",
+                    new JTable(expTableModel))
+                    == EDACCExtendedWarning.RET_OK_OPTION) {
+                InstanceDAO.deleteAll(notRem);
+                main.instanceTableModel.removeInstances(notRem);
+            }
+
+        }
+        updateInstanceClasses();
+        main.instanceTableModel.fireTableDataChanged();
+        Tasks.getTaskView().setCancelable(false);
     }
 }

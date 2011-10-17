@@ -573,7 +573,7 @@ public class EDACCInstanceGeneratorUnifKCNF extends javax.swing.JDialog implemen
     @Override
     public void onTaskSuccessful(String methodName, Object result) {
         if (methodName.equals("generate")) {
-            manageDBInstances.UpdateInstanceClasses();
+            manageDBInstances.updateInstanceClasses();
             manageDBInstances.loadInstances();
             manageDBInstances.restoreExpandedState();
         }
