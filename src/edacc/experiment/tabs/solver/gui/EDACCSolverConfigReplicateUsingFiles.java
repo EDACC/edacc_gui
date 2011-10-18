@@ -9,9 +9,17 @@ import edacc.JTableTooltipInformation;
 import edacc.experiment.tabs.solver.SolverConfigEntryTableModel;
 import edacc.experiment.tabs.solver.SolverConfigurationEntry;
 import edacc.model.Parameter;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -55,10 +63,23 @@ public class EDACCSolverConfigReplicateUsingFiles extends javax.swing.JDialog {
         tblParameters = tblParameters = new JTableTooltipInformation();
         btnReplicate = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
-
-        setName("Form"); // NOI18N
+        jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        txtRegexGroupsFromFilename = new javax.swing.JTextField();
+        txtSolverConfigurationName = new javax.swing.JTextField();
+        chkMultipleSolverConfigs = new javax.swing.JCheckBox();
+        jLabel5 = new javax.swing.JLabel();
+        txtRegexGroupsFromLines = new javax.swing.JTextField();
+        btnSaveSettings = new javax.swing.JButton();
+        btnLoadSettings = new javax.swing.JButton();
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCSolverConfigReplicateUsingFiles.class);
+        setTitle(resourceMap.getString("Form.title")); // NOI18N
+        setName("Form"); // NOI18N
+
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel1.border.title"))); // NOI18N
         jPanel1.setName("jPanel1"); // NOI18N
 
@@ -78,7 +99,7 @@ public class EDACCSolverConfigReplicateUsingFiles extends javax.swing.JDialog {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addComponent(txtDirectory, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
+                .addComponent(txtDirectory, javax.swing.GroupLayout.DEFAULT_SIZE, 665, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnChooseDirectory))
         );
@@ -102,11 +123,11 @@ public class EDACCSolverConfigReplicateUsingFiles extends javax.swing.JDialog {
         pnlParameters.setLayout(pnlParametersLayout);
         pnlParametersLayout.setHorizontalGroup(
             pnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 720, Short.MAX_VALUE)
         );
         pnlParametersLayout.setVerticalGroup(
             pnlParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
         );
 
         btnReplicate.setText(resourceMap.getString("btnReplicate.text")); // NOI18N
@@ -125,30 +146,129 @@ public class EDACCSolverConfigReplicateUsingFiles extends javax.swing.JDialog {
             }
         });
 
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel2.border.title"))); // NOI18N
+        jPanel2.setName("jPanel2"); // NOI18N
+
+        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
+        jLabel1.setName("jLabel1"); // NOI18N
+
+        jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
+        jLabel2.setName("jLabel2"); // NOI18N
+
+        jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
+        jLabel3.setName("jLabel3"); // NOI18N
+
+        jLabel4.setText(resourceMap.getString("jLabel4.text")); // NOI18N
+        jLabel4.setName("jLabel4"); // NOI18N
+
+        txtRegexGroupsFromFilename.setText(resourceMap.getString("txtRegexGroupsFromFilename.text")); // NOI18N
+        txtRegexGroupsFromFilename.setName("txtRegexGroupsFromFilename"); // NOI18N
+
+        txtSolverConfigurationName.setText(resourceMap.getString("txtSolverConfigurationName.text")); // NOI18N
+        txtSolverConfigurationName.setName("txtSolverConfigurationName"); // NOI18N
+
+        chkMultipleSolverConfigs.setSelected(true);
+        chkMultipleSolverConfigs.setText(resourceMap.getString("chkMultipleSolverConfigs.text")); // NOI18N
+        chkMultipleSolverConfigs.setName("chkMultipleSolverConfigs"); // NOI18N
+
+        jLabel5.setText(resourceMap.getString("jLabel5.text")); // NOI18N
+        jLabel5.setName("jLabel5"); // NOI18N
+
+        txtRegexGroupsFromLines.setText(resourceMap.getString("txtRegexGroupsFromLines.text")); // NOI18N
+        txtRegexGroupsFromLines.setName("txtRegexGroupsFromLines"); // NOI18N
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel5))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtSolverConfigurationName, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)
+                            .addComponent(txtRegexGroupsFromFilename, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)
+                            .addComponent(chkMultipleSolverConfigs, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)
+                            .addComponent(txtRegexGroupsFromLines, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)))
+                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 710, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(chkMultipleSolverConfigs))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(txtSolverConfigurationName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txtRegexGroupsFromFilename, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(txtRegexGroupsFromLines, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel4))
+        );
+
+        btnSaveSettings.setText(resourceMap.getString("btnSaveSettings.text")); // NOI18N
+        btnSaveSettings.setName("btnSaveSettings"); // NOI18N
+        btnSaveSettings.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveSettingsActionPerformed(evt);
+            }
+        });
+
+        btnLoadSettings.setText(resourceMap.getString("btnLoadSettings.text")); // NOI18N
+        btnLoadSettings.setName("btnLoadSettings"); // NOI18N
+        btnLoadSettings.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoadSettingsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(pnlParameters, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(239, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(btnSaveSettings)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnLoadSettings)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 362, Short.MAX_VALUE)
                 .addComponent(btnCancel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnReplicate)
                 .addContainerGap())
+            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(pnlParameters, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlParameters, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(3, 3, 3)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlParameters, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnReplicate)
-                    .addComponent(btnCancel))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnCancel)
+                    .addComponent(btnSaveSettings)
+                    .addComponent(btnLoadSettings))
+                .addContainerGap())
         );
 
         pack();
@@ -177,21 +297,172 @@ public class EDACCSolverConfigReplicateUsingFiles extends javax.swing.JDialog {
     private void btnReplicateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReplicateActionPerformed
         File dir = new File(txtDirectory.getText());
         if (!dir.exists()) {
-            // TODO: ERROR
+            JOptionPane.showMessageDialog(this, "Directory does not exist.", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             chosenFolder = dir;
             setVisible(false);
         }
     }//GEN-LAST:event_btnReplicateActionPerformed
+
+    private void btnSaveSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveSettingsActionPerformed
+        JFileChooser saveFileChooser = new JFileChooser();
+        saveFileChooser.showSaveDialog(this);
+        File file;
+        if ((file = saveFileChooser.getSelectedFile()) != null) {
+            if (file.exists()) {
+                int userInput = JOptionPane.showConfirmDialog(this, "File exists. Overwrite?");
+                if (userInput != JOptionPane.YES_OPTION) {
+                    JOptionPane.showMessageDialog(this, "Settings not saved.", "Warning", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            }
+
+            try {
+                FileWriter fw = new FileWriter(file);
+
+                BufferedWriter br = new BufferedWriter(fw);
+                // writing settings:
+                br.write("directory: " + txtDirectory.getText() + '\n');
+                br.write("multiple: " + Boolean.toString(chkMultipleSolverConfigs.isSelected()) + '\n');
+                br.write("scprefix: " + txtSolverConfigurationName.getText() + '\n');
+                br.write("scsuffix: " + txtRegexGroupsFromFilename.getText() + '\n');
+                br.write("scsuffixlines: " + txtRegexGroupsFromLines.getText() + '\n');
+                // write values
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    br.write("start_val\n");
+                    br.write("row: " + i + '\n');
+                    br.write("selected: " + model.getValueAt(i, 0).toString() + '\n');
+                    br.write("value: " + model.getValueAt(i, 3).toString() + '\n');
+                    br.write("regex: " + model.getValueAt(i, 6).toString() + '\n');
+                    br.write("end_val\n");
+                }
+                br.flush();
+                br.close();
+                fw.close();
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "Error while saving settings:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } 
+        }
+
+    }//GEN-LAST:event_btnSaveSettingsActionPerformed
+
+    private void btnLoadSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadSettingsActionPerformed
+        JFileChooser openFileChooser = new JFileChooser();
+        openFileChooser.showOpenDialog(this);
+        File file;
+        if ((file = openFileChooser.getSelectedFile()) != null) {
+            if (!file.exists()) {
+                JOptionPane.showMessageDialog(this, "File does not exist.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            } else if (!file.canRead()) {
+                JOptionPane.showMessageDialog(this, "Could not read file.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                Pattern pdir = Pattern.compile("directory: (.*)");
+                Pattern pmul = Pattern.compile("multiple: (.*)");
+                Pattern ppref = Pattern.compile("scprefix: (.*)");
+                Pattern psuf = Pattern.compile("scsuffix: (.*)");
+                Pattern psuflines = Pattern.compile("scsuffixlines: (.*)");
+                Pattern pstartval = Pattern.compile("start_val");
+                Pattern pendval = Pattern.compile("end_val");
+                Pattern psel = Pattern.compile("selected: (.*)");
+                Pattern pval = Pattern.compile("value: (.*)");
+                Pattern prow = Pattern.compile("row: (.*)");
+                Pattern pregex = Pattern.compile("regex: (.*)");
+                FileReader fr = new FileReader(file);
+                BufferedReader br = new BufferedReader(fr);
+                String line;
+                Boolean sel = null;
+                String val = null;
+                Integer row = null;
+                Boolean regex = null;
+                boolean readval = false;
+                while ((line = br.readLine()) != null) {
+                    if (!readval) {
+                        Matcher m = pdir.matcher(line);
+                        if (m.matches() && m.groupCount() == 1) {
+                            txtDirectory.setText(m.group(1));
+                        }
+                        m = pmul.matcher(line);
+                        if (m.matches() && m.groupCount() == 1) {
+                            chkMultipleSolverConfigs.setSelected(Boolean.parseBoolean(m.group(1)));
+                        }
+                        m = ppref.matcher(line);
+                        if (m.matches() && m.groupCount() == 1) {
+                            txtSolverConfigurationName.setText(m.group(1));
+                        }
+                        m = psuf.matcher(line);
+                        if (m.matches() && m.groupCount() == 1) {
+                            txtRegexGroupsFromFilename.setText(m.group(1));
+                        }
+                        m = psuflines.matcher(line);
+                        if (m.matches() && m.groupCount() == 1) {
+                            txtRegexGroupsFromLines.setText(m.group(1));
+                        }
+                        m = pstartval.matcher(line);
+                        if (m.matches()) {
+                            readval = true;
+                        }
+                    } else {
+                        Matcher m = prow.matcher(line);
+                        if (m.matches() && m.groupCount() == 1) {
+                            row = Integer.parseInt(m.group(1));
+                        }
+                        m = psel.matcher(line);
+                        if (m.matches() && m.groupCount() == 1) {
+                            sel = Boolean.parseBoolean(m.group(1));
+                        }
+                        m = pval.matcher(line);
+                        if (m.matches() && m.groupCount() == 1) {
+                            val = m.group(1);
+                        }
+                        m = pregex.matcher(line);
+                        if (m.matches() && m.groupCount() == 1) {
+                            regex = Boolean.parseBoolean(m.group(1));
+                        }
+                        m = pendval.matcher(line);
+                        if (m.matches()) {
+                            if (val != null && sel != null && row != null && regex != null) {
+                                model.setValueAt(sel, row, 0);
+                                model.setValueAt(val, row, 3);
+                                model.setValueAt(regex, row, 6);
+                            }
+                            val = null;
+                            sel = null;
+                            row = null;
+                            readval = false;
+                        }
+                    }
+                }
+                fr.close();
+                br.close();
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "Error while reading file:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnLoadSettingsActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnChooseDirectory;
+    private javax.swing.JButton btnLoadSettings;
     private javax.swing.JButton btnReplicate;
+    private javax.swing.JButton btnSaveSettings;
+    private javax.swing.JCheckBox chkMultipleSolverConfigs;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel pnlParameters;
     private javax.swing.JTable tblParameters;
     private javax.swing.JTextField txtDirectory;
+    private javax.swing.JTextField txtRegexGroupsFromFilename;
+    private javax.swing.JTextField txtRegexGroupsFromLines;
+    private javax.swing.JTextField txtSolverConfigurationName;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -200,6 +471,22 @@ public class EDACCSolverConfigReplicateUsingFiles extends javax.swing.JDialog {
      */
     public File getChosenFolder() {
         return chosenFolder;
+    }
+
+    public boolean parseMultipleSolverConfigurations() {
+        return chkMultipleSolverConfigs.isSelected();
+    }
+
+    public String getSolverConfigurationName() {
+        return txtSolverConfigurationName.getText();
+    }
+
+    public String getRegexGroupsFromFilename() {
+        return txtRegexGroupsFromFilename.getText();
+    }
+
+    public String getRegexGroupsFromLines() {
+        return txtRegexGroupsFromLines.getText();
     }
 
     public SolverConfigEntryTableModel getModel() {

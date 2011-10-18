@@ -35,12 +35,10 @@ public class PARX implements CostFunction {
 		if (results.size() == 0)
 			return 0;
 		for (ExperimentResult res : results) {
-			if (res.getStatus().getStatusCode() > 0) {
-				if (String.valueOf(res.getResultCode().getResultCode()).startsWith("1")) {
-					sum += res.getResultTime();
-				} else {
-					sum += res.getCPUTimeLimit() * (float) penaltyFactor;
-				}
+			if (String.valueOf(res.getResultCode().getResultCode()).startsWith("1")) {
+				sum += res.getResultTime();
+			} else {
+				sum += res.getCPUTimeLimit() * (float) penaltyFactor;
 			}
 		}
 		return sum / results.size();
