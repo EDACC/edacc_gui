@@ -306,4 +306,9 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
             }
         }
     }
+    
+    @Override
+      public boolean isCellEditable(int rowIndex, int vColIndex) {
+        return false;
+    }
 }
