@@ -1539,7 +1539,7 @@
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="btnAddToClass" min="-2" pref="151" max="-2" attributes="0"/>
                                           <EmptySpace pref="186" max="32767" attributes="0"/>
-                                          <Component id="bComputeProperty" min="-2" max="-2" attributes="0"/>
+                                          <Component id="btnComputeProperty" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="1">
                                           <Component id="btnAddInstances" linkSize="8" min="-2" max="-2" attributes="0"/>
@@ -1571,7 +1571,7 @@
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="btnAddToClass" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="bComputeProperty" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="btnComputeProperty" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="32767" attributes="0"/>
                               </Group>
@@ -1641,13 +1641,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAddInstances1ActionPerformed"/>
                           </Events>
                         </Component>
-                        <Component class="javax.swing.JButton" name="bComputeProperty">
+                        <Component class="javax.swing.JButton" name="btnComputeProperty">
                           <Properties>
-                            <Property name="text" type="java.lang.String" resourceKey="bComputeProperty.text"/>
-                            <Property name="name" type="java.lang.String" value="bComputeProperty" noResource="true"/>
+                            <Property name="text" type="java.lang.String" resourceKey="btnComputeProperty.text"/>
+                            <Property name="enabled" type="boolean" value="false"/>
+                            <Property name="name" type="java.lang.String" value="btnComputeProperty" noResource="true"/>
                           </Properties>
                           <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bComputePropertyActionPerformed"/>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnComputePropertyActionPerformed"/>
                           </Events>
                         </Component>
                         <Component class="javax.swing.JButton" name="btnGenerate">

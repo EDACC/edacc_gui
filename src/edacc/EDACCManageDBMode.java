@@ -286,7 +286,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         btnExportInstances = new javax.swing.JButton();
         btnAddToClass = new javax.swing.JButton();
         btnAddInstances1 = new javax.swing.JButton();
-        bComputeProperty = new javax.swing.JButton();
+        btnComputeProperty = new javax.swing.JButton();
         btnGenerate = new javax.swing.JButton();
         lblFilterStatus = new javax.swing.JLabel();
         btnFilterInstances = new javax.swing.JButton();
@@ -1336,11 +1336,12 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             }
         });
 
-        bComputeProperty.setText(resourceMap.getString("bComputeProperty.text")); // NOI18N
-        bComputeProperty.setName("bComputeProperty"); // NOI18N
-        bComputeProperty.addActionListener(new java.awt.event.ActionListener() {
+        btnComputeProperty.setText(resourceMap.getString("btnComputeProperty.text")); // NOI18N
+        btnComputeProperty.setEnabled(false);
+        btnComputeProperty.setName("btnComputeProperty"); // NOI18N
+        btnComputeProperty.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bComputePropertyActionPerformed(evt);
+                btnComputePropertyActionPerformed(evt);
             }
         });
 
@@ -1362,7 +1363,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     .addGroup(panelButtonsInstancesLayout.createSequentialGroup()
                         .addComponent(btnAddToClass, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 186, Short.MAX_VALUE)
-                        .addComponent(bComputeProperty))
+                        .addComponent(btnComputeProperty))
                     .addGroup(panelButtonsInstancesLayout.createSequentialGroup()
                         .addComponent(btnAddInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -1391,7 +1392,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 .addGap(18, 18, 18)
                 .addGroup(panelButtonsInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddToClass)
-                    .addComponent(bComputeProperty))
+                    .addComponent(btnComputeProperty))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1937,7 +1938,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         this.manageDBInstances.showInstanceInfoDialog(this.tableInstances.getSelectedRows());
     }//GEN-LAST:event_btnAddInstances1ActionPerformed
     private EDACCComputeInstancePropertyDialog computeInstancePropertyDlg;
-    private void bComputePropertyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bComputePropertyActionPerformed
+    private void btnComputePropertyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnComputePropertyActionPerformed
         Vector<Instance> instances = new Vector<Instance>();
         for (int i : tableInstances.getSelectedRows()) {
             instances.add(instanceTableModel.getInstance(tableInstances.convertRowIndexToModel(i)));
@@ -1948,7 +1949,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         manageDBInstances.loadProperties();
         instanceTableModel.updateProperties();
         instanceTableModel.fireTableDataChanged();
-    }//GEN-LAST:event_bComputePropertyActionPerformed
+    }//GEN-LAST:event_btnComputePropertyActionPerformed
 
     private void btnGenerateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerateActionPerformed
         saveExpandedState();
@@ -2319,10 +2320,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         parameterTableModel.fireTableDataChanged();
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton bComputeProperty;
     private javax.swing.JButton btnAddInstances;
     private javax.swing.JButton btnAddInstances1;
     private javax.swing.JButton btnAddToClass;
+    private javax.swing.JButton btnComputeProperty;
     private javax.swing.JButton btnEditInstanceClass;
     private javax.swing.JButton btnExportInstanceClass;
     private javax.swing.JButton btnExportInstances;
@@ -2560,6 +2561,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         jMIAddInstance.setEnabled(enable);
         jMIExportInstance.setEnabled(enable);
         jMIRemoveInstance.setEnabled(enable);
+        btnComputeProperty.setEnabled(enable);
     }
 
     public void showSolverBinariesDetails(Vector<SolverBinaries> solverBinaries) {
