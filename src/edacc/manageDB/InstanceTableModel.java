@@ -282,7 +282,7 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
         return res == null ? new LinkedList<Integer>() : res;
     }
 
-    void addNewInstances(Vector<Instance> instances) {
+    public void addNewInstances(Vector<Instance> instances) {
         for (int i = 0; i < instances.size(); i++) {
             addNewInstance(instances.get(i));
         }

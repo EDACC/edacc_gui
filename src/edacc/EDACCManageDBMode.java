@@ -2507,6 +2507,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                         JOptionPane.WARNING_MESSAGE);
             } else if (e instanceof TaskCancelledException) {
                 InstanceTableModel tableModel = new InstanceTableModel();
+                tableModel.clearTable();
                 tableModel.addInstances(manageDBInstances.getTmp());
                 if (EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
                         EDACCApp.getApplication().getMainFrame(),
@@ -2520,6 +2521,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     }
                     manageDBInstances.setTmp(new Vector<Instance>());
                 }
+                instanceTableModel.addNewInstances(manageDBInstances.getTmp());
+                manageDBInstances.setTmp(new Vector<Instance>());                 
+                manageDBInstances.updateInstanceClasses();
+                updateInstanceTable();
             }
 
         }
