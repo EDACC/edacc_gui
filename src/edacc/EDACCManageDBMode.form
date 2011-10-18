@@ -1540,10 +1540,8 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
-                                          <Component id="btnAddToClass" linkSize="9" min="-2" pref="151" max="-2" attributes="0"/>
-                                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                                          <Component id="btnRemoveFromClass" linkSize="9" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace pref="17" max="32767" attributes="0"/>
+                                          <Component id="btnAddToClass" min="-2" pref="151" max="-2" attributes="0"/>
+                                          <EmptySpace pref="186" max="32767" attributes="0"/>
                                           <Component id="bComputeProperty" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="1">
@@ -1576,7 +1574,6 @@
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="btnAddToClass" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="btnRemoveFromClass" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="bComputeProperty" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="32767" attributes="0"/>
@@ -1632,18 +1629,6 @@
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAddToClassActionPerformed"/>
-                          </Events>
-                        </Component>
-                        <Component class="javax.swing.JButton" name="btnRemoveFromClass">
-                          <Properties>
-                            <Property name="toolTipText" type="java.lang.String" resourceKey="btnRemoveFromClass.toolTipText"/>
-                            <Property name="actionCommand" type="java.lang.String" resourceKey="btnRemoveFromClass.actionCommand"/>
-                            <Property name="enabled" type="boolean" value="false"/>
-                            <Property name="label" type="java.lang.String" resourceKey="btnRemoveFromClass.label"/>
-                            <Property name="name" type="java.lang.String" value="btnRemoveFromClass" noResource="true"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRemoveFromClassActionPerformed"/>
                           </Events>
                         </Component>
                         <Component class="javax.swing.JButton" name="btnAddInstances1">
