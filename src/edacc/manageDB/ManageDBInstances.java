@@ -1026,7 +1026,7 @@ public class ManageDBInstances implements Observer {
      * @param selectionPaths
      * @param selectedRows
      * @throws SQLException 
-     */
+         */
     public void removeInstances(TreePath[] selectionPaths, int[] selectedRows) throws SQLException {
         HashMap<Integer, Instance> selectedToRemove = new HashMap<Integer, Instance>();
 
