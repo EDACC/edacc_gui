@@ -1058,6 +1058,7 @@ public class ManageDBInstances implements Observer {
                 for (Instance inst : lastOccurrence) {
                     selectedToRemove.remove(inst.getId());
                 }
+                tableModel.clearTable();
                 tableModel.addInstances(new Vector<Instance>(lastOccurrence));
                 if (EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_CANCEL_OPTIONS,
                         EDACCApp.getApplication().getMainFrame(),
