@@ -1026,7 +1026,7 @@ public class ManageDBInstances implements Observer {
      * @param selectionPaths
      * @param selectedRows
      * @throws SQLException 
-         */
+     */
     public void removeInstances(TreePath[] selectionPaths, int[] selectedRows) throws SQLException {
         HashMap<Integer, Instance> selectedToRemove = new HashMap<Integer, Instance>();
 
@@ -1034,6 +1034,12 @@ public class ManageDBInstances implements Observer {
             Instance tmp = (Instance) main.instanceTableModel.getInstance(tableInstances.convertRowIndexToModel(selectedRows[i]));
             selectedToRemove.put(tmp.getId(), tmp);
         }
+
+        ArrayList<InstanceClass> classes = new ArrayList<InstanceClass>();
+        for (int j = 0; j < selectionPaths.length; j++) {
+            classes.addAll(getAllToEnd((DefaultMutableTreeNode) (selectionPaths[j].getLastPathComponent())));
+        }
+
 
         InstanceTableModel tableModel = new InstanceTableModel();
         tableModel.addInstances(new Vector<Instance>(selectedToRemove.values()));
@@ -1047,7 +1053,7 @@ public class ManageDBInstances implements Observer {
 
             //Check if one of the selected instances is dangered being deleted complety from the database and inform and ask user
 
-            ArrayList<Instance> lastOccurrence = InstanceHasInstanceClassDAO.checkIfLastOccurrence(new ArrayList<Instance>(selectedToRemove.values()));
+            ArrayList<Instance> lastOccurrence = InstanceHasInstanceClassDAO.checkIfLastOccurrence(new ArrayList<Instance>(selectedToRemove.values()), classes);
             if (!lastOccurrence.isEmpty()) {
                 for (Instance inst : lastOccurrence) {
                     selectedToRemove.remove(inst.getId());
@@ -1065,10 +1071,6 @@ public class ManageDBInstances implements Observer {
             }
 
             //Get the selected instance classes
-            ArrayList<InstanceClass> classes = new ArrayList<InstanceClass>();
-            for (int j = 0; j < selectionPaths.length; j++) {
-                classes.addAll(getAllToEnd((DefaultMutableTreeNode) (selectionPaths[j].getLastPathComponent())));
-            }
 
             ArrayList<Instance> toRemove = new ArrayList<Instance>(selectedToRemove.values());
             Tasks.startTask("tryToRemoveInstances", new Class[]{ArrayList.class, ArrayList.class, ArrayList.class, edacc.model.Tasks.class}, new Object[]{toRemove, lastOccurrence, classes, null}, this, this.main);
