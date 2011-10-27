@@ -76,14 +76,22 @@ public class ManageDBSolvers implements Observer {
      * Applies the name and the description of a solver.
      * @param name
      * @param description
+     * @return <code>true</code> if the solver changed
      */
-    public void applySolver(String name, String description, String author, String version) {
+    public boolean applySolver(String name, String description, String author, String version) {
         if (currentSolver != null) {
+            if (currentSolver.getName().equals(name)
+                    && currentSolver.getDescription().equals(description)
+                    && currentSolver.getAuthors().equals(author)
+                    && currentSolver.getVersion().equals(version))
+                return false;
             currentSolver.setName(name);
             currentSolver.setDescription(description);
             currentSolver.setAuthor(author);
             currentSolver.setVersion(version);
+            return true;
         }
+        return false;
     }
 
     public void saveSolvers() {

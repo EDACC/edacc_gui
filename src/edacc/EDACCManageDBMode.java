@@ -1640,9 +1640,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
      * Applies the solver name and description and updates the UI of the table.
      */
     private void solverChanged() {
-        manageDBSolvers.applySolver(tfSolverName.getText(), taSolverDescription.getText(), tfSolverAuthors.getText(), tfSolverVersion.getText());
+        unsavedChanges = unsavedChanges
+                | manageDBSolvers.applySolver(tfSolverName.getText(), taSolverDescription.getText(), tfSolverAuthors.getText(), tfSolverVersion.getText());
         tableSolver.updateUI();
-        unsavedChanges = true;
     }
     private JFileChooser codeFileChooser;
     private void btnSolverAddCodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverAddCodeActionPerformed
@@ -2201,22 +2201,40 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         }
         selectedRow = tableParameters.convertRowIndexToModel(selectedRow);
         Parameter p = parameterTableModel.getParameter(selectedRow);
-        p.setName(tfParametersName.getText());
 
+        String name = tfParametersName.getText();
+        String order = tfParametersOrder.getText();
+        String defaultValue = tfParametersDefaultValue.getText();
+        String prefix = tfParametersPrefix.getText();
+        boolean hasValue = !chkHasNoValue.isSelected();
+        boolean mandatory = chkMandatory.isSelected();
+        boolean space = chkSpace.isSelected();
+        boolean attachToPrevious = chkAttachToPrevious.isSelected();
 
+        if (p.getName() != null && p.getName().equals(name)
+                && order != null && order.equals(Integer.toString(p.getOrder()))
+                && p.getDefaultValue() != null && p.getDefaultValue().equals(defaultValue)
+                && p.getPrefix() != null && p.getPrefix().equals(prefix)
+                && p.getHasValue() == hasValue
+                && p.isMandatory() == mandatory
+                && p.getSpace() == space
+                && p.isAttachToPrevious() == attachToPrevious)
+            return;
+
+        p.setName(name);
         try {
-            p.setOrder(Integer.parseInt(tfParametersOrder.getText()));
+            p.setOrder(Integer.parseInt(order));
         } catch (NumberFormatException e) {
-            if (!tfParametersOrder.getText().equals("")) {
+            if (!order.equals("")) {
                 tfParametersOrder.setText(Integer.toString(p.getOrder()));
             }
         }
-        p.setDefaultValue(tfParametersDefaultValue.getText());
-        p.setPrefix(tfParametersPrefix.getText());
-        p.setHasValue(!chkHasNoValue.isSelected());
-        p.setMandatory(chkMandatory.isSelected());
-        p.setSpace(chkSpace.isSelected());
-        p.setAttachToPrevious(chkAttachToPrevious.isSelected());
+        p.setDefaultValue(defaultValue);
+        p.setPrefix(prefix);
+        p.setHasValue(hasValue);
+        p.setMandatory(mandatory);
+        p.setSpace(space);
+        p.setAttachToPrevious(attachToPrevious);
         tableParameters.updateUI();
         unsavedChanges = true;
         // show error message if necessary
