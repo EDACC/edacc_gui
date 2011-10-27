@@ -2178,6 +2178,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             selRows[i] = tableParameters.convertRowIndexToModel(selRows[i]);
         }
         manageDBParameters.moveUp(selRows, tableParameters);
+        tableParameters.getSelectionModel().setSelectionInterval(tableParameters.convertRowIndexToView(selRows[0]), tableParameters.convertRowIndexToView(selRows[selRows.length - 1]));
         tableParameters.updateUI();
     }//GEN-LAST:event_jMIMoveUpActionPerformed
 
@@ -2187,6 +2188,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             selRows[i] = tableParameters.convertRowIndexToModel(selRows[i]);
         }
         manageDBParameters.moveDown(selRows, tableParameters);
+        tableParameters.getSelectionModel().setSelectionInterval(tableParameters.convertRowIndexToView(selRows[0]), tableParameters.convertRowIndexToView(selRows[selRows.length - 1]));
         tableParameters.updateUI();
     }//GEN-LAST:event_jMIMoveDownActionPerformed
 
