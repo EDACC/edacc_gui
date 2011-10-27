@@ -122,6 +122,7 @@ public class ParameterTableModel extends AbstractTableModel{
         }
 
         params.add(param);
+        fireTableDataChanged();
     }
 
     /**
