@@ -7,6 +7,7 @@ package edacc.model;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -52,6 +53,30 @@ public class ParameterInstanceDAO {
         }
         st.executeBatch();
         st.close();
+    }
+    
+    public static void saveBulk(List<ParameterInstance> parameters) throws SQLException {
+        if (parameters.isEmpty()) return;
+        StringBuilder insertQuery = new StringBuilder();
+        insertQuery.append("INSERT INTO " + table + " (SolverConfig_IdSolverConfig, Parameters_IdParameter, value) VALUES ");
+        ParameterInstance last = parameters.get(parameters.size() - 1);
+        for (ParameterInstance pi: parameters) {
+            insertQuery.append("(");
+            insertQuery.append(pi.getSolverConfiguration().getId());
+            insertQuery.append(",");
+            insertQuery.append(pi.getParameter_id());
+            insertQuery.append(",?)");
+            if (pi != last) insertQuery.append(",");
+        }
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery.toString());
+        int count = 1;
+        for (ParameterInstance pi: parameters) {
+            st.setString(count++, pi.getValue());
+            pi.setSaved();
+        }
+        st.executeUpdate();
+        st.close();
+
     }
 
     public static void save(ParameterInstance i) throws SQLException {
