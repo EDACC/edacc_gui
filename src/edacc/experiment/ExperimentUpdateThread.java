@@ -5,6 +5,7 @@ import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentDAO.StatusCount;
 import edacc.model.StatusCode;
+import edacc.util.Pair;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -19,7 +20,7 @@ import javax.swing.SwingWorker;
 public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> {
 
     private ExperimentTableModel model;
-    private HashMap<Integer, Experiment> modifiedExperiments;
+    private final HashMap<Integer, Experiment> modifiedExperiments = new HashMap<Integer, Experiment>();
 
     /**
      * Creates a new experiment update thread.
@@ -28,7 +29,6 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
     public ExperimentUpdateThread(ExperimentTableModel model) {
         super();
         this.model = model;
-        modifiedExperiments = new HashMap<Integer, Experiment>();
     }
 
     @Override
@@ -71,7 +71,8 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
                         not_started = stat.getCount();
                     }
                 }
-                publish(new ExperimentStatus(exp, count, finished, running, failed, not_started));
+                Pair<Integer, Boolean> pa = ExperimentDAO.getPriorityActiveByExperiment(exp);
+                publish(new ExperimentStatus(exp, count, finished, running, failed, not_started, pa.getFirst(), pa.getSecond()));
             }
             if (this.isCancelled()) 
                 break;
@@ -107,6 +108,14 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
                         model.setRunningAt(i, status.running);
                         modified = true;
                     }
+                    if (status.experiment.getPriority() != status.priority) {
+                        model.setValueAt(status.priority, i, ExperimentTableModel.COL_PRIORITY);
+                        modified = true;
+                    }
+                    if (status.experiment.isActive() != status.active) {
+                        model.setValueAt(status.active, i, ExperimentTableModel.COL_ACTIVE);
+                        modified = true;
+                    }
                     if (modified) {
                         synchronized (modifiedExperiments) {
                             modifiedExperiments.put(status.experiment.getId(), status.experiment);
@@ -125,14 +134,17 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
         int running;
         int failed;
         int not_started;
-
-        ExperimentStatus(Experiment exp, int count, int finished, int running, int failed, int not_started) {
+        int priority;
+        boolean active;
+        ExperimentStatus(Experiment exp, int count, int finished, int running, int failed, int not_started, int priority, boolean active) {
             this.experiment = exp;
             this.count = count;
             this.finished = finished;
             this.running = running;
             this.failed = failed;
             this.not_started = not_started;
+            this.priority = priority;
+            this.active = active;
         }
     }
 }

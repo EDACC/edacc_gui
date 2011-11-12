@@ -1,5 +1,6 @@
 package edacc.model;
 
+import edacc.util.Pair;
 import java.util.LinkedList;
 import java.sql.*;
 import java.util.ArrayList;
@@ -243,6 +244,27 @@ public class ExperimentDAO {
         rs.close();
         ps.close();
         return res;
+    }
+    
+    public static Pair<Integer, Boolean> getPriorityActiveByExperiment(Experiment exp) throws SQLException {
+        Pair<Integer, Boolean> p = new Pair<Integer, Boolean>(0,false);
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT priority, active FROM " + table + " WHERE idExperiment = ?");
+        ps.setInt(1, exp.getId());
+        Integer priority = null;
+        Boolean active = null;
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            priority = rs.getInt(1);
+            active = rs.getBoolean(2);
+        }
+        rs.close();
+        ps.close();
+        if (priority == null | active == null) {
+            return null;
+        } else {
+            return new Pair<Integer, Boolean>(priority, active);
+        }
     }
     
     public static class StatusCount {
