@@ -72,7 +72,8 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
                     }
                 }
                 Pair<Integer, Boolean> pa = ExperimentDAO.getPriorityActiveByExperiment(exp);
-                publish(new ExperimentStatus(exp, count, finished, running, failed, not_started, pa.getFirst(), pa.getSecond()));
+                if (pa != null)
+                    publish(new ExperimentStatus(exp, count, finished, running, failed, not_started, pa.getFirst(), pa.getSecond()));
             }
             if (this.isCancelled()) 
                 break;
