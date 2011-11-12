@@ -298,7 +298,9 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
      * @param name the name of the operation
      */
     public void setOperationName(String name) {
-        taskView.setOperationName(name);
+        if (taskView != null) {
+            taskView.setOperationName(name);
+        }
     }
 
     /**
