@@ -314,4 +314,10 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
     public synchronized static boolean isTaskRunning() {
         return taskRunning;
     }
+    
+    public void setCancelable(boolean c) {
+        if (taskView != null) {
+            taskView.setCancelable(c);
+        }
+    }
 }

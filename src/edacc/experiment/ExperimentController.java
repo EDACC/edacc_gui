@@ -205,7 +205,7 @@ public class ExperimentController {
 
         PropertyChangeListener cancelExperimentResultDAOStatementListener = null;
         if (Tasks.getTaskView() != null) {
-            Tasks.getTaskView().setCancelable(true);
+            task.setCancelable(true);
             cancelExperimentResultDAOStatementListener = new PropertyChangeListener() {
 
                 @Override
@@ -225,9 +225,7 @@ public class ExperimentController {
         } catch (MySQLStatementCancelledException ex) {
             throw new TaskCancelledException();
         } finally {
-            if (Tasks.getTaskView() != null) {
-                Tasks.getTaskView().setCancelable(false);
-            }
+            task.setCancelable(false);
             if (cancelExperimentResultDAOStatementListener != null) {
                 task.removePropertyChangeListener(cancelExperimentResultDAOStatementListener);
             }
@@ -646,7 +644,7 @@ public class ExperimentController {
             // We have to delete jobs
             String msg = "The number of runs specified is less than the number of runs in this experiment. There are " + deleteJobs.size() + " jobs which would be deleted. Do you want to continue?";
             int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), msg, "Jobs would be deleted", javax.swing.JOptionPane.YES_NO_OPTION);
-            Tasks.getTaskView().setCancelable(true);
+            task.setCancelable(true);
             task.setTaskProgress(0.f);
             if (userInput == 1) {
                 return 0;
@@ -674,11 +672,10 @@ public class ExperimentController {
                 task.removePropertyChangeListener(cancelExperimentResultDAOStatementListener);
             }
         }
-
-        Tasks.getTaskView().setCancelable(false);
+        task.setCancelable(false);
         task.setStatus("Updating local cache..");
         experimentResultCache.updateExperimentResults();
-        Tasks.getTaskView().setCancelable(true);
+        task.setCancelable(true);
 
         task.setStatus("Preparing job generation");
 
@@ -892,7 +889,7 @@ public class ExperimentController {
     public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, boolean exportClient, boolean exportRunsolver, boolean exportConfig, boolean exportVerifier, File clientBinary, File verifierBinary, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException, InstanceNotInDBException, TaskCancelledException {
         File tmpDir = new File("tmp");
         tmpDir.mkdir();
-        Tasks.getTaskView().setCancelable(true);
+        task.setCancelable(true);
         Calendar cal = Calendar.getInstance();
         String dateStr = cal.get(Calendar.YEAR) + "" + (cal.get(Calendar.MONTH) < 9 ? "0" + (cal.get(Calendar.MONTH) + 1) : (cal.get(Calendar.MONTH) + 1)) + "" + (cal.get(Calendar.DATE) < 10 ? "0" + cal.get(Calendar.DATE) : cal.get(Calendar.DATE));
         ArrayList<ExperimentHasGridQueue> eqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(activeExperiment);
@@ -1206,7 +1203,7 @@ public class ExperimentController {
      * @throws IOException 
      */
     public void exportCSV(File file, Tasks task) throws IOException {
-        Tasks.getTaskView().setCancelable(true);
+        task.setCancelable(true);
         task.setOperationName("Exporting jobs to CSV file");
 
         if (file.exists()) {
