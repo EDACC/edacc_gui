@@ -32,11 +32,15 @@ public class ClientUpdateThread extends SwingWorker<Void, Client> {
     protected Void doInBackground() throws Exception {
         while (!this.isCancelled()) {
             for (Client c : ClientDAO.getClients()) {
+                if (this.isCancelled())
+                    break;
                 if (!ids.contains(c.getId())) {
                     publish(c);
                     ids.add(c.getId());
                 }
             }
+            if (this.isCancelled())
+                break;
             Thread.sleep(5000);
         }
         return null;

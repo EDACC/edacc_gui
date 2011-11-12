@@ -49,6 +49,8 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
             }
             for (Experiment exp : experiments) {
                 ArrayList<StatusCount> statusCount = ExperimentDAO.getJobCountForExperiment(exp);
+                if (this.isCancelled())
+                    break;
                 int running = 0;
                 int finished = 0;
                 int failed = 0;
@@ -71,6 +73,8 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
                 }
                 publish(new ExperimentStatus(exp, count, finished, running, failed, not_started));
             }
+            if (this.isCancelled()) 
+                break;
             Thread.sleep(2000);
             sleep_count += 2000;
         }
