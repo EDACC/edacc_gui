@@ -95,7 +95,7 @@ public class ClientDAO {
             cache.remove(c);
         }
 
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT Experiment_idExperiment, Client_idClient, numCores FROM Experiment_has_Client");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT Experiment_idExperiment, Client_idClient, numCores FROM Experiment_has_Client WHERE numCores > 0");
         ResultSet rs = st.executeQuery();
         HashMap<Client, HashMap<Experiment, Integer>> map = new HashMap<Client, HashMap<Experiment, Integer>>();
         while (rs.next()) {
