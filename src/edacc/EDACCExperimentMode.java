@@ -58,6 +58,7 @@ import edacc.model.SolverDAO;
 import edacc.model.TaskCancelledException;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
+import edacc.parameterspace.ParameterConfiguration;
 import edacc.parameterspace.graph.ParameterGraph;
 import edacc.properties.PropertyTypeNotExistException;
 import java.awt.Color;
@@ -2994,11 +2995,22 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
                             ParameterGraph graph = ParameterGraphDAO.loadParameterGraph(SolverDAO.getById(sb.getIdSolver()));
                             Random random = new Random();
+                            task.setStatus("Generating solver configurations");
+                            List<ParameterConfiguration> configs = new LinkedList<ParameterConfiguration>();
+                            List<String> names = new LinkedList<String>();
+
                             for (int i = 0; i < number; i++) {
-                                task.setStatus("Processing solver configuration " + i + " of " + number);
-                                int id = ParameterGraphDAO.createSolverConfig(expController.getActiveExperiment().getId(), graph.getRandomConfiguration(random), "Random " + i);
+                                configs.add(graph.getRandomConfiguration(random));
+                                names.add("");
+                            }
+
+                            List<Integer> scIds = ParameterGraphDAO.createSolverConfigs(expController.getActiveExperiment().getId(), configs, names);
+                            expController.solverConfigCache.synchronize();
+                            for (Integer id : scIds) {
                                 if (id > 0) {
-                                    SolverConfiguration solverConfig = SolverConfigurationDAO.getSolverConfigurationById(id);
+                                    SolverConfiguration solverConfig = expController.solverConfigCache.getSolverConfigurationById(id);
+                                    if (solverConfig == null)
+                                        continue;
                                     ArrayList<ParameterInstance> pis = ParameterInstanceDAO.getBySolverConfig(solverConfig);
                                     String name = "CP:";
                                     for (ParameterInstance pi : pis) {
@@ -3013,20 +3025,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                                             }
                                         }
                                     }
-
-                                    expController.solverConfigCache.synchronize();
-                                    for (SolverConfiguration sc : expController.solverConfigCache.getAll()) {
-                                        if (sc.getId() == solverConfig.getId()) {
-                                            sc.setName(name);
-                                            break;
-                                        }
-                                    }
-                                    expController.solverConfigCache.saveAll();
-                                } else {
-                                    // TODO: ERROR?
+                                    solverConfig.setName(name);
                                 }
                             }
-                            expController.solverConfigCache.synchronize();
+                            expController.solverConfigCache.saveAll();
+
+                            
                         } catch (final Exception ex) {
                             SwingUtilities.invokeLater(new Runnable() {
 
@@ -3045,8 +3049,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Expected an integer for number of solver configurations.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-
-
         }
     }//GEN-LAST:event_btnConfigurationScenarioRandomSolverConfigsActionPerformed
 
@@ -3633,6 +3635,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             manageExperimentPane.setEnabledAt(TAB_CONFIGURATIONSCENARIO, true);
         } else {
             manageExperimentPane.setEnabledAt(TAB_CONFIGURATIONSCENARIO, false);
+
+
         }
     }
 

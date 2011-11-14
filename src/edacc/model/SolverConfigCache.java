@@ -47,6 +47,10 @@ public class SolverConfigCache extends Observable {
             }
         });
     }
+    
+    public synchronized SolverConfiguration getSolverConfigurationById(Integer id) {
+        return solverConfigs.get(id);
+    }
 
     public synchronized void synchronize() throws SQLException {
         HashSet<Integer> ids = new HashSet<Integer>();
