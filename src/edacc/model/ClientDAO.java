@@ -118,6 +118,8 @@ public class ClientDAO {
             HashMap<Experiment, Integer> tmp = map.get(c);
             if (tmp != null) {
                 c.setComputingExperiments(tmp);
+            } else {
+                c.setComputingExperiments(new HashMap<Experiment, Integer>());
             }
             if (c.isModified()) {
                 c.notifyObservers();

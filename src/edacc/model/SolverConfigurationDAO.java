@@ -131,6 +131,11 @@ public class SolverConfigurationDAO {
         while (rs.next()) {
             SolverConfiguration c = cache.getCached(rs.getInt("IdSolverConfig"));
             if (c != null) {
+                if (c.isSaved()) {
+                    SolverConfiguration tmp = getSolverConfigurationFromResultset(rs);
+                    c.setName(tmp.getName());
+                    c.setSaved();
+                }
                 res.add(c);
             } else {
                 SolverConfiguration i = getSolverConfigurationFromResultset(rs);
