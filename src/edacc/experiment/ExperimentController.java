@@ -76,6 +76,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
@@ -104,6 +105,7 @@ public class ExperimentController {
     private ConfigurationScenario configScenario;
     private ConfigurationScenario savedScenario;
     private SolverConfigurationEntryModel solverConfigurationEntryModel;
+
     /**
      * Creates a new experiment Controller
      * @param experimentMode the experiment mode to be used
@@ -344,7 +346,7 @@ public class ExperimentController {
      */
     public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException, Exception {
         // TODO: there are some points where this task should never be canceled (by an application crash or lost db connection)... fix them!
-        
+
         task.setStatus("Checking jobs..");
 
         // check for solver configurations with no value for parameters which must have values
@@ -438,6 +440,28 @@ public class ExperimentController {
         }
         task.setStatus("Saving solver configurations..");
 
+        // first look for unsaved solver configurations..
+        List<SolverConfiguration> solverConfigurations = new LinkedList<SolverConfiguration>();
+        for (Solver s : solverConfigurationEntryModel.getSolvers()) {
+            // iterate over solvers
+            for (SolverConfigurationEntry entry : solverConfigurationEntryModel.getEntries(s)) {
+                // iterate over solver configs
+                if (entry.getSolverConfig() == null) {
+                    SolverConfiguration sc = new SolverConfiguration();
+                    sc.setSolverBinary(entry.getSolverBinary());
+                    sc.setExperiment_id(activeExperiment.getId());
+                    sc.setSeed_group(entry.getSeedGroup());
+                    sc.setName(entry.getName());
+                    sc.setHint(entry.getHint());
+                    entry.setSolverConfig(sc);
+                    solverConfigurations.add(sc);
+                }
+            }
+        }
+        solverConfigCache.createAll(solverConfigurations);
+
+        // look for all parameter instances, create new ones, save all
+        List<ParameterInstance> parameterInstances = new LinkedList<ParameterInstance>();
         for (Solver s : solverConfigurationEntryModel.getSolvers()) {
             // iterate over solvers
             for (SolverConfigurationEntry entry : solverConfigurationEntryModel.getEntries(s)) {
@@ -450,9 +474,12 @@ public class ExperimentController {
                     entry.getSolverConfig().setSeed_group(entry.getSeedGroup());
                     entry.getSolverConfig().setHint(entry.getHint());
                 }
-                entry.saveParameterInstances();
+                parameterInstances.addAll(entry.getParameterInstances());
             }
         }
+        ParameterInstanceDAO.saveBulk(parameterInstances);
+        
+        // save modified solver configurations and delete deleted
         solverConfigCache.saveAll();
         getExperimentResults().updateExperimentResults();
         main.generateJobsTableModel.updateNumRuns();
@@ -793,7 +820,7 @@ public class ExperimentController {
                 experimentResultCache.updateExperimentResults();
                 // TODO: also update solver config cache if needed and cache parameter instances of solver configs
                 //       maybe this should be done in experimentResultCache?
-                
+
                 // temporary: simple synchronize, but may not be needed..
                 solverConfigCache.synchronize();
             } finally {
@@ -1783,7 +1810,7 @@ public class ExperimentController {
         }
         return false;
     }
-    
+
     public boolean solverConfigsIsModified() {
         return (solverConfigCache != null && solverConfigCache.isModified()) || (solverConfigurationEntryModel == null ? false : solverConfigurationEntryModel.isModified());
     }
@@ -1944,7 +1971,7 @@ public class ExperimentController {
         // we need a new instance for this
         savedScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
     }
-    
+
     public ConfigurationScenario getConfigurationScenarioForExperiment(Experiment exp) throws SQLException {
         ConfigurationScenario scenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(exp.getId());
         return scenario;
@@ -1957,7 +1984,7 @@ public class ExperimentController {
     public void reloadConfigurationScenario() throws SQLException {
         configScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
     }
-    
+
     public SolverConfigurationEntryModel getSolverConfigurationEntryModel() {
         return solverConfigurationEntryModel;
     }

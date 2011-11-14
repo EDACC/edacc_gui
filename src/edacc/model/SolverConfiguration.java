@@ -20,10 +20,10 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
     }
 
     public void setCost(Float cost) {
-        this.cost = cost;
-        if (this.isSaved() && (cost == null || !cost.equals(this.cost))) {
+        if (this.isSaved() && (cost == null && this.cost != null || !cost.equals(this.cost))) {
             this.setModified();
         }
+        this.cost = cost;
     }
 
     public String getCost_function() {
@@ -31,7 +31,7 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
     }
 
     public void setCost_function(String cost_function) {
-        if (this.isSaved() && (cost_function == null || !cost_function.equals(this.cost_function))) {
+        if (this.isSaved() && (cost_function == null && this.cost_function != null || !cost_function.equals(this.cost_function))) {
             this.setModified();
         }
         this.cost_function = cost_function;
@@ -82,10 +82,10 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
     }
 
     public void setSolverBinary(SolverBinaries solverBinary) {
-        this.solverBinary = solverBinary;
-        if (this.isSaved()) {
+        if (this.isSaved() && this.getSolverBinary() != solverBinary) {
             this.setModified();
         }
+        this.solverBinary = solverBinary;
     }
 
     public String getName() {
@@ -98,14 +98,14 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
         }
         this.name = name;
     }
-    
+
     public void setHint(String hint) {
         if (!hint.equals(this.hint) && this.isSaved()) {
             this.setModified();
         }
         this.hint = hint;
     }
-    
+
     public String getHint() {
         return hint;
     }

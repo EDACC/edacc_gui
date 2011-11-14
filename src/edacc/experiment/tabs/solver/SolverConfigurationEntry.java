@@ -11,6 +11,7 @@ import edacc.model.SolverConfiguration;
 import edacc.model.SolverDAO;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -60,36 +61,42 @@ public class SolverConfigurationEntry {
     }
 
     /**
-     * Saves all new and modified parameter instances to the database.
+     * Returns a list of all parameter instances. Creates new parameter instances for not existing parameter instances.
      * @throws SQLException
      */
-    public void saveParameterInstances() throws SQLException {
-        ArrayList<ParameterInstance> parameterVector = new ArrayList<ParameterInstance>();
+    public List<ParameterInstance> getParameterInstances() throws SQLException {
+        ArrayList<ParameterInstance> parameters = new ArrayList<ParameterInstance>();
+        ArrayList<ParameterInstance> newParameters = new ArrayList<ParameterInstance>();
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             if ((Boolean) tableModel.getValueAt(i, 0)) {
                 Parameter p = (Parameter) tableModel.getValueAt(i, 5);
                 ParameterInstance pi = (ParameterInstance) tableModel.getValueAt(i, 6);
                 if (pi == null) {
-                    pi = ParameterInstanceDAO.createParameterInstance(p.getId(), solverConfig, (String) tableModel.getValueAt(i, 2));
-                    parameterVector.add(pi);
+                    pi = new ParameterInstance();
+                    pi.setParameter_id(p.getId());
+                    pi.setSolverConfiguration(solverConfig);
+                    pi.setValue((String) tableModel.getValueAt(i));
+                    newParameters.add(pi);
+                    parameters.add(pi);
                 }
-                if (!pi.getValue().equals((String) tableModel.getValueAt(i, 3))) {
-                    pi.setValue((String) tableModel.getValueAt(i, 3));
+                if (!pi.getValue().equals(tableModel.getValueAt(i))) {
+                    pi.setValue(tableModel.getValueAt(i));
                     ParameterInstanceDAO.setModified(pi);
-                    ParameterInstanceDAO.save(pi);
+                    parameters.add(pi);
                 }
             } else {
                 ParameterInstance pi = (ParameterInstance) tableModel.getValueAt(i, 6);
                 if (pi != null) {
                     ParameterInstanceDAO.setDeleted(pi);
-                    ParameterInstanceDAO.save(pi);
                     tableModel.removeParameterInstance(pi);
+                    parameters.add(pi);
                 }
             }
         }
-        if (parameterVector.size() > 0) {
-            tableModel.setParameterInstances(parameterVector);
+        if (newParameters.size() > 0) {
+            tableModel.setParameterInstances(newParameters);
         }
+        return parameters;
     }
 
     /**

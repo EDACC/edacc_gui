@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -41,10 +42,10 @@ public class ParameterInstanceDAO {
         save(i);
         return i;
     }
-    
+
     public static void saveBatch(List<ParameterInstance> parameters) throws SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
-        for (ParameterInstance pi: parameters) {
+        for (ParameterInstance pi : parameters) {
             st.setInt(1, pi.getSolverConfiguration().getId());
             st.setInt(2, pi.getParameter_id());
             st.setString(3, pi.getValue());
@@ -54,29 +55,82 @@ public class ParameterInstanceDAO {
         st.executeBatch();
         st.close();
     }
-    
-    public static void saveBulk(List<ParameterInstance> parameters) throws SQLException {
-        if (parameters.isEmpty()) return;
-        StringBuilder insertQuery = new StringBuilder();
-        insertQuery.append("INSERT INTO " + table + " (SolverConfig_IdSolverConfig, Parameters_IdParameter, value) VALUES ");
-        ParameterInstance last = parameters.get(parameters.size() - 1);
-        for (ParameterInstance pi: parameters) {
-            insertQuery.append("(");
-            insertQuery.append(pi.getSolverConfiguration().getId());
-            insertQuery.append(",");
-            insertQuery.append(pi.getParameter_id());
-            insertQuery.append(",?)");
-            if (pi != last) insertQuery.append(",");
-        }
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery.toString());
-        int count = 1;
-        for (ParameterInstance pi: parameters) {
-            st.setString(count++, pi.getValue());
-            pi.setSaved();
-        }
-        st.executeUpdate();
-        st.close();
 
+    public static void saveBulk(List<ParameterInstance> parameters) throws SQLException {
+        if (parameters.isEmpty()) {
+            return;
+        }
+        List<ParameterInstance> modified = new LinkedList<ParameterInstance>();
+        List<ParameterInstance> deleted = new LinkedList<ParameterInstance>();
+        List<ParameterInstance> newOnes = new LinkedList<ParameterInstance>();
+
+        for (ParameterInstance pi : parameters) {
+            if (pi.isNew()) {
+                newOnes.add(pi);
+            } else if (pi.isModified()) {
+                modified.add(pi);
+            } else if (pi.isDeleted()) {
+                deleted.add(pi);
+            }
+        }
+
+        if (!newOnes.isEmpty()) {
+            StringBuilder insertQuery = new StringBuilder();
+            insertQuery.append("INSERT INTO " + table + " (SolverConfig_IdSolverConfig, Parameters_IdParameter, value) VALUES ");
+            ParameterInstance last = newOnes.get(newOnes.size() - 1);
+            for (ParameterInstance pi : newOnes) {
+                insertQuery.append("(");
+                insertQuery.append(pi.getSolverConfiguration().getId());
+                insertQuery.append(",");
+                insertQuery.append(pi.getParameter_id());
+                insertQuery.append(",?)");
+                if (pi != last) {
+                    insertQuery.append(",");
+                }
+            }
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery.toString());
+            int count = 1;
+            for (ParameterInstance pi : newOnes) {
+                st.setString(count++, pi.getValue());
+                pi.setSaved();
+            }
+            st.executeUpdate();
+            st.close();
+        }
+        if (!modified.isEmpty()) {
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
+            ParameterInstance last = modified.get(modified.size() - 1);
+            for (ParameterInstance pi : modified) {
+                st.setString(1, pi.getValue());
+                st.setInt(2, pi.getSolverConfiguration().getId());
+                st.setInt(3, pi.getParameter_id());
+                st.addBatch();
+            }
+            st.executeBatch();
+            st.close();
+        }
+        if (!deleted.isEmpty()) {
+            StringBuilder tmp = new StringBuilder();
+            
+            int count = deleted.size();
+            tmp.append("(?");
+            count--;
+            for (int i = 0; i < count; i++) {
+                tmp.append(",?");
+            }
+            tmp.append(")");
+            StringBuilder deleteQuery = new StringBuilder("DELETE FROM " + table + " WHERE ");
+            ParameterInstance last = deleted.get(deleted.size()-1);
+            for (int i = 0; i < deleted.size(); i++) {
+                deleteQuery.append("SolverConfig_IdSolverConfig=").append(deleted.get(i).getSolverConfiguration().getId()).append(" AND Parameters_IdParameter=").append(deleted.get(i).getParameter_id());
+                if (deleted.get(i) != last) {
+                    deleteQuery.append(" OR ");
+                }
+            }
+            Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+            st.executeUpdate(deleteQuery.toString());
+            st.close();
+        }
     }
 
     public static void save(ParameterInstance i) throws SQLException {
@@ -206,7 +260,7 @@ public class ParameterInstanceDAO {
         for (int i = 0; i < scs.size() - 1; i++) {
             sb.append(scs.get(i).getId()).append(',');
         }
-        sb.append(scs.get(scs.size() -1).getId()).append(')');
+        sb.append(scs.get(scs.size() - 1).getId()).append(')');
         String idString = sb.toString();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE SolverConfig_idSolverConfig IN " + idString + " ORDER BY SolverConfig_idSolverConfig ASC");
         int cur_idx = 0;

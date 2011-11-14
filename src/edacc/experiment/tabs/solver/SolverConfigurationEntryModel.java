@@ -84,7 +84,7 @@ public class SolverConfigurationEntryModel {
         return list == null ? 0 : list.size();
     }
 
-    public boolean isModified() {
+    public synchronized boolean isModified() {
         for (List<SolverConfigurationEntry> entries : mapSolverEntryList.values()) {
             for (SolverConfigurationEntry entry : entries) {
                 if (entry.isModified()) {

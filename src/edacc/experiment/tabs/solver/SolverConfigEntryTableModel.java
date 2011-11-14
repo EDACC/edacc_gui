@@ -87,6 +87,7 @@ public class SolverConfigEntryTableModel extends ThreadSafeDefaultTableModel {
                 parameterInstances[i] = null;
             }
         } else {
+            // TODO: performance
             for (int i = 0; i < params.size(); i++) {
                 for (int j = 0; j < parameters.length; j++) {
                     if (parameters[j].getId() == params.get(i).getParameter_id()) {
