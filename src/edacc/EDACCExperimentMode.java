@@ -3274,11 +3274,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         final int jobsWaiting = jobsTableModel.getJobsCount(StatusCode.NOT_STARTED);
         final int jobsRunning = jobsTableModel.getJobsCount(StatusCode.RUNNING);
 
-        final int jobsCrashed = jobsTableModel.getJobsCount(StatusCode.LAUNCHERCRASH)
-                + jobsTableModel.getJobsCount(StatusCode.SOLVERCRASH)
-                + jobsTableModel.getJobsCount(StatusCode.VERIFIERCRASH)
-                + jobsTableModel.getJobsCount(StatusCode.WATCHERCRASH)
-                + jobsTableModel.getJobsCount(StatusCode.TERMINATED);
+        final int jobsCrashed = jobsCount - (jobsSuccessful + jobsWaiting + jobsRunning);
+        //jobsTableModel.getJobsCount(StatusCode.LAUNCHERCRASH)
+          //      + jobsTableModel.getJobsCount(StatusCode.SOLVERCRASH)
+            //    + jobsTableModel.getJobsCount(StatusCode.VERIFIERCRASH)
+              //  + jobsTableModel.getJobsCount(StatusCode.WATCHERCRASH)
+                //+ jobsTableModel.getJobsCount(StatusCode.TERMINATED);
 
         int jobsNotSuccessful = jobsCount - jobsSuccessful - jobsWaiting - jobsRunning;
         double percentage = (double) (jobsSuccessful + jobsNotSuccessful) / jobsCount;
