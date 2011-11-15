@@ -99,7 +99,6 @@ public class ParameterInstanceDAO {
         }
         if (!modified.isEmpty()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
-            ParameterInstance last = modified.get(modified.size() - 1);
             for (ParameterInstance pi : modified) {
                 st.setString(1, pi.getValue());
                 st.setInt(2, pi.getSolverConfiguration().getId());
