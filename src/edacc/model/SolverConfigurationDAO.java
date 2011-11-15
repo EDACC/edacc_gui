@@ -107,7 +107,7 @@ public class SolverConfigurationDAO {
         return query;
     }
 
-    protected static void saveAll(List<SolverConfiguration> scs) throws SQLException {
+    public static void saveAll(List<SolverConfiguration> scs) throws SQLException {
         int deletedCount = 0, newCount = 0, modifiedCount = 0;
         for (SolverConfiguration sc : scs) {
             if (sc.isDeleted()) {
