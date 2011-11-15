@@ -775,7 +775,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         lblETA = new javax.swing.JLabel();
         btnComputeResultProperties = new javax.swing.JButton();
         btnSetPriority = new javax.swing.JButton();
-        lblETAProgress = new javax.swing.JLabel();
         panelAnalysis = new javax.swing.JScrollPane();
 
         popupTblClients.setName("popupTblClients"); // NOI18N
@@ -1892,9 +1891,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         });
 
-        lblETAProgress.setText(resourceMap.getString("lblETAProgress.text")); // NOI18N
-        lblETAProgress.setName("lblETAProgress"); // NOI18N
-
         javax.swing.GroupLayout panelJobBrowserLayout = new javax.swing.GroupLayout(panelJobBrowser);
         panelJobBrowser.setLayout(panelJobBrowserLayout);
         panelJobBrowserLayout.setHorizontalGroup(
@@ -1904,13 +1900,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addComponent(lblJobsFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 1009, Short.MAX_VALUE)
                 .addContainerGap())
             .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1029, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelJobBrowserLayout.createSequentialGroup()
+            .addGroup(panelJobBrowserLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelJobBrowserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelJobBrowserLayout.createSequentialGroup()
-                        .addComponent(lblETA)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblETAProgress, javax.swing.GroupLayout.DEFAULT_SIZE, 969, Short.MAX_VALUE))
+                .addGroup(panelJobBrowserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblETA, javax.swing.GroupLayout.DEFAULT_SIZE, 1009, Short.MAX_VALUE)
                     .addGroup(panelJobBrowserLayout.createSequentialGroup()
                         .addComponent(btnRefreshJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1942,9 +1935,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panelJobBrowserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblETA)
-                    .addComponent(lblETAProgress))
+                .addComponent(lblETA)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelJobBrowserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRefreshJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -3335,12 +3326,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         lblETA.setText(text);
         lblETA.setToolTipText(tooltip);
-        lblETAProgress.setIcon(new Icon() {
+        lblETA.setIcon(new Icon() {
 
             @Override
             public void paintIcon(Component c, Graphics g, int x, int y) {
 
-                int width = lblETAProgress.getWidth();
+                int width = lblETA.getWidth();
                 if (jobsCount == 0) {
                     return;
                 }
@@ -3353,29 +3344,28 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 int runningPix = (int) Math.round(runningPerc * width);
                  int waitingPix = (int) Math.round(waitingPerc * width);
                 g.setColor(Util.COLOR_JOBBROWSER_ERROR);
-                g.fillRect(0, 0, crashedPix, lblETAProgress.getHeight());
+                g.fillRect(0, 0, crashedPix, lblETA.getHeight());
                 g.setColor(Util.COLOR_JOBBROWSER_FINISHED);
-                g.fillRect(crashedPix, 0, successfulPix, lblETAProgress.getHeight());
+                g.fillRect(crashedPix, 0, successfulPix, lblETA.getHeight());
                 g.setColor(Util.COLOR_JOBBROWSER_RUNNING);
-                g.fillRect(crashedPix + successfulPix, 0, runningPix, lblETAProgress.getHeight());
+                g.fillRect(crashedPix + successfulPix, 0, runningPix, lblETA.getHeight());
                 g.setColor(Util.COLOR_JOBBROWSER_WAITING);
                // int waitingPix = width - (crashedPix + successfulPix + runningPix);
                 if (waitingPix > 0) {
-                    g.fillRect(crashedPix + successfulPix + runningPix, 0, waitingPix, lblETAProgress.getHeight());
+                    g.fillRect(crashedPix + successfulPix + runningPix, 0, waitingPix, lblETA.getHeight());
                 }
             }
 
             @Override
             public int getIconWidth() {
-                return 10;
+                return 1;
             }
 
             @Override
             public int getIconHeight() {
-                return lblETAProgress.getHeight();
+                return lblETA.getHeight();
             }
         });
-        lblETAProgress.setText("");
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBrowserColumnSelection;
@@ -3446,7 +3436,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JTree jTreeInstanceClass;
     private javax.swing.JLabel lblETA;
-    private javax.swing.JLabel lblETAProgress;
     private javax.swing.JLabel lblFilterStatus;
     private javax.swing.JLabel lblJobsFilterStatus;
     private javax.swing.JLabel lblSolverConfigFilterStatus;
