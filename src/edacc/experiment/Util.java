@@ -29,6 +29,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author simon
  */
 public class Util {
+    public static final Color COLOR_ROYALBLUE = new Color(4 * 16 + 1, 6 * 16 + 9, 14 * 16 + 1);
+    public static final Color COLOR_GREEN = new Color(0 * 16 + 0, 12 * 16 + 12, 3 * 16 + 3);
 
     /** Color to be used for errors */
     public static final Color COLOR_ERROR = new Color(0xed1c24);
@@ -37,6 +39,10 @@ public class Util {
     /** Color to be used for the generate jobs table if a value is not saved and lower as the saved value */
     public static final Color COLOR_GENERATEJOBSTABLE_UNSAVED_LOWER = COLOR_ERROR;
 
+    public static final Color COLOR_JOBBROWSER_WAITING = COLOR_ROYALBLUE;
+    public static final Color COLOR_JOBBROWSER_ERROR = COLOR_ERROR;
+    public static final Color COLOR_JOBBROWSER_RUNNING = Color.orange;
+    public static final Color COLOR_JOBBROWSER_FINISHED = COLOR_GREEN;
     /**
      * Updates the width of each column according to the table size and the data in the cells.
      * @param table

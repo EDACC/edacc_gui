@@ -12,9 +12,6 @@ import javax.swing.table.DefaultTableCellRenderer;
  * @author daniel
  */
 public class EDACCExperimentModeJobsCellRenderer extends DefaultTableCellRenderer {
-
-    private final Color royalBlue = new Color(4 * 16 + 1, 6 * 16 + 9, 14 * 16 + 1);
-    private final Color green = new Color(0 * 16 + 0, 12 * 16 + 12, 3 * 16 + 3);
     public int markRow = -1;
     public int markCol = -1;
 
@@ -42,13 +39,13 @@ public class EDACCExperimentModeJobsCellRenderer extends DefaultTableCellRendere
         }
 
         if (status < -1) {
-            comp.setBackground(Util.COLOR_ERROR);
+            comp.setBackground(Util.COLOR_JOBBROWSER_ERROR);
         } else if (status == -1) {
-            comp.setBackground(royalBlue);
+            comp.setBackground(Util.COLOR_JOBBROWSER_WAITING);
         } else if (status == 0) {
-            comp.setBackground(Color.orange);
+            comp.setBackground(Util.COLOR_JOBBROWSER_RUNNING);
         } else {
-            comp.setBackground(green);
+            comp.setBackground(Util.COLOR_JOBBROWSER_FINISHED);
         }
         if (row == markRow && col == markCol) {
             comp.setBackground(Color.GRAY);

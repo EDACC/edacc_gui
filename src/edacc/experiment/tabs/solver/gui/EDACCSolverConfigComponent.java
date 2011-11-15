@@ -116,6 +116,18 @@ public class EDACCSolverConfigComponent extends JComponent implements SolverConf
     }
 
     @Override
+    public Dimension getMaximumSize() {
+        return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(0,0);
+    }
+    
+    
+
+    @Override
     public void paint(Graphics g) {
         //  this.removeAll();
         Rectangle rect = g.getClipBounds();
