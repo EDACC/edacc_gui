@@ -16,7 +16,10 @@ public class StatusCode extends BaseModel implements Serializable {
     public static final StatusCode NOT_STARTED = new StatusCode(-1, "not started");
     public static final StatusCode RUNNING = new StatusCode(0, "running");
     public static final StatusCode SUCCESSFUL = new StatusCode(1, "finished");
-
+    public static final StatusCode TERMINATED = new StatusCode(20, "terminated by user");
+    public static final StatusCode TIMELIMIT = new StatusCode(21, "time limit exceeded");
+    public static final StatusCode WALLCLOCKLIMIT = new StatusCode(22, "wallclock time limit exceeded");
+    public static final StatusCode MEMORYLIMIT = new StatusCode(23, "memory limit exceeded");
     // these values will be saved by the DAO automatically on initialization if they don't exist in the database
     public static final StatusCode[] CONST = {LAUNCHERCRASH, WATCHERCRASH, SOLVERCRASH, VERIFIERCRASH, NOT_STARTED, RUNNING, SUCCESSFUL};
 

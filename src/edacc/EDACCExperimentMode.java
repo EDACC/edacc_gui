@@ -3276,14 +3276,18 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             return;
         }
         final int jobsCount = jobsTableModel.getJobsCount();
-        final int jobsSuccessful = jobsTableModel.getJobsCount(StatusCode.SUCCESSFUL);
+        final int jobsSuccessful = jobsTableModel.getJobsCount(StatusCode.SUCCESSFUL)
+                + jobsTableModel.getJobsCount(StatusCode.TIMELIMIT)
+                + jobsTableModel.getJobsCount(StatusCode.WALLCLOCKLIMIT)
+                + jobsTableModel.getJobsCount(StatusCode.MEMORYLIMIT);
         final int jobsWaiting = jobsTableModel.getJobsCount(StatusCode.NOT_STARTED);
         final int jobsRunning = jobsTableModel.getJobsCount(StatusCode.RUNNING);
 
         final int jobsCrashed = jobsTableModel.getJobsCount(StatusCode.LAUNCHERCRASH)
                 + jobsTableModel.getJobsCount(StatusCode.SOLVERCRASH)
                 + jobsTableModel.getJobsCount(StatusCode.VERIFIERCRASH)
-                + jobsTableModel.getJobsCount(StatusCode.WATCHERCRASH);
+                + jobsTableModel.getJobsCount(StatusCode.WATCHERCRASH)
+                + jobsTableModel.getJobsCount(StatusCode.TERMINATED);
 
         int jobsNotSuccessful = jobsCount - jobsSuccessful - jobsWaiting - jobsRunning;
         double percentage = (double) (jobsSuccessful + jobsNotSuccessful) / jobsCount;
@@ -3343,11 +3347,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 float crashedPerc = jobsCrashed / (float) jobsCount;
                 float successfulPerc = jobsSuccessful / (float) jobsCount;
                 float runningPerc = jobsRunning / (float) jobsCount;
-                //float waitingPerc = jobsWaiting / (float) jobsCount;
+                float waitingPerc = jobsWaiting / (float) jobsCount;
                 int crashedPix = (int) Math.round(crashedPerc * width);
                 int successfulPix = (int) Math.round(successfulPerc * width);
                 int runningPix = (int) Math.round(runningPerc * width);
-                // int waitingPix = (int) (waitingPerc * width);
+                 int waitingPix = (int) Math.round(waitingPerc * width);
                 g.setColor(Util.COLOR_JOBBROWSER_ERROR);
                 g.fillRect(0, 0, crashedPix, lblETAProgress.getHeight());
                 g.setColor(Util.COLOR_JOBBROWSER_FINISHED);
@@ -3355,7 +3359,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 g.setColor(Util.COLOR_JOBBROWSER_RUNNING);
                 g.fillRect(crashedPix + successfulPix, 0, runningPix, lblETAProgress.getHeight());
                 g.setColor(Util.COLOR_JOBBROWSER_WAITING);
-                int waitingPix = width - (crashedPix + successfulPix + runningPix);
+               // int waitingPix = width - (crashedPix + successfulPix + runningPix);
                 if (waitingPix > 0) {
                     g.fillRect(crashedPix + successfulPix + runningPix, 0, waitingPix, lblETAProgress.getHeight());
                 }
