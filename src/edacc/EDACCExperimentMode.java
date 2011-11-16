@@ -3505,6 +3505,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         if (methodName.equals("loadExperiment")) {
             expController.unloadExperiment();
         }
+        e.printStackTrace();
         if (e instanceof TaskCancelledException) {
             javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         } else if (e instanceof SQLException) {

@@ -31,12 +31,12 @@ public class ExperimentResultDAO {
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idJob=?";
     protected static final String selectQuery = "SELECT SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance, "
             + "idJob, run, seed, status, resultTime, resultCode, "
-         //   + "solverExitCode, watcherExitCode, verifierExitCode, "
+            //   + "solverExitCode, watcherExitCode, verifierExitCode, "
             + "computeQueue, TIMESTAMPDIFF(SECOND, startTime, NOW()) AS runningTime, "
             + "IF(status = " + StatusCode.RUNNING.getStatusCode() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) AS date_modified,"
             + "priority, startTime, CPUTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast, computeNode, computeNodeIP, Client_idClient "
             + "FROM " + table + " ";
-           // + "LEFT JOIN ExperimentResultsOutput ON (idJob = ExperimentResults_idJob) ";
+    // + "LEFT JOIN ExperimentResultsOutput ON (idJob = ExperimentResults_idJob) ";
     protected static final String copyOutputQuery = "UPDATE ExperimentResultsOutput as dest, ExperimentResultsOutput as src "
             + "SET "
             + "dest.solverOutput = src.solverOutput, "
@@ -60,40 +60,132 @@ public class ExperimentResultDAO {
         return r;
     }
 
+    private static String getInsertQuery(int count) {
+        StringBuilder query = new StringBuilder("INSERT INTO " + table + " "
+                + "(SolverConfig_idSolverConfig, Experiment_idExperiment,"
+                + "Instances_idInstance, run, status, seed, "
+                + "startTime, priority, resultTime, computeQueue, resultCode, "
+                + "CPUTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, "
+                + "outputSizeLimitFirst, outputSizeLimitLast) "
+                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+
+        count--;
+        for (int i = 0; i < count; i++) {
+            query.append(",(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        }
+        return query.toString();
+    }
+
+    private static String getInsertOutputsQuery(int count) {
+        StringBuilder query = new StringBuilder("INSERT INTO " + outputTable + " "
+                + "(ExperimentResults_idJob, solverOutput, launcherOutput, "
+                + "watcherOutput, verifierOutput, solverExitCode, watcherExitCode, "
+                + "verifierExitCode) "
+                + "VALUES (?,?,?,?,?,?,?,?)");
+
+        count--;
+        for (int i = 0; i < count; i++) {
+            query.append(",(?,?,?,?,?,?,?,?)");
+        }
+        return query.toString();
+    }
+
+    private static String getDeleteQuery(int count) {
+        StringBuilder query = new StringBuilder("DELETE FROM ExperimentResults WHERE idJob IN (?");
+        count--;
+        for (int i = 0; i < count; i++) {
+            query.append(",?");
+        }
+        query.append(')');
+        return query.toString();
+    }
+
+    public static void batchSave(ArrayList<ExperimentResult> v) throws SQLException {
+        batchSave(v, null);
+    }
+
     /**
      * Saves the experiment results at once (batch).
      * @param v
      * @throws SQLException
      */
-    public static void batchSave(ArrayList<ExperimentResult> v) throws SQLException {
+    public static void batchSave(ArrayList<ExperimentResult> v, Tasks task) throws SQLException {
+        if (v.isEmpty()) {
+            return;
+        }
+        if (v.size() > 10000) {
+            boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
+            try {
+                DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+                ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
+                int jobsCreated = 0;
+                for (ExperimentResult ex : v) {
+                    res.add(ex);
+                    if (res.size() == 10000) {
+                        batchSave(res);
+                        jobsCreated += 10000;
+                        if (task != null) {
+                            task.setTaskProgress(jobsCreated / (float) v.size());
+                        }
+                        res.clear();
+                    }
+                    
+                }
+                if (!res.isEmpty()) {
+                    batchSave(res);
+                }
+                if (task != null) {
+                    task.setTaskProgress(0.f);
+                }
+            } catch (SQLException ex) {
+                if (autoCommit) {
+                    DatabaseConnector.getInstance().getConn().rollback();
+                }
+                throw ex;
+            } catch (Error ex) {
+                if (autoCommit) {
+                    DatabaseConnector.getInstance().getConn().rollback();
+                }
+                throw ex;
+            } catch (Throwable ex) {
+                if (autoCommit) {
+                    DatabaseConnector.getInstance().getConn().rollback();
+                }
+            } finally {
+                DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+            }
+            return ;
+        }
+
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         try {
+
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
-            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+            String query = getInsertQuery(v.size());
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+            int curCount = 1;
             curSt = st;
             for (ExperimentResult r : v) {
-                st.setInt(1, r.getSolverConfigId());
-                st.setInt(2, r.getExperimentId());
-                st.setInt(3, r.getInstanceId());
-                st.setInt(4, r.getRun());
-                st.setInt(5, r.getStatus().getStatusCode());
-                st.setInt(6, r.getSeed());
-                st.setTimestamp(7, r.getStartTime());
-                st.setInt(8, r.getPriority());
-                st.setFloat(9, r.getResultTime());
-                st.setInt(10, r.getComputeQueue());
-                st.setInt(11, r.getResultCode().getResultCode());
+                st.setInt(curCount++, r.getSolverConfigId());
+                st.setInt(curCount++, r.getExperimentId());
+                st.setInt(curCount++, r.getInstanceId());
+                st.setInt(curCount++, r.getRun());
+                st.setInt(curCount++, r.getStatus().getStatusCode());
+                st.setInt(curCount++, r.getSeed());
+                st.setTimestamp(curCount++, r.getStartTime());
+                st.setInt(curCount++, r.getPriority());
+                st.setFloat(curCount++, r.getResultTime());
+                st.setInt(curCount++, r.getComputeQueue());
+                st.setInt(curCount++, r.getResultCode().getResultCode());
 
-                st.setInt(12, r.getCPUTimeLimit());
-                st.setInt(13, r.getMemoryLimit());
-                st.setInt(14, r.getWallClockTimeLimit());
-                st.setInt(15, r.getStackSizeLimit());
-                st.setInt(16, r.getOutputSizeLimitFirst());
-                st.setInt(17, r.getOutputSizeLimitLast());
-
-                st.addBatch();
+                st.setInt(curCount++, r.getCPUTimeLimit());
+                st.setInt(curCount++, r.getMemoryLimit());
+                st.setInt(curCount++, r.getWallClockTimeLimit());
+                st.setInt(curCount++, r.getStackSizeLimit());
+                st.setInt(curCount++, r.getOutputSizeLimitFirst());
+                st.setInt(curCount++, r.getOutputSizeLimitLast());
             }
-            st.executeBatch();
+            st.executeUpdate();
             ResultSet rs = st.getGeneratedKeys();
             int i = 0;
             while (rs.next()) {
@@ -104,40 +196,51 @@ public class ExperimentResultDAO {
             rs.close();
             st.close();
 
-            st = DatabaseConnector.getInstance().getConn().prepareStatement(insertOutputsQuery);
+            query = getInsertOutputsQuery(v.size());
+            st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
             curSt = st;
+            curCount = 1;
             for (ExperimentResult r : v) {
-                st.setInt(1, r.getId());
+                st.setInt(curCount++, r.getId());
                 if (r instanceof ExperimentResultEx) {
                     ExperimentResultEx rx = (ExperimentResultEx) r;
-                    st.setBytes(2, rx.getSolverOutput());
-                    st.setBytes(3, rx.getLauncherOutput());
-                    st.setBytes(4, rx.getWatcherOutput());
-                    st.setBytes(5, rx.getVerifierOutput());
+                    st.setBytes(curCount++, rx.getSolverOutput());
+                    st.setBytes(curCount++, rx.getLauncherOutput());
+                    st.setBytes(curCount++, rx.getWatcherOutput());
+                    st.setBytes(curCount++, rx.getVerifierOutput());
                 } else {
-                    st.setNull(2, java.sql.Types.BLOB);
-                    st.setNull(3, java.sql.Types.BLOB);
-                    st.setNull(4, java.sql.Types.BLOB);
-                    st.setNull(5, java.sql.Types.BLOB);
+                    st.setNull(curCount++, java.sql.Types.BLOB);
+                    st.setNull(curCount++, java.sql.Types.BLOB);
+                    st.setNull(curCount++, java.sql.Types.BLOB);
+                    st.setNull(curCount++, java.sql.Types.BLOB);
                 }
-                st.setNull(6, java.sql.Types.INTEGER);
-                st.setNull(7, java.sql.Types.INTEGER);
-                st.setNull(8, java.sql.Types.INTEGER);
-                st.addBatch();
+                st.setNull(curCount++, java.sql.Types.INTEGER);
+                st.setNull(curCount++, java.sql.Types.INTEGER);
+                st.setNull(curCount++, java.sql.Types.INTEGER);
             }
-            st.executeBatch();
+            st.executeUpdate();
             st.close();
-        } catch (SQLException e) {
-            DatabaseConnector.getInstance().getConn().rollback();
-            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
-            throw e;
+        } catch (SQLException ex) {
+            if (autoCommit) {
+                DatabaseConnector.getInstance().getConn().rollback();
+            }
+            throw ex;
+        } catch (Error ex) {
+            if (autoCommit) {
+                DatabaseConnector.getInstance().getConn().rollback();
+            }
+            throw ex;
+        } catch (Throwable ex) {
+            if (autoCommit) {
+                DatabaseConnector.getInstance().getConn().rollback();
+            }
         } finally {
             curSt = null;
             DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
         }
 
     }
-    
+
     /*
      * Updates the CPUTimeLimit property of given list of jobs
      * @param v list of the jobs to update
@@ -304,20 +407,71 @@ public class ExperimentResultDAO {
         }
     }
 
+    public static void deleteExperimentResults(ArrayList<ExperimentResult> experimentResults) throws SQLException {
+        deleteExperimentResults(experimentResults, null);
+    }
+
     /**
      * Deletes all experiment results at once (batch).
      * @param experimentResults the experiment results to be deleted
      * @throws SQLException
      */
-    public static void deleteExperimentResults(ArrayList<ExperimentResult> experimentResults) throws SQLException {
+    public static void deleteExperimentResults(ArrayList<ExperimentResult> experimentResults, Tasks task) throws SQLException {
+        if (experimentResults.isEmpty()) {
+            return;
+        }
+        if (experimentResults.size() > 10000) {
+            boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
+            try {
+                ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
+                int deletedCount = 0;
+                for (ExperimentResult ex : experimentResults) {
+                    res.add(ex);
+                    if (res.size() == 10000) {
+                        deleteExperimentResults(res, task);
+                        deletedCount += 10000;
+                        if (task != null) {
+                            task.setTaskProgress(deletedCount / (float) experimentResults.size());
+                        }
+                        res.clear();
+                    }
+                }
+                if (!res.isEmpty()) {
+                    deleteExperimentResults(res);
+                }
+                if (task != null) {
+                    task.setTaskProgress(0.f);
+                }
+            } catch (SQLException e) {
+                if (autoCommit) {
+                    DatabaseConnector.getInstance().getConn().rollback();
+                }
+                throw e;
+            } catch (Error e) {
+                if (autoCommit) {
+                    DatabaseConnector.getInstance().getConn().rollback();
+                }
+                throw e;
+            } catch (Throwable e) {
+                if (autoCommit) {
+                    DatabaseConnector.getInstance().getConn().rollback();
+                }
+            } finally {
+                curSt = null;
+                DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+            }
+            return ;
+        }
+
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         try {
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
-            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
+            String query = getDeleteQuery(experimentResults.size());
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(query);
             curSt = st;
+            int curCount = 1;
             for (ExperimentResult r : experimentResults) {
-                st.setInt(1, r.getId());
-                st.addBatch();
+                st.setInt(curCount++, r.getId());
                 r.setDeleted();
                 /* this should only be done if the batch delete actually
                  * gets commited, right now this might not be the case
@@ -326,7 +480,7 @@ public class ExperimentResultDAO {
                  * Without caching this might not be a problem.
                  */
             }
-            st.executeBatch();
+            st.executeUpdate();
             st.close();
 
             // send message to clients to stop calculation of deleted jobs
@@ -351,8 +505,19 @@ public class ExperimentResultDAO {
             }
 
         } catch (SQLException e) {
-            DatabaseConnector.getInstance().getConn().rollback();
+            if (autoCommit) {
+                DatabaseConnector.getInstance().getConn().rollback();
+            }
             throw e;
+        } catch (Error e) {
+            if (autoCommit) {
+                DatabaseConnector.getInstance().getConn().rollback();
+            }
+            throw e;
+        } catch (Throwable e) {
+            if (autoCommit) {
+                DatabaseConnector.getInstance().getConn().rollback();
+            }
         } finally {
             curSt = null;
             DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
@@ -370,9 +535,9 @@ public class ExperimentResultDAO {
         r.setStatus(StatusCodeDAO.getByStatusCode(rs.getInt("status")));
         r.setResultTime(rs.getFloat("resultTime"));
         r.setResultCode(ResultCodeDAO.getByResultCode(rs.getInt("resultCode")));
-       // r.setSolverExitCode(rs.getInt("solverExitCode"));
-       // r.setWatcherExitCode(rs.getInt("watcherExitCode"));
-       // r.setVerifierExitCode(rs.getInt("verifierExitCode"));
+        // r.setSolverExitCode(rs.getInt("solverExitCode"));
+        // r.setWatcherExitCode(rs.getInt("watcherExitCode"));
+        // r.setVerifierExitCode(rs.getInt("verifierExitCode"));
         r.setComputeQueue(rs.getInt("computeQueue"));
         r.setPriority(rs.getInt("priority"));
         r.setStartTime(rs.getTimestamp("startTime"));
@@ -643,7 +808,8 @@ public class ExperimentResultDAO {
             }
             rs.close();
             ps.close();
-            totalNumberOfValuesLeftToBatch -= batchSize;;
+            totalNumberOfValuesLeftToBatch -= batchSize;
+            ;
         }
         return results;
     }
@@ -988,18 +1154,18 @@ public class ExperimentResultDAO {
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
         /*while (rs.next()) {
-            ExperimentResult er = getExperimentResultFromResultSet(rs);
-            ExperimentResultHasPropertyDAO.assign(er);
-            v.add(er);
-            er.setSaved();
+        ExperimentResult er = getExperimentResultFromResultSet(rs);
+        ExperimentResultHasPropertyDAO.assign(er);
+        v.add(er);
+        er.setSaved();
         }*/
-        while(rs.next()){
+        while (rs.next()) {
             ExperimentResult er = getExperimentResultFromResultSet(rs);
             er.setSaved();
             expResultsMap.put(er.getId(), er);
             v.add(er);
         }
-        ExperimentResultHasPropertyDAO.assign(expResultsMap ,v);
+        ExperimentResultHasPropertyDAO.assign(expResultsMap, v);
 
         rs.close();
         st.close();

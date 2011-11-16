@@ -680,7 +680,7 @@ public class ExperimentController {
                 task.addPropertyChangeListener(cancelExperimentResultDAOStatementListener);
                 try {
                     ExperimentResultDAO.setAutoCommit(false);
-                    ExperimentResultDAO.deleteExperimentResults(deleteJobs);
+                    ExperimentResultDAO.deleteExperimentResults(deleteJobs, task);
                     task.setStatus("Updating existing jobs..");
                     ExperimentResultDAO.batchUpdateRun(updateJobs);
                 } catch (Exception ex) {
@@ -776,7 +776,7 @@ public class ExperimentController {
         task.addPropertyChangeListener(cancelExperimentResultDAOStatementListener);
         task.setStatus("Saving changes to database..");
         try {
-            ExperimentResultDAO.batchSave(experiment_results);
+            ExperimentResultDAO.batchSave(experiment_results, task);
         } catch (SQLException ex) {
             if (ex.getMessage().contains("cancelled")) {
                 throw new TaskCancelledException();
