@@ -15,6 +15,8 @@ import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.InstanceClassAlreadyInDBException;
+import edacc.model.InstanceDuplicateMd5Exception;
+import edacc.model.InstanceDuplicateNameException;
 import edacc.model.InstanceNotInDBException;
 import edacc.model.Instance;
 import edacc.model.InstanceAlreadyInDBException;
@@ -116,6 +118,10 @@ public class ManageDBInstances implements Observer {
         }
     }
 
+    /**
+     * 
+     * @throws SQLException 
+     */
     public void loadInstanceClasses() throws SQLException {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getAllAsTreeFast();
         main.instanceClassTreeModel.setRoot(root);
@@ -128,8 +134,15 @@ public class ManageDBInstances implements Observer {
     }
 
     /**
-     * Will open a jFilechooser to select a file or directory to add all containing
-     * instance files into the "instance table" of the MangeDBMode.
+     * 
+     * @param input
+     * @param ret
+     * @param task
+     * @param fileExtension
+     * @param compress
+     * @param autoClass
+     * @throws InstanceException
+     * @throws TaskCancelledException 
      */
     public void addInstances(InstanceClass input, File ret, Tasks task, String fileExtension, Boolean compress, Boolean autoClass) throws InstanceException, TaskCancelledException {
         try {
@@ -148,7 +161,6 @@ public class ManageDBInstances implements Observer {
                 } else {
                     instances = buildInstancesGivenClass(instanceFiles, (InstanceClass) input, task, compress);
                 }
-
 
                 main.instanceTableModel.addNewInstances(instances);
                 updateInstanceClasses();
@@ -363,6 +375,14 @@ public class ManageDBInstances implements Observer {
 
         Vector<Instance> instances = new Vector<Instance>();
         String duplicatesDB = "";
+        
+        Vector<File> duplicateName = new Vector<File>();
+        Vector<String> duplicateNameMd5Value = new Vector<String>();
+        Vector<File> duplicateMd5 = new Vector<File>();
+        Vector<String> duplicateMd5Md5Value = new Vector<String>();
+        Vector<File> duplicateBoth = new Vector<File>();
+        Vector<String> duplicateBothMd5Value = new Vector<String>();
+        
         Vector<String> errorsDB = new Vector<String>();
         Vector<String> errorsAdd = new Vector<String>();
         StringBuilder instanceErrors = new StringBuilder("");
@@ -383,7 +403,15 @@ public class ManageDBInstances implements Observer {
                 instances.add(temp);
                 InstanceDAO.save(temp, compressBinary, instanceClass);
                 this.tmp.add(temp);
+            } catch (InstanceDuplicateNameException ex) {
+                duplicateName.add(instanceFiles.get(i));
+                duplicateNameMd5Value.add(md5);
+            } catch (InstanceDuplicateMd5Exception ex) {
+               duplicateMd5.add(instanceFiles.get(i));
+               duplicateMd5Md5Value.add(md5);
             } catch (InstanceAlreadyInDBException ex) {
+                duplicateBoth.add(instanceFiles.get(i));
+                duplicateBothMd5Value.add(md5);
                 errorsDB.add(instanceFiles.get(i).getAbsolutePath());
                 errorsDBInstances.add(md5);
             }
@@ -391,6 +419,9 @@ public class ManageDBInstances implements Observer {
             task.setStatus("Added " + i + " instances of " + instanceFiles.size());
         }
 
+        errorHandlerAddInstance(duplicateName, duplicateNameMd5Value, duplicateMd5, duplicateMd5Md5Value, duplicateBoth, duplicateBothMd5Value);
+        
+        /*
         setTmp(new Vector<Instance>());
         String instanceErrs = instanceErrors.toString();
         if (!errorsAdd.isEmpty()) {
@@ -414,7 +445,7 @@ public class ManageDBInstances implements Observer {
                     InstanceHasInstanceClassDAO.createInstanceHasInstance(InstanceDAO.getByMd5(errorsDBInstances.get(i)), instanceClass);
                 }
             }
-        }
+        }*/
 
         return instances;
     }
@@ -1139,5 +1170,18 @@ public class ManageDBInstances implements Observer {
         updateInstanceClasses();
         main.instanceTableModel.fireTableDataChanged();
         Tasks.getTaskView().setCancelable(false);
+    }
+
+    /**
+     * 
+     * @param duplicateName
+     * @param duplicateNameMd5Value
+     * @param duplicateMd5
+     * @param duplicateMd5Md5Value
+     * @param duplicateBoth
+     * @param duplicateBothMd5Value 
+     */
+    private void errorHandlerAddInstance(Vector<File> duplicateName, Vector<String> duplicateNameMd5Value, Vector<File> duplicateMd5, Vector<String> duplicateMd5Md5Value, Vector<File> duplicateBoth, Vector<String> duplicateBothMd5Value) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

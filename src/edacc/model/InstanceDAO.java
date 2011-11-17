@@ -73,15 +73,14 @@ public class InstanceDAO {
      * @throws InstanceAlreadyInDBException
      */
     public static Instance createInstance(File file, String name, String md5) throws SQLException, FileNotFoundException,
-            InstanceAlreadyInDBException {
+            InstanceAlreadyInDBException, InstanceDuplicateNameException, InstanceDuplicateMd5Exception {
         PreparedStatement ps;
-        final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ?";
+        final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ? or name = ?";
         ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
         ps.setString(1, md5);
+        ps.setString(2, name);
         ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            throw new InstanceAlreadyInDBException();
-        }
+        alreadyInDB(rs, file, name, md5);
         Instance i = new Instance();
         i.setFile(file);
         i.setName(name);
@@ -557,8 +556,34 @@ public class InstanceDAO {
                 "SELECT idInstance FROM " + table + " WHERE md5=?");
         ps.setString(1, md5);
         ResultSet rs = ps.executeQuery();
-        if(rs.next())
+        if (rs.next()) {
             return getById(rs.getInt(1));
-        return null;        
+        }
+        return null;
+    }
+
+    /**
+     *  Throws an exception, depending on the state of equality of the instances.
+     * @param rs ResultSet with the duplicate entries.
+     * @param file Instance file of the new created instance.
+     * @param name Name of the new created instance.
+     * @param md5 MD5 sum of the new created instance.   
+     * @throws SQLException
+     * @throws InstanceAlreadyInDBException
+     * @throws InstanceDuplicateNameException
+     * @throws InstanceDuplicateMd5Exception 
+     */
+    private static void alreadyInDB(ResultSet rs, File file, String name, String md5) throws SQLException, InstanceAlreadyInDBException, InstanceDuplicateNameException, InstanceDuplicateMd5Exception {
+        while (rs.next()) {
+        }
+        Instance duplicate = getById(instanceId);
+
+        if (duplicate.getName().equals(name) && duplicate.getMd5().equals(md5)) {
+            throw new InstanceAlreadyInDBException();
+        } else if (duplicate.getName().equals(name)) {
+            throw new InstanceDuplicateNameException();
+        } else if (duplicate.getMd5().equals(md5)) {
+            throw new InstanceDuplicateMd5Exception();
+        }
     }
 }
