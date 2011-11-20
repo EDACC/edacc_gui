@@ -17,7 +17,6 @@ import java.util.Iterator;
 public class ClientDAO {
 
     protected static final String table = "Client";
-    protected static final String selectQuery = "SELECT * FROM Clients";
     protected static final String updateQuery = "UPDATE " + table + " SET message =? WHERE idClient=?";
     private static final ObjectCache<Client> cache = new ObjectCache<Client>();
 
@@ -63,7 +62,7 @@ public class ClientDAO {
         }
 
         if (!idsModified.isEmpty()) {
-            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idClient, message, jobs_wait_time, current_wait_time, TIMESTAMPDIFF(SECOND, lastReport, NOW()) > 20 AS dead FROM " + table + " WHERE idClient IN " + getIntArray(idsModified));
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idClient, message, jobs_wait_time, current_wait_time, TIMESTAMPDIFF(SECOND, lastReport, NOW()) > 20 AS dead, IF(walltime=0,0,TIMESTAMPDIFF(SECOND,NOW(),TIMESTAMPADD(SECOND,walltime,startTimestamp))) AS timeleft FROM " + table + " WHERE idClient IN " + getIntArray(idsModified));
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 Client c = cache.getCached(rs.getInt("idClient"));
@@ -71,13 +70,14 @@ public class ClientDAO {
                 c.setDead(rs.getBoolean("dead"));
                 c.setWait_time(rs.getInt("jobs_wait_time"));
                 c.setCurrent_wait_time(rs.getInt("current_wait_time"));
+                c.setTimeleft(rs.getInt("timeleft"));
             }
             rs.close();
             st.close();
         }
 
         if (!clientIds.isEmpty()) {
-            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idClient, numCores, numThreads, hyperthreading, turboboost, CPUName, cacheSize, cpuflags, memory, memoryFree, cpuinfo, meminfo, message, gridQueue_idgridQueue, lastReport, TIMESTAMPDIFF(SECOND, lastReport, NOW()) > 20 AS dead, jobs_wait_time, current_wait_time FROM " + table + " WHERE idClient IN " + getIntArray(clientIds));
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idClient, numCores, numThreads, hyperthreading, turboboost, CPUName, cacheSize, cpuflags, memory, memoryFree, cpuinfo, meminfo, message, gridQueue_idgridQueue, lastReport, TIMESTAMPDIFF(SECOND, lastReport, NOW()) > 20 AS dead, IF(walltime=0,0,TIMESTAMPDIFF(SECOND,NOW(),TIMESTAMPADD(SECOND,walltime,startTimestamp))) AS timeleft, jobs_wait_time, current_wait_time FROM " + table + " WHERE idClient IN " + getIntArray(clientIds));
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 Client c = new Client(rs);
