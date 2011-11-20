@@ -252,12 +252,6 @@ public class PropertyComputationController implements Runnable {
                     Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
                     Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (PropertyNotInDBException ex) {
-                    Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (PropertyTypeNotExistException ex) {
-                    Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ComputationMethodDoesNotExistException ex) {
-                    Logger.getLogger(PropertyComputationController.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (InstanceHasPropertyNotInDBException ex) {
                     try {
                         instancePropertyQueue.add(InstanceHasPropertyDAO.createInstanceHasInstanceProperty(instances.get(i), givenProperties.get(j)));

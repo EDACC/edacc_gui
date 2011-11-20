@@ -33,7 +33,7 @@ public class SolverConfigurationEntryModel {
         this.listeners.remove(listener);
     }
 
-    public void insert(SolverConfigurationEntry entry, Solver solver, int index) {
+    public synchronized void insert(SolverConfigurationEntry entry, Solver solver, int index) {
         LinkedList<SolverConfigurationEntry> list = mapSolverEntryList.get(solver);
         if (list == null) {
             list = new LinkedList<SolverConfigurationEntry>();
@@ -43,11 +43,11 @@ public class SolverConfigurationEntryModel {
         size++;
     }
 
-    public SolverConfigurationEntry getEntry(Solver solver, int index) {
+    public synchronized SolverConfigurationEntry getEntry(Solver solver, int index) {
         return mapSolverEntryList.get(solver).get(index);
     }
 
-    public void add(SolverConfigurationEntry entry) {
+    public synchronized void add(SolverConfigurationEntry entry) {
         LinkedList<SolverConfigurationEntry> list = mapSolverEntryList.get(entry.getSolver());
         if (list == null) {
             list = new LinkedList<SolverConfigurationEntry>();
@@ -69,17 +69,17 @@ public class SolverConfigurationEntryModel {
         }
     }
 
-    public int getSize() {
+    public synchronized int getSize() {
         return size;
     }
 
-    public List<Solver> getSolvers() {
+    public synchronized List<Solver> getSolvers() {
         LinkedList<Solver> solvers = new LinkedList<Solver>();
         solvers.addAll(mapSolverEntryList.keySet());
         return solvers;
     }
 
-    public int getSize(Solver solver) {
+    public synchronized int getSize(Solver solver) {
         List<SolverConfigurationEntry> list = mapSolverEntryList.get(solver);
         return list == null ? 0 : list.size();
     }
@@ -95,18 +95,18 @@ public class SolverConfigurationEntryModel {
         return false;
     }
 
-    public boolean solverExists(Solver o) {
+    public synchronized boolean solverExists(Solver o) {
         return mapSolverEntryList.get(o) != null;
     }
 
-    public void removeSolver(Solver o) {
+    public synchronized void removeSolver(Solver o) {
         if (solverExists(o)) {
             size -= mapSolverEntryList.get(o).size();
             mapSolverEntryList.remove(o);
         }
     }
 
-    public void removeSolverConfigurationEntry(SolverConfigurationEntry entry) {
+    public synchronized void removeSolverConfigurationEntry(SolverConfigurationEntry entry) {
         List<SolverConfigurationEntry> tmp = mapSolverEntryList.get(entry.getSolver());
         if (tmp != null) {
             if (tmp.contains(entry)) {
@@ -119,12 +119,12 @@ public class SolverConfigurationEntryModel {
         }
     }
 
-    public void clear() {
+    public synchronized void clear() {
         mapSolverEntryList.clear();
         size = 0;
     }
 
-    public int getSolverIndex(SolverConfigurationEntry entry) {
+    public synchronized int getSolverIndex(SolverConfigurationEntry entry) {
         List<SolverConfigurationEntry> tmp = mapSolverEntryList.get(entry.getSolver());
         if (tmp == null) {
             return -1;
@@ -132,7 +132,7 @@ public class SolverConfigurationEntryModel {
         return tmp.indexOf(entry);
     }
 
-    public List<SolverConfigurationEntry> getEntries(Solver solver) {
+    public synchronized List<SolverConfigurationEntry> getEntries(Solver solver) {
         List<SolverConfigurationEntry> entries = new LinkedList<SolverConfigurationEntry>();
         List<SolverConfigurationEntry> tmp = mapSolverEntryList.get(solver);
         if (tmp != null) {
@@ -146,7 +146,7 @@ public class SolverConfigurationEntryModel {
      * <b>Note:</b> Here a modified solver configuration doesn't mean a new/deleted solver configuration.
      * @return ArrayList of all modified solver configurations
      */
-    public ArrayList<SolverConfiguration> getModifiedSolverConfigurations() {
+    public synchronized ArrayList<SolverConfiguration> getModifiedSolverConfigurations() {
         ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
         for (Solver s : getSolvers()) {
             for (SolverConfigurationEntry entry : getEntries(s)) {
@@ -158,7 +158,7 @@ public class SolverConfigurationEntryModel {
         return res;
     }
 
-    public Object getValueAt(Pair<Solver, Integer> p, int col) {
+    public synchronized Object getValueAt(Pair<Solver, Integer> p, int col) {
         SolverConfigurationEntry entry = getEntry(p.getFirst(), p.getSecond());
         switch (col) {
             case 0:

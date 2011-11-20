@@ -43,11 +43,21 @@ public class Util {
     public static final Color COLOR_JOBBROWSER_ERROR = COLOR_ERROR;
     public static final Color COLOR_JOBBROWSER_RUNNING = Color.orange;
     public static final Color COLOR_JOBBROWSER_FINISHED = COLOR_GREEN;
+    
+    /**
+     * Calls <code>updateTableColumnWidth(table, 5000)</code>.
+     * @param table 
+     */
+    public static void updateTableColumnWidth(JTable table) {
+        updateTableColumnWidth(table, 5000);
+    }
+    
     /**
      * Updates the width of each column according to the table size and the data in the cells.
      * @param table
+     * @param maxRows maximum number of rows to be taken in considerations.
      */
-    public static void updateTableColumnWidth(JTable table) {
+    public static void updateTableColumnWidth(JTable table, int maxRows) {
         int tableWidth = table.getWidth();
         if (table.getAutoResizeMode() == JTable.AUTO_RESIZE_OFF) {
             tableWidth = Integer.MAX_VALUE;
@@ -84,7 +94,7 @@ public class Util {
                 }
                 minwidth[col] = width[col];
                 minwidthsum += width[col];
-                for (int row = 0; row < Math.min(10000, table.getRowCount()); row++) {
+                for (int row = 0; row < Math.min(maxRows, table.getRowCount()); row++) {
                     // get the component which represents the value and determine its witdth
                     int len = table.getCellRenderer(row, col).getTableCellRendererComponent(table, table.getValueAt(row, col), false, true, row, col).getPreferredSize().width;
                     if (len > width[col]) {

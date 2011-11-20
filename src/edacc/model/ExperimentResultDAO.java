@@ -129,7 +129,7 @@ public class ExperimentResultDAO {
                         }
                         res.clear();
                     }
-                    
+
                 }
                 if (!res.isEmpty()) {
                     batchSave(res);
@@ -154,7 +154,7 @@ public class ExperimentResultDAO {
             } finally {
                 DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
             }
-            return ;
+            return;
         }
 
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
@@ -460,7 +460,7 @@ public class ExperimentResultDAO {
                 curSt = null;
                 DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
             }
-            return ;
+            return;
         }
 
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
@@ -582,7 +582,12 @@ public class ExperimentResultDAO {
         st.close();
         return res;
     }
+    private static final int CONST_MAXSELECTROWCOUNT = 100000;
 
+    public static ArrayList<ExperimentResult> getAllModifiedByExperimentId(int id, Timestamp modified) throws SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
+        return getAllModifiedByExperimentId(id, modified, null);
+    }
+    
     /**
      * Returns all experiment results which were modified after the modified timestamp for a given experiment id
      * @param id the experiment id for the experiment results
@@ -594,12 +599,53 @@ public class ExperimentResultDAO {
      * @throws PropertyNotInDBException
      * @throws PropertyTypeNotExistException
      */
-    public static ArrayList<ExperimentResult> getAllModifiedByExperimentId(int id, Timestamp modified) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
+    public static ArrayList<ExperimentResult> getAllModifiedByExperimentId(int id, Timestamp modified, Tasks task) throws SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
+        ArrayList<ExperimentResult> results = new ArrayList<ExperimentResult>();
+        boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
+        try {
+            int lastCount = 0;
+            do {
+                ArrayList<ExperimentResult> tmp = getAllModifiedByExperimentId(id, modified, results.size());
+                lastCount = tmp.size();
+                results.addAll(tmp);
+                if (task != null) {
+                    task.setStatus("Loading experiment results (" + results.size() + ")..");
+                }
+            } while (lastCount == CONST_MAXSELECTROWCOUNT);
+        } catch (SQLException ex) {
+            if (autoCommit) {
+                DatabaseConnector.getInstance().getConn().rollback();
+            }
+            throw ex;
+        } catch (IOException ex) {
+            if (autoCommit) {
+                DatabaseConnector.getInstance().getConn().rollback();
+            }
+            throw ex;
+        } catch (Error err) {
+            if (autoCommit) {
+                DatabaseConnector.getInstance().getConn().rollback();
+            }
+            throw err;
+        } catch (Throwable t) {
+            if (autoCommit) {
+                DatabaseConnector.getInstance().getConn().rollback();
+            }
+            t.printStackTrace();
+        } finally {
+            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+        }
+        if (task != null) {
+            task.setStatus("Experiment results loaded.");
+        }
+        return results;
+    }
 
+    private static ArrayList<ExperimentResult> getAllModifiedByExperimentId(int id, Timestamp modified, int offset) throws SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         ArrayList<ExperimentResult> v = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery
-                + "WHERE Experiment_idExperiment=? AND IF(status = " + StatusCode.RUNNING.getStatusCode() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) >= ?;");
+                + "WHERE Experiment_idExperiment=? AND IF(status = " + StatusCode.RUNNING.getStatusCode() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) >= ? LIMIT " + offset + "," + CONST_MAXSELECTROWCOUNT);
         st.setInt(1, id);
         st.setTimestamp(2, modified);
         curSt = st;

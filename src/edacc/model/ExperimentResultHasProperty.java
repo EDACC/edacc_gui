@@ -52,23 +52,9 @@ public class ExperimentResultHasProperty extends BaseModel implements IntegerPKM
                 Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
                 Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ExperimentResultNotInDBException ex) {
-                Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (PropertyTypeNotExistException ex) {
-                Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (PropertyNotInDBException ex) {
-                Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ComputationMethodDoesNotExistException ex) {
-                Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ExpResultHasSolvPropertyNotInDBException ex) {
-                Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (StatusCodeNotInDBException ex) {
-                Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ResultCodeNotInDBException ex) {
-                Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            } 
         }
         return expResult;
     }
@@ -87,15 +73,9 @@ public class ExperimentResultHasProperty extends BaseModel implements IntegerPKM
             Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (PropertyNotInDBException ex) {
-            Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (PropertyTypeNotExistException ex) {
-            Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ComputationMethodDoesNotExistException ex) {
-            Logger.getLogger(ExperimentResultHasProperty.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
         return solvProperty;
     }
 

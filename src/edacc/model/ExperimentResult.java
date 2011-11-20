@@ -35,7 +35,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
     private int outputSizeLimitLast;
     private String computeNode;
     private String computeNodeIP;
-    private transient HashMap<Integer, ExperimentResultHasProperty> propertyValues;
+    private transient HashMap<Integer, ExperimentResultHasProperty> propertyValues = null;
     private Timestamp datemodified;
     private Integer idClient;
 
@@ -241,6 +241,9 @@ public class ExperimentResult extends BaseModel implements Serializable {
     }
 
     public HashMap<Integer, ExperimentResultHasProperty> getPropertyValues() {
+        if (propertyValues == null) {
+            propertyValues = new HashMap<Integer, ExperimentResultHasProperty>();
+        }
         return propertyValues;
     }
 

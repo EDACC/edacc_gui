@@ -2090,18 +2090,19 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                             @Override
                             public void run(Tasks task) {
                                 try {
-                                    expController.loadJobs();
+                                    expController.loadJobs(task);
+                                    tableJobs.scrollRectToVisible(rect);
+                                    SwingUtilities.invokeLater(new Runnable() {
+
+                                        @Override
+                                        public void run() {
+                                            EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
+                                        }
+                                    });
                                 } catch (Throwable e) {
                                     EDACCExperimentMode.this.onTaskFailed("loadJobs", e);
                                 }
-                                tableJobs.scrollRectToVisible(rect);
-                                SwingUtilities.invokeLater(new Runnable() {
 
-                                    @Override
-                                    public void run() {
-                                        EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
-                                    }
-                                });
 
                             }
                         });
@@ -2175,15 +2176,21 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
                         @Override
                         public void run() {
-                            expController.loadJobs();
+                            expController.loadJobs(null);
                             if (!Tasks.isTaskRunning()) {
                                 Tasks.startTask(new TaskRunnable() {
 
                                     @Override
                                     public void run(Tasks task) {
                                         try {
-                                            expController.loadJobs();
-                                            EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
+                                            expController.loadJobs(null);
+                                            SwingUtilities.invokeLater(new Runnable() {
+
+                                                @Override
+                                                public void run() {
+                                                    EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
+                                                }
+                                            });
                                         } catch (Throwable ex) {
                                             EDACCExperimentMode.this.onTaskFailed("loadJobs", ex);
                                         }
@@ -2226,7 +2233,24 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         compute.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         compute.setVisible(true);
         resultBrowserETA = null;
-        Tasks.startTask("loadJobs", expController, this, false);
+        Tasks.startTask(new TaskRunnable() {
+
+            @Override
+            public void run(Tasks task) {
+                try {
+                    expController.loadJobs(task);
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
+                        }
+                    });
+                } catch (Throwable ex) {
+                    EDACCExperimentMode.this.onTaskFailed("loadJobs", ex);
+                }
+            }
+        });
     }//GEN-LAST:event_btnComputeResultPropertiesActionPerformed
 
     private void jTreeInstanceClassValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTreeInstanceClassValueChanged
@@ -2734,7 +2758,24 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     private void btnRefreshJobsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshJobsActionPerformed
         resultBrowserETA = null;
-        Tasks.startTask("loadJobs", expController, this, false);
+        Tasks.startTask(new TaskRunnable() {
+
+            @Override
+            public void run(Tasks task) {
+                try {
+                    expController.loadJobs(task);
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
+                        }
+                    });
+                } catch (Throwable ex) {
+                    EDACCExperimentMode.this.onTaskFailed("loadJobs", ex);
+                }
+            }
+        });
     }//GEN-LAST:event_btnRefreshJobsActionPerformed
 
     private void btnBrowserColumnSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBrowserColumnSelectionActionPerformed
@@ -3276,10 +3317,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         final int jobsCrashed = jobsCount - (jobsSuccessful + jobsWaiting + jobsRunning);
         //jobsTableModel.getJobsCount(StatusCode.LAUNCHERCRASH)
-          //      + jobsTableModel.getJobsCount(StatusCode.SOLVERCRASH)
-            //    + jobsTableModel.getJobsCount(StatusCode.VERIFIERCRASH)
-              //  + jobsTableModel.getJobsCount(StatusCode.WATCHERCRASH)
-                //+ jobsTableModel.getJobsCount(StatusCode.TERMINATED);
+        //      + jobsTableModel.getJobsCount(StatusCode.SOLVERCRASH)
+        //    + jobsTableModel.getJobsCount(StatusCode.VERIFIERCRASH)
+        //  + jobsTableModel.getJobsCount(StatusCode.WATCHERCRASH)
+        //+ jobsTableModel.getJobsCount(StatusCode.TERMINATED);
 
         int jobsNotSuccessful = jobsCount - jobsSuccessful - jobsWaiting - jobsRunning;
         double percentage = (double) (jobsSuccessful + jobsNotSuccessful) / jobsCount;
@@ -3343,7 +3384,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 int crashedPix = (int) Math.round(crashedPerc * width);
                 int successfulPix = (int) Math.round(successfulPerc * width);
                 int runningPix = (int) Math.round(runningPerc * width);
-                 int waitingPix = (int) Math.round(waitingPerc * width);
+                int waitingPix = (int) Math.round(waitingPerc * width);
                 g.setColor(Util.COLOR_JOBBROWSER_ERROR);
                 g.fillRect(0, 0, crashedPix, lblETA.getHeight());
                 g.setColor(Util.COLOR_JOBBROWSER_FINISHED);
@@ -3351,7 +3392,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 g.setColor(Util.COLOR_JOBBROWSER_RUNNING);
                 g.fillRect(crashedPix + successfulPix, 0, runningPix, lblETA.getHeight());
                 g.setColor(Util.COLOR_JOBBROWSER_WAITING);
-               // int waitingPix = width - (crashedPix + successfulPix + runningPix);
+                // int waitingPix = width - (crashedPix + successfulPix + runningPix);
                 if (waitingPix > 0) {
                     g.fillRect(crashedPix + successfulPix + runningPix, 0, waitingPix, lblETA.getHeight());
                 }

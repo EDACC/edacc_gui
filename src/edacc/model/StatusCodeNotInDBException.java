@@ -1,9 +1,11 @@
 package edacc.model;
 
+import java.sql.SQLException;
+
 /**
  *
  * @author simon
  */
-public class StatusCodeNotInDBException extends Exception {
+public class StatusCodeNotInDBException extends SQLException {
 
 }

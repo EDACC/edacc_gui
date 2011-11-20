@@ -225,12 +225,6 @@ public class ManagePropertyController {
             Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (PropertyTypeDoesNotExistException ex) {
             Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (PropertyNotInDBException ex) {
-            Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (PropertyTypeNotExistException ex) {
-            Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ComputationMethodDoesNotExistException ex) {
-            Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
     }
 }

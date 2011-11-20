@@ -51,10 +51,6 @@ public class ComputePropertiesController {
             Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (PropertyNotInDBException ex) {
-            Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (PropertyTypeNotExistException ex) {
-            Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(ComputePropertiesController.class.getName()).log(Level.SEVERE, null, ex);
         }

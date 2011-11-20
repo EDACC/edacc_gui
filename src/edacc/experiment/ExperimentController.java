@@ -223,7 +223,7 @@ public class ExperimentController {
             task.addPropertyChangeListener(cancelExperimentResultDAOStatementListener);
         }
         try {
-            experimentResultCache.updateExperimentResults();
+            experimentResultCache.updateExperimentResults(task);
         } catch (MySQLStatementCancelledException ex) {
             throw new TaskCancelledException();
         } finally {
@@ -238,7 +238,7 @@ public class ExperimentController {
 
             @Override
             public void run() {
-                Util.updateTableColumnWidth(main.tblGenerateJobs);
+                Util.updateTableColumnWidth(main.tblGenerateJobs, 1);
             }
         });
         if (activeExperiment.isConfigurationExp()) {
@@ -487,7 +487,7 @@ public class ExperimentController {
 
             @Override
             public void run() {
-                Util.updateTableColumnWidth(main.tblGenerateJobs);
+                Util.updateTableColumnWidth(main.tblGenerateJobs, 1);
             }
         });
     }
@@ -569,7 +569,7 @@ public class ExperimentController {
 
             @Override
             public void run() {
-                Util.updateTableColumnWidth(main.tblGenerateJobs);
+                Util.updateTableColumnWidth(main.tblGenerateJobs, 1);
             }
         });
     }
@@ -790,7 +790,7 @@ public class ExperimentController {
 
             @Override
             public void run() {
-                Util.updateTableColumnWidth(main.tblGenerateJobs);
+                Util.updateTableColumnWidth(main.tblGenerateJobs, 1);
             }
         });
         return experiments_added;
@@ -812,12 +812,12 @@ public class ExperimentController {
     /**
      * Updates the job browser table
      */
-    public synchronized void loadJobs() {
+    public synchronized void loadJobs(Tasks task) {
         try {
             boolean autocommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
             try {
-                experimentResultCache.updateExperimentResults();
+                experimentResultCache.updateExperimentResults(task);
                 // TODO: also update solver config cache if needed and cache parameter instances of solver configs
                 //       maybe this should be done in experimentResultCache?
 
@@ -841,7 +841,7 @@ public class ExperimentController {
                             if (tmp == null) {
                                 results = null;
                                 break;
-                            } else if (!er.getDatemodified().equals(tmp.getDatemodified())) {
+                            } else if (!er.getStatus().equals(tmp.getStatus()) || !er.getDatemodified().equals(tmp.getDatemodified())) {
                                 results.set(i, tmp);
                                 changedRows.add(i);
                             }
@@ -1374,7 +1374,7 @@ public class ExperimentController {
             }
         }
         ExperimentResultDAO.batchUpdatePriority(values);
-        this.loadJobs();
+        this.loadJobs(null);
     }
 
     /**
@@ -1393,7 +1393,7 @@ public class ExperimentController {
             }
         }
         ExperimentResultDAO.batchUpdateStatus(updatedJobs, status);
-        this.loadJobs();
+        this.loadJobs(null);
     }
 
     /**
