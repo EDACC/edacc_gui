@@ -5,18 +5,19 @@
  */
 package edacc;
 
-import edacc.events.TaskEvents;
 import edacc.experiment.ExperimentController;
 import edacc.experiment.ExperimentResultsBrowserTableModel;
 import edacc.model.ExperimentResult;
+import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
 import java.sql.SQLException;
+import javax.swing.SwingUtilities;
 
 /**
  *
  * @author simon
  */
-public class EDACCOutputViewer extends javax.swing.JDialog implements TaskEvents {
+public class EDACCOutputViewer extends javax.swing.JDialog {
 
     /** Creates new form EDACCOutputViewer */
     private ExperimentController expController;
@@ -92,7 +93,7 @@ public class EDACCOutputViewer extends javax.swing.JDialog implements TaskEvents
         txtContent.setText(text);
     }
 
-    public void updateContent(int column, ExperimentResult expResult) {
+    public void updateContent(int column, final ExperimentResult expResult) {
         String title = "Output Viewer - ";
         int ot = -1;
         if (column == ExperimentResultsBrowserTableModel.COL_SOLVER_OUTPUT) {
@@ -109,31 +110,45 @@ public class EDACCOutputViewer extends javax.swing.JDialog implements TaskEvents
             title += "launcher output";
         }
         setTitle(title);
+        final int f_ot = ot;
         if (ot != -1) {
-            Tasks.startTask("getExperimentResultOutput", new Class[]{int.class, ExperimentResult.class}, new Object[]{ot, expResult}, expController, this);
-        }
-    }
+            Tasks.startTask(new TaskRunnable() {
 
-    @Override
-    public void onTaskSuccessful(String methodName, Object result) {
-        if (methodName.equals("getExperimentResultOutput")) {
-            setContent((String) result);
-        }
-    }
+                @Override
+                public void run(Tasks task) {
+                    SwingUtilities.invokeLater(new Runnable() {
 
-    @Override
-    public void onTaskStart(String methodName) {
-        if (methodName.equals("getExperimentResultOutput")) {
-            setContent("Loading..");
-        }
-    }
+                        @Override
+                        public void run() {
+                            setContent("Loading..");
+                        }
+                        
+                    });
+                    try {
+                        final String result = expController.getExperimentResultOutput(f_ot, expResult);
+                        SwingUtilities.invokeLater(new Runnable() {
 
-    @Override
-    public void onTaskFailed(String methodName, Throwable e) {
-        if (e instanceof SQLException) {
-            javax.swing.JOptionPane.showMessageDialog(null, "There was an error while communicating with the database: " + e, "Connection error", javax.swing.JOptionPane.ERROR_MESSAGE);
-        } else {
-            javax.swing.JOptionPane.showMessageDialog(null, "" + e, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                            @Override
+                            public void run() {
+                                setContent(result);
+                            }
+                            
+                        });
+                    } catch (final SQLException ex) {
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                javax.swing.JOptionPane.showMessageDialog(null, "There was an error while communicating with the database: " + ex, "Connection error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                            }
+                            
+                        });
+                    } catch (final Exception ex) {
+                        javax.swing.JOptionPane.showMessageDialog(null, "" + ex, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+                
+            });
         }
     }
 }

@@ -83,30 +83,6 @@ public class Tasks extends org.jdesktop.application.Task<Void, Void> {
         startTask(methodName, signature, parameters, target, view, true);
     }
 
-    /**
-     * Starts a task for a method without any parameters.
-     * If there is currently a task running this methode does nothing.
-     * @param methodName
-     * @param target
-     * @param view
-     * @deprecated use <code>startTask(TaskRunnable runnable)</code> instead
-     */
-    public static void startTask(String methodName, Object target, TaskEvents view) {
-        startTask(methodName, target, view, true);
-    }
-
-    /**
-     *
-     * @param methodName
-     * @param target
-     * @param view
-     * @param withTaskView
-     * @deprecated use <code>startTask(TaskRunnable runnable, boolean withTaskView)</code> instead
-     */
-    public static void startTask(String methodName, Object target, TaskEvents view, boolean withTaskView) {
-        startTask(methodName, new Class[]{}, new Object[]{}, target, view, withTaskView);
-    }
-
     public static void startTask(TaskRunnable runnable) {
         startTask(runnable, true);
     }
