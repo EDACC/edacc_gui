@@ -63,6 +63,10 @@ public class ManageDBSolvers implements Observer {
         DatabaseConnector.getInstance().addObserver(this);
     }
 
+    public Solver getCurrentSolver() {
+        return currentSolver;
+    }
+
     /**
      * Loads all solvers from the DB and adds it to the Solver table.
      * @throws NoConnectionToDBException
