@@ -80,7 +80,7 @@ public class ManageDBSolvers implements Observer {
      */
     public boolean applySolver(String name, String description, String author, String version) {
         if (currentSolver != null) {
-            if (currentSolver.getName().equals(name)
+            if (currentSolver.getName() != null && currentSolver.getName().equals(name)
                     && currentSolver.getDescription().equals(description)
                     && currentSolver.getAuthors().equals(author)
                     && currentSolver.getVersion().equals(version))
