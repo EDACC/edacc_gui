@@ -62,6 +62,12 @@ public class ManageDBParameters implements Observer {
         parameterTableModel.addParameter(p);
     }
 
+    public Parameter addParameter(Solver s) {
+        Parameter p = new Parameter();
+        parameterTableModel.addParameter(s, p);
+        return p;
+    }
+
     public void setCurrentSolver(Solver currentSolver) {
         parameterTableModel.setCurrentSolver(currentSolver);      
     }
