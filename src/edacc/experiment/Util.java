@@ -281,6 +281,45 @@ public class Util {
         }
         return res;
     }
+    
+    /**
+     * Returns true if the number in field is greater or equal the given number. 
+     * Also changes the fields layout to give the user a feedback which values aren't valid.
+     * @param field the text field
+     * @param number the number
+     * @return true, iff the value in the field is valid
+     */
+    public static boolean verifyNumber_geq(JTextField field, Long number) {
+        boolean res;
+        try {
+            res = Long.parseLong(field.getText()) >= number;
+        } catch (Exception ex) {
+            res = false;
+        }
+        JTextField tmp = new JTextField();
+        Border defaultBorder = tmp.getBorder();
+        if (!res) {
+            // Mark as error
+
+            // default thickness
+            int thickness = 1;
+            if (tmp.getBorder() instanceof LineBorder) {
+                // if the look and feel uses some line border then get the thickness from it
+                thickness = ((LineBorder) tmp.getBorder()).getThickness();
+            }
+            // red line border with the hopefully same thickness as the old border
+            Border errorBorder = BorderFactory.createLineBorder(new Color(255, 0, 0), thickness);
+            // this is a hack: create a border inside the red border so that the distance from text to our new border seems to be the same as with the original border
+            Border insideBorder = BorderFactory.createLineBorder(new Color(255, 238, 238), tmp.getBorder().getBorderInsets(tmp).left - thickness); // light red, color of the JTextField Background
+            field.setBackground(new Color(255, 238, 238));
+            field.setBorder(BorderFactory.createCompoundBorder(errorBorder, insideBorder));
+        } else {
+            // this is easier .. set the default border from look&feel
+            field.setBackground(UIManager.getColor("TextField.background"));
+            field.setBorder(defaultBorder);
+        }
+        return res;
+    }
 
     /**
      * Replaces all illegal characters by '_' of filename and returns the result.

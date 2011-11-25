@@ -72,23 +72,21 @@ public class ExperimentResultsBrowserTableModel extends ThreadSafeDefaultTableMo
     public static final int COL_MEMORYLIMIT = 17;
     /** The index of the stack size limit column */
     public static final int COL_STACKSIZELIMIT = 18;
-    /** The index of the output size limit column */
-    public static final int COL_OUTPUTSIZELIMIT = 19;
     /** The index of the solver output column */
-    public static final int COL_SOLVER_OUTPUT = 20;
+    public static final int COL_SOLVER_OUTPUT = 19;
     /** The index of the launcher output column */
-    public static final int COL_LAUNCHER_OUTPUT = 21;
+    public static final int COL_LAUNCHER_OUTPUT = 20;
     /** The index of the watcher output column */
-    public static final int COL_WATCHER_OUTPUT = 22;
+    public static final int COL_WATCHER_OUTPUT = 21;
     /** The index of the verifier output column */
-    public static final int COL_VERIFIER_OUTPUT = 23;
+    public static final int COL_VERIFIER_OUTPUT = 22;
     /** The index of the first property column */
-    public static final int COL_PROPERTY = 24;
+    public static final int COL_PROPERTY = 23;
     private ArrayList<ExperimentResult> jobs;
     // the constant columns
-    private String[] CONST_COLUMNS = {"ID", "Priority", "Compute Queue", "Compute Node", "Compute Node IP", "Solver", "Solver Configuration", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Run time", "Result Code", "CPU Time Limit", "Wall Clock Time Limit", "Memory Limit", "Stack Size Limit", "Output Size Limit", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
+    private String[] CONST_COLUMNS = {"ID", "Priority", "Compute Queue", "Compute Node", "Compute Node IP", "Solver", "Solver Configuration", "Parameters", "Instance", "Run", "Time", "Seed", "Status", "Run time", "Result Code", "CPU Time Limit", "Wall Clock Time Limit", "Memory Limit", "Stack Size Limit", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
     /** the default visibility of each column */
-    public static boolean[] DEFAULT_VISIBILITY = {false, false, true, false, false, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false};
+    public static boolean[] DEFAULT_VISIBILITY = {false, false, true, false, false, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false};
     private String[] columns;
     private ArrayList<Property> properties;
     private HashMap<Integer, GridQueue> gridQueues;
@@ -362,12 +360,6 @@ public class ExperimentResultsBrowserTableModel extends ThreadSafeDefaultTableMo
                 return j.getMemoryLimit();
             case COL_STACKSIZELIMIT:
                 return j.getStackSizeLimit();
-            case COL_OUTPUTSIZELIMIT:
-                if (j.getOutputSizeLimitFirst() == -1 || j.getOutputSizeLimitLast() == -1) {
-                    return "none";
-                } else {
-                    return "Preserve first " + j.getOutputSizeLimitFirst() + " MB and last " + j.getOutputSizeLimitLast() + " MB";
-                }
             case COL_SOLVER_OUTPUT:
                 return "view";
             case COL_LAUNCHER_OUTPUT:

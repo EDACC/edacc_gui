@@ -11,6 +11,9 @@ public class Experiment extends BaseModel implements IntegerPKModel {
     private int priority;
     private boolean configurationExp;
     private boolean active;
+    private Integer solverOutputPreserveFirst, solverOutputPreserveLast;
+    private Integer watcherOutputPreserveFirst, watcherOutputPreserveLast;
+    private Integer verifierOutputPreserveFirst, verifierOutputPreserveLast;
 
     @Override
     public int hashCode() {
@@ -102,6 +105,72 @@ public class Experiment extends BaseModel implements IntegerPKModel {
 
     public void setPriority(int priority) {
         this.priority = priority;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public Integer getSolverOutputPreserveFirst() {
+        return solverOutputPreserveFirst;
+    }
+
+    public void setSolverOutputPreserveFirst(Integer solverOutputSizePreserveFirst) {
+        this.solverOutputPreserveFirst = solverOutputSizePreserveFirst;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public Integer getSolverOutputPreserveLast() {
+        return solverOutputPreserveLast;
+    }
+
+    public void setSolverOutputPreserveLast(Integer solverOutputPreserveLast) {
+        this.solverOutputPreserveLast = solverOutputPreserveLast;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public Integer getVerifierOutputPreserveFirst() {
+        return verifierOutputPreserveFirst;
+    }
+
+    public void setVerifierOutputPreserveFirst(Integer verifierOutputPreserveFirst) {
+        this.verifierOutputPreserveFirst = verifierOutputPreserveFirst;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public Integer getVerifierOutputPreserveLast() {
+        return verifierOutputPreserveLast;
+    }
+
+    public void setVerifierOutputPreserveLast(Integer verifierOutputPreserveLast) {
+        this.verifierOutputPreserveLast = verifierOutputPreserveLast;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public Integer getWatcherOutputPreserveFirst() {
+        return watcherOutputPreserveFirst;
+    }
+
+    public void setWatcherOutputPreserveFirst(Integer watcherOutputPreserveFirst) {
+        this.watcherOutputPreserveFirst = watcherOutputPreserveFirst;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public Integer getWatcherOutputPreserveLast() {
+        return watcherOutputPreserveLast;
+    }
+
+    public void setWatcherOutputPreserveLast(Integer watcherOutputPreserveLast) {
+        this.watcherOutputPreserveLast = watcherOutputPreserveLast;
         if (this.isSaved()) {
             this.setModified();
         }

@@ -10,8 +10,8 @@ public class ExperimentResultEx extends ExperimentResult {
 
     private byte[] watcherOutput, launcherOutput, verifierOutput, solverOutput;
     
-    protected ExperimentResultEx(int run, int priority, int computeQueue, StatusCode status, ResultCode resultCode, int seed, float resultTime, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimitFirst, int outputSizeLimitLast, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
-        super(run, priority, computeQueue, status, seed, resultCode, resultTime, SolverConfigId, ExperimentId, InstanceId, startTime, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast);
+    protected ExperimentResultEx(int run, int priority, int computeQueue, StatusCode status, ResultCode resultCode, int seed, float resultTime, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
+        super(run, priority, computeQueue, status, seed, resultCode, resultTime, SolverConfigId, ExperimentId, InstanceId, startTime, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit);
         this.solverOutput = solverOutput;
         this.launcherOutput = launcherOutput;
         this.watcherOutput = watcherOutput;

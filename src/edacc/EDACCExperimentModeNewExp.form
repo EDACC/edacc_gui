@@ -35,26 +35,62 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="lblExperimentDescription" alignment="1" max="32767" attributes="1"/>
-                          <Component id="lblExperimentName" alignment="0" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="81" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jScrollPane1" pref="282" max="32767" attributes="2"/>
-                          <Component id="txtExperimentName" alignment="0" pref="282" max="32767" attributes="2"/>
-                      </Group>
-                  </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="btnCancel" min="-2" pref="89" max="-2" attributes="1"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnCreateExperiment" min="-2" pref="89" max="-2" attributes="1"/>
                   </Group>
+                  <Component id="lblWatcherOutputPreserveLast" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="chkConfigurationExp" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblWatcherOutputPreserveFirst" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblSolverOutputPreserveLast" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblSolverOutputPreserveFirst" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel10" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblExperimentName" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblExperimentDescription" alignment="0" min="-2" max="-2" attributes="1"/>
+                          <Component id="lblVerifierOutputPreserveFirst" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblVerifierOutputPreserveLast" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="jScrollPane1" pref="510" max="32767" attributes="2"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="chkLimitWatcherOutput" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="lblLimitWatcherOutputIn" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="comboWatcherOutputUnit" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="chkLimitVerifierOutput" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="lblLimitVerifierOutputIn" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="comboVerifierOutputUnit" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="chkConfigurationExp" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="txtWatcherOutputPreserveLast" alignment="0" pref="510" max="32767" attributes="0"/>
+                          <Component id="txtWatcherOutputPreserveFirst" alignment="0" pref="510" max="32767" attributes="0"/>
+                          <Component id="txtSolverOutputPreserveLast" alignment="1" pref="510" max="32767" attributes="0"/>
+                          <Component id="txtSolverOutputPreserveFirst" alignment="0" pref="510" max="32767" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="chkLimitSolverOutput" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="lblLimitSolverOutputIn" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="comboSolverOutputUnit" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="txtExperimentName" alignment="1" pref="510" max="32767" attributes="2"/>
+                          <Component id="txtVerifierOutputPreserveFirst" alignment="1" pref="510" max="32767" attributes="0"/>
+                          <Component id="txtVerifierOutputPreserveLast" alignment="1" pref="510" max="32767" attributes="0"/>
+                      </Group>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -69,10 +105,73 @@
                   <Component id="lblExperimentName" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txtExperimentName" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jScrollPane1" pref="193" max="32767" attributes="0"/>
                   <Component id="lblExperimentDescription" min="-2" max="-2" attributes="0"/>
-                  <Component id="jScrollPane1" pref="184" max="32767" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="chkLimitSolverOutput" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                      <Component id="lblLimitSolverOutputIn" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="comboSolverOutputUnit" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lblSolverOutputPreserveFirst" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtSolverOutputPreserveFirst" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="txtSolverOutputPreserveLast" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblSolverOutputPreserveLast" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkLimitWatcherOutput" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                      <Component id="lblLimitWatcherOutputIn" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="comboWatcherOutputUnit" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="txtWatcherOutputPreserveFirst" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblWatcherOutputPreserveFirst" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lblWatcherOutputPreserveLast" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtWatcherOutputPreserveLast" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkLimitVerifierOutput" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                      <Component id="lblLimitVerifierOutputIn" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="comboVerifierOutputUnit" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="txtVerifierOutputPreserveFirst" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblVerifierOutputPreserveFirst" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="txtVerifierOutputPreserveLast" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblVerifierOutputPreserveLast" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="2" attributes="0">
@@ -166,6 +265,174 @@
       <Properties>
         <Property name="text" type="java.lang.String" resourceKey="jLabel1.text"/>
         <Property name="name" type="java.lang.String" value="jLabel1" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="chkLimitVerifierOutput">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="chkLimitVerifierOutput.text"/>
+        <Property name="name" type="java.lang.String" value="chkLimitVerifierOutput" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkLimitVerifierOutputActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtVerifierOutputPreserveLast">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="txtVerifierOutputPreserveLast.text"/>
+        <Property name="name" type="java.lang.String" value="txtVerifierOutputPreserveLast" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtVerifierOutputPreserveFirst">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="txtVerifierOutputPreserveFirst.text"/>
+        <Property name="name" type="java.lang.String" value="txtVerifierOutputPreserveFirst" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblVerifierOutputPreserveLast">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lblVerifierOutputPreserveLast.text"/>
+        <Property name="name" type="java.lang.String" value="lblVerifierOutputPreserveLast" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblVerifierOutputPreserveFirst">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lblVerifierOutputPreserveFirst.text"/>
+        <Property name="name" type="java.lang.String" value="lblVerifierOutputPreserveFirst" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel4">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="jLabel4.text"/>
+        <Property name="name" type="java.lang.String" value="jLabel4" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblWatcherOutputPreserveLast">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lblWatcherOutputPreserveLast.text"/>
+        <Property name="name" type="java.lang.String" value="lblWatcherOutputPreserveLast" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtWatcherOutputPreserveLast">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="txtWatcherOutputPreserveLast.text"/>
+        <Property name="name" type="java.lang.String" value="txtWatcherOutputPreserveLast" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtWatcherOutputPreserveFirst">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="txtWatcherOutputPreserveFirst.text"/>
+        <Property name="name" type="java.lang.String" value="txtWatcherOutputPreserveFirst" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblWatcherOutputPreserveFirst">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lblWatcherOutputPreserveFirst.text"/>
+        <Property name="name" type="java.lang.String" value="lblWatcherOutputPreserveFirst" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel7">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="jLabel7.text"/>
+        <Property name="name" type="java.lang.String" value="jLabel7" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="chkLimitWatcherOutput">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="chkLimitWatcherOutput.text"/>
+        <Property name="name" type="java.lang.String" value="chkLimitWatcherOutput" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkLimitWatcherOutputActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblSolverOutputPreserveLast">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lblSolverOutputPreserveLast.text"/>
+        <Property name="name" type="java.lang.String" value="lblSolverOutputPreserveLast" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtSolverOutputPreserveLast">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="txtSolverOutputPreserveLast.text"/>
+        <Property name="name" type="java.lang.String" value="txtSolverOutputPreserveLast" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblSolverOutputPreserveFirst">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lblSolverOutputPreserveFirst.text"/>
+        <Property name="name" type="java.lang.String" value="lblSolverOutputPreserveFirst" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtSolverOutputPreserveFirst">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="txtSolverOutputPreserveFirst.text"/>
+        <Property name="name" type="java.lang.String" value="txtSolverOutputPreserveFirst" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="chkLimitSolverOutput">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="chkLimitSolverOutput.text"/>
+        <Property name="name" type="java.lang.String" value="chkLimitSolverOutput" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkLimitSolverOutputActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel10">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="jLabel10.text"/>
+        <Property name="name" type="java.lang.String" value="jLabel10" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblLimitSolverOutputIn">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lblLimitSolverOutputIn.text"/>
+        <Property name="name" type="java.lang.String" value="lblLimitSolverOutputIn" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="comboSolverOutputUnit">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="2">
+            <StringItem index="0" value="lines"/>
+            <StringItem index="1" value="bytes"/>
+          </StringArray>
+        </Property>
+        <Property name="name" type="java.lang.String" value="comboSolverOutputUnit" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblLimitWatcherOutputIn">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lblLimitWatcherOutputIn.text"/>
+        <Property name="name" type="java.lang.String" value="lblLimitWatcherOutputIn" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="comboWatcherOutputUnit">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="2">
+            <StringItem index="0" value="lines"/>
+            <StringItem index="1" value="bytes"/>
+          </StringArray>
+        </Property>
+        <Property name="name" type="java.lang.String" value="comboWatcherOutputUnit" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblLimitVerifierOutputIn">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lblLimitVerifierOutputIn.text"/>
+        <Property name="name" type="java.lang.String" value="lblLimitVerifierOutputIn" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="comboVerifierOutputUnit">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="2">
+            <StringItem index="0" value="lines"/>
+            <StringItem index="1" value="bytes"/>
+          </StringArray>
+        </Property>
+        <Property name="name" type="java.lang.String" value="comboVerifierOutputUnit" noResource="true"/>
       </Properties>
     </Component>
   </SubComponents>

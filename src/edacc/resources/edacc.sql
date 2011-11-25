@@ -127,6 +127,12 @@ CREATE  TABLE IF NOT EXISTS `Experiment` (
   `priority` INT NULL ,
   `active` TINYINT(1)  NOT NULL ,
   `countUnprocessedJobs` INT NOT NULL DEFAULT 0 ,
+  `solverOutputPreserveFirst` INT NULL ,
+  `solverOutputPreserveLast` INT NULL ,
+  `watcherOutputPreserveFirst` INT NULL ,
+  `watcherOutputPreserveLast` INT NULL ,
+  `verifierOutputPreserveFirst` INT NULL ,
+  `verifierOutputPreserveLast` INT NULL ,
   PRIMARY KEY (`idExperiment`) )
 ENGINE = InnoDB;
 

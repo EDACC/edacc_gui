@@ -12,8 +12,14 @@ import java.util.ArrayList;
 public class ExperimentDAO {
 
     protected static final String table = "Experiment";
-    protected static final String insertQuery = "INSERT INTO " + table + " (Name, Date, description, configurationExp, priority, active) VALUES (?, ?, ?, ?, ?, ?)";
-    protected static final String updateQuery = "UPDATE " + table + " SET Name =?, Date =?, description =?, configurationExp =?, priority =?, active=? WHERE idExperiment=?";
+    protected static final String insertQuery = "INSERT INTO " + table + " (Name, Date, description, configurationExp, "
+            + "priority, active, solverOutputPreserveFirst, solverOutputPreserveLast, watcherOutputPreserveFirst, "
+            + "watcherOutputPreserveLast, verifierOutputPreserveFirst, verifierOutputPreserveLast) "
+            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+    protected static final String updateQuery = "UPDATE " + table + " SET Name =?, Date =?, description =?, "
+            + "configurationExp =?, priority =?, active=?,solverOutputPreserveFirst=?,solverOutputPreserveLast=?,"
+            + "watcherOutputPreserveFirst=?,watcherOutputPreserveLast=?,verifierOutputPreserveFirst=?,"
+            + "verifierOutputPreserveLast=? WHERE idExperiment=?";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idExperiment=?";
     private static final ObjectCache<Experiment> cache = new ObjectCache<Experiment>();
 
@@ -22,7 +28,7 @@ public class ExperimentDAO {
      * so it can be referenced by related objects
      * @return new Experiment object
      */
-    public static Experiment createExperiment(String name, Date date, String description, boolean configurationExp) throws SQLException {
+    public static Experiment createExperiment(String name, Date date, String description, boolean configurationExp, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast) throws SQLException {
         if (getExperimentByName(name) != null) {
             throw new SQLException("There exists already an experiment with the same name.");
         }
@@ -33,6 +39,12 @@ public class ExperimentDAO {
         i.setActive(true);
         i.setConfigurationExp(configurationExp);
         i.setPriority(0);
+        i.setSolverOutputPreserveFirst(solverOutputPreserveFirst);
+        i.setSolverOutputPreserveLast(solverOutputPreserveLast);
+        i.setWatcherOutputPreserveFirst(watcherOutputPreserveFirst);
+        i.setWatcherOutputPreserveLast(watcherOutputPreserveLast);
+        i.setVerifierOutputPreserveFirst(verifierOutputPreserveFirst);
+        i.setVerifierOutputPreserveLast(verifierOutputPreserveLast);
         save(i);
         cache.cache(i);
         return i;
@@ -73,7 +85,7 @@ public class ExperimentDAO {
             st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
         } else if (experiment.isModified()) {
             st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
-            st.setInt(7, experiment.getId());
+            st.setInt(13, experiment.getId());
         } else {
             return;
         }
@@ -83,6 +95,27 @@ public class ExperimentDAO {
         st.setBoolean(4, experiment.isConfigurationExp());
         st.setInt(5, experiment.getPriority());
         st.setBoolean(6, experiment.isActive());
+        if (experiment.getSolverOutputPreserveFirst() == null) {
+            st.setNull(7, java.sql.Types.INTEGER);
+            st.setNull(8, java.sql.Types.INTEGER);
+        } else {
+            st.setInt(7, experiment.getSolverOutputPreserveFirst());
+            st.setInt(8, experiment.getSolverOutputPreserveLast());
+        }
+        if (experiment.getWatcherOutputPreserveFirst() == null) {
+            st.setNull(9, java.sql.Types.INTEGER);
+            st.setNull(10, java.sql.Types.INTEGER);            
+        } else {
+            st.setInt(9, experiment.getWatcherOutputPreserveFirst());
+            st.setInt(10, experiment.getWatcherOutputPreserveLast());
+        }
+        if (experiment.getVerifierOutputPreserveFirst() == null) {
+            st.setNull(11, java.sql.Types.INTEGER);
+            st.setNull(12, java.sql.Types.INTEGER);  
+        } else {
+            st.setInt(11, experiment.getVerifierOutputPreserveFirst());
+            st.setInt(12, experiment.getVerifierOutputPreserveLast());
+        }
         st.executeUpdate();
 
         if (experiment.isNew()) {
@@ -120,6 +153,30 @@ public class ExperimentDAO {
         i.setConfigurationExp(rs.getBoolean("configurationExp"));
         i.setPriority(rs.getInt("priority"));
         i.setActive(rs.getBoolean("active"));
+        i.setSolverOutputPreserveFirst(rs.getInt("solverOutputPreserveFirst"));
+        if (rs.wasNull()) {
+            i.setSolverOutputPreserveFirst(null);
+        }
+        i.setSolverOutputPreserveLast(rs.getInt("solverOutputPreserveLast"));
+        if (rs.wasNull()) {
+            i.setSolverOutputPreserveLast(null);
+        }
+        i.setWatcherOutputPreserveFirst(rs.getInt("watcherOutputPreserveFirst"));
+        if (rs.wasNull()) {
+            i.setWatcherOutputPreserveFirst(null);
+        }
+        i.setWatcherOutputPreserveLast(rs.getInt("watcherOutputPreserveLast"));
+        if (rs.wasNull()) {
+            i.setWatcherOutputPreserveLast(null);
+        }
+        i.setVerifierOutputPreserveFirst(rs.getInt("verifierOutputPreserveFirst"));
+        if (rs.wasNull()) {
+            i.setVerifierOutputPreserveFirst(null);
+        }
+        i.setVerifierOutputPreserveLast(rs.getInt("verifierOutputPreserveLast"));
+        if (rs.wasNull()) {
+            i.setVerifierOutputPreserveLast(null);
+        }
         return i;
     }
 
@@ -231,10 +288,10 @@ public class ExperimentDAO {
     public static void clearCache() {
         cache.clear();
     }
-    
+
     public static ArrayList<StatusCount> getJobCountForExperiment(Experiment exp) throws SQLException, StatusCodeNotInDBException {
         final String query = "SELECT status, COUNT(idJob) FROM ExperimentResults WHERE Experiment_idExperiment = ? GROUP BY status";
-                PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ps.setInt(1, exp.getId());
         ResultSet rs = ps.executeQuery();
         ArrayList<StatusCount> res = new ArrayList<StatusCount>();
@@ -245,9 +302,9 @@ public class ExperimentDAO {
         ps.close();
         return res;
     }
-    
+
     public static Pair<Integer, Boolean> getPriorityActiveByExperiment(Experiment exp) throws SQLException {
-        Pair<Integer, Boolean> p = new Pair<Integer, Boolean>(0,false);
+        Pair<Integer, Boolean> p = new Pair<Integer, Boolean>(0, false);
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT priority, active FROM " + table + " WHERE idExperiment = ?");
         ps.setInt(1, exp.getId());
@@ -266,11 +323,12 @@ public class ExperimentDAO {
             return new Pair<Integer, Boolean>(priority, active);
         }
     }
-    
+
     public static class StatusCount {
+
         StatusCode statusCode;
         Integer count;
-        
+
         public StatusCount(StatusCode statusCode, Integer count) {
             this.statusCode = statusCode;
             this.count = count;

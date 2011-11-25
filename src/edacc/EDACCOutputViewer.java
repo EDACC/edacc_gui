@@ -21,6 +21,7 @@ public class EDACCOutputViewer extends javax.swing.JDialog {
 
     /** Creates new form EDACCOutputViewer */
     private ExperimentController expController;
+
     public EDACCOutputViewer(java.awt.Frame parent, boolean modal, ExperimentController expController) {
         super(parent, modal);
         initComponents();
@@ -99,16 +100,16 @@ public class EDACCOutputViewer extends javax.swing.JDialog {
         if (column == ExperimentResultsBrowserTableModel.COL_SOLVER_OUTPUT) {
             ot = ExperimentResult.SOLVER_OUTPUT;
             title += "solver output";
-            } else if (column == ExperimentResultsBrowserTableModel.COL_VERIFIER_OUTPUT) {
+        } else if (column == ExperimentResultsBrowserTableModel.COL_VERIFIER_OUTPUT) {
             ot = ExperimentResult.VERIFIER_OUTPUT;
             title += "verifier output";
-            } else if (column == ExperimentResultsBrowserTableModel.COL_WATCHER_OUTPUT) {
+        } else if (column == ExperimentResultsBrowserTableModel.COL_WATCHER_OUTPUT) {
             ot = ExperimentResult.WATCHER_OUTPUT;
             title += "watcher output";
-            } else if (column == ExperimentResultsBrowserTableModel.COL_LAUNCHER_OUTPUT) {
+        } else if (column == ExperimentResultsBrowserTableModel.COL_LAUNCHER_OUTPUT) {
             ot = ExperimentResult.LAUNCHER_OUTPUT;
             title += "launcher output";
-        }
+        } 
         setTitle(title);
         final int f_ot = ot;
         if (ot != -1) {
@@ -122,7 +123,6 @@ public class EDACCOutputViewer extends javax.swing.JDialog {
                         public void run() {
                             setContent("Loading..");
                         }
-                        
                     });
                     try {
                         final String result = expController.getExperimentResultOutput(f_ot, expResult);
@@ -132,7 +132,6 @@ public class EDACCOutputViewer extends javax.swing.JDialog {
                             public void run() {
                                 setContent(result);
                             }
-                            
                         });
                     } catch (final SQLException ex) {
                         SwingUtilities.invokeLater(new Runnable() {
@@ -141,13 +140,11 @@ public class EDACCOutputViewer extends javax.swing.JDialog {
                             public void run() {
                                 javax.swing.JOptionPane.showMessageDialog(null, "There was an error while communicating with the database: " + ex, "Connection error", javax.swing.JOptionPane.ERROR_MESSAGE);
                             }
-                            
                         });
                     } catch (final Exception ex) {
                         javax.swing.JOptionPane.showMessageDialog(null, "" + ex, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
                     }
                 }
-                
             });
         }
     }

@@ -31,8 +31,6 @@ public class ExperimentResult extends BaseModel implements Serializable {
     private int memoryLimit;
     private int wallClockTimeLimit;
     private int stackSizeLimit;
-    private int outputSizeLimitFirst;
-    private int outputSizeLimitLast;
     private String computeNode;
     private String computeNodeIP;
     private transient HashMap<Integer, ExperimentResultHasProperty> propertyValues = null;
@@ -42,7 +40,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
     protected ExperimentResult() {
     }
 
-    protected ExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float resultTime, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimitFirst, int outputSizeLimitLast) {
+    protected ExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float resultTime, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit) {
         this.run = run;
         this.priority = priority;
         this.computeQueue = computeQueue;
@@ -58,8 +56,6 @@ public class ExperimentResult extends BaseModel implements Serializable {
         this.memoryLimit = memoryLimit;
         this.wallClockTimeLimit = wallClockTimeLimit;
         this.stackSizeLimit = stackSizeLimit;
-        this.outputSizeLimitFirst = outputSizeLimitFirst;
-        this.outputSizeLimitLast = outputSizeLimitLast;
     }
 
     @Override
@@ -287,28 +283,6 @@ public class ExperimentResult extends BaseModel implements Serializable {
 
     public void setMemoryLimit(int memoryLimit) {
         this.memoryLimit = memoryLimit;
-        if (this.isSaved()) {
-            this.setModified();
-        }
-    }
-
-    public int getOutputSizeLimitFirst() {
-        return outputSizeLimitFirst;
-    }
-
-    public void setOutputSizeLimitFirst(int outputSizeLimitFirst) {
-        this.outputSizeLimitFirst = outputSizeLimitFirst;
-        if (this.isSaved()) {
-            this.setModified();
-        }
-    }
-
-    public int getOutputSizeLimitLast() {
-        return outputSizeLimitLast;
-    }
-
-    public void setOutputSizeLimitLast(int outputSizeLimitLast) {
-        this.outputSizeLimitLast = outputSizeLimitLast;
         if (this.isSaved()) {
             this.setModified();
         }

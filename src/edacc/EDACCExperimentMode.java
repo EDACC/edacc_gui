@@ -2536,7 +2536,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     public void run(Tasks task) {
                         Experiment newExp;
                         try {
-                            newExp = expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc, dialogNewExp.isConfigurationExp);
+                            newExp = expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc, 
+                                    dialogNewExp.isConfigurationExp, dialogNewExp.solverOutputPreserveFirst, 
+                                    dialogNewExp.solverOutputPreserveLast, dialogNewExp.watcherOutputPreserveFirst, 
+                                    dialogNewExp.watcherOutputPreserveLast, dialogNewExp.verifierOutputPreserveFirst, 
+                                    dialogNewExp.verifierOutputPreserveLast);
                             if (experimentUpdateThread != null) {
                                 experimentUpdateThread.cancel(true);
                             }
@@ -2722,14 +2726,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         try {
             HashMap<String, Integer> limits = expController.getMaxLimits();
-            EDACCExperimentModeGenerateJobs dialog = new EDACCExperimentModeGenerateJobs(EDACCApp.getApplication().getMainFrame(), true, limits.get("cpuTimeLimit"), limits.get("memoryLimit"), limits.get("wallClockTimeLimit"), limits.get("stackSizeLimit"), limits.get("outputSizeLimitFirst"), limits.get("outputSizeLimitLast"));
+            EDACCExperimentModeGenerateJobs dialog = new EDACCExperimentModeGenerateJobs(EDACCApp.getApplication().getMainFrame(), true, limits.get("cpuTimeLimit"), limits.get("memoryLimit"), limits.get("wallClockTimeLimit"), limits.get("stackSizeLimit"));
             dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
             dialog.setVisible(true);
             if (!dialog.isCancelled()) {
-                Tasks.startTask("generateJobs", new Class[]{edacc.model.Tasks.class, int.class, int.class, int.class, int.class, int.class, int.class, int.class
+                Tasks.startTask("generateJobs", new Class[]{edacc.model.Tasks.class, int.class, int.class, int.class, int.class, int.class
                         },
                         new Object[]{
-                            null, dialog.getCpuTimeLimit(), dialog.getMemoryLimit(), dialog.getWallClockTimeLimit(), dialog.getStackSizeLimit(), dialog.getOutputSizeLimitFirst(), dialog.getOutputSizeLimitLast(), dialog.getMaxSeed()
+                            null, dialog.getCpuTimeLimit(), dialog.getMemoryLimit(), dialog.getWallClockTimeLimit(), dialog.getStackSizeLimit(), dialog.getMaxSeed()
                         }, expController,
                         this);
             } else {
@@ -2887,7 +2891,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
 
         Experiment exp = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
-        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription(), exp.isConfigurationExp());
+        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription(), exp.isConfigurationExp(), exp.getSolverOutputPreserveFirst(), exp.getSolverOutputPreserveLast(), exp.getWatcherOutputPreserveFirst(), exp.getWatcherOutputPreserveLast(), exp.getVerifierOutputPreserveFirst(), exp.getVerifierOutputPreserveLast());
         dialogEditExp.setLocationRelativeTo(mainFrame);
         try {
             while (true) {
@@ -2906,13 +2910,31 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             if (!dialogEditExp.canceled) {
                 String oldName = exp.getName();
                 String oldDescr = exp.getDescription();
+                Integer oldSOPF = exp.getSolverOutputPreserveFirst();
+                Integer oldSOPL = exp.getSolverOutputPreserveLast();
+                Integer oldWOPF = exp.getWatcherOutputPreserveFirst();
+                Integer oldWOPL = exp.getWatcherOutputPreserveLast();
+                Integer oldVOPF = exp.getVerifierOutputPreserveFirst();
+                Integer oldVOPL = exp.getVerifierOutputPreserveLast();
                 exp.setName(dialogEditExp.expName);
                 exp.setDescription(dialogEditExp.expDesc);
+                exp.setSolverOutputPreserveFirst(dialogEditExp.solverOutputPreserveFirst);
+                exp.setSolverOutputPreserveLast(dialogEditExp.solverOutputPreserveLast);
+                exp.setVerifierOutputPreserveFirst(dialogEditExp.verifierOutputPreserveFirst);
+                exp.setVerifierOutputPreserveLast(dialogEditExp.verifierOutputPreserveLast);
+                exp.setWatcherOutputPreserveFirst(dialogEditExp.watcherOutputPreserveFirst);
+                exp.setWatcherOutputPreserveLast(dialogEditExp.watcherOutputPreserveLast);
                 try {
                     expController.saveExperiment(exp);
                 } catch (SQLException ex) {
                     exp.setName(oldName);
                     exp.setDescription(oldDescr);
+                    exp.setSolverOutputPreserveFirst(oldSOPF);
+                    exp.setSolverOutputPreserveLast(oldSOPL);
+                    exp.setWatcherOutputPreserveFirst(oldWOPF);
+                    exp.setWatcherOutputPreserveLast(oldWOPL);
+                    exp.setVerifierOutputPreserveFirst(oldVOPF);
+                    exp.setVerifierOutputPreserveLast(oldVOPL);
                     createDatabaseErrorMessage(ex);
                 }
                 for (int i = 0; i < expTableModel.getRowCount(); i++) {

@@ -310,9 +310,9 @@ public class ExperimentController {
      * @throws PropertyTypeNotExistException
      * @throws ComputationMethodDoesNotExistException 
      */
-    public Experiment createExperiment(String name, String description, boolean configurationExp) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
+    public Experiment createExperiment(String name, String description, boolean configurationExp, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         java.util.Date d = new java.util.Date();
-        Experiment res = ExperimentDAO.createExperiment(name, new Date(d.getTime()), description, configurationExp);
+        Experiment res = ExperimentDAO.createExperiment(name, new Date(d.getTime()), description, configurationExp, solverOutputPreserveFirst, solverOutputPreserveLast, watcherOutputPreserveFirst, watcherOutputPreserveLast, verifierOutputPreserveFirst, verifierOutputPreserveLast);
         initialize();
         return res;
     }
@@ -607,7 +607,7 @@ public class ExperimentController {
      * @throws StatusCodeNotInDBException
      * @throws ResultCodeNotInDBException 
      */
-    public synchronized int generateJobs(final Tasks task, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimitFirst, int outputSizeLimitLast, int maxSeed) throws SQLException, TaskCancelledException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
+    public synchronized int generateJobs(final Tasks task, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int maxSeed) throws SQLException, TaskCancelledException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         PropertyChangeListener cancelExperimentResultDAOStatementListener = new PropertyChangeListener() {
 
             @Override
@@ -756,14 +756,14 @@ public class ExperimentController {
                         if (solverConfigHasSeed.get(c.getId())) {
                             Integer seed = linked_seeds.get(new SeedGroup(c.getSeed_group(), i.getId(), run));
                             if (seed != null) {
-                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, seed.intValue(), ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast));
+                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, seed.intValue(), ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit));
                             } else {
                                 Integer new_seed = new Integer(generateSeed(maxSeed));
                                 linked_seeds.put(new SeedGroup(c.getSeed_group(), i.getId(), run), new_seed);
-                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, new_seed.intValue(), ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast));
+                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, new_seed.intValue(), ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit));
                             }
                         } else {
-                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, 0, ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast));
+                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, 0, ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit));
                         }
                         experiments_added++;
                     }
@@ -1446,8 +1446,6 @@ public class ExperimentController {
         int memoryLimit = -1;
         int wallClockTimeLimit = -1;
         int stackSizeLimit = -1;
-        int outputSizeLimitLast = -1;
-        int outputSizeLimitFirst = -1;
 
         experimentResultCache.updateExperimentResults();
         for (ExperimentResult er : experimentResultCache.values()) {
@@ -1463,20 +1461,12 @@ public class ExperimentController {
             if (er.getStackSizeLimit() > stackSizeLimit) {
                 stackSizeLimit = er.getStackSizeLimit();
             }
-            if (er.getOutputSizeLimitFirst() > outputSizeLimitFirst) {
-                outputSizeLimitFirst = er.getOutputSizeLimitFirst();
-            }
-            if (er.getOutputSizeLimitLast() > outputSizeLimitLast) {
-                outputSizeLimitLast = er.getOutputSizeLimitLast();
-            }
         }
 
         res.put("cpuTimeLimit", cpuTimeLimit);
         res.put("memoryLimit", memoryLimit);
         res.put("wallClockTimeLimit", wallClockTimeLimit);
         res.put("stackSizeLimit", stackSizeLimit);
-        res.put("outputSizeLimitFirst", outputSizeLimitFirst);
-        res.put("outputSizeLimitLast", outputSizeLimitLast);
         return res;
     }
 
@@ -1721,7 +1711,7 @@ public class ExperimentController {
                             }
                             if (contains) {
                                 resultsToImport.add(er);
-                                importedResults.add(ExperimentResultDAO.createExperimentResult(firstRun++, er.getPriority(), er.getComputeQueue(), er.getStatus(), er.getSeed(), er.getResultCode(), er.getResultTime(), mapHisScToMySc.get(sc.getId()), activeExperiment.getId(), er.getInstanceId(), er.getStartTime(), er.getCPUTimeLimit(), er.getMemoryLimit(), er.getWallClockTimeLimit(), er.getStackSizeLimit(), er.getOutputSizeLimitFirst(), er.getOutputSizeLimitLast()));
+                                importedResults.add(ExperimentResultDAO.createExperimentResult(firstRun++, er.getPriority(), er.getComputeQueue(), er.getStatus(), er.getSeed(), er.getResultCode(), er.getResultTime(), mapHisScToMySc.get(sc.getId()), activeExperiment.getId(), er.getInstanceId(), er.getStartTime(), er.getCPUTimeLimit(), er.getMemoryLimit(), er.getWallClockTimeLimit(), er.getStackSizeLimit()));
                             }
                         }
                         seedGroupFirstRun.put(solverConfig.getSeed_group(), firstRun);
@@ -1737,7 +1727,7 @@ public class ExperimentController {
                 experimentResultCache.updateExperimentResults();
                 main.generateJobsTableModel.updateNumRuns();
                 // no use of seed here because seeds are given by seed groups if jobs have to be generated
-                generateJobs(task, -1, -1, -1, -1, -1, -1, 0);
+                generateJobs(task, -1, -1, -1, -1, 0);
             }
             DatabaseConnector.getInstance().getConn().setAutoCommit(true);
         } catch (Exception ex) {
