@@ -14,6 +14,7 @@ import edacc.model.StatusCode;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.PropertyNotInDBException;
 import edacc.model.StatusCodeNotInDBException;
+import edacc.model.Tasks;
 import edacc.properties.PropertyTypeNotExistException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -75,6 +76,10 @@ public class ExperimentResultCache {
         return resultMap.values();
     }
 
+    public synchronized void updateExperimentResults() throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
+        updateExperimentResults(null);
+    }   
+    
     /**
      * Updates the experiment result cache. The resultMap is then synchronized with the database
      * @throws SQLException
@@ -88,12 +93,12 @@ public class ExperimentResultCache {
      * @throws StatusCodeNotInDBException
      * @throws ResultCodeNotInDBException 
      */
-    public synchronized void updateExperimentResults() throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
+    public synchronized void updateExperimentResults(Tasks task) throws SQLException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         Timestamp ts;
         ArrayList<ExperimentResult> modified;
         if (experiment != null) {
             ts = ExperimentResultDAO.getLastModifiedByExperimentId(experiment.getId());
-            modified = ExperimentResultDAO.getAllModifiedByExperimentId(experiment.getId(), lastUpdated);
+            modified = ExperimentResultDAO.getAllModifiedByExperimentId(experiment.getId(), lastUpdated, task);
         } else if (client != null) {
             ts = ExperimentResultDAO.getLastModifiedByClientId(client.getId());
             modified = ExperimentResultDAO.getAllModifiedByClientId(client.getId(), lastUpdated);

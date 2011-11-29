@@ -76,6 +76,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
@@ -104,6 +105,7 @@ public class ExperimentController {
     private ConfigurationScenario configScenario;
     private ConfigurationScenario savedScenario;
     private SolverConfigurationEntryModel solverConfigurationEntryModel;
+
     /**
      * Creates a new experiment Controller
      * @param experimentMode the experiment mode to be used
@@ -221,7 +223,7 @@ public class ExperimentController {
             task.addPropertyChangeListener(cancelExperimentResultDAOStatementListener);
         }
         try {
-            experimentResultCache.updateExperimentResults();
+            experimentResultCache.updateExperimentResults(task);
         } catch (MySQLStatementCancelledException ex) {
             throw new TaskCancelledException();
         } finally {
@@ -236,7 +238,7 @@ public class ExperimentController {
 
             @Override
             public void run() {
-                Util.updateTableColumnWidth(main.tblGenerateJobs);
+                Util.updateTableColumnWidth(main.tblGenerateJobs, 1);
             }
         });
         if (activeExperiment.isConfigurationExp()) {
@@ -308,9 +310,9 @@ public class ExperimentController {
      * @throws PropertyTypeNotExistException
      * @throws ComputationMethodDoesNotExistException 
      */
-    public Experiment createExperiment(String name, String description, boolean configurationExp) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
+    public Experiment createExperiment(String name, String description, boolean configurationExp, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         java.util.Date d = new java.util.Date();
-        Experiment res = ExperimentDAO.createExperiment(name, new Date(d.getTime()), description, configurationExp);
+        Experiment res = ExperimentDAO.createExperiment(name, new Date(d.getTime()), description, configurationExp, solverOutputPreserveFirst, solverOutputPreserveLast, watcherOutputPreserveFirst, watcherOutputPreserveLast, verifierOutputPreserveFirst, verifierOutputPreserveLast);
         initialize();
         return res;
     }
@@ -344,7 +346,7 @@ public class ExperimentController {
      */
     public void saveSolverConfigurations(Tasks task) throws SQLException, InterruptedException, InvocationTargetException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException, Exception {
         // TODO: there are some points where this task should never be canceled (by an application crash or lost db connection)... fix them!
-        
+
         task.setStatus("Checking jobs..");
 
         // check for solver configurations with no value for parameters which must have values
@@ -438,6 +440,28 @@ public class ExperimentController {
         }
         task.setStatus("Saving solver configurations..");
 
+        // first look for unsaved solver configurations..
+        List<SolverConfiguration> solverConfigurations = new LinkedList<SolverConfiguration>();
+        for (Solver s : solverConfigurationEntryModel.getSolvers()) {
+            // iterate over solvers
+            for (SolverConfigurationEntry entry : solverConfigurationEntryModel.getEntries(s)) {
+                // iterate over solver configs
+                if (entry.getSolverConfig() == null) {
+                    SolverConfiguration sc = new SolverConfiguration();
+                    sc.setSolverBinary(entry.getSolverBinary());
+                    sc.setExperiment_id(activeExperiment.getId());
+                    sc.setSeed_group(entry.getSeedGroup());
+                    sc.setName(entry.getName());
+                    sc.setHint(entry.getHint());
+                    entry.setSolverConfig(sc);
+                    solverConfigurations.add(sc);
+                }
+            }
+        }
+        solverConfigCache.createAll(solverConfigurations);
+
+        // look for all parameter instances, create new ones, save all
+        List<ParameterInstance> parameterInstances = new LinkedList<ParameterInstance>();
         for (Solver s : solverConfigurationEntryModel.getSolvers()) {
             // iterate over solvers
             for (SolverConfigurationEntry entry : solverConfigurationEntryModel.getEntries(s)) {
@@ -450,9 +474,12 @@ public class ExperimentController {
                     entry.getSolverConfig().setSeed_group(entry.getSeedGroup());
                     entry.getSolverConfig().setHint(entry.getHint());
                 }
-                entry.saveParameterInstances();
+                parameterInstances.addAll(entry.getParameterInstances());
             }
         }
+        ParameterInstanceDAO.saveBulk(parameterInstances);
+        
+        // save modified solver configurations and delete deleted
         solverConfigCache.saveAll();
         getExperimentResults().updateExperimentResults();
         main.generateJobsTableModel.updateNumRuns();
@@ -460,7 +487,7 @@ public class ExperimentController {
 
             @Override
             public void run() {
-                Util.updateTableColumnWidth(main.tblGenerateJobs);
+                Util.updateTableColumnWidth(main.tblGenerateJobs, 1);
             }
         });
     }
@@ -542,7 +569,7 @@ public class ExperimentController {
 
             @Override
             public void run() {
-                Util.updateTableColumnWidth(main.tblGenerateJobs);
+                Util.updateTableColumnWidth(main.tblGenerateJobs, 1);
             }
         });
     }
@@ -580,7 +607,7 @@ public class ExperimentController {
      * @throws StatusCodeNotInDBException
      * @throws ResultCodeNotInDBException 
      */
-    public synchronized int generateJobs(final Tasks task, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int outputSizeLimitFirst, int outputSizeLimitLast, int maxSeed) throws SQLException, TaskCancelledException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
+    public synchronized int generateJobs(final Tasks task, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int maxSeed) throws SQLException, TaskCancelledException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         PropertyChangeListener cancelExperimentResultDAOStatementListener = new PropertyChangeListener() {
 
             @Override
@@ -653,7 +680,7 @@ public class ExperimentController {
                 task.addPropertyChangeListener(cancelExperimentResultDAOStatementListener);
                 try {
                     ExperimentResultDAO.setAutoCommit(false);
-                    ExperimentResultDAO.deleteExperimentResults(deleteJobs);
+                    ExperimentResultDAO.deleteExperimentResults(deleteJobs, task);
                     task.setStatus("Updating existing jobs..");
                     ExperimentResultDAO.batchUpdateRun(updateJobs);
                 } catch (Exception ex) {
@@ -729,14 +756,14 @@ public class ExperimentController {
                         if (solverConfigHasSeed.get(c.getId())) {
                             Integer seed = linked_seeds.get(new SeedGroup(c.getSeed_group(), i.getId(), run));
                             if (seed != null) {
-                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, seed.intValue(), ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast));
+                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, seed.intValue(), ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit));
                             } else {
                                 Integer new_seed = new Integer(generateSeed(maxSeed));
                                 linked_seeds.put(new SeedGroup(c.getSeed_group(), i.getId(), run), new_seed);
-                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, new_seed.intValue(), ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast));
+                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, new_seed.intValue(), ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit));
                             }
                         } else {
-                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, 0, ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast));
+                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, 0, ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit));
                         }
                         experiments_added++;
                     }
@@ -749,7 +776,7 @@ public class ExperimentController {
         task.addPropertyChangeListener(cancelExperimentResultDAOStatementListener);
         task.setStatus("Saving changes to database..");
         try {
-            ExperimentResultDAO.batchSave(experiment_results);
+            ExperimentResultDAO.batchSave(experiment_results, task);
         } catch (SQLException ex) {
             if (ex.getMessage().contains("cancelled")) {
                 throw new TaskCancelledException();
@@ -763,7 +790,7 @@ public class ExperimentController {
 
             @Override
             public void run() {
-                Util.updateTableColumnWidth(main.tblGenerateJobs);
+                Util.updateTableColumnWidth(main.tblGenerateJobs, 1);
             }
         });
         return experiments_added;
@@ -785,15 +812,15 @@ public class ExperimentController {
     /**
      * Updates the job browser table
      */
-    public synchronized void loadJobs() {
+    public synchronized void loadJobs(Tasks task) {
         try {
             boolean autocommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
             try {
-                experimentResultCache.updateExperimentResults();
+                experimentResultCache.updateExperimentResults(task);
                 // TODO: also update solver config cache if needed and cache parameter instances of solver configs
                 //       maybe this should be done in experimentResultCache?
-                
+
                 // temporary: simple synchronize, but may not be needed..
                 solverConfigCache.synchronize();
             } finally {
@@ -814,7 +841,7 @@ public class ExperimentController {
                             if (tmp == null) {
                                 results = null;
                                 break;
-                            } else if (!er.getDatemodified().equals(tmp.getDatemodified())) {
+                            } else if (!er.getStatus().equals(tmp.getStatus()) || !er.getDatemodified().equals(tmp.getDatemodified())) {
                                 results.set(i, tmp);
                                 changedRows.add(i);
                             }
@@ -1347,7 +1374,7 @@ public class ExperimentController {
             }
         }
         ExperimentResultDAO.batchUpdatePriority(values);
-        this.loadJobs();
+        this.loadJobs(null);
     }
 
     /**
@@ -1366,7 +1393,7 @@ public class ExperimentController {
             }
         }
         ExperimentResultDAO.batchUpdateStatus(updatedJobs, status);
-        this.loadJobs();
+        this.loadJobs(null);
     }
 
     /**
@@ -1419,8 +1446,6 @@ public class ExperimentController {
         int memoryLimit = -1;
         int wallClockTimeLimit = -1;
         int stackSizeLimit = -1;
-        int outputSizeLimitLast = -1;
-        int outputSizeLimitFirst = -1;
 
         experimentResultCache.updateExperimentResults();
         for (ExperimentResult er : experimentResultCache.values()) {
@@ -1436,20 +1461,12 @@ public class ExperimentController {
             if (er.getStackSizeLimit() > stackSizeLimit) {
                 stackSizeLimit = er.getStackSizeLimit();
             }
-            if (er.getOutputSizeLimitFirst() > outputSizeLimitFirst) {
-                outputSizeLimitFirst = er.getOutputSizeLimitFirst();
-            }
-            if (er.getOutputSizeLimitLast() > outputSizeLimitLast) {
-                outputSizeLimitLast = er.getOutputSizeLimitLast();
-            }
         }
 
         res.put("cpuTimeLimit", cpuTimeLimit);
         res.put("memoryLimit", memoryLimit);
         res.put("wallClockTimeLimit", wallClockTimeLimit);
         res.put("stackSizeLimit", stackSizeLimit);
-        res.put("outputSizeLimitFirst", outputSizeLimitFirst);
-        res.put("outputSizeLimitLast", outputSizeLimitLast);
         return res;
     }
 
@@ -1694,7 +1711,7 @@ public class ExperimentController {
                             }
                             if (contains) {
                                 resultsToImport.add(er);
-                                importedResults.add(ExperimentResultDAO.createExperimentResult(firstRun++, er.getPriority(), er.getComputeQueue(), er.getStatus(), er.getSeed(), er.getResultCode(), er.getResultTime(), mapHisScToMySc.get(sc.getId()), activeExperiment.getId(), er.getInstanceId(), er.getStartTime(), er.getCPUTimeLimit(), er.getMemoryLimit(), er.getWallClockTimeLimit(), er.getStackSizeLimit(), er.getOutputSizeLimitFirst(), er.getOutputSizeLimitLast()));
+                                importedResults.add(ExperimentResultDAO.createExperimentResult(firstRun++, er.getPriority(), er.getComputeQueue(), er.getStatus(), er.getSeed(), er.getResultCode(), er.getResultTime(), mapHisScToMySc.get(sc.getId()), activeExperiment.getId(), er.getInstanceId(), er.getStartTime(), er.getCPUTimeLimit(), er.getMemoryLimit(), er.getWallClockTimeLimit(), er.getStackSizeLimit()));
                             }
                         }
                         seedGroupFirstRun.put(solverConfig.getSeed_group(), firstRun);
@@ -1710,7 +1727,7 @@ public class ExperimentController {
                 experimentResultCache.updateExperimentResults();
                 main.generateJobsTableModel.updateNumRuns();
                 // no use of seed here because seeds are given by seed groups if jobs have to be generated
-                generateJobs(task, -1, -1, -1, -1, -1, -1, 0);
+                generateJobs(task, -1, -1, -1, -1, 0);
             }
             DatabaseConnector.getInstance().getConn().setAutoCommit(true);
         } catch (Exception ex) {
@@ -1783,7 +1800,7 @@ public class ExperimentController {
         }
         return false;
     }
-    
+
     public boolean solverConfigsIsModified() {
         return (solverConfigCache != null && solverConfigCache.isModified()) || (solverConfigurationEntryModel == null ? false : solverConfigurationEntryModel.isModified());
     }
@@ -1944,7 +1961,7 @@ public class ExperimentController {
         // we need a new instance for this
         savedScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
     }
-    
+
     public ConfigurationScenario getConfigurationScenarioForExperiment(Experiment exp) throws SQLException {
         ConfigurationScenario scenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(exp.getId());
         return scenario;
@@ -1957,7 +1974,7 @@ public class ExperimentController {
     public void reloadConfigurationScenario() throws SQLException {
         configScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());
     }
-    
+
     public SolverConfigurationEntryModel getSolverConfigurationEntryModel() {
         return solverConfigurationEntryModel;
     }

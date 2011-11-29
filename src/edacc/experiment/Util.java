@@ -29,6 +29,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author simon
  */
 public class Util {
+    public static final Color COLOR_ROYALBLUE = new Color(4 * 16 + 1, 6 * 16 + 9, 14 * 16 + 1);
+    public static final Color COLOR_GREEN = new Color(0 * 16 + 0, 12 * 16 + 12, 3 * 16 + 3);
 
     /** Color to be used for errors */
     public static final Color COLOR_ERROR = new Color(0xed1c24);
@@ -37,11 +39,25 @@ public class Util {
     /** Color to be used for the generate jobs table if a value is not saved and lower as the saved value */
     public static final Color COLOR_GENERATEJOBSTABLE_UNSAVED_LOWER = COLOR_ERROR;
 
+    public static final Color COLOR_JOBBROWSER_WAITING = COLOR_ROYALBLUE;
+    public static final Color COLOR_JOBBROWSER_ERROR = COLOR_ERROR;
+    public static final Color COLOR_JOBBROWSER_RUNNING = Color.orange;
+    public static final Color COLOR_JOBBROWSER_FINISHED = COLOR_GREEN;
+    
+    /**
+     * Calls <code>updateTableColumnWidth(table, 5000)</code>.
+     * @param table 
+     */
+    public static void updateTableColumnWidth(JTable table) {
+        updateTableColumnWidth(table, 5000);
+    }
+    
     /**
      * Updates the width of each column according to the table size and the data in the cells.
      * @param table
+     * @param maxRows maximum number of rows to be taken in considerations.
      */
-    public static void updateTableColumnWidth(JTable table) {
+    public static void updateTableColumnWidth(JTable table, int maxRows) {
         int tableWidth = table.getWidth();
         if (table.getAutoResizeMode() == JTable.AUTO_RESIZE_OFF) {
             tableWidth = Integer.MAX_VALUE;
@@ -78,7 +94,7 @@ public class Util {
                 }
                 minwidth[col] = width[col];
                 minwidthsum += width[col];
-                for (int row = 0; row < Math.min(10000, table.getRowCount()); row++) {
+                for (int row = 0; row < Math.min(maxRows, table.getRowCount()); row++) {
                     // get the component which represents the value and determine its witdth
                     int len = table.getCellRenderer(row, col).getTableCellRendererComponent(table, table.getValueAt(row, col), false, true, row, col).getPreferredSize().width;
                     if (len > width[col]) {
@@ -238,6 +254,45 @@ public class Util {
         boolean res;
         try {
             res = Integer.parseInt(field.getText()) >= number;
+        } catch (Exception ex) {
+            res = false;
+        }
+        JTextField tmp = new JTextField();
+        Border defaultBorder = tmp.getBorder();
+        if (!res) {
+            // Mark as error
+
+            // default thickness
+            int thickness = 1;
+            if (tmp.getBorder() instanceof LineBorder) {
+                // if the look and feel uses some line border then get the thickness from it
+                thickness = ((LineBorder) tmp.getBorder()).getThickness();
+            }
+            // red line border with the hopefully same thickness as the old border
+            Border errorBorder = BorderFactory.createLineBorder(new Color(255, 0, 0), thickness);
+            // this is a hack: create a border inside the red border so that the distance from text to our new border seems to be the same as with the original border
+            Border insideBorder = BorderFactory.createLineBorder(new Color(255, 238, 238), tmp.getBorder().getBorderInsets(tmp).left - thickness); // light red, color of the JTextField Background
+            field.setBackground(new Color(255, 238, 238));
+            field.setBorder(BorderFactory.createCompoundBorder(errorBorder, insideBorder));
+        } else {
+            // this is easier .. set the default border from look&feel
+            field.setBackground(UIManager.getColor("TextField.background"));
+            field.setBorder(defaultBorder);
+        }
+        return res;
+    }
+    
+    /**
+     * Returns true if the number in field is greater or equal the given number. 
+     * Also changes the fields layout to give the user a feedback which values aren't valid.
+     * @param field the text field
+     * @param number the number
+     * @return true, iff the value in the field is valid
+     */
+    public static boolean verifyNumber_geq(JTextField field, Long number) {
+        boolean res;
+        try {
+            res = Long.parseLong(field.getText()) >= number;
         } catch (Exception ex) {
             res = false;
         }

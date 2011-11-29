@@ -623,12 +623,6 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (PropertyTypeDoesNotExistException ex) {
                 Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (PropertyNotInDBException ex) {
-                Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (PropertyTypeNotExistException ex) {
-                Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ComputationMethodDoesNotExistException ex) {
-                Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (PropertyAlreadyInDBException ex) {
                 JOptionPane.showMessageDialog(this,
                         "The name of the property is already used. \n Please change the name to create the new property.",
@@ -825,12 +819,6 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
 
         } catch (SQLException ex) {
             Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ComputationMethodDoesNotExistException ex) {
-            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (PropertyNotInDBException ex) {
-            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (PropertyTypeNotExistException ex) {
-            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -980,9 +968,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ComputationMethodDoesNotExistException ex) {
-            Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
     }
 
     void loadPropertyValues() {

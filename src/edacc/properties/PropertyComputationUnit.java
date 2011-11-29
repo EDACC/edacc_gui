@@ -424,12 +424,6 @@ public class PropertyComputationUnit implements Runnable {
             Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (PropertyNotInDBException ex) {
-            Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (PropertyTypeNotExistException ex) {
-            Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ComputationMethodDoesNotExistException ex) {
-            Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception e) {
             e.printStackTrace();
         }

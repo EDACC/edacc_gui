@@ -16,6 +16,7 @@ import edacc.experiment.ExperimentController;
 import edacc.manageDB.ProblemOccuredDuringPropertyComputation;
 import edacc.model.ExperimentResult;
 import edacc.model.Property;
+import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
 import edacc.properties.ComputePropertiesController;
 import edacc.properties.PropertySelectionTableModel;
@@ -213,7 +214,14 @@ public class EDACCComputeResultProperties extends javax.swing.JDialog implements
     @Override
     public void onTaskSuccessful(String methodName, Object result) {
         if(methodName.equals("computeProperties")){
-            Tasks.startTask("loadJobs", expController, this, false);
+            Tasks.startTask(new TaskRunnable() {
+
+                @Override
+                public void run(Tasks task) {
+                    expController.loadJobs(task);
+                }
+                
+            });
         }
     }
 

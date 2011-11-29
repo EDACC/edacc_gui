@@ -5,11 +5,13 @@
 
 package edacc.model;
 
+import java.sql.SQLException;
+
 /**
  *
  * @author rretz
  */
-public class ComputationMethodDoesNotExistException extends Exception{
+public class ComputationMethodDoesNotExistException extends SQLException{
 
     public ComputationMethodDoesNotExistException() {
         super();

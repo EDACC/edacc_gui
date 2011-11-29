@@ -68,7 +68,6 @@ public class SolverBinariesDAO {
             ps.setString(2, s.getBinaryName());
             if (s.getBinaryFiles() != null && s.getBinaryFiles().length > 0) {
                 ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(s.getBinaryFiles(), new File(s.getRootDir()));
-                s.setMd5(Util.calculateMD5(new ByteArrayInputStream(zipped.toByteArray())));
                 ps.setBinaryStream(3, new ByteArrayInputStream(zipped.toByteArray()));
             } else {
                 throw new NoSolverBinarySpecifiedException();

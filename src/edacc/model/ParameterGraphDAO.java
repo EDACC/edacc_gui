@@ -17,6 +17,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.LinkedList;
+import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -118,6 +120,96 @@ public class ParameterGraphDAO {
         return new ByteArrayInputStream(os.toByteArray());
     }
 
+    public static List<Integer> createSolverConfigs(int idExperiment, List<ParameterConfiguration> configs, List<String> names) throws SQLException {
+        if (configs.size() != names.size()) {
+            throw new IllegalArgumentException();
+        }
+        List<Integer> solverConfigIds = new LinkedList<Integer>();
+        if (configs.isEmpty()) {
+            return solverConfigIds;
+        }
+        
+        boolean autocommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
+        try {
+            DatabaseConnector.getInstance().getConn().setAutoCommit(false);
+            ConfigurationScenario cs = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(idExperiment);
+            SolverBinaries solver_binary = SolverBinariesDAO.getById(cs.getIdSolverBinary());
+
+            List<SolverConfiguration> solverConfigurations = new LinkedList<SolverConfiguration>();
+            for (int i = 0; i < configs.size(); i++) {
+                ParameterConfiguration config = configs.get(i);
+                config.updateChecksum();
+                SolverConfiguration solver_config = new SolverConfiguration();
+                solver_config.setHint("");
+                solver_config.setSolverBinary(solver_binary);
+                solver_config.setExperiment_id(idExperiment);
+                solver_config.setName(names.get(i));
+                solver_config.setParameter_hash(toHex(config.getChecksum()));
+                solverConfigurations.add(solver_config);
+                SolverConfigurationDAO.save(solver_config);
+                solverConfigIds.add(solver_config.getId());
+            }
+
+            List<ParameterInstance> paramInstances = new LinkedList<ParameterInstance>();
+            for (int i = 0; i < configs.size(); i++) {
+                SolverConfiguration solver_config = solverConfigurations.get(i);
+                ParameterConfiguration config = configs.get(i);
+                for (ConfigurationScenarioParameter param : cs.getParameters()) {
+                    ParameterInstance pi = new ParameterInstance();
+                    if ("instance".equals(param.getParameter().getName()) || "seed".equals(param.getParameter().getName())) {
+                        pi.setParameter_id(param.getParameter().getId());
+                        pi.setSolverConfiguration(solver_config);
+                        pi.setValue("");
+                        paramInstances.add(pi);
+                    } else if (!param.isConfigurable()) {
+                        if (param.getParameter().getHasValue()) {
+                            pi.setParameter_id(param.getParameter().getId());
+                            pi.setSolverConfiguration(solver_config);
+                            pi.setValue(param.getFixedValue());
+                            paramInstances.add(pi);
+                        } else { // flag
+                            pi.setParameter_id(param.getParameter().getId());
+                            pi.setSolverConfiguration(solver_config);
+                            pi.setValue("");
+                            paramInstances.add(pi);
+                        }
+                    } else if (param.isConfigurable()) {
+                        edacc.parameterspace.Parameter config_param = null;
+                        for (edacc.parameterspace.Parameter p : config.getParameter_instances().keySet()) {
+                            if (p.getName().equals(param.getParameter().getName())) {
+                                config_param = p;
+                                break;
+                            }
+                        }
+                        if (config_param == null) {
+                            System.out.println("no parameterspace param corresponding to " + param.getParameter().getName());
+                            continue;
+                        }
+
+                        if (OptionalDomain.OPTIONS.NOT_SPECIFIED.equals(config.getParameterValue(config_param))) {
+                            continue;
+                        } else if (FlagDomain.FLAGS.OFF.equals(config.getParameterValue(config_param))) {
+                            continue;
+                        } else {
+                            pi.setParameter_id(param.getParameter().getId());
+                            pi.setSolverConfiguration(solver_config);
+                            pi.setValue(config.getParameterValue(config_param).toString());
+                            paramInstances.add(pi);
+                        }
+                    }
+                }
+            }
+            ParameterInstanceDAO.saveBulk(paramInstances);
+        } catch (Exception e) {
+            DatabaseConnector.getInstance().getConn().rollback();
+            e.printStackTrace();
+        } finally {
+            DatabaseConnector.getInstance().getConn().setAutoCommit(autocommit);
+        }
+
+        return solverConfigIds;
+    }
+
     /**
      * Creates a new solver configuration in the database for the experiment specified by the idExperiment argument.
      * The solver binary of the configuration is determined by the configuration scenario that the user created in the GUI.
@@ -128,53 +220,14 @@ public class ParameterGraphDAO {
      * @param config parameter configuration object that specifies the values of parameters.
      * @return unique database ID > 0 of the created solver configuration, 0 on errors.
      */
-    public static int createSolverConfig(int idExperiment, ParameterConfiguration config, String name) {
-        try {
-            ConfigurationScenario cs = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(idExperiment);
-            SolverBinaries solver_binary = SolverBinariesDAO.getById(cs.getIdSolverBinary());
-            config.updateChecksum();
-            SolverConfiguration solver_config = SolverConfigurationDAO.createSolverConfiguration(solver_binary, idExperiment, 0, name, "", null, null, toHex(config.getChecksum()));
-
-            for (ConfigurationScenarioParameter param : cs.getParameters()) {
-                if ("instance".equals(param.getParameter().getName()) || "seed".equals(param.getParameter().getName())) {
-                    ParameterInstance pi = ParameterInstanceDAO.createParameterInstance(param.getParameter().getId(), solver_config, "");
-                    ParameterInstanceDAO.save(pi);
-                } else if (!param.isConfigurable()) {
-                    if (param.getParameter().getHasValue()) {
-                        ParameterInstance pi = ParameterInstanceDAO.createParameterInstance(param.getParameter().getId(), solver_config, param.getFixedValue());
-                        ParameterInstanceDAO.save(pi);
-                    } else { // flag
-                        System.out.println("flag" + param.getParameter().getName());
-                        ParameterInstance pi = ParameterInstanceDAO.createParameterInstance(param.getParameter().getId(), solver_config, "");
-                        ParameterInstanceDAO.save(pi);
-                    }
-                } else if (param.isConfigurable()) {
-                    edacc.parameterspace.Parameter config_param = null;
-                    for (edacc.parameterspace.Parameter p : config.getParameter_instances().keySet()) {
-                        if (p.getName().equals(param.getParameter().getName())) {
-                            config_param = p;
-                            break;
-                        }
-                    }
-                    if (config_param == null) {
-                        System.out.println("no parameterspace param corresponding to " + param.getParameter().getName());
-                        continue;
-                    }
-
-                    if (OptionalDomain.OPTIONS.NOT_SPECIFIED.equals(config.getParameterValue(config_param))) {
-                        continue;
-                    } else if (FlagDomain.FLAGS.OFF.equals(config.getParameterValue(config_param))) {
-                        continue;
-                    } else {
-                        ParameterInstance pi = ParameterInstanceDAO.createParameterInstance(param.getParameter().getId(), solver_config, config.getParameterValue(config_param).toString());
-                        ParameterInstanceDAO.save(pi);
-                    }
-                }
-            }
-
-            return solver_config.getId();
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static int createSolverConfig(int idExperiment, ParameterConfiguration config, String name) throws SQLException {
+        List<ParameterConfiguration> configs = new LinkedList<ParameterConfiguration>();
+        configs.add(config);
+        List<String> names = new LinkedList<String>();
+        names.add(name);
+        List<Integer> res = createSolverConfigs(idExperiment, configs, names);
+        if (res.size()>0) {
+            return res.get(0);
         }
         return 0;
     }

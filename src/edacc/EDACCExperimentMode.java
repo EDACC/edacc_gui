@@ -58,11 +58,13 @@ import edacc.model.SolverDAO;
 import edacc.model.TaskCancelledException;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
+import edacc.parameterspace.ParameterConfiguration;
 import edacc.parameterspace.graph.ParameterGraph;
 import edacc.properties.PropertyTypeNotExistException;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -83,6 +85,7 @@ import java.util.TimerTask;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -954,7 +957,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnImport, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 520, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 433, Short.MAX_VALUE)
                 .addComponent(btnCreateExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRemoveExperiment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -990,9 +993,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             panelManageExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelManageExperimentLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 1096, Short.MAX_VALUE)
+                .addComponent(scrollPaneExperimentsTable, javax.swing.GroupLayout.DEFAULT_SIZE, 1009, Short.MAX_VALUE)
                 .addGap(10, 10, 10))
-            .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1116, Short.MAX_VALUE)
+            .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1029, Short.MAX_VALUE)
         );
         panelManageExperimentLayout.setVerticalGroup(
             panelManageExperimentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1031,7 +1034,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         panelClientBrowser.setLayout(panelClientBrowserLayout);
         panelClientBrowserLayout.setHorizontalGroup(
             panelClientBrowserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 1116, Short.MAX_VALUE)
+            .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 1029, Short.MAX_VALUE)
         );
         panelClientBrowserLayout.setVerticalGroup(
             panelClientBrowserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1087,7 +1090,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jPanel10.setLayout(jPanel10Layout);
         jPanel10Layout.setHorizontalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 1084, Short.MAX_VALUE)
+            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 997, Short.MAX_VALUE)
         );
         jPanel10Layout.setVerticalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1150,15 +1153,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                             .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(panelConfigurationScenarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(comboConfigScenarioSolvers, 0, 1019, Short.MAX_VALUE)
-                            .addComponent(comboConfigScenarioSolverBinaries, 0, 1019, Short.MAX_VALUE)))
+                            .addComponent(comboConfigScenarioSolvers, 0, 932, Short.MAX_VALUE)
+                            .addComponent(comboConfigScenarioSolverBinaries, 0, 932, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelConfigurationScenarioLayout.createSequentialGroup()
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnConfigurationScenarioRandomSolverConfigs)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnDefineCourse, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 415, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 328, Short.MAX_VALUE)
                         .addComponent(btnConfigScenarioUndo)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnConfigScenarioSave)))
@@ -1306,6 +1309,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel2.border.title"))); // NOI18N
         jPanel2.setName("jPanel2"); // NOI18N
+        jPanel2.setPreferredSize(new java.awt.Dimension(0, 0));
 
         jScrollPane4.setToolTipText(resourceMap.getString("jScrollPane4.toolTipText")); // NOI18N
         jScrollPane4.setName("jScrollPane4"); // NOI18N
@@ -1346,14 +1350,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addComponent(btnSolverTabFilterSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnChangeView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(lblSolverConfigFilterStatus)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnChangeView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1398,10 +1402,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             .addGroup(panelChooseSolverLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelChooseSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(splitPaneSolverSolverConfigs, javax.swing.GroupLayout.DEFAULT_SIZE, 1128, Short.MAX_VALUE)
+                    .addComponent(splitPaneSolverSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(panelChooseSolverLayout.createSequentialGroup()
                         .addComponent(btnImportSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 779, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 660, Short.MAX_VALUE)
                         .addComponent(btnUndoSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSaveSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -1411,7 +1415,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             panelChooseSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelChooseSolverLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(splitPaneSolverSolverConfigs, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
+                .addComponent(splitPaneSolverSolverConfigs, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelChooseSolverLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSaveSolverConfigurations, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1583,7 +1587,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                         .addComponent(btnFilterInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnInstanceColumnSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 349, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 262, Short.MAX_VALUE)
                         .addComponent(btnUndoInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnSaveInstances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -1629,10 +1633,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
                         .addGap(10, 10, 10)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 889, Short.MAX_VALUE))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 802, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(lblFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 889, Short.MAX_VALUE))
+                        .addComponent(lblFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 802, Short.MAX_VALUE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
@@ -1656,7 +1660,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         panelChooseInstances.setLayout(panelChooseInstancesLayout);
         panelChooseInstancesLayout.setHorizontalGroup(
             panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1116, Short.MAX_VALUE)
+            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1029, Short.MAX_VALUE)
         );
         panelChooseInstancesLayout.setVerticalGroup(
             panelChooseInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1740,7 +1744,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 .addComponent(btnGeneratePackage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSetNumRuns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 334, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 247, Short.MAX_VALUE)
                 .addComponent(btnGenerateJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -1761,7 +1765,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1116, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1029, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1893,33 +1897,32 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             panelJobBrowserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelJobBrowserLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnRefreshJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnBrowserColumnSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnFilterJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnComputeResultProperties)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSetPriority, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 286, Short.MAX_VALUE)
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtJobsTimer, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkJobsTimer)
+                .addComponent(lblJobsFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 1009, Short.MAX_VALUE)
                 .addContainerGap())
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1029, Short.MAX_VALUE)
             .addGroup(panelJobBrowserLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblJobsFilterStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 1096, Short.MAX_VALUE)
+                .addGroup(panelJobBrowserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblETA, javax.swing.GroupLayout.DEFAULT_SIZE, 1009, Short.MAX_VALUE)
+                    .addGroup(panelJobBrowserLayout.createSequentialGroup()
+                        .addComponent(btnRefreshJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnBrowserColumnSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnFilterJobs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnComputeResultProperties)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSetPriority, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 195, Short.MAX_VALUE)
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtJobsTimer, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkJobsTimer)))
                 .addContainerGap())
-            .addGroup(panelJobBrowserLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblETA)
-                .addContainerGap(1072, Short.MAX_VALUE))
-            .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1116, Short.MAX_VALUE)
         );
 
         panelJobBrowserLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnBrowserColumnSelection, btnComputeResultProperties, btnExport, btnFilterJobs, btnRefreshJobs});
@@ -1962,7 +1965,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1121, Short.MAX_VALUE)
+                .addComponent(manageExperimentPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1034, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -2087,18 +2090,19 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                             @Override
                             public void run(Tasks task) {
                                 try {
-                                    expController.loadJobs();
+                                    expController.loadJobs(task);
+                                    tableJobs.scrollRectToVisible(rect);
+                                    SwingUtilities.invokeLater(new Runnable() {
+
+                                        @Override
+                                        public void run() {
+                                            EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
+                                        }
+                                    });
                                 } catch (Throwable e) {
                                     EDACCExperimentMode.this.onTaskFailed("loadJobs", e);
                                 }
-                                tableJobs.scrollRectToVisible(rect);
-                                SwingUtilities.invokeLater(new Runnable() {
 
-                                    @Override
-                                    public void run() {
-                                        EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
-                                    }
-                                });
 
                             }
                         });
@@ -2172,15 +2176,21 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
                         @Override
                         public void run() {
-                            expController.loadJobs();
+                            expController.loadJobs(null);
                             if (!Tasks.isTaskRunning()) {
                                 Tasks.startTask(new TaskRunnable() {
 
                                     @Override
                                     public void run(Tasks task) {
                                         try {
-                                            expController.loadJobs();
-                                            EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
+                                            expController.loadJobs(null);
+                                            SwingUtilities.invokeLater(new Runnable() {
+
+                                                @Override
+                                                public void run() {
+                                                    EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
+                                                }
+                                            });
                                         } catch (Throwable ex) {
                                             EDACCExperimentMode.this.onTaskFailed("loadJobs", ex);
                                         }
@@ -2223,7 +2233,24 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         compute.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
         compute.setVisible(true);
         resultBrowserETA = null;
-        Tasks.startTask("loadJobs", expController, this, false);
+        Tasks.startTask(new TaskRunnable() {
+
+            @Override
+            public void run(Tasks task) {
+                try {
+                    expController.loadJobs(task);
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
+                        }
+                    });
+                } catch (Throwable ex) {
+                    EDACCExperimentMode.this.onTaskFailed("loadJobs", ex);
+                }
+            }
+        });
     }//GEN-LAST:event_btnComputeResultPropertiesActionPerformed
 
     private void jTreeInstanceClassValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTreeInstanceClassValueChanged
@@ -2509,7 +2536,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     public void run(Tasks task) {
                         Experiment newExp;
                         try {
-                            newExp = expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc, dialogNewExp.isConfigurationExp);
+                            newExp = expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc, 
+                                    dialogNewExp.isConfigurationExp, dialogNewExp.solverOutputPreserveFirst, 
+                                    dialogNewExp.solverOutputPreserveLast, dialogNewExp.watcherOutputPreserveFirst, 
+                                    dialogNewExp.watcherOutputPreserveLast, dialogNewExp.verifierOutputPreserveFirst, 
+                                    dialogNewExp.verifierOutputPreserveLast);
                             if (experimentUpdateThread != null) {
                                 experimentUpdateThread.cancel(true);
                             }
@@ -2695,14 +2726,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         try {
             HashMap<String, Integer> limits = expController.getMaxLimits();
-            EDACCExperimentModeGenerateJobs dialog = new EDACCExperimentModeGenerateJobs(EDACCApp.getApplication().getMainFrame(), true, limits.get("cpuTimeLimit"), limits.get("memoryLimit"), limits.get("wallClockTimeLimit"), limits.get("stackSizeLimit"), limits.get("outputSizeLimitFirst"), limits.get("outputSizeLimitLast"));
+            EDACCExperimentModeGenerateJobs dialog = new EDACCExperimentModeGenerateJobs(EDACCApp.getApplication().getMainFrame(), true, limits.get("cpuTimeLimit"), limits.get("memoryLimit"), limits.get("wallClockTimeLimit"), limits.get("stackSizeLimit"));
             dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
             dialog.setVisible(true);
             if (!dialog.isCancelled()) {
-                Tasks.startTask("generateJobs", new Class[]{edacc.model.Tasks.class, int.class, int.class, int.class, int.class, int.class, int.class, int.class
+                Tasks.startTask("generateJobs", new Class[]{edacc.model.Tasks.class, int.class, int.class, int.class, int.class, int.class
                         },
                         new Object[]{
-                            null, dialog.getCpuTimeLimit(), dialog.getMemoryLimit(), dialog.getWallClockTimeLimit(), dialog.getStackSizeLimit(), dialog.getOutputSizeLimitFirst(), dialog.getOutputSizeLimitLast(), dialog.getMaxSeed()
+                            null, dialog.getCpuTimeLimit(), dialog.getMemoryLimit(), dialog.getWallClockTimeLimit(), dialog.getStackSizeLimit(), dialog.getMaxSeed()
                         }, expController,
                         this);
             } else {
@@ -2731,7 +2762,24 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     private void btnRefreshJobsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshJobsActionPerformed
         resultBrowserETA = null;
-        Tasks.startTask("loadJobs", expController, this, false);
+        Tasks.startTask(new TaskRunnable() {
+
+            @Override
+            public void run(Tasks task) {
+                try {
+                    expController.loadJobs(task);
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            EDACCExperimentMode.this.onTaskSuccessful("loadJobs", null);
+                        }
+                    });
+                } catch (Throwable ex) {
+                    EDACCExperimentMode.this.onTaskFailed("loadJobs", ex);
+                }
+            }
+        });
     }//GEN-LAST:event_btnRefreshJobsActionPerformed
 
     private void btnBrowserColumnSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBrowserColumnSelectionActionPerformed
@@ -2843,7 +2891,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
 
         Experiment exp = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
-        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription(), exp.isConfigurationExp());
+        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription(), exp.isConfigurationExp(), exp.getSolverOutputPreserveFirst(), exp.getSolverOutputPreserveLast(), exp.getWatcherOutputPreserveFirst(), exp.getWatcherOutputPreserveLast(), exp.getVerifierOutputPreserveFirst(), exp.getVerifierOutputPreserveLast());
         dialogEditExp.setLocationRelativeTo(mainFrame);
         try {
             while (true) {
@@ -2862,13 +2910,31 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             if (!dialogEditExp.canceled) {
                 String oldName = exp.getName();
                 String oldDescr = exp.getDescription();
+                Integer oldSOPF = exp.getSolverOutputPreserveFirst();
+                Integer oldSOPL = exp.getSolverOutputPreserveLast();
+                Integer oldWOPF = exp.getWatcherOutputPreserveFirst();
+                Integer oldWOPL = exp.getWatcherOutputPreserveLast();
+                Integer oldVOPF = exp.getVerifierOutputPreserveFirst();
+                Integer oldVOPL = exp.getVerifierOutputPreserveLast();
                 exp.setName(dialogEditExp.expName);
                 exp.setDescription(dialogEditExp.expDesc);
+                exp.setSolverOutputPreserveFirst(dialogEditExp.solverOutputPreserveFirst);
+                exp.setSolverOutputPreserveLast(dialogEditExp.solverOutputPreserveLast);
+                exp.setVerifierOutputPreserveFirst(dialogEditExp.verifierOutputPreserveFirst);
+                exp.setVerifierOutputPreserveLast(dialogEditExp.verifierOutputPreserveLast);
+                exp.setWatcherOutputPreserveFirst(dialogEditExp.watcherOutputPreserveFirst);
+                exp.setWatcherOutputPreserveLast(dialogEditExp.watcherOutputPreserveLast);
                 try {
                     expController.saveExperiment(exp);
                 } catch (SQLException ex) {
                     exp.setName(oldName);
                     exp.setDescription(oldDescr);
+                    exp.setSolverOutputPreserveFirst(oldSOPF);
+                    exp.setSolverOutputPreserveLast(oldSOPL);
+                    exp.setWatcherOutputPreserveFirst(oldWOPF);
+                    exp.setWatcherOutputPreserveLast(oldWOPL);
+                    exp.setVerifierOutputPreserveFirst(oldVOPF);
+                    exp.setVerifierOutputPreserveLast(oldVOPL);
                     createDatabaseErrorMessage(ex);
                 }
                 for (int i = 0; i < expTableModel.getRowCount(); i++) {
@@ -2994,11 +3060,23 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
                             ParameterGraph graph = ParameterGraphDAO.loadParameterGraph(SolverDAO.getById(sb.getIdSolver()));
                             Random random = new Random();
+                            task.setStatus("Generating solver configurations");
+                            List<ParameterConfiguration> configs = new LinkedList<ParameterConfiguration>();
+                            List<String> names = new LinkedList<String>();
+
                             for (int i = 0; i < number; i++) {
-                                task.setStatus("Processing solver configuration " + i + " of " + number);
-                                int id = ParameterGraphDAO.createSolverConfig(expController.getActiveExperiment().getId(), graph.getRandomConfiguration(random), "Random " + i);
+                                configs.add(graph.getRandomConfiguration(random));
+                                names.add("");
+                            }
+
+                            List<Integer> scIds = ParameterGraphDAO.createSolverConfigs(expController.getActiveExperiment().getId(), configs, names);
+                            expController.solverConfigCache.synchronize();
+                            for (Integer id : scIds) {
                                 if (id > 0) {
-                                    SolverConfiguration solverConfig = SolverConfigurationDAO.getSolverConfigurationById(id);
+                                    SolverConfiguration solverConfig = expController.solverConfigCache.getSolverConfigurationById(id);
+                                    if (solverConfig == null) {
+                                        continue;
+                                    }
                                     ArrayList<ParameterInstance> pis = ParameterInstanceDAO.getBySolverConfig(solverConfig);
                                     String name = "CP:";
                                     for (ParameterInstance pi : pis) {
@@ -3013,20 +3091,12 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                                             }
                                         }
                                     }
-
-                                    expController.solverConfigCache.synchronize();
-                                    for (SolverConfiguration sc : expController.solverConfigCache.getAll()) {
-                                        if (sc.getId() == solverConfig.getId()) {
-                                            sc.setName(name);
-                                            break;
-                                        }
-                                    }
-                                    expController.solverConfigCache.saveAll();
-                                } else {
-                                    // TODO: ERROR?
+                                    solverConfig.setName(name);
                                 }
                             }
-                            expController.solverConfigCache.synchronize();
+                            expController.solverConfigCache.saveAll();
+
+
                         } catch (final Exception ex) {
                             SwingUtilities.invokeLater(new Runnable() {
 
@@ -3045,8 +3115,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Expected an integer for number of solver configurations.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-
-
         }
     }//GEN-LAST:event_btnConfigurationScenarioRandomSolverConfigsActionPerformed
 
@@ -3261,15 +3329,20 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             lblETA.setText("");
             return;
         }
-        int jobsCount = jobsTableModel.getJobsCount();
-        int jobsSuccessful = jobsTableModel.getJobsCount(StatusCode.SUCCESSFUL);
-        int jobsWaiting = jobsTableModel.getJobsCount(StatusCode.NOT_STARTED);
-        int jobsRunning = jobsTableModel.getJobsCount(StatusCode.RUNNING);
+        final int jobsCount = jobsTableModel.getJobsCount();
+        final int jobsSuccessful = jobsTableModel.getJobsCount(StatusCode.SUCCESSFUL)
+                + jobsTableModel.getJobsCount(StatusCode.TIMELIMIT)
+                + jobsTableModel.getJobsCount(StatusCode.WALLCLOCKLIMIT)
+                + jobsTableModel.getJobsCount(StatusCode.MEMORYLIMIT);
+        final int jobsWaiting = jobsTableModel.getJobsCount(StatusCode.NOT_STARTED);
+        final int jobsRunning = jobsTableModel.getJobsCount(StatusCode.RUNNING);
 
-        int jobsCrashed = jobsTableModel.getJobsCount(StatusCode.LAUNCHERCRASH)
-                + jobsTableModel.getJobsCount(StatusCode.SOLVERCRASH)
-                + jobsTableModel.getJobsCount(StatusCode.VERIFIERCRASH)
-                + jobsTableModel.getJobsCount(StatusCode.WATCHERCRASH);
+        final int jobsCrashed = jobsCount - (jobsSuccessful + jobsWaiting + jobsRunning);
+        //jobsTableModel.getJobsCount(StatusCode.LAUNCHERCRASH)
+        //      + jobsTableModel.getJobsCount(StatusCode.SOLVERCRASH)
+        //    + jobsTableModel.getJobsCount(StatusCode.VERIFIERCRASH)
+        //  + jobsTableModel.getJobsCount(StatusCode.WATCHERCRASH)
+        //+ jobsTableModel.getJobsCount(StatusCode.TERMINATED);
 
         int jobsNotSuccessful = jobsCount - jobsSuccessful - jobsWaiting - jobsRunning;
         double percentage = (double) (jobsSuccessful + jobsNotSuccessful) / jobsCount;
@@ -3317,6 +3390,46 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         lblETA.setText(text);
         lblETA.setToolTipText(tooltip);
+        lblETA.setIcon(new Icon() {
+
+            @Override
+            public void paintIcon(Component c, Graphics g, int x, int y) {
+
+                int width = lblETA.getWidth();
+                if (jobsCount == 0) {
+                    return;
+                }
+                float crashedPerc = jobsCrashed / (float) jobsCount;
+                float successfulPerc = jobsSuccessful / (float) jobsCount;
+                float runningPerc = jobsRunning / (float) jobsCount;
+                float waitingPerc = jobsWaiting / (float) jobsCount;
+                int crashedPix = (int) Math.round(crashedPerc * width);
+                int successfulPix = (int) Math.round(successfulPerc * width);
+                int runningPix = (int) Math.round(runningPerc * width);
+                int waitingPix = (int) Math.round(waitingPerc * width);
+                g.setColor(Util.COLOR_JOBBROWSER_ERROR);
+                g.fillRect(0, 0, crashedPix, lblETA.getHeight());
+                g.setColor(Util.COLOR_JOBBROWSER_FINISHED);
+                g.fillRect(crashedPix, 0, successfulPix, lblETA.getHeight());
+                g.setColor(Util.COLOR_JOBBROWSER_RUNNING);
+                g.fillRect(crashedPix + successfulPix, 0, runningPix, lblETA.getHeight());
+                g.setColor(Util.COLOR_JOBBROWSER_WAITING);
+                // int waitingPix = width - (crashedPix + successfulPix + runningPix);
+                if (waitingPix > 0) {
+                    g.fillRect(crashedPix + successfulPix + runningPix, 0, waitingPix, lblETA.getHeight());
+                }
+            }
+
+            @Override
+            public int getIconWidth() {
+                return 1;
+            }
+
+            @Override
+            public int getIconHeight() {
+                return lblETA.getHeight();
+            }
+        });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBrowserColumnSelection;
@@ -3455,6 +3568,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         if (methodName.equals("loadExperiment")) {
             expController.unloadExperiment();
         }
+        e.printStackTrace();
         if (e instanceof TaskCancelledException) {
             javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         } else if (e instanceof SQLException) {
@@ -3633,6 +3747,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             manageExperimentPane.setEnabledAt(TAB_CONFIGURATIONSCENARIO, true);
         } else {
             manageExperimentPane.setEnabledAt(TAB_CONFIGURATIONSCENARIO, false);
+
+
         }
     }
 

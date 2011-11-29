@@ -299,7 +299,7 @@
                               <Group type="102" alignment="1" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="1" attributes="0">
-                                      <Component id="jScrollPane1" alignment="0" pref="279" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane1" alignment="0" pref="365" max="32767" attributes="0"/>
                                       <Component id="panelParametersButons" alignment="0" max="32767" attributes="0"/>
                                       <Component id="jPanel2" alignment="0" max="32767" attributes="0"/>
                                   </Group>
@@ -398,10 +398,10 @@
                                       </Group>
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Group type="103" alignment="1" groupAlignment="0" attributes="0">
-                                              <Component id="tfParametersName" alignment="1" pref="138" max="32767" attributes="3"/>
-                                              <Component id="tfParametersPrefix" alignment="1" pref="138" max="32767" attributes="3"/>
-                                              <Component id="tfParametersOrder" alignment="1" pref="138" max="32767" attributes="3"/>
-                                              <Component id="tfParametersDefaultValue" alignment="1" pref="138" max="32767" attributes="0"/>
+                                              <Component id="tfParametersName" alignment="1" pref="224" max="32767" attributes="3"/>
+                                              <Component id="tfParametersPrefix" alignment="1" pref="224" max="32767" attributes="3"/>
+                                              <Component id="tfParametersOrder" alignment="1" pref="224" max="32767" attributes="3"/>
+                                              <Component id="tfParametersDefaultValue" alignment="1" pref="224" max="32767" attributes="0"/>
                                               <Component id="chkSpace" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                           <Component id="chkAttachToPrevious" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
@@ -617,7 +617,9 @@
                                   <Group type="102" alignment="0" attributes="0">
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnParametersNew" linkSize="3" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="bImportParamsOfSolver" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnGraph" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnParametersDelete" linkSize="3" min="-2" max="-2" attributes="0"/>
@@ -631,6 +633,7 @@
                                       <Component id="btnParametersNew" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnParametersDelete" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnGraph" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="bImportParamsOfSolver" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                             </DimensionLayout>
@@ -669,6 +672,16 @@
                               </Properties>
                               <Events>
                                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnGraphActionPerformed"/>
+                              </Events>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="bImportParamsOfSolver">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" resourceKey="bImportParamsOfSolver.text"/>
+                                <Property name="toolTipText" type="java.lang.String" resourceKey="bImportParamsOfSolver.toolTipText"/>
+                                <Property name="name" type="java.lang.String" value="bImportParamsOfSolver" noResource="true"/>
+                              </Properties>
+                              <Events>
+                                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bImportParamsOfSolverActionPerformed"/>
                               </Events>
                             </Component>
                           </SubComponents>

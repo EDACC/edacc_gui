@@ -401,8 +401,6 @@ public class EDACCManageComputationMethodDialog extends javax.swing.JDialog {
                 Logger.getLogger(EDACCManageComputationMethodDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
                 Logger.getLogger(EDACCManageComputationMethodDialog.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ComputationMethodDoesNotExistException ex) {
-                Logger.getLogger(EDACCManageComputationMethodDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ComputationMethodAlreadyExistsException ex) {
                 Logger.getLogger(EDACCManageComputationMethodDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (NoComputationMethodBinarySpecifiedException ex) {
@@ -470,9 +468,7 @@ public class EDACCManageComputationMethodDialog extends javax.swing.JDialog {
             Logger.getLogger(EDACCManageComputationMethodDialog.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(EDACCManageComputationMethodDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ComputationMethodDoesNotExistException ex) {
-            Logger.getLogger(EDACCManageComputationMethodDialog.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
       }
 
     public void clearInputFields() {

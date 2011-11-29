@@ -32,6 +32,7 @@ public class Client extends BaseModel implements IntegerPKModel {
     private boolean dead;
     private int wait_time;
     private int current_wait_time;
+    private int timeleft;
     private HashMap<Experiment, Integer> computingExperiments;
     private Observable observable;
 
@@ -54,6 +55,7 @@ public class Client extends BaseModel implements IntegerPKModel {
         this.dead = rs.getBoolean("dead");
         this.wait_time = rs.getInt("jobs_wait_time");
         this.current_wait_time = rs.getInt("current_wait_time");
+        this.timeleft = rs.getInt("timeleft");
         computingExperiments = new HashMap<Experiment, Integer>();
         observable = new Observable() {
 
@@ -230,5 +232,16 @@ public class Client extends BaseModel implements IntegerPKModel {
             this.setModified();
         }
         this.wait_time = wait_time;
+    }
+
+    public int getTimeleft() {
+        return timeleft;
+    }
+
+    public void setTimeleft(int timeleft) {
+        if (this.timeleft != timeleft) {
+            this.setModified();
+        }
+        this.timeleft = timeleft;
     }
 }

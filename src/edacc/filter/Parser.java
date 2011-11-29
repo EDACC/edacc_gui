@@ -36,13 +36,14 @@ public class Parser {
      * @throws Exception if there are unknown arguments in the expression or there is a syntax error in the expression
      */
     public boolean eval(String expression, HashMap<Integer, Boolean> arguments, boolean test) throws Exception {
-        expression = expression.replaceAll(" ", "");
         boolean res = true;
         boolean not = false;
         int op = 0;
         int i = 0;
         while (i < expression.length()) {
-            if (expression.charAt(i) == '(') {
+            if (expression.charAt(i) == ' ') {
+                i++;
+            } else if (expression.charAt(i) == '(') {
                 if (op == -1) {
                     throw new Exception("");
                 }

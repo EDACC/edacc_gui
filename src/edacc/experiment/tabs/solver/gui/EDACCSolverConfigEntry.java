@@ -15,7 +15,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.sql.SQLException;
-import java.util.LinkedList;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -58,7 +57,7 @@ public class EDACCSolverConfigEntry extends javax.swing.JPanel {
         for (SolverBinaries sb : model.getSolver().getSolverBinaries()) {
             comboSolverBinaries.addItem(sb);
         }
-
+        parameterTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         parameterTable.setRowSelectionAllowed(false);
         parameterTable.setCellSelectionEnabled(false);
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {

@@ -345,7 +345,6 @@ public class ExperimentResultHasPropertyDAO {
             PropertyTypeNotExistException, IOException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException {
         HashMap<Integer, ExperimentResult> experimentResults = new HashMap<Integer, ExperimentResult>();
         for (ExperimentResult er : expResults) {
-            er.setPropertyValues(new HashMap<Integer, ExperimentResultHasProperty>());
             experimentResults.put(er.getId(), er);
         }
         HashMap<Integer, Property> solverProperties = new HashMap<Integer, Property>();

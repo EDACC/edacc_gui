@@ -103,7 +103,27 @@ public class ClientTableModel extends ThreadSafeDefaultTableModel implements Obs
                 for (Integer cores : clients.get(row).getComputingExperiments().values()) {
                     computeCores += cores;
                 }
-                return "" + computeCores + " threads computing " + clients.get(row).getComputingExperiments().size() + " experiments";
+                String timeleftStr = "";
+                int timeleft;
+                if ((timeleft = clients.get(row).getTimeleft()) > 0) {
+                    int seconds = timeleft % 60;
+                    timeleft /= 60;
+                    int minutes = timeleft % 60;
+                    timeleft /= 60;
+                    int hours = timeleft % 24;
+                    timeleft /= 24;
+                    int days = timeleft;
+                    if (days > 0) {
+                        timeleftStr = "" + days + "d" + hours + "h" + minutes + "m" + seconds + "s";
+                    } else if (hours > 0) {
+                        timeleftStr = hours + "h" + minutes + "m" + seconds + "s";
+                    } else if (minutes > 0) {
+                        timeleftStr = minutes + "m" + seconds + "s";
+                    } else if (seconds > 0) {
+                        timeleftStr = seconds + "s";
+                    }
+                }
+                return "" + computeCores + " threads computing " + clients.get(row).getComputingExperiments().size() + " experiments." + (!timeleftStr.equals("") ? " Expected timeleft: " + timeleftStr : "");
             case COL_WAITTIME:
                 return "" + clients.get(row).getCurrent_wait_time() + " sec / " + clients.get(row).getWait_time() + " sec";
             case COL_CORES:

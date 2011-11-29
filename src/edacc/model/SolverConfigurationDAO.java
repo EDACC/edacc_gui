@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -52,8 +53,7 @@ public class SolverConfigurationDAO {
             st.setString(4, i.getName());
             if (i.getCost() == null) {
                 st.setNull(5, java.sql.Types.FLOAT);
-            }
-            else {
+            } else {
                 st.setFloat(5, i.getCost());
             }
             st.setString(6, i.getCost_function());
@@ -88,6 +88,112 @@ public class SolverConfigurationDAO {
         }
     }
 
+    private static String getDeleteQuery(int count) {
+        String query = "DELETE FROM " + table + " WHERE idSolverConfig IN (?";
+        count--;
+        for (int i = 0; i < count; i++) {
+            query += ",?";
+        }
+        query += ")";
+        return query;
+    }
+
+    private static String getInsertQuery(int count) {
+        String query = "INSERT INTO " + table + " (SolverBinaries_IdSolverBinary, Experiment_IdExperiment, seed_group, name, cost, cost_function, parameter_hash, hint) VALUES (?,?,?,?,?,?,?,?)";
+        count--;
+        for (int i = 0; i < count; i++) {
+            query += ",(?,?,?,?,?,?,?,?)";
+        }
+        return query;
+    }
+
+    public static void saveAll(List<SolverConfiguration> scs) throws SQLException {
+        int deletedCount = 0, newCount = 0, modifiedCount = 0;
+        for (SolverConfiguration sc : scs) {
+            if (sc.isDeleted()) {
+                deletedCount++;
+            } else if (sc.isModified()) {
+                modifiedCount++;
+            } else if (sc.isNew()) {
+                newCount++;
+            }
+        }
+        PreparedStatement stDelete = null, stInsert = null, stUpdate = null;
+        if (deletedCount > 0) {
+            String query = getDeleteQuery(deletedCount);
+            stDelete = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        }
+        if (newCount > 0) {
+            String query = getInsertQuery(newCount);
+            stInsert = DatabaseConnector.getInstance().getConn().prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+        }
+        int posDelete = 1, posInsert = 1, posUpdate = 1;
+        for (SolverConfiguration sc : scs) {
+            if (sc.isDeleted()) {
+                stDelete.setInt(posDelete++, sc.getId());
+            } else if (sc.isModified()) {
+                if (stUpdate == null) {
+                    stUpdate = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
+                } 
+                stUpdate.setInt(1, sc.getSolverBinary().getIdSolverBinary());
+                stUpdate.setInt(2, sc.getSeed_group());
+                stUpdate.setString(3, sc.getName());
+                if (sc.getCost() == null) {
+                    stUpdate.setNull(4, java.sql.Types.FLOAT);
+                } else {
+                    stUpdate.setFloat(4, sc.getCost());
+                }
+                stUpdate.setString(5, sc.getCost_function());
+                stUpdate.setString(6, sc.getParameter_hash());
+                stUpdate.setString(7, sc.getHint());
+                stUpdate.setInt(8, sc.getId());
+                stUpdate.addBatch();
+            } else if (sc.isNew()) {
+                stInsert.setInt(posInsert++, sc.getSolverBinary().getId());
+                stInsert.setInt(posInsert++, sc.getExperiment_id());
+                stInsert.setInt(posInsert++, sc.getSeed_group());
+                stInsert.setString(posInsert++, sc.getName());
+                if (sc.getCost() == null) {
+                    stInsert.setNull(posInsert++, java.sql.Types.FLOAT);
+                } else {
+                    stInsert.setFloat(posInsert++, sc.getCost());
+                }
+                stInsert.setString(posInsert++, sc.getCost_function());
+                stInsert.setString(posInsert++, sc.getParameter_hash());
+                stInsert.setString(posInsert++, sc.getHint());
+            }
+        }
+
+        if (stDelete != null) {
+            stDelete.executeUpdate();
+            stDelete.close();
+        }
+        if (stUpdate != null) {
+            stUpdate.executeBatch();
+            stUpdate.close();
+        }
+        if (stInsert != null) {
+            stInsert.executeUpdate();
+            ResultSet generatedKeys = stInsert.getGeneratedKeys();
+
+            for (SolverConfiguration sc : scs) {
+                if (sc.isNew()) {
+                    if (generatedKeys.next()) {
+                        sc.setId(generatedKeys.getInt(1));
+                    }
+                }
+            }
+            generatedKeys.close();
+            stInsert.close();
+        }
+        for (SolverConfiguration sc : scs) {
+            if (sc.isModified() || sc.isNew()) {
+                sc.setSaved();
+            }
+            cache.cache(sc);
+        }
+    }
+
     public static ArrayList<ParameterInstance> getSolverConfigurationParameters(SolverConfiguration i) throws SQLException {
         return ParameterInstanceDAO.getBySolverConfig(i);
     }
@@ -99,7 +205,7 @@ public class SolverConfigurationDAO {
     public static void removeSolverConfiguration(SolverConfiguration solverConfig) {
         solverConfig.setDeleted();
     }
-    
+
     public static SolverConfiguration createSolverConfiguration(SolverBinaries solverBinary, int experimentId, int seed_group, String name, String hint) throws SQLException, Exception {
         return createSolverConfiguration(solverBinary, experimentId, seed_group, name, hint, null, null, null);
     }
@@ -131,6 +237,11 @@ public class SolverConfigurationDAO {
         while (rs.next()) {
             SolverConfiguration c = cache.getCached(rs.getInt("IdSolverConfig"));
             if (c != null) {
+                if (c.isSaved()) {
+                    SolverConfiguration tmp = getSolverConfigurationFromResultset(rs);
+                    c.setName(tmp.getName());
+                    c.setSaved();
+                }
                 res.add(c);
             } else {
                 SolverConfiguration i = getSolverConfigurationFromResultset(rs);
@@ -201,7 +312,7 @@ public class SolverConfigurationDAO {
         st.close();
         return res;
     }
-    
+
     public static SolverConfiguration getByParameterHash(int experimentId, String parameter_hash) throws SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE parameter_hash=? AND Experiment_idExperiment=?");
         st.setString(1, parameter_hash);

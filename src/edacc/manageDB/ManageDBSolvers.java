@@ -21,12 +21,15 @@ import edacc.model.Tasks;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.SequenceInputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
@@ -36,6 +39,7 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+import javax.imageio.stream.FileImageInputStream;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -59,6 +63,10 @@ public class ManageDBSolvers implements Observer {
         DatabaseConnector.getInstance().addObserver(this);
     }
 
+    public Solver getCurrentSolver() {
+        return currentSolver;
+    }
+
     /**
      * Loads all solvers from the DB and adds it to the Solver table.
      * @throws NoConnectionToDBException
@@ -80,7 +88,7 @@ public class ManageDBSolvers implements Observer {
      */
     public boolean applySolver(String name, String description, String author, String version) {
         if (currentSolver != null) {
-            if (currentSolver.getName().equals(name)
+            if (currentSolver.getName() != null && currentSolver.getName().equals(name)
                     && currentSolver.getDescription().equals(description)
                     && currentSolver.getAuthors().equals(author)
                     && currentSolver.getVersion().equals(version))
@@ -220,17 +228,33 @@ public class ManageDBSolvers implements Observer {
         if (binary.length == 0) {
             return;
         }
+        Arrays.sort(binary);
         SolverBinaries b = new SolverBinaries(currentSolver);
         b.setBinaryArchive(binary);
         b.setBinaryName(binary[0].getName());
-
-        Util.removeCommonPrefix(b);
-
-        // TODO beim SPeichern wird momentan ein zweites Mal gezippt -> zwischenspeichern vom Stream!!
-        ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(binary, new File(b.getRootDir()));
-        b.setMd5(Util.calculateMD5(new ByteArrayInputStream(zipped.toByteArray())));
+        FileInputStreamList is = new FileInputStreamList(binary);
+        SequenceInputStream seq = new SequenceInputStream(is);
+        String md5 = Util.calculateMD5(seq);
+        if (hasDuplicates(md5)) {
+            if (JOptionPane.showConfirmDialog(gui,
+                    "There already exists a solver binary with the same "
+                    + "checksum. Do you want to add this binary anyway?",
+                    "Duplicate solver binary",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+                    == JOptionPane.NO_OPTION)
+                return;
+        }
+        b.setMd5(md5);
+        Util.removeCommonPrefix(b);        
         new EDACCSolverBinaryDlg(EDACCApp.getApplication().getMainFrame(), b, this, EDACCSolverBinaryDlg.DialogMode.CREATE_MODE).setVisible(true);
         gui.showSolverBinariesDetails(currentSolver.getSolverBinaries());
+    }
+
+    private boolean hasDuplicates(String md5) {
+        for (SolverBinaries b : currentSolver.getSolverBinaries())
+            if (md5.equals(b.getMd5()))
+                return true;
+        return false;
     }
     
     /**
@@ -244,13 +268,22 @@ public class ManageDBSolvers implements Observer {
         if (binary.length == 0) {
             return;
         }
+        Arrays.sort(binary);
         solverBin.setBinaryArchive(binary);
-
+        FileInputStreamList is = new FileInputStreamList(binary);
+        SequenceInputStream seq = new SequenceInputStream(is);
+        String md5 = Util.calculateMD5(seq);
+        if (hasDuplicates(md5)) {
+            if (JOptionPane.showConfirmDialog(gui,
+                    "There already exists a solver binary with the same "
+                    + "checksum. Do you want to add this binary anyway?",
+                    "Duplicate solver binary",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+                    == JOptionPane.NO_OPTION)
+                return;
+        }
+        solverBin.setMd5(md5);
         Util.removeCommonPrefix(solverBin);
-
-        // TODO beim SPeichern wird momentan ein zweites Mal gezippt -> zwischenspeichern vom Stream!!
-        ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(binary, new File(solverBin.getRootDir()));
-        solverBin.setMd5(Util.calculateMD5(new ByteArrayInputStream(zipped.toByteArray())));
         new EDACCSolverBinaryDlg(EDACCApp.getApplication().getMainFrame(), solverBin, this, EDACCSolverBinaryDlg.DialogMode.EDIT_MODE).setVisible(true);
         gui.showSolverBinariesDetails(currentSolver.getSolverBinaries());
     }

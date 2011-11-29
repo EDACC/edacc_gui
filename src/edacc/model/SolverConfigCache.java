@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Observable;
 import javax.swing.SwingUtilities;
 
@@ -46,6 +47,10 @@ public class SolverConfigCache extends Observable {
                 notifyObservers(sc);
             }
         });
+    }
+    
+    public synchronized SolverConfiguration getSolverConfigurationById(Integer id) {
+        return solverConfigs.get(id);
     }
 
     public synchronized void synchronize() throws SQLException {
@@ -135,11 +140,22 @@ public class SolverConfigCache extends Observable {
      * @throws SQLException
      */
     public synchronized void saveAll() throws SQLException {
+        SolverConfigurationDAO.saveAll(getAll());
         for (SolverConfiguration sc : getAll()) {
-            SolverConfigurationDAO.save(sc);
             if (sc.isDeleted()) {
                 solverConfigs.remove(sc.getId());
             }
+        }
+    }
+
+    public void createAll(List<SolverConfiguration> solverConfigurations) throws SQLException {
+        for (SolverConfiguration sc : solverConfigurations)
+            if (!sc.isNew()) {
+                throw new IllegalArgumentException("Can't create existing solver configurations");
+            }
+        SolverConfigurationDAO.saveAll(solverConfigurations);
+        for (SolverConfiguration sc : solverConfigurations) {
+            solverConfigs.put(sc.getId(), sc);
         }
     }
 }

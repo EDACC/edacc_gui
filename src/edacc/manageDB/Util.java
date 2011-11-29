@@ -43,6 +43,9 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -90,7 +93,7 @@ public class Util {
         return buf.toString();
     }
 
-    public static String calculateMD5(ByteArrayInputStream is) throws NoSuchAlgorithmException, IOException {
+    public static String calculateMD5(InputStream is) throws NoSuchAlgorithmException, IOException {
         MessageDigest digest = MessageDigest.getInstance("MD5");
         byte[] buffer = new byte[8192];
         int read = 0;
@@ -452,6 +455,4 @@ public class Util {
         }
         return lcp;
     }
-
-
 }
