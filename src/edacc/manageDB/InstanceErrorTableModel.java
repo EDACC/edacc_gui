@@ -9,7 +9,8 @@ import edacc.model.Instance;
 import java.util.ArrayList;
 
 /**
- *
+ * TableModel created for the Table with the instances a error occured by adding them to the database.
+ * Used in the EDACCAddInstanceErrorDialog.
  * @author rretz
  */
 public class InstanceErrorTableModel extends ThreadSafeDefaultTableModel {
@@ -17,7 +18,8 @@ public class InstanceErrorTableModel extends ThreadSafeDefaultTableModel {
     private String[] columns = {"Name", "MD5"};
     ArrayList<Instance> instances;
 
-    public InstanceErrorTableModel() {
+    public InstanceErrorTableModel(ArrayList<Instance> instances) {
+        this.instances = instances;
     }
 
     @Override
@@ -53,6 +55,12 @@ public class InstanceErrorTableModel extends ThreadSafeDefaultTableModel {
                 instances.get(row).getMd5();
             default:
                 return null;
+        }
+    }
+    
+    public void remove(ArrayList<Instance> toRemove){
+        for(Instance remove : toRemove){
+            instances.remove(remove);
         }
     }
 }

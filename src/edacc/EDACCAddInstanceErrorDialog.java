@@ -11,9 +11,11 @@
 package edacc;
 
 import edacc.manageDB.AddInstanceErrorController;
+import edacc.manageDB.InstanceDupErrorFilter;
 import edacc.model.Instance;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -21,6 +23,7 @@ import java.util.HashMap;
  */
 public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
     private AddInstanceErrorController controller;
+    private InstanceDupErrorFilter dupErrorFilter;
 
     /** Creates new form EDACCAddInstanceErrorDialog */
     public EDACCAddInstanceErrorDialog(java.awt.Frame parent, boolean modal) {
@@ -255,13 +258,26 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
         });
     }
 
-    public void initialize(ArrayList<Instance> toAdd, HashMap<Instance, ArrayList<Instance>> duplicateMd5, HashMap<Instance, ArrayList<Instance>> duplicateName) {
-        controller = new AddInstanceErrorController(toAdd, duplicateMd5, duplicateName);
+    public void initialize(ArrayList<Instance> toAdd, HashMap<Instance, ArrayList<Instance>> duplicate) {
+        controller = new AddInstanceErrorController(toAdd, duplicate);
+        
+        // initialize the InstanceToAdd table
         jTableInstancesToAdd.setModel(controller.getToAddModel());
-        jTableProblemCausing.setModel(controller.getDuplicateModel());
+        jTableInstancesToAdd.setRowSorter(controller.getToAddSorter());
+
         
-        
+        // initialize the ProblemCausing table
+        jTableProblemCausing.setModel(controller.getDuplicateModel());  
+        jTableProblemCausing.setRowSorter(controller.getDuplicateSorter());
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                dupErrorFilter = new InstanceDupErrorFilter(EDACCApp.getApplication().getMainFrame(), true, jTableProblemCausing, true);
+            }
+        });
     }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtnAdd;
     private javax.swing.JButton jBtnDone;

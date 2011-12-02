@@ -8,24 +8,40 @@ import edacc.model.Instance;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
  * @author rretz
  */
 public class AddInstanceErrorController {
-    public TableModel getDuplicateModel;
-
-    public AddInstanceErrorController(ArrayList<Instance> toAdd, HashMap<Instance, ArrayList<Instance>> duplicateMd5, HashMap<Instance, ArrayList<Instance>> duplicateName) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    private InstanceDupErrorTableModel duplicateModel;
+    private TableRowSorter<InstanceDupErrorTableModel> duplicateSorter;
+    private InstanceErrorTableModel toAddModel;
+    private TableRowSorter<InstanceErrorTableModel> toAddSorter;
+    
+    public AddInstanceErrorController(ArrayList<Instance> toAdd, HashMap<Instance, ArrayList<Instance>> duplicate) {
+        duplicateModel = new InstanceDupErrorTableModel(duplicate);
+        duplicateSorter = new TableRowSorter<InstanceDupErrorTableModel>();
+        
+        toAddModel = new InstanceErrorTableModel(toAdd);      
+        toAddSorter = new TableRowSorter<InstanceErrorTableModel>();
     }
 
     public TableModel getToAddModel() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        return toAddModel;
+    }
+    
+    public TableRowSorter getToAddSorter(){
+        return toAddSorter;
     }
 
     public TableModel getDuplicateModel() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        return duplicateModel;
+    }
+    
+    public TableRowSorter getDuplicateSorter(){
+        return duplicateSorter;
     }
     
 }
