@@ -63,4 +63,8 @@ public class InstanceErrorTableModel extends ThreadSafeDefaultTableModel {
             instances.remove(remove);
         }
     }
+    
+    public Instance getInstance(int row){
+        return instances.get(row);
+    }
 }

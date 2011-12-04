@@ -4,6 +4,7 @@
  */
 package edacc.manageDB;
 
+import edacc.EDACCAddInstanceErrorDialog;
 import edacc.model.Instance;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,16 +20,22 @@ public class AddInstanceErrorController {
     private TableRowSorter<InstanceDupErrorTableModel> duplicateSorter;
     private InstanceErrorTableModel toAddModel;
     private TableRowSorter<InstanceErrorTableModel> toAddSorter;
+    private EDACCAddInstanceErrorDialog main;
+    private InstanceDupErrorFilter filter;
     
-    public AddInstanceErrorController(ArrayList<Instance> toAdd, HashMap<Instance, ArrayList<Instance>> duplicate) {
+    public AddInstanceErrorController(ArrayList<Instance> toAdd, HashMap<Instance, ArrayList<Instance>> duplicate, EDACCAddInstanceErrorDialog main) {
         duplicateModel = new InstanceDupErrorTableModel(duplicate);
         duplicateSorter = new TableRowSorter<InstanceDupErrorTableModel>();
         
         toAddModel = new InstanceErrorTableModel(toAdd);      
         toAddSorter = new TableRowSorter<InstanceErrorTableModel>();
+        
+        filter = new InstanceDupErrorFilter(duplicateModel);
+        
+        this.main = main;
     }
 
-    public TableModel getToAddModel() {
+    public InstanceErrorTableModel getToAddModel() {
         return toAddModel;
     }
     
@@ -36,12 +43,20 @@ public class AddInstanceErrorController {
         return toAddSorter;
     }
 
-    public TableModel getDuplicateModel() {
+    public InstanceDupErrorTableModel getDuplicateModel() {
         return duplicateModel;
     }
     
     public TableRowSorter getDuplicateSorter(){
         return duplicateSorter;
+    }
+    
+    public InstanceDupErrorFilter getFilter(){
+        return filter;
+    }
+
+    public void updateFilter() {       
+        filter.setSelectedInstance(toAddModel.getInstance(main.getSelectedToAddInstance()).getId());
     }
     
 }

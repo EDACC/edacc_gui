@@ -12,6 +12,7 @@ package edacc;
 
 import edacc.manageDB.AddInstanceErrorController;
 import edacc.manageDB.InstanceDupErrorFilter;
+import edacc.manageDB.InstancesToAddSelectionListener;
 import edacc.model.Instance;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,8 +23,10 @@ import javax.swing.SwingUtilities;
  * @author rretz
  */
 public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
+
     private AddInstanceErrorController controller;
     private InstanceDupErrorFilter dupErrorFilter;
+    private InstanceDupErrorFilter filter;
 
     /** Creates new form EDACCAddInstanceErrorDialog */
     public EDACCAddInstanceErrorDialog(java.awt.Frame parent, boolean modal) {
@@ -260,24 +263,27 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
 
     public void initialize(ArrayList<Instance> toAdd, HashMap<Instance, ArrayList<Instance>> duplicate) {
         controller = new AddInstanceErrorController(toAdd, duplicate);
-        
-        // initialize the InstanceToAdd table
-        jTableInstancesToAdd.setModel(controller.getToAddModel());
-        jTableInstancesToAdd.setRowSorter(controller.getToAddSorter());
 
-        
-        // initialize the ProblemCausing table
-        jTableProblemCausing.setModel(controller.getDuplicateModel());  
+
+        // initialize the ProblemCausing (Duplicate Instance) table
+        jTableProblemCausing.setModel(controller.getDuplicateModel());
         jTableProblemCausing.setRowSorter(controller.getDuplicateSorter());
+
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
-                dupErrorFilter = new InstanceDupErrorFilter(EDACCApp.getApplication().getMainFrame(), true, jTableProblemCausing, true);
+                filter = new InstanceDupErrorFilter(controller.getDuplicateModel());
             }
         });
+
+        // initialize the InstanceToAdd table
+        jTableInstancesToAdd.setModel(controller.getToAddModel());
+        jTableInstancesToAdd.setRowSorter(controller.getToAddSorter());
+        jTableInstancesToAdd.getSelectionModel().addListSelectionListener(new InstancesToAddSelectionListener(filter, jTableInstancesToAdd));
+
+
     }
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtnAdd;
     private javax.swing.JButton jBtnDone;
@@ -292,4 +298,8 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
     private javax.swing.JTable jTableInstancesToAdd;
     private javax.swing.JTable jTableProblemCausing;
     // End of variables declaration//GEN-END:variables
+
+    public int getSelectedToAddInstance() {
+        return jTableInstancesToAdd.getSelectedRow();
+    }
 }

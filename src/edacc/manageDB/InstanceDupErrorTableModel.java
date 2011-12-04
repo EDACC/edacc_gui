@@ -6,6 +6,8 @@ package edacc.manageDB;
 
 import edacc.experiment.ThreadSafeDefaultTableModel;
 import edacc.model.Instance;
+import edacc.model.InstanceDAO;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,8 +23,11 @@ public class InstanceDupErrorTableModel extends ThreadSafeDefaultTableModel {
 
     private ArrayList<Instance> instances = new ArrayList<Instance>();
     private String[] columns = {"Name", "MD5", "Path", "Link"};
+    // <id of instance to link, error causing instance to link to>
     private HashMap<Integer, Instance> toLink = new HashMap<Integer, Instance>();
+    // <duplicate Instance, error causing instance>
     private HashMap<Instance, Instance> relatedInstances = new HashMap<Instance, Instance>();
+    // <error causing instance, all related duplicate instances>
     private HashMap<Instance, ArrayList<Instance>> backRelation;
 
     public InstanceDupErrorTableModel(HashMap<Instance, ArrayList<Instance>> instances) {
@@ -125,4 +130,12 @@ public class InstanceDupErrorTableModel extends ThreadSafeDefaultTableModel {
         }
 
     }
+    
+    /**
+     * Returns the error causing instance object which is related to the given duplicate Instance
+     */
+    public Instance getRelatedErrorInstance(int id) throws SQLException{
+        return relatedInstances.get(InstanceDAO.getById(id));
+    }
+    
 }
