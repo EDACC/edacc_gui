@@ -12,6 +12,7 @@ package edacc;
 
 import edacc.manageDB.AddInstanceErrorController;
 import edacc.manageDB.InstanceDupErrorFilter;
+import edacc.manageDB.InstanceErrorTableModel;
 import edacc.manageDB.InstancesToAddSelectionListener;
 import edacc.model.Instance;
 import java.util.ArrayList;
@@ -239,6 +240,7 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jBtnAddActionPerformed
 
     private void jBtnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDoneActionPerformed
+        controller.drop(((InstanceErrorTableModel)jTableInstancesToAdd.getModel()).getAllInstances());
         this.dispose();
     }//GEN-LAST:event_jBtnDoneActionPerformed
 
@@ -261,8 +263,8 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
         });
     }
 
-    public void initialize(ArrayList<Instance> toAdd, HashMap<Instance, ArrayList<Instance>> duplicate) {
-        controller = new AddInstanceErrorController(toAdd, duplicate);
+    public void initialize(HashMap<Instance, ArrayList<Instance>> duplicate) {
+        controller = new AddInstanceErrorController(duplicate, this);
 
 
         // initialize the ProblemCausing (Duplicate Instance) table
@@ -280,7 +282,7 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
         // initialize the InstanceToAdd table
         jTableInstancesToAdd.setModel(controller.getToAddModel());
         jTableInstancesToAdd.setRowSorter(controller.getToAddSorter());
-        jTableInstancesToAdd.getSelectionModel().addListSelectionListener(new InstancesToAddSelectionListener(filter, jTableInstancesToAdd));
+        jTableInstancesToAdd.getSelectionModel().addListSelectionListener(new InstancesToAddSelectionListener(controller));
 
 
     }

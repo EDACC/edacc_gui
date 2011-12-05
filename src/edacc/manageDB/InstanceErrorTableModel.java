@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class InstanceErrorTableModel extends ThreadSafeDefaultTableModel {
 
     private String[] columns = {"Name", "MD5"};
-    ArrayList<Instance> instances;
+    private ArrayList<Instance> instances;
 
     public InstanceErrorTableModel(ArrayList<Instance> instances) {
         this.instances = instances;
@@ -66,5 +66,9 @@ public class InstanceErrorTableModel extends ThreadSafeDefaultTableModel {
     
     public Instance getInstance(int row){
         return instances.get(row);
+    }
+
+    public ArrayList<Instance> getAllInstances() {
+        return instances;
     }
 }

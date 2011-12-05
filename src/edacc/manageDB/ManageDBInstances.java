@@ -4,6 +4,7 @@
  */
 package edacc.manageDB;
 
+import edacc.EDACCAddInstanceErrorDialog;
 import edacc.EDACCAddInstanceToInstanceClass;
 import edacc.EDACCApp;
 import edacc.EDACCCreateEditInstanceClassDialog;
@@ -15,6 +16,7 @@ import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentHasInstanceDAO;
 import edacc.model.InstanceClassAlreadyInDBException;
+import edacc.model.InstanceDuplicateInDBException;
 import edacc.model.InstanceDuplicateMd5Exception;
 import edacc.model.InstanceDuplicateNameException;
 import edacc.model.InstanceNotInDBException;
@@ -109,7 +111,7 @@ public class ManageDBInstances implements Observer {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
-        } 
+        }
     }
 
     /**
@@ -369,14 +371,9 @@ public class ManageDBInstances implements Observer {
 
         Vector<Instance> instances = new Vector<Instance>();
         String duplicatesDB = "";
-        
-        Vector<File> duplicateName = new Vector<File>();
-        Vector<String> duplicateNameMd5Value = new Vector<String>();
-        Vector<File> duplicateMd5 = new Vector<File>();
-        Vector<String> duplicateMd5Md5Value = new Vector<String>();
-        Vector<File> duplicateBoth = new Vector<File>();
-        Vector<String> duplicateBothMd5Value = new Vector<String>();
-        
+
+        HashMap<Instance, ArrayList<Instance>> duplicate = new HashMap<Instance, ArrayList<Instance>>();
+
         Vector<String> errorsDB = new Vector<String>();
         Vector<String> errorsAdd = new Vector<String>();
         StringBuilder instanceErrors = new StringBuilder("");
@@ -393,53 +390,30 @@ public class ManageDBInstances implements Observer {
             try {
                 md5 = calculateMD5(instanceFiles.get(i));
                 String fileName = instanceFiles.get(i).getName();
-                Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), fileName, md5);
+                Instance temp;
+                temp = InstanceDAO.createInstance(instanceFiles.get(i), fileName, md5);
+
                 instances.add(temp);
                 InstanceDAO.save(temp, compressBinary, instanceClass);
                 this.tmp.add(temp);
-            } catch (InstanceDuplicateNameException ex) {
-                duplicateName.add(instanceFiles.get(i));
-                duplicateNameMd5Value.add(md5);
-            } catch (InstanceDuplicateMd5Exception ex) {
-               duplicateMd5.add(instanceFiles.get(i));
-               duplicateMd5Md5Value.add(md5);
+            } catch (InstanceDuplicateInDBException ex) {
+                Instance dup = new Instance();
+                dup.setFile(instanceFiles.get(i));
+                dup.setName(instanceFiles.get(i).getName());
+                dup.setMd5(md5);
+                duplicate.put(dup, ex.getDuplicates());
+
             } catch (InstanceAlreadyInDBException ex) {
-                duplicateBoth.add(instanceFiles.get(i));
-                duplicateBothMd5Value.add(md5);
-                errorsDB.add(instanceFiles.get(i).getAbsolutePath());
-                errorsDBInstances.add(md5);
+                InstanceHasInstanceClassDAO.createInstanceHasInstance(ex.getDuplicate(), instanceClass);
             }
-            task.setTaskProgress((float) i / (float) instanceFiles.size());
-            task.setStatus("Added " + i + " instances of " + instanceFiles.size());
-        }
 
-        errorHandlerAddInstance(duplicateName, duplicateNameMd5Value, duplicateMd5, duplicateMd5Md5Value, duplicateBoth, duplicateBothMd5Value);
-        
-        /*
-        setTmp(new Vector<Instance>());
-        String instanceErrs = instanceErrors.toString();
-        if (!errorsAdd.isEmpty()) {
-            FileNameTableModel tmp = new FileNameTableModel();
-            tmp.setAll(errorsAdd);
-            EDACCExtendedWarning.showMessageDialog(
-                    EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
-                    "By adding the following instances an error occured.",
-                    new JTable(tmp));
+            task.setTaskProgress(
+                    (float) i
+                    / (float) instanceFiles.size());
+            task.setStatus(
+                    "Added " + i + " instances of " + instanceFiles.size());
         }
-
-        if (!errorsDB.isEmpty()) {
-            FileNameTableModel tmp = new FileNameTableModel();
-            tmp.setAll(errorsDB);
-            if (EDACCExtendedWarning.showMessageDialog(
-                    EDACCExtendedWarning.OK_CANCEL_OPTIONS, EDACCApp.getApplication().getMainFrame(),
-                    "The following instances are already in the database. (Equal name or md5 hash). \\n"
-                    + "Do you want to add the instances to the selected/autobuilded classes?",
-                    new JTable(tmp)) == EDACCExtendedWarning.RET_OK_OPTION) {
-                for (int i = 0; i < errorsDBInstances.size(); i++) {
-                    InstanceHasInstanceClassDAO.createInstanceHasInstance(InstanceDAO.getByMd5(errorsDBInstances.get(i)), instanceClass);
-                }
-            }
-        }*/
+        HandlerAddInstance(duplicate);
 
         return instances;
     }
@@ -797,6 +771,8 @@ public class ManageDBInstances implements Observer {
             tableModel.addClasses(instanceClasses);
             EDACCExtendedWarning.showMessageDialog(EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(), "The selected instances belong to the following common instance classes.", new JTable(tableModel));
 
+
+
         } catch (NoConnectionToDBException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
@@ -1030,11 +1006,13 @@ public class ManageDBInstances implements Observer {
     public void loadProperties() {
         try {
             PropertyDAO.init();
+
+
         } catch (SQLException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(ManageDBInstances.class.getName()).log(Level.SEVERE, null, ex);
-        } 
+        }
     }
 
     /**
@@ -1093,7 +1071,11 @@ public class ManageDBInstances implements Observer {
             //Get the selected instance classes
 
             ArrayList<Instance> toRemove = new ArrayList<Instance>(selectedToRemove.values());
-            Tasks.startTask("tryToRemoveInstances", new Class[]{ArrayList.class, ArrayList.class, ArrayList.class, edacc.model.Tasks.class}, new Object[]{toRemove, lastOccurrence, classes, null}, this, this.main);
+            Tasks.startTask("tryToRemoveInstances", new Class[]{ArrayList.class, ArrayList.class, ArrayList.class, edacc.model.Tasks.class
+                    },
+                    new Object[]{
+                        toRemove, lastOccurrence, classes, null},
+                    this, this.main);
         }
     }
 
@@ -1160,16 +1142,12 @@ public class ManageDBInstances implements Observer {
         Tasks.getTaskView().setCancelable(false);
     }
 
-    /**
-     * 
-     * @param duplicateName
-     * @param duplicateNameMd5Value
-     * @param duplicateMd5
-     * @param duplicateMd5Md5Value
-     * @param duplicateBoth
-     * @param duplicateBothMd5Value 
-     */
-    private void errorHandlerAddInstance(Vector<File> duplicateName, Vector<String> duplicateNameMd5Value, Vector<File> duplicateMd5, Vector<String> duplicateMd5Md5Value, Vector<File> duplicateBoth, Vector<String> duplicateBothMd5Value) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    private void HandlerAddInstance(HashMap<Instance, ArrayList<Instance>> duplicate) {
+        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+        EDACCAddInstanceErrorDialog errorDialog = new EDACCAddInstanceErrorDialog(mainFrame, true);
+        errorDialog.initialize(duplicate);
+        EDACCApp.getApplication().show(errorDialog);
     }
+
+
 }

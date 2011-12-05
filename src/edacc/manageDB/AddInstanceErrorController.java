@@ -23,10 +23,11 @@ public class AddInstanceErrorController {
     private EDACCAddInstanceErrorDialog main;
     private InstanceDupErrorFilter filter;
     
-    public AddInstanceErrorController(ArrayList<Instance> toAdd, HashMap<Instance, ArrayList<Instance>> duplicate, EDACCAddInstanceErrorDialog main) {
+    public AddInstanceErrorController(HashMap<Instance, ArrayList<Instance>> duplicate, EDACCAddInstanceErrorDialog main) {
         duplicateModel = new InstanceDupErrorTableModel(duplicate);
         duplicateSorter = new TableRowSorter<InstanceDupErrorTableModel>();
         
+        ArrayList<Instance> toAdd = (ArrayList<Instance>) duplicate.keySet();
         toAddModel = new InstanceErrorTableModel(toAdd);      
         toAddSorter = new TableRowSorter<InstanceErrorTableModel>();
         
@@ -57,6 +58,10 @@ public class AddInstanceErrorController {
 
     public void updateFilter() {       
         filter.setSelectedInstance(toAddModel.getInstance(main.getSelectedToAddInstance()).getId());
+    }
+
+    public void drop(ArrayList<Instance> allInstances) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
     
 }

@@ -73,7 +73,7 @@ public class InstanceDAO {
      * @throws InstanceAlreadyInDBException
      */
     public static Instance createInstance(File file, String name, String md5) throws SQLException, FileNotFoundException,
-            InstanceAlreadyInDBException, InstanceDuplicateNameException, InstanceDuplicateMd5Exception {
+            InstanceAlreadyInDBException, InstanceDuplicateInDBException {
         PreparedStatement ps;
         final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ? or name = ?";
         ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
@@ -573,17 +573,20 @@ public class InstanceDAO {
      * @throws InstanceDuplicateNameException
      * @throws InstanceDuplicateMd5Exception 
      */
-    private static void alreadyInDB(ResultSet rs, File file, String name, String md5) throws SQLException, InstanceAlreadyInDBException, InstanceDuplicateNameException, InstanceDuplicateMd5Exception {
-        while (rs.next()) {
+    private static void alreadyInDB(ResultSet rs, File file, String name, String md5) throws SQLException, InstanceAlreadyInDBException, InstanceDuplicateInDBException {
+        ArrayList<Instance> duplicates = new ArrayList<Instance>();
+        while (rs.next()) {           
+            int instanceId = rs.getInt("idInstance");
+            Instance duplicate = getById(instanceId);
+            if (duplicate.getName().equals(name) && duplicate.getMd5().equals(md5)) {
+                throw new InstanceAlreadyInDBException(duplicate);
+            }else {
+                duplicates.add(duplicate);
+            }              
         }
-        Instance duplicate = getById(instanceId);
-
-        if (duplicate.getName().equals(name) && duplicate.getMd5().equals(md5)) {
-            throw new InstanceAlreadyInDBException();
-        } else if (duplicate.getName().equals(name)) {
-            throw new InstanceDuplicateNameException();
-        } else if (duplicate.getMd5().equals(md5)) {
-            throw new InstanceDuplicateMd5Exception();
+        
+        if(!duplicates.isEmpty()){
+            throw new InstanceDuplicateInDBException(duplicates);
         }
     }
 }
