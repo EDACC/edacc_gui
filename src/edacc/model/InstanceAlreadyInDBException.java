@@ -20,7 +20,7 @@ public class InstanceAlreadyInDBException extends Exception{
     }
 
     InstanceAlreadyInDBException(Instance duplicate) {
-        duplicate = duplicate;
+        this.duplicate = duplicate;
     }
     
 

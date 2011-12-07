@@ -80,7 +80,7 @@ public class InstanceDAO {
         ps.setString(1, md5);
         ps.setString(2, name);
         ResultSet rs = ps.executeQuery();
-        alreadyInDB(rs, file, name, md5);
+        alreadyInDB(rs, name, md5);
         Instance i = new Instance();
         i.setFile(file);
         i.setName(name);
@@ -90,16 +90,14 @@ public class InstanceDAO {
         return i;
     }
 
-    public static Instance createInstance(String name, String formula, InstanceClass instanceClass) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException, InstanceAlreadyInDBException {
+    public static Instance createInstance(String name, String formula, InstanceClass instanceClass) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException, InstanceAlreadyInDBException, InstanceDuplicateInDBException {
         String md5 = edacc.manageDB.Util.calculateMD5(formula);
         PreparedStatement ps;
-        final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ?;";
+        final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ? or name = ?";
         ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
         ps.setString(1, md5);
         ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            throw new InstanceAlreadyInDBException();
-        }
+        alreadyInDB(rs, name, md5);
         Instance i = new Instance();
         i.setName(name);
         i.setMd5(md5);
@@ -565,7 +563,6 @@ public class InstanceDAO {
     /**
      *  Throws an exception, depending on the state of equality of the instances.
      * @param rs ResultSet with the duplicate entries.
-     * @param file Instance file of the new created instance.
      * @param name Name of the new created instance.
      * @param md5 MD5 sum of the new created instance.   
      * @throws SQLException
@@ -573,7 +570,7 @@ public class InstanceDAO {
      * @throws InstanceDuplicateNameException
      * @throws InstanceDuplicateMd5Exception 
      */
-    private static void alreadyInDB(ResultSet rs, File file, String name, String md5) throws SQLException, InstanceAlreadyInDBException, InstanceDuplicateInDBException {
+    private static void alreadyInDB(ResultSet rs, String name, String md5) throws SQLException, InstanceAlreadyInDBException, InstanceDuplicateInDBException {
         ArrayList<Instance> duplicates = new ArrayList<Instance>();
         while (rs.next()) {           
             int instanceId = rs.getInt("idInstance");
@@ -589,4 +586,5 @@ public class InstanceDAO {
             throw new InstanceDuplicateInDBException(duplicates);
         }
     }
+
 }

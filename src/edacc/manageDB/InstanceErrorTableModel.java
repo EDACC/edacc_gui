@@ -7,24 +7,31 @@ package edacc.manageDB;
 import edacc.experiment.ThreadSafeDefaultTableModel;
 import edacc.model.Instance;
 import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
 
 /**
  * TableModel created for the Table with the instances a error occured by adding them to the database.
  * Used in the EDACCAddInstanceErrorDialog.
  * @author rretz
  */
-public class InstanceErrorTableModel extends ThreadSafeDefaultTableModel {
+public class InstanceErrorTableModel extends DefaultTableModel {
 
     private String[] columns = {"Name", "MD5"};
-    private ArrayList<Instance> instances;
+    private ArrayList<Instance> instances = new ArrayList<Instance>();
 
-    public InstanceErrorTableModel(ArrayList<Instance> instances) {
-        this.instances = instances;
+    public InstanceErrorTableModel() {
+        
+    }
+
+    InstanceErrorTableModel(ArrayList<Instance> toAdd) {
+        this.instances = toAdd;
     }
 
     @Override
     public int getRowCount() {
-        return instances == null ? 0 : instances.size();
+        if(instances == null)
+            return 0;
+        return instances.size();
     }
 
     @Override
@@ -50,25 +57,26 @@ public class InstanceErrorTableModel extends ThreadSafeDefaultTableModel {
     public Object getValueAt(int row, int col) {
         switch (col) {
             case 0:
-                instances.get(row).getName();
+                return instances.get(row).getName();
             case 1:
-                instances.get(row).getMd5();
+                return instances.get(row).getMd5();
             default:
-                return null;
+                return "";
         }
     }
-    
-    public void remove(ArrayList<Instance> toRemove){
-        for(Instance remove : toRemove){
+
+    public void remove(ArrayList<Instance> toRemove) {
+        for (Instance remove : toRemove) {
             instances.remove(remove);
         }
     }
-    
-    public Instance getInstance(int row){
+
+    public Instance getInstance(int row) {
         return instances.get(row);
     }
 
     public ArrayList<Instance> getAllInstances() {
         return instances;
     }
+
 }

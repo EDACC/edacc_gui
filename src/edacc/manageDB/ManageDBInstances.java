@@ -77,6 +77,7 @@ public class ManageDBInstances implements Observer {
     Lock lock = new ReentrantLock();
     Condition condition;
     private Vector<Instance> tmp;
+    private HashMap<Instance, ArrayList<Instance>> duplicate;
 
     public void setTmp(Vector<Instance> tmp) {
         this.tmp = tmp;
@@ -413,7 +414,7 @@ public class ManageDBInstances implements Observer {
             task.setStatus(
                     "Added " + i + " instances of " + instanceFiles.size());
         }
-        HandlerAddInstance(duplicate);
+        setDuplicateInstances(duplicate);
 
         return instances;
     }
@@ -436,6 +437,8 @@ public class ManageDBInstances implements Observer {
         if (instanceFiles.isEmpty()) {
             throw new InstanceException();
         }
+
+        HashMap<Instance, ArrayList<Instance>> duplicate = new HashMap<Instance, ArrayList<Instance>>();
         Vector<Instance> instances = new Vector<Instance>();
         Vector<String> errorsDB = new Vector<String>();
         Vector<String> errorsAdd = new Vector<String>();
@@ -451,52 +454,59 @@ public class ManageDBInstances implements Observer {
             if (task.isCancelled()) {
                 throw new TaskCancelledException();
             }
+            String md5 = calculateMD5(instanceFiles.get(i));
+            String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, instanceFiles.get(i).getParent().length());
+            String[] possibleInstanceClasses = rawPath.split("\\\\|/");
+            if (possibleInstanceClasses.length != 1) {
+                instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes, 0);
+            } else {
+                instanceClass = (InstanceClass) ((DefaultMutableTreeNode) nodes.getRoot()).getUserObject();
+            }
             try {
-                String md5 = calculateMD5(instanceFiles.get(i));
-
                 //Get all InstanceClasses of the Instance and assigne it to the corresponding InstanceClass
-                String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, instanceFiles.get(i).getParent().length());
-                String[] possibleInstanceClasses = rawPath.split("\\\\|/");
-                if (possibleInstanceClasses.length != 1) {
-                    instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes, 0);
-                } else {
-                    instanceClass = (InstanceClass) ((DefaultMutableTreeNode) nodes.getRoot()).getUserObject();
-                }
+
                 Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), instanceFiles.get(i).getName(), md5);
                 instances.add(temp);
                 InstanceDAO.save(temp, compressBinary, instanceClass);
                 this.tmp.add(temp);
 
+            } catch (InstanceDuplicateInDBException ex) {
+                Instance dup = new Instance();
+                dup.setFile(instanceFiles.get(i));
+                dup.setName(instanceFiles.get(i).getName());
+                dup.setMd5(md5);
+                duplicate.put(dup, ex.getDuplicates());
+
             } catch (InstanceAlreadyInDBException ex) {
-                errorsDB.add(instanceFiles.get(i).getAbsolutePath());
-                errorsDBInstances.add(instanceFiles.get(i));
+                InstanceHasInstanceClassDAO.createInstanceHasInstance(ex.getDuplicate(), instanceClass);
             }
             task.setTaskProgress((float) i / (float) instanceFiles.size());
             task.setStatus("Added " + i + " instances of " + instanceFiles.size());
         }
         setTmp(new Vector<Instance>());
-        if (!errorsAdd.isEmpty()) {
-            FileNameTableModel tmp = new FileNameTableModel();
-            tmp.setAll(errorsAdd);
-            EDACCExtendedWarning.showMessageDialog(
-                    EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
-                    "By adding the following instances an error occured.",
-                    new JTable(tmp));
+        /*if (!errorsAdd.isEmpty()) {
+        FileNameTableModel tmp = new FileNameTableModel();
+        tmp.setAll(errorsAdd);
+        EDACCExtendedWarning.showMessageDialog(
+        EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
+        "By adding the following instances an error occured.",
+        new JTable(tmp));
         }
-
+        
         if (!errorsDB.isEmpty()) {
-            FileNameTableModel tmp = new FileNameTableModel();
-            tmp.setAll(errorsDB);
-            task.cancel(true);
-            if (EDACCExtendedWarning.showMessageDialog(
-                    EDACCExtendedWarning.OK_CANCEL_OPTIONS, EDACCApp.getApplication().getMainFrame(),
-                    "The following instances are already in the database. (Equal name or md5 hash). \n"
-                    + "Do you want to add the instances to the selected/autobuilded classes?",
-                    new JTable(tmp)) == EDACCExtendedWarning.RET_OK_OPTION) {
-                addInstancesToAutoBuildedInstances(errorsDBInstances, nodes, ret);
-            }
-
+        FileNameTableModel tmp = new FileNameTableModel();
+        tmp.setAll(errorsDB);
+        task.cancel(true);
+        if (EDACCExtendedWarning.showMessageDialog(
+        EDACCExtendedWarning.OK_CANCEL_OPTIONS, EDACCApp.getApplication().getMainFrame(),
+        "The following instances are already in the database. (Equal name or md5 hash). \n"
+        + "Do you want to add the instances to the selected/autobuilded classes?",
+        new JTable(tmp)) == EDACCExtendedWarning.RET_OK_OPTION) {
+        addInstancesToAutoBuildedInstances(errorsDBInstances, nodes, ret);
         }
+        
+        }*/
+        setDuplicateInstances(duplicate);
         return instances;
 
     }
@@ -524,6 +534,7 @@ public class ManageDBInstances implements Observer {
             throw new InstanceException();
         }
 
+        HashMap<Instance, ArrayList<Instance>> duplicate = new HashMap<Instance, ArrayList<Instance>>();
         Vector<Instance> instances = new Vector<Instance>();
         Vector<String> errorsDB = new Vector<String>();
         Vector<String> errorsAdd = new Vector<String>();
@@ -541,23 +552,30 @@ public class ManageDBInstances implements Observer {
             }
 
             String md5 = calculateMD5(instanceFiles.get(i));
+            String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, instanceFiles.get(i).getParent().length());
+            String[] possibleInstanceClasses = rawPath.split("\\\\|/");
+            if (possibleInstanceClasses.length != 1) {
+                instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes, 0);
+            } else {
+                instanceClass = (InstanceClass) ((DefaultMutableTreeNode) nodes.getRoot()).getUserObject();
+            }
             try {
                 //Get all InstanceClasses of the Instance and assigne it to the corresponding InstanceClass    
-                String rawPath = instanceFiles.get(i).getAbsolutePath().substring(ret.getParent().length() + 1, instanceFiles.get(i).getParent().length());
-                String[] possibleInstanceClasses = rawPath.split("\\\\|/");
-                if (possibleInstanceClasses.length != 1) {
-                    instanceClass = getInstanceClassFromTree(possibleInstanceClasses, nodes, 0);
-                } else {
-                    instanceClass = (InstanceClass) ((DefaultMutableTreeNode) nodes.getRoot()).getUserObject();
-                }
+
                 Instance temp = InstanceDAO.createInstance(instanceFiles.get(i), instanceFiles.get(i).getName(), md5);
                 instances.add(temp);
                 InstanceDAO.save(temp, compressBinary, instanceClass);
                 this.tmp.add(temp);
 
+            } catch (InstanceDuplicateInDBException ex) {
+                Instance dup = new Instance();
+                dup.setFile(instanceFiles.get(i));
+                dup.setName(instanceFiles.get(i).getName());
+                dup.setMd5(md5);
+                duplicate.put(dup, ex.getDuplicates());
+
             } catch (InstanceAlreadyInDBException ex) {
-                errorsDB.add(instanceFiles.get(i).getAbsolutePath());
-                errorsDBInstances.add(instanceFiles.get(i));
+                InstanceHasInstanceClassDAO.createInstanceHasInstance(ex.getDuplicate(), instanceClass);
             }
             task.setTaskProgress((float) i / (float) instanceFiles.size());
             task.setStatus("Added " + i + " instances of " + instanceFiles.size());
@@ -565,27 +583,28 @@ public class ManageDBInstances implements Observer {
 
         setTmp(new Vector<Instance>());
 
-        if (!errorsAdd.isEmpty()) {
-            FileNameTableModel tmp = new FileNameTableModel();
-            tmp.setAll(errorsAdd);
-            EDACCExtendedWarning.showMessageDialog(
-                    EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
-                    "By adding the following instances an error occured.",
-                    new JTable(tmp));
+        /*if (!errorsAdd.isEmpty()) {
+        FileNameTableModel tmp = new FileNameTableModel();
+        tmp.setAll(errorsAdd);
+        EDACCExtendedWarning.showMessageDialog(
+        EDACCExtendedWarning.OK_OPTIONS, EDACCApp.getApplication().getMainFrame(),
+        "By adding the following instances an error occured.",
+        new JTable(tmp));
         }
-
+        
         if (!errorsDB.isEmpty()) {
-            FileNameTableModel tmp = new FileNameTableModel();
-            tmp.setAll(errorsDB);
-            task.cancel(true);
-            if (EDACCExtendedWarning.showMessageDialog(
-                    EDACCExtendedWarning.OK_CANCEL_OPTIONS, EDACCApp.getApplication().getMainFrame(),
-                    "The following instances are already in the database. (Equal name or md5 hash). \n"
-                    + "Do you want to add the instances to the selected/autobuilded classes?",
-                    new JTable(tmp)) == EDACCExtendedWarning.RET_OK_OPTION) {
-                addInstancesToAutoBuildedInstances(errorsDBInstances, nodes, ret);
-            }
+        FileNameTableModel tmp = new FileNameTableModel();
+        tmp.setAll(errorsDB);
+        task.cancel(true);
+        if (EDACCExtendedWarning.showMessageDialog(
+        EDACCExtendedWarning.OK_CANCEL_OPTIONS, EDACCApp.getApplication().getMainFrame(),
+        "The following instances are already in the database. (Equal name or md5 hash). \n"
+        + "Do you want to add the instances to the selected/autobuilded classes?",
+        new JTable(tmp)) == EDACCExtendedWarning.RET_OK_OPTION) {
+        addInstancesToAutoBuildedInstances(errorsDBInstances, nodes, ret);
         }
+        }*/
+        setDuplicateInstances(duplicate);
         return instances;
     }
 
@@ -1142,12 +1161,15 @@ public class ManageDBInstances implements Observer {
         Tasks.getTaskView().setCancelable(false);
     }
 
-    private void HandlerAddInstance(HashMap<Instance, ArrayList<Instance>> duplicate) {
+    public void HandlerAddInstance() {
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        EDACCAddInstanceErrorDialog errorDialog = new EDACCAddInstanceErrorDialog(mainFrame, true);
+        EDACCAddInstanceErrorDialog errorDialog = new EDACCAddInstanceErrorDialog(mainFrame, true);       
         errorDialog.initialize(duplicate);
         EDACCApp.getApplication().show(errorDialog);
+        
     }
 
-
+    private void setDuplicateInstances(HashMap<Instance, ArrayList<Instance>> duplicate) {
+        this.duplicate = duplicate;
+    }
 }

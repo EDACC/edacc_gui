@@ -27,13 +27,13 @@ public class AddInstanceErrorController {
         duplicateModel = new InstanceDupErrorTableModel(duplicate);
         duplicateSorter = new TableRowSorter<InstanceDupErrorTableModel>();
         
-        ArrayList<Instance> toAdd = (ArrayList<Instance>) duplicate.keySet();
+        ArrayList<Instance> toAdd = new ArrayList<Instance>(duplicate.keySet());
         toAddModel = new InstanceErrorTableModel(toAdd);      
         toAddSorter = new TableRowSorter<InstanceErrorTableModel>();
         
         filter = new InstanceDupErrorFilter(duplicateModel);
         
-        this.main = main;
+        this.main = main;     
     }
 
     public InstanceErrorTableModel getToAddModel() {

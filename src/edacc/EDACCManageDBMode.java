@@ -2572,6 +2572,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
     public void onTaskSuccessful(String methodName, Object result) {
         if (methodName.equals("addInstances")) {
+            manageDBInstances.HandlerAddInstance();
             jTreeInstanceClass.setSelectionPath(null);
             tableInstances.clearSelection();
             this.instanceTableModel.fireTableDataChanged();

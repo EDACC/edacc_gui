@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
+import javax.swing.table.DefaultTableModel;
 
 /**
  * TableModel created for the Table with the duplicate instances which caused an error by adding a new 
@@ -19,7 +20,7 @@ import java.util.Set;
  * Used in the EDACCAddInstanceErrorDialog.
  * @author rretz
  */
-public class InstanceDupErrorTableModel extends ThreadSafeDefaultTableModel {
+public class InstanceDupErrorTableModel extends DefaultTableModel {
 
     private ArrayList<Instance> instances = new ArrayList<Instance>();
     private String[] columns = {"Name", "MD5", "Path", "Link"};
@@ -30,25 +31,26 @@ public class InstanceDupErrorTableModel extends ThreadSafeDefaultTableModel {
     // <error causing instance, all related duplicate instances>
     private HashMap<Instance, ArrayList<Instance>> backRelation;
 
-    public InstanceDupErrorTableModel(HashMap<Instance, ArrayList<Instance>> instances) {
-        Set<Instance> keys = instances.keySet();
+    InstanceDupErrorTableModel(HashMap<Instance, ArrayList<Instance>> duplicate) {
+        Set<Instance> keys = duplicate.keySet();
         for (Instance causedInstance : keys) {
-            ArrayList<Instance> tmp = instances.get(causedInstance);
+            ArrayList<Instance> tmp = duplicate.get(causedInstance);
             for (Instance dupInstance : tmp) {
                 relatedInstances.put(dupInstance, causedInstance);
             }
         }
-        this.instances = (ArrayList<Instance>) relatedInstances.keySet();
-        this.backRelation = instances;
+        this.instances = new ArrayList<Instance>(duplicate.keySet());
+
+        this.backRelation = duplicate;
     }
 
     @Override
     public Object getValueAt(int row, int col) {
         switch (col) {
             case 0:
-                instances.get(row).getName();
+                return instances.get(row).getName();
             case 1:
-                instances.get(row).getMd5();
+                return instances.get(row).getMd5();
             case 2:
                 return " ";
             case 3:
@@ -130,12 +132,11 @@ public class InstanceDupErrorTableModel extends ThreadSafeDefaultTableModel {
         }
 
     }
-    
+
     /**
      * Returns the error causing instance object which is related to the given duplicate Instance
      */
-    public Instance getRelatedErrorInstance(int id) throws SQLException{
+    public Instance getRelatedErrorInstance(int id) throws SQLException {
         return relatedInstances.get(InstanceDAO.getById(id));
     }
-    
 }
