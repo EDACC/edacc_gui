@@ -448,7 +448,6 @@ public class ManageDBInstances implements Observer {
 
         //Creates all InstanceClasses in the directory and structures them as a tree.
         DefaultMutableTreeNode nodes = InstanceClassDAO.createInstanceClassFromDirectory(ret);
-
         //Create the instances and assigne them to their InstanceClass
         for (int i = 0; i < instanceFiles.size(); i++) {
             if (task.isCancelled()) {
@@ -544,7 +543,6 @@ public class ManageDBInstances implements Observer {
 
         //Creates all InstanceClasses in the directory and structures them as a tree. The given InstanceClass is the root of this tree.
         DefaultMutableTreeNode nodes = InstanceClassDAO.createInstanceClassFromDirectory(ret, input);
-
         //Create the instances and assigne them to their InstanceClass
         for (int i = 0; i < instanceFiles.size(); i++) {
             if (task.isCancelled()) {

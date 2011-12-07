@@ -18,6 +18,10 @@ import edacc.manageDB.InstancesToAddSelectionListener;
 import edacc.model.Instance;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.RowFilter;
+import javax.swing.RowSorter;
+import javax.swing.SwingUtilities;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -30,6 +34,7 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
     private InstanceDupErrorFilter filter;
     private InstanceDupErrorTableModel dupErrorModel;
     private InstanceErrorTableModel toAddModel;
+    private TableRowSorter rowSorter;
 
     /** Creates new form EDACCAddInstanceErrorDialog */
     public EDACCAddInstanceErrorDialog(java.awt.Frame parent, boolean modal) {
@@ -283,17 +288,15 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
 
         dupErrorModel = controller.getDuplicateModel();
         jTableProblemCausing.setModel(dupErrorModel);
-        //jTableProblemCausing.setRowSorter(controller.getDuplicateSorter());
 
-
-
-        /* SwingUtilities.invokeLater(new Runnable() {
+        jTableProblemCausing.setRowSorter(new TableRowSorter<InstanceDupErrorTableModel>(dupErrorModel));
+        rowSorter = (TableRowSorter<? extends InstanceDupErrorTableModel>) jTableProblemCausing.getRowSorter();
+        InstanceDupErrorFilter rowFilter = new InstanceDupErrorFilter(dupErrorModel);
+        rowSorter.setRowFilter(rowFilter);
+        controller.setFilter(rowFilter);
         
-        @Override
-        public void run() {
-        filter = new InstanceDupErrorFilter(controller.getDuplicateModel());
-        }
-        });*/
+        
+        //jTableProblemCausing.setRowSorter(controller.getDuplicateSorter());
 
         // initialize the InstanceToAdd table
         this.toAddModel = controller.getToAddModel();
@@ -321,5 +324,9 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
 
     public int getSelectedToAddInstance() {
         return jTableInstancesToAdd.getSelectedRow();
+    }
+
+    public void sort() {
+        this.rowSorter.sort();
     }
 }

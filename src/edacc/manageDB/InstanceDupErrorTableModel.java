@@ -39,7 +39,7 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
                 relatedInstances.put(dupInstance, causedInstance);
             }
         }
-        this.instances = new ArrayList<Instance>(duplicate.keySet());
+        this.instances = new ArrayList<Instance>(relatedInstances.keySet());
 
         this.backRelation = duplicate;
     }
@@ -137,6 +137,7 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
      * Returns the error causing instance object which is related to the given duplicate Instance
      */
     public Instance getRelatedErrorInstance(int id) throws SQLException {
-        return relatedInstances.get(InstanceDAO.getById(id));
+        
+        return relatedInstances.get(instances.get(id));
     }
 }

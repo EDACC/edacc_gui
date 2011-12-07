@@ -13,6 +13,8 @@ import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowFilter.Entry;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -21,27 +23,34 @@ import javax.swing.RowFilter.Entry;
 public class InstanceDupErrorFilter extends RowFilter<InstanceDupErrorTableModel, Integer> {
 
     private InstanceDupErrorTableModel model;
-    private int selectedInstanceId;
+    private Instance selectedInstance ;
+    private TableRowSorter< ? extends TableModel> rowSorter;
+    private RowFilter<Object, Object> rowFilter;
 
-    public InstanceDupErrorFilter(InstanceDupErrorTableModel model) {
+    public InstanceDupErrorFilter(final InstanceDupErrorTableModel model) {
         this.model = model;
-        selectedInstanceId = -1;
+        selectedInstance = null;
+
+       
+    }
+
+    public void setSelectedInstance(Instance selectedInstance) {
+        this.selectedInstance= selectedInstance;
     }
 
     @Override
     public boolean include(Entry<? extends InstanceDupErrorTableModel, ? extends Integer> entry) {
         try {
-            Instance instance = model.getRelatedErrorInstance((Integer) entry.getIdentifier());
-            if (instance.getId() == selectedInstanceId) {
-                return true;
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(InstanceDupErrorFilter.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return false;
-    }
-    
-    public void setSelectedInstance(int id){
-        selectedInstanceId = id;
+                    Instance instance = model.getRelatedErrorInstance((Integer) entry.getIdentifier());
+                    if(instance == null)
+                        return false;
+                                
+                    if (instance == selectedInstance) {
+                        return true;
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(InstanceDupErrorFilter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return false;
     }
 }

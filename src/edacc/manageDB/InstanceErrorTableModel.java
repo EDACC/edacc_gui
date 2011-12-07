@@ -20,7 +20,6 @@ public class InstanceErrorTableModel extends DefaultTableModel {
     private ArrayList<Instance> instances = new ArrayList<Instance>();
 
     public InstanceErrorTableModel() {
-        
     }
 
     InstanceErrorTableModel(ArrayList<Instance> toAdd) {
@@ -29,8 +28,9 @@ public class InstanceErrorTableModel extends DefaultTableModel {
 
     @Override
     public int getRowCount() {
-        if(instances == null)
+        if (instances == null) {
             return 0;
+        }
         return instances.size();
     }
 
@@ -79,4 +79,8 @@ public class InstanceErrorTableModel extends DefaultTableModel {
         return instances;
     }
 
+    @Override
+    public boolean isCellEditable(int row, int col) {
+        return false;
+    }
 }
