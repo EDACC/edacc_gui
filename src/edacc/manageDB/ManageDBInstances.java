@@ -78,6 +78,7 @@ public class ManageDBInstances implements Observer {
     Condition condition;
     private Vector<Instance> tmp;
     private HashMap<Instance, ArrayList<Instance>> duplicate;
+    private HashMap<Instance, InstanceClass> classes;
 
     public void setTmp(Vector<Instance> tmp) {
         this.tmp = tmp;
@@ -375,6 +376,7 @@ public class ManageDBInstances implements Observer {
 
         HashMap<Instance, ArrayList<Instance>> duplicate = new HashMap<Instance, ArrayList<Instance>>();
 
+        HashMap<Instance, InstanceClass> iClasses = new HashMap<Instance, InstanceClass>();
         Vector<String> errorsDB = new Vector<String>();
         Vector<String> errorsAdd = new Vector<String>();
         StringBuilder instanceErrors = new StringBuilder("");
@@ -403,6 +405,7 @@ public class ManageDBInstances implements Observer {
                 dup.setName(instanceFiles.get(i).getName());
                 dup.setMd5(md5);
                 duplicate.put(dup, ex.getDuplicates());
+                iClasses.put(dup, instanceClass);
 
             } catch (InstanceAlreadyInDBException ex) {
                 InstanceHasInstanceClassDAO.createInstanceHasInstance(ex.getDuplicate(), instanceClass);
@@ -415,7 +418,7 @@ public class ManageDBInstances implements Observer {
                     "Added " + i + " instances of " + instanceFiles.size());
         }
         setDuplicateInstances(duplicate);
-
+        setClasses(iClasses);
         return instances;
     }
 
@@ -438,6 +441,7 @@ public class ManageDBInstances implements Observer {
             throw new InstanceException();
         }
 
+        HashMap<Instance, InstanceClass> iClasses = new HashMap<Instance, InstanceClass>();
         HashMap<Instance, ArrayList<Instance>> duplicate = new HashMap<Instance, ArrayList<Instance>>();
         Vector<Instance> instances = new Vector<Instance>();
         Vector<String> errorsDB = new Vector<String>();
@@ -475,7 +479,7 @@ public class ManageDBInstances implements Observer {
                 dup.setName(instanceFiles.get(i).getName());
                 dup.setMd5(md5);
                 duplicate.put(dup, ex.getDuplicates());
-
+                iClasses.put(dup, instanceClass);
             } catch (InstanceAlreadyInDBException ex) {
                 InstanceHasInstanceClassDAO.createInstanceHasInstance(ex.getDuplicate(), instanceClass);
             }
@@ -505,6 +509,7 @@ public class ManageDBInstances implements Observer {
         }
         
         }*/
+        setClasses(iClasses);
         setDuplicateInstances(duplicate);
         return instances;
 
@@ -533,6 +538,7 @@ public class ManageDBInstances implements Observer {
             throw new InstanceException();
         }
 
+        HashMap<Instance, InstanceClass> iClasses = new HashMap<Instance, InstanceClass>();
         HashMap<Instance, ArrayList<Instance>> duplicate = new HashMap<Instance, ArrayList<Instance>>();
         Vector<Instance> instances = new Vector<Instance>();
         Vector<String> errorsDB = new Vector<String>();
@@ -571,6 +577,7 @@ public class ManageDBInstances implements Observer {
                 dup.setName(instanceFiles.get(i).getName());
                 dup.setMd5(md5);
                 duplicate.put(dup, ex.getDuplicates());
+                iClasses.put(dup, instanceClass);
 
             } catch (InstanceAlreadyInDBException ex) {
                 InstanceHasInstanceClassDAO.createInstanceHasInstance(ex.getDuplicate(), instanceClass);
@@ -603,6 +610,7 @@ public class ManageDBInstances implements Observer {
         }
         }*/
         setDuplicateInstances(duplicate);
+        setClasses(iClasses);
         return instances;
     }
 
@@ -1162,9 +1170,13 @@ public class ManageDBInstances implements Observer {
     public void HandlerAddInstance() {
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
         EDACCAddInstanceErrorDialog errorDialog = new EDACCAddInstanceErrorDialog(mainFrame, true);       
-        errorDialog.initialize(duplicate);
+        errorDialog.initialize(duplicate, classes);
         EDACCApp.getApplication().show(errorDialog);
         
+    }
+
+    public void setClasses(HashMap<Instance, InstanceClass> classes) {
+        this.classes = classes;
     }
 
     private void setDuplicateInstances(HashMap<Instance, ArrayList<Instance>> duplicate) {

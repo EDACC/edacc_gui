@@ -16,8 +16,12 @@ import edacc.manageDB.InstanceDupErrorTableModel;
 import edacc.manageDB.InstanceErrorTableModel;
 import edacc.manageDB.InstancesToAddSelectionListener;
 import edacc.model.Instance;
+import edacc.model.InstanceClass;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SwingUtilities;
@@ -40,9 +44,6 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
     public EDACCAddInstanceErrorDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-
-
-
     }
 
     /** This method is called from within the constructor to
@@ -95,12 +96,12 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
         jPnlInstancesToAdd.setLayout(jPnlInstancesToAddLayout);
         jPnlInstancesToAddLayout.setHorizontalGroup(
             jPnlInstancesToAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 326, Short.MAX_VALUE)
+            .addGap(0, 284, Short.MAX_VALUE)
             .addGroup(jPnlInstancesToAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPnlInstancesToAddLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 306, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
+                    .addContainerGap()))
         );
         jPnlInstancesToAddLayout.setVerticalGroup(
             jPnlInstancesToAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -137,15 +138,15 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
             jPnlProblemCausingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPnlProblemCausingLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPnlProblemCausingLayout.setVerticalGroup(
             jPnlProblemCausingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPnlProblemCausingLayout.createSequentialGroup()
+            .addGroup(jPnlProblemCausingLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         jPnlToolBtns.setName("jPnlToolBtns"); // NOI18N
@@ -160,9 +161,19 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
 
         jBtnLink.setText(resourceMap.getString("jBtnLink.text")); // NOI18N
         jBtnLink.setName("jBtnLink"); // NOI18N
+        jBtnLink.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnLinkActionPerformed(evt);
+            }
+        });
 
         jBtnDrop.setText(resourceMap.getString("jBtnDrop.text")); // NOI18N
         jBtnDrop.setName("jBtnDrop"); // NOI18N
+        jBtnDrop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnDropActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPnlToolBtnsLayout = new javax.swing.GroupLayout(jPnlToolBtns);
         jPnlToolBtns.setLayout(jPnlToolBtnsLayout);
@@ -175,7 +186,7 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
                 .addComponent(jBtnLink, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jBtnDrop)
-                .addContainerGap(62, Short.MAX_VALUE))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         jPnlToolBtnsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jBtnAdd, jBtnDrop, jBtnLink});
@@ -224,10 +235,10 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jPnlToolBtns, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPnlInstancesToAdd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
+                            .addComponent(jPnlInstancesToAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPnlProblemCausing, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jPnlDialogBtns, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -239,10 +250,10 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPnlInstancesToAdd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(169, 169, 169)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPnlToolBtns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPnlProblemCausing, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPnlDialogBtns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -251,13 +262,43 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBtnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddActionPerformed
-        // TODO add your handling code here:
+        int[] rows = jTableInstancesToAdd.getSelectedRows();
+        jTableInstancesToAdd.clearSelection();
+        for (int i = 0; i < rows.length; i++) {
+            rows[i] = jTableInstancesToAdd.convertRowIndexToModel(rows[i]);
+        }
+        controller.add(rows);
+        controller.remove(rows);
+        dupErrorModel.fireTableDataChanged();
+        toAddModel.fireTableDataChanged();
     }//GEN-LAST:event_jBtnAddActionPerformed
 
     private void jBtnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDoneActionPerformed
-        controller.drop(((InstanceErrorTableModel) jTableInstancesToAdd.getModel()).getAllInstances());
         this.dispose();
     }//GEN-LAST:event_jBtnDoneActionPerformed
+
+    private void jBtnDropActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDropActionPerformed
+        int[] rows = jTableInstancesToAdd.getSelectedRows();      
+        jTableInstancesToAdd.clearSelection();
+        for (int i = 0; i < rows.length; i++) {
+            rows[i] = jTableInstancesToAdd.convertRowIndexToModel(rows[i]);
+        }
+        controller.remove(rows);
+        dupErrorModel.fireTableDataChanged();
+        toAddModel.fireTableDataChanged();
+    }//GEN-LAST:event_jBtnDropActionPerformed
+
+    private void jBtnLinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnLinkActionPerformed
+        jTableInstancesToAdd.clearSelection();
+        try {
+            controller.link(dupErrorModel.getSelected());
+        } catch (SQLException ex) {
+            Logger.getLogger(EDACCAddInstanceErrorDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        dupErrorModel.fireTableDataChanged();
+        toAddModel.fireTableDataChanged();
+
+    }//GEN-LAST:event_jBtnLinkActionPerformed
 
     /**
      * @param args the command line arguments
@@ -280,8 +321,8 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
         });
     }
 
-    public void initialize(HashMap<Instance, ArrayList<Instance>> duplicate) {
-        controller = new AddInstanceErrorController(duplicate, this);
+    public void initialize(HashMap<Instance, ArrayList<Instance>> duplicate, HashMap<Instance, InstanceClass> instanceClasses) {
+        controller = new AddInstanceErrorController(duplicate, this, instanceClasses);
 
 
         // initialize the ProblemCausing (Duplicate Instance) table
@@ -294,8 +335,8 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
         InstanceDupErrorFilter rowFilter = new InstanceDupErrorFilter(dupErrorModel);
         rowSorter.setRowFilter(rowFilter);
         controller.setFilter(rowFilter);
-        
-        
+
+
         //jTableProblemCausing.setRowSorter(controller.getDuplicateSorter());
 
         // initialize the InstanceToAdd table
@@ -328,5 +369,9 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
 
     public void sort() {
         this.rowSorter.sort();
+    }
+
+    public boolean isSelected() {
+        return jTableInstancesToAdd.getSelectedRowCount() != 0;
     }
 }

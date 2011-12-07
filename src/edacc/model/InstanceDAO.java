@@ -250,6 +250,56 @@ public class InstanceDAO {
         }
     }
 
+    private static void save(Instance instance, InstanceClass instanceClass) {
+        if (instance.isNew()) {
+            try {
+
+                // insert query, set ID!
+                // TODO insert instance blob
+                // insert instance into db
+                PreparedStatement ps;
+                final String insertQuery = "INSERT INTO " + table + " (name, md5, instance) "
+                        + "VALUES (?, ?, ?)";
+                ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+                File input = null;
+                //      File output = null;
+                FileInputStream fInStream = null;
+
+                if (instance.getFile() != null) {
+
+                    input = instance.getFile();
+                    fInStream = new FileInputStream(input);
+                    java.sql.Blob b = DatabaseConnector.getInstance().getConn().createBlob();
+                    TaskICodeProgress progress = new TaskICodeProgress(input.length(), "Compressing " + input.getName());
+                    Util.sevenZipEncode(fInStream, b.setBinaryStream(1), input.length(), progress);
+                    progress.finished();
+                    ps.setBlob(3, b);
+
+
+                } else {
+                    ps.setNull(3, Types.BLOB);
+                }
+
+
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    instance.setId(rs.getInt(1));
+                }
+                cache.cache(instance);
+
+                ps.close();
+                instance.setSaved();
+                // Add Instance to InstanceClass
+                InstanceHasInstanceClassDAO.createInstanceHasInstance(instance, instanceClass);
+
+                //                output.delete();
+                //input.delete();
+            } catch (Exception ex) {
+                Logger.getLogger(InstanceDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
     /**
      * retrieves an instance from the database
      * @param id the id of the instance to be retrieved
@@ -572,19 +622,22 @@ public class InstanceDAO {
      */
     private static void alreadyInDB(ResultSet rs, String name, String md5) throws SQLException, InstanceAlreadyInDBException, InstanceDuplicateInDBException {
         ArrayList<Instance> duplicates = new ArrayList<Instance>();
-        while (rs.next()) {           
+        while (rs.next()) {
             int instanceId = rs.getInt("idInstance");
             Instance duplicate = getById(instanceId);
             if (duplicate.getName().equals(name) && duplicate.getMd5().equals(md5)) {
                 throw new InstanceAlreadyInDBException(duplicate);
-            }else {
+            } else {
                 duplicates.add(duplicate);
-            }              
+            }
         }
-        
-        if(!duplicates.isEmpty()){
+
+        if (!duplicates.isEmpty()) {
             throw new InstanceDuplicateInDBException(duplicates);
         }
     }
 
+    public static void createDuplicateInstance(Instance i, InstanceClass iClass) {
+        save(i, iClass);
+    }
 }

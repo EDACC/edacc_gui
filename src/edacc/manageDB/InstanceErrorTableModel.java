@@ -65,12 +65,6 @@ public class InstanceErrorTableModel extends DefaultTableModel {
         }
     }
 
-    public void remove(ArrayList<Instance> toRemove) {
-        for (Instance remove : toRemove) {
-            instances.remove(remove);
-        }
-    }
-
     public Instance getInstance(int row) {
         return instances.get(row);
     }
@@ -82,5 +76,13 @@ public class InstanceErrorTableModel extends DefaultTableModel {
     @Override
     public boolean isCellEditable(int row, int col) {
         return false;
+    }
+
+    public void remove(int row) {
+        instances.remove(row);
+    }
+
+    void remove(Instance remove) {
+        instances.remove(remove);
     }
 }

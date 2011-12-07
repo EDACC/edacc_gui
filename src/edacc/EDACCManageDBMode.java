@@ -2575,15 +2575,15 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             manageDBInstances.HandlerAddInstance();
             jTreeInstanceClass.setSelectionPath(null);
             tableInstances.clearSelection();
-            this.instanceTableModel.fireTableDataChanged();
+            manageDBInstances.loadInstances();
             manageDBInstances.updateInstanceClasses();
+            this.instanceTableModel.fireTableDataChanged();            
             restoreExpandedState();
         } else if (methodName.equals("exportInstances")) {
         }
     }
 
     public void setFilterStatus(String status) {
-
         lblFilterStatus.setForeground(Color.red);
         lblFilterStatus.setText(status);
         lblFilterStatus.setIcon(new ImageIcon("warning-icon.png"));

@@ -97,7 +97,7 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
     public void setValueAt(Object value, int row, int col) {
         if (col == 3) {
             Boolean check = true;
-            ArrayList<Instance> toCheck = backRelation.get(relatedInstances.get(instances.get(row).getId()));
+            ArrayList<Instance> toCheck = backRelation.get(relatedInstances.get(instances.get(row)));
             for (Instance tmp : toCheck) {
                 if (toLink.containsKey(tmp)) {
                     check = false;
@@ -106,7 +106,7 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
 
             if (check) {
                 if ((Boolean) value) {
-                    toLink.put(instances.get(row).getId(), relatedInstances.get(instances.get(row).getId()));
+                    toLink.put(instances.get(row).getId(), relatedInstances.get(instances.get(row)));
                 } else {
                     toLink.remove(instances.get(row).getId());
                 }
@@ -125,7 +125,7 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
             ArrayList<Instance> tmp = backRelation.get(causedInstance);
             for (Instance dupInstance : tmp) {
                 relatedInstances.remove(dupInstance);
-                toLink.remove(dupInstance);
+                toLink.remove(dupInstance.getId());
                 instances.remove(dupInstance);
             }
             backRelation.remove(causedInstance);
@@ -136,8 +136,31 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
     /**
      * Returns the error causing instance object which is related to the given duplicate Instance
      */
-    public Instance getRelatedErrorInstance(int id) throws SQLException {
-        
+    public Instance getRelatedErrorInstance(int id) throws SQLException {       
         return relatedInstances.get(instances.get(id));
     }
+
+    /**
+     * Removes all duplicate instances from the Model
+     * @param instance 
+     */
+    public void removeDups(Instance instance) {
+        ArrayList<Instance> toRemove = backRelation.get(instance);
+        for(Instance remove : toRemove){
+            instances.remove(remove);
+            relatedInstances.remove(remove);    
+            toLink.remove(remove.getId());
+        }
+        backRelation.remove(instance);
+        
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public HashMap<Integer, Instance> getSelected(){
+        return toLink;
+    }
+            
 }

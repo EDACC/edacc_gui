@@ -22,7 +22,9 @@ public class InstancesToAddSelectionListener implements ListSelectionListener{
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        controller.updateFilter();
+        if(controller.isSelected()){
+            controller.updateFilter();
+        }       
     }
     
 }

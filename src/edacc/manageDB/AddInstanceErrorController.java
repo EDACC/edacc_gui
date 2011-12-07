@@ -6,6 +6,11 @@ package edacc.manageDB;
 
 import edacc.EDACCAddInstanceErrorDialog;
 import edacc.model.Instance;
+import edacc.model.InstanceClass;
+import edacc.model.InstanceDAO;
+import edacc.model.InstanceHasInstanceClass;
+import edacc.model.InstanceHasInstanceClassDAO;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JTable;
@@ -24,17 +29,18 @@ public class AddInstanceErrorController {
     private TableRowSorter<InstanceErrorTableModel> toAddSorter;
     private EDACCAddInstanceErrorDialog main;
     private InstanceDupErrorFilter filter;
+    private HashMap<Instance, InstanceClass> instanceClasses;
 
-    public AddInstanceErrorController(HashMap<Instance, ArrayList<Instance>> duplicate, EDACCAddInstanceErrorDialog main) {
+    public AddInstanceErrorController(HashMap<Instance, ArrayList<Instance>> duplicate, EDACCAddInstanceErrorDialog main, HashMap<Instance, InstanceClass> instanceClasses) {
         duplicateModel = new InstanceDupErrorTableModel(duplicate);
         duplicateSorter = new TableRowSorter<InstanceDupErrorTableModel>();
-
 
 
         ArrayList<Instance> toAdd = new ArrayList<Instance>(duplicate.keySet());
         toAddModel = new InstanceErrorTableModel(toAdd);
         toAddSorter = new TableRowSorter<InstanceErrorTableModel>();
 
+        this.instanceClasses = instanceClasses;
         this.main = main;
     }
 
@@ -64,11 +70,44 @@ public class AddInstanceErrorController {
         this.duplicateModel.fireTableDataChanged();
     }
 
-    public void drop(ArrayList<Instance> allInstances) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
     public void setFilter(InstanceDupErrorFilter rowFilter) {
         this.filter = rowFilter;
+    }
+
+    /**
+     * Removes the instances and their related duplicates from both tables.
+     * @param rows Row number of the error causing instances to delete.
+     */
+    public void remove(int[] rows) {
+        for (int row : rows) {
+            duplicateModel.removeDups(toAddModel.getInstance(row));
+            toAddModel.remove(row);
+        }
+    }
+
+    public void add(int[] rows) {
+        for (int row : rows) {
+            Instance add = toAddModel.getInstance(row);
+            InstanceDAO.createDuplicateInstance(add, instanceClasses.get(add));
+            duplicateModel.removeDups(toAddModel.getInstance(row));
+            toAddModel.remove(row);
+        }
+    }
+
+    public void link(HashMap<Integer, Instance> selected) throws SQLException {
+        ArrayList<Integer> ids = new ArrayList<Integer>(selected.keySet());
+        for(int id : ids){
+            Instance instance = InstanceDAO.getById(id);
+            InstanceHasInstanceClassDAO.createInstanceHasInstance(instance, instanceClasses.get(selected.get(id)));
+        }
+        ArrayList<Instance> toRemove = new ArrayList<Instance> (selected.values());
+        for(Instance remove: toRemove){
+            duplicateModel.removeDups(remove);
+            toAddModel.remove(remove);
+        }
+    }
+
+    public boolean isSelected() {
+        return main.isSelected();
     }
 }
