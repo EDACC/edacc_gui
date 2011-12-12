@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package edacc.manageDB;
 
 import java.io.File;
@@ -41,7 +40,6 @@ public class FileInputStreamList implements Enumeration<FileInputStream> {
                     files.addAll(Arrays.asList(f.listFiles()));
                     return nextElement();
                 }
-                System.out.println("EXISTS: " + f.getAbsolutePath() + ": " + f.exists());
                 return new FileInputStream(f);
             } catch (FileNotFoundException ex) {
                 throw new NoSuchElementException("File " + f.getAbsolutePath() + " not found:\n" + ex.getMessage());
@@ -52,10 +50,12 @@ public class FileInputStreamList implements Enumeration<FileInputStream> {
 
     @Override
     public boolean hasMoreElements() {
-        if (currentElement < 0)
+        if (currentElement < 0) {
             return false;
-        if (currentElement >= files.size())
+        }
+        if (currentElement >= files.size()) {
             return false;
+        }
         return true;
     }
 }
