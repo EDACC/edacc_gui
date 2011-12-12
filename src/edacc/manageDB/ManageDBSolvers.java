@@ -31,6 +31,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
@@ -91,8 +92,9 @@ public class ManageDBSolvers implements Observer {
             if (currentSolver.getName() != null && currentSolver.getName().equals(name)
                     && currentSolver.getDescription().equals(description)
                     && currentSolver.getAuthors().equals(author)
-                    && currentSolver.getVersion().equals(version))
+                    && currentSolver.getVersion().equals(version)) {
                 return false;
+            }
             currentSolver.setName(name);
             currentSolver.setDescription(description);
             currentSolver.setAuthor(author);
@@ -232,31 +234,38 @@ public class ManageDBSolvers implements Observer {
         SolverBinaries b = new SolverBinaries(currentSolver);
         b.setBinaryArchive(binary);
         b.setBinaryName(binary[0].getName());
-        FileInputStreamList is = new FileInputStreamList(binary);
-        SequenceInputStream seq = new SequenceInputStream(is);
-        String md5 = Util.calculateMD5(seq);
-        if (hasDuplicates(md5)) {
-            if (JOptionPane.showConfirmDialog(gui,
-                    "There already exists a solver binary with the same "
-                    + "checksum. Do you want to add this binary anyway?",
-                    "Duplicate solver binary",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
-                    == JOptionPane.NO_OPTION)
-                return;
+        try {
+            FileInputStreamList is = new FileInputStreamList(binary);
+            SequenceInputStream seq = new SequenceInputStream(is);
+            String md5 = Util.calculateMD5(seq);
+            if (hasDuplicates(md5)) {
+                if (JOptionPane.showConfirmDialog(gui,
+                        "There already exists a solver binary with the same "
+                        + "checksum. Do you want to add this binary anyway?",
+                        "Duplicate solver binary",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+                        == JOptionPane.NO_OPTION) {
+                    return;
+                }
+            }
+            b.setMd5(md5);
+            Util.removeCommonPrefix(b);
+            new EDACCSolverBinaryDlg(EDACCApp.getApplication().getMainFrame(), b, this, EDACCSolverBinaryDlg.DialogMode.CREATE_MODE).setVisible(true);
+            gui.showSolverBinariesDetails(currentSolver.getSolverBinaries());
+        } catch (NoSuchElementException e) {
+            JOptionPane.showMessageDialog(gui, "You have to choose some files!", "No files chosen!", JOptionPane.ERROR_MESSAGE);
         }
-        b.setMd5(md5);
-        Util.removeCommonPrefix(b);        
-        new EDACCSolverBinaryDlg(EDACCApp.getApplication().getMainFrame(), b, this, EDACCSolverBinaryDlg.DialogMode.CREATE_MODE).setVisible(true);
-        gui.showSolverBinariesDetails(currentSolver.getSolverBinaries());
     }
 
     private boolean hasDuplicates(String md5) {
-        for (SolverBinaries b : currentSolver.getSolverBinaries())
-            if (md5.equals(b.getMd5()))
+        for (SolverBinaries b : currentSolver.getSolverBinaries()) {
+            if (md5.equals(b.getMd5())) {
                 return true;
+            }
+        }
         return false;
     }
-    
+
     /**
      * Edits a solver binary with all details and changes also the file archive.
      * @param binary
@@ -279,15 +288,16 @@ public class ManageDBSolvers implements Observer {
                     + "checksum. Do you want to add this binary anyway?",
                     "Duplicate solver binary",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
-                    == JOptionPane.NO_OPTION)
+                    == JOptionPane.NO_OPTION) {
                 return;
+            }
         }
         solverBin.setMd5(md5);
         Util.removeCommonPrefix(solverBin);
         new EDACCSolverBinaryDlg(EDACCApp.getApplication().getMainFrame(), solverBin, this, EDACCSolverBinaryDlg.DialogMode.EDIT_MODE).setVisible(true);
         gui.showSolverBinariesDetails(currentSolver.getSolverBinaries());
     }
-    
+
     /**
      * Edits a solver binary but doesn't change the archive. Only the details
      * like name, run command or run path are changed.
@@ -305,7 +315,7 @@ public class ManageDBSolvers implements Observer {
         // refresh gui
         gui.showSolverBinariesDetails(currentSolver.getSolverBinaries());
     }
-    
+
     private void setFileArrayOfSolverBinary(SolverBinaries solverBin) throws SQLException, IOException {
         // make temporary directory
         File tmpDir = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "edacctmpdir");
@@ -313,7 +323,7 @@ public class ManageDBSolvers implements Observer {
         ZipInputStream zis = new ZipInputStream(SolverBinariesDAO.getZippedBinaryFile(solverBin));
         LinkedList<File> bins = new LinkedList<File>(); // the binary files in the zip 
         ZipEntry entry;
-        
+
         while ((entry = zis.getNextEntry()) != null) {
             bins.add(new File(tmpDir.getAbsolutePath() + System.getProperty("file.separator") + entry.getName()));
         }
@@ -363,8 +373,9 @@ public class ManageDBSolvers implements Observer {
 
     public void removeSolverBinary(SolverBinaries b) throws SQLException, NoSolverBinarySpecifiedException, FileNotFoundException, IOException, NoSuchAlgorithmException {
         Solver s = SolverDAO.getById(b.getIdSolver());
-        if (s.getSolverBinaries().size() <= 1)
+        if (s.getSolverBinaries().size() <= 1) {
             throw new NoSolverBinarySpecifiedException("There must be at least one binary remaining for solver " + s.getName() + "!");
+        }
         b.setDeleted();
         SolverBinariesDAO.save(b);
         solverBinariesTableModel.setSolverBinaries(currentSolver.getSolverBinaries());
