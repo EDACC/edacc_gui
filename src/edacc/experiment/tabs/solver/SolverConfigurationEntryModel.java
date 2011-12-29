@@ -143,14 +143,14 @@ public class SolverConfigurationEntryModel {
 
     /**
      * Returns an <code>ArrayList</code> of all modified solver configurations and solver configurations for which the seed group has been changed. <br><br>
-     * <b>Note:</b> Here a modified solver configuration doesn't mean a new/deleted solver configuration.
+     * <b>Note:</b> Here a modified solver configuration doesn't mean a new/deleted/renamed solver configuration or solver configuration with changed hint.
      * @return ArrayList of all modified solver configurations
      */
     public synchronized ArrayList<SolverConfiguration> getModifiedSolverConfigurations() {
         ArrayList<SolverConfiguration> res = new ArrayList<SolverConfiguration>();
         for (Solver s : getSolvers()) {
             for (SolverConfigurationEntry entry : getEntries(s)) {
-                if (entry.getSolverConfig() != null && entry.isModified()) {
+                if (entry.getSolverConfig() != null && entry.parametersModified()) {
                     res.add(entry.getSolverConfig());
                 }
             }

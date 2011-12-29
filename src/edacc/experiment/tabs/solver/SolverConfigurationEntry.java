@@ -100,9 +100,8 @@ public class SolverConfigurationEntry {
     }
 
     /**
-     * Checks for unsaved data, i.e. checks iff the seed group, the parameter instances or the idx have been changed.<br/>
+     * Checks for unsaved data, i.e. checks if the seed group, the parameter instances, name, hint have been changed.<br/>
      * If the seed group is not a valid integer it will be substituted and used as 0.
-     * @param idx the idx to check the equality. If <code>idx == -1</code> the idx and name of the solver configuration will not be checked
      * @return <code>true</code>, if and only if data is unsaved, false otherwise
      */
     public boolean isModified() {
@@ -111,6 +110,21 @@ public class SolverConfigurationEntry {
                 || !name.equals(solverConfig.getName())
                 || solverConfig.getSolverBinary() != solverBinary
                 || !hint.equals(solverConfig.getHint())) {
+            return true;
+        }
+        return tableModel.isModified();
+    }
+    
+    /**
+     * Checks for unsaved data, i.e. checks if the seed group, the parameter instances, have been changed.<br/>
+     * name and hint are not checked with this method.<br />
+     * If the seed group is not a valid integer it will be substituted and used as 0.
+     * @return <code>true</code>, if and only if data is unsaved, false otherwise
+     */
+    public boolean parametersModified() {
+        if (solverConfig == null
+                || solverConfig.getSeed_group() != seedGroup
+                || solverConfig.getSolverBinary() != solverBinary) {
             return true;
         }
         return tableModel.isModified();
