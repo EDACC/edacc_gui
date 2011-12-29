@@ -37,7 +37,7 @@ public class FileInputStreamList implements Enumeration<FileInputStream> {
             File f = files.get(currentElement++);
             try {
                 if (f.isDirectory()) {
-                    files.addAll(Arrays.asList(f.listFiles()));
+                    files.addAll(currentElement, Arrays.asList(f.listFiles()));
                     return nextElement();
                 }
                 return new FileInputStream(f);
