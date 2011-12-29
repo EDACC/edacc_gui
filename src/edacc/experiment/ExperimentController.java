@@ -57,6 +57,7 @@ import edacc.model.Tasks;
 import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.ConvertException;
 import edacc.satinstances.PropertyValueType;
+import edacc.util.Pair;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
@@ -607,7 +608,7 @@ public class ExperimentController {
      * @throws StatusCodeNotInDBException
      * @throws ResultCodeNotInDBException 
      */
-    public synchronized int generateJobs(final Tasks task, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int maxSeed) throws SQLException, TaskCancelledException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
+    public synchronized Pair<Integer, Integer> generateJobs(final Tasks task, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, int maxSeed) throws SQLException, TaskCancelledException, IOException, PropertyTypeNotExistException, PropertyNotInDBException, NoConnectionToDBException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         PropertyChangeListener cancelExperimentResultDAOStatementListener = new PropertyChangeListener() {
 
             @Override
@@ -630,12 +631,13 @@ public class ExperimentController {
         // get solver configurations of this experiment
         ArrayList<SolverConfiguration> vsc = solverConfigCache.getAll();
 
-        int experiments_added = 0;
+        int jobs_deleted = 0;
+        int jobs_added = 0;
         HashMap<SeedGroup, Integer> linked_seeds = new HashMap<SeedGroup, Integer>();
         ArrayList<ExperimentResult> experiment_results = new ArrayList<ExperimentResult>();
 
         ArrayList<ExperimentResult> deleteJobs = new ArrayList<ExperimentResult>();
-        ArrayList<IdValue<Integer>> updateJobs = new ArrayList<IdValue<Integer>>();
+        //ArrayList<IdValue<Integer>> updateJobs = new ArrayList<IdValue<Integer>>();
         task.setStatus("Preparing..");
         int elements = 0; // # jobs when finished
         for (Instance i : listInstances) {
@@ -650,19 +652,21 @@ public class ExperimentController {
                         runs.add(run);
                     }
                     int runsToDelete = currentNumRuns - numRuns;
-                    Random random = new Random();
+                    
+                    /* don't delete jobs randomly, because seed groups will be destroyed! */
+                    //Random random = new Random();
                     for (int k = 0; k < runsToDelete; k++) {
                         if (runs.isEmpty()) {
                             break;
                         }
-                        int index = random.nextInt(runs.size());
+                        int index = runs.size() -1;//random.nextInt(runs.size());
                         deleteJobs.add(experimentResultCache.getResult(sc.getId(), i.getId(), runs.get(index)));
                         runs.remove(index);
                     }
 
-                    for (int k = 0; k < runs.size(); k++) {
+                    /*for (int k = 0; k < runs.size(); k++) {
                         updateJobs.add(new IdValue<Integer>(experimentResultCache.getResult(sc.getId(), i.getId(), runs.get(k)).getId(), k));
-                    }
+                    }*/
                 }
             }
         }
@@ -674,15 +678,16 @@ public class ExperimentController {
             task.setCancelable(true);
             task.setTaskProgress(0.f);
             if (userInput == 1) {
-                return 0;
+                return new Pair<Integer, Integer>(0,0);
             } else {
                 task.setStatus("Deleting jobs..");
                 task.addPropertyChangeListener(cancelExperimentResultDAOStatementListener);
                 try {
                     ExperimentResultDAO.setAutoCommit(false);
                     ExperimentResultDAO.deleteExperimentResults(deleteJobs, task);
-                    task.setStatus("Updating existing jobs..");
-                    ExperimentResultDAO.batchUpdateRun(updateJobs);
+                    jobs_deleted += deleteJobs.size();
+                    //task.setStatus("Updating existing jobs..");
+                    //ExperimentResultDAO.batchUpdateRun(updateJobs);
                 } catch (Exception ex) {
                     DatabaseConnector.getInstance().getConn().rollback();
                     if (ex instanceof MySQLStatementCancelledException) {
@@ -765,7 +770,7 @@ public class ExperimentController {
                         } else {
                             experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, 0, ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit));
                         }
-                        experiments_added++;
+                        jobs_added++;
                     }
                     done++;
                 }
@@ -793,8 +798,7 @@ public class ExperimentController {
                 Util.updateTableColumnWidth(main.tblGenerateJobs, 1);
             }
         });
-        return experiments_added;
-
+        return new Pair<Integer, Integer>(jobs_added, jobs_deleted);
     }
 
     /**

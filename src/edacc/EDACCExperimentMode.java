@@ -61,6 +61,7 @@ import edacc.model.Tasks;
 import edacc.parameterspace.ParameterConfiguration;
 import edacc.parameterspace.graph.ParameterGraph;
 import edacc.properties.PropertyTypeNotExistException;
+import edacc.util.Pair;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -2536,10 +2537,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     public void run(Tasks task) {
                         Experiment newExp;
                         try {
-                            newExp = expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc, 
-                                    dialogNewExp.isConfigurationExp, dialogNewExp.solverOutputPreserveFirst, 
-                                    dialogNewExp.solverOutputPreserveLast, dialogNewExp.watcherOutputPreserveFirst, 
-                                    dialogNewExp.watcherOutputPreserveLast, dialogNewExp.verifierOutputPreserveFirst, 
+                            newExp = expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc,
+                                    dialogNewExp.isConfigurationExp, dialogNewExp.solverOutputPreserveFirst,
+                                    dialogNewExp.solverOutputPreserveLast, dialogNewExp.watcherOutputPreserveFirst,
+                                    dialogNewExp.watcherOutputPreserveLast, dialogNewExp.verifierOutputPreserveFirst,
                                     dialogNewExp.verifierOutputPreserveLast);
                             if (experimentUpdateThread != null) {
                                 experimentUpdateThread.cancel(true);
@@ -2726,16 +2727,35 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         try {
             HashMap<String, Integer> limits = expController.getMaxLimits();
-            EDACCExperimentModeGenerateJobs dialog = new EDACCExperimentModeGenerateJobs(EDACCApp.getApplication().getMainFrame(), true, limits.get("cpuTimeLimit"), limits.get("memoryLimit"), limits.get("wallClockTimeLimit"), limits.get("stackSizeLimit"));
+            final EDACCExperimentModeGenerateJobs dialog = new EDACCExperimentModeGenerateJobs(EDACCApp.getApplication().getMainFrame(), true, limits.get("cpuTimeLimit"), limits.get("memoryLimit"), limits.get("wallClockTimeLimit"), limits.get("stackSizeLimit"));
             dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
             dialog.setVisible(true);
             if (!dialog.isCancelled()) {
-                Tasks.startTask("generateJobs", new Class[]{edacc.model.Tasks.class, int.class, int.class, int.class, int.class, int.class
-                        },
-                        new Object[]{
-                            null, dialog.getCpuTimeLimit(), dialog.getMemoryLimit(), dialog.getWallClockTimeLimit(), dialog.getStackSizeLimit(), dialog.getMaxSeed()
-                        }, expController,
-                        this);
+                Tasks.startTask(new TaskRunnable() {
+
+                    @Override
+                    public void run(Tasks task) {
+                        try {
+                            final Object res = expController.generateJobs(task, dialog.getCpuTimeLimit(), dialog.getMemoryLimit(), dialog.getWallClockTimeLimit(), dialog.getStackSizeLimit(), dialog.getMaxSeed());
+                            SwingUtilities.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    EDACCExperimentMode.this.onTaskSuccessful("generateJobs", res);
+                                }
+                            });
+
+                        } catch (final Throwable ex) {
+                            SwingUtilities.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    EDACCExperimentMode.this.onTaskFailed("generateJobs", ex);
+                                }
+                            });
+                        }
+                    }
+                });
             } else {
                 javax.swing.JOptionPane.showMessageDialog(null, "No jobs have been generated.", "Cancelled", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
@@ -3536,8 +3556,18 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     @Override
     public void onTaskSuccessful(String methodName, Object result) {
         if ("generateJobs".equals(methodName)) {
-            int added_experiments = (Integer) result;
-            javax.swing.JOptionPane.showMessageDialog(this, "Added " + added_experiments + " new " + (added_experiments == 1 ? "job" : "jobs") + ".", "Jobs added", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            Pair<Integer, Integer> p = (Pair<Integer, Integer>) result;
+            String message = "";
+            if (p.getFirst() > 0) {
+                message += "Added " + p.getFirst() + " new " + (p.getFirst() == 1 ? "job" : "jobs") + ". ";
+            }
+            if (p.getSecond() > 0) {
+                message += "Removed " + p.getSecond() + " " + (p.getSecond() == 1 ? "job" : "jobs") + ".";
+            }
+            if (p.getFirst() == 0 && p.getSecond() == 0) {
+                message = "Nothing changed.";
+            }
+            javax.swing.JOptionPane.showMessageDialog(this, message, "Generate Jobs", javax.swing.JOptionPane.INFORMATION_MESSAGE);
             setGenerateJobsTitle();
         } else if ("loadExperiment".equals(methodName)) {
             setTitles();
@@ -3568,7 +3598,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         if (methodName.equals("loadExperiment")) {
             expController.unloadExperiment();
         }
-        e.printStackTrace();
         if (e instanceof TaskCancelledException) {
             javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         } else if (e instanceof SQLException) {

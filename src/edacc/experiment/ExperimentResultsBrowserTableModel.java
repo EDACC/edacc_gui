@@ -307,7 +307,7 @@ public class ExperimentResultsBrowserTableModel extends ThreadSafeDefaultTableMo
             case COL_PRIORITY:
                 return j.getPriority();
             case COL_COMPUTEQUEUE:
-                GridQueue q = gridQueues.get(j.getComputeQueue());
+                GridQueue q = gridQueues == null ? null : gridQueues.get(j.getComputeQueue());
                 return q == null ? "none" : q.getName();
             case COL_COMPUTENODE:
                 return j.getComputeNode() == null ? "none" : j.getComputeNode();
