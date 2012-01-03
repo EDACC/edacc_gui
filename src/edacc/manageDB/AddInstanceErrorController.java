@@ -80,28 +80,28 @@ public class AddInstanceErrorController {
      */
     public void remove(int[] rows) {
         for (int row : rows) {
-            duplicateModel.removeDups(toAddModel.getInstance(row));
-            toAddModel.remove(row);
+            duplicateModel.removeDups(toAddModel.getInstance(row));           
         }
+        toAddModel.removeRows(rows);
     }
 
     public void add(int[] rows) {
         for (int row : rows) {
             Instance add = toAddModel.getInstance(row);
             duplicateModel.removeDups(add);
-            InstanceDAO.createDuplicateInstance(add, instanceClasses.get(add));
-            toAddModel.remove(row);
+            InstanceDAO.createDuplicateInstance(add, instanceClasses.get(add));            
         }
+        toAddModel.removeRows(rows);
     }
 
     public void link(HashMap<Integer, Instance> selected) throws SQLException {
         ArrayList<Integer> ids = new ArrayList<Integer>(selected.keySet());
-        for(int id : ids){
+        for (int id : ids) {
             Instance instance = InstanceDAO.getById(id);
             InstanceHasInstanceClassDAO.createInstanceHasInstance(instance, instanceClasses.get(selected.get(id)));
         }
-        ArrayList<Instance> toRemove = new ArrayList<Instance> (selected.values());
-        for(Instance remove: toRemove){
+        ArrayList<Instance> toRemove = new ArrayList<Instance>(selected.values());
+        for (Instance remove : toRemove) {
             duplicateModel.removeDups(remove);
             toAddModel.remove(remove);
         }
@@ -109,5 +109,22 @@ public class AddInstanceErrorController {
 
     public boolean isSelected() {
         return main.isSelected();
+    }
+
+    public int getSelectedRows() {
+        return main.getSelectedToAddInstance();
+    }
+
+    public int getSelectedToAddRowCount() {
+        return main.getSelectedToAddRowCount();
+    }
+    void noneFilter() {
+        filter.setSelectedInstance(null);
+        main.sort();
+        this.duplicateModel.fireTableDataChanged();
+    }
+
+    public void mulipleSelectionBtnShow(boolean b) {
+        main.multipleSelecteBtnShow(b);
     }
 }

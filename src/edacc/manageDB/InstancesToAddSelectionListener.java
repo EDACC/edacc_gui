@@ -12,19 +12,26 @@ import javax.swing.event.ListSelectionListener;
  *
  * @author rretz
  */
-public class InstancesToAddSelectionListener implements ListSelectionListener{
+public class InstancesToAddSelectionListener implements ListSelectionListener {
 
     AddInstanceErrorController controller;
-    
+
     public InstancesToAddSelectionListener(AddInstanceErrorController controller) {
         this.controller = controller;
     }
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        if(controller.isSelected()){
-            controller.updateFilter();
-        }       
+        if (controller.getSelectedToAddRowCount() != 1) {
+            controller.noneFilter();
+            controller.mulipleSelectionBtnShow(true);
+        } else {
+            if (controller.isSelected()) {
+                controller.updateFilter(); 
+                controller.mulipleSelectionBtnShow(false);
+            }    
+            
+        }
+
     }
-    
 }

@@ -374,4 +374,21 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
     public boolean isSelected() {
         return jTableInstancesToAdd.getSelectedRowCount() != 0;
     }
+
+    public void multipleSelecteBtnShow(boolean b) {
+        if(isSelected()){
+            this.jBtnLink.setEnabled(!b);
+            this.jBtnAdd.setEnabled(true);
+            this.jBtnDrop.setEnabled(true);
+        }else {
+            this.jBtnLink.setEnabled(false);
+            this.jBtnAdd.setEnabled(false);
+            this.jBtnDrop.setEnabled(false);
+        }
+        
+    }
+
+    public int getSelectedToAddRowCount() {
+        return this.jTableInstancesToAdd.getSelectedRowCount();
+    }
 }

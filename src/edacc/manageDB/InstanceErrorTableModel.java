@@ -82,7 +82,18 @@ public class InstanceErrorTableModel extends DefaultTableModel {
         instances.remove(row);
     }
 
-    void remove(Instance remove) {
+    public void remove(Instance remove) {
         instances.remove(remove);
+    }
+
+    public void removeRows(int[] rows) {
+        ArrayList<Instance> toRemove = new ArrayList<Instance>();
+        for (int row : rows) {
+            toRemove.add(this.getInstance(row));
+        }
+
+        for (Instance instance : toRemove) {
+            this.remove(instance);
+        }
     }
 }
