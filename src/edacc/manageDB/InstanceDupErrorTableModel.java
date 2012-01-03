@@ -145,6 +145,7 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
      * @param instance 
      */
     public void removeDups(Instance instance) {
+        Set<Instance> keySet = backRelation.keySet();
         ArrayList<Instance> toRemove = backRelation.get(instance);
         for(Instance remove : toRemove){
             instances.remove(remove);

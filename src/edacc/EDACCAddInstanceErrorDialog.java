@@ -268,7 +268,7 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
             rows[i] = jTableInstancesToAdd.convertRowIndexToModel(rows[i]);
         }
         controller.add(rows);
-        controller.remove(rows);
+        //controller.remove(rows);
         dupErrorModel.fireTableDataChanged();
         toAddModel.fireTableDataChanged();
     }//GEN-LAST:event_jBtnAddActionPerformed

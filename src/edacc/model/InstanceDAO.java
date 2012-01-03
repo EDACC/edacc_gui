@@ -279,8 +279,9 @@ public class InstanceDAO {
                 } else {
                     ps.setNull(3, Types.BLOB);
                 }
-
-
+                ps.setString(1, instance.getName());
+                ps.setString(2, instance.getMd5());
+                ps.executeUpdate();
                 ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
                     instance.setId(rs.getInt(1));

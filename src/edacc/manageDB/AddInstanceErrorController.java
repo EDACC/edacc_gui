@@ -88,8 +88,8 @@ public class AddInstanceErrorController {
     public void add(int[] rows) {
         for (int row : rows) {
             Instance add = toAddModel.getInstance(row);
+            duplicateModel.removeDups(add);
             InstanceDAO.createDuplicateInstance(add, instanceClasses.get(add));
-            duplicateModel.removeDups(toAddModel.getInstance(row));
             toAddModel.remove(row);
         }
     }
