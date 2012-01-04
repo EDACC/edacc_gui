@@ -80,7 +80,7 @@ public class AddInstanceErrorController {
      */
     public void remove(int[] rows) {
         for (int row : rows) {
-            duplicateModel.removeDups(toAddModel.getInstance(row));           
+            duplicateModel.removeDups(toAddModel.getInstance(row));
         }
         toAddModel.removeRows(rows);
     }
@@ -89,21 +89,26 @@ public class AddInstanceErrorController {
         for (int row : rows) {
             Instance add = toAddModel.getInstance(row);
             duplicateModel.removeDups(add);
-            InstanceDAO.createDuplicateInstance(add, instanceClasses.get(add));            
+            InstanceDAO.createDuplicateInstance(add, instanceClasses.get(add));
         }
         toAddModel.removeRows(rows);
     }
 
-    public void link(HashMap<Integer, Instance> selected) throws SQLException {
+    public void link(HashMap<Integer, ArrayList<Instance>> selected) throws SQLException {
         ArrayList<Integer> ids = new ArrayList<Integer>(selected.keySet());
         for (int id : ids) {
             Instance instance = InstanceDAO.getById(id);
-            InstanceHasInstanceClassDAO.createInstanceHasInstance(instance, instanceClasses.get(selected.get(id)));
+            for (Instance inst : selected.get(id)) {
+                InstanceHasInstanceClassDAO.createInstanceHasInstance(instance, instanceClasses.get(inst));
+            }
+
         }
-        ArrayList<Instance> toRemove = new ArrayList<Instance>(selected.values());
-        for (Instance remove : toRemove) {
-            duplicateModel.removeDups(remove);
-            toAddModel.remove(remove);
+        ArrayList<ArrayList<Instance>> toRemove = new ArrayList<ArrayList<Instance>>(selected.values());
+        for (ArrayList<Instance> removeList : toRemove) {
+            for (Instance remove : removeList) {
+                duplicateModel.removeDups(remove);
+                toAddModel.remove(remove);
+            }
         }
     }
 
@@ -118,6 +123,7 @@ public class AddInstanceErrorController {
     public int getSelectedToAddRowCount() {
         return main.getSelectedToAddRowCount();
     }
+
     void noneFilter() {
         filter.setSelectedInstance(null);
         main.sort();
@@ -126,5 +132,23 @@ public class AddInstanceErrorController {
 
     public void mulipleSelectionBtnShow(boolean b) {
         main.multipleSelecteBtnShow(b);
+    }
+
+    public Instance getToAddSelectedInstance() {
+        int tmp = main.getToAddSelectedInstance();
+        if (tmp == -1) {
+            return null;
+        } else {
+            return toAddModel.getInstance(tmp);
+        }
+    }
+
+    public ArrayList<Instance> getToAddSelectedInstances() {
+        ArrayList<Instance> ret = new ArrayList<Instance>();
+        int[] tmp = main.getToAddSelectedInstances();
+        for (int i : tmp) {
+            ret.add(toAddModel.getInstance(i));
+        }
+        return ret;
     }
 }

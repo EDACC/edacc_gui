@@ -391,4 +391,20 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
     public int getSelectedToAddRowCount() {
         return this.jTableInstancesToAdd.getSelectedRowCount();
     }
+
+    public int getToAddSelectedInstance() {
+        if(jTableInstancesToAdd.getSelectedRowCount() == 1){
+            return jTableInstancesToAdd.convertColumnIndexToModel(this.jTableInstancesToAdd.getSelectedRow());
+        } else
+            return -1;
+       
+    }
+
+    public int[] getToAddSelectedInstances() {
+        int[] convertedRows = this.jTableInstancesToAdd.getSelectedRows();
+        for(int i = 0; i < convertedRows.length;i++ ){
+            convertedRows[i] = jTableInstancesToAdd.convertRowIndexToModel(convertedRows[i]);
+        }
+        return convertedRows;
+    }
 }

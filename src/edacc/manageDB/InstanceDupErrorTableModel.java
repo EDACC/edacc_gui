@@ -26,9 +26,9 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
     private ArrayList<Instance> instances = new ArrayList<Instance>();
     private String[] columns = {"Name", "MD5", "Link"};
     // <id of instance to link, error causing instance to link to>
-    private HashMap<Integer, Instance> toLink = new HashMap<Integer, Instance>();
+    private HashMap<Integer, ArrayList<Instance>> toLink = new HashMap<Integer, ArrayList<Instance>>();
     // <duplicate Instance, error causing instance>
-    private HashMap<Instance, Instance> relatedInstances = new HashMap<Instance, Instance>();
+    private HashMap<Instance, ArrayList<Instance>> relatedInstances = new HashMap<Instance, ArrayList<Instance>>();
     // <error causing instance, all related duplicate instances>
     private HashMap<Instance, ArrayList<Instance>> backRelation;
 
@@ -38,8 +38,13 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
         for (Instance causedInstance : keys) {
             ArrayList<Instance> tmp = duplicate.get(causedInstance);
             for (Instance dupInstance : tmp) {
-
-                relatedInstances.put(dupInstance, causedInstance);
+                if (relatedInstances.containsKey(dupInstance)) {
+                    relatedInstances.get(dupInstance).add(causedInstance);
+                } else {
+                    ArrayList<Instance> tmpList = new ArrayList<Instance>();
+                    tmpList.add(causedInstance);
+                    relatedInstances.put(dupInstance, tmpList);
+                }
             }
         }
         this.instances = new ArrayList<Instance>(relatedInstances.keySet());
@@ -56,7 +61,11 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
                 return instances.get(row).getMd5();
             case 2:
                 if (toLink.containsKey(instances.get(row).getId())) {
-                    return true;
+                    if (toLink.get(instances.get(row).getId()).contains(controller.getToAddSelectedInstance())) {
+                        return true;
+                    } else {
+                        return false;
+                    }
                 } else {
                     return false;
                 }
@@ -91,25 +100,36 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
 
     @Override
     public boolean isCellEditable(int row, int col) {
-        return col == 3;
+        return col == 2;
     }
 
     @Override
     public void setValueAt(Object value, int row, int col) {
-        if (col == 3) {
+        if (col == 2) {
             Boolean check = true;
-            ArrayList<Instance> toCheck = backRelation.get(relatedInstances.get(instances.get(row)));
+            int tmpIndex = relatedInstances.get(instances.get(row)).indexOf(controller.getToAddSelectedInstance());
+            Instance tmpInstance = relatedInstances.get(instances.get(row)).get(tmpIndex);
+            ArrayList<Instance> toCheck = backRelation.get(tmpInstance);
             for (Instance tmp : toCheck) {
-                if (toLink.containsKey(tmp)) {
+                if (toLink.containsKey(tmp.getId())) {
                     check = false;
                 }
             }
 
             if (check) {
                 if ((Boolean) value) {
-                    toLink.put(instances.get(row).getId(), relatedInstances.get(instances.get(row)));
+                    if (toLink.containsKey(instances.get(row).getId())) {
+                        toLink.get(instances.get(row).getId()).add(tmpInstance);            
+                    }else {
+                         ArrayList<Instance> tmpList = new ArrayList<Instance>();
+                         tmpList.add(tmpInstance);
+                         toLink.put(instances.get(row).getId(), tmpList);                                
+                    }
                 } else {
-                    toLink.remove(instances.get(row).getId());
+                    toLink.get(instances.get(row).getId()).remove(tmpInstance);
+                    if(toLink.get(instances.get(row).getId()).isEmpty()){
+                        toLink.remove(instances.get(row).getId());
+                    }
                 }
             }
 
@@ -125,7 +145,7 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
         for (Instance causedInstance : removeDups) {
             ArrayList<Instance> tmp = backRelation.get(causedInstance);
             for (Instance dupInstance : tmp) {
-                relatedInstances.remove(dupInstance);
+                relatedInstances.get(dupInstance);
                 toLink.remove(dupInstance.getId());
                 instances.remove(dupInstance);
             }
@@ -137,7 +157,7 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
     /**
      * Returns the error causing instance object which is related to the given duplicate Instance
      */
-    public Instance getRelatedErrorInstance(int id) throws SQLException {       
+    public ArrayList<Instance> getRelatedErrorInstance(int id) throws SQLException {
         return relatedInstances.get(instances.get(id));
     }
 
@@ -148,21 +168,20 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
     public void removeDups(Instance instance) {
         Set<Instance> keySet = backRelation.keySet();
         ArrayList<Instance> toRemove = backRelation.get(instance);
-        for(Instance remove : toRemove){
+        for (Instance remove : toRemove) {
             instances.remove(remove);
-            relatedInstances.remove(remove);    
+            relatedInstances.remove(remove);
             toLink.remove(remove.getId());
         }
         backRelation.remove(instance);
-        
+
     }
-    
+
     /**
      * 
      * @return 
      */
-    public HashMap<Integer, Instance> getSelected(){
+    public HashMap<Integer, ArrayList<Instance>> getSelected() {
         return toLink;
     }
-            
 }

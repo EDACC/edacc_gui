@@ -6,11 +6,9 @@ package edacc.manageDB;
 
 import edacc.model.Instance;
 import java.sql.SQLException;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFrame;
-import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowFilter.Entry;
 import javax.swing.table.TableModel;
@@ -41,11 +39,11 @@ public class InstanceDupErrorFilter extends RowFilter<InstanceDupErrorTableModel
     @Override
     public boolean include(Entry<? extends InstanceDupErrorTableModel, ? extends Integer> entry) {
         try {
-                    Instance instance = model.getRelatedErrorInstance((Integer) entry.getIdentifier());
-                    if(instance == null)
+                    ArrayList<Instance> instances = model.getRelatedErrorInstance((Integer) entry.getIdentifier());
+                    if(instances == null)
                         return false;
                                 
-                    if (instance == selectedInstance) {
+                    if (instances.contains(selectedInstance)) {
                         return true;
                     }
                 } catch (SQLException ex) {
