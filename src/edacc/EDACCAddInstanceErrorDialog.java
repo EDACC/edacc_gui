@@ -394,7 +394,7 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
 
     public int getToAddSelectedInstance() {
         if(jTableInstancesToAdd.getSelectedRowCount() == 1){
-            return jTableInstancesToAdd.convertColumnIndexToModel(this.jTableInstancesToAdd.getSelectedRow());
+            return jTableInstancesToAdd.convertRowIndexToModel(this.jTableInstancesToAdd.getSelectedRow());
         } else
             return -1;
        

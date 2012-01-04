@@ -110,11 +110,11 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
             int tmpIndex = relatedInstances.get(instances.get(row)).indexOf(controller.getToAddSelectedInstance());
             Instance tmpInstance = relatedInstances.get(instances.get(row)).get(tmpIndex);
             ArrayList<Instance> toCheck = backRelation.get(tmpInstance);
-            for (Instance tmp : toCheck) {
-                if (toLink.containsKey(tmp.getId())) {
+            /*for (Instance tmp : toCheck) {
+                if (toLink.containsKey(tmp.getId()) && toLink.get(tmp.getId()).contains(tmpInstance)) {
                     check = false;
                 }
-            }
+            }*/
 
             if (check) {
                 if ((Boolean) value) {
