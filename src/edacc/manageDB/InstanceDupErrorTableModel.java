@@ -22,8 +22,9 @@ import javax.swing.table.DefaultTableModel;
  */
 public class InstanceDupErrorTableModel extends DefaultTableModel {
 
+    private AddInstanceErrorController controller;
     private ArrayList<Instance> instances = new ArrayList<Instance>();
-    private String[] columns = {"Name", "MD5", "Path", "Link"};
+    private String[] columns = {"Name", "MD5", "Link"};
     // <id of instance to link, error causing instance to link to>
     private HashMap<Integer, Instance> toLink = new HashMap<Integer, Instance>();
     // <duplicate Instance, error causing instance>
@@ -31,11 +32,13 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
     // <error causing instance, all related duplicate instances>
     private HashMap<Instance, ArrayList<Instance>> backRelation;
 
-    InstanceDupErrorTableModel(HashMap<Instance, ArrayList<Instance>> duplicate) {
+    InstanceDupErrorTableModel(HashMap<Instance, ArrayList<Instance>> duplicate, AddInstanceErrorController controller) {
+        this.controller = controller;
         Set<Instance> keys = duplicate.keySet();
         for (Instance causedInstance : keys) {
             ArrayList<Instance> tmp = duplicate.get(causedInstance);
             for (Instance dupInstance : tmp) {
+
                 relatedInstances.put(dupInstance, causedInstance);
             }
         }
@@ -52,8 +55,6 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
             case 1:
                 return instances.get(row).getMd5();
             case 2:
-                return " ";
-            case 3:
                 if (toLink.containsKey(instances.get(row).getId())) {
                     return true;
                 } else {

@@ -7,6 +7,7 @@ public class Instance extends BaseModel implements IntegerPKModel {
 
     @Override
     public int hashCode() {
+
         return 31 + id;
     }
 

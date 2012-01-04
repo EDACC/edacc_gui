@@ -32,7 +32,7 @@ public class AddInstanceErrorController {
     private HashMap<Instance, InstanceClass> instanceClasses;
 
     public AddInstanceErrorController(HashMap<Instance, ArrayList<Instance>> duplicate, EDACCAddInstanceErrorDialog main, HashMap<Instance, InstanceClass> instanceClasses) {
-        duplicateModel = new InstanceDupErrorTableModel(duplicate);
+        duplicateModel = new InstanceDupErrorTableModel(duplicate, this);
         duplicateSorter = new TableRowSorter<InstanceDupErrorTableModel>();
 
 
