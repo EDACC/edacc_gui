@@ -185,6 +185,7 @@ public class ParameterGraphDAO {
                             System.out.println("no parameterspace param corresponding to " + param.getParameter().getName());
                             continue;
                         }
+                        if (config.getParameterValue(config_param) == null) continue;
 
                         if (OptionalDomain.OPTIONS.NOT_SPECIFIED.equals(config.getParameterValue(config_param))) {
                             continue;
