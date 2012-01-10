@@ -213,7 +213,7 @@ public class ExperimentDAO {
      */
     public static LinkedList<Experiment> getAll() throws SQLException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM " + table);
+        ResultSet rs = st.executeQuery("SELECT * FROM " + table + " ORDER BY idExperiment DESC");
         LinkedList<Experiment> res = new LinkedList<Experiment>();
         while (rs.next()) {
             int id = rs.getInt("idExperiment");
