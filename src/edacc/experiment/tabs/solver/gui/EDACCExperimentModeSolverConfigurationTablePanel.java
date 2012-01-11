@@ -40,6 +40,7 @@ import javax.swing.table.DefaultTableModel;
  * @author simon
  */
 public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swing.JPanel implements SolverConfigurationEntryModelListener {
+
     private TableModel tableModel;
     private ExperimentController expController;
     private SolverConfigurationEntryModel model;
@@ -52,15 +53,6 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
         model.addSolverConfigurationEntryModelListener(this);
         tableModel = new TableModel();
         table.setModel(tableModel);
-        table.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
-        });
     }
 
     /** This method is called from within the constructor to
@@ -123,6 +115,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
 
             }
         ));
+        table.setComponentPopupMenu(popupMenu);
         table.setName("table"); // NOI18N
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -213,7 +206,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
             // TODO: fix
             SolverConfigurationEntry entry = tableModel.getEntry(table.convertRowIndexToModel(table.getSelectedRow()));
             try {
-                SolverConfigurationEntry copy = new SolverConfigurationEntry(entry);                
+                SolverConfigurationEntry copy = new SolverConfigurationEntry(entry);
                 EDACCSolverConfigEntry entryDialog = new EDACCSolverConfigEntry(copy, new EDACCSolverConfigEntryAdapter());
 
                 SolverConfigDialog dialog = new SolverConfigDialog(entryDialog);
@@ -250,7 +243,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
     }//GEN-LAST:event_tableMouseClicked
 
     private void itemCalculateCostsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCalculateCostsActionPerformed
-         final ArrayList<SolverConfiguration> selected = new ArrayList<SolverConfiguration>();
+        final ArrayList<SolverConfiguration> selected = new ArrayList<SolverConfiguration>();
         for (int row : table.getSelectedRows()) {
             SolverConfigurationEntry entry = tableModel.getEntry(table.convertRowIndexToModel(row));
             if (entry.getSolverConfig() != null) {
@@ -330,7 +323,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
             }
             fireTableDataChanged();
         }
-        
+
         public void updateEntry(SolverConfigurationEntry entry) {
             for (int i = 0; i < entries.size(); i++) {
                 if (entries.get(i) == entry) {
