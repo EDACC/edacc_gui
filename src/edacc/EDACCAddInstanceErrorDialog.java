@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultRowSorter;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SwingUtilities;
+import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 /**
@@ -69,7 +71,7 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
         jBtnDone = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(600, 405));
+        setMinimumSize(new java.awt.Dimension(600, 450));
         setName("Form"); // NOI18N
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCAddInstanceErrorDialog.class);
@@ -146,7 +148,7 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
             .addGroup(jPnlProblemCausingLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         jPnlToolBtns.setName("jPnlToolBtns"); // NOI18N
@@ -240,7 +242,7 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
                             .addComponent(jPnlInstancesToAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPnlProblemCausing, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jPnlDialogBtns, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPnlDialogBtns, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -253,9 +255,9 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPnlToolBtns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPnlProblemCausing, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPnlDialogBtns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -342,6 +344,7 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
         // initialize the InstanceToAdd table
         this.toAddModel = controller.getToAddModel();
         jTableInstancesToAdd.setModel(toAddModel);
+        jTableInstancesToAdd.setRowSorter(new TableRowSorter<InstanceErrorTableModel>(toAddModel));
         //jTableInstancesToAdd.setRowSorter(controller.getToAddSorter());
         jTableInstancesToAdd.getSelectionModel().addListSelectionListener(new InstancesToAddSelectionListener(controller));
 
@@ -364,7 +367,7 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
 
     public int getSelectedToAddInstance() {
-        return jTableInstancesToAdd.getSelectedRow();
+        return jTableInstancesToAdd.convertRowIndexToModel(jTableInstancesToAdd.getSelectedRow());
     }
 
     public void sort() {
