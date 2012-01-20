@@ -22,16 +22,23 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
@@ -53,6 +60,20 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
         model.addSolverConfigurationEntryModelListener(this);
         tableModel = new TableModel();
         table.setModel(tableModel);
+
+        int condition = JComponent.WHEN_IN_FOCUSED_WINDOW;
+        InputMap inputMap = table.getInputMap(condition);
+        ActionMap actionMap = table.getActionMap();
+        
+        itemRemove.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "Delete");
+        actionMap.put("Delete", new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                itemRemove.doClick();
+            }
+        });
     }
 
     /** This method is called from within the constructor to
