@@ -125,7 +125,6 @@ public class DateFilter extends javax.swing.JPanel implements FilterInterface {
         } else {
             return false;
         }
-        System.out.println("COMP = " + comp);
         if ("<".equals(compStr)) {
             return comp < 0;
         } else if ("<=".equals(compStr)) {
