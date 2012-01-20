@@ -39,12 +39,12 @@ public class QueueListModel extends AbstractListModel {
     public void refreshQueues() throws NoConnectionToDBException, SQLException {
 
         queues = GridQueueDAO.getAll();
-        checkBoxes = new ArrayList<JCheckBox>();
-        for (GridQueue q : queues) {
-            JCheckBox checkBox = new JCheckBox(q.getName() + " (" + q.getId() + ")");
-            checkBoxes.add(checkBox);
-            if (expController != null) {
-                ArrayList<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(expController.getActiveExperiment());
+        if (expController != null) {
+            ArrayList<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(expController.getActiveExperiment());
+            checkBoxes = new ArrayList<JCheckBox>();
+            for (GridQueue q : queues) {
+                JCheckBox checkBox = new JCheckBox(q.getName() + " (" + q.getId() + ")");
+                checkBoxes.add(checkBox);
                 for (ExperimentHasGridQueue ehgq : ehgqs) {
                     if (ehgq.getIdGridQueue() == q.getId()) {
                         checkBox.setSelected(true);
