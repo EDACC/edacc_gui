@@ -173,6 +173,7 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
                         model.setValueAt(status.active, i, ExperimentTableModel.COL_ACTIVE);
                         modified = true;
                     }
+                    modified |= status.running > 0;
                     if (modified) {
                         synchronized (modifiedExperiments) {
                             if (!modifiedExperimentListContains.contains(status.experiment.getId())) {
