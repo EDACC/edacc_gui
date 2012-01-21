@@ -1,5 +1,6 @@
 package edacc.experiment;
 
+import edacc.EDACCFilter;
 import edacc.experiment.ExperimentUpdateThread.ExperimentStatus;
 import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
@@ -12,6 +13,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import javax.swing.RowFilter.Entry;
 import javax.swing.SwingWorker;
 
 /**
@@ -24,6 +26,7 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
     private final int MODIFIED_EXPERIMENTS_UPDATE_INTERVAL = 2000;
     private final int EXPERIMENTS_UPDATE_INTERVAL = 20000;
     private ExperimentTableModel model;
+    private EDACCFilter filter;
     private final HashSet<Integer> modifiedExperimentListContains = new HashSet<Integer>();
     private final LinkedList<ModifiedExperiment> modifiedExperiments = new LinkedList<ModifiedExperiment>();
 
@@ -31,9 +34,10 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
      * Creates a new experiment update thread.
      * @param model the model to be used
      */
-    public ExperimentUpdateThread(ExperimentTableModel model) {
+    public ExperimentUpdateThread(ExperimentTableModel model, EDACCFilter filter) {
         super();
         this.model = model;
+        this.filter = filter;
     }
 
     @Override
@@ -43,9 +47,32 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
         LinkedList<Experiment> experiments = new LinkedList<Experiment>();
         while (!this.isCancelled()) {
             if (sleep_count >= EXPERIMENTS_UPDATE_INTERVAL) {
-                for (Experiment exp : ExperimentDAO.getAll()) {
+                for (int i = 0; i < model.getRowCount(); i++) {
                     synchronized (modifiedExperiments) {
-                        if (!modifiedExperimentListContains.contains(exp.getId())) {
+                        final int row = i;
+                        Experiment exp = model.getExperimentAt(row);
+                        if (filter.include(new Entry<ExperimentTableModel, Integer>() {
+
+                            @Override
+                            public ExperimentTableModel getModel() {
+                                return model;
+                            }
+
+                            @Override
+                            public int getValueCount() {
+                                return model.getColumnCount();
+                            }
+
+                            @Override
+                            public Object getValue(int index) {
+                                return model.getValueAt(row, index);
+                            }
+
+                            @Override
+                            public Integer getIdentifier() {
+                                return row;
+                            }
+                        }) && !modifiedExperimentListContains.contains(exp.getId())) {
                             experiments.add(exp);
                         }
                     }

@@ -254,13 +254,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         });
 
-        experimentUpdateThread = new ExperimentUpdateThread(expTableModel);
+        
         
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
                 experimentFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tableExperiments, true);
+                experimentUpdateThread = new ExperimentUpdateThread(expTableModel, experimentFilter);
             }
             
         });
@@ -643,7 +644,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         btnLoadExperiment.setEnabled(false);
         expController.initialize();
         if (experimentUpdateThread == null || experimentUpdateThread.isDone()) {
-            experimentUpdateThread = new ExperimentUpdateThread(expTableModel);
+            experimentUpdateThread = new ExperimentUpdateThread(expTableModel, experimentFilter);
         }
         experimentUpdateThread.execute();
         SwingUtilities.invokeLater(new Runnable() {
@@ -2042,7 +2043,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             case TAB_EXPERIMENTS:
                 if (experimentUpdateThread != null) {
                     if (experimentUpdateThread.isDone()) {
-                        experimentUpdateThread = new ExperimentUpdateThread(expTableModel);
+                        experimentUpdateThread = new ExperimentUpdateThread(expTableModel, experimentFilter);
                     }
                     experimentUpdateThread.execute();
                 }
@@ -2568,7 +2569,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                                 experimentUpdateThread.cancel(true);
                             }
                             if (experimentUpdateThread == null || experimentUpdateThread.isDone()) {
-                                experimentUpdateThread = new ExperimentUpdateThread(expTableModel);
+                                experimentUpdateThread = new ExperimentUpdateThread(expTableModel, experimentFilter);
                             }
                             experimentUpdateThread.execute();
                         } catch (SQLException ex) {
@@ -2616,7 +2617,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                         experimentUpdateThread.cancel(true);
                     }
                     if (experimentUpdateThread == null || experimentUpdateThread.isDone()) {
-                        experimentUpdateThread = new ExperimentUpdateThread(expTableModel);
+                        experimentUpdateThread = new ExperimentUpdateThread(expTableModel, experimentFilter);
                     }
                     experimentUpdateThread.execute();
                 } catch (SQLException ex) {
