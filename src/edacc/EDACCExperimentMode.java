@@ -2926,6 +2926,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }//GEN-LAST:event_btnSelectQueueActionPerformed
 
