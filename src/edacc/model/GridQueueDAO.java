@@ -147,7 +147,7 @@ public class GridQueueDAO {
 
     public static ArrayList<GridQueue> getAll() throws NoConnectionToDBException, SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT * FROM " + table);
+                "SELECT * FROM " + table + ";");
         ResultSet rs = st.executeQuery();
         ArrayList<GridQueue> res = new ArrayList<GridQueue>();
         while (rs.next()) {

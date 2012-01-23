@@ -4,6 +4,7 @@ public class Parameter extends BaseModel implements IntegerPKModel {
     private int id;
     private int idSolver;
     private String name;
+    private String oldName;
     private String prefix;
     private String defaultValue;
     private int order;
@@ -14,6 +15,7 @@ public class Parameter extends BaseModel implements IntegerPKModel {
 
     public Parameter() {
         super();
+        oldName = null;
         name = prefix = defaultValue = "";
         hasValue=true;
         attachToPrevious=false;
@@ -32,10 +34,16 @@ public class Parameter extends BaseModel implements IntegerPKModel {
     }
 
     public void setName(String name) {
+        if (oldName == null)
+            oldName = this.name;
         this.name = name;
         if (this.isSaved()) {
             this.setModified();
         }
+    }
+    
+    protected String getOldName() {
+        return oldName;
     }
 
     public int getOrder() {
@@ -131,4 +139,12 @@ public class Parameter extends BaseModel implements IntegerPKModel {
     public void setAttachToPrevious(boolean attachToPrevious) {
         this.attachToPrevious = attachToPrevious;
     }
+
+    @Override
+    public void setSaved() {
+        super.setSaved();
+        oldName = null;
+    }
+    
+    
 }
