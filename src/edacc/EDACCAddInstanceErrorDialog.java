@@ -13,10 +13,12 @@ package edacc;
 import edacc.manageDB.AddInstanceErrorController;
 import edacc.manageDB.InstanceDupErrorFilter;
 import edacc.manageDB.InstanceDupErrorTableModel;
+import edacc.manageDB.InstanceErrorTableCellRenderer;
 import edacc.manageDB.InstanceErrorTableModel;
 import edacc.manageDB.InstancesToAddSelectionListener;
 import edacc.model.Instance;
 import edacc.model.InstanceClass;
+import java.awt.Color;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -345,7 +347,8 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
         this.toAddModel = controller.getToAddModel();
         jTableInstancesToAdd.setModel(toAddModel);
         jTableInstancesToAdd.setRowSorter(new TableRowSorter<InstanceErrorTableModel>(toAddModel));
-        //jTableInstancesToAdd.setRowSorter(controller.getToAddSorter());
+        InstanceErrorTableCellRenderer renderer = new InstanceErrorTableCellRenderer(controller);
+        jTableInstancesToAdd.setDefaultRenderer(String.class, renderer);
         jTableInstancesToAdd.getSelectionModel().addListSelectionListener(new InstancesToAddSelectionListener(controller));
 
         this.dupErrorModel.fireTableDataChanged();
@@ -410,4 +413,10 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
         }
         return convertedRows;
     }
+
+    public int ToAddTableConvertRowToModel(int row) {
+        return jTableInstancesToAdd.convertRowIndexToModel(row);
+    }
+
+
 }
