@@ -43,6 +43,7 @@ import java.util.zip.ZipOutputStream;
 import javax.imageio.stream.FileImageInputStream;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.xml.bind.JAXBException;
 
 /**
  *
@@ -178,6 +179,17 @@ public class ManageDBSolvers implements Observer {
                                     JOptionPane.ERROR_MESSAGE);
                         }
                     });
+                } catch (final JAXBException ex) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            JOptionPane.showMessageDialog(gui,
+                                    ex.getMessage(),
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    });
                 }
             }
         }, true);
@@ -189,7 +201,7 @@ public class ManageDBSolvers implements Observer {
      * @throws SQLException
      * @throws FileNotFoundException
      */
-    public void saveSolvers(final Tasks task) throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, NoSolverNameSpecifiedException, IOException, NoSuchAlgorithmException {
+    public void saveSolvers(final Tasks task) throws SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, NoSolverNameSpecifiedException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, JAXBException {
         task.setOperationName("Saving solvers...");
         int countSolvers = solverTableModel.getSolvers().size();
         for (int i = 0; i < countSolvers; i++) {

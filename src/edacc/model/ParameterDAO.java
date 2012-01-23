@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Vector;
+import javax.xml.bind.JAXBException;
 
 /**
  *
@@ -22,7 +23,7 @@ public class ParameterDAO {
      * @param solver
      * @param parameter
      */
-    public static void saveParameterForSolver(Solver solver, Parameter parameter) throws NoConnectionToDBException, SQLException {
+    public static void saveParameterForSolver(Solver solver, Parameter parameter) throws NoConnectionToDBException, SQLException, JAXBException {
         if (!solver.isSaved())
             return; 
         if (parameter.isSaved()) return;
@@ -68,6 +69,10 @@ public class ParameterDAO {
             ps.setBoolean(9, parameter.isAttachToPrevious());
             ps.setInt(10, parameter.getId());
             ps.executeUpdate();
+
+            if (parameter.getOldName() != null) {
+                ParameterGraphDAO.updateParameterGraphParameterName(solver, parameter.getOldName(), parameter.getName());
+            }
             parameter.setSaved();
         }
         Vector<Parameter> p = cache.get(solver.getId());

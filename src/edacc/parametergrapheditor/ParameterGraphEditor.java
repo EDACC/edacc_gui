@@ -285,8 +285,18 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         graph.setAllowNegativeCoordinates(false);
 
         ParameterGraph parameterGraph = ParameterGraphDAO.loadParameterGraph(solver);
-        loadParameterGraph(parameterGraph);
-
+        try {
+            loadParameterGraph(parameterGraph);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Could not load parameter graph!", "Error", JOptionPane.ERROR_MESSAGE);
+            graph.removeCells(graph.getChildCells(graph.getDefaultParent()));
+            // create root node:
+            graph.updateCellSize(rootNode = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, new AndNode(null, null), 20, 20, 80, 30));
+            if (parameters == null) {
+                parameters = new HashSet<Parameter>();
+            }
+            graph.getModel().endUpdate();
+        }
     }
 
     private void loadParameterGraph(ParameterGraph parameterGraph) {
@@ -578,6 +588,15 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
     }
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+
+        String sVersion = java.lang.System.getProperties().getProperty("java.version");
+        sVersion = sVersion.substring(0, 3);
+        Float f = Float.valueOf(sVersion);
+        if (f > 1.69) {
+            JOptionPane.showMessageDialog(this, "Saving a parameter graph with jdk 1.7 or higher is currently not supported.", "Error", JOptionPane.ERROR_MESSAGE);
+            return ;
+        }
+
         try {
             ParameterGraph parameterGraph = getParameterGraph();
             try {
@@ -684,7 +703,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             if (f.exists()) {
                 int input = JOptionPane.showConfirmDialog(this, "File " + f.getAbsoluteFile() + " exists. Overwrite?", "File exists", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
                 if (input != JOptionPane.YES_OPTION) {
-                    return ;
+                    return;
                 }
             }
             ParameterGraph parameterGraph;

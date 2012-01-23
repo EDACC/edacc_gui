@@ -3,6 +3,9 @@ package edacc.model;
 import edacc.parameterspace.ParameterConfiguration;
 import edacc.parameterspace.domain.FlagDomain;
 import edacc.parameterspace.domain.OptionalDomain;
+import edacc.parameterspace.graph.AndNode;
+import edacc.parameterspace.graph.Edge;
+import edacc.parameterspace.graph.Node;
 import edacc.parameterspace.graph.ParameterGraph;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -19,6 +22,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -29,7 +33,9 @@ import javax.xml.bind.Unmarshaller;
  * @author simon
  */
 public class ParameterGraphDAO {
-
+    public static final int SUCCESS = 0;
+    public static final int NOSUCHGRAPH = 1;
+    public static final int NOSUCHPARAMETER = 2;
     public static final String INSERT = "INSERT INTO ParameterGraph (Solver_idSolver, serializedGraph) VALUES (?, ?)";
     public static final String UPDATE = "UPDATE ParameterGraph SET serializedGraph = ? WHERE Solver_idSolver = ?";
 
@@ -57,6 +63,37 @@ public class ParameterGraphDAO {
             st.close();
         }
         return null;
+    }
+    
+    
+    
+    public static int updateParameterGraphParameterName(Solver solver, String oldName, String newName) throws SQLException, JAXBException {
+        if (solver == null || oldName == null || newName == null) {
+            throw new IllegalArgumentException();
+        }
+        ParameterGraph graph = loadParameterGraph(solver);
+        if (graph == null) {
+            return NOSUCHGRAPH;
+        }
+        Set<edacc.parameterspace.Parameter> parameters = graph.getParameterSet();
+        Set<Node> nodes = graph.nodes;
+        List<Edge> edges = graph.edges;
+        AndNode startNode = graph.startNode;
+        boolean found = false;
+        for (edacc.parameterspace.Parameter param : parameters) {
+            if (oldName.equals(param.getName())) {
+                param.setName(newName);
+                found = true;
+                break;
+            }
+        }
+        if (found) {
+            ParameterGraph newGraph = new ParameterGraph(nodes,edges,parameters,startNode);
+            saveParameterGraph(newGraph, solver);
+        } else {
+            return NOSUCHPARAMETER;
+        }
+        return SUCCESS;
     }
 
     public static ParameterGraph loadParameterGraph(File file) throws FileNotFoundException, JAXBException {

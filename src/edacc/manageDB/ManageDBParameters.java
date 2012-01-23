@@ -50,7 +50,7 @@ public class ManageDBParameters implements Observer {
         }
     }
 
-    public void saveParameters(Solver s) throws NoConnectionToDBException, SQLException{
+    public void saveParameters(Solver s) throws NoConnectionToDBException, SQLException, JAXBException{
         for(Parameter p : parameterTableModel.getParamtersOfSolver(s)){
             ParameterDAO.saveParameterForSolver(s, p);
         }
