@@ -60,8 +60,7 @@ public class PropertyComputationController implements Runnable {
         this.condition = lock.newCondition();
         this.task = task;
         this.lock = lock;
-        // availableProcessors = Runtime.getRuntime().availableProcessors();
-        availableProcessors = DatabaseConnector.getInstance().getMaxconnections();
+        availableProcessors = Runtime.getRuntime().availableProcessors();
         this.task.setOperationName("compute properties");
         this.task.setStatus("initialize the computation");
         this.recompute = recompute;
@@ -80,8 +79,7 @@ public class PropertyComputationController implements Runnable {
         this.condition = lock.newCondition();
         this.task = task;
         this.lock = lock;
-        //availableProcessors = Runtime.getRuntime().availableProcessors();
-        availableProcessors = DatabaseConnector.getInstance().getMaxconnections();
+        availableProcessors = Runtime.getRuntime().availableProcessors();
         this.task.setOperationName("compute properties");
         this.task.setStatus("initialize the computation");
         createJobQueue(instances, givenProperties);

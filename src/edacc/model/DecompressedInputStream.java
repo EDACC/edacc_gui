@@ -22,7 +22,7 @@ public class DecompressedInputStream extends InputStream {
     int bufPos = 0;
     int curBufSize = 0;
     final static int maxBufSize = 256 * 1024;
-    int[] buf = new int[maxBufSize * 2];
+    byte[] buf = new byte[maxBufSize * 2];
 
     public DecompressedInputStream(Decoder dec, long outSize, InputStream input) {
         this.dec = dec;
@@ -48,6 +48,7 @@ public class DecompressedInputStream extends InputStream {
         if (outPos >= outSize) {
             if (view != null) {
                 view.subTaskFinished(id);
+                view = null;
             }
             return -1;
         }
@@ -60,20 +61,34 @@ public class DecompressedInputStream extends InputStream {
             }
 
             dec.Code(input, new OutputStream() {
-
+                @Override
+                public void write(byte[] b, int off, int len) throws IOException {
+                    System.arraycopy(b, off, buf, bufPos, len);
+                    bufPos+=len;
+                }
+                
                 @Override
                 public void write(int b) throws IOException {
 
-                    buf[bufPos++] = b;
+                    buf[bufPos++] = (byte) b;
                 }
             }, outSize, bytesToRead, null);
             curBufSize = bufPos;
             bufPos = 0;
         }
         outPos++;
-        if (outPos % 128 == 0 && view != null) {
+        if (outPos % (32*1024) == 0 && view != null) {
             view.setProgress(id, outPos / (float) outSize * 100);
         }
         return buf[bufPos++];
+    }
+
+    @Override
+    public void close() throws IOException {
+        super.close();
+        if (view != null) {
+            view.subTaskFinished(id);
+            view = null;
+        }
     }
 }

@@ -29,6 +29,7 @@ public class EDACCTaskView extends javax.swing.JDialog {
     private GridBagConstraints subTaskConstraints;
     private HashMap<Integer, SubTaskPanel> subTaskPanels;
     private int currentSubTaskId;
+    private int maxSubTasks;
 
     /** Creates new form EDACCTaskView */
     public EDACCTaskView(java.awt.Frame parent, boolean modal, Tasks task) {
@@ -36,6 +37,7 @@ public class EDACCTaskView extends javax.swing.JDialog {
         initComponents();
         this.task = task;
         currentSubTaskId = 0;
+        maxSubTasks = 0;
         btnCancel.setVisible(false);
         progressBar.setMaximum(10000);
         progressBar.setIndeterminate(true);
@@ -210,11 +212,11 @@ public class EDACCTaskView extends javax.swing.JDialog {
 
     private void updateSubTaskConstraints() {
         subTaskConstraints.gridy = 1;
-        subTaskConstraints.weighty = 1;
+        subTaskConstraints.weighty = 100;
         for (Component c : pnlSubTasks.getComponents()) {
             subTaskLayout.setConstraints(c, subTaskConstraints);
             subTaskConstraints.gridy++;
-            subTaskConstraints.weighty *= 1000;
+            subTaskConstraints.weighty *= 100;
         }
     }
 
@@ -222,24 +224,39 @@ public class EDACCTaskView extends javax.swing.JDialog {
         if (subTaskPanels == null) {
             subTaskPanels = new HashMap<Integer, SubTaskPanel>();
         }
-        SubTaskPanel panel = new SubTaskPanel();
-        pnlSubTasks.add(panel, subTaskConstraints);
-        updateSubTaskConstraints();
+        final SubTaskPanel panel = new SubTaskPanel();
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                pnlSubTasks.add(panel, subTaskConstraints);
+                updateSubTaskConstraints();
+                EDACCTaskView.this.pack();
+                if (pnlSubTasks.getComponentCount() > maxSubTasks)
+                    maxSubTasks = pnlSubTasks.getComponentCount();
+                pnlSubTasks.setPreferredSize(new Dimension(pnlSubTasks.getPreferredSize().width, panel.getPreferredSize().height * maxSubTasks));
+            }
+        });
 
         subTaskPanels.put(++currentSubTaskId, panel);
-        this.pack();
-
         return currentSubTaskId;
     }
 
     public synchronized void subTaskFinished(int subTaskId) {
-        SubTaskPanel panel = subTaskPanels.get(subTaskId);
+        final SubTaskPanel panel = subTaskPanels.get(subTaskId);
         if (panel != null) {
-            pnlSubTasks.setPreferredSize(new Dimension(pnlSubTasks.getWidth(), pnlSubTasks.getHeight()));
             subTaskPanels.remove(subTaskId);
-            pnlSubTasks.remove(panel);
-            updateSubTaskConstraints();
-            this.pack();
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                  //  pnlSubTasks.setPreferredSize(new Dimension(pnlSubTasks.getWidth(), pnlSubTasks.getHeight()));
+                    pnlSubTasks.remove(panel);
+                    updateSubTaskConstraints();
+                    EDACCTaskView.this.pack();
+                }
+            });
+
         }
     }
 
@@ -260,7 +277,6 @@ public class EDACCTaskView extends javax.swing.JDialog {
                     }
                     panel.progressBar.setValue((int) (progress * 100));
                 }
-
             }
         });
     }
