@@ -151,4 +151,10 @@ public class AddInstanceErrorController {
         }
         return ret;
     }
+
+    public boolean isLinked(int row) {
+        row = main.ToAddTableConvertRowToModel(row);
+        Instance linked = toAddModel.getInstance(row);
+        return duplicateModel.isLinked(linked);
+    }
 }
