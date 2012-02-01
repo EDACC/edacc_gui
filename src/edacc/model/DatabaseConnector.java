@@ -196,6 +196,7 @@ public class DatabaseConnector extends Observable {
                 // try to find the connection of this thread: every thread can only have one connection at a time
                 for (ThreadConnection tconn : connections) {
                     if (tconn.thread == Thread.currentThread()) {
+                       // System.err.println(Thread.currentThread().getId() + " Found connection");
                         if (tconn.conn.isValid(10)) {
                             tconn.time = System.currentTimeMillis();
                             return tconn.conn;
@@ -205,6 +206,7 @@ public class DatabaseConnector extends Observable {
                 // try to take a connection from a dead thread
                 for (ThreadConnection tconn : connections) {
                     if (tconn.thread == null || !tconn.thread.isAlive()) {
+                       // System.err.println("Taking connection of dead thread");
                         tconn.thread = Thread.currentThread();
                         if (tconn.conn.isValid(10)) {
                             tconn.time = System.currentTimeMillis();
@@ -215,13 +217,17 @@ public class DatabaseConnector extends Observable {
                 // create new connection if max connection count isn't reached
                 if (connections.size() < maxconnections) {
                     Connection conn = getNewConnection();
+                   // System.err.println("Creating new connection");
                     connections.add(new ThreadConnection(Thread.currentThread(), conn, System.currentTimeMillis()));
                     return conn;
                 }
                 // try to steal a connection from a living thread. It is safe to use
                 // connections where autoCommit is true (no data to commit/rollback)
+                // TODO: 500ms is too less?
                 for (ThreadConnection tconn : connections) {
                     if (tconn.conn.getAutoCommit() && System.currentTimeMillis() - tconn.time > 500) {
+                     //   System.err.println("Stealing connection");
+                       
                         tconn.thread = Thread.currentThread();
                         if (tconn.conn.isValid(10)) {
                             return tconn.conn;

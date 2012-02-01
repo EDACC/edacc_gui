@@ -184,4 +184,19 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
     public HashMap<Integer, ArrayList<Instance>> getSelected() {
         return toLink;
     }
+
+    /**
+     * 
+     * @param linked
+     * @return true if the given Instance-object is linked to an duplicate Instance else false
+     */
+    public boolean isLinked(Instance linked) {
+      ArrayList<Instance> tmp = backRelation.get(linked);
+      for(Instance inst : tmp){
+          if(toLink.get(inst.getId()) != null){
+              return true;
+          }
+      }
+      return false;
+    }
 }

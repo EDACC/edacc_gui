@@ -415,13 +415,21 @@ public class InstanceDAO {
      * @throws SQLException
      * @throws InstanceNotInDBException
      */
-    public static InputStream getBinary(int id) throws NoConnectionToDBException, SQLException, InstanceNotInDBException, IOException {
+    public static InputStream getBinary(Instance instance) throws NoConnectionToDBException, SQLException, InstanceNotInDBException, IOException, InterruptedException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+        FileCache fc = FileCache.getInstance();
+        if (fc.hasFile(instance.getId(), instance.getMd5())) {
+            return Util.getDecompressedInputStream(fc.getInputStream(instance.getId(), instance.getMd5()));
+        }
 
-        ResultSet rs = st.executeQuery("SELECT i.instance FROM " + table + " AS i WHERE i.idInstance = " + id);
+        ResultSet rs = st.executeQuery("SELECT i.instance FROM " + table + " AS i WHERE i.idInstance = " + instance.getId());
         try {
             if (rs.next()) {
-                return Util.getDecompressedInputStream(rs.getBlob("instance").getBinaryStream());
+                InputStream is = rs.getBlob("instance").getBinaryStream();
+                fc.cacheFile(is, instance.getId(), instance.getMd5());
+                is.close();
+                is = fc.getInputStream(instance.getId(), instance.getMd5());
+                return Util.getDecompressedInputStream(is);
             } else {
                 throw new InstanceNotInDBException();
             }
@@ -480,7 +488,7 @@ public class InstanceDAO {
      * @param i
      * @return
      */
-    public static File getBinaryFileOfInstance(Instance i) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, InstanceNotInDBException {
+    public static File getBinaryFileOfInstance(Instance i) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, InstanceNotInDBException, InterruptedException {
         File f = new File("tmp" + System.getProperty("file.separator") + i.getId() + "_" + i.getName());
         // create missing directories
         f.getParentFile().mkdirs();
@@ -497,10 +505,10 @@ public class InstanceDAO {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public static void getBinaryFileOfInstance(Instance i, File f) throws FileNotFoundException, IOException, NoConnectionToDBException, InstanceNotInDBException {
+    public static void getBinaryFileOfInstance(Instance i, File f) throws FileNotFoundException, IOException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
         FileOutputStream out = new FileOutputStream(f);
         try {
-            Util.sevenZipDecode(getBinary(i.getId()), out);
+            Util.sevenZipDecode(getBinary(i), out);
         } catch (SQLException e) {
             // TODO: error
             e.printStackTrace();
@@ -513,8 +521,8 @@ public class InstanceDAO {
         cache.clear();
     }
 
-    public static SATInstance getSATFormulaOfInstance(Instance i) throws IOException, InvalidVariableException, InstanceNotInDBException, SQLException {
-        return edacc.satinstances.InstanceParser.getInstance().parseInstance(getBinary(i.getId()));
+    public static SATInstance getSATFormulaOfInstance(Instance i) throws IOException, InvalidVariableException, InstanceNotInDBException, SQLException, NoConnectionToDBException, InterruptedException {
+        return edacc.satinstances.InstanceParser.getInstance().parseInstance(getBinary(i));
     }
 
     /**

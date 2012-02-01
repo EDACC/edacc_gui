@@ -110,7 +110,7 @@ public class PropertyComputationUnit implements Runnable {
                 switch (property.getPropertySource()) {
                     case Instance:
                         try {
-                            InputStream inputStream = InstanceDAO.getBinary(ihp.getInstance().getId());
+                            InputStream inputStream = InstanceDAO.getBinary(ihp.getInstance());
                             compute(inputStream);
                             inputStream.close();
                         } catch (InstanceNotInDBException ex) {
@@ -268,8 +268,9 @@ public class PropertyComputationUnit implements Runnable {
                 // check, if already an error occured
                 if (err.ready()) {
                     in.close();
+                    String error = err.readLine();
                     err.close();
-                    throw new ErrorInExternalProgramException(err.readLine());
+                    throw new ErrorInExternalProgramException(error == null ? "unknown error" : error);
                 }
                 // check, if program already has terminated
                 try {

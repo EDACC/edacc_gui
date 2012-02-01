@@ -919,7 +919,7 @@ public class ExperimentController {
      * @throws InstanceNotInDBException
      * @throws TaskCancelledException 
      */
-    public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, boolean exportClient, boolean exportRunsolver, boolean exportConfig, boolean exportVerifier, File clientBinary, File verifierBinary, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException, InstanceNotInDBException, TaskCancelledException {
+    public void generatePackage(String location, boolean exportInstances, boolean exportSolvers, boolean exportClient, boolean exportRunsolver, boolean exportConfig, boolean exportVerifier, File clientBinary, File verifierBinary, Tasks task) throws FileNotFoundException, IOException, NoConnectionToDBException, SQLException, ClientBinaryNotFoundException, InstanceNotInDBException, TaskCancelledException, InterruptedException {
         File tmpDir = new File("tmp");
         tmpDir.mkdir();
         task.setCancelable(true);

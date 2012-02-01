@@ -217,7 +217,7 @@ public class ManageDBInstances implements Observer {
      */
     public void exportInstances(int[] rows, String path, Tasks task) throws IOException, NoConnectionToDBException, SQLException,
             InstanceNotInDBException, FileNotFoundException, MD5CheckFailedException,
-            NoSuchAlgorithmException, TaskCancelledException {
+            NoSuchAlgorithmException, TaskCancelledException, InterruptedException {
         task.setOperationName("Exporting instances");
         Tasks.getTaskView().setCancelable(true);
         Instance temp;
@@ -866,7 +866,7 @@ public class ManageDBInstances implements Observer {
         return ret;
     }
 
-    public void exportInstanceClass(DefaultMutableTreeNode selected, String path, Tasks task) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException, InstanceNotInDBException, TaskCancelledException {
+    public void exportInstanceClass(DefaultMutableTreeNode selected, String path, Tasks task) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException, InstanceNotInDBException, TaskCancelledException, InterruptedException {
         Tasks.getTaskView().setCancelable(true);
         task.setOperationName("Exporting instance classes");
         InstanceClass root = (InstanceClass) selected.getUserObject();
@@ -914,7 +914,7 @@ public class ManageDBInstances implements Observer {
         }
     }
 
-    private Vector<Instance> exportInstanceClasses(DefaultMutableTreeNode selected, String path, Tasks task) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException, InstanceNotInDBException {
+    private Vector<Instance> exportInstanceClasses(DefaultMutableTreeNode selected, String path, Tasks task) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, NoSuchAlgorithmException, InstanceNotInDBException, InterruptedException {
         task.setOperationName("Exporting instance classes");
         InstanceClass root = (InstanceClass) selected.getUserObject();
         Vector<InstanceClass> tmp = new Vector<InstanceClass>();

@@ -9,6 +9,7 @@ import edacc.experiment.tabs.solver.SolverConfigurationEntryModel;
 import edacc.experiment.tabs.solver.gui.EDACCSolverConfigComponent;
 import edacc.filter.ArgumentPanel;
 import edacc.filter.BooleanFilter;
+import edacc.filter.DateFilter;
 import edacc.filter.FilterInterface;
 import edacc.filter.NumberFilter;
 import edacc.filter.Parser;
@@ -21,6 +22,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
@@ -448,7 +450,9 @@ public class EDACCFilter extends javax.swing.JDialog {
             // find out which filter to use, construct it and add it to the panel.
             FilterType filterType = (FilterType) comboFilterTypes.getSelectedItem();
             FilterInterface filter = null;
-            if (filterType.clazz == Integer.class || filterType.clazz == Float.class || filterType.clazz == Double.class) {
+            if (filterType.clazz == java.util.Date.class || filterType.clazz == java.sql.Date.class) {
+                filter = new DateFilter(filterType.name);
+            } else if (filterType.clazz == Integer.class || filterType.clazz == Float.class || filterType.clazz == Double.class) {
                 filter = new NumberFilter(filterType.name);
             } else if (filterType.clazz == Boolean.class) {
                 filter = new BooleanFilter(filterType.name);

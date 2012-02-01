@@ -1,15 +1,19 @@
 package edacc.experiment;
 
+import edacc.EDACCFilter;
 import edacc.experiment.ExperimentUpdateThread.ExperimentStatus;
 import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentDAO.StatusCount;
 import edacc.model.StatusCode;
 import edacc.util.Pair;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import javax.swing.RowFilter.Entry;
 import javax.swing.SwingWorker;
 
 /**
@@ -19,68 +23,120 @@ import javax.swing.SwingWorker;
  */
 public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> {
 
+    private final int MODIFIED_EXPERIMENTS_UPDATE_INTERVAL = 2000;
+    private final int EXPERIMENTS_UPDATE_INTERVAL = 20000;
     private ExperimentTableModel model;
-    private final HashMap<Integer, Experiment> modifiedExperiments = new HashMap<Integer, Experiment>();
+    private EDACCFilter filter;
+    private final HashSet<Integer> modifiedExperimentListContains = new HashSet<Integer>();
+    private final LinkedList<ModifiedExperiment> modifiedExperiments = new LinkedList<ModifiedExperiment>();
 
     /**
      * Creates a new experiment update thread.
      * @param model the model to be used
      */
-    public ExperimentUpdateThread(ExperimentTableModel model) {
+    public ExperimentUpdateThread(ExperimentTableModel model, EDACCFilter filter) {
         super();
         this.model = model;
+        this.filter = filter;
     }
 
     @Override
     @SuppressWarnings("SleepWhileInLoop")
     protected Void doInBackground() throws Exception {
-        int sleep_count = 10000;
+        int sleep_count = EXPERIMENTS_UPDATE_INTERVAL;
+        LinkedList<Experiment> experiments = new LinkedList<Experiment>();
         while (!this.isCancelled()) {
-            LinkedList<Experiment> experiments;
-            if (sleep_count >= 10000) {
-                experiments = ExperimentDAO.getAll();
+            if (sleep_count >= EXPERIMENTS_UPDATE_INTERVAL) {
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    synchronized (modifiedExperiments) {
+                        final int row = i;
+                        Experiment exp = model.getExperimentAt(row);
+                        if (filter.include(new Entry<ExperimentTableModel, Integer>() {
+
+                            @Override
+                            public ExperimentTableModel getModel() {
+                                return model;
+                            }
+
+                            @Override
+                            public int getValueCount() {
+                                return model.getColumnCount();
+                            }
+
+                            @Override
+                            public Object getValue(int index) {
+                                return model.getValueAt(row, index);
+                            }
+
+                            @Override
+                            public Integer getIdentifier() {
+                                return row;
+                            }
+                        }) && !modifiedExperimentListContains.contains(exp.getId())) {
+                            experiments.add(exp);
+                        }
+                    }
+                }
                 sleep_count = 0;
-            } else {
-                experiments = new LinkedList<Experiment>();
+            }
+
+            while (true) {
+                Experiment exp = null;
                 synchronized (modifiedExperiments) {
-                    experiments.addAll(modifiedExperiments.values());
-                    modifiedExperiments.clear();
+                    if (!modifiedExperiments.isEmpty()) {
+                        ModifiedExperiment mexp = modifiedExperiments.getFirst();
+                        if (mexp.toBeUpdated()) {
+                            modifiedExperiments.removeFirst();
+                            modifiedExperimentListContains.remove(mexp.exp.getId());
+                            experiments.push(mexp.exp);
+                        }
+                    }
                 }
-            }
-            for (Experiment exp : experiments) {
-                ArrayList<StatusCount> statusCount = ExperimentDAO.getJobCountForExperiment(exp);
-                if (this.isCancelled())
+                if (experiments.isEmpty())
                     break;
-                int running = 0;
-                int finished = 0;
-                int failed = 0;
-                int not_started = 0;
-                int count = 0;
-                for (StatusCount stat : statusCount) {
-                    count += stat.getCount();
-                    if (stat.getStatusCode() != StatusCode.NOT_STARTED && stat.getStatusCode() != StatusCode.RUNNING) {
-                        finished += stat.getCount();
-                    }
-                    if (stat.getStatusCode().getStatusCode() < -1) {
-                        failed += stat.getCount();
-                    }
-                    if (stat.getStatusCode() == StatusCode.RUNNING) {
-                        running = stat.getCount();
-                    }
-                    if (stat.getStatusCode() == StatusCode.NOT_STARTED) {
-                        not_started = stat.getCount();
-                    }
+                
+                exp = experiments.poll();
+                checkExperiment(exp);
+                if (this.isCancelled()) {
+                    break;
                 }
-                Pair<Integer, Boolean> pa = ExperimentDAO.getPriorityActiveByExperiment(exp);
-                if (pa != null)
-                    publish(new ExperimentStatus(exp, count, finished, running, failed, not_started, pa.getFirst(), pa.getSecond()));
             }
-            if (this.isCancelled()) 
+            if (this.isCancelled()) {
                 break;
-            Thread.sleep(2000);
-            sleep_count += 2000;
+            }
+            Thread.sleep(1000);
+            sleep_count += 1000;
         }
         return null;
+    }
+
+    private void checkExperiment(Experiment exp) throws SQLException {
+        ArrayList<StatusCount> statusCount = ExperimentDAO.getJobCountForExperiment(exp);
+
+        int running = 0;
+        int finished = 0;
+        int failed = 0;
+        int not_started = 0;
+        int count = 0;
+        for (StatusCount stat : statusCount) {
+            count += stat.getCount();
+            if (stat.getStatusCode() != StatusCode.NOT_STARTED && stat.getStatusCode() != StatusCode.RUNNING) {
+                finished += stat.getCount();
+            }
+            if (stat.getStatusCode().getStatusCode() < -1) {
+                failed += stat.getCount();
+            }
+            if (stat.getStatusCode() == StatusCode.RUNNING) {
+                running = stat.getCount();
+            }
+            if (stat.getStatusCode() == StatusCode.NOT_STARTED) {
+                not_started = stat.getCount();
+            }
+        }
+        Pair<Integer, Boolean> pa = ExperimentDAO.getPriorityActiveByExperiment(exp);
+        if (pa != null) {
+            publish(new ExperimentStatus(exp, count, finished, running, failed, not_started, pa.getFirst(), pa.getSecond()));
+        }
     }
 
     @Override
@@ -117,9 +173,13 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
                         model.setValueAt(status.active, i, ExperimentTableModel.COL_ACTIVE);
                         modified = true;
                     }
+                    modified |= status.running > 0;
                     if (modified) {
                         synchronized (modifiedExperiments) {
-                            modifiedExperiments.put(status.experiment.getId(), status.experiment);
+                            if (!modifiedExperimentListContains.contains(status.experiment.getId())) {
+                                modifiedExperiments.add(new ModifiedExperiment(status.experiment));
+                                modifiedExperimentListContains.add(status.experiment.getId());
+                            }
                         }
                     }
                 }
@@ -137,6 +197,7 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
         int not_started;
         int priority;
         boolean active;
+
         ExperimentStatus(Experiment exp, int count, int finished, int running, int failed, int not_started, int priority, boolean active) {
             this.experiment = exp;
             this.count = count;
@@ -146,6 +207,21 @@ public class ExperimentUpdateThread extends SwingWorker<Void, ExperimentStatus> 
             this.not_started = not_started;
             this.priority = priority;
             this.active = active;
+        }
+    }
+
+    private class ModifiedExperiment {
+
+        private Date updateTime;
+        private Experiment exp;
+
+        public ModifiedExperiment(Experiment exp) {
+            this.exp = exp;
+            this.updateTime = new Date(new Date().getTime() + MODIFIED_EXPERIMENTS_UPDATE_INTERVAL);
+        }
+
+        public boolean toBeUpdated() {
+            return new Date().after(updateTime);
         }
     }
 }
