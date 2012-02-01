@@ -72,7 +72,7 @@ public class Main {
                 printHelp();
             } else if ("--mintime".equals(args[0]) || "--avgtime".equals(args[0])) {
                 Integer expId = null;
-                if ("--expid".equals(args[1])) {
+                if (args.length > 1 && "--expid".equals(args[1])) {
                     expId = Integer.parseInt(args[2]);
                 }
                 ObjectInputStream is = new ObjectInputStream(System.in);

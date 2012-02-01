@@ -167,7 +167,8 @@ public class PropertyComputationUnit implements Runnable {
 
         try {
             ArrayList<ExperimentResult> er = ExperimentResultDAO.getAllByInstanceId(ihp.getInstance().getId());
-            System.out.println("found " + er.size() + " results for this instance");            ObjectOutputStream os = new ObjectOutputStream(p.getOutputStream());
+            System.out.println("found " + er.size() + " results for this instance");           
+            ObjectOutputStream os = new ObjectOutputStream(p.getOutputStream());
             os.writeUnshared(er);
             os.flush();
             os.close();
@@ -178,7 +179,12 @@ public class PropertyComputationUnit implements Runnable {
 
         // check, if already an error occured
         if (err.ready()) {
-            throw new ErrorInExternalProgramException(err.readLine());
+            String message = "";
+            String line;
+            while ((line = err.readLine()) != null) {
+                message += line + '\n';
+            }
+            throw new ErrorInExternalProgramException(message);
         }
         // check, if program already has terminated
         try {
