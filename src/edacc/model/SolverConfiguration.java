@@ -136,14 +136,17 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
         hash = 97 * hash + this.id;
         return hash;
     }
-
+    
     public boolean hasEqualSemantics(SolverConfiguration sc) throws SQLException {
+        return hasEqualSemantics(sc.getSolverBinary(), ParameterInstanceDAO.getBySolverConfig(sc));
+    }
+
+    public boolean hasEqualSemantics(SolverBinaries binary, ArrayList<ParameterInstance> paramInstances) throws SQLException {
         boolean equal = true;
-        if (sc.getSolverBinary().getId() != getSolverBinary().getId()) {
+        if (binary.getId() != getSolverBinary().getId()) {
             // if the solver configs doesn't have the same solver binary -> other semantics
             equal = false;
         } else {
-            ArrayList<ParameterInstance> paramInstances = ParameterInstanceDAO.getBySolverConfig(sc);
             ArrayList<ParameterInstance> myParamInstances = ParameterInstanceDAO.getBySolverConfig(this);
             if (paramInstances.size() != myParamInstances.size()) {
                 // if number of parameters doesn't equal, the solver config has other semantics

@@ -2,10 +2,12 @@ package edacc.experiment;
 
 import edacc.EDACCApp;
 import edacc.model.InstanceClass;
+import edacc.model.IntegerPKModel;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstance;
 import edacc.model.Solver;
+import edacc.model.SolverConfiguration;
 import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.JTable;
@@ -428,6 +431,19 @@ public class Util {
                 }
             }
         };
+    }
+
+    public static String getIdArray(List<Integer> list) {
+        if (list.isEmpty())
+            throw new IllegalArgumentException("List is empty.");
+        
+        StringBuilder sb = new StringBuilder("");
+        for (int i = 0; i < list.size() -1; i++) {
+            sb.append(list.get(i));
+            sb.append(',');
+        }
+        sb.append(list.get(list.size()-1));
+        return sb.toString();
     }
 
     static class ValueUnit {

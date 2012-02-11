@@ -15,6 +15,7 @@ import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentDAO.StatusCount;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
+import edacc.model.ParameterInstanceDAO;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.StatusCode;
@@ -228,6 +229,8 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
                         }
                         list.add(sc);
                     }
+                    
+                    ParameterInstanceDAO.cacheParameterInstances(tmpSolverConfigs);
 
                     for (Instance i : InstanceDAO.getAllByExperimentId(experiment.getId())) {
                         instanceIds.add(i.getId());

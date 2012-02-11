@@ -1,6 +1,7 @@
 package edacc.model;
 
 import edacc.properties.PropertyTypeNotExistException;
+import edacc.util.Pair;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -322,8 +323,10 @@ public class ExperimentResultDAO {
             st.executeBatch();
             st.close();
         } catch (Throwable e) {
-            DatabaseConnector.getInstance().getConn().rollback();
-            DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+            if (autoCommit) {
+                DatabaseConnector.getInstance().getConn().rollback();
+                DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
+            }
             if (e instanceof SQLException) {
                 throw (SQLException) e;
             }
@@ -582,7 +585,7 @@ public class ExperimentResultDAO {
     public static ArrayList<ExperimentResult> getAllModifiedByExperimentId(int id, Timestamp modified) throws SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         return getAllModifiedByExperimentId(id, modified, null);
     }
-    
+
     /**
      * Returns all experiment results which were modified after the modified timestamp for a given experiment id
      * @param id the experiment id for the experiment results
@@ -1265,6 +1268,44 @@ public class ExperimentResultDAO {
         st.close();
         return res;
     }
+    
+    public static HashMap<Pair<SolverConfiguration, Instance>, List<ExperimentResult>> getBySolverConfigurationsAndInstances(List<SolverConfiguration> scs, List<Instance> instances) throws SQLException {
+        //TODO: also assign experiment result properties?
+        
+        HashMap<Pair<SolverConfiguration, Instance>, List<ExperimentResult>> res = new HashMap<Pair<SolverConfiguration, Instance>, List<ExperimentResult>>();
+        if (scs.isEmpty() || instances.isEmpty())
+            return res;
+        
+        List<Integer> scIds = new ArrayList<Integer>();
+        for (SolverConfiguration sc : scs)
+            scIds.add(sc.getId());
+        List<Integer> iIds = new ArrayList<Integer>();
+        for (Instance i: instances) 
+            iIds.add(i.getId());
+        
+        String scIdsStr = edacc.experiment.Util.getIdArray(scIds);
+        String iIdStr = edacc.experiment.Util.getIdArray(iIds);
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
+                selectQuery
+                + "WHERE Instances_idInstance in (" + iIdStr + ") AND SolverConfig_idSolverConfig IN (" + scIdsStr + ");"
+                );
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            ExperimentResult er = getExperimentResultFromResultSet(rs);
+            Pair<SolverConfiguration, Instance> identifier = new Pair<SolverConfiguration, Instance>(SolverConfigurationDAO.getSolverConfigurationById(er.getSolverConfigId()), InstanceDAO.getById(er.getInstanceId()));
+            List<ExperimentResult> results = res.get(identifier);
+            if (results == null) {
+                results = new ArrayList<ExperimentResult>();
+                res.put(identifier, results);
+            }
+            results.add(er);
+            er.setSaved();
+        }
+        rs.close();
+        st.close();
+        
+        return res;
+    }
 
     public static ArrayList<ExperimentResult> getBySolverConfigurationAndInstance(SolverConfiguration sc, Instance i) throws SQLException, StatusCodeNotInDBException, ResultCodeNotInDBException, Exception {
         ArrayList<ExperimentResult> v = new ArrayList<ExperimentResult>();
@@ -1284,7 +1325,30 @@ public class ExperimentResultDAO {
         st.close();
         return v;
     }
-
+    
+    public static HashMap<SeedGroupExperimentIdInstanceId, Integer> getMaxRunsForSeedGroupsByExperimentIdsAndInstanceId(List<Integer> seed_groups, List<Integer> expIds, List<Integer> instanceIds) throws SQLException {
+        HashMap<SeedGroupExperimentIdInstanceId, Integer> res = new HashMap<SeedGroupExperimentIdInstanceId, Integer>();
+        if (expIds.isEmpty() || seed_groups.isEmpty() || instanceIds.isEmpty())
+            return res;
+        Statement st = DatabaseConnector.getInstance().getConn().createStatement();
+        
+        ResultSet rs = st.executeQuery(
+                    "SELECT MAX(RUN), ExperimentResults.Experiment_idExperiment, seed_group, Instances_idInstance "
+                + "FROM ExperimentResults JOIN SolverConfig ON (ExperimentResults.SolverConfig_idSolverConfig = SolverConfig.idSolverConfig) "
+                + "WHERE ExperimentResults.Experiment_idExperiment IN (" + edacc.experiment.Util.getIdArray(expIds) + ") AND seed_group IN (" + edacc.experiment.Util.getIdArray(seed_groups) + ") AND Instances_idInstance IN (" + edacc.experiment.Util.getIdArray(instanceIds) + ") GROUP BY ExperimentResults.Experiment_idExperiment, seed_group, Instances_idInstance;"
+                );
+        while (rs.next()) {
+            int maxRuns = rs.getInt(1);
+            int expId = rs.getInt(2);
+            int seedGroup = rs.getInt(3);
+            int instanceId = rs.getInt(4);
+            res.put(new SeedGroupExperimentIdInstanceId(seedGroup, expId, instanceId), maxRuns);
+        }
+        rs.close();
+        st.close();
+        return res;
+    }
+    
     public static int getMaxRunForSeedGroupByExperimentIdAndInstanceId(int seed_group, int expId, int instanceId) throws SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT MAX(run) FROM " + table + " "
@@ -1306,17 +1370,6 @@ public class ExperimentResultDAO {
         return res;
     }
 
-    public static class IdValue<T> {
-
-        private int id;
-        private T value;
-
-        public IdValue(int id, T value) {
-            this.id = id;
-            this.value = value;
-        }
-    }
-
     public static int getNumJobsBySolverConfigurationId(int idSolverConfig) throws SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT COUNT(idJob) FROM " + table + " WHERE SolverConfig_idSolverConfig=?");
@@ -1329,5 +1382,59 @@ public class ExperimentResultDAO {
         rs.close();
         st.close();
         return count;
+    }
+
+    public static class IdValue<T> {
+
+        private int id;
+        private T value;
+
+        public IdValue(int id, T value) {
+            this.id = id;
+            this.value = value;
+        }
+    }
+    
+    
+    public static class SeedGroupExperimentIdInstanceId {
+        int seedGroup;
+        int expId;
+        int instanceId;
+        
+        public SeedGroupExperimentIdInstanceId(int seedGroup, int expId, int instanceId) {
+            this.seedGroup = seedGroup;
+            this.expId = expId;
+            this.instanceId = instanceId;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final SeedGroupExperimentIdInstanceId other = (SeedGroupExperimentIdInstanceId) obj;
+            if (this.seedGroup != other.seedGroup) {
+                return false;
+            }
+            if (this.expId != other.expId) {
+                return false;
+            }
+            if (this.instanceId != other.instanceId) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 79 * hash + this.seedGroup;
+            hash = 79 * hash + this.expId;
+            hash = 79 * hash + this.instanceId;
+            return hash;
+        }        
     }
 }
