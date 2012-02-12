@@ -1,10 +1,19 @@
 package edacc.model;
 
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 /**
  *
@@ -134,7 +143,7 @@ public class SolverConfigurationDAO {
             } else if (sc.isModified()) {
                 if (stUpdate == null) {
                     stUpdate = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
-                } 
+                }
                 stUpdate.setInt(1, sc.getSolverBinary().getIdSolverBinary());
                 stUpdate.setInt(2, sc.getSeed_group());
                 stUpdate.setString(3, sc.getName());
@@ -330,5 +339,65 @@ public class SolverConfigurationDAO {
         rs.close();
         st.close();
         return null;
+    }
+
+    public static void exportSolverConfigurations(final ZipOutputStream stream, Experiment experiment) throws IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
+        List<SolverConfiguration> solverConfigs = getSolverConfigurationByExperimentId(experiment.getId());
+        for (SolverConfiguration sc : solverConfigs) {
+            sc.parameterInstances = ParameterInstanceDAO.getBySolverConfig(sc);
+        }
+        stream.putNextEntry(new ZipEntry("experiment_" + experiment.getId() + ".solverconfigs"));
+        writeSolverConfigurationsToStream(new ObjectOutputStream(stream), solverConfigs);
+        for (SolverConfiguration sc : solverConfigs) {
+            sc.parameterInstances = null;
+        }
+    }
+
+    public static HashMap<Integer, SolverConfiguration> importSolverConfigurations(ZipFile file, Experiment fileExp, Experiment dbExp, HashMap<Integer, SolverBinaries> solverBinaryMap, HashMap<Integer, Parameter> parameterMap) throws SQLException, IOException, ClassNotFoundException {
+        HashMap<Integer, SolverConfiguration> solverConfigMap = new HashMap<Integer, SolverConfiguration>();
+        
+        List<SolverConfiguration> solverConfigs = readSolverConfigurationsFromFile(file, fileExp);
+        for (SolverConfiguration sc : solverConfigs) {
+            SolverConfiguration dbSc = new SolverConfiguration(sc);
+            dbSc.setExperiment_id(dbExp.getId());
+            dbSc.setSolverBinary(solverBinaryMap.get(sc.getSolverBinary().getId()));
+            SolverConfigurationDAO.save(dbSc);
+            List<ParameterInstance> dbParams = new LinkedList<ParameterInstance>();
+            for (ParameterInstance pi : sc.parameterInstances) {
+                ParameterInstance dbParam = new ParameterInstance(pi);
+                dbParam.setSolverConfiguration(dbSc);
+                dbParam.setParameter_id(parameterMap.get(pi.getParameter_id()).getId());
+                dbParams.add(dbParam);
+            }
+            ParameterInstanceDAO.saveBulk(dbParams);
+            solverConfigMap.put(sc.getId(), dbSc);
+        }
+        
+        return solverConfigMap;
+    }
+
+    public static void writeSolverConfigurationsToStream(ObjectOutputStream stream, List<SolverConfiguration> solverConfigs) throws IOException, SQLException {
+        for (SolverConfiguration sc : solverConfigs) {
+            stream.writeUnshared(sc);
+        }
+    }
+
+    public static List<SolverConfiguration> readSolverConfigurationsFromFile(ZipFile file, Experiment experiment) throws IOException, ClassNotFoundException {
+        ZipEntry entry = file.getEntry("experiment_" + experiment.getId() + ".solverconfigs");
+        ObjectInputStream ois = new ObjectInputStream(file.getInputStream(entry));
+        List<SolverConfiguration> res = new LinkedList<SolverConfiguration>();
+        SolverConfiguration sc;
+        while ((sc = readSolverConfigurationFromStream(ois)) != null) {
+            res.add(sc);
+        }
+        return res;
+    }
+
+    public static SolverConfiguration readSolverConfigurationFromStream(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        try {
+            return (SolverConfiguration) stream.readUnshared();
+        } catch (EOFException ex) {
+            return null;
+        }
     }
 }

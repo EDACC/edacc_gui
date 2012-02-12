@@ -1,21 +1,63 @@
 package edacc.model;
 
+import edacc.parameterspace.graph.ParameterGraph;
 import java.io.File;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
-public class Solver extends BaseModel implements IntegerPKModel {
+public class Solver extends BaseModel implements IntegerPKModel, Serializable {
 
     private static Random rand = new Random();
     
     private int id;
     private String name;
     private String description;
-    private File[] codeFile;
+    private transient File[] codeFile;
     private String authors;
     private String version;
     private Vector<SolverBinaries> solverBinaries;
+    
+    // currently only used for export! (will not be set by DAOs)
+    protected List<Parameter> parameters;
+    protected ParameterGraph graph;
 
+    public boolean realEquals(Solver other, List<Parameter> params) throws SQLException {
+        boolean res = other.name.equals(name) && other.description.equals(description) && other.authors.equals(authors) && other.version.equals(version);
+        if (!res)
+            return false;
+        List<Parameter> ownParams = ParameterDAO.getParameterFromSolverId(id);
+        if (ownParams.size() != params.size()) {
+            return false;
+        }
+        for (Parameter ownParam : ownParams) {
+            boolean found = false;
+            for (Parameter hisParam : params) {
+                if (hisParam.realEquals(ownParam)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                return false;
+        }
+        return true;
+    }
+    
+    public Solver(Solver solver) {
+        this(solver.getName(), solver.getDescription(), solver.getAuthors(), solver.getVersion());
+    }
+    
+    public Solver(String name, String description, String authors, String version) {
+        this();
+        this.name = name;
+        this.description = description;
+        this.authors = authors;
+        this.version = version;
+    }
+    
     public Solver() {
         this.setNew();
         this.solverBinaries = new Vector<SolverBinaries>();

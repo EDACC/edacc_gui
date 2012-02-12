@@ -38,9 +38,11 @@ public class ExperimentResult extends BaseModel implements Serializable {
     private Integer idClient;
 
     protected ExperimentResult() {
+        super();
     }
 
     protected ExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float resultTime, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit) {
+        this();
         this.run = run;
         this.priority = priority;
         this.computeQueue = computeQueue;
@@ -56,6 +58,31 @@ public class ExperimentResult extends BaseModel implements Serializable {
         this.memoryLimit = memoryLimit;
         this.wallClockTimeLimit = wallClockTimeLimit;
         this.stackSizeLimit = stackSizeLimit;
+    }
+    
+    protected ExperimentResult(ExperimentResult er) {
+        this();
+        id = er.id;
+        run = er.run;
+        priority = er.priority;
+        computeQueue = er.computeQueue;
+        computeNode = er.computeNode;
+        computeNodeIP = er.computeNodeIP;
+        status = er.status;
+        seed = er.seed;
+        resultCode = er.resultCode;
+        resultTime = er.resultTime;
+        SolverConfigId = er.SolverConfigId;
+        ExperimentId = er.ExperimentId;
+        InstanceId = er.InstanceId;
+        startTime = er.startTime;
+        CPUTimeLimit = er.CPUTimeLimit;
+        memoryLimit = er.memoryLimit;
+        wallClockTimeLimit = er.wallClockTimeLimit;
+        stackSizeLimit = er.stackSizeLimit;
+        solverExitCode = er.solverExitCode;
+        verifierExitCode = er.verifierExitCode;
+        watcherExitCode = er.watcherExitCode;
     }
 
     @Override

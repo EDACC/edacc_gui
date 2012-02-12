@@ -5,12 +5,13 @@
 package edacc.model;
 
 import java.io.File;
+import java.io.Serializable;
 
 /**
  *
  * @author dgall
  */
-public class SolverBinaries extends BaseModel implements IntegerPKModel {
+public class SolverBinaries extends BaseModel implements IntegerPKModel, Serializable {
 
     /**
      * The (db) id of this object.
@@ -36,7 +37,7 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
      * it should be persisted to the db by updating the field.
      * The save method in the SolverBinariesDAO will handle the described procedure.
      */
-    private File[] binaryFiles;
+    private transient File[] binaryFiles;
     /**
      * The md5 sum of the archive.
      * NULL, if no md5 sum has been calculated yet (eg. because of missing binaryArchive).
@@ -56,6 +57,15 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
      */
     private String runPath;
 
+    public boolean realEquals(SolverBinaries other) {
+        return (other.binaryName == null ? binaryName == null : other.binaryName.equals(binaryName)) && 
+                (other.rootDir == null ? rootDir == null : other.rootDir.equals(rootDir)) && 
+                (other.md5 == null ? md5 == null : other.md5.equals(md5)) && 
+                (other.version == null ? version == null : other.version.equals(version)) && 
+                (other.runCommand == null ? runCommand == null : other.runCommand.equals(runCommand)) &&
+                (other.runPath == null ? runPath == null : other.runPath.equals(runPath));
+    }
+    
     public SolverBinaries(Solver s) {
         this(s.getId());
     }
@@ -70,6 +80,7 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
      * @param b the solver binary to be cloned.
      */
     public SolverBinaries(SolverBinaries b) {
+        this(b.getIdSolver());
         this.setAll(b);
     }
     
@@ -77,7 +88,7 @@ public class SolverBinaries extends BaseModel implements IntegerPKModel {
      * Sets all values of this object to the values of the given solverBinary.
      * @param b the solverbinaries with the values to be copied.
      */
-    public void setAll(SolverBinaries b) {
+    final public void setAll(SolverBinaries b) {
         this.setBinaryArchive(b.getBinaryFiles());
         this.setBinaryName(b.getBinaryName());
         this.setIdSolver(b.getIdSolver());

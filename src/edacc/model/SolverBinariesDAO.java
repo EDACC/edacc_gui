@@ -6,22 +6,30 @@ package edacc.model;
 
 import edacc.manageDB.Util;
 import edacc.manageDB.NoSolverBinarySpecifiedException;
+import edacc.util.Pair;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  *
@@ -42,8 +50,9 @@ public class SolverBinariesDAO {
         ps.setInt(1, solver.getId());
         ps.executeUpdate();
         // update object information
-        for (SolverBinaries b : solver.getSolverBinaries())
+        for (SolverBinaries b : solver.getSolverBinaries()) {
             b.setDeleted();
+        }
         // clear solver binaries vector of solver
         solver.setSolverBinaries(new Vector<SolverBinaries>());
     }
@@ -56,6 +65,10 @@ public class SolverBinariesDAO {
     }
 
     public static void save(SolverBinaries s) throws SQLException, NoSolverBinarySpecifiedException, FileNotFoundException, IOException, NoSuchAlgorithmException {
+        save(s, null);
+    }
+
+    public static void save(SolverBinaries s, BinaryData data) throws SQLException, NoSolverBinarySpecifiedException, FileNotFoundException, IOException, NoSuchAlgorithmException {
         if (s.isSaved()) {
             return;
         }
@@ -66,7 +79,9 @@ public class SolverBinariesDAO {
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(INSERT_QUERY, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setInt(1, s.getIdSolver());
             ps.setString(2, s.getBinaryName());
-            if (s.getBinaryFiles() != null && s.getBinaryFiles().length > 0) {
+            if (data != null) {
+                ps.setBinaryStream(3, new ByteArrayInputStream(data.getData()));
+            } else if (s.getBinaryFiles() != null && s.getBinaryFiles().length > 0) {
                 ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(s.getBinaryFiles(), new File(s.getRootDir()));
                 ps.setBinaryStream(3, new ByteArrayInputStream(zipped.toByteArray()));
             } else {
@@ -95,7 +110,7 @@ public class SolverBinariesDAO {
                 s.setIdSolverBinary(rs.getInt(1));
             }
         }
-        
+
         // modify files if necessary
         if (s.isModified() && s.getBinaryFiles() != null && s.getBinaryFiles().length > 0) { // binary files have been changed validly
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(UPDATE_FILES_QUERY, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -106,7 +121,7 @@ public class SolverBinariesDAO {
             ps.setInt(3, s.getId());
             ps.executeUpdate();
         }
-        
+
         if (s.isDeleted()) {
             cache.remove(s);
             // remove SolverBinary from Vector in corresponding solver object
@@ -225,5 +240,58 @@ public class SolverBinariesDAO {
         }
         rs.close();
         return res;
+    }
+
+   /* public static HashMap<Integer, Integer> importSolverBinaries(ZipFile file, int solverId, HashMap<Integer, Integer> solverIdMap) throws IOException, ClassNotFoundException, SQLException, NoSolverBinarySpecifiedException, FileNotFoundException, NoSuchAlgorithmException {
+        SolverBinariesDAO.clearCache();
+        SolverDAO.clearCache();
+        ZipEntry sbEntry = file.getEntry("solver_" + solverId + ".solverbinaries");
+        Pair<SolverBinaries, BinaryData> sb;
+        HashMap<Integer, Integer> res = new HashMap<Integer, Integer>();
+        ObjectInputStream sbis = new ObjectInputStream(file.getInputStream(sbEntry));
+        while ((sb = readSolverBinaryFromStream(sbis)) != null) {
+            boolean found = false;
+            System.out.println("FOUND SOLVER BINARY");
+            Solver dbSolver = SolverDAO.getById(solverIdMap.get(sb.getFirst().getIdSolver()));
+            for (SolverBinaries dbSb : dbSolver.getSolverBinaries()) {
+                if (dbSb.realEquals(sb.getFirst())) {
+                    found = true;
+                    res.put(sb.getFirst().getId(), dbSb.getId());
+                    break;
+                }
+            }
+            if (!found) {
+                // TODO:
+                SolverBinaries dbSolverBinary = new SolverBinaries(sb.getFirst());
+                dbSolverBinary.setIdSolver(solverIdMap.get(dbSolverBinary.getIdSolver()));
+                System.out.println("WRITING SOLVERBINARY TO DB");
+                save(dbSolverBinary, sb.getSecond());
+                res.put(sb.getFirst().getId(), dbSolverBinary.getId());
+            } 
+        }
+        SolverBinariesDAO.clearCache();
+        SolverDAO.clearCache();
+        return res;
+    }*/
+
+    public static void writeSolverBinariesToStream(ObjectOutputStream stream, List<SolverBinaries> solverBinaries) throws IOException, SQLException {
+        for (SolverBinaries sb : solverBinaries) {
+            stream.writeObject(sb.getId());
+            InputStream is = getZippedBinaryFile(sb);
+            BinaryData data = new BinaryData(is);
+            is.close();
+            stream.writeUnshared(data);
+        }
+    }
+
+    public static Pair<Integer, BinaryData> readSolverBinaryDataFromStream(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        Integer sbId;
+        try {
+            sbId = (Integer) stream.readUnshared();
+        } catch (EOFException ex) {
+            return null;
+        }
+        BinaryData data = (BinaryData) stream.readObject();
+        return new Pair<Integer, BinaryData>(sbId, data);
     }
 }

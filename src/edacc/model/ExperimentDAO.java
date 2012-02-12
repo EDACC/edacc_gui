@@ -1,9 +1,18 @@
 package edacc.model;
 
 import edacc.util.Pair;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 /**
  *
@@ -323,6 +332,78 @@ public class ExperimentDAO {
             return new Pair<Integer, Boolean>(priority, active);
         }
     }
+    
+    public static void exportExperiments(final ZipOutputStream stream, List<Experiment> experiments) throws IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
+        for (Experiment exp : experiments) {
+            ExperimentResultDAO.exportExperimentResults(stream, exp);
+            SolverConfigurationDAO.exportSolverConfigurations(stream, exp);
+            exp.instances = ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(exp.getId());
+            exp.scenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(exp.getId());
+        }
+        stream.putNextEntry(new ZipEntry("experiments.edacc"));
+        writeExperimentsToStream(new ObjectOutputStream(stream), experiments);
+        for (Experiment exp : experiments) {
+            exp.instances = null;
+            exp.scenario = null;
+        }
+    }
+
+    public static void importExperiments(ZipFile file, List<Experiment> experiments, HashMap<Integer, SolverBinaries> solverBinaryMap, HashMap<Integer, Parameter> parameterMap, HashMap<Integer, Instance> instanceMap) throws SQLException, IOException, ClassNotFoundException {
+        for (Experiment experiment: experiments) {
+            Experiment dbExperiment = new Experiment(experiment);
+            ExperimentDAO.save(dbExperiment);
+            for (ExperimentHasInstance ehi : experiment.instances) {
+                ExperimentHasInstanceDAO.createExperimentHasInstance(dbExperiment.getId(), instanceMap.get(ehi.getInstances_id()).getId());
+            }
+            if (experiment.scenario != null) {
+                ConfigurationScenario dbScenario = new ConfigurationScenario(experiment.scenario);
+                for (InstanceSeed is : dbScenario.getCourse().getInstanceSeedList()) {
+                    is.instance = InstanceDAO.getById(instanceMap.get(is.instance.getId()).getId());
+                }
+                for (ConfigurationScenarioParameter param : dbScenario.getParameters()) {
+                    param.setParameter(parameterMap.get(param.getParameter().getId()));
+                    param.setIdParameter(param.getParameter().getId());
+                }
+                dbScenario.setIdExperiment(dbExperiment.getId());
+                dbScenario.setIdSolverBinary(solverBinaryMap.get(dbScenario.getIdSolverBinary()).getId());
+                
+                // otherwise the instance seed course will not be saved.
+                //dbScenario.getCourse().setInitialLength(0);
+                
+                ConfigurationScenarioDAO.save(dbScenario);
+            }
+            HashMap<Integer, SolverConfiguration> solverConfigMap = SolverConfigurationDAO.importSolverConfigurations(file, experiment, dbExperiment, solverBinaryMap, parameterMap);
+            
+            ExperimentResultDAO.importExperimentResults(file, experiment, dbExperiment, solverConfigMap, instanceMap);
+            // TODO: jobs
+        }
+    }
+
+    public static void writeExperimentsToStream(ObjectOutputStream stream, List<Experiment> experiments) throws IOException, SQLException {
+        for (Experiment exp : experiments) {
+            stream.writeUnshared(exp);
+        }
+    }
+
+    public static List<Experiment> readExperimentsFromFile(ZipFile file) throws IOException, ClassNotFoundException {
+        ZipEntry entry = file.getEntry("experiments.edacc");
+        ObjectInputStream ois = new ObjectInputStream(file.getInputStream(entry));
+        List<Experiment> res = new LinkedList<Experiment>();
+        Experiment exp;
+        while ((exp = readExperimentFromStream(ois)) != null) {
+            res.add(exp);
+        }
+        return res;
+    }
+
+    public static Experiment readExperimentFromStream(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        try {
+            return (Experiment) stream.readUnshared();
+        } catch (EOFException ex) {
+            return null;
+        }
+    }
+    
 
     public static class StatusCount {
 

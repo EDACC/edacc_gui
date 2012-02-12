@@ -87,7 +87,9 @@ public class DecompressedInputStream extends InputStream {
         System.arraycopy(buf, bufPos, b, off, len);
         bufPos += len;
         outPos += len;
-        view.setProgress(id, outPos / (float) outSize * 100);
+        if (view != null) {
+            view.setProgress(id, outPos / (float) outSize * 100);
+        }
         return len;
     }
 

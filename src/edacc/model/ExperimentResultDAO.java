@@ -3,12 +3,15 @@ package edacc.model;
 import edacc.properties.PropertyTypeNotExistException;
 import edacc.util.Pair;
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -17,7 +20,11 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 public class ExperimentResultDAO {
 
@@ -100,7 +107,7 @@ public class ExperimentResultDAO {
         return query.toString();
     }
 
-    public static void batchSave(ArrayList<ExperimentResult> v) throws SQLException {
+    public static void batchSave(List<ExperimentResult> v) throws SQLException {
         batchSave(v, null);
     }
 
@@ -109,7 +116,7 @@ public class ExperimentResultDAO {
      * @param v
      * @throws SQLException
      */
-    public static void batchSave(ArrayList<ExperimentResult> v, Tasks task) throws SQLException {
+    public static void batchSave(List<ExperimentResult> v, Tasks task) throws SQLException {
         if (v.isEmpty()) {
             return;
         }
@@ -1268,27 +1275,29 @@ public class ExperimentResultDAO {
         st.close();
         return res;
     }
-    
+
     public static HashMap<Pair<SolverConfiguration, Instance>, List<ExperimentResult>> getBySolverConfigurationsAndInstances(List<SolverConfiguration> scs, List<Instance> instances) throws SQLException {
         //TODO: also assign experiment result properties?
-        
+
         HashMap<Pair<SolverConfiguration, Instance>, List<ExperimentResult>> res = new HashMap<Pair<SolverConfiguration, Instance>, List<ExperimentResult>>();
-        if (scs.isEmpty() || instances.isEmpty())
+        if (scs.isEmpty() || instances.isEmpty()) {
             return res;
-        
+        }
+
         List<Integer> scIds = new ArrayList<Integer>();
-        for (SolverConfiguration sc : scs)
+        for (SolverConfiguration sc : scs) {
             scIds.add(sc.getId());
+        }
         List<Integer> iIds = new ArrayList<Integer>();
-        for (Instance i: instances) 
+        for (Instance i : instances) {
             iIds.add(i.getId());
-        
+        }
+
         String scIdsStr = edacc.experiment.Util.getIdArray(scIds);
         String iIdStr = edacc.experiment.Util.getIdArray(iIds);
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 selectQuery
-                + "WHERE Instances_idInstance in (" + iIdStr + ") AND SolverConfig_idSolverConfig IN (" + scIdsStr + ");"
-                );
+                + "WHERE Instances_idInstance in (" + iIdStr + ") AND SolverConfig_idSolverConfig IN (" + scIdsStr + ");");
         ResultSet rs = st.executeQuery();
         while (rs.next()) {
             ExperimentResult er = getExperimentResultFromResultSet(rs);
@@ -1303,7 +1312,7 @@ public class ExperimentResultDAO {
         }
         rs.close();
         st.close();
-        
+
         return res;
     }
 
@@ -1325,18 +1334,18 @@ public class ExperimentResultDAO {
         st.close();
         return v;
     }
-    
+
     public static HashMap<SeedGroupExperimentIdInstanceId, Integer> getMaxRunsForSeedGroupsByExperimentIdsAndInstanceId(List<Integer> seed_groups, List<Integer> expIds, List<Integer> instanceIds) throws SQLException {
         HashMap<SeedGroupExperimentIdInstanceId, Integer> res = new HashMap<SeedGroupExperimentIdInstanceId, Integer>();
-        if (expIds.isEmpty() || seed_groups.isEmpty() || instanceIds.isEmpty())
+        if (expIds.isEmpty() || seed_groups.isEmpty() || instanceIds.isEmpty()) {
             return res;
+        }
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        
+
         ResultSet rs = st.executeQuery(
-                    "SELECT MAX(RUN), ExperimentResults.Experiment_idExperiment, seed_group, Instances_idInstance "
+                "SELECT MAX(RUN), ExperimentResults.Experiment_idExperiment, seed_group, Instances_idInstance "
                 + "FROM ExperimentResults JOIN SolverConfig ON (ExperimentResults.SolverConfig_idSolverConfig = SolverConfig.idSolverConfig) "
-                + "WHERE ExperimentResults.Experiment_idExperiment IN (" + edacc.experiment.Util.getIdArray(expIds) + ") AND seed_group IN (" + edacc.experiment.Util.getIdArray(seed_groups) + ") AND Instances_idInstance IN (" + edacc.experiment.Util.getIdArray(instanceIds) + ") GROUP BY ExperimentResults.Experiment_idExperiment, seed_group, Instances_idInstance;"
-                );
+                + "WHERE ExperimentResults.Experiment_idExperiment IN (" + edacc.experiment.Util.getIdArray(expIds) + ") AND seed_group IN (" + edacc.experiment.Util.getIdArray(seed_groups) + ") AND Instances_idInstance IN (" + edacc.experiment.Util.getIdArray(instanceIds) + ") GROUP BY ExperimentResults.Experiment_idExperiment, seed_group, Instances_idInstance;");
         while (rs.next()) {
             int maxRuns = rs.getInt(1);
             int expId = rs.getInt(2);
@@ -1348,7 +1357,7 @@ public class ExperimentResultDAO {
         st.close();
         return res;
     }
-    
+
     public static int getMaxRunForSeedGroupByExperimentIdAndInstanceId(int seed_group, int expId, int instanceId) throws SQLException {
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT MAX(run) FROM " + table + " "
@@ -1384,6 +1393,48 @@ public class ExperimentResultDAO {
         return count;
     }
 
+    public static void exportExperimentResults(final ZipOutputStream stream, Experiment experiment) throws IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
+        stream.putNextEntry(new ZipEntry("experiment_" + experiment.getId() + ".jobs"));
+        writeExperimentResultsToStream(new ObjectOutputStream(stream), ExperimentResultDAO.getAllByExperimentId(experiment.getId()));
+    }
+
+    public static void importExperimentResults(ZipFile file, Experiment fileExp, Experiment dbExp, HashMap<Integer, SolverConfiguration> solverConfigMap, HashMap<Integer, Instance> instanceMap) throws IOException, ClassNotFoundException, SQLException {
+        List<ExperimentResult> results = new LinkedList<ExperimentResult>();
+        for (ExperimentResult er : readExperimentResultsFromFile(file, fileExp)) {
+            ExperimentResult dbEr = new ExperimentResult(er);
+            dbEr.setExperimentId(dbExp.getId());
+            dbEr.setInstanceId(instanceMap.get(dbEr.getInstanceId()).getId());
+            dbEr.setSolverConfigId(solverConfigMap.get(dbEr.getSolverConfigId()).getId());
+            results.add(dbEr);
+        }
+        ExperimentResultDAO.batchSave(results);
+    }
+
+    public static void writeExperimentResultsToStream(ObjectOutputStream stream, List<ExperimentResult> results) throws IOException, SQLException {
+        for (ExperimentResult er : results) {
+            stream.writeUnshared(er);
+        }
+    }
+
+    public static List<ExperimentResult> readExperimentResultsFromFile(ZipFile file, Experiment experiment) throws IOException, ClassNotFoundException {
+        ZipEntry entry = file.getEntry("experiment_" + experiment.getId() + ".jobs");
+        ObjectInputStream ois = new ObjectInputStream(file.getInputStream(entry));
+        List<ExperimentResult> res = new LinkedList<ExperimentResult>();
+        ExperimentResult er;
+        while ((er = readExperimentResultFromStream(ois)) != null) {
+            res.add(er);
+        }
+        return res;
+    }
+
+    public static ExperimentResult readExperimentResultFromStream(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        try {
+            return (ExperimentResult) stream.readUnshared();
+        } catch (EOFException ex) {
+            return null;
+        }
+    }
+
     public static class IdValue<T> {
 
         private int id;
@@ -1394,13 +1445,13 @@ public class ExperimentResultDAO {
             this.value = value;
         }
     }
-    
-    
+
     public static class SeedGroupExperimentIdInstanceId {
+
         int seedGroup;
         int expId;
         int instanceId;
-        
+
         public SeedGroupExperimentIdInstanceId(int seedGroup, int expId, int instanceId) {
             this.seedGroup = seedGroup;
             this.expId = expId;
@@ -1435,6 +1486,6 @@ public class ExperimentResultDAO {
             hash = 79 * hash + this.expId;
             hash = 79 * hash + this.instanceId;
             return hash;
-        }        
+        }
     }
 }

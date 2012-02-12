@@ -1,9 +1,22 @@
 package edacc.model;
 
-public class ParameterInstance extends BaseModel {
+import java.io.Serializable;
+
+public class ParameterInstance extends BaseModel implements Serializable {
     private int parameter_id;
     private SolverConfiguration solverConfiguration;
     private String value;
+
+    public ParameterInstance() {
+        super();
+    }
+    
+    protected ParameterInstance(ParameterInstance pi) {
+        this();
+        parameter_id = pi.parameter_id;
+        solverConfiguration = pi.solverConfiguration;
+        value = pi.value;
+    }
     
     public int getParameter_id() {
         return parameter_id;

@@ -1,6 +1,7 @@
 package edacc.model;
 
 import edacc.experiment.Util;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -49,7 +50,7 @@ public class FileCache {
             if (f.exists()) {
                 String md5_check = null;
                 try {
-                    InputStream is = new FileInputStream(f);
+                    InputStream is = new BufferedInputStream(new FileInputStream(f));
                     InputStream ucis = edacc.manageDB.Util.getDecompressedInputStream(is);
                     md5_check = edacc.manageDB.Util.calculateMD5(ucis);
                     ucis.close();
@@ -59,6 +60,9 @@ public class FileCache {
                 }
                 if (md5.equals(md5_check)) {
                     cache.put(new FileIdentifier(db_id, md5), f);
+                } else {
+                    cache.put(new FileIdentifier(db_id, md5), null);
+                    return false;
                 }
                 //System.out.println("Cache hit");
                 return true;
@@ -94,7 +98,8 @@ public class FileCache {
         if (f == null) {
             return null;
         }
-        return new FileInputStream(f);
+        // we need a buffered input stream here because LZMA check needs capability of reset
+        return new BufferedInputStream(new FileInputStream(f));
     }
 
     private class FileIdentifier {

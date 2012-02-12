@@ -1,9 +1,11 @@
 package edacc.model;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
-public class SolverConfiguration extends BaseModel implements IntegerPKModel {
+public class SolverConfiguration extends BaseModel implements IntegerPKModel, Serializable {
 
     private SolverBinaries solverBinary;
     private int experiment_id;
@@ -15,6 +17,27 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
     private String parameter_hash;
     private String hint;
 
+    // only used for export.
+    protected List<ParameterInstance> parameterInstances;
+
+    
+    public SolverConfiguration() {
+        super();
+    }
+    
+    protected SolverConfiguration(SolverConfiguration sc) {
+        this();
+        solverBinary = sc.solverBinary;
+        experiment_id = sc.experiment_id;
+        id = sc.id;
+        seed_group = sc.seed_group;
+        name = sc.name;
+        cost = sc.cost;
+        cost_function = sc.cost_function;
+        parameter_hash = sc.parameter_hash;
+        hint = sc.hint;
+    }
+    
     public Float getCost() {
         return cost;
     }

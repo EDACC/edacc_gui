@@ -13,10 +13,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import edacc.parameterspace.Parameter;
 import edacc.parameterspace.ParameterConfiguration;
-import edacc.parameterspace.domain.RealDomain;
+import java.io.Serializable;
 
 @XmlRootElement( name="parameterspace" )
-public class ParameterGraph {
+public class ParameterGraph implements Serializable {
 	@XmlIDREF public AndNode startNode;
 	public Set<Node> nodes;
 	public Set<Parameter> parameters;
