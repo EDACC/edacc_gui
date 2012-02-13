@@ -17,6 +17,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -39,7 +40,7 @@ public class ProbabilisticDomination extends Plot {
     private static JRadioButton[] radioButtons;
     private static ProbabilisticDomination probDom;
     private static SolverConfiguration _solver1, _solver2;
-    private static ArrayList<Instance> _instances;
+    private static List<Instance> _instances;
     private static Property _property;
     private Property property;
     private SolverConfiguration solver1, solver2;

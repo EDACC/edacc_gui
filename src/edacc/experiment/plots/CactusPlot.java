@@ -10,6 +10,7 @@ import edacc.model.Property;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
 
@@ -31,7 +32,7 @@ public class CactusPlot extends Plot {
     private static SolverConfigurationSelector solverConfigurationSelector;
     private Integer run;
     private Property property;
-    private ArrayList<Instance> instances;
+    private List<Instance> instances;
     private ArrayList<SolverConfiguration> solverConfigs;
     private HashSet<Integer> selectedInstanceIds;
 

@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -54,7 +55,7 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
     private TableCellRenderer defaultBooleanCellRenderer;
     private boolean cancelled;
     private ArrayList<SolverConfiguration> selectedSolverConfigs;
-    private ArrayList<Instance> selectedInstances;
+    private List<Instance> selectedInstances;
     private HashMap<Integer, ArrayList<StatusCount>> statusCounts;
     private ArrayList<StatusCode> selectedStatusCodes;
 
@@ -476,7 +477,7 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
         return selectedStatusCodes;
     }
 
-    public ArrayList<Instance> getSelectedInstances() {
+    public List<Instance> getSelectedInstances() {
         return selectedInstances;
     }
 

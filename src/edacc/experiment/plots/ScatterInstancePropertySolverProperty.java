@@ -8,6 +8,7 @@ import edacc.model.Property;
 import java.awt.geom.Point2D;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
 
@@ -22,7 +23,7 @@ public class ScatterInstancePropertySolverProperty extends Plot {
     private static InstanceSelector instanceSelector;
     private String infos, plotTitle;
     private SolverConfiguration solverConfig;
-    private ArrayList<Instance> instances;
+    private List<Instance> instances;
     private Property solverProperty;
     private Property instanceProperty;
     private Integer run;

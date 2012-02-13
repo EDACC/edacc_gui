@@ -1398,7 +1398,9 @@ public class ExperimentResultDAO {
         writeExperimentResultsToStream(new ObjectOutputStream(stream), ExperimentResultDAO.getAllByExperimentId(experiment.getId()));
     }
 
-    public static void importExperimentResults(ZipFile file, Experiment fileExp, Experiment dbExp, HashMap<Integer, SolverConfiguration> solverConfigMap, HashMap<Integer, Instance> instanceMap) throws IOException, ClassNotFoundException, SQLException {
+    public static void importExperimentResults(Tasks task, ZipFile file, Experiment fileExp, Experiment dbExp, HashMap<Integer, SolverConfiguration> solverConfigMap, HashMap<Integer, Instance> instanceMap) throws IOException, ClassNotFoundException, SQLException {
+        task.setStatus("Reading jobs..");
+        task.setTaskProgress(0.f);
         List<ExperimentResult> results = new LinkedList<ExperimentResult>();
         for (ExperimentResult er : readExperimentResultsFromFile(file, fileExp)) {
             ExperimentResult dbEr = new ExperimentResult(er);
@@ -1407,7 +1409,8 @@ public class ExperimentResultDAO {
             dbEr.setSolverConfigId(solverConfigMap.get(dbEr.getSolverConfigId()).getId());
             results.add(dbEr);
         }
-        ExperimentResultDAO.batchSave(results);
+        task.setStatus("Saving jobs..");
+        ExperimentResultDAO.batchSave(results, task);
     }
 
     public static void writeExperimentResultsToStream(ObjectOutputStream stream, List<ExperimentResult> results) throws IOException, SQLException {

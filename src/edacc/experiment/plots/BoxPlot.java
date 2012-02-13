@@ -6,6 +6,7 @@ import edacc.model.Instance;
 import edacc.model.Property;
 import edacc.model.SolverConfiguration;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
 
@@ -19,7 +20,7 @@ public class BoxPlot extends Plot {
     private static SolverConfigurationSelector solverConfigurationSelector;
     private static JComboBox comboProperty;
     private String warning = null;
-    private ArrayList<Instance> instances;
+    private List<Instance> instances;
     private ArrayList<SolverConfiguration> solverConfigs;
     private Property property;
 

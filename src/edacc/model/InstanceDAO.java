@@ -675,21 +675,33 @@ public class InstanceDAO {
         save(i, iClass);
     }
 
-    public static void exportInstances(final ZipOutputStream stream, List<Instance> instances) throws IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
+    public static void exportInstances(Tasks task, final ZipOutputStream stream, List<Instance> instances) throws IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
+        task.setOperationName("Exporting instances..");
+        int current = 1;
         for (Instance i : instances) {
+            task.setStatus("Writing instance " + current + " / " + instances.size());
+            task.setTaskProgress(current / (float) instances.size());
             stream.putNextEntry(new ZipEntry("instance_" + i.getId() + ".binary"));
             writeInstanceBinaryToStream(new ObjectOutputStream(stream), i);
+            current++;
         }
+        task.setTaskProgress(0.f);
+        task.setStatus("Writing instance inforamtions..");
         stream.putNextEntry(new ZipEntry("instances.edacc"));
         writeInstancesToStream(new ObjectOutputStream(stream), instances);
+        task.setStatus("Done.");
     }
 
-    public static HashMap<Integer, Instance> importInstances(ZipFile file, List<Instance> instances) throws SQLException, InstanceClassMustBeSourceException, IOException, InstanceClassAlreadyInDBException, ClassNotFoundException {
+    public static HashMap<Integer, Instance> importInstances(Tasks task, ZipFile file, List<Instance> instances) throws SQLException, InstanceClassMustBeSourceException, IOException, InstanceClassAlreadyInDBException, ClassNotFoundException {
+        task.setOperationName("Importing instances..");
         HashMap<Integer, Instance> res = new HashMap<Integer, Instance>();
 
         InstanceClass clazz = null;
         List<Instance> dbInstances = getAll();
+        int current = 1;
         for (Instance fileInstance : instances) {
+            task.setStatus("Saving instance " + current + " / " + instances.size());
+            task.setTaskProgress(current / (float) instances.size());
             boolean found = false;
             for (Instance i : dbInstances) {
                 if (i.getMd5().equals(fileInstance.getMd5())) {
@@ -702,13 +714,15 @@ public class InstanceDAO {
                 if (clazz == null) {
                     clazz = InstanceClassDAO.createInstanceClass("imported instances", "Imported instances from other databases", null);
                 }
-                System.out.println("WRITING INSTANCE " + fileInstance.getName());
                 ObjectInputStream stream = new ObjectInputStream(file.getInputStream(file.getEntry("instance_" + fileInstance.getId() + ".binary")));
                 Instance newInstance = new Instance(fileInstance);
                 InstanceDAO.save(newInstance, true, clazz, readInstanceBinaryFromStream(stream));
                 res.put(fileInstance.getId(), newInstance);
             }
+            current++;
         }
+        task.setTaskProgress(0.f);
+        task.setStatus("Done.");
         return res;
     }
 
@@ -726,6 +740,9 @@ public class InstanceDAO {
 
     public static List<Instance> readInstancesFromFile(ZipFile file) throws IOException, ClassNotFoundException {
         ZipEntry entry = file.getEntry("instances.edacc");
+        if (entry == null) {
+            throw new IOException("Invalid file.");
+        }
         ObjectInputStream ois = new ObjectInputStream(file.getInputStream(entry));
         List<Instance> res = new LinkedList<Instance>();
         Instance i;

@@ -62,6 +62,34 @@
                 <Property name="name" type="java.lang.String" value="disconnectMenuItem" noResource="true"/>
               </Properties>
             </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator3">
+              <Properties>
+                <Property name="name" type="java.lang.String" value="jSeparator3" noResource="true"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="importMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="importMenuItem.text"/>
+                <Property name="name" type="java.lang.String" value="importMenuItem" noResource="true"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="importMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="exportMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="exportMenuItem.text"/>
+                <Property name="name" type="java.lang.String" value="exportMenuItem" noResource="true"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="exportMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator2">
+              <Properties>
+                <Property name="name" type="java.lang.String" value="jSeparator2" noResource="true"/>
+              </Properties>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="generateDBMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
@@ -70,6 +98,11 @@
                 <Property name="text" type="java.lang.String" resourceKey="generateDBMenuItem.text"/>
                 <Property name="toolTipText" type="java.lang.String" resourceKey="generateDBMenuItem.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="generateDBMenuItem" noResource="true"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator1">
+              <Properties>
+                <Property name="name" type="java.lang.String" value="jSeparator1" noResource="true"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="exitMenuItem">

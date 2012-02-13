@@ -1630,7 +1630,7 @@ public class ExperimentController {
      * @throws SQLException
      * @throws Exception 
      */
-    public void importData(Tasks task, ArrayList<SolverConfiguration> selectedSolverConfigs, ArrayList<Instance> selectedInstances, ArrayList<StatusCode> statusCodes) throws SQLException, Exception {
+    public void importData(Tasks task, List<SolverConfiguration> selectedSolverConfigs, List<Instance> selectedInstances, List<StatusCode> statusCodes) throws SQLException, Exception {
         if (main.hasUnsavedChanges()) {
             throw new IllegalArgumentException("Assertion failure: Has unsaved changes.");
         }

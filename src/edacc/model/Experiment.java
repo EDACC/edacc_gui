@@ -18,7 +18,7 @@ public class Experiment extends BaseModel implements IntegerPKModel, Serializabl
     private Integer verifierOutputPreserveFirst, verifierOutputPreserveLast;
 
     // only used for export
-    protected List<ExperimentHasInstance> instances;
+    public List<ExperimentHasInstance> instances;
     protected ConfigurationScenario scenario;
     
     protected Experiment() {

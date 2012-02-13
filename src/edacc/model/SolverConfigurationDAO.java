@@ -353,11 +353,14 @@ public class SolverConfigurationDAO {
         }
     }
 
-    public static HashMap<Integer, SolverConfiguration> importSolverConfigurations(ZipFile file, Experiment fileExp, Experiment dbExp, HashMap<Integer, SolverBinaries> solverBinaryMap, HashMap<Integer, Parameter> parameterMap) throws SQLException, IOException, ClassNotFoundException {
+    public static HashMap<Integer, SolverConfiguration> importSolverConfigurations(Tasks task, ZipFile file, Experiment fileExp, Experiment dbExp, HashMap<Integer, SolverBinaries> solverBinaryMap, HashMap<Integer, Parameter> parameterMap) throws SQLException, IOException, ClassNotFoundException {
         HashMap<Integer, SolverConfiguration> solverConfigMap = new HashMap<Integer, SolverConfiguration>();
         
         List<SolverConfiguration> solverConfigs = readSolverConfigurationsFromFile(file, fileExp);
+        int current = 1;
         for (SolverConfiguration sc : solverConfigs) {
+            task.setStatus("Saving solver configuration " + current + " / " + solverConfigs.size());
+            task.setTaskProgress(current / (float)solverConfigs.size());
             SolverConfiguration dbSc = new SolverConfiguration(sc);
             dbSc.setExperiment_id(dbExp.getId());
             dbSc.setSolverBinary(solverBinaryMap.get(sc.getSolverBinary().getId()));
@@ -371,6 +374,7 @@ public class SolverConfigurationDAO {
             }
             ParameterInstanceDAO.saveBulk(dbParams);
             solverConfigMap.put(sc.getId(), dbSc);
+            current++;
         }
         
         return solverConfigMap;

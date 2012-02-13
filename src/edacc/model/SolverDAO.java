@@ -4,7 +4,6 @@ import edacc.manageDB.NoSolverBinarySpecifiedException;
 import edacc.manageDB.NoSolverNameSpecifiedException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.util.Hashtable;
 import java.util.LinkedList;
 import edacc.manageDB.Util;
 import edacc.util.Pair;
@@ -23,14 +21,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import javax.xml.bind.JAXBException;
 
@@ -407,8 +402,12 @@ public class SolverDAO {
         return res;
     }
 
-    public static void exportSolvers(final ZipOutputStream stream, List<Solver> solvers) throws IOException, SQLException, JAXBException {
+    public static void exportSolvers(Tasks task, final ZipOutputStream stream, List<Solver> solvers) throws IOException, SQLException, JAXBException {
+        task.setOperationName("Exporting solvers..");
+        int current = 1;
         for (Solver s : solvers) {
+            task.setStatus("Writing solver binary " + current + " / " + solvers.size());
+            task.setTaskProgress(current / (float) solvers.size());
             s.parameters = ParameterDAO.getParameterFromSolverId(s.getId());
             s.graph = ParameterGraphDAO.loadParameterGraph(s);
             stream.putNextEntry(new ZipEntry("solver_" + s.getId() + ".solverbinaries"));
@@ -416,45 +415,48 @@ public class SolverDAO {
             //List<Parameter> parameters = ParameterDAO.getParameterFromSolverId(s.getId());
             //stream.putNextEntry(new ZipEntry("solver_" + s.getId() + ".parameters"));
             //ParameterDAO.writeParametersToStream(new ObjectOutputStream(stream), parameters);
+            current++;
         }
+        task.setTaskProgress(0.f);
+        task.setStatus("Writing solver informations..");
         stream.putNextEntry(new ZipEntry("solvers.edacc"));
         writeSolversToStream(new ObjectOutputStream(stream), solvers);
-        
+
         for (Solver s : solvers) {
             s.parameters = null;
             s.graph = null;
         }
+        task.setStatus("Done.");
     }
 
-    public static Pair<HashMap<Integer, SolverBinaries>, HashMap<Integer, Parameter>> importSolvers(final ZipFile file, List<Solver> solvers) throws IOException, ClassNotFoundException, SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, NoSolverNameSpecifiedException, NoSuchAlgorithmException, NoConnectionToDBException, JAXBException {
+    public static Pair<HashMap<Integer, SolverBinaries>, HashMap<Integer, Parameter>> importSolvers(Tasks task, final ZipFile file, List<Solver> solvers, HashMap<Integer, Solver> solverMap, HashMap<Integer, String> nameMap) throws IOException, ClassNotFoundException, SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, NoSolverNameSpecifiedException, NoSuchAlgorithmException, NoConnectionToDBException, JAXBException {
+        task.setOperationName("Importing solvers..");
         clearCache();
-        System.out.println("IMPORTING " + solvers.size() + " SOLVERS.");
-        List<Solver> dbSolvers = SolverDAO.getAll();
+
         HashMap<Integer, SolverBinaries> mapSolverBinaries = new HashMap<Integer, SolverBinaries>();
         HashMap<Integer, Parameter> mapParameters = new HashMap<Integer, Parameter>();
         HashMap<Integer, Integer> mapSolvers = new HashMap<Integer, Integer>();
+        int current = 1;
         for (Solver s : solvers) {
-            boolean found = false;
-            for (Solver dbSolver : dbSolvers) {
-                if (dbSolver.realEquals(s, s.parameters)) {
-                    mapSolvers.put(s.getId(), dbSolver.getId());
-                    
+            task.setStatus("Saving solver " + current + " / " + solvers.size());
+            task.setTaskProgress(current / (float) solvers.size());
+            if (solverMap.containsKey(s.getId())) {
+                Solver dbSolver = solverMap.get(s.getId());
+                mapSolvers.put(s.getId(), dbSolver.getId());
+                for (Parameter fileParam : s.parameters) {
                     for (Parameter dbParam : ParameterDAO.getParameterFromSolverId(dbSolver.getId())) {
-                        for (Parameter fileParam : s.parameters) {
-                            if (fileParam.realEquals(dbParam)) {
-                                mapParameters.put(fileParam.getId(), dbParam);
-                                break;
-                            }
+
+                        if (fileParam.realEquals(dbParam)) {
+                            mapParameters.put(fileParam.getId(), dbParam);
+                            break;
                         }
                     }
-                    
-                    found = true;
-                    break;
+                    // TODO: if a param is not found we could have problems importing solver configs!
                 }
-            }
-            if (!found) {
-                System.out.println("WRITING SOLVER TO DB");
+                mapSolvers.put(s.getId(), dbSolver.getId());
+            } else {
                 Solver newDBSolver = new Solver(s);
+                newDBSolver.setName(nameMap.get(s.getId()));
                 SolverDAO.save(newDBSolver, true);
                 if (s.graph != null) {
                     ParameterGraphDAO.saveParameterGraph(s.graph, newDBSolver);
@@ -472,9 +474,9 @@ public class SolverDAO {
             List<SolverBinaries> dbSolverBinaries = SolverBinariesDAO.getBinariesOfSolver(SolverDAO.getById(mapSolvers.get(s.getId())));
             HashMap<Integer, SolverBinaries> solverBinaryMap = new HashMap<Integer, SolverBinaries>();
             for (SolverBinaries sb : s.getSolverBinaries()) {
-                found = false;
+                boolean found = false;
                 for (SolverBinaries dbSb : dbSolverBinaries) {
-                    if (dbSb.realEquals(sb)) {
+                    if (dbSb.getMd5().equals(sb.getMd5())) {
                         found = true;
                         mapSolverBinaries.put(sb.getId(), dbSb);
                         break;
@@ -495,13 +497,15 @@ public class SolverDAO {
                     if (sb != null) {
                         SolverBinaries dbSolverBinary = new SolverBinaries(sb);
                         dbSolverBinary.setIdSolver(mapSolvers.get(s.getId()));
-                        System.out.println("WRITING SOLVERBINARY TO DB");
                         SolverBinariesDAO.save(dbSolverBinary, sbData.getSecond());
                         mapSolverBinaries.put(sb.getId(), dbSolverBinary);
                     }
                 }
             }
+            current++;
         }
+        task.setStatus("Done.");
+        task.setTaskProgress(0.f);
         clearCache();
         return new Pair<HashMap<Integer, SolverBinaries>, HashMap<Integer, Parameter>>(mapSolverBinaries, mapParameters);
     }
@@ -522,6 +526,9 @@ public class SolverDAO {
 
     public static List<Solver> readSolversFromFile(ZipFile file) throws IOException, ClassNotFoundException {
         ZipEntry entry = file.getEntry("solvers.edacc");
+        if (entry == null) {
+            throw new IOException("Invalid file.");
+        }
         ObjectInputStream stream = new ObjectInputStream(file.getInputStream(entry));
         List<Solver> solvers = new LinkedList<Solver>();
         Solver solver;
@@ -529,5 +536,76 @@ public class SolverDAO {
             solvers.add(solver);
         }
         return solvers;
+    }
+
+    public static HashMap<Integer, List<Solver>> mapFileSolversToExistingSolversWithSolverBinariesInCommon(List<Solver> fileSolvers) throws SQLException {
+        HashMap<Integer, List<Solver>> map = new HashMap<Integer, List<Solver>>();
+        List<Solver> dbSolvers = SolverDAO.getAll();
+        for (Solver s : fileSolvers) {
+            List<Solver> solverList = new ArrayList<Solver>();
+            for (Solver dbSolver : dbSolvers) {
+                boolean found = false;
+                for (SolverBinaries dbSb : dbSolver.getSolverBinaries()) {
+                    for (SolverBinaries sb : s.getSolverBinaries()) {
+                        if (dbSb.getMd5().equals(sb.getMd5())) {
+                            found = true;
+                            break;
+                        }
+
+                    }
+                    if (found) {
+                        break;
+                    }
+                }
+                if (found) {
+                    for (Parameter p : s.parameters) {
+                        found = false;
+                        for (Parameter p2 : ParameterDAO.getParameterFromSolverId(dbSolver.getId())) {
+                            if (p.getName().equals(p2.getName())) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            break;
+                        }
+                    }
+                    if (found) {
+                        solverList.add(dbSolver);
+                    }
+                }
+            }
+            map.put(s.getId(), solverList);
+        }
+        return map;
+
+    }
+
+    public static HashMap<Integer, List<Solver>> mapFileSolversToExistingSolversWithSameParameters(List<Solver> fileSolvers) throws SQLException {
+        HashMap<Integer, List<Solver>> map = new HashMap<Integer, List<Solver>>();
+        List<Solver> dbSolvers = SolverDAO.getAll();
+        for (Solver s : fileSolvers) {
+            List<Solver> solverList = new ArrayList<Solver>();
+            for (Solver dbSolver : dbSolvers) {
+                boolean found = false;
+                for (Parameter p : s.parameters) {
+                    found = false;
+                    for (Parameter p2 : ParameterDAO.getParameterFromSolverId(dbSolver.getId())) {
+                        if (p.getName().equals(p2.getName())) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        break;
+                    }
+                }
+                if (found) {
+                    solverList.add(dbSolver);
+                }
+            }
+            map.put(s.getId(), solverList);
+        }
+        return map;
     }
 }

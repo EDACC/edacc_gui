@@ -29,10 +29,12 @@ import edacc.manageDB.Util;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
 import edacc.updates.UpdateController;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import javax.help.HelpSet;
 import javax.help.JHelp;
+import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import org.xml.sax.SAXException;
 
@@ -174,7 +176,12 @@ public class EDACCView extends FrameView implements Observer {
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         connectToDBMenuItem = new javax.swing.JMenuItem();
         disconnectMenuItem = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JPopupMenu.Separator();
+        importMenuItem = new javax.swing.JMenuItem();
+        exportMenuItem = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
         generateDBMenuItem = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
         javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
         gridMenu = new javax.swing.JMenu();
         settingsMenuItem = new javax.swing.JMenuItem();
@@ -226,11 +233,38 @@ public class EDACCView extends FrameView implements Observer {
         disconnectMenuItem.setName("disconnectMenuItem"); // NOI18N
         fileMenu.add(disconnectMenuItem);
 
+        jSeparator3.setName("jSeparator3"); // NOI18N
+        fileMenu.add(jSeparator3);
+
+        importMenuItem.setText(resourceMap.getString("importMenuItem.text")); // NOI18N
+        importMenuItem.setName("importMenuItem"); // NOI18N
+        importMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(importMenuItem);
+
+        exportMenuItem.setText(resourceMap.getString("exportMenuItem.text")); // NOI18N
+        exportMenuItem.setName("exportMenuItem"); // NOI18N
+        exportMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(exportMenuItem);
+
+        jSeparator2.setName("jSeparator2"); // NOI18N
+        fileMenu.add(jSeparator2);
+
         generateDBMenuItem.setAction(actionMap.get("btnGenerateTables")); // NOI18N
         generateDBMenuItem.setText(resourceMap.getString("generateDBMenuItem.text")); // NOI18N
         generateDBMenuItem.setToolTipText(resourceMap.getString("generateDBMenuItem.toolTipText")); // NOI18N
         generateDBMenuItem.setName("generateDBMenuItem"); // NOI18N
         fileMenu.add(generateDBMenuItem);
+
+        jSeparator1.setName("jSeparator1"); // NOI18N
+        fileMenu.add(jSeparator1);
 
         exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
         exitMenuItem.setName("exitMenuItem"); // NOI18N
@@ -429,7 +463,6 @@ public class EDACCView extends FrameView implements Observer {
                         public void run() {
                             JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "No updates available.", "Check for Updates", JOptionPane.INFORMATION_MESSAGE);
                         }
-                        
                     });
                     return;
                 }
@@ -489,6 +522,95 @@ public class EDACCView extends FrameView implements Observer {
         });
 
     }//GEN-LAST:event_updatesMenuItemActionPerformed
+
+    private void importMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importMenuItemActionPerformed
+        if (!unloadModes()) {
+            return;
+        }
+
+        final File file = EDACCImportExport.getImportFile();
+        if (file == null) {
+            JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "No file has been selected.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Tasks.startTask(new TaskRunnable() {
+
+            @Override
+            public void run(Tasks task) {
+                try {
+                    final EDACCImportExport importPanel = new EDACCImportExport(file);
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            mainPanelLayout.replace(mode, importPanel);
+                            mode = importPanel;
+                            manageDBModeMenuItem.setSelected(false);
+                            manageExperimentModeMenuItem.setSelected(false);
+                            statusMessageLabel.setText("IMPORT - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+                        }
+                    });
+                } catch (final Exception e) {
+                    if (!SwingUtilities.isEventDispatchThread()) {
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                handleModeChangeError(e);
+                            }
+                        });
+                    } else {
+                        handleModeChangeError(e);
+                    }
+                }
+            }
+        });
+
+
+    }//GEN-LAST:event_importMenuItemActionPerformed
+
+    private void exportMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportMenuItemActionPerformed
+        if (!unloadModes()) {
+            return;
+        }
+
+        Tasks.startTask(new TaskRunnable() {
+
+            @Override
+            public void run(Tasks task) {
+                try {
+
+                    final EDACCImportExport exportPanel = new EDACCImportExport();
+                    SwingUtilities.invokeAndWait(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            mainPanelLayout.replace(mode, exportPanel);
+                            mode = exportPanel;
+                            manageDBModeMenuItem.setSelected(false);
+                            manageExperimentModeMenuItem.setSelected(false);
+                            statusMessageLabel.setText("EXPORT - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+                        }
+                    });
+
+                } catch (final Exception e) {
+                    if (!SwingUtilities.isEventDispatchThread()) {
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                handleModeChangeError(e);
+                            }
+                        });
+                    } else {
+                        handleModeChangeError(e);
+                    }
+                }
+            }
+        });
+
+    }//GEN-LAST:event_exportMenuItemActionPerformed
 
     @Action
     public void btnConnectToDB() {
@@ -572,21 +694,7 @@ public class EDACCView extends FrameView implements Observer {
         }
     }
 
-    public void noMode() {
-        manageExperimentModeMenuItem.setSelected(false);
-        manageDBModeMenuItem.setSelected(false);
-        mainPanelLayout.replace(mode, noMode);
-        mode = noMode;
-        if (!DatabaseConnector.getInstance().isConnected()) {
-            statusMessageLabel.setText("No database connection established!");
-        } else {
-            statusMessageLabel.setText("Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
-        }
-
-    }
-
-    @Action
-    public void manageDBMode() {
+    private boolean unloadModes() {
         if (manageExperimentModeMenuItem.isSelected()) {
             if (experimentMode.hasUnsavedChanges()) {
                 if (JOptionPane.showConfirmDialog(mode,
@@ -597,10 +705,46 @@ public class EDACCView extends FrameView implements Observer {
                     Util.clearCaches();
                 } else {
                     manageDBModeMenuItem.setSelected(false);
-                    return;
+                    return false;
                 }
             }
             experimentMode.deinitialize();
+        }
+        if (manageDBModeMenuItem.isSelected()) {
+            if (manageDBMode.unsavedChanges) {
+                if (JOptionPane.showConfirmDialog(mode,
+                        "Any unsaved changes will be lost, are you sure you want to switch to experiment mode?",
+                        "Warning!",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+
+                    Util.clearCaches();
+                } else {
+                    manageExperimentModeMenuItem.setSelected(false);
+                    return false;
+                }
+            }
+            manageDBMode.reinitialize();
+        }
+        noMode();
+        return true;
+    }
+
+    public void noMode() {
+        manageExperimentModeMenuItem.setSelected(false);
+        manageDBModeMenuItem.setSelected(false);
+        mainPanelLayout.replace(mode, noMode);
+        mode = noMode;
+        if (!DatabaseConnector.getInstance().isConnected()) {
+            statusMessageLabel.setText("No database connection established!");
+        } else {
+            statusMessageLabel.setText("Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+        }
+    }
+
+    @Action
+    public void manageDBMode() {
+        if (!unloadModes()) {
+            return;
         }
 
         try {
@@ -627,26 +771,16 @@ public class EDACCView extends FrameView implements Observer {
 
     @Action
     public void manageExperimentMode() {
-        if (manageDBModeMenuItem.isSelected()) {
-            if (manageDBMode.unsavedChanges) {
-                if (JOptionPane.showConfirmDialog(mode,
-                        "Any unsaved changes will be lost, are you sure you want to switch to experiment mode?",
-                        "Warning!",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-
-                    Util.clearCaches();
-                } else {
-                    manageExperimentModeMenuItem.setSelected(false);
-                    return;
-                }
-            }
-            manageDBMode.reinitialize();
+        if (!unloadModes()) {
+            return;
         }
+
         Tasks.startTask(new TaskRunnable() {
 
             @Override
             public void run(Tasks task) {
                 try {
+                    experimentMode.initialize();
                     SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
@@ -658,7 +792,6 @@ public class EDACCView extends FrameView implements Observer {
                             statusMessageLabel.setText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
                         }
                     });
-                    experimentMode.initialize();
                 } catch (final Exception e) {
                     SwingUtilities.invokeLater(new Runnable() {
 
@@ -675,7 +808,9 @@ public class EDACCView extends FrameView implements Observer {
     }
 
     public void handleModeChangeError(Throwable e) {
-        if (e instanceof NoConnectionToDBException) {
+        if (e instanceof java.io.InvalidClassException) {
+            JOptionPane.showMessageDialog(EDACCView.this.getComponent(), "Invalid class.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        } else if (e instanceof NoConnectionToDBException) {
             JOptionPane.showMessageDialog(EDACCView.this.getComponent(), "You have to connect to the database before switching modes", "No database connection", JOptionPane.ERROR_MESSAGE);
             noMode();
         } else if (e instanceof SQLException) {
@@ -708,9 +843,14 @@ public class EDACCView extends FrameView implements Observer {
     private javax.swing.JMenuItem ManagePropertyMenuItem;
     private javax.swing.JMenuItem connectToDBMenuItem;
     private javax.swing.JMenuItem disconnectMenuItem;
+    private javax.swing.JMenuItem exportMenuItem;
     private javax.swing.JMenuItem generateDBMenuItem;
     private javax.swing.JMenu gridMenu;
     private javax.swing.JMenuItem helpMenuItem;
+    private javax.swing.JMenuItem importMenuItem;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
+    private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JRadioButtonMenuItem manageDBModeMenuItem;
     private javax.swing.JRadioButtonMenuItem manageExperimentModeMenuItem;
@@ -747,6 +887,8 @@ public class EDACCView extends FrameView implements Observer {
         connectToDBMenuItem.setEnabled(!state);
         disconnectMenuItem.setEnabled(state);
         generateDBMenuItem.setEnabled(state);
+        importMenuItem.setEnabled(state);
+        exportMenuItem.setEnabled(state);
     }
 
     public Component getMode() {

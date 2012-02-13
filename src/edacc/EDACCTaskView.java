@@ -11,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.Date;
 import java.util.HashMap;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -30,11 +31,14 @@ public class EDACCTaskView extends javax.swing.JDialog {
     private HashMap<Integer, SubTaskPanel> subTaskPanels;
     private int currentSubTaskId;
     private int maxSubTasks;
+    private Thread updateSubTasks;
 
     /** Creates new form EDACCTaskView */
     public EDACCTaskView(java.awt.Frame parent, boolean modal, Tasks task) {
         super(parent, modal);
         initComponents();
+        updateSubTasks = null;
+
         this.task = task;
         currentSubTaskId = 0;
         maxSubTasks = 0;
@@ -232,8 +236,9 @@ public class EDACCTaskView extends javax.swing.JDialog {
                 pnlSubTasks.add(panel, subTaskConstraints);
                 updateSubTaskConstraints();
                 EDACCTaskView.this.pack();
-                if (pnlSubTasks.getComponentCount() > maxSubTasks)
+                if (pnlSubTasks.getComponentCount() > maxSubTasks) {
                     maxSubTasks = pnlSubTasks.getComponentCount();
+                }
                 pnlSubTasks.setPreferredSize(new Dimension(pnlSubTasks.getPreferredSize().width, panel.getPreferredSize().height * maxSubTasks));
             }
         });
@@ -250,8 +255,37 @@ public class EDACCTaskView extends javax.swing.JDialog {
 
                 @Override
                 public void run() {
-                  //  pnlSubTasks.setPreferredSize(new Dimension(pnlSubTasks.getWidth(), pnlSubTasks.getHeight()));
+                    //  pnlSubTasks.setPreferredSize(new Dimension(pnlSubTasks.getWidth(), pnlSubTasks.getHeight()));
                     pnlSubTasks.remove(panel);
+
+                    // this operation is needed to update the GUI if it was the last subtask and no new
+                    // tasks will be created. We sleep some time before repainting because it will
+                    // flicker otherwise
+
+
+                    if (updateSubTasks == null || !updateSubTasks.isAlive()) {
+                        updateSubTasks = new Thread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(150);
+                                    SwingUtilities.invokeAndWait(new Runnable() {
+
+                                        @Override
+                                        public void run() {
+                                            pnlSubTasks.invalidate();
+                                            pnlSubTasks.revalidate();
+                                            pnlSubTasks.repaint();
+                                        }
+                                    });
+
+                                } catch (Exception ex) {
+                                }
+                            }
+                        });
+                        updateSubTasks.start();
+                    }
                     updateSubTaskConstraints();
                     EDACCTaskView.this.pack();
                 }

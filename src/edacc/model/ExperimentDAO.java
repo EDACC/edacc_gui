@@ -333,29 +333,53 @@ public class ExperimentDAO {
         }
     }
     
-    public static void exportExperiments(final ZipOutputStream stream, List<Experiment> experiments) throws IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
+    public static void exportExperiments(Tasks task, final ZipOutputStream stream, List<Experiment> experiments) throws IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
+        
+        int current = 1;
         for (Experiment exp : experiments) {
+            task.setOperationName("Exporting experiment " + current + " / " + experiments.size());
+            task.setStatus("Writing jobs..");
+            task.setTaskProgress(current / (float) experiments.size());
             ExperimentResultDAO.exportExperimentResults(stream, exp);
+            task.setStatus("Writing solver configurations..");
             SolverConfigurationDAO.exportSolverConfigurations(stream, exp);
+            task.setStatus("Retrieving instance and configuration scenario informations..");
             exp.instances = ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(exp.getId());
             exp.scenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(exp.getId());
+            current++;
         }
+        task.setOperationName("Exporting experiments..");
+        task.setTaskProgress(0.f);
+        task.setStatus("Writing experiment informations..");
         stream.putNextEntry(new ZipEntry("experiments.edacc"));
         writeExperimentsToStream(new ObjectOutputStream(stream), experiments);
         for (Experiment exp : experiments) {
             exp.instances = null;
             exp.scenario = null;
         }
+        task.setStatus("Done.");
     }
 
-    public static void importExperiments(ZipFile file, List<Experiment> experiments, HashMap<Integer, SolverBinaries> solverBinaryMap, HashMap<Integer, Parameter> parameterMap, HashMap<Integer, Instance> instanceMap) throws SQLException, IOException, ClassNotFoundException {
+    public static void importExperiments(Tasks task, ZipFile file, List<Experiment> experiments, HashMap<Integer, SolverBinaries> solverBinaryMap, HashMap<Integer, Parameter> parameterMap, HashMap<Integer, Instance> instanceMap) throws SQLException, IOException, ClassNotFoundException {
+        
+        int current = 1;
         for (Experiment experiment: experiments) {
+            task.setTaskProgress(0.f);
+            task.setOperationName("Importing experiment " + current + " / " + experiments.size());
+            task.setStatus("Saving experiment..");
             Experiment dbExperiment = new Experiment(experiment);
             ExperimentDAO.save(dbExperiment);
+            task.setStatus("Saving instances..");
+            int currentInstance = 1;
             for (ExperimentHasInstance ehi : experiment.instances) {
+                task.setTaskProgress(currentInstance / (float) experiment.instances.size());
                 ExperimentHasInstanceDAO.createExperimentHasInstance(dbExperiment.getId(), instanceMap.get(ehi.getInstances_id()).getId());
+                currentInstance++;
             }
+            task.setTaskProgress(0.f);
+            
             if (experiment.scenario != null) {
+                task.setStatus("Saving configuration scenario..");
                 ConfigurationScenario dbScenario = new ConfigurationScenario(experiment.scenario);
                 for (InstanceSeed is : dbScenario.getCourse().getInstanceSeedList()) {
                     is.instance = InstanceDAO.getById(instanceMap.get(is.instance.getId()).getId());
@@ -367,15 +391,12 @@ public class ExperimentDAO {
                 dbScenario.setIdExperiment(dbExperiment.getId());
                 dbScenario.setIdSolverBinary(solverBinaryMap.get(dbScenario.getIdSolverBinary()).getId());
                 
-                // otherwise the instance seed course will not be saved.
-                //dbScenario.getCourse().setInitialLength(0);
-                
                 ConfigurationScenarioDAO.save(dbScenario);
             }
-            HashMap<Integer, SolverConfiguration> solverConfigMap = SolverConfigurationDAO.importSolverConfigurations(file, experiment, dbExperiment, solverBinaryMap, parameterMap);
+            HashMap<Integer, SolverConfiguration> solverConfigMap = SolverConfigurationDAO.importSolverConfigurations(task, file, experiment, dbExperiment, solverBinaryMap, parameterMap);
             
-            ExperimentResultDAO.importExperimentResults(file, experiment, dbExperiment, solverConfigMap, instanceMap);
-            // TODO: jobs
+            ExperimentResultDAO.importExperimentResults(task, file, experiment, dbExperiment, solverConfigMap, instanceMap);
+            current++;
         }
     }
 
@@ -387,6 +408,9 @@ public class ExperimentDAO {
 
     public static List<Experiment> readExperimentsFromFile(ZipFile file) throws IOException, ClassNotFoundException {
         ZipEntry entry = file.getEntry("experiments.edacc");
+        if (entry == null) {
+            throw new IOException("Invalid file.");
+        }
         ObjectInputStream ois = new ObjectInputStream(file.getInputStream(entry));
         List<Experiment> res = new LinkedList<Experiment>();
         Experiment exp;
