@@ -1,6 +1,8 @@
 package edacc.model;
 
-public class Parameter extends BaseModel implements IntegerPKModel {
+import java.io.Serializable;
+
+public class Parameter extends BaseModel implements IntegerPKModel, Serializable {
     private int id;
     private int idSolver;
     private String name;
@@ -13,6 +15,31 @@ public class Parameter extends BaseModel implements IntegerPKModel {
     private boolean space;
     private boolean attachToPrevious;
 
+    public Parameter(Parameter p) {
+        this();
+        id = p.id;
+        idSolver = p.idSolver;
+        name = p.name;
+        oldName = p.oldName;
+        prefix = p.prefix;
+        defaultValue = p.defaultValue;
+        order = p.order;
+        hasValue = p.hasValue;
+        mandatory = p.mandatory;
+        space = p.space;
+        attachToPrevious = p.attachToPrevious;
+    }
+
+    public boolean realEquals(Parameter other) {
+        return (name == null ? other.name == null : name.equals(other.name)) &&
+                (prefix == null ? other.prefix == null : prefix.equals(other.prefix)) &&
+                (defaultValue == null ? other.defaultValue == null : defaultValue.equals(other.defaultValue)) &&
+                (order == other.order) &&
+                (mandatory == other.mandatory) &&
+                (space == other.space) &&
+                (attachToPrevious == other.attachToPrevious);
+    }
+    
     public Parameter() {
         super();
         oldName = null;

@@ -1,15 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package edacc.model;
+
+import java.io.Serializable;
 
 /**
  *
  * @author simon
  */
-public class ExperimentHasInstance extends BaseModel implements IntegerPKModel {
+public class ExperimentHasInstance extends BaseModel implements IntegerPKModel, Serializable {
     private int id;
     private int experiment_id;
     private int instances_id;

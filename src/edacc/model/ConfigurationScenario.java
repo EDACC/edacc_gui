@@ -1,8 +1,9 @@
 package edacc.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ConfigurationScenario extends BaseModel implements IntegerPKModel {
+public class ConfigurationScenario extends BaseModel implements IntegerPKModel, Serializable {
 
     private int id;
     private int idExperiment;
@@ -11,7 +12,20 @@ public class ConfigurationScenario extends BaseModel implements IntegerPKModel {
     private Course course;
     
     public ConfigurationScenario() {
+        super();
         parameters = new ArrayList<ConfigurationScenarioParameter>();
+    }
+
+    protected ConfigurationScenario(ConfigurationScenario scenario) {
+        this();
+        id = scenario.id;
+        idExperiment = scenario.idExperiment;
+        idSolverBinary = scenario.idSolverBinary;
+        parameters = new ArrayList<ConfigurationScenarioParameter>();
+        for (ConfigurationScenarioParameter p : scenario.parameters) {
+            parameters.add(new ConfigurationScenarioParameter(p.isConfigurable(), p.getFixedValue(), p.getParameter()));
+        }
+        course = new Course(scenario.course);
     }
 
     @Override

@@ -4,21 +4,30 @@ import edacc.manageDB.Util;
 import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.InvalidVariableException;
 import edacc.satinstances.SATInstance;
+import edacc.util.Pair;
 import java.io.ByteArrayInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 /**
  * data access object for the Instance class
@@ -175,6 +184,10 @@ public class InstanceDAO {
         }
     }
 
+    public static void save(Instance instance, boolean compressBinary, InstanceClass instanceClass) throws SQLException, FileNotFoundException, IOException {
+        save(instance, compressBinary, instanceClass, null);
+    }
+
     /**
      * persists an instance object in the database
      * @param instance The instance object to persist
@@ -182,7 +195,7 @@ public class InstanceDAO {
      * @throws SQLException if an SQL error occurs while saving the instance.
      * @throws FileNotFoundException if the file of the instance couldn't be found.
      */
-    public static void save(Instance instance, boolean compressBinary, InstanceClass instanceClass) throws SQLException, FileNotFoundException, IOException {
+    public static void save(Instance instance, boolean compressBinary, InstanceClass instanceClass, BinaryData data) throws SQLException, FileNotFoundException, IOException {
         PreparedStatement ps;
         if (instance.isNew()) {
             try {
@@ -198,7 +211,17 @@ public class InstanceDAO {
                 //      File output = null;
                 FileInputStream fInStream = null;
 
-                if (instance.getFile() != null) {
+                if (data != null) {
+                    if (compressBinary) {
+                        java.sql.Blob b = DatabaseConnector.getInstance().getConn().createBlob();
+                        TaskICodeProgress progress = new TaskICodeProgress(data.getData().length, "Compressing " + instance.getName());
+                        Util.sevenZipEncode(new ByteArrayInputStream(data.getData()), b.setBinaryStream(1), data.getData().length, progress);
+                        progress.finished();
+                        ps.setBlob(3, b);
+                    } else {
+                        ps.setBytes(3, data.getData());
+                    }
+                } else if (instance.getFile() != null) {
 
                     input = instance.getFile();
                     fInStream = new FileInputStream(input);
@@ -227,7 +250,9 @@ public class InstanceDAO {
                 ps.close();
                 instance.setSaved();
 
-                fInStream.close();
+                if (fInStream != null) {
+                    fInStream.close();
+                }
 
                 // Add instance to the given InstanceClass
                 InstanceHasInstanceClassDAO.createInstanceHasInstance(instance, instanceClass);
@@ -649,5 +674,98 @@ public class InstanceDAO {
 
     public static void createDuplicateInstance(Instance i, InstanceClass iClass) {
         save(i, iClass);
+    }
+
+    public static void exportInstances(Tasks task, final ZipOutputStream stream, List<Instance> instances) throws IOException, SQLException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
+        task.setOperationName("Exporting instances..");
+        int current = 1;
+        for (Instance i : instances) {
+            task.setStatus("Writing instance " + current + " / " + instances.size());
+            task.setTaskProgress(current / (float) instances.size());
+            stream.putNextEntry(new ZipEntry("instance_" + i.getId() + ".binary"));
+            writeInstanceBinaryToStream(new ObjectOutputStream(stream), i);
+            current++;
+        }
+        task.setTaskProgress(0.f);
+        task.setStatus("Writing instance inforamtions..");
+        stream.putNextEntry(new ZipEntry("instances.edacc"));
+        writeInstancesToStream(new ObjectOutputStream(stream), instances);
+        task.setStatus("Done.");
+    }
+
+    public static HashMap<Integer, Instance> importInstances(Tasks task, ZipFile file, List<Instance> instances) throws SQLException, InstanceClassMustBeSourceException, IOException, InstanceClassAlreadyInDBException, ClassNotFoundException {
+        task.setOperationName("Importing instances..");
+        HashMap<Integer, Instance> res = new HashMap<Integer, Instance>();
+
+        InstanceClass clazz = null;
+        List<Instance> dbInstances = getAll();
+        int current = 1;
+        for (Instance fileInstance : instances) {
+            task.setStatus("Saving instance " + current + " / " + instances.size());
+            task.setTaskProgress(current / (float) instances.size());
+            boolean found = false;
+            for (Instance i : dbInstances) {
+                if (i.getMd5().equals(fileInstance.getMd5())) {
+                    found = true;
+                    res.put(fileInstance.getId(), i);
+                    break;
+                }
+            }
+            if (!found) {
+                if (clazz == null) {
+                    clazz = InstanceClassDAO.createInstanceClass("imported instances", "Imported instances from other databases", null);
+                }
+                ObjectInputStream stream = new ObjectInputStream(file.getInputStream(file.getEntry("instance_" + fileInstance.getId() + ".binary")));
+                Instance newInstance = new Instance(fileInstance);
+                InstanceDAO.save(newInstance, true, clazz, readInstanceBinaryFromStream(stream));
+                res.put(fileInstance.getId(), newInstance);
+            }
+            current++;
+        }
+        task.setTaskProgress(0.f);
+        task.setStatus("Done.");
+        return res;
+    }
+
+    public static void writeInstanceBinaryToStream(ObjectOutputStream stream, Instance instance) throws NoConnectionToDBException, IOException, SQLException, InstanceNotInDBException, InterruptedException {
+        InputStream is = InstanceDAO.getBinary(instance);
+        BinaryData data = new BinaryData(is);
+        stream.writeUnshared(data);
+    }
+
+    public static void writeInstancesToStream(ObjectOutputStream stream, List<Instance> instances) throws IOException, SQLException {
+        for (Instance i : instances) {
+            stream.writeUnshared(i);
+        }
+    }
+
+    public static List<Instance> readInstancesFromFile(ZipFile file) throws IOException, ClassNotFoundException {
+        ZipEntry entry = file.getEntry("instances.edacc");
+        if (entry == null) {
+            throw new IOException("Invalid file.");
+        }
+        ObjectInputStream ois = new ObjectInputStream(file.getInputStream(entry));
+        List<Instance> res = new LinkedList<Instance>();
+        Instance i;
+        while ((i = readInstanceFromStream(ois)) != null) {
+            res.add(i);
+        }
+        return res;
+    }
+
+    public static BinaryData readInstanceBinaryFromStream(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        try {
+            return (BinaryData) stream.readUnshared();
+        } catch (EOFException ex) {
+            return null;
+        }
+    }
+
+    public static Instance readInstanceFromStream(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        try {
+            return (Instance) stream.readUnshared();
+        } catch (EOFException ex) {
+            return null;
+        }
     }
 }

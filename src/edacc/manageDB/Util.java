@@ -398,6 +398,7 @@ public class Util {
 
     public static boolean isLZMA(InputStream is) throws IOException {
         byte[] buf = new byte[lzma_identifier.length()];
+        is.mark(lzma_identifier.length()+8);
         if (is.read(buf, 0, lzma_identifier.length()) != lzma_identifier.length()) {
             is.reset();
             return false;

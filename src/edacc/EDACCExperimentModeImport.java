@@ -15,6 +15,7 @@ import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentDAO.StatusCount;
 import edacc.model.Instance;
 import edacc.model.InstanceDAO;
+import edacc.model.ParameterInstanceDAO;
 import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.StatusCode;
@@ -25,6 +26,7 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -53,7 +55,7 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
     private TableCellRenderer defaultBooleanCellRenderer;
     private boolean cancelled;
     private ArrayList<SolverConfiguration> selectedSolverConfigs;
-    private ArrayList<Instance> selectedInstances;
+    private List<Instance> selectedInstances;
     private HashMap<Integer, ArrayList<StatusCount>> statusCounts;
     private ArrayList<StatusCode> selectedStatusCodes;
 
@@ -228,6 +230,8 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
                         }
                         list.add(sc);
                     }
+                    
+                    ParameterInstanceDAO.cacheParameterInstances(tmpSolverConfigs);
 
                     for (Instance i : InstanceDAO.getAllByExperimentId(experiment.getId())) {
                         instanceIds.add(i.getId());
@@ -473,7 +477,7 @@ public class EDACCExperimentModeImport extends javax.swing.JDialog {
         return selectedStatusCodes;
     }
 
-    public ArrayList<Instance> getSelectedInstances() {
+    public List<Instance> getSelectedInstances() {
         return selectedInstances;
     }
 

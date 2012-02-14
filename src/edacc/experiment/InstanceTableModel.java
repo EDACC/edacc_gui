@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -45,7 +46,7 @@ public class InstanceTableModel extends ThreadSafeDefaultTableModel {
      * @param updateProperties if true, properties are updated from the db
      * @see edacc.EDACCInstanceFilter
      */
-    public void setInstances(ArrayList<Instance> instances, boolean filterInstanceClassIds, boolean updateProperties) {
+    public void setInstances(List<Instance> instances, boolean filterInstanceClassIds, boolean updateProperties) {
         boolean isCompetition;
 
         try {
@@ -54,11 +55,18 @@ public class InstanceTableModel extends ThreadSafeDefaultTableModel {
             isCompetition = false;
         }
         updateProperties(updateProperties || properties == null);
-        this.instances = instances;
-        experimentHasInstances = new Vector<ExperimentHasInstance>();
-        experimentHasInstances.setSize(instances.size());
+        if (instances == null) {
+            this.instances = null;
+        } else {
+            this.instances = new ArrayList<Instance>();
+            this.instances.addAll(instances);
+        }
+        
         if (instances == null) {
             benchmarkTypes = null;
+            experimentHasInstances = null;
+            instanceClassIds = null;
+            return;
         } else if (isCompetition) {
             benchmarkTypes = new String[instances.size()];
             try {
@@ -71,6 +79,8 @@ public class InstanceTableModel extends ThreadSafeDefaultTableModel {
             }
 
         }
+        experimentHasInstances = new Vector<ExperimentHasInstance>();
+        experimentHasInstances.setSize(instances.size());
         if (filterInstanceClassIds) {
             instanceClassIds = new HashMap<Instance, LinkedList<Integer>>();
             for (Instance i : instances) {
@@ -224,7 +234,7 @@ public class InstanceTableModel extends ThreadSafeDefaultTableModel {
      * Returns all selected instances
      * @return <code>ArrayList</code> of selected instances
      */
-    public ArrayList<Instance> getSelectedInstances() {
+    public List<Instance> getSelectedInstances() {
         ArrayList<Instance> res = new ArrayList<Instance>();
         for (Instance instance : instances) {
             if (selectedInstances.containsKey(instance.getId())) {

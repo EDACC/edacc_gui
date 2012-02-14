@@ -62,11 +62,16 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
 
                 // Get index of item clicked
                 int index = list.locationToIndex(event.getPoint());
-                JCheckBox item = queueListModel.checkBoxes.get(index);
-                // Toggle selected state
-                item.setSelected(!item.isSelected());
-                // Repaint cell
-                list.repaint(list.getCellBounds(index, index));
+                if (index == -1) {
+                    return;
+                }
+                if (queueListModel.checkBoxes != null) {
+                    JCheckBox item = queueListModel.checkBoxes.get(index);
+                    // Toggle selected state
+                    item.setSelected(!item.isSelected());
+                    // Repaint cell
+                    list.repaint(list.getCellBounds(index, index));
+                }
             }
         });
         listQueues.setCellRenderer(new ListCellRenderer() {

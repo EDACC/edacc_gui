@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -185,11 +186,11 @@ public class InstanceSelector extends JPanel {
         updateTableColumnWidth = true;
     }
 
-    public ArrayList<Instance> getSelectedInstances() {
+    public List<Instance> getSelectedInstances() {
         return tableModel.getSelectedInstances();
     }
 
-    public void setSelectedInstances(ArrayList<Instance> selectedInstances) {
+    public void setSelectedInstances(List<Instance> selectedInstances) {
         HashSet<Integer> ids = new HashSet<Integer>();
         for (Instance i : selectedInstances) {
             ids.add(i.getId());

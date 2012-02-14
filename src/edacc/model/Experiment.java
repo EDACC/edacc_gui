@@ -1,8 +1,10 @@
 package edacc.model;
 
+import java.io.Serializable;
 import java.sql.Date;
+import java.util.List;
 
-public class Experiment extends BaseModel implements IntegerPKModel {
+public class Experiment extends BaseModel implements IntegerPKModel, Serializable {
 
     private int id;
     private String description;
@@ -14,6 +16,31 @@ public class Experiment extends BaseModel implements IntegerPKModel {
     private Integer solverOutputPreserveFirst, solverOutputPreserveLast;
     private Integer watcherOutputPreserveFirst, watcherOutputPreserveLast;
     private Integer verifierOutputPreserveFirst, verifierOutputPreserveLast;
+
+    // only used for export
+    public List<ExperimentHasInstance> instances;
+    protected ConfigurationScenario scenario;
+    
+    protected Experiment() {
+        super();
+    }
+    
+    protected Experiment(Experiment experiment) {
+        this();
+        id = experiment.id;
+        description = experiment.description;
+        date = experiment.date;
+        name = experiment.name;
+        priority = experiment.priority;
+        configurationExp = experiment.configurationExp;
+        active = experiment.active;
+        solverOutputPreserveFirst = experiment.solverOutputPreserveFirst;
+        solverOutputPreserveLast = experiment.solverOutputPreserveLast;
+        watcherOutputPreserveFirst = experiment.watcherOutputPreserveFirst;
+        watcherOutputPreserveLast = experiment.watcherOutputPreserveLast;
+        verifierOutputPreserveFirst = experiment.verifierOutputPreserveFirst;
+        verifierOutputPreserveLast = experiment.verifierOutputPreserveLast;
+    }
 
     @Override
     public int hashCode() {

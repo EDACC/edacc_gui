@@ -1,9 +1,11 @@
 package edacc.model;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
-public class SolverConfiguration extends BaseModel implements IntegerPKModel {
+public class SolverConfiguration extends BaseModel implements IntegerPKModel, Serializable {
 
     private SolverBinaries solverBinary;
     private int experiment_id;
@@ -15,6 +17,27 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
     private String parameter_hash;
     private String hint;
 
+    // only used for export.
+    protected List<ParameterInstance> parameterInstances;
+
+    
+    public SolverConfiguration() {
+        super();
+    }
+    
+    protected SolverConfiguration(SolverConfiguration sc) {
+        this();
+        solverBinary = sc.solverBinary;
+        experiment_id = sc.experiment_id;
+        id = sc.id;
+        seed_group = sc.seed_group;
+        name = sc.name;
+        cost = sc.cost;
+        cost_function = sc.cost_function;
+        parameter_hash = sc.parameter_hash;
+        hint = sc.hint;
+    }
+    
     public Float getCost() {
         return cost;
     }
@@ -136,14 +159,17 @@ public class SolverConfiguration extends BaseModel implements IntegerPKModel {
         hash = 97 * hash + this.id;
         return hash;
     }
-
+    
     public boolean hasEqualSemantics(SolverConfiguration sc) throws SQLException {
+        return hasEqualSemantics(sc.getSolverBinary(), ParameterInstanceDAO.getBySolverConfig(sc));
+    }
+
+    public boolean hasEqualSemantics(SolverBinaries binary, ArrayList<ParameterInstance> paramInstances) throws SQLException {
         boolean equal = true;
-        if (sc.getSolverBinary().getId() != getSolverBinary().getId()) {
+        if (binary.getId() != getSolverBinary().getId()) {
             // if the solver configs doesn't have the same solver binary -> other semantics
             equal = false;
         } else {
-            ArrayList<ParameterInstance> paramInstances = ParameterInstanceDAO.getBySolverConfig(sc);
             ArrayList<ParameterInstance> myParamInstances = ParameterInstanceDAO.getBySolverConfig(this);
             if (paramInstances.size() != myParamInstances.size()) {
                 // if number of parameters doesn't equal, the solver config has other semantics

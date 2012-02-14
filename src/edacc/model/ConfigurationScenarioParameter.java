@@ -1,6 +1,8 @@
 package edacc.model;
 
-public class ConfigurationScenarioParameter extends BaseModel implements Comparable<ConfigurationScenarioParameter> {
+import java.io.Serializable;
+
+public class ConfigurationScenarioParameter extends BaseModel implements Comparable<ConfigurationScenarioParameter>, Serializable {
 
     private int idConfigurationScenario;
     private int idParameter;

@@ -1,10 +1,12 @@
 package edacc.model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author simon
  */
-public class InstanceSeed {
+public class InstanceSeed implements Serializable {
 
     public Instance instance;
     public int seed;

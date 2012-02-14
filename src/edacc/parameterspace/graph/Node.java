@@ -5,10 +5,10 @@ import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 import edacc.parameterspace.Parameter;
-import edacc.parameterspace.domain.Domain;
+import java.io.Serializable;
 
 @XmlSeeAlso({AndNode.class, OrNode.class})
-public abstract class Node {
+public abstract class Node implements Serializable {
 	protected String id;
 	protected Parameter parameter;
 	

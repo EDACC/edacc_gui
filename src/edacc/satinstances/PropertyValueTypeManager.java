@@ -160,7 +160,7 @@ public class PropertyValueTypeManager {
         for (File f : files) {
             if (f.getName().toLowerCase().endsWith(".class")) {
                 try {
-                    System.out.println("Absolute Path: " + f.getAbsolutePath());
+                    //System.out.println("Absolute Path: " + f.getAbsolutePath());
                     Class<?> cls = cl.loadClass("edacc.satinstances." + f.getName().substring(0,
                             f.getName().length() - 6).replace('/', '.'));
                     if (isPluggableClass(cls)) {

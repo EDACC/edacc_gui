@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import edacc.model.Solver;
 import edacc.model.SolverDAO;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -37,8 +38,9 @@ public class SolverTableModel extends ThreadSafeDefaultTableModel {
      * Sets the solvers used for this model.
      * @param solvers the solvers to be used as an <code>ArrayList</code>
      */
-    public void setSolvers(ArrayList<Solver> solvers) {
-        this.solvers = solvers;
+    public void setSolvers(List<Solver> solvers) {
+        this.solvers = new ArrayList<Solver>();
+        this.solvers.addAll(solvers);
         this.selected = new Boolean[solvers.size()];
         for (int i = 0; i < solvers.size(); i++) {
             selected[i] = false;

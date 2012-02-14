@@ -3,8 +3,9 @@ package edacc.parameterspace;
 import javax.xml.bind.annotation.XmlID;
 
 import edacc.parameterspace.domain.Domain;
+import java.io.Serializable;
 
-public class Parameter implements Comparable<Parameter> {
+public class Parameter implements Comparable<Parameter>, Serializable {
 	private String name;
 	private Domain domain;
 	

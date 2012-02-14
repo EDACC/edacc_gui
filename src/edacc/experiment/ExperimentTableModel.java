@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Represents a experiment table model
@@ -57,8 +58,13 @@ public class ExperimentTableModel extends ThreadSafeDefaultTableModel {
      * Sets the experiments for the model
      * @param experiments the experiments
      */
-    public void setExperiments(ArrayList<Experiment> experiments) {
-        this.experiments = experiments;
+    public void setExperiments(List<Experiment> experiments) {
+        if (experiments == null)
+            this.experiments = null;
+        else {
+            this.experiments = new ArrayList<Experiment>();
+            this.experiments.addAll(experiments);
+        }
         if (experiments != null) {
             running = new Integer[experiments.size()];
             finished = new Integer[experiments.size()];

@@ -40,13 +40,13 @@ public class ConfigurationScenarioDAO {
             st.close();
             PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement("INSERT INTO ConfigurationScenario_has_Parameters (ConfigurationScenario_idConfigurationScenario, Parameters_idParameter, configurable, fixedValue) VALUES (?, ?, ?, ?)");
             for (ConfigurationScenarioParameter param : cs.getParameters()) {
-                    ps.setInt(1, cs.getId());
-                    param.setIdConfigurationScenario(cs.getId());
-                    ps.setInt(2, param.getIdParameter());
-                    ps.setBoolean(3, param.isConfigurable());
-                    ps.setString(4, param.getFixedValue());
-                    ps.addBatch();
-                    param.setSaved();
+                ps.setInt(1, cs.getId());
+                param.setIdConfigurationScenario(cs.getId());
+                ps.setInt(2, param.getIdParameter());
+                ps.setBoolean(3, param.isConfigurable());
+                ps.setString(4, param.getFixedValue());
+                ps.addBatch();
+                param.setSaved();
             }
             ps.executeBatch();
             ps.close();
@@ -62,12 +62,12 @@ public class ConfigurationScenarioDAO {
                 }
                 st2.executeBatch();
                 st2.close();
-                if (cs.getCourse().getInitialLength() == 0) {
-                    Statement stmnt = DatabaseConnector.getInstance().getConn().createStatement();
-                    stmnt.executeUpdate("UPDATE ConfigurationScenario SET initial_course_length = " + cs.getCourse().getLength() + " WHERE idConfigurationScenario = " + cs.getId());
-                    stmnt.close();
-                    cs.getCourse().setInitialLength(cs.getCourse().getLength());
-                }
+                //  if (cs.getCourse().getInitialLength() == 0) {
+                Statement stmnt = DatabaseConnector.getInstance().getConn().createStatement();
+                stmnt.executeUpdate("UPDATE ConfigurationScenario SET initial_course_length = " + cs.getCourse().getLength() + " WHERE idConfigurationScenario = " + cs.getId());
+                stmnt.close();
+                cs.getCourse().setInitialLength(cs.getCourse().getLength());
+                //  }
                 cs.getCourse().setSaved();
             } else if (cs.getCourse() == null) {
                 cs.setCourse(new Course());
@@ -129,7 +129,7 @@ public class ConfigurationScenarioDAO {
         }
         rs2.close();
         st2.close();
-        
+
         if (initialCourseLength > 0) {
             PreparedStatement st3 = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT ConfigurationScenario_idConfigurationScenario, Instances_idInstance, seed, `order` FROM Course WHERE ConfigurationScenario_idConfigurationScenario = ? ORDER BY `order` ASC");
             st3.setInt(1, cs.getId());
@@ -146,10 +146,10 @@ public class ConfigurationScenarioDAO {
         } else {
             cs.setCourse(new Course());
         }
-        
+
         return cs;
     }
-    
+
     public static boolean configurationScenarioParameterIsSaved(ConfigurationScenarioParameter param) {
         return param.isSaved();
     }

@@ -1,10 +1,15 @@
 package edacc.model;
 
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Vector;
 import javax.xml.bind.JAXBException;
 
@@ -185,5 +190,19 @@ public class ParameterDAO {
             ret.add(rs.getString(1));
         }
         return ret;
+    }
+    
+    public static void writeParametersToStream(ObjectOutputStream stream, List<Parameter> parameters) throws IOException, SQLException {
+        for (Parameter p : parameters) {
+            stream.writeUnshared(p);
+        }
+    }
+
+    public static Parameter readParameterFromStream(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        try {
+            return (Parameter) stream.readUnshared();
+        } catch (EOFException ex) {
+            return null;
+        }
     }
 }

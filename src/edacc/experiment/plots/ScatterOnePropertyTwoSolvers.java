@@ -9,6 +9,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import javax.swing.JComboBox;
 import org.rosuda.JRI.Rengine;
 
@@ -22,7 +23,7 @@ public class ScatterOnePropertyTwoSolvers extends Plot {
     private static InstanceSelector instanceSelector;
     private static ScaleSelector scaleSelector;
     private String infos, plotTitle;
-    private ArrayList<Instance> instances;
+    private List<Instance> instances;
     private SolverConfiguration xSolverConfig, ySolverConfig;
     private Property property;
     private Integer run;

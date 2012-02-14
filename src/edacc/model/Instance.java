@@ -1,10 +1,14 @@
 package edacc.model;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.HashMap;
 
-public class Instance extends BaseModel implements IntegerPKModel {
-
+public class Instance extends BaseModel implements IntegerPKModel, Serializable {
+    public Instance() {
+        super();
+    }
+    
     @Override
     public int hashCode() {
 
@@ -68,6 +72,15 @@ public class Instance extends BaseModel implements IntegerPKModel {
     private int id;
     private String name;
     private String md5;
-    private File file;
-    private HashMap<Integer, InstanceHasProperty> propertyValues;
+    private transient File file;
+    private transient HashMap<Integer, InstanceHasProperty> propertyValues;
+    
+    protected Instance(Instance instance) {
+        this();
+        id = instance.id;
+        name = instance.name;
+        md5 = instance.md5;
+        file = instance.file;
+        propertyValues = instance.propertyValues;
+    }
 }
