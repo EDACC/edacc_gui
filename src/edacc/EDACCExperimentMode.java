@@ -3942,10 +3942,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
             if (expController.getActiveExperiment() == null) {
                 manageExperimentPane.setTitleAt(TAB_EXPERIMENTS, "Experiments");
-                ((EDACCView) EDACCApp.getApplication().getMainView()).setStatusText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+                ((EDACCView) EDACCApp.getApplication().getMainView()).setStatusText(EDACCExperimentMode.this, "");
             } else {
                 manageExperimentPane.setTitleAt(TAB_EXPERIMENTS, "Experiments (Active: " + expController.getActiveExperiment().getName() + ")");
-                ((EDACCView) EDACCApp.getApplication().getMainView()).setStatusText("MANAGE EXPERIMENT MODE (Active: " + expController.getActiveExperiment().getName() + ") - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+                ((EDACCView) EDACCApp.getApplication().getMainView()).setStatusText(EDACCExperimentMode.this, "(Active: " + expController.getActiveExperiment().getName() + ")");
             }
             manageExperimentPane.invalidate();
         }
