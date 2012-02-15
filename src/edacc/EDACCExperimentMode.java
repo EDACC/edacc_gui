@@ -2519,6 +2519,19 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 public void run(Tasks task) {
                     try {
                         expController.importData(task, dialog.getSelectedSolverConfigs(), dialog.getSelectedInstances(), dialog.getSelectedStatusCodes());
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                try {
+                                    expController.refreshSolverConfigurationModel();
+                                    expController.refreshGenerateJobsModel();
+                                } catch (Exception ex) {
+                                    // TODO: error?
+                                }
+                            }
+                        });
+
                     } catch (final Exception ex) {
                         SwingUtilities.invokeLater(new Runnable() {
 
@@ -3127,6 +3140,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             JOptionPane.showMessageDialog(this, "You have to save the configuration scenario before generating random solver configurations.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        if (expController.solverConfigsIsModified()) {
+            JOptionPane.showMessageDialog(this, "You have to save the solver configurations before generating random solver configurations.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         String input = JOptionPane.showInputDialog("How many random solver configurations should be generated?");
         if (input != null) {
             try {
@@ -3175,7 +3192,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                                     String name = "CP:";
                                     for (ParameterInstance pi : pis) {
                                         Parameter p = params.get(pi.getParameter_id());
-                                        if (p != null) {
+                                        if (p != null && !p.getName().equals("instance") && !p.getName().equals("seed")) {
                                             name += " " + p.getPrefix();
                                             if (p.getHasValue()) {
                                                 if (p.getSpace()) {
@@ -3189,7 +3206,18 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                                 }
                             }
                             expController.solverConfigCache.saveAll();
+                            SwingUtilities.invokeLater(new Runnable() {
 
+                                @Override
+                                public void run() {
+                                    try {
+                                        expController.refreshSolverConfigurationModel();
+                                        expController.refreshGenerateJobsModel();
+                                    } catch (Exception ex) {
+                                        // TODO: error?
+                                    }
+                                }
+                            });
 
                         } catch (final Exception ex) {
                             SwingUtilities.invokeLater(new Runnable() {
@@ -3738,16 +3766,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         lblSolverConfigFilterStatus.setForeground(Color.red);
         lblSolverConfigFilterStatus.setText(status);
     }
-    
+
     public void updateGenerateJobsFilterStatus() {
         String status = "";
         lblGenerateJobsFilterStatus.setForeground(Color.red);
         if (generateJobsFilter.hasFiltersApplied()) {
-            status += "Filters applied. Showing " + tblGenerateJobs.getRowCount() + " instances and " + (tblGenerateJobs.getColumnCount()-1) + " solver configurations.";
+            status += "Filters applied. Showing " + tblGenerateJobs.getRowCount() + " instances and " + (tblGenerateJobs.getColumnCount() - 1) + " solver configurations.";
         }
         lblGenerateJobsFilterStatus.setText(status);
     }
-    
+
     public void updateExperimentFilterStatus() {
         lblExperimentFilterStatus.setForeground(Color.red);
         String status = "";
