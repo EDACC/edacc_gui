@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Provides caching for experiment results. Use the higher level methods to get
@@ -164,9 +165,9 @@ public class ExperimentResultCache {
      * Returns all experiment result with the specified solver config id.<br/>
      * updateExperimentResults() should be called first.
      * @param idSolverConfig
-     * @return 
+     * @return List of experiment results for the solver config id
      */
-    public synchronized ArrayList<ExperimentResult> getResults(int idSolverConfig) {
+    public synchronized List<ExperimentResult> getResults(int idSolverConfig) {
         ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
         for (ExperimentResult er : resultMap.values()) {
             if (er.getSolverConfigId() == idSolverConfig) {
@@ -174,7 +175,15 @@ public class ExperimentResultCache {
             }
         }
         return res;
-    } 
+    }
+    
+    /**
+     * Returns the number of experiment results in this cache.
+     * @return number of experiment results
+     */
+    public synchronized int getSize() {
+        return resultMap.size();
+    }
 
     /**
      * Returns all experiment results with any run in the given list for the active experiment.<br/>
@@ -182,7 +191,7 @@ public class ExperimentResultCache {
      * @param runs
      * @return arraylist of experiment results
      */
-    public synchronized ArrayList<ExperimentResult> getAllByRun(ArrayList<Integer> runs) {
+    public synchronized List<ExperimentResult> getAllByRun(ArrayList<Integer> runs) {
         HashSet<Integer> set = new HashSet<Integer>();
         set.addAll(runs);
         ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
@@ -200,7 +209,7 @@ public class ExperimentResultCache {
      * @param run
      * @return arraylist of experiment results
      */
-    public synchronized ArrayList<ExperimentResult> getAllByRun(Integer run) {
+    public synchronized List<ExperimentResult> getAllByRun(Integer run) {
         ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
         for (ExperimentResult er : resultMap.values()) {
             if (er.getRun() == run) {

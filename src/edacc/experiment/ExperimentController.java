@@ -111,7 +111,6 @@ public class ExperimentController {
     /**
      * Creates a new experiment Controller
      * @param experimentMode the experiment mode to be used
-     * @param solverConfigPanel the solver config panel to be used
      */
     public ExperimentController(EDACCExperimentMode experimentMode) {
         this.main = experimentMode;
@@ -601,8 +600,6 @@ public class ExperimentController {
      * @param memoryLimit
      * @param wallClockTimeLimit
      * @param stackSizeLimit
-     * @param outputSizeLimitFirst
-     * @param outputSizeLimitLast
      * @param maxSeed
      * @return number of jobs added to the experiment results table
      * @throws SQLException
@@ -653,7 +650,7 @@ public class ExperimentController {
             for (SolverConfiguration sc : vsc) {
                 int numRuns = main.generateJobsTableModel.getNumRuns(i, sc);
                 elements += numRuns;
-                int currentNumRuns = experimentResultCache.getResults(sc.getId(), i.getId()).size();
+                int currentNumRuns = experimentResultCache.getNumRuns(sc.getId(), i.getId());
                 if (currentNumRuns > numRuns) {
                     // we have to delete jobs
                     ArrayList<Integer> runs = new ArrayList<Integer>();
@@ -1432,10 +1429,10 @@ public class ExperimentController {
     }
 
     /**
-     * Returns the output of a experiment result as a string
+     * Returns the output of an experiment result as a string
      * @param type for possible types see edacc.model.ExperimentResult
-     * @param er
-     * @return
+     * @param er the experiment result for which the output should be returned
+     * @return output of the experiment result as a string
      * @throws SQLException
      * @throws NoConnectionToDBException
      * @throws IOException 
@@ -1449,7 +1446,7 @@ public class ExperimentController {
      * returns a hashmap containing the maximum limits of the experiment results for the currently loaded experiment.<br/>
      * <br/>
      * possible keys are: cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, outputSizeLimitFirst, outputSizeLimitLast
-     * @return
+     * @return HashMap for the limits
      * @throws SQLException
      * @throws Exception 
      */
@@ -2039,7 +2036,7 @@ public class ExperimentController {
      * Returns an instance of a cost function from the given database representation,
      * or null, if no such cost function exists.
      * @param databaseRepresentation
-     * @return
+     * @return instance of CostFunction
      */
     public CostFunction costFunctionByName(String databaseRepresentation) {
         if ("average".equals(databaseRepresentation)) {
