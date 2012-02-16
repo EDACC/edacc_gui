@@ -16,6 +16,8 @@ CREATE  TABLE IF NOT EXISTS `User` (
   `email` VARCHAR(255) NOT NULL ,
   `postal_address` VARCHAR(255) NULL ,
   `affiliation` VARCHAR(255) NULL ,
+  `activation_hash` VARCHAR(255) NULL ,
+  `verified` TINYINT(1) NULL ,
   PRIMARY KEY (`idUser`) )
 ENGINE = InnoDB;
 
