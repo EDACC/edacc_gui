@@ -389,7 +389,7 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
         }
 
         @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             // Component comp = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
             JLabel label = new JLabel();

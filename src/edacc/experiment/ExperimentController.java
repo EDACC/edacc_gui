@@ -483,8 +483,7 @@ public class ExperimentController {
         
         // save modified solver configurations and delete deleted
         solverConfigCache.saveAll();
-        getExperimentResults().updateExperimentResults();
-        main.generateJobsTableModel.updateNumRuns();
+        refreshGenerateJobsModel();
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
@@ -501,12 +500,21 @@ public class ExperimentController {
      */
     public void undoSolverConfigurations(Tasks task) throws SQLException {
         solverConfigCache.reload();
+        refreshSolverConfigurationModel();
+    }
+    
+    public void refreshSolverConfigurationModel() throws SQLException {
         solverConfigurationEntryModel.clear();
         for (SolverConfiguration solverConfig : solverConfigCache.getAll()) {
             solverConfigurationEntryModel.add(new SolverConfigurationEntry(solverConfig, activeExperiment));
         }
         solverConfigurationEntryModel.fireDataChanged();
         main.setTitles();
+    }
+    
+    public void refreshGenerateJobsModel() throws SQLException, IOException {
+        getExperimentResults().updateExperimentResults();
+        main.generateJobsTableModel.updateNumRuns();
     }
 
     /**
