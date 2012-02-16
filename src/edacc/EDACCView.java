@@ -35,6 +35,7 @@ import java.net.URL;
 import javax.help.HelpSet;
 import javax.help.JHelp;
 import javax.swing.JFileChooser;
+import javax.swing.JPanel;
 import javax.swing.UIManager;
 import org.xml.sax.SAXException;
 
@@ -48,6 +49,9 @@ public class EDACCView extends FrameView implements Observer {
     private EDACCNoMode noMode;
     private Component mode;
     private javax.swing.GroupLayout mainPanelLayout;
+    private String noModeIdentifier = "";
+    private String manageDBModeIdentifier = "MANAGE DB MODE";
+    private String experimentModeIdentifier = "MANAGE EXPERIMENT MODE";
 
     public EDACCView(SingleFrameApplication app) {
         super(app);
@@ -144,8 +148,29 @@ public class EDACCView extends FrameView implements Observer {
         });
     }
 
-    public void setStatusText(String text) {
-        statusMessageLabel.setText(text);
+    public void setStatusText(Component src, String text) {
+        if (src != mode) {
+            return;
+        }
+        String status;
+        if (mode == this.manageDBMode) {
+            status = manageDBModeIdentifier + " " + text;
+        } else if (src == this.experimentMode) {
+            status = experimentModeIdentifier + " " + text;
+        } else if (mode == this.noMode) {
+            status = (noModeIdentifier.equals("") ? text : noModeIdentifier + " " + text);
+        } else {
+            status = text;
+        }
+        if (!"".equals(status)) {
+            status += " - ";
+        }
+        if (DatabaseConnector.getInstance().isConnected()) {
+            status += "Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname();
+        } else {
+            status += "Not connected.";
+        }
+        statusMessageLabel.setText(status);
     }
 
     private void createDatabaseErrorMessage(SQLException e) {
@@ -524,7 +549,7 @@ public class EDACCView extends FrameView implements Observer {
     }//GEN-LAST:event_updatesMenuItemActionPerformed
 
     private void importMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importMenuItemActionPerformed
-        if (!unloadModes()) {
+        if (!unloadModes(null)) {
             return;
         }
 
@@ -548,7 +573,7 @@ public class EDACCView extends FrameView implements Observer {
                             mode = importPanel;
                             manageDBModeMenuItem.setSelected(false);
                             manageExperimentModeMenuItem.setSelected(false);
-                            statusMessageLabel.setText("IMPORT - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+                            setStatusText(mode, "IMPORT");
                         }
                     });
                 } catch (final Exception e) {
@@ -571,7 +596,7 @@ public class EDACCView extends FrameView implements Observer {
     }//GEN-LAST:event_importMenuItemActionPerformed
 
     private void exportMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportMenuItemActionPerformed
-        if (!unloadModes()) {
+        if (!unloadModes(null)) {
             return;
         }
 
@@ -590,7 +615,7 @@ public class EDACCView extends FrameView implements Observer {
                             mode = exportPanel;
                             manageDBModeMenuItem.setSelected(false);
                             manageExperimentModeMenuItem.setSelected(false);
-                            statusMessageLabel.setText("EXPORT - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+                            setStatusText(mode, "EXPORT");
                         }
                     });
 
@@ -694,11 +719,15 @@ public class EDACCView extends FrameView implements Observer {
         }
     }
 
-    private boolean unloadModes() {
+    private boolean unloadModes(Component newMode) {
         if (manageExperimentModeMenuItem.isSelected()) {
             if (experimentMode.hasUnsavedChanges()) {
+                String text = "switch the mode?";
+                if (newMode == manageDBMode) {
+                    text = "switch to Manage DB mode?";
+                }
                 if (JOptionPane.showConfirmDialog(mode,
-                        "Any unsaved changes will be lost, are you sure you want to switch to Manage DB mode?",
+                        "Any unsaved changes will be lost, are you sure you want to " + text,
                         "Warning!",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
@@ -712,8 +741,12 @@ public class EDACCView extends FrameView implements Observer {
         }
         if (manageDBModeMenuItem.isSelected()) {
             if (manageDBMode.unsavedChanges) {
+                String text = "switch the mode?";
+                if (newMode == experimentMode) {
+                    text = "switch to Experiment mode?";
+                }
                 if (JOptionPane.showConfirmDialog(mode,
-                        "Any unsaved changes will be lost, are you sure you want to switch to experiment mode?",
+                        "Any unsaved changes will be lost, are you sure you want to " + text,
                         "Warning!",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
 
@@ -734,16 +767,12 @@ public class EDACCView extends FrameView implements Observer {
         manageDBModeMenuItem.setSelected(false);
         mainPanelLayout.replace(mode, noMode);
         mode = noMode;
-        if (!DatabaseConnector.getInstance().isConnected()) {
-            statusMessageLabel.setText("No database connection established!");
-        } else {
-            statusMessageLabel.setText("Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
-        }
+        setStatusText(mode, "");
     }
 
     @Action
     public void manageDBMode() {
-        if (!unloadModes()) {
+        if (!unloadModes(manageDBMode)) {
             return;
         }
 
@@ -753,7 +782,7 @@ public class EDACCView extends FrameView implements Observer {
             mode = manageDBMode;
             manageDBModeMenuItem.setSelected(true);
             manageExperimentModeMenuItem.setSelected(false);
-            statusMessageLabel.setText("MANAGE DB MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+            setStatusText(mode, "");
         } catch (final Exception e) {
             if (!SwingUtilities.isEventDispatchThread()) {
                 SwingUtilities.invokeLater(new Runnable() {
@@ -771,7 +800,7 @@ public class EDACCView extends FrameView implements Observer {
 
     @Action
     public void manageExperimentMode() {
-        if (!unloadModes()) {
+        if (!unloadModes(experimentMode)) {
             return;
         }
 
@@ -789,7 +818,7 @@ public class EDACCView extends FrameView implements Observer {
                             mode = experimentMode;
                             manageExperimentModeMenuItem.setSelected(true);
                             manageDBModeMenuItem.setSelected(false);
-                            statusMessageLabel.setText("MANAGE EXPERIMENT MODE - Connected to database: " + DatabaseConnector.getInstance().getDatabase() + " on host: " + DatabaseConnector.getInstance().getHostname());
+                            setStatusText(mode, "");
                         }
                     });
                 } catch (final Exception e) {
