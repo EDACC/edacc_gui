@@ -18,6 +18,7 @@ CREATE  TABLE IF NOT EXISTS `User` (
   `affiliation` VARCHAR(255) NULL ,
   `activation_hash` VARCHAR(255) NULL ,
   `verified` TINYINT(1) NULL ,
+  `accepted_terms` TINYINT(1) NULL ,
   PRIMARY KEY (`idUser`) )
 ENGINE = InnoDB;
 
