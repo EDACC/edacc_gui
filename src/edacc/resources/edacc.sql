@@ -18,6 +18,7 @@ CREATE  TABLE IF NOT EXISTS `User` (
   `affiliation` VARCHAR(255) NULL ,
   `activation_hash` VARCHAR(255) NULL ,
   `verified` TINYINT(1) NULL ,
+  `accepted_terms` TINYINT(1) NULL ,
   PRIMARY KEY (`idUser`) )
 ENGINE = InnoDB;
 
@@ -34,6 +35,7 @@ CREATE  TABLE IF NOT EXISTS `Solver` (
   `code` LONGBLOB NULL ,
   `version` VARCHAR(255) NULL ,
   `authors` VARCHAR(255) NULL ,
+  `description_pdf` LONGBLOB NULL ,
   `User_idUser` INT NULL ,
   PRIMARY KEY (`idSolver`) ,
   UNIQUE INDEX `name` (`name` ASC, `version` ASC) ,
