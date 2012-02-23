@@ -334,6 +334,7 @@ CREATE  TABLE IF NOT EXISTS `ExperimentResults` (
   `outputSizeLimitLast` INT NULL ,
   `Client_idClient` INT NULL ,
   `cost` FLOAT NULL ,
+  `wallTime` FLOAT NULL ,
   PRIMARY KEY (`idJob`) ,
   INDEX `fk_ExperimentResults_SolverConfig1` (`SolverConfig_idSolverConfig` ASC) ,
   INDEX `fk_ExperimentResults_Experiment1` (`Experiment_idExperiment` ASC) ,
