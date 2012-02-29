@@ -40,6 +40,7 @@ public class PropertyValueTypeManager {
     private String table = "PropertyValueType";
     private String insertQuery = "INSERT INTO " + table + " (name, typeClass, isDefault, typeClassFileName) VALUES (?, ?, ?, ?);";
     private String deleteQuery = "DELETE FROM " + table + " WHERE name=?;";
+
     public static PropertyValueTypeManager getInstance() throws IOException, NoConnectionToDBException, SQLException {
         if (instance == null) {
             instance = new PropertyValueTypeManager();
@@ -210,28 +211,27 @@ public class PropertyValueTypeManager {
         return propertyTypes;
     }
 
-   /* public static void main(String[] args) throws IOException, NoConnectionToDBException, SQLException, ClassNotFoundException {
-        DatabaseConnector.getInstance().connect("localhost", 3306, "root", "EDACC", "s3cret");
-        PropertyValueType t = PropertyValueTypeManager.getInstance().getPropertyValueTypeByName("Test");
-        System.out.println(t.getName());
-        // Create a File object on the root of the directory containing the class file
-       /* File file = new File("/home/dgall/Projekte/EDACC/");
-        try {
-        // Convert File to a URL
-        URL url = file.toURL(); // file:/c:/myclasses/
-        URL[] urls = new URL[]{url};
-        for (URL u : urls)
-        System.out.println(u);
-        // Create a new class loader with the directory
-        ClassLoader cl = new URLClassLoader(urls);
-        // Load in the class; MyClass.class should be located in // the directory file:/c:/myclasses/com/mycompany
-        Class cls = cl.loadClass("edacc.satinstances.TestProperty");
-        System.out.println(cls.getName());
-        } catch (MalformedURLException e) {
-        } catch (ClassNotFoundException e) { }*/
-   // }
-
-    public Vector<String> readNameFromJarFile(File file) throws IOException{
+    /* public static void main(String[] args) throws IOException, NoConnectionToDBException, SQLException, ClassNotFoundException {
+    DatabaseConnector.getInstance().connect("localhost", 3306, "root", "EDACC", "s3cret");
+    PropertyValueType t = PropertyValueTypeManager.getInstance().getPropertyValueTypeByName("Test");
+    System.out.println(t.getName());
+    // Create a File object on the root of the directory containing the class file
+    /* File file = new File("/home/dgall/Projekte/EDACC/");
+    try {
+    // Convert File to a URL
+    URL url = file.toURL(); // file:/c:/myclasses/
+    URL[] urls = new URL[]{url};
+    for (URL u : urls)
+    System.out.println(u);
+    // Create a new class loader with the directory
+    ClassLoader cl = new URLClassLoader(urls);
+    // Load in the class; MyClass.class should be located in // the directory file:/c:/myclasses/com/mycompany
+    Class cls = cl.loadClass("edacc.satinstances.TestProperty");
+    System.out.println(cls.getName());
+    } catch (MalformedURLException e) {
+    } catch (ClassNotFoundException e) { }*/
+    // }
+    public Vector<String> readNameFromJarFile(File file) throws IOException {
         Vector<String> names = new Vector<String>();
         JarInputStream jaris = new JarInputStream(new FileInputStream(file));
         JarEntry ent = null;
@@ -254,39 +254,52 @@ public class PropertyValueTypeManager {
      * @throws SQLException
      * @author rretz
      */
-    public void addPropertyValueTypes(Vector<String> toAdd, File file) throws IOException, NoConnectionToDBException, SQLException {
+    public void addPropertyValueTypes(Vector<String> toAdd, File file) throws IOException, NoConnectionToDBException, SQLException, PropertyValueTypeAlreadyExistsException {
         JarFile jf = new JarFile(file);
         LinkedList<File> files = new LinkedList<File>();
         JarInputStream jaris = new JarInputStream(new FileInputStream(file));
         JarEntry ent = null;
         File base = new File("touch").getAbsoluteFile().getParentFile();
         ClassLoader cl = new URLClassLoader(new URL[]{base.toURI().toURL()},
-                 PropertyValueType.class.getClassLoader());
+                PropertyValueType.class.getClassLoader());
         /* Checks every JarEntry if it is one of the searched class files.
          * Load and Add the located classes to the database and cache.
-        */
+         */
+        ArrayList<String> duplicateEntry = new ArrayList<String>();
         while ((ent = jaris.getNextJarEntry()) != null) {
-            for(int i = 0; i < toAdd.size(); i++){
-                if (ent.getName().equals(toAdd.get(i)+ ".class")) {
+            for (int i = 0; i < toAdd.size(); i++) {
+                if (ent.getName().equals(toAdd.get(i) + ".class")) {
                     toAdd.remove(i);
                     files.add(getFileOfJarEntry(new JarFile(file), ent, file));
                     List<Class<PropertyValueType<?>>> classes = getClassesFromFiles(files, cl);
                     Enumeration<PropertyValueType<?>> enumerationToAdd = createPropertyValueTypeObjects(classes).elements();
 
-                    if(enumerationToAdd.hasMoreElements()){
+                    if (enumerationToAdd.hasMoreElements()) {
                         PropertyValueType<?> tmp = enumerationToAdd.nextElement();
-                        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
-                        ps.setString(1, tmp.getName());
-                        ps.setBinaryStream(2, new FileInputStream(files.getFirst()));
-                        ps.setBoolean(3, tmp.isDefault());
-                        ps.setString(4, ent.getName());
-                        ps.executeUpdate();
-                        propertyTypes.put(tmp.getName(), tmp);
+                        String checkQuery = "SELECT * FROM " + table + " WHERE name = \'" + tmp.getName() + "\' ";
+                        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(checkQuery);
+                        ResultSet rs = ps.executeQuery();
+                        if (rs.next()) {
+                            duplicateEntry.add(tmp.getName());
+                        } else {
+                            ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery);
+                            ps.setString(1, tmp.getName());
+                            ps.setBinaryStream(2, new FileInputStream(files.getFirst()));
+                            ps.setBoolean(3, tmp.isDefault());
+                            ps.setString(4, ent.getName());
+                            ps.executeUpdate();
+                            propertyTypes.put(tmp.getName(), tmp);
+                        }
+
                     }
                     files.clear();
+
                 }
             }
-            
+
+        }
+        if (!duplicateEntry.isEmpty()) {
+            throw new PropertyValueTypeAlreadyExistsException(duplicateEntry);
         }
     }
 
@@ -299,14 +312,15 @@ public class PropertyValueTypeManager {
      * @throws IOException
      * @author rretz
      */
-    private File getFileOfJarEntry(JarFile jf, JarEntry ent, File root) throws IOException{
+    private File getFileOfJarEntry(JarFile jf, JarEntry ent, File root) throws IOException {
         File input = new File(ent.getName());
         BufferedInputStream bis = new BufferedInputStream(jf.getInputStream(ent));
         File dir = new File(root.getParent());
         dir.mkdirs();
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(input) );
-        for ( int c; ( c = bis.read() ) != -1; )
-        bos.write( (byte)c );
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(input));
+        for (int c; (c = bis.read()) != -1;) {
+            bos.write((byte) c);
+        }
         bos.close();
         return input;
     }
@@ -318,18 +332,18 @@ public class PropertyValueTypeManager {
      * @throws SQLException
      * @throws PropertyValueTypeInPropertyException
      */
-    public void remove(PropertyValueType<?> toRemove) throws NoConnectionToDBException, SQLException, PropertyValueTypeInPropertyException{
+    public void remove(PropertyValueType<?> toRemove) throws NoConnectionToDBException, SQLException, PropertyValueTypeInPropertyException {
         String query = "SELECT InstanceProperty.valueType, SolverProperty.PropertyValueType_name FROM InstanceProperty, SolverProperty;";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
         ResultSet rs = ps.executeQuery();
-        if(!rs.next()){
+        if (!rs.next()) {
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
             ps.setString(1, toRemove.getName());
             ps.executeUpdate();
             propertyTypes.remove(toRemove.getName());
-        }
-        else
+        } else {
             throw new PropertyValueTypeInPropertyException();
+        }
     }
 
     /**
@@ -337,7 +351,7 @@ public class PropertyValueTypeManager {
      * default types of EDACC.
      * @author rretz
      */
-    public void addDefaultToDB() throws NoConnectionToDBException, SQLException, IOException {
+    public void addDefaultToDB() throws NoConnectionToDBException, SQLException, IOException, PropertyValueTypeAlreadyExistsException {
         File f = new File(EDACCApp.class.getProtectionDomain().getCodeSource().getLocation().getPath());
         String path;
         if (f.isDirectory()) {
@@ -345,11 +359,9 @@ public class PropertyValueTypeManager {
         } else {
             path = f.getParent() + "/edacc/resources/defaultPropertyValueType.jar";
         }
-        
+
         File defaultTypes = new File(path);
         Vector<String> names = readNameFromJarFile(defaultTypes);
-        addPropertyValueTypes(names, defaultTypes);     
+        addPropertyValueTypes(names, defaultTypes);
     }
-
-
 }
