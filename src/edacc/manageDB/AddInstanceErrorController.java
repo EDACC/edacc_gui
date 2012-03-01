@@ -8,13 +8,10 @@ import edacc.EDACCAddInstanceErrorDialog;
 import edacc.model.Instance;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceDAO;
-import edacc.model.InstanceHasInstanceClass;
 import edacc.model.InstanceHasInstanceClassDAO;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.swing.JTable;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 /**
@@ -85,15 +82,28 @@ public class AddInstanceErrorController {
         toAddModel.removeRows(rows);
     }
 
+    /**
+     * 
+     * @param rows 
+     */
     public void add(int[] rows) {
         for (int row : rows) {
             Instance add = toAddModel.getInstance(row);
             duplicateModel.removeDups(add);
             InstanceDAO.createDuplicateInstance(add, instanceClasses.get(add));
+            duplicateModel.checkNewAdded(add);
         }
+        
         toAddModel.removeRows(rows);
     }
 
+    /**
+     * Links the given tuple, removes them from both tables of the EDACCAddInstanceErrorDialog and 
+     * updates the database.
+     * @param selected @HashMap<@Integer, @ArrayList<@Instance>> of all links between error causing and duplicate 
+     * instances.
+     * @throws SQLException 
+     */
     public void link(HashMap<Integer, ArrayList<Instance>> selected) throws SQLException {
         ArrayList<Integer> ids = new ArrayList<Integer>(selected.keySet());
         for (int id : ids) {
@@ -112,28 +122,44 @@ public class AddInstanceErrorController {
         }
     }
 
+    /**
+     * 
+     * @return True if one or more instances are selected in the jTableInstancesToAdd table.
+     */
     public boolean isSelected() {
         return main.isSelected();
     }
 
-    public int getSelectedRows() {
-        return main.getSelectedToAddInstance();
-    }
-
+    /**
+     * 
+     * @return The count of selected Instances of the jTableInstancesToAdd table.
+     */
     public int getSelectedToAddRowCount() {
         return main.getSelectedToAddRowCount();
     }
 
-    void noneFilter() {
+    /**
+     * Removes the filter on the jTableProblemCausing table.
+     */
+    public void noneFilter() {
         filter.setSelectedInstance(null);
         main.sort();
         this.duplicateModel.fireTableDataChanged();
     }
 
+    /**
+     * Enables or disables buttons of the EDACCInstanceErrorDialog, which cannot work on with
+     * multiple selected instance in the jTableInstancesToAdd table.
+     * @param b 
+     */
     public void mulipleSelectionBtnShow(boolean b) {
         main.multipleSelecteBtnShow(b);
     }
-
+    
+    /**
+     * 
+     * @return Instance which is selected in the jTableInstancesToAdd table
+     */
     public Instance getToAddSelectedInstance() {
         int tmp = main.getToAddSelectedInstance();
         if (tmp == -1) {
@@ -143,6 +169,10 @@ public class AddInstanceErrorController {
         }
     }
 
+    /**
+     * 
+     * @return Arraylist<Instance> of instances which are selected in the jTableInstancesToAdd table.
+     */
     public ArrayList<Instance> getToAddSelectedInstances() {
         ArrayList<Instance> ret = new ArrayList<Instance>();
         int[] tmp = main.getToAddSelectedInstances();
@@ -152,6 +182,12 @@ public class AddInstanceErrorController {
         return ret;
     }
 
+    /**
+     * 
+     * @param row
+     * @return True if the instance at the given row of the jTableInstancesToAdd is linked with
+     *  a duplicate instance which is already in the database.
+     */
     public boolean isLinked(int row) {
         row = main.ToAddTableConvertRowToModel(row);
         Instance linked = toAddModel.getInstance(row);
