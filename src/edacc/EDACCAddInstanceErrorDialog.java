@@ -69,7 +69,6 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
         jBtnAdd = new javax.swing.JButton();
         jBtnLink = new javax.swing.JButton();
         jBtnDrop = new javax.swing.JButton();
-        jPnlDialogBtns = new javax.swing.JPanel();
         jBtnDone = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -100,21 +99,21 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
         jPnlInstancesToAdd.setLayout(jPnlInstancesToAddLayout);
         jPnlInstancesToAddLayout.setHorizontalGroup(
             jPnlInstancesToAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 284, Short.MAX_VALUE)
+            .addGap(0, 375, Short.MAX_VALUE)
             .addGroup(jPnlInstancesToAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPnlInstancesToAddLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 351, Short.MAX_VALUE)
                     .addContainerGap()))
         );
         jPnlInstancesToAddLayout.setVerticalGroup(
             jPnlInstancesToAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 275, Short.MAX_VALUE)
+            .addGap(0, 509, Short.MAX_VALUE)
             .addGroup(jPnlInstancesToAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPnlInstancesToAddLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 485, Short.MAX_VALUE)
+                    .addContainerGap()))
         );
 
         jPnlProblemCausing.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPnlProblemCausing.border.title"))); // NOI18N
@@ -142,15 +141,15 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
             jPnlProblemCausingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPnlProblemCausingLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 577, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPnlProblemCausingLayout.setVerticalGroup(
             jPnlProblemCausingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPnlProblemCausingLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 485, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jPnlToolBtns.setName("jPnlToolBtns"); // NOI18N
@@ -179,6 +178,14 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
             }
         });
 
+        jBtnDone.setText(resourceMap.getString("jBtnDone.text")); // NOI18N
+        jBtnDone.setName("jBtnDone"); // NOI18N
+        jBtnDone.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnDoneActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPnlToolBtnsLayout = new javax.swing.GroupLayout(jPnlToolBtns);
         jPnlToolBtns.setLayout(jPnlToolBtnsLayout);
         jPnlToolBtnsLayout.setHorizontalGroup(
@@ -190,46 +197,26 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
                 .addComponent(jBtnLink, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jBtnDrop)
-                .addContainerGap(13, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 636, Short.MAX_VALUE)
+                .addComponent(jBtnDone, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         jPnlToolBtnsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jBtnAdd, jBtnDrop, jBtnLink});
 
         jPnlToolBtnsLayout.setVerticalGroup(
             jPnlToolBtnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPnlToolBtnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(jBtnAdd)
-                .addComponent(jBtnLink)
-                .addComponent(jBtnDrop))
+            .addGroup(jPnlToolBtnsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPnlToolBtnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jBtnAdd)
+                    .addComponent(jBtnLink)
+                    .addComponent(jBtnDrop)
+                    .addComponent(jBtnDone))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPnlToolBtnsLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jBtnAdd, jBtnDrop, jBtnLink});
-
-        jPnlDialogBtns.setName("jPnlDialogBtns"); // NOI18N
-
-        jBtnDone.setText(resourceMap.getString("jBtnDone.text")); // NOI18N
-        jBtnDone.setName("jBtnDone"); // NOI18N
-        jBtnDone.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnDoneActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPnlDialogBtnsLayout = new javax.swing.GroupLayout(jPnlDialogBtns);
-        jPnlDialogBtns.setLayout(jPnlDialogBtnsLayout);
-        jPnlDialogBtnsLayout.setHorizontalGroup(
-            jPnlDialogBtnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPnlDialogBtnsLayout.createSequentialGroup()
-                .addContainerGap(477, Short.MAX_VALUE)
-                .addComponent(jBtnDone, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-        jPnlDialogBtnsLayout.setVerticalGroup(
-            jPnlDialogBtnsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPnlDialogBtnsLayout.createSequentialGroup()
-                .addComponent(jBtnDone)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -239,27 +226,22 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jPnlToolBtns, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPnlInstancesToAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jPnlInstancesToAdd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPnlProblemCausing, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jPnlDialogBtns, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPnlToolBtns, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPnlInstancesToAdd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPnlToolBtns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPnlInstancesToAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPnlProblemCausing, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPnlDialogBtns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPnlToolBtns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
@@ -359,7 +341,6 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
     private javax.swing.JButton jBtnDone;
     private javax.swing.JButton jBtnDrop;
     private javax.swing.JButton jBtnLink;
-    private javax.swing.JPanel jPnlDialogBtns;
     private javax.swing.JPanel jPnlInstancesToAdd;
     private javax.swing.JPanel jPnlProblemCausing;
     private javax.swing.JPanel jPnlToolBtns;
