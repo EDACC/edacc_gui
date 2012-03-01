@@ -107,7 +107,6 @@ CREATE  TABLE IF NOT EXISTS `Instances` (
   `md5` VARCHAR(60) NOT NULL ,
   `BenchmarkType_idBenchmarkType` INT NULL ,
   PRIMARY KEY (`idInstance`) ,
-  UNIQUE INDEX `name` (`name` ASC) ,
   INDEX `fk_Instances_BenchmarkType1` (`BenchmarkType_idBenchmarkType` ASC) ,
   CONSTRAINT `fk_Instances_BenchmarkType1`
     FOREIGN KEY (`BenchmarkType_idBenchmarkType` )
