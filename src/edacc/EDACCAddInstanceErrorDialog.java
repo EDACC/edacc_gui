@@ -10,6 +10,7 @@
  */
 package edacc;
 
+import edacc.manageDB.InstanceDupErrorTableRenderer;
 import edacc.manageDB.AddInstanceErrorController;
 import edacc.manageDB.InstanceDupErrorFilter;
 import edacc.manageDB.InstanceDupErrorTableModel;
@@ -18,17 +19,11 @@ import edacc.manageDB.InstanceErrorTableModel;
 import edacc.manageDB.InstancesToAddSelectionListener;
 import edacc.model.Instance;
 import edacc.model.InstanceClass;
-import java.awt.Color;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.DefaultRowSorter;
-import javax.swing.RowFilter;
-import javax.swing.RowSorter;
-import javax.swing.SwingUtilities;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 /**
@@ -321,6 +316,8 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
         InstanceDupErrorFilter rowFilter = new InstanceDupErrorFilter(dupErrorModel);
         rowSorter.setRowFilter(rowFilter);
         controller.setFilter(rowFilter);
+        InstanceDupErrorTableRenderer duprenderer = new InstanceDupErrorTableRenderer(controller, dupErrorModel);
+        jTableProblemCausing.setDefaultRenderer(String.class, duprenderer);
 
 
         //jTableProblemCausing.setRowSorter(controller.getDuplicateSorter());

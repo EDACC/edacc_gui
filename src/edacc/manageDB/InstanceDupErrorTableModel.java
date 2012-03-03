@@ -226,10 +226,27 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
                     tmpRI.add(inst);
                     relatedInstances.put(add, tmpRI);
                 }
-                
+
             }
         }
-        if(added)
+        if (added) {
             instances.add(add);
+        }
+    }
+
+    public boolean dupName(int row, Instance toAddSelectedInstance, int column) {
+        if (column == 0) {
+            return getValueAt(row, 0).equals(toAddSelectedInstance.getName());
+        } else {
+            return false;
+        }
+    }
+
+    public boolean dupMd5(int row, Instance toAddSelectedInstance, int column) {
+        if (column == 1) {
+            return getValueAt(row, 1).equals(toAddSelectedInstance.getMd5());
+        } else {
+            return false;
+        }
     }
 }

@@ -4,7 +4,6 @@
  */
 package edacc.manageDB;
 
-import edacc.experiment.ThreadSafeDefaultTableModel;
 import edacc.model.Instance;
 import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
