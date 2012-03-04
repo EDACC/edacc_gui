@@ -192,6 +192,8 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
      */
     public boolean isLinked(Instance linked) {
         ArrayList<Instance> tmp = backRelation.get(linked);
+        if(tmp == null)
+         return false;
         for (Instance inst : tmp) {
             if (toLink.get(inst.getId()) != null) {
                 return true;

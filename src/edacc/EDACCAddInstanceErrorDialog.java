@@ -10,6 +10,7 @@
  */
 package edacc;
 
+import edacc.events.TaskEvents;
 import edacc.manageDB.InstanceDupErrorTableRenderer;
 import edacc.manageDB.AddInstanceErrorController;
 import edacc.manageDB.InstanceDupErrorFilter;
@@ -30,7 +31,7 @@ import javax.swing.table.TableRowSorter;
  *
  * @author rretz
  */
-public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
+public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog  implements TaskEvents{
 
     private AddInstanceErrorController controller;
     private InstanceDupErrorFilter dupErrorFilter;
@@ -394,6 +395,25 @@ public class EDACCAddInstanceErrorDialog extends javax.swing.JDialog {
 
     public int ToAddTableConvertRowToModel(int row) {
         return jTableInstancesToAdd.convertRowIndexToModel(row);
+    }
+
+    @Override
+    public void onTaskSuccessful(String methodName, Object result) {
+        toAddModel.fireTableDataChanged();
+        dupErrorModel.fireTableDataChanged();
+    }
+
+    @Override
+    public void onTaskStart(String methodName) {
+    }
+
+    @Override
+    public void onTaskFailed(String methodName, Throwable e) {
+        try {
+            throw e;
+        } catch (Throwable ex) {
+            Logger.getLogger(EDACCAddInstanceErrorDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 

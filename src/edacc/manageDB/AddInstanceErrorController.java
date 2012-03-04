@@ -5,10 +5,14 @@
 package edacc.manageDB;
 
 import edacc.EDACCAddInstanceErrorDialog;
+import edacc.EDACCApp;
+import edacc.events.TaskEvents;
 import edacc.model.Instance;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasInstanceClassDAO;
+import edacc.model.Tasks;
+import java.lang.reflect.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,19 +86,32 @@ public class AddInstanceErrorController {
         toAddModel.removeRows(rows);
     }
 
+    public void add(int[] row) {
+       Tasks.startTask("tryToAdd", new Class[]{row.getClass(), edacc.model.Tasks.class}, 
+               new Object[]{row, null}, this, this.main);
+    }
+
     /**
      * 
      * @param rows 
      */
-    public void add(int[] rows) {
+    public void tryToAdd(int[] rows, Tasks task) {
+        Tasks.getTaskView().setCancelable(true);
+        task.setOperationName("Add instances");
+        int count = 0;
+        int all = rows.length;
+
         for (int row : rows) {
             Instance add = toAddModel.getInstance(row);
             duplicateModel.removeDups(add);
             InstanceDAO.createDuplicateInstance(add, instanceClasses.get(add));
             duplicateModel.checkNewAdded(add);
+            task.setStatus(count + " of " + all + " instances removed");
+            task.setTaskProgress((float) count / (float) all);
+            count++;
         }
-        
         toAddModel.removeRows(rows);
+        Tasks.getTaskView().setCancelable(false);
     }
 
     /**
@@ -155,7 +172,7 @@ public class AddInstanceErrorController {
     public void mulipleSelectionBtnShow(boolean b) {
         main.multipleSelecteBtnShow(b);
     }
-    
+
     /**
      * 
      * @return Instance which is selected in the jTableInstancesToAdd table
