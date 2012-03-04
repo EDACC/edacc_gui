@@ -168,8 +168,10 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
      * @param instance 
      */
     public void removeDups(Instance instance) {
-        ArrayList<Instance> toRemove = backRelation.get(instance);
-        for (Instance remove : toRemove) {
+       ArrayList<Instance> toRemove = backRelation.get(instance);
+       if(toRemove == null)
+           return;
+       for (Instance remove : toRemove) {
             relatedInstances.get(remove).remove(instance);
             toLink.remove(remove.getId());
         }

@@ -106,7 +106,7 @@ public class AddInstanceErrorController {
             duplicateModel.removeDups(add);
             InstanceDAO.createDuplicateInstance(add, instanceClasses.get(add));
             duplicateModel.checkNewAdded(add);
-            task.setStatus(count + " of " + all + " instances removed");
+            task.setStatus(count + " of " + all + " instances added");
             task.setTaskProgress((float) count / (float) all);
             count++;
         }
