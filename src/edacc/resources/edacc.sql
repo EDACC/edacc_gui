@@ -19,6 +19,7 @@ CREATE  TABLE IF NOT EXISTS `User` (
   `activation_hash` VARCHAR(255) NULL ,
   `verified` TINYINT(1) NULL ,
   `accepted_terms` TINYINT(1) NULL ,
+  `admin` TINYINT(1) NULL ,
   PRIMARY KEY (`idUser`) )
 ENGINE = InnoDB;
 
