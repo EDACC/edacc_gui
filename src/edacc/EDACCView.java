@@ -214,6 +214,7 @@ public class EDACCView extends FrameView implements Observer {
         manageDBModeMenuItem = new javax.swing.JRadioButtonMenuItem();
         manageExperimentModeMenuItem = new javax.swing.JRadioButtonMenuItem();
         propertyMenu = new javax.swing.JMenu();
+        ImportPropertyCSVMenuItem = new javax.swing.JMenuItem();
         ManagePropertyMenuItem = new javax.swing.JMenuItem();
         javax.swing.JMenu helpMenu = new javax.swing.JMenu();
         helpMenuItem = new javax.swing.JMenuItem();
@@ -224,6 +225,7 @@ public class EDACCView extends FrameView implements Observer {
         statusMessageLabel = new javax.swing.JLabel();
         statusAnimationLabel = new javax.swing.JLabel();
         progressBar = new javax.swing.JProgressBar();
+        jFilechooserCSV = new javax.swing.JFileChooser();
 
         mainPanel.setMinimumSize(new java.awt.Dimension(800, 600));
         mainPanel.setName("mainPanel"); // NOI18N
@@ -330,6 +332,15 @@ public class EDACCView extends FrameView implements Observer {
         propertyMenu.setText(resourceMap.getString("propertyMenu.text")); // NOI18N
         propertyMenu.setName("propertyMenu"); // NOI18N
 
+        ImportPropertyCSVMenuItem.setText(resourceMap.getString("ImportPropertyCSVMenuItem.text")); // NOI18N
+        ImportPropertyCSVMenuItem.setName("ImportPropertyCSVMenuItem"); // NOI18N
+        ImportPropertyCSVMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ImportPropertyCSVMenuItemActionPerformed(evt);
+            }
+        });
+        propertyMenu.add(ImportPropertyCSVMenuItem);
+
         ManagePropertyMenuItem.setAction(actionMap.get("btnSolverProperties")); // NOI18N
         ManagePropertyMenuItem.setText(resourceMap.getString("ManagePropertyMenuItem.text")); // NOI18N
         ManagePropertyMenuItem.setName("ManagePropertyMenuItem"); // NOI18N
@@ -408,6 +419,8 @@ public class EDACCView extends FrameView implements Observer {
                     .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(3, 3, 3))
         );
+
+        jFilechooserCSV.setName("jFilechooserCSV"); // NOI18N
 
         setComponent(mainPanel);
         setMenuBar(menuBar);
@@ -636,6 +649,22 @@ public class EDACCView extends FrameView implements Observer {
         });
 
     }//GEN-LAST:event_exportMenuItemActionPerformed
+
+    private void ImportPropertyCSVMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ImportPropertyCSVMenuItemActionPerformed
+        // Select csv file with propertiy data 
+        int returnVal = jFilechooserCSV.showOpenDialog(mainPanel);
+        File csvFile = jFilechooserCSV.getSelectedFile();
+        
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+            EDACCImportPropertyCSV importCSVProps = new EDACCImportPropertyCSV(mainFrame, true);
+            importCSVProps.setLocationRelativeTo(mainFrame);
+
+            importCSVProps.initialize(csvFile);
+            importCSVProps.setVisible(true);
+        }
+
+    }//GEN-LAST:event_ImportPropertyCSVMenuItemActionPerformed
 
     @Action
     public void btnConnectToDB() {
@@ -869,6 +898,7 @@ public class EDACCView extends FrameView implements Observer {
     public void btnProperties() {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem ImportPropertyCSVMenuItem;
     private javax.swing.JMenuItem ManagePropertyMenuItem;
     private javax.swing.JMenuItem connectToDBMenuItem;
     private javax.swing.JMenuItem disconnectMenuItem;
@@ -877,6 +907,7 @@ public class EDACCView extends FrameView implements Observer {
     private javax.swing.JMenu gridMenu;
     private javax.swing.JMenuItem helpMenuItem;
     private javax.swing.JMenuItem importMenuItem;
+    private javax.swing.JFileChooser jFilechooserCSV;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;

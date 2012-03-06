@@ -227,4 +227,8 @@ public class ManagePropertyController {
             Logger.getLogger(ManagePropertyController.class.getName()).log(Level.SEVERE, null, ex);
         } 
     }
+
+    public void importPropertyCSV(File file) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
 }

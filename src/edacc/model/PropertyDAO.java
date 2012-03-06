@@ -20,6 +20,8 @@ import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -435,5 +437,9 @@ public class PropertyDAO {
             return;
         }
 
+    }
+
+    public static void importCSV(Set<Entry<Property, String>> selected, Boolean overwrite, File csvFile) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

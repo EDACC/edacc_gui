@@ -694,7 +694,14 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_buttonImportPropertyActionPerformed
 
     private void buttonImportCSVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonImportCSVActionPerformed
-        // TODO add your handling code here:
+        jFileChooser1.setFileSelectionMode(jFileChooser1.FILES_ONLY);
+        jFileChooser1.setMultiSelectionEnabled(false);
+        int returnVal = jFileChooser1.showOpenDialog(this);
+        if (returnVal == jFileChooser1.CANCEL_OPTION) {
+            return;
+        }
+        File file = jFileChooser1.getSelectedFile();
+        controller.importPropertyCSV(file);
     }//GEN-LAST:event_buttonImportCSVActionPerformed
 
     /**
