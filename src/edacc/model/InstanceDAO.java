@@ -4,7 +4,6 @@ import edacc.manageDB.Util;
 import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.InvalidVariableException;
 import edacc.satinstances.SATInstance;
-import edacc.util.Pair;
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.File;
@@ -20,7 +19,6 @@ import java.util.LinkedList;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -102,7 +100,8 @@ public class InstanceDAO {
     public static Instance createInstance(String name, String formula, InstanceClass instanceClass) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException, InstanceAlreadyInDBException, InstanceDuplicateInDBException {
         String md5 = edacc.manageDB.Util.calculateMD5(formula);
         PreparedStatement ps;
-        final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ? or name = ?";
+        //final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ? or name = ?";
+        final String Query = "SELECT idInstance FROM " + table + " WHERE md5 = ?";
         ps = DatabaseConnector.getInstance().getConn().prepareStatement(Query);
         ps.setString(1, md5);
         ResultSet rs = ps.executeQuery();

@@ -6,7 +6,7 @@ package edacc.satinstances;
 
 /**
  *
- * @author Robert
+ * @author rretz
  */
 public class StringPropertyValueType extends PropertyValueType<String> {
 

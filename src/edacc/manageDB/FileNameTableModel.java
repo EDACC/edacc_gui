@@ -5,6 +5,7 @@
 
 package edacc.manageDB;
 
+import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 
@@ -13,11 +14,11 @@ import javax.swing.table.AbstractTableModel;
  * @author rretz
  */
 public class FileNameTableModel extends AbstractTableModel{
-     private String[] columns = {"Path"};
-     private Vector<String> names;
+     private String[] columns = {"Name"};
+     private ArrayList<String> names;
 
      public FileNameTableModel(){
-         names = new Vector<String>();
+         names = new ArrayList<String>();
      }
 
 
@@ -42,7 +43,7 @@ public class FileNameTableModel extends AbstractTableModel{
         return columns[column];
     }
 
-    public void setAll(Vector<String> toAdd){
+    public void setAll(ArrayList<String> toAdd){
         names.addAll(toAdd);
     }
 

@@ -9,7 +9,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 DROP TABLE IF EXISTS `User` ;
 
 CREATE  TABLE IF NOT EXISTS `User` (
-  `idUser` INT NOT NULL INT NOT NULL AUTO_INCREMENT ,
+  `idUser` INT NOT NULL AUTO_INCREMENT ,
   `lastname` VARCHAR(255) NOT NULL ,
   `firstname` VARCHAR(255) NOT NULL ,
   `password` VARCHAR(255) NOT NULL ,
@@ -19,6 +19,7 @@ CREATE  TABLE IF NOT EXISTS `User` (
   `activation_hash` VARCHAR(255) NULL ,
   `verified` TINYINT(1) NULL ,
   `accepted_terms` TINYINT(1) NULL ,
+  `admin` TINYINT(1) NULL ,
   PRIMARY KEY (`idUser`) )
 ENGINE = InnoDB;
 
@@ -107,7 +108,6 @@ CREATE  TABLE IF NOT EXISTS `Instances` (
   `md5` VARCHAR(60) NOT NULL ,
   `BenchmarkType_idBenchmarkType` INT NULL ,
   PRIMARY KEY (`idInstance`) ,
-  UNIQUE INDEX `name` (`name` ASC) ,
   INDEX `fk_Instances_BenchmarkType1` (`BenchmarkType_idBenchmarkType` ASC) ,
   CONSTRAINT `fk_Instances_BenchmarkType1`
     FOREIGN KEY (`BenchmarkType_idBenchmarkType` )

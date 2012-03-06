@@ -4,12 +4,9 @@
  */
 package edacc.manageDB;
 
-import edacc.experiment.ThreadSafeDefaultTableModel;
 import edacc.model.Instance;
-import edacc.model.InstanceDAO;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 import javax.swing.table.DefaultTableModel;
@@ -32,6 +29,11 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
     // <error causing instance, all related duplicate instances>
     private HashMap<Instance, ArrayList<Instance>> backRelation;
 
+    /**
+     * 
+     * @param duplicate HashmMap with <error causing instance, ArrayList of duplicated instances>
+     * @param controller 
+     */
     InstanceDupErrorTableModel(HashMap<Instance, ArrayList<Instance>> duplicate, AddInstanceErrorController controller) {
         this.controller = controller;
         Set<Instance> keys = duplicate.keySet();
@@ -111,23 +113,23 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
             Instance tmpInstance = relatedInstances.get(instances.get(row)).get(tmpIndex);
             ArrayList<Instance> toCheck = backRelation.get(tmpInstance);
             /*for (Instance tmp : toCheck) {
-                if (toLink.containsKey(tmp.getId()) && toLink.get(tmp.getId()).contains(tmpInstance)) {
-                    check = false;
-                }
+            if (toLink.containsKey(tmp.getId()) && toLink.get(tmp.getId()).contains(tmpInstance)) {
+            check = false;
+            }
             }*/
 
             if (check) {
                 if ((Boolean) value) {
                     if (toLink.containsKey(instances.get(row).getId())) {
-                        toLink.get(instances.get(row).getId()).add(tmpInstance);            
-                    }else {
-                         ArrayList<Instance> tmpList = new ArrayList<Instance>();
-                         tmpList.add(tmpInstance);
-                         toLink.put(instances.get(row).getId(), tmpList);                                
+                        toLink.get(instances.get(row).getId()).add(tmpInstance);
+                    } else {
+                        ArrayList<Instance> tmpList = new ArrayList<Instance>();
+                        tmpList.add(tmpInstance);
+                        toLink.put(instances.get(row).getId(), tmpList);
                     }
                 } else {
                     toLink.get(instances.get(row).getId()).remove(tmpInstance);
-                    if(toLink.get(instances.get(row).getId()).isEmpty()){
+                    if (toLink.get(instances.get(row).getId()).isEmpty()) {
                         toLink.remove(instances.get(row).getId());
                     }
                 }
@@ -166,11 +168,11 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
      * @param instance 
      */
     public void removeDups(Instance instance) {
-        Set<Instance> keySet = backRelation.keySet();
-        ArrayList<Instance> toRemove = backRelation.get(instance);
-        for (Instance remove : toRemove) {
-            instances.remove(remove);
-            relatedInstances.remove(remove);
+       ArrayList<Instance> toRemove = backRelation.get(instance);
+       if(toRemove == null)
+           return;
+       for (Instance remove : toRemove) {
+            relatedInstances.get(remove).remove(instance);
             toLink.remove(remove.getId());
         }
         backRelation.remove(instance);
@@ -179,7 +181,7 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
 
     /**
      * 
-     * @return 
+     * @return All user specified links between error causing and duplicate instances.
      */
     public HashMap<Integer, ArrayList<Instance>> getSelected() {
         return toLink;
@@ -191,12 +193,64 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
      * @return true if the given Instance-object is linked to an duplicate Instance else false
      */
     public boolean isLinked(Instance linked) {
-      ArrayList<Instance> tmp = backRelation.get(linked);
-      for(Instance inst : tmp){
-          if(toLink.get(inst.getId()) != null){
-              return true;
-          }
-      }
-      return false;
+        ArrayList<Instance> tmp = backRelation.get(linked);
+        if(tmp == null)
+         return false;
+        for (Instance inst : tmp) {
+            if (toLink.get(inst.getId()) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks and adds the given instance to the table if the table contains an instance with the same
+     * md5sum or name.
+     * @param add The instance object to check.
+     */
+    public void checkNewAdded(Instance add) {
+        Set<Instance> keySet = backRelation.keySet();
+        Boolean added = false;
+        for (Instance inst : keySet) {
+            if (inst.getName().equals(add.getName()) || inst.getMd5().equals(add.getMd5())) {
+                added = true;
+                ArrayList<Instance> tmp = backRelation.get(inst);
+                tmp.add(add);
+                backRelation.remove(inst);
+                backRelation.put(inst, tmp);
+                if (relatedInstances.containsKey(inst)) {
+                    ArrayList<Instance> tmpRI = relatedInstances.get(add);
+                    tmpRI.add(inst);
+                    relatedInstances.remove(add);
+                    relatedInstances.put(add, tmpRI);
+
+                } else {
+                    ArrayList<Instance> tmpRI = new ArrayList<Instance>();
+                    tmpRI.add(inst);
+                    relatedInstances.put(add, tmpRI);
+                }
+
+            }
+        }
+        if (added) {
+            instances.add(add);
+        }
+    }
+
+    public boolean dupName(int row, Instance toAddSelectedInstance, int column) {
+        if (column == 0) {
+            return getValueAt(row, 0).equals(toAddSelectedInstance.getName());
+        } else {
+            return false;
+        }
+    }
+
+    public boolean dupMd5(int row, Instance toAddSelectedInstance, int column) {
+        if (column == 1) {
+            return getValueAt(row, 1).equals(toAddSelectedInstance.getMd5());
+        } else {
+            return false;
+        }
     }
 }

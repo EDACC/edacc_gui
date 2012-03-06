@@ -8,6 +8,7 @@ package edacc.properties;
 import edacc.EDACCSelectPropertyValueTypeClassDialog;
 import edacc.model.NoConnectionToDBException;
 import edacc.satinstances.PropertyValueType;
+import edacc.satinstances.PropertyValueTypeAlreadyExistsException;
 import edacc.satinstances.PropertyValueTypeManager;
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class SelectPropertyValueTypeClassController {
         this.tablePropertyValueTypes = tablePropertyValueTypes;
     }
 
-    public void addPropertyValueTypes(int[] selectedRows, File file) throws IOException, NoConnectionToDBException, SQLException {
+    public void addPropertyValueTypes(int[] selectedRows, File file) throws IOException, NoConnectionToDBException, SQLException, PropertyValueTypeAlreadyExistsException {
         Vector<String> toAdd = new Vector<String>();
         for(int i = 0; i < selectedRows.length; i++){
             toAdd.add((String)((PropertyValueTypeSelectionModel)tablePropertyValueTypes.getModel()).getValueAt(selectedRows[i], 0));

@@ -1,6 +1,7 @@
 package edacc.model;
 
 import edacc.EDACCApp;
+import edacc.satinstances.PropertyValueTypeAlreadyExistsException;
 import edacc.satinstances.PropertyValueTypeManager;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +12,8 @@ import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * singleton class handling the database connection.
@@ -395,7 +398,11 @@ public class DatabaseConnector extends Observable {
         st.close();
 
         task.setStatus("Adding default property value types");
-        PropertyValueTypeManager.getInstance().addDefaultToDB();
+        try {
+            PropertyValueTypeManager.getInstance().addDefaultToDB();
+        } catch (PropertyValueTypeAlreadyExistsException ex) {
+            Logger.getLogger(DatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void executeSqlScript(Tasks task, InputStream in) throws IOException, SQLException {

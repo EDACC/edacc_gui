@@ -11,17 +11,21 @@
 
 package edacc;
 
+import edacc.manageDB.FileNameTableModel;
 import edacc.model.NoConnectionToDBException;
 import edacc.properties.PropertyValueTypeSelectionModel;
 import edacc.properties.PropertyValueTypeTableModel;
 import edacc.properties.SelectPropertyValueTypeClassController;
 import edacc.satinstances.PropertyValueType;
+import edacc.satinstances.PropertyValueTypeAlreadyExistsException;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
@@ -159,6 +163,7 @@ public class EDACCSelectPropertyValueTypeClassDialog extends javax.swing.JDialog
     }//GEN-LAST:event_buttonDoneActionPerformed
 
     private void buttonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAddActionPerformed
+        ArrayList<String> duplicateEntry = new ArrayList<String>();
         int[] selectedRows = tablePropertyValueTypes.getSelectedRows();
         if(selectedRows.length == 0){
             JOptionPane.showMessageDialog(this,
@@ -170,8 +175,21 @@ public class EDACCSelectPropertyValueTypeClassDialog extends javax.swing.JDialog
                 selectedRows[i] = tablePropertyValueTypes.convertRowIndexToModel(selectedRows[i]);
             }
             try {
-                controller.addPropertyValueTypes(selectedRows, file);
+                try {
+                    controller.addPropertyValueTypes(selectedRows, file);
+                } catch (PropertyValueTypeAlreadyExistsException ex) {
+                    //Logger.getLogger(EDACCSelectPropertyValueTypeClassDialog.class.getName()).log(Level.SEVERE, null, ex);
+                    duplicateEntry = ex.getDuplicateEntry();
+                }
                 this.setVisible(false);
+                if(!duplicateEntry.isEmpty()){
+                    JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+                    FileNameTableModel tableModel = new FileNameTableModel();
+                    tableModel.setAll(duplicateEntry);
+                    EDACCExtWarningErrorDialog errorDialog = new EDACCExtWarningErrorDialog(mainFrame, true, false, tableModel, "Following property value types generate an duplicate name error in the database.");
+                    errorDialog.setLocationRelativeTo(mainFrame);
+                    errorDialog.setVisible(true);             
+                }
             } catch (IOException ex) {
                 Logger.getLogger(EDACCSelectPropertyValueTypeClassDialog.class.getName()).log(Level.SEVERE, null, ex);
             } catch (NoConnectionToDBException ex) {
