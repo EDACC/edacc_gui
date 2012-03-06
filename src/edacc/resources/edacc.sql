@@ -256,6 +256,7 @@ CREATE  TABLE IF NOT EXISTS `gridQueue` (
   `name` VARCHAR(255) NOT NULL ,
   `location` VARCHAR(255) NULL ,
   `numCPUs` INT NOT NULL ,
+  `numCPUsPerJob` INT NOT NULL ,
   `description` TEXT NULL ,
   `numCores` INT NULL ,
   `numThreads` INT NULL ,

@@ -49,16 +49,16 @@ public class GridQueueDAO {
         PreparedStatement ps;
         if (q.isNew()) {
             // insert query, set ID!
-            final String insertQuery = "INSERT INTO " + table + " (name, location, numCPUs, description) "
+            final String insertQuery = "INSERT INTO " + table + " (name, location, numCPUs, numCPUsPerJob, description) "
                     + "VALUES (?, ?, ?, ?)";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
         } else if (q.isModified()) {
             // update query
-            final String updateQuery = "UPDATE " + table + " SET name=?, location=?, numCPUs=?, description=? "
+            final String updateQuery = "UPDATE " + table + " SET name=?, location=?, numCPUs=?, numCPUsPerJob=?, description=? "
                     + "WHERE idgridQueue=?";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
 
-            ps.setInt(5, q.getId());
+            ps.setInt(6, q.getId());
 
         } else {
             return;
@@ -67,7 +67,8 @@ public class GridQueueDAO {
         ps.setString(1, q.getName());
         ps.setString(2, q.getLocation());
         ps.setInt(3, q.getNumCPUs());
-        ps.setString(4, q.getDescription());
+        ps.setInt(4, q.getNumCPUsPerJob());
+        ps.setString(5, q.getDescription());
 
         ps.executeUpdate();
 
@@ -102,6 +103,7 @@ public class GridQueueDAO {
         q.setName(rs.getString("name"));
         q.setDescription(rs.getString("description"));
         q.setNumCPUs(rs.getInt("numCPUs"));
+        q.setNumCPUsPerJob(rs.getInt("numCPUsPerJob"));
         q.setCPUName(rs.getString("CPUName"));
         q.setCacheSize(rs.getInt("cacheSize"));
         q.setCpuflags(rs.getString("cpuflags"));

@@ -3714,6 +3714,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     @Override
     public void onTaskFailed(String methodName, Throwable e) {
         if (methodName.equals("loadExperiment")) {
+            System.out.println("THIS MIGHT BE OUR LOAD EXPERIMENT BUG");
+            e.printStackTrace();
             expController.unloadExperiment();
         }
         if (e instanceof TaskCancelledException) {

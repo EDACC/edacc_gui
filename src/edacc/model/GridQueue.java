@@ -16,6 +16,7 @@ public class GridQueue extends BaseModel implements IntegerPKModel {
     private String name;
     private String location;
     private int numCPUs;
+    private int numCPUsPerJob;
     private String description;
     private int numCores;
     private int numThreads;
@@ -80,6 +81,17 @@ public class GridQueue extends BaseModel implements IntegerPKModel {
 
     public void setNumCPUs(int numCPUs) {
         this.numCPUs = numCPUs;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public int getNumCPUsPerJob() {
+        return numCPUsPerJob;
+    }
+
+    public void setNumCPUsPerJob(int numCPUsPerJob) {
+        this.numCPUsPerJob = numCPUsPerJob;
         if (this.isSaved()) {
             this.setModified();
         }
