@@ -50,7 +50,7 @@ public class GridQueueDAO {
         if (q.isNew()) {
             // insert query, set ID!
             final String insertQuery = "INSERT INTO " + table + " (name, location, numCPUs, numCPUsPerJob, description) "
-                    + "VALUES (?, ?, ?, ?)";
+                    + "VALUES (?, ?, ?, ?, ?)";
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
         } else if (q.isModified()) {
             // update query
