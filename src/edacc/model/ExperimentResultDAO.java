@@ -33,12 +33,12 @@ public class ExperimentResultDAO {
     protected static final String outputTable = "ExperimentResultsOutput";
     protected static final String insertQuery = "INSERT INTO " + table + " (SolverConfig_idSolverConfig, Experiment_idExperiment,"
             + "Instances_idInstance, run, status, seed, "
-            + "startTime, priority, resultTime, computeQueue, resultCode, CPUTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit) "
-            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            + "startTime, priority, resultTime, wallTime, computeQueue, resultCode, CPUTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit) "
+            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     protected static final String insertOutputsQuery = "INSERT INTO " + outputTable + " (ExperimentResults_idJob, solverOutput, launcherOutput, watcherOutput, verifierOutput, solverExitCode, watcherExitCode, verifierExitCode) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idJob=?";
     protected static final String selectQuery = "SELECT SolverConfig_idSolverConfig, Experiment_idExperiment, Instances_idInstance, "
-            + "idJob, run, seed, status, resultTime, resultCode, "
+            + "idJob, run, seed, status, resultTime, wallTime, resultCode, "
             //   + "solverExitCode, watcherExitCode, verifierExitCode, "
             + "computeQueue, TIMESTAMPDIFF(SECOND, startTime, NOW()) AS runningTime, "
             + "IF(status = " + StatusCode.RUNNING.getStatusCode() + ", TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), date_modified) AS date_modified,"
@@ -56,14 +56,14 @@ public class ExperimentResultDAO {
             + "dest.verifierExitCode = src.verifierExitCode "
             + "WHERE src.ExperimentResults_idJob = ? AND dest.ExperimentResults_idJob = ?";
 
-    public static ExperimentResult createExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float time, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit) throws SQLException {
-        ExperimentResult r = new ExperimentResult(run, priority, computeQueue, status, seed, resultCode, time, SolverConfigId, ExperimentId, InstanceId, startTime, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit);
+    public static ExperimentResult createExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float resultTime, float wallTime, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit) throws SQLException {
+        ExperimentResult r = new ExperimentResult(run, priority, computeQueue, status, seed, resultCode, resultTime, wallTime, SolverConfigId, ExperimentId, InstanceId, startTime, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit);
         r.setNew();
         return r;
     }
 
-    public static ExperimentResultEx createExperimentResult(int run, int priority, int computeQueue, StatusCode status, ResultCode resultCode, int seed, float time, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
-        ExperimentResultEx r = new ExperimentResultEx(run, priority, computeQueue, status, resultCode, seed, time, SolverConfigId, ExperimentId, InstanceId, startTime, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, solverOutput, launcherOutput, watcherOutput, verifierOutput);
+    public static ExperimentResultEx createExperimentResult(int run, int priority, int computeQueue, StatusCode status, ResultCode resultCode, int seed, float resultTime, float wallTime, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit, byte[] solverOutput, byte[] launcherOutput, byte[] watcherOutput, byte[] verifierOutput) {
+        ExperimentResultEx r = new ExperimentResultEx(run, priority, computeQueue, status, resultCode, seed, resultTime, wallTime, SolverConfigId, ExperimentId, InstanceId, startTime, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit, solverOutput, launcherOutput, watcherOutput, verifierOutput);
         r.setNew();
         return r;
     }
@@ -72,13 +72,13 @@ public class ExperimentResultDAO {
         StringBuilder query = new StringBuilder("INSERT INTO " + table + " "
                 + "(SolverConfig_idSolverConfig, Experiment_idExperiment,"
                 + "Instances_idInstance, run, status, seed, "
-                + "startTime, priority, resultTime, computeQueue, resultCode, "
+                + "startTime, priority, resultTime, wallTime, computeQueue, resultCode, "
                 + "CPUTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit) "
-                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
         count--;
         for (int i = 0; i < count; i++) {
-            query.append(",(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+            query.append(",(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         }
         return query.toString();
     }
@@ -182,6 +182,7 @@ public class ExperimentResultDAO {
                 st.setTimestamp(curCount++, r.getStartTime());
                 st.setInt(curCount++, r.getPriority());
                 st.setFloat(curCount++, r.getResultTime());
+                st.setFloat(curCount++, r.getWallTime());
                 st.setInt(curCount++, r.getComputeQueue());
                 st.setInt(curCount++, r.getResultCode().getResultCode());
 
@@ -541,6 +542,7 @@ public class ExperimentResultDAO {
         r.setSeed(rs.getInt("seed"));
         r.setStatus(StatusCodeDAO.getByStatusCode(rs.getInt("status")));
         r.setResultTime(rs.getFloat("resultTime"));
+        r.setWallTime(rs.getFloat("wallTime"));
         r.setResultCode(ResultCodeDAO.getByResultCode(rs.getInt("resultCode")));
         // r.setSolverExitCode(rs.getInt("solverExitCode"));
         // r.setWatcherExitCode(rs.getInt("watcherExitCode"));
@@ -719,7 +721,7 @@ public class ExperimentResultDAO {
             }
             ExperimentResult er = resultMap.get(rs.getInt(1));
             ExperimentResultEx erx = createExperimentResult(er.getRun(), er.getPriority(), er.getComputeQueue(), er.getStatus(),
-                    er.getResultCode(), er.getSeed(), er.getResultTime(), er.getSolverConfigId(), er.getExperimentId(),
+                    er.getResultCode(), er.getSeed(), er.getResultTime(), er.getWallTime(), er.getSolverConfigId(), er.getExperimentId(),
                     er.getInstanceId(),
                     startTime,
                     er.getCPUTimeLimit(),
@@ -859,7 +861,6 @@ public class ExperimentResultDAO {
             rs.close();
             ps.close();
             totalNumberOfValuesLeftToBatch -= batchSize;
-            ;
         }
         return results;
     }

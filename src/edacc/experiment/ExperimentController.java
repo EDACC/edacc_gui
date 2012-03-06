@@ -79,7 +79,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -767,14 +766,14 @@ public class ExperimentController {
                         if (solverConfigHasSeed.get(c.getId())) {
                             Integer seed = linked_seeds.get(new SeedGroup(c.getSeed_group(), i.getId(), run));
                             if (seed != null) {
-                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, seed.intValue(), ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit));
+                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, seed.intValue(), ResultCode.UNKNOWN, 0, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit));
                             } else {
                                 Integer new_seed = new Integer(generateSeed(maxSeed));
                                 linked_seeds.put(new SeedGroup(c.getSeed_group(), i.getId(), run), new_seed);
-                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, new_seed.intValue(), ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit));
+                                experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, new_seed.intValue(), ResultCode.UNKNOWN, 0, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit));
                             }
                         } else {
-                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, 0, ResultCode.UNKNOWN, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit));
+                            experiment_results.add(ExperimentResultDAO.createExperimentResult(run, 0, 0, StatusCode.NOT_STARTED, 0, ResultCode.UNKNOWN, 0, 0, c.getId(), activeExperiment.getId(), i.getId(), null, cpuTimeLimit, memoryLimit, wallClockTimeLimit, stackSizeLimit));
                         }
                         jobs_added++;
                     }
@@ -1763,7 +1762,7 @@ public class ExperimentController {
                             }
                             if (contains) {
                                 resultsToImport.add(er);
-                                importedResults.add(ExperimentResultDAO.createExperimentResult(firstRun++, er.getPriority(), er.getComputeQueue(), er.getStatus(), er.getSeed(), er.getResultCode(), er.getResultTime(), mapHisScToMySc.get(sc.getId()), activeExperiment.getId(), er.getInstanceId(), er.getStartTime(), er.getCPUTimeLimit(), er.getMemoryLimit(), er.getWallClockTimeLimit(), er.getStackSizeLimit()));
+                                importedResults.add(ExperimentResultDAO.createExperimentResult(firstRun++, er.getPriority(), er.getComputeQueue(), er.getStatus(), er.getSeed(), er.getResultCode(), er.getResultTime(), er.getWallTime(), mapHisScToMySc.get(sc.getId()), activeExperiment.getId(), er.getInstanceId(), er.getStartTime(), er.getCPUTimeLimit(), er.getMemoryLimit(), er.getWallClockTimeLimit(), er.getStackSizeLimit()));
                             }
                         }
                         seedGroupFirstRun.put(solverConfig.getSeed_group(), firstRun);
