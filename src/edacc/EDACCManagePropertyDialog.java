@@ -135,6 +135,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         buttonExportProperty = new javax.swing.JButton();
         buttonImportProperty = new javax.swing.JButton();
         buttonDone = new javax.swing.JButton();
+        buttonImportCSV = new javax.swing.JButton();
 
         jFileChooser1.setName("jFileChooser1"); // NOI18N
 
@@ -291,15 +292,15 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                         .addGap(18, 18, 18)
                         .addComponent(labelComputationMethodParameters)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(textFieldComputationmethodParameter, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE))
+                        .addComponent(textFieldComputationmethodParameter, javax.swing.GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE))
                     .addGroup(panelManagePropertyEditInputLayout.createSequentialGroup()
                         .addComponent(comboBoxPropertyValuetype, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(buttonPropertyAddValueType, javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE))
                     .addComponent(checkBoxMultipleOccurrences)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 586, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 586, Short.MAX_VALUE)
-                    .addComponent(textPropertyFieldName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 586, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 636, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 636, Short.MAX_VALUE)
+                    .addComponent(textPropertyFieldName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 636, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -371,7 +372,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         panelManagerPropertyEditLayout.setHorizontalGroup(
             panelManagerPropertyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManagerPropertyEditLayout.createSequentialGroup()
-                .addContainerGap(707, Short.MAX_VALUE)
+                .addContainerGap(711, Short.MAX_VALUE)
                 .addComponent(buttonSaveProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         panelManagerPropertyEditLayout.setVerticalGroup(
@@ -388,16 +389,16 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManagePropertyLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelManagePropertyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 787, Short.MAX_VALUE)
+                    .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 791, Short.MAX_VALUE)
                     .addComponent(panelManagePropertyEditInput, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelManagerPropertyEdit, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 787, Short.MAX_VALUE))
+                    .addComponent(panelManagerPropertyEdit, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 791, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelManagePropertyLayout.setVerticalGroup(
             panelManagePropertyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelManagePropertyLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
+                .addComponent(panelManageSolverPropertyTable, javax.swing.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(panelManagePropertyEditInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -447,6 +448,14 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             }
         });
 
+        buttonImportCSV.setText(resourceMap.getString("buttonImportCSV.text")); // NOI18N
+        buttonImportCSV.setName("buttonImportCSV"); // NOI18N
+        buttonImportCSV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonImportCSVActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelManageSolverPropertyShowButtonsLayout = new javax.swing.GroupLayout(panelManageSolverPropertyShowButtons);
         panelManageSolverPropertyShowButtons.setLayout(panelManageSolverPropertyShowButtonsLayout);
         panelManageSolverPropertyShowButtonsLayout.setHorizontalGroup(
@@ -460,12 +469,14 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 .addComponent(buttonExportProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(buttonImportProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 363, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(buttonImportCSV)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 248, Short.MAX_VALUE)
                 .addComponent(buttonDone, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
-        panelManageSolverPropertyShowButtonsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {buttonExportProperty, buttonImportProperty, buttonNewProperty, buttonRemoveProperty});
+        panelManageSolverPropertyShowButtonsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {buttonExportProperty, buttonImportCSV, buttonImportProperty, buttonNewProperty, buttonRemoveProperty});
 
         panelManageSolverPropertyShowButtonsLayout.setVerticalGroup(
             panelManageSolverPropertyShowButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -476,11 +487,12 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                     .addComponent(buttonRemoveProperty)
                     .addComponent(buttonExportProperty)
                     .addComponent(buttonImportProperty)
-                    .addComponent(buttonDone))
+                    .addComponent(buttonDone)
+                    .addComponent(buttonImportCSV))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        panelManageSolverPropertyShowButtonsLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {buttonExportProperty, buttonImportProperty, buttonNewProperty, buttonRemoveProperty});
+        panelManageSolverPropertyShowButtonsLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {buttonExportProperty, buttonImportCSV, buttonImportProperty, buttonNewProperty, buttonRemoveProperty});
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -681,6 +693,10 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         controller.importProperty(files);
     }//GEN-LAST:event_buttonImportPropertyActionPerformed
 
+    private void buttonImportCSVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonImportCSVActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_buttonImportCSVActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -703,6 +719,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     private javax.swing.JButton buttonDone;
     private javax.swing.JButton buttonExportProperty;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton buttonImportCSV;
     private javax.swing.JButton buttonImportProperty;
     private javax.swing.JButton buttonNewComputationMethod;
     private javax.swing.JButton buttonNewProperty;

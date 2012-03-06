@@ -487,7 +487,9 @@
                   <Component id="buttonExportProperty" linkSize="1" min="-2" pref="80" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="buttonImportProperty" linkSize="1" min="-2" pref="80" max="-2" attributes="0"/>
-                  <EmptySpace pref="373" max="32767" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="buttonImportCSV" linkSize="1" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="248" max="32767" attributes="0"/>
                   <Component id="buttonDone" min="-2" pref="80" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -503,6 +505,7 @@
                       <Component id="buttonExportProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="buttonImportProperty" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="buttonDone" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="buttonImportCSV" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -553,6 +556,15 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonDoneActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="buttonImportCSV">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="buttonImportCSV.text"/>
+            <Property name="name" type="java.lang.String" value="buttonImportCSV" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonImportCSVActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
