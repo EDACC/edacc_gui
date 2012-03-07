@@ -1,6 +1,6 @@
 <?xml version="1.1" encoding="UTF-8" ?>
 
-<Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+<Form version="1.6" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
     <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
@@ -73,7 +73,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="jSplitPane1" pref="364" max="32767" attributes="0"/>
+                  <Component id="jSplitPane1" pref="402" max="32767" attributes="0"/>
                   <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jBtnImport" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -120,7 +120,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane2" pref="306" max="32767" attributes="0"/>
+                          <Component id="jScrollPane2" pref="344" max="32767" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="jBtnManageProperties" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -159,6 +159,9 @@
                     <Property name="text" type="java.lang.String" resourceKey="jBtnManageProperties.text"/>
                     <Property name="name" type="java.lang.String" value="jBtnManageProperties" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBtnManagePropertiesActionPerformed"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>
@@ -177,11 +180,12 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="103" groupAlignment="1" attributes="0">
                               <Component id="jScrollPane1" alignment="0" pref="229" max="32767" attributes="0"/>
+                              <Component id="jRBtnOverwrite" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="jRBtnOverwrite" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="31" max="32767" attributes="0"/>
+                                  <Component id="jRBtnAutoCreate" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
                                   <Component id="jBtnDrop" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
@@ -193,10 +197,12 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane1" pref="306" max="32767" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="jScrollPane1" pref="328" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="jRBtnOverwrite" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jRBtnOverwrite" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jRBtnAutoCreate" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jBtnDrop" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -226,6 +232,9 @@
                           </Table>
                         </Property>
                         <Property name="name" type="java.lang.String" value="jTableCSVProp" noResource="true"/>
+                        <Property name="selectionModel" type="javax.swing.ListSelectionModel" editor="org.netbeans.modules.form.editors2.JTableSelectionModelEditor">
+                          <JTableSelectionModel selectionMode="0"/>
+                        </Property>
                       </Properties>
                     </Component>
                   </SubComponents>
@@ -243,6 +252,12 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" resourceKey="jRBtnOverwrite.text"/>
                     <Property name="name" type="java.lang.String" value="jRBtnOverwrite" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JRadioButton" name="jRBtnAutoCreate">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="jRBtnAutoCreate.text"/>
+                    <Property name="name" type="java.lang.String" value="jRBtnAutoCreate" noResource="true"/>
                   </Properties>
                 </Component>
               </SubComponents>

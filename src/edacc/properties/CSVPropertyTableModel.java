@@ -33,7 +33,7 @@ public class CSVPropertyTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
-            case 0:
+            case 0:               
                 return csvProps.get(rowIndex);
             default:
                 return "";

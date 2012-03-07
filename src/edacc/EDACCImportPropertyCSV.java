@@ -10,9 +10,19 @@
  */
 package edacc;
 
-import edacc.model.PropertyDAO;
+import edacc.properties.SystemPropertyTableRenderer;
+import edacc.properties.CSVPropertyTableRenderer;
+import edacc.properties.CSVPropertyTableModel;
+import edacc.properties.ImportCSVPropSelectionListener;
 import edacc.properties.ImportPropertyCSVController;
+import edacc.properties.SystemPropertyTableModel;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -48,6 +58,7 @@ public class EDACCImportPropertyCSV extends javax.swing.JDialog {
         jTableCSVProp = new javax.swing.JTable();
         jBtnDrop = new javax.swing.JButton();
         jRBtnOverwrite = new javax.swing.JRadioButton();
+        jRBtnAutoCreate = new javax.swing.JRadioButton();
         jBtnDone = new javax.swing.JButton();
         jBtnImport = new javax.swing.JButton();
 
@@ -81,6 +92,11 @@ public class EDACCImportPropertyCSV extends javax.swing.JDialog {
 
         jBtnManageProperties.setText(resourceMap.getString("jBtnManageProperties.text")); // NOI18N
         jBtnManageProperties.setName("jBtnManageProperties"); // NOI18N
+        jBtnManageProperties.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnManagePropertiesActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelSystemProprtiesLayout = new javax.swing.GroupLayout(jPanelSystemProprties);
         jPanelSystemProprties.setLayout(jPanelSystemProprtiesLayout);
@@ -97,7 +113,7 @@ public class EDACCImportPropertyCSV extends javax.swing.JDialog {
             jPanelSystemProprtiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelSystemProprtiesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jBtnManageProperties)
                 .addContainerGap())
@@ -121,6 +137,7 @@ public class EDACCImportPropertyCSV extends javax.swing.JDialog {
             }
         ));
         jTableCSVProp.setName("jTableCSVProp"); // NOI18N
+        jTableCSVProp.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(jTableCSVProp);
 
         jBtnDrop.setText(resourceMap.getString("jBtnDrop.text")); // NOI18N
@@ -134,17 +151,21 @@ public class EDACCImportPropertyCSV extends javax.swing.JDialog {
         jRBtnOverwrite.setText(resourceMap.getString("jRBtnOverwrite.text")); // NOI18N
         jRBtnOverwrite.setName("jRBtnOverwrite"); // NOI18N
 
+        jRBtnAutoCreate.setText(resourceMap.getString("jRBtnAutoCreate.text")); // NOI18N
+        jRBtnAutoCreate.setName("jRBtnAutoCreate"); // NOI18N
+
         javax.swing.GroupLayout jPanelCSVPropertiesLayout = new javax.swing.GroupLayout(jPanelCSVProperties);
         jPanelCSVProperties.setLayout(jPanelCSVPropertiesLayout);
         jPanelCSVPropertiesLayout.setHorizontalGroup(
             jPanelCSVPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelCSVPropertiesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanelCSVPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
-                    .addGroup(jPanelCSVPropertiesLayout.createSequentialGroup()
-                        .addComponent(jRBtnOverwrite)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                .addGroup(jPanelCSVPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
+                    .addComponent(jRBtnOverwrite, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelCSVPropertiesLayout.createSequentialGroup()
+                        .addComponent(jRBtnAutoCreate)
+                        .addGap(29, 29, 29)
                         .addComponent(jBtnDrop)))
                 .addContainerGap())
         );
@@ -152,10 +173,12 @@ public class EDACCImportPropertyCSV extends javax.swing.JDialog {
             jPanelCSVPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelCSVPropertiesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jRBtnOverwrite)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelCSVPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jRBtnOverwrite)
+                    .addComponent(jRBtnAutoCreate)
                     .addComponent(jBtnDrop))
                 .addContainerGap())
         );
@@ -195,7 +218,7 @@ public class EDACCImportPropertyCSV extends javax.swing.JDialog {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 364, Short.MAX_VALUE)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBtnImport)
@@ -228,12 +251,23 @@ public class EDACCImportPropertyCSV extends javax.swing.JDialog {
     }//GEN-LAST:event_jBtnDoneActionPerformed
 
     private void jBtnDropActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDropActionPerformed
-        controller.dropCSVProp(jTableCSVProp.convertRowIndexToModel(jTableCSVProp.getSelectedRow()));
+        if (jTableCSVProp.getSelectedRowCount() == 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Nothing is selected. Select a property to drop.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } else {
+            controller.dropCSVProp(jTableCSVProp.convertRowIndexToModel(jTableCSVProp.getSelectedRow()));
+        }
     }//GEN-LAST:event_jBtnDropActionPerformed
 
     private void jBtnImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnImportActionPerformed
         controller.importCSVData(jRBtnOverwrite.isSelected());
     }//GEN-LAST:event_jBtnImportActionPerformed
+
+    private void jBtnManagePropertiesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnManagePropertiesActionPerformed
+        controller.ManageProperties();
+    }//GEN-LAST:event_jBtnManagePropertiesActionPerformed
 
     /**
      * @param args the command line arguments
@@ -255,13 +289,28 @@ public class EDACCImportPropertyCSV extends javax.swing.JDialog {
     }
 
     public void initialize(File csvFile) {
-        controller = new ImportPropertyCSVController(this, csvFile);
+        try {
+            controller = new ImportPropertyCSVController(this, csvFile);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(EDACCImportPropertyCSV.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(EDACCImportPropertyCSV.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         // init jTableCSVProp
         jTableCSVProp.setModel(controller.getCsvPropTableModel());
+        jTableCSVProp.setRowSorter(new TableRowSorter<CSVPropertyTableModel>(controller.getCsvPropTableModel()));
+        jTableCSVProp.getSelectionModel().addListSelectionListener(new ImportCSVPropSelectionListener(controller));
+        CSVPropertyTableRenderer csvPropRenderer = new CSVPropertyTableRenderer(controller);
+        jTableCSVProp.setDefaultRenderer(String.class, csvPropRenderer);
 
         // init jTableSysProp
         jTableSysProp.setModel(controller.getSysPropTableModel());
+        jTableSysProp.setRowSorter(new TableRowSorter<SystemPropertyTableModel>(controller.getSysPropTableModel()));
+        SystemPropertyTableRenderer sysPropRenderer = new SystemPropertyTableRenderer(controller);
+        jTableSysProp.setDefaultRenderer(String.class, sysPropRenderer);
+        
+        controller.refreshTables();
 
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -272,6 +321,7 @@ public class EDACCImportPropertyCSV extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanelCSVProperties;
     private javax.swing.JPanel jPanelSystemProprties;
+    private javax.swing.JRadioButton jRBtnAutoCreate;
     private javax.swing.JRadioButton jRBtnOverwrite;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -281,6 +331,13 @@ public class EDACCImportPropertyCSV extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
 
     public int getSelectedCSVPropertyRow() {
+        if (jTableCSVProp.getSelectedRow() == -1) {
+            return -1;
+        }
         return jTableCSVProp.convertRowIndexToModel(jTableCSVProp.getSelectedRow());
+    }
+
+    public void setSelectedCSVPropertyRow(int save) {
+        jTableCSVProp.setRowSelectionInterval(save, save);
     }
 }

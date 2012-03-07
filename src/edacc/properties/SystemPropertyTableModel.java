@@ -33,6 +33,10 @@ public class SystemPropertyTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
+        String selectedCSVProp = controller.getSelectedCSVProperty();
+        if (selectedCSVProp.equals("")) {
+            return 0;
+        }
         return properties.size();
     }
 
@@ -43,14 +47,18 @@ public class SystemPropertyTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+        String selectedCSVProp = controller.getSelectedCSVProperty();
+
         switch (columnIndex) {
             case 0:
                 return properties.get(rowIndex).getName();
             case 1:
                 return properties.get(rowIndex).getType().name();
             case 2:
+
                 if (selected.containsKey(properties.get(rowIndex))) {
-                    if ((selected.get(properties.get(rowIndex))).equals(controller.getSelectedCSVProperty())) {
+
+                    if ((selected.get(properties.get(rowIndex))).equals(selectedCSVProp)) {
                         return true;
                     } else {
                         return false;
@@ -70,10 +78,19 @@ public class SystemPropertyTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int col) {
+        String csvProp = controller.getSelectedCSVProperty();
         if (col == 2) {
-            selected.put(properties.get(row), controller.getSelectedCSVProperty());
+            for(Entry ent : selected.entrySet()){
+                if(ent.getValue().equals(csvProp)){
+                    selected.remove(ent.getKey());
+                    break;
+                }
+                 
+            }
+            selected.put(properties.get(row), csvProp);
         }
         this.fireTableCellUpdated(row, col);
+        controller.refreshCSVPropTable();
     }
 
     @Override
@@ -96,5 +113,25 @@ public class SystemPropertyTableModel extends AbstractTableModel {
 
     public Set<Entry<Property, String>> getSelected() {
         return selected.entrySet();
+    }
+
+    public void updateProperties(ArrayList<Property> properties) {
+        this.properties = properties;
+        HashMap<Property,String> tmp = (HashMap<Property,String>) selected.clone();
+        selected = new HashMap<Property, String>();
+        for(Property prop : properties){
+           if(tmp.containsKey(prop)){
+               selected.put(prop, tmp.get(prop));
+           }
+        }
+        
+    }
+
+    public boolean isSelected(String CSVPropToCheck) {
+        return selected.containsValue(CSVPropToCheck); 
+    }
+
+    public boolean propertyAlreadyChoosen(int convertRowIndexToModel) {
+        return selected.containsKey(properties.get(convertRowIndexToModel));
     }
 }
