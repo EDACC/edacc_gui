@@ -20,6 +20,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,6 +37,8 @@ public class InstanceDAO {
 
     protected static final String table = "Instances";
     private static final ObjectCache<Instance> cache = new ObjectCache<Instance>();
+    // HashMap<Instance name, HashMap<Instance md5, Instance id>>
+    private static HashMap<String, HashMap<String, Integer>> nameMd5Cache = new HashMap<String, HashMap<String, Integer>>();
 
     private static String getPropertySelect(Vector<Property> props) {
         String select = " ";
@@ -121,6 +125,7 @@ public class InstanceDAO {
             ps.setInt(1, i.getId());
             ps.executeUpdate();
             cache.remove(i);
+            nameMd5Cache.remove(i.getName());
             i.setDeleted();
             ps.close();
         } else {
@@ -167,6 +172,15 @@ public class InstanceDAO {
                     instance.setId(rs.getInt(1));
                 }
                 cache.cache(instance);
+                if (nameMd5Cache.containsKey(instance.getName())) {
+                    HashMap<String, Integer> tmp = nameMd5Cache.get(instance.getName());
+                    tmp.put(instance.getMd5(), instance.getId());
+                    nameMd5Cache.put(instance.getName(), tmp);
+                } else {
+                    HashMap<String, Integer> tmp = new HashMap<String, Integer>();
+                    tmp.put(instance.getMd5(), instance.getId());
+                    nameMd5Cache.put(instance.getName(), tmp);
+                }
 
                 ps.close();
                 instance.setSaved();
@@ -244,6 +258,15 @@ public class InstanceDAO {
                     instance.setId(rs.getInt(1));
                 }
                 cache.cache(instance);
+                if (nameMd5Cache.containsKey(instance.getName())) {
+                    HashMap<String, Integer> tmp = nameMd5Cache.get(instance.getName());
+                    tmp.put(instance.getMd5(), instance.getId());
+                    nameMd5Cache.put(instance.getName(), tmp);
+                } else {
+                    HashMap<String, Integer> tmp = new HashMap<String, Integer>();
+                    tmp.put(instance.getMd5(), instance.getId());
+                    nameMd5Cache.put(instance.getName(), tmp);
+                }
 
                 ps.close();
                 instance.setSaved();
@@ -311,6 +334,15 @@ public class InstanceDAO {
                     instance.setId(rs.getInt(1));
                 }
                 cache.cache(instance);
+                if (nameMd5Cache.containsKey(instance.getName())) {
+                    HashMap<String, Integer> tmp = nameMd5Cache.get(instance.getName());
+                    tmp.put(instance.getMd5(), instance.getId());
+                    nameMd5Cache.put(instance.getName(), tmp);
+                } else {
+                    HashMap<String, Integer> tmp = new HashMap<String, Integer>();
+                    tmp.put(instance.getMd5(), instance.getId());
+                    nameMd5Cache.put(instance.getName(), tmp);
+                }
 
                 ps.close();
                 instance.setSaved();
@@ -381,6 +413,16 @@ public class InstanceDAO {
             Instance i = getInstance(rs, props);
             i.setSaved();
             cache.cache(i);
+            if (nameMd5Cache.containsKey(i.getName())) {
+                HashMap<String, Integer> tmp = nameMd5Cache.get(i.getName());
+                tmp.put(i.getMd5(), i.getId());
+                nameMd5Cache.put(i.getName(), tmp);
+            } else {
+                HashMap<String, Integer> tmp = new HashMap<String, Integer>();
+                tmp.put(i.getMd5(), i.getId());
+                nameMd5Cache.put(i.getName(), tmp);
+            }
+
             res.add(i);
         }
         rs.close();
@@ -601,6 +643,7 @@ public class InstanceDAO {
         ps.executeUpdate();
         for (int i = 0; i < lastRelated.size(); i++) {
             cache.remove(lastRelated.get(i));
+            nameMd5Cache.remove(lastRelated.get(i).getName());
             lastRelated.get(i).setDeleted();
         }
     }
@@ -768,24 +811,20 @@ public class InstanceDAO {
     }
 
     public static Instance getByMd5AndName(String name, String md5) throws SQLException {
-        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idInstance FROM " + table + " WHERE md5 = ? or name = ?");
-        ps.setString(1, md5);
-        ps.setString(2, name);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            return getById(rs.getInt(1));
+        if (nameMd5Cache.containsKey(name)) {
+            Integer id = nameMd5Cache.get(name).get(md5);
+            if (id == null) {
+                return null;
+            } else {
+                return cache.getCached(id);
+            }
         }
         return null;
     }
 
     public static Instance getByName(String name) throws SQLException {
-        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idInstance FROM " + table + " WHERE name=?");
-        ps.setString(1, name);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            return getById(rs.getInt(1));
+        if (nameMd5Cache.containsKey(name)) {
+            return cache.getCached(new ArrayList<Integer>(nameMd5Cache.get(name).values()).get(0));
         }
         return null;
     }

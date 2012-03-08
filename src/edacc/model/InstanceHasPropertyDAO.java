@@ -304,7 +304,7 @@ public class InstanceHasPropertyDAO {
         try {
             Object check = type.getJavaTypeRepresentation(value);
         } catch (ConvertException ex) {
-            Logger.getLogger(InstanceHasPropertyDAO.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(InstanceHasPropertyDAO.class.getName()).log(Level.SEVERE, null, ex);
             value = null;
         }
 

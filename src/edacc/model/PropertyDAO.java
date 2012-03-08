@@ -460,7 +460,7 @@ public class PropertyDAO {
         }
 
         Boolean hasMD5 = false;;
-        if (fstLine.get(1).equals("md5") || fstLine.get(0).equals("MD5") || fstLine.get(0).equals("Md5")) {
+        if (fstLine.get(1).equals("md5") || fstLine.get(1).equals("MD5") || fstLine.get(1).equals("Md5")) {
             hasMD5 = true;
         }
 
@@ -516,22 +516,24 @@ public class PropertyDAO {
             return null;
         }
 
-        if (fstLine.get(1).equals("md5") || fstLine.get(0).equals("MD5") || fstLine.get(0).equals("Md5")) {
+        if (fstLine.get(1).equals("md5") || fstLine.get(1).equals("MD5") || fstLine.get(1).equals("Md5")) {
             count++;
         }
 
-        for (int i = count; count < fstLine.size(); count++) {
+        for (int i = count; i < fstLine.size(); i++) {
             Boolean tmp = false;
             for (Entry ent : selected) {
                 if (ent.getValue().equals(fstLine.get(i))) {
                     head.add((Property) ent.getKey());
-                    tmp = false;
+                    tmp = true;
                     break;
                 }
+                
             }
             if (!tmp) {
                 head.add(null);
             }
+            
         }
         return head;
     }

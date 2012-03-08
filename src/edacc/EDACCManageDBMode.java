@@ -2042,6 +2042,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         }
         tableInstances.getRowSorter().setSortKeys(newSortKeys);
         edacc.experiment.Util.updateTableColumnWidth(tableInstances);
+        instanceTableModel.fireTableDataChanged();
+        instanceTableModel.updateProperties();
         tableInstances.updateUI();
     }//GEN-LAST:event_btnSelectInstanceColumnsActionPerformed
 
