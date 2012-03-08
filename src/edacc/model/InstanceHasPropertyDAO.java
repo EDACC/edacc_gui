@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -294,5 +296,33 @@ public class InstanceHasPropertyDAO {
     public static void clearCache() {
         cache.clear();
         idCache.clear();
+    }
+
+    public static void createInstanceHasInstanceProperty(Instance i, Property prop, String value, Boolean overwrite) throws SQLException, NoConnectionToDBException, IOException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, InstanceHasPropertyNotInDBException {
+        // Convert value, if an conversionErrorOccures, the value is set to null
+        PropertyValueType type = prop.getPropertyValueType();
+        try {
+            Object check = type.getJavaTypeRepresentation(value);
+        } catch (ConvertException ex) {
+            Logger.getLogger(InstanceHasPropertyDAO.class.getName()).log(Level.SEVERE, null, ex);
+            value = null;
+        }
+
+        // Check if the InstanceHasProperty already exist, modify or create a new one. The result depends on
+        // the Boolean value of overwrite.
+        try {
+            InstanceHasProperty alreadyExist = getByInstanceAndProperty(i, prop);
+            if (overwrite) {
+
+                alreadyExist.setValue(value);
+                save(alreadyExist);
+                alreadyExist.isSaved();
+            }
+        } catch (InstanceHasPropertyNotInDBException ex) {
+            InstanceHasProperty ihp = new InstanceHasProperty(i, prop, value);
+            save(ihp);
+            ihp.isSaved();
+        }
+
     }
 }

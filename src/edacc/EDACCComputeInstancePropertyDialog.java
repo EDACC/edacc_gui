@@ -150,7 +150,7 @@ public class EDACCComputeInstancePropertyDialog extends javax.swing.JDialog impl
 
     private void showProperties() {
         try {
-            Vector<Property> props = PropertyDAO.getAllInstanceProperties();
+            Vector<Property> props = PropertyDAO.getAllInstancePropertiesWithoutCSVImport();
             listProperties.setModel(new PropertyListModel(props));
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "An error occured while trying to load the properties from the DB: \n" + e.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);

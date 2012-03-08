@@ -14,6 +14,10 @@ import javax.swing.table.AbstractTableModel;
 public class CSVPropertyTableModel extends AbstractTableModel {
 
     private ArrayList<String> csvProps;
+
+    public ArrayList<String> getCsvProps() {
+        return csvProps;
+    }
     private String[] columns = {"CSV Property"};
 
     CSVPropertyTableModel(ArrayList<String> csvProps) {

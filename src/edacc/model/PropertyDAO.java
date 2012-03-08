@@ -8,10 +8,12 @@ import edacc.properties.PropertySource;
 import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.PropertyValueType;
 import edacc.satinstances.PropertyValueTypeManager;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -20,6 +22,8 @@ import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
@@ -439,7 +443,109 @@ public class PropertyDAO {
 
     }
 
-    public static void importCSV(Set<Entry<Property, String>> selected, Boolean overwrite, File csvFile) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    public static void importCSV(Set<Entry<Property, String>> selected, Boolean overwrite, File csvFile, Tasks task) throws IOException, SQLException, NoConnectionToDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, InstanceHasPropertyNotInDBException, InstancesNotFoundException {
+        task.setCancelable(true);
+        task.setOperationName("Import properties from csv file");
+
+        ArrayList<String[]> instanceError = new ArrayList<String[]>();
+
+        BufferedReader br = new BufferedReader(new FileReader(csvFile));
+        String firstLine = br.readLine();
+        ArrayList<String> fstLine = new ArrayList<String>(Arrays.asList(firstLine.split(",")));
+        ArrayList<Property> head = generateCSVImportHead(fstLine, selected);
+
+        if (head == null) {
+            task.cancel(true);
+            return;
+        }
+
+        Boolean hasMD5 = false;;
+        if (fstLine.get(1).equals("md5") || fstLine.get(0).equals("MD5") || fstLine.get(0).equals("Md5")) {
+            hasMD5 = true;
+        }
+
+        String line = br.readLine();
+
+        while (line != null) {
+
+            ArrayList<String> tmpLine = new ArrayList<String>(Arrays.asList(line.split(",")));
+
+            Instance tmp;
+            int count = 0;
+            if (hasMD5) {
+                tmp = InstanceDAO.getByMd5AndName(tmpLine.get(0), tmpLine.get(1));
+                count = 2;
+            } else {
+                tmp = InstanceDAO.getByName(tmpLine.get(0));
+                count = 1;
+            }
+
+            if (tmp == null) {
+                if (hasMD5) {
+                    instanceError.add(new String[]{tmpLine.get(0), tmpLine.get(1)});
+                } else {
+                    instanceError.add(new String[]{tmpLine.get(0), ""});
+                }
+            } else {
+                // import property values
+                for (int i = count; i < tmpLine.size(); i++) // Get the matching Instance
+                {
+                    if (head.get((i - count)) != null) {
+                        InstanceHasPropertyDAO.createInstanceHasInstanceProperty(tmp, head.get((i - count)), tmpLine.get(i), overwrite);
+                    }
+                }
+            }
+            line = br.readLine();
+        }
+        if (!instanceError.isEmpty()) {
+            throw new InstancesNotFoundException(instanceError);
+        }
+
+    }
+
+    private static ArrayList<Property> generateCSVImportHead(ArrayList<String> fstLine, Set<Entry<Property, String>> selected) {
+        ArrayList<Property> head = new ArrayList<Property>();
+        if (fstLine.size() < 2) {
+            return null;
+        }
+
+        int count = 0;
+        if (fstLine.get(0).equals("Name") || fstLine.get(0).equals("name") || fstLine.get(0).equals("NAME")) {
+            count++;
+        } else {
+            return null;
+        }
+
+        if (fstLine.get(1).equals("md5") || fstLine.get(0).equals("MD5") || fstLine.get(0).equals("Md5")) {
+            count++;
+        }
+
+        for (int i = count; count < fstLine.size(); count++) {
+            Boolean tmp = false;
+            for (Entry ent : selected) {
+                if (ent.getValue().equals(fstLine.get(i))) {
+                    head.add((Property) ent.getKey());
+                    tmp = false;
+                    break;
+                }
+            }
+            if (!tmp) {
+                head.add(null);
+            }
+        }
+        return head;
+    }
+
+    public static Vector<Property> getAllInstancePropertiesWithoutCSVImport() throws SQLException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, IOException {
+        Vector<Property> res = new Vector<Property>();
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT idProperty FROM " + table + " WHERE PropertyType=0 AND propertySource !=8;");
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            res.add(PropertyDAO.getById(rs.getInt("idProperty")));
+        }
+        rs.close();
+        ps.close();
+        return res;
     }
 }

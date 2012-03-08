@@ -51,7 +51,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     private ManagePropertyController controller;
     private PropertyTableModel propertyTableModel;
     private PropertySource[] ResultPropertySources = {PropertySource.LauncherOutput, PropertySource.SolverOutput, PropertySource.VerifierOutput, PropertySource.WatcherOutput};
-    private PropertySource[] InstancePropertySources = {PropertySource.Instance, PropertySource.InstanceName, PropertySource.ExperimentResults};
+    private PropertySource[] InstancePropertySources = {PropertySource.Instance, PropertySource.InstanceName, PropertySource.ExperimentResults, PropertySource.CSVImport};
     private PropertyType[] propertyTypes = {PropertyType.InstanceProperty, PropertyType.ResultProperty};
     private EDACCManagePropertyValueTypesDialog PropertyValueTypesDialog;
     private boolean editing = false;
@@ -591,14 +591,16 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                     "You must specify a name for the property.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
-        } else if ((textAreaRegularExpressions.getText().equals("") && comboBoxComputationMethod.getSelectedIndex() == -1)
+        } else if (((textAreaRegularExpressions.getText().equals("") && comboBoxComputationMethod.getSelectedIndex() == -1)
                 || (radioBtnComputationMethod.isSelected() && comboBoxComputationMethod.getSelectedIndex() == -1)
                 || (radioBtnRegExpression.isSelected() && textAreaRegularExpressions.getText().equals(""))
-                || (!radioBtnComputationMethod.isSelected() && !radioBtnRegExpression.isSelected())) {
-            JOptionPane.showMessageDialog(this,
-                    "You must specify a regular expression or choose a computation method for the property.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+                || (!radioBtnComputationMethod.isSelected() && !radioBtnRegExpression.isSelected())) && (!this.comboBoxPropertySource.getSelectedItem().equals(PropertySource.CSVImport))) {
+              
+                JOptionPane.showMessageDialog(this,
+                        "You must specify a regular expression or choose a computation method for the property.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            
         } else if (comboBoxPropertySource.getSelectedIndex() == -1) {
             JOptionPane.showMessageDialog(this,
                     "You must select a source for the property.",
@@ -612,17 +614,23 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         } else {
             try {
                 int selectedRow = -1;
-                if(controller.getEditId() != -1){
+                if (controller.getEditId() != -1) {
                     selectedRow = tableProperty.getSelectedRow();
                 }
-                if (radioBtnRegExpression.isSelected()) {
-                    controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), textAreaRegularExpressions.getText(), null, "", (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String) comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
+                if (!this.comboBoxPropertySource.getSelectedItem().equals(PropertySource.CSVImport)) {
+                    if (radioBtnRegExpression.isSelected()) {
+                        controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), textAreaRegularExpressions.getText(), null, "", (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String) comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
 
-                } else if (radioBtnComputationMethod.isSelected()) {
-                    controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), "", (ComputationMethod) ComputationMethodDAO.getByName((String) comboBoxComputationMethod.getSelectedItem()), textFieldComputationmethodParameter.getText(), (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String) comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
+                    } else if (radioBtnComputationMethod.isSelected()) {
+                        controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), "", (ComputationMethod) ComputationMethodDAO.getByName((String) comboBoxComputationMethod.getSelectedItem()), textFieldComputationmethodParameter.getText(), (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String) comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
+                    }
+
+                } else {
+                    controller.saveProperty(textPropertyFieldName.getText(), textAreaPropertyDescription.getText(), (PropertyType) comboBoxPropertyType.getSelectedItem(), "", null, "", (PropertySource) comboBoxPropertySource.getSelectedItem(), (PropertyValueType<?>) PropertyValueTypeManager.getInstance().getPropertyValueTypeByName((String) comboBoxPropertyValuetype.getSelectedItem()), checkBoxMultipleOccurrences.isSelected());
                 }
-                if(selectedRow == -1){
-                    selectedRow = tableProperty.getRowCount()-1;
+
+                if (selectedRow == -1) {
+                    selectedRow = tableProperty.getRowCount() - 1;
                 }
                 tableProperty.setRowSelectionInterval(selectedRow, selectedRow);
             } catch (IOException ex) {
@@ -794,6 +802,13 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 radioBtnComputationMethod.setEnabled(false);
                 buttonNewComputationMethod.setEnabled(false);
                 textFieldComputationmethodParameter.setEnabled(false);
+                comboBoxComputationMethod.setEnabled(false);
+            } else if (this.comboBoxPropertySource.getSelectedItem().equals(PropertySource.CSVImport)) {
+                this.radioBtnComputationMethod.setEnabled(false);
+                this.radioBtnRegExpression.setEnabled(false);
+                this.textAreaRegularExpressions.setEnabled(false);
+                this.textFieldComputationmethodParameter.setEnabled(false);
+                this.buttonNewComputationMethod.setEnabled(false);
                 comboBoxComputationMethod.setEnabled(false);
             } else if (this.comboBoxPropertySource.getSelectedItem().equals(PropertySource.Instance)) {
                 this.radioBtnComputationMethod.setEnabled(true);
@@ -971,7 +986,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         this.textPropertyFieldName.setEnabled(false);
         this.textAreaPropertyDescription.setEnabled(false);
         this.comboBoxComputationMethod.setEnabled(false);
-        this.checkBoxMultipleOccurrences.setEnabled(false);               
+        this.checkBoxMultipleOccurrences.setEnabled(false);
         this.textAreaRegularExpressions.setEnabled(false);
         this.textFieldComputationmethodParameter.setEnabled(false);
         this.buttonNewComputationMethod.setEnabled(false);
@@ -992,7 +1007,7 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(EDACCManagePropertyDialog.class.getName()).log(Level.SEVERE, null, ex);
-        } 
+        }
     }
 
     void loadPropertyValues() {

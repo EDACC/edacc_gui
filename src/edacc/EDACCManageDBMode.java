@@ -2231,8 +2231,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 && p.getHasValue() == hasValue
                 && p.isMandatory() == mandatory
                 && p.getSpace() == space
-                && p.isAttachToPrevious() == attachToPrevious)
+                && p.isAttachToPrevious() == attachToPrevious) {
             return;
+        }
 
         p.setName(name);
         try {
@@ -2555,7 +2556,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     manageDBInstances.setTmp(new Vector<Instance>());
                 }
                 instanceTableModel.addNewInstances(manageDBInstances.getTmp());
-                manageDBInstances.setTmp(new Vector<Instance>());                 
+                manageDBInstances.setTmp(new Vector<Instance>());
                 manageDBInstances.updateInstanceClasses();
                 updateInstanceTable();
             }
@@ -2571,7 +2572,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             tableInstances.clearSelection();
             manageDBInstances.loadInstances();
             manageDBInstances.updateInstanceClasses();
-            this.instanceTableModel.fireTableDataChanged();            
+            this.instanceTableModel.fireTableDataChanged();
             restoreExpandedState();
         } else if (methodName.equals("exportInstances")) {
         }

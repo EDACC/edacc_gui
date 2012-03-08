@@ -8,10 +8,13 @@ import edacc.EDACCApp;
 import edacc.EDACCImportPropertyCSV;
 import edacc.EDACCManagePropertyDialog;
 import edacc.model.ComputationMethodDoesNotExistException;
+import edacc.model.InstanceHasPropertyNotInDBException;
+import edacc.model.InstancesNotFoundException;
 import edacc.model.NoConnectionToDBException;
 import edacc.model.Property;
 import edacc.model.PropertyDAO;
 import edacc.model.PropertyNotInDBException;
+import edacc.model.Tasks;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,6 +23,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -112,7 +117,13 @@ public class ImportPropertyCSVController {
     }
 
     public void importCSVData(Boolean overwrite) {
-        PropertyDAO.importCSV(sysPropTableModel.getSelected(), overwrite, csvFile);
+        Tasks.startTask("importCSV", new Class[]{Set.class, Boolean.class,
+                    File.class, edacc.model.Tasks.class},
+                new Object[]{sysPropTableModel.getSelected(), overwrite, csvFile, null}, this, this.view);
+    }
+
+    public void importCSV(Set<Entry<Property, String>> selected, Boolean overwrite, File csvFile, Tasks task) throws IOException, SQLException, NoConnectionToDBException, PropertyTypeNotExistException, InstanceHasPropertyNotInDBException, InstancesNotFoundException {
+        PropertyDAO.importCSV(selected, overwrite, csvFile, task);
     }
 
     public void ManageProperties() {
@@ -148,13 +159,13 @@ public class ImportPropertyCSVController {
     }
 
     public boolean LinkPropChoosen(int rowOfCSVPropertyTable) {
-        return sysPropTableModel.isSelected((String)csvPropTableModel.getValueAt(rowOfCSVPropertyTable, 0));
+        return sysPropTableModel.isSelected((String) csvPropTableModel.getValueAt(rowOfCSVPropertyTable, 0));
     }
 
     public void refreshCSVPropTable() {
-       int save  = view.getSelectedCSVPropertyRow();
-       csvPropTableModel.fireTableDataChanged();
-       view.setSelectedCSVPropertyRow(save);
+        int save = view.getSelectedCSVPropertyRow();
+        csvPropTableModel.fireTableDataChanged();
+        view.setSelectedCSVPropertyRow(save);
     }
 
     public boolean propAlreadyChoosen(int convertRowIndexToModel) {

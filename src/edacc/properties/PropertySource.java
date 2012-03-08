@@ -14,5 +14,5 @@ package edacc.properties;
  * @author rretz
  */
 public enum PropertySource {
-    LauncherOutput, Parameter, SolverOutput, VerifierOutput, WatcherOutput, Instance, InstanceName, ExperimentResults;
+    LauncherOutput, Parameter, SolverOutput, VerifierOutput, WatcherOutput, Instance, InstanceName, ExperimentResults, CSVImport;
 }

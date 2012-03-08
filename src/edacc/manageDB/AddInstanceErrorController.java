@@ -5,14 +5,11 @@
 package edacc.manageDB;
 
 import edacc.EDACCAddInstanceErrorDialog;
-import edacc.EDACCApp;
-import edacc.events.TaskEvents;
 import edacc.model.Instance;
 import edacc.model.InstanceClass;
 import edacc.model.InstanceDAO;
 import edacc.model.InstanceHasInstanceClassDAO;
 import edacc.model.Tasks;
-import java.lang.reflect.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;

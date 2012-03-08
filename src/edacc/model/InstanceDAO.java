@@ -766,4 +766,27 @@ public class InstanceDAO {
             return null;
         }
     }
+
+    public static Instance getByMd5AndName(String name, String md5) throws SQLException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT idInstance FROM " + table + " WHERE md5 = ? or name = ?");
+        ps.setString(1, md5);
+        ps.setString(2, name);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return getById(rs.getInt(1));
+        }
+        return null;
+    }
+
+    public static Instance getByName(String name) throws SQLException {
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
+                "SELECT idInstance FROM " + table + " WHERE name=?");
+        ps.setString(1, name);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return getById(rs.getInt(1));
+        }
+        return null;
+    }
 }

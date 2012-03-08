@@ -182,10 +182,9 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="1" attributes="0">
                               <Component id="jScrollPane1" alignment="0" pref="229" max="32767" attributes="0"/>
-                              <Component id="jRBtnOverwrite" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="jRBtnAutoCreate" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
+                                  <Component id="jRBtnOverwrite" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
                                   <Component id="jBtnDrop" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
@@ -197,13 +196,11 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane1" pref="328" max="32767" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jRBtnOverwrite" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <Component id="jScrollPane1" pref="344" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jRBtnAutoCreate" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jBtnDrop" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jRBtnOverwrite" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -252,12 +249,6 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" resourceKey="jRBtnOverwrite.text"/>
                     <Property name="name" type="java.lang.String" value="jRBtnOverwrite" noResource="true"/>
-                  </Properties>
-                </Component>
-                <Component class="javax.swing.JRadioButton" name="jRBtnAutoCreate">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="jRBtnAutoCreate.text"/>
-                    <Property name="name" type="java.lang.String" value="jRBtnAutoCreate" noResource="true"/>
                   </Properties>
                 </Component>
               </SubComponents>
