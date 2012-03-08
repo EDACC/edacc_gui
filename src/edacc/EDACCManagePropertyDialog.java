@@ -135,7 +135,6 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         buttonExportProperty = new javax.swing.JButton();
         buttonImportProperty = new javax.swing.JButton();
         buttonDone = new javax.swing.JButton();
-        buttonImportCSV = new javax.swing.JButton();
 
         jFileChooser1.setName("jFileChooser1"); // NOI18N
 
@@ -448,14 +447,6 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
             }
         });
 
-        buttonImportCSV.setText(resourceMap.getString("buttonImportCSV.text")); // NOI18N
-        buttonImportCSV.setName("buttonImportCSV"); // NOI18N
-        buttonImportCSV.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonImportCSVActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout panelManageSolverPropertyShowButtonsLayout = new javax.swing.GroupLayout(panelManageSolverPropertyShowButtons);
         panelManageSolverPropertyShowButtons.setLayout(panelManageSolverPropertyShowButtonsLayout);
         panelManageSolverPropertyShowButtonsLayout.setHorizontalGroup(
@@ -469,14 +460,12 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                 .addComponent(buttonExportProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(buttonImportProperty, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(buttonImportCSV)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 248, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 373, Short.MAX_VALUE)
                 .addComponent(buttonDone, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
-        panelManageSolverPropertyShowButtonsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {buttonExportProperty, buttonImportCSV, buttonImportProperty, buttonNewProperty, buttonRemoveProperty});
+        panelManageSolverPropertyShowButtonsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {buttonExportProperty, buttonImportProperty, buttonNewProperty, buttonRemoveProperty});
 
         panelManageSolverPropertyShowButtonsLayout.setVerticalGroup(
             panelManageSolverPropertyShowButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -487,12 +476,11 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
                     .addComponent(buttonRemoveProperty)
                     .addComponent(buttonExportProperty)
                     .addComponent(buttonImportProperty)
-                    .addComponent(buttonDone)
-                    .addComponent(buttonImportCSV))
+                    .addComponent(buttonDone))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        panelManageSolverPropertyShowButtonsLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {buttonExportProperty, buttonImportCSV, buttonImportProperty, buttonNewProperty, buttonRemoveProperty});
+        panelManageSolverPropertyShowButtonsLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {buttonExportProperty, buttonImportProperty, buttonNewProperty, buttonRemoveProperty});
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -701,17 +689,6 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
         controller.importProperty(files);
     }//GEN-LAST:event_buttonImportPropertyActionPerformed
 
-    private void buttonImportCSVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonImportCSVActionPerformed
-        jFileChooser1.setFileSelectionMode(jFileChooser1.FILES_ONLY);
-        jFileChooser1.setMultiSelectionEnabled(false);
-        int returnVal = jFileChooser1.showOpenDialog(this);
-        if (returnVal == jFileChooser1.CANCEL_OPTION) {
-            return;
-        }
-        File file = jFileChooser1.getSelectedFile();
-        controller.importPropertyCSV(file);
-    }//GEN-LAST:event_buttonImportCSVActionPerformed
-
     /**
      * @param args the command line arguments
      */
@@ -734,7 +711,6 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     private javax.swing.JButton buttonDone;
     private javax.swing.JButton buttonExportProperty;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JButton buttonImportCSV;
     private javax.swing.JButton buttonImportProperty;
     private javax.swing.JButton buttonNewComputationMethod;
     private javax.swing.JButton buttonNewProperty;
