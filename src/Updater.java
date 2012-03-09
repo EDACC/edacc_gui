@@ -69,7 +69,7 @@ public class Updater {
             new File(getPath() + System.getProperty("file.separator") + "update.zip").delete();
             int input = JOptionPane.showConfirmDialog(null, "Update completed. Start EDACC?", "Update successful", JOptionPane.YES_NO_OPTION);
             if (input == JOptionPane.YES_OPTION) {
-                Runtime.getRuntime().exec(System.getProperty("java.home") + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "java -jar " + getPath() + System.getProperty("file.separator") +  "EDACC.jar");
+                Runtime.getRuntime().exec("\"" + System.getProperty("java.home") + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "java\" -jar \"" + getPath() + System.getProperty("file.separator") +  "EDACC.jar\"");
             }
 
         } catch (FileNotFoundException ex) {
