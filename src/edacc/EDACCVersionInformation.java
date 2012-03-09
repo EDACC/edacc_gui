@@ -42,7 +42,8 @@ public class EDACCVersionInformation extends javax.swing.JDialog {
         lblVersion.setText(appVersion.toString());
         if (appVersion.isDeveloperVersion()) {
             btnChangeVersion.setText("Release Version");
-            if (developerVersion != null && !appVersion.getMd5().equals(developerVersion.getMd5())) {
+            
+            if (developerVersion != null && !appVersion.getCommit().equals(developerVersion.getCommit())) {
                 lblStatus.setText("A new developer version is available. Use the update button to update the EDACC application.");
                 btnUpdate.setEnabled(true);
             } else {

@@ -11,6 +11,7 @@ public class Version {
     private static final Pattern pattern = Pattern.compile("v(-?[0-9]+)\\.(-?[0-9]+)(?:\\.(-?[0-9]+))?");
     
     private int major,minor,patch;
+    private String commit;
     private String branch;
     private String location;
     private String md5;
@@ -22,9 +23,10 @@ public class Version {
         minor = resourceMap.getInteger("version.minor");
         patch = resourceMap.getInteger("version.patch");
         branch = resourceMap.getString("version.branch");
+        commit = resourceMap.getString("version.commit");
     }
     
-    public Version(String str_version, String location, String md5) {
+    public Version(String str_version, String location, String md5, String commit) {
         Matcher m = pattern.matcher(str_version);
         if (m.matches()) {
             major = Integer.parseInt(m.group(1));
@@ -33,6 +35,7 @@ public class Version {
         }
         this.location = location;
         this.md5 = md5;
+        this.commit = commit;
         branch = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(Version.class).getString("version.branch");
     }
     
@@ -73,10 +76,14 @@ public class Version {
         return patch;
     }
 
+    public String getCommit() {
+        return commit;
+    }
+
     @Override
     public String toString() {
         if (isDeveloperVersion()) {
-            return "Developer Version";
+            return "Developer Version " + commit;
         }
         String res = "v" + major + "." + minor;
         if (patch != 0) {

@@ -56,6 +56,8 @@ public class UpdateController {
             String version = null;
             String v_url = null;
             String md5 = null;
+            String commit = null;
+            
             if ("version".equals(node.getNodeName())) {
                 for (int j = 0; j < node.getChildNodes().getLength(); j++) {
                     Node n = node.getChildNodes().item(j);
@@ -65,11 +67,13 @@ public class UpdateController {
                         v_url = n.getTextContent();
                     } else if ("md5".equals(n.getNodeName())) {
                         md5 = n.getTextContent();
+                    } else if ("commit".equals(n.getNodeName())) {
+                        commit = n.getTextContent();
                     }
                 }
                 Version v = null;
                 try {
-                    v = new Version(version, v_url, md5);
+                    v = new Version(version, v_url, md5, commit);
                     res.add(v);
                 } catch (Exception ex) {
                 }
@@ -91,8 +95,7 @@ public class UpdateController {
     
     public Version getDeveloperVersion() throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
         for (Version v : getVersions()) {
-            System.out.println("v: " + v);
-            if (v.getMinor() == -1 && v.getMajor() == -1 && v.getPatch() == -1) {
+            if (v.isDeveloperVersion()) {
                 return v;
             }
         }
