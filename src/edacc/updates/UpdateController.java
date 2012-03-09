@@ -157,7 +157,7 @@ public class UpdateController {
             }
             bout.close();
             fos.close();
-            Runtime.getRuntime().exec(System.getProperty("java.home") + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "java -classpath " + edacc.experiment.Util.getPath() + " Updater");
+            Runtime.getRuntime().exec(System.getProperty("java.home") + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "java -classpath \"" + edacc.experiment.Util.getPath() + "\" Updater");
             Runtime.getRuntime().halt(0);
         } else {
             throw new ClassNotFoundException();

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.swing.JOptionPane;
@@ -18,8 +19,8 @@ public class Updater {
      * Returns the path to the root edacc folder, i.e. the path to the EDACC.jar
      * @return the path to the root edacc folder
      */
-    private static String getPath() {
-        File f = new File(Updater.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+    private static String getPath() throws URISyntaxException {
+        File f = new File(Updater.class.getProtectionDomain().getCodeSource().getLocation().toURI());
         if (f.isDirectory()) {
             return f.getPath();
         } else {
@@ -75,7 +76,9 @@ public class Updater {
             JOptionPane.showMessageDialog(null, "File not found while updating. Update cancelled. Reason:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Error while reading/writing files. Update cancelled. Reason:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error while updating. Update cancelled. Reason:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        
         }
     }
 }

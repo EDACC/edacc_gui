@@ -42,7 +42,7 @@ public class EDACCVersionInformation extends javax.swing.JDialog {
         lblVersion.setText(appVersion.toString());
         if (appVersion.isDeveloperVersion()) {
             btnChangeVersion.setText("Release Version");
-            
+
             if (developerVersion != null && !appVersion.getCommit().equals(developerVersion.getCommit())) {
                 lblStatus.setText("A new developer version is available. Use the update button to update the EDACC application.");
                 btnUpdate.setEnabled(true);
@@ -161,6 +161,17 @@ public class EDACCVersionInformation extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+        Version v = null;
+        if (JOptionPane.showConfirmDialog(this, "Do you really want to update?", "Confirmation", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            if (appVersion.isDeveloperVersion()) {
+                v = developerVersion;
+            } else {
+                v = currentVersion;
+            }
+        }
+        if (v != null) {
+            update(v);
+        }
     }//GEN-LAST:event_btnUpdateActionPerformed
 
     private void btnChangeVersionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangeVersionActionPerformed
@@ -175,59 +186,7 @@ public class EDACCVersionInformation extends javax.swing.JDialog {
             }
         }
         if (v != null) {
-            final Version fVersion = v;
-            Tasks.startTask(new TaskRunnable() {
-
-                @Override
-                public void run(Tasks task) {
-                    try {
-                        UpdateController.getInstance().download(task, fVersion);
-                    } catch (MalformedURLException ex) {
-                        processDownloadException(ex);
-                        return;
-                    } catch (IOException ex) {
-                        processDownloadException(ex);
-                        return;
-                    } catch (VersionException ex) {
-                        processDownloadException(ex);
-                        return;
-                    }
-
-                    try {
-                        UpdateController.getInstance().startUpdater();
-
-                    } catch (FileNotFoundException ex) {
-                        processStartUpdaterException(ex);
-                        return;
-                    } catch (IOException ex) {
-                        processStartUpdaterException(ex);
-                        return;
-                    } catch (ClassNotFoundException ex) {
-                        processStartUpdaterException(ex);
-                        return;
-                    }
-                }
-
-                private void processStartUpdaterException(Exception ex) {
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Couldn't start updater.", "Error", JOptionPane.ERROR_MESSAGE);
-                        }
-                    });
-                }
-
-                private void processDownloadException(final Exception ex) {
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Error while downloading update: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                        }
-                    });
-                }
-            });
+            update(v);
         }
 
     }//GEN-LAST:event_btnChangeVersionActionPerformed
@@ -239,4 +198,60 @@ public class EDACCVersionInformation extends javax.swing.JDialog {
     private javax.swing.JLabel lblStatus;
     private javax.swing.JLabel lblVersion;
     // End of variables declaration//GEN-END:variables
+
+    private void update(Version v) {
+        final Version fVersion = v;
+        Tasks.startTask(new TaskRunnable() {
+
+            @Override
+            public void run(Tasks task) {
+                try {
+                    UpdateController.getInstance().download(task, fVersion);
+                } catch (MalformedURLException ex) {
+                    processDownloadException(ex);
+                    return;
+                } catch (IOException ex) {
+                    processDownloadException(ex);
+                    return;
+                } catch (VersionException ex) {
+                    processDownloadException(ex);
+                    return;
+                }
+
+                try {
+                    UpdateController.getInstance().startUpdater();
+
+                } catch (FileNotFoundException ex) {
+                    processStartUpdaterException(ex);
+                    return;
+                } catch (IOException ex) {
+                    processStartUpdaterException(ex);
+                    return;
+                } catch (ClassNotFoundException ex) {
+                    processStartUpdaterException(ex);
+                    return;
+                }
+            }
+
+            private void processStartUpdaterException(Exception ex) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Couldn't start updater.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+            }
+
+            private void processDownloadException(final Exception ex) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Error while downloading update: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+            }
+        });
+    }
 }
