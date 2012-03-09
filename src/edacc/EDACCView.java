@@ -455,14 +455,22 @@ public class EDACCView extends FrameView implements Observer {
         manageSolverProperties.setVisible(true);
     }//GEN-LAST:event_ManagePropertyMenuItemActionPerformed
 
+    private void showVersionInformations(Version appVersion, Version currentVersion, Version developerVersion) {
+        EDACCVersionInformation dialog = new EDACCVersionInformation(EDACCApp.getApplication().getMainFrame(), true, appVersion, currentVersion, developerVersion);
+        EDACCApp.getApplication().show(dialog);
+    }
+    
     private void updatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updatesMenuItemActionPerformed
         Tasks.startTask(new TaskRunnable() {
 
             @Override
             public void run(Tasks task) {
-                Version v = null;
+                Version appVersion = new Version();
+                Version currentVersion = new Version();
+                Version developerVersion = null;
                 try {
-                    v = UpdateController.getInstance().getNewestVersion();
+                    currentVersion = UpdateController.getInstance().getNewestVersion();
+                    developerVersion = UpdateController.getInstance().getDeveloperVersion();
                 } catch (ParserConfigurationException ex) {
                     processGetNewestVersionException(ex);
                     return;
@@ -476,47 +484,18 @@ public class EDACCView extends FrameView implements Observer {
                     processGetNewestVersionException(ex);
                     return;
                 }
-                Version current_version = new Version();
-                if (v.compareTo(current_version) != 0) {
-                    int userinput = JOptionPane.showConfirmDialog(Tasks.getTaskView(), "New Version available: " + v + ". Update?", "Update available", JOptionPane.YES_NO_OPTION);
-                    if (userinput == JOptionPane.NO_OPTION) {
-                        return;
-                    }
-                    try {
-                        UpdateController.getInstance().download(task, v);
-                    } catch (MalformedURLException ex) {
-                        processDownloadException(ex);
-                        return;
-                    } catch (IOException ex) {
-                        processDownloadException(ex);
-                        return;
-                    } catch (VersionException ex) {
-                        processDownloadException(ex);
-                        return;
-                    }
-                } else {
-                    SwingUtilities.invokeLater(new Runnable() {
+                final Version fAppVersion = appVersion;
+                final Version fCurrentVersion = currentVersion;
+                final Version fDeveloperVersion = developerVersion;
+                
+                SwingUtilities.invokeLater(new Runnable() {
 
-                        @Override
-                        public void run() {
-                            JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "No updates available.", "Check for Updates", JOptionPane.INFORMATION_MESSAGE);
-                        }
-                    });
-                    return;
-                }
-                try {
-                    UpdateController.getInstance().startUpdater();
-
-                } catch (FileNotFoundException ex) {
-                    processStartUpdaterException(ex);
-                    return;
-                } catch (IOException ex) {
-                    processStartUpdaterException(ex);
-                    return;
-                } catch (ClassNotFoundException ex) {
-                    processStartUpdaterException(ex);
-                    return;
-                }
+                    @Override
+                    public void run() {
+                        showVersionInformations(fAppVersion, fCurrentVersion, fDeveloperVersion);
+                    }
+                    
+                });
             }
 
             private void processGetNewestVersionException(final Exception ex) {
@@ -536,26 +515,6 @@ public class EDACCView extends FrameView implements Observer {
                     }
                 });
 
-            }
-
-            private void processStartUpdaterException(Exception ex) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Couldn't start updater.", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                });
-            }
-
-            private void processDownloadException(final Exception ex) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Error while downloading update: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                });
             }
         });
 

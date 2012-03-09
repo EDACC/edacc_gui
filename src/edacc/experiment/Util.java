@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,21 +33,20 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author simon
  */
 public class Util {
+
     public static final Color COLOR_ROYALBLUE = new Color(4 * 16 + 1, 6 * 16 + 9, 14 * 16 + 1);
     public static final Color COLOR_GREEN = new Color(0 * 16 + 0, 12 * 16 + 12, 3 * 16 + 3);
-
     /** Color to be used for errors */
     public static final Color COLOR_ERROR = new Color(0xed1c24);
     /** Color to be used for the generate jobs table if a value is not saved and bigger as the saved value */
     public static final Color COLOR_GENERATEJOBSTABLE_UNSAVED_BIGGER = Color.green;
     /** Color to be used for the generate jobs table if a value is not saved and lower as the saved value */
     public static final Color COLOR_GENERATEJOBSTABLE_UNSAVED_LOWER = COLOR_ERROR;
-
     public static final Color COLOR_JOBBROWSER_WAITING = COLOR_ROYALBLUE;
     public static final Color COLOR_JOBBROWSER_ERROR = COLOR_ERROR;
     public static final Color COLOR_JOBBROWSER_RUNNING = Color.orange;
     public static final Color COLOR_JOBBROWSER_FINISHED = COLOR_GREEN;
-    
+
     /**
      * Calls <code>updateTableColumnWidth(table, 5000)</code>.
      * @param table 
@@ -54,7 +54,7 @@ public class Util {
     public static void updateTableColumnWidth(JTable table) {
         updateTableColumnWidth(table, 5000);
     }
-    
+
     /**
      * Updates the width of each column according to the table size and the data in the cells.
      * @param table
@@ -238,12 +238,18 @@ public class Util {
      * @return the path to the root edacc folder
      */
     public static String getPath() {
-        File f = new File(EDACCApp.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+        File f;
+        try {
+            f = new File(EDACCApp.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+        } catch (Exception ex) {
+            return "";
+        }
         if (f.isDirectory()) {
             return f.getPath();
         } else {
             return f.getParent();
         }
+
     }
 
     /**
@@ -284,7 +290,7 @@ public class Util {
         }
         return res;
     }
-    
+
     /**
      * Returns true if the number in field is greater or equal the given number. 
      * Also changes the fields layout to give the user a feedback which values aren't valid.
@@ -359,7 +365,7 @@ public class Util {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                
+
                 if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                     TableModel model = table.getModel();
                     /*
@@ -434,15 +440,16 @@ public class Util {
     }
 
     public static String getIdArray(List<Integer> list) {
-        if (list.isEmpty())
+        if (list.isEmpty()) {
             throw new IllegalArgumentException("List is empty.");
-        
+        }
+
         StringBuilder sb = new StringBuilder("");
-        for (int i = 0; i < list.size() -1; i++) {
+        for (int i = 0; i < list.size() - 1; i++) {
             sb.append(list.get(i));
             sb.append(',');
         }
-        sb.append(list.get(list.size()-1));
+        sb.append(list.get(list.size() - 1));
         return sb.toString();
     }
 

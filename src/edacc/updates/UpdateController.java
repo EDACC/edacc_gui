@@ -13,6 +13,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.NoSuchAlgorithmException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.xml.parsers.DocumentBuilder;
@@ -37,17 +39,18 @@ public class UpdateController {
         return instance;
     }
 
-    public Version getNewestVersion() throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
+    private List<Version> getVersions() throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
+        List<Version> res = new LinkedList<Version>();
+
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         URL url = new URL(org.jdesktop.application.Application.getInstance(EDACCApp.class).getContext().getResourceMap(Version.class).getString("version.url"));
         URLConnection con = url.openConnection();
         Document doc = docBuilder.parse(con.getInputStream());
         if (doc.getChildNodes().getLength() != 1 || !"versions".equals(doc.getChildNodes().item(0).getNodeName())) {
-            return new Version();
+            return res;
         }
         Node root = doc.getChildNodes().item(0);
-        Version new_version = new Version();
         for (int i = 0; i < root.getChildNodes().getLength(); i++) {
             Node node = root.getChildNodes().item(i);
             String version = null;
@@ -67,15 +70,33 @@ public class UpdateController {
                 Version v = null;
                 try {
                     v = new Version(version, v_url, md5);
+                    res.add(v);
                 } catch (Exception ex) {
-                }
-                if (v != null && new_version.compareTo(v) < 0) {
-                    new_version = v;
                 }
             }
         }
 
+        return res;
+    }
+
+    public Version getNewestVersion() throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
+        Version new_version = new Version();
+        for (Version v : getVersions()) {
+            if (new_version.compareTo(v) < 0) {
+                new_version = v;
+            }
+        }
         return new_version;
+    }
+    
+    public Version getDeveloperVersion() throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
+        for (Version v : getVersions()) {
+            System.out.println("v: " + v);
+            if (v.getMinor() == -1 && v.getMajor() == -1 && v.getPatch() == -1) {
+                return v;
+            }
+        }
+        return null;
     }
 
     public void download(Tasks task, Version v) throws MalformedURLException, IOException, VersionException {
@@ -85,6 +106,8 @@ public class UpdateController {
         java.net.URLConnection connection = url.openConnection();
         int length = connection.getContentLength();
         java.io.BufferedInputStream in = new java.io.BufferedInputStream(connection.getInputStream());
+        
+        System.out.println(new File(edacc.experiment.Util.getPath() + System.getProperty("file.separator") + "update.zip").getPath());
         java.io.FileOutputStream fos = new java.io.FileOutputStream(edacc.experiment.Util.getPath() + System.getProperty("file.separator") + "update.zip");
         java.io.BufferedOutputStream bout = new BufferedOutputStream(fos, 1024 * 24);
         byte data[] = new byte[1024 * 24];

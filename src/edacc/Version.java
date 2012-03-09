@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
  * @author simon
  */
 public class Version {
-    private static final Pattern pattern = Pattern.compile("v([0-9]+)\\.([0-9]+)(?:\\.([0-9]+))?");
+    private static final Pattern pattern = Pattern.compile("v(-?[0-9]+)\\.(-?[0-9]+)(?:\\.(-?[0-9]+))?");
     
     private int major,minor,patch;
     private String branch;
@@ -61,13 +61,32 @@ public class Version {
         return md5;
     }
 
+    public int getMajor() {
+        return major;
+    }
+
+    public int getMinor() {
+        return minor;
+    }
+
+    public int getPatch() {
+        return patch;
+    }
+
     @Override
     public String toString() {
+        if (isDeveloperVersion()) {
+            return "Developer Version";
+        }
         String res = "v" + major + "." + minor;
         if (patch != 0) {
             res += "." + patch;
         }
         res += " " + branch;
         return res;
+    }
+
+    public boolean isDeveloperVersion() {
+        return minor == major && major == patch && patch == -1;
     }
 }

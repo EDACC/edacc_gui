@@ -3,6 +3,7 @@
  */
 package edacc;
 
+import edacc.experiment.Util;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.io.File;
@@ -55,16 +56,7 @@ public class EDACCApp extends SingleFrameApplication {
             updater.delete();
         }
         
-        // find application directory
-        // when running from netbeans this is "build/classes"
-        // when running from a JAR it's the directory containing the JAR
-        File f = new File(EDACCApp.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-        String logPath;
-        if (f.isDirectory()) {
-            logPath = f.getPath() + System.getProperty("file.separator") + "edacc_errors.log";
-        } else {
-            logPath = f.getParent() + System.getProperty("file.separator") + "edacc_errors.log";
-        }
+        String logPath = edacc.experiment.Util.getPath() + System.getProperty("file.separator") + "edacc_errors.log";
         logger = new ErrorLogger(logPath);
         Thread.setDefaultUncaughtExceptionHandler(logger); // register for all threads
         EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue(); // register for swing stuff
