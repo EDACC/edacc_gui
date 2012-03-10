@@ -1,0 +1,1 @@
+ALTER TABLE `Experiment` ADD COLUMN `defaultCost` ENUM('resultTime', 'wallTime', 'cost') NOT NULL DEFAULT 'resultTime' AFTER `priority`;

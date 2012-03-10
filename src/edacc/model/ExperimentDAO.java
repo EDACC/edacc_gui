@@ -22,11 +22,11 @@ public class ExperimentDAO {
 
     protected static final String table = "Experiment";
     protected static final String insertQuery = "INSERT INTO " + table + " (Name, Date, description, configurationExp, "
-            + "priority, active, solverOutputPreserveFirst, solverOutputPreserveLast, watcherOutputPreserveFirst, "
+            + "priority, defaultCost, active, solverOutputPreserveFirst, solverOutputPreserveLast, watcherOutputPreserveFirst, "
             + "watcherOutputPreserveLast, verifierOutputPreserveFirst, verifierOutputPreserveLast) "
-            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
     protected static final String updateQuery = "UPDATE " + table + " SET Name =?, Date =?, description =?, "
-            + "configurationExp =?, priority =?, active=?,solverOutputPreserveFirst=?,solverOutputPreserveLast=?,"
+            + "configurationExp =?, priority =?, defaultCost=?, active=?,solverOutputPreserveFirst=?,solverOutputPreserveLast=?,"
             + "watcherOutputPreserveFirst=?,watcherOutputPreserveLast=?,verifierOutputPreserveFirst=?,"
             + "verifierOutputPreserveLast=? WHERE idExperiment=?";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idExperiment=?";
@@ -37,7 +37,7 @@ public class ExperimentDAO {
      * so it can be referenced by related objects
      * @return new Experiment object
      */
-    public static Experiment createExperiment(String name, Date date, String description, boolean configurationExp, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast) throws SQLException {
+    public static Experiment createExperiment(String name, Date date, String description, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast) throws SQLException {
         if (getExperimentByName(name) != null) {
             throw new SQLException("There exists already an experiment with the same name.");
         }
@@ -48,6 +48,7 @@ public class ExperimentDAO {
         i.setActive(true);
         i.setConfigurationExp(configurationExp);
         i.setPriority(0);
+        i.setDefaultCost(defaultCost);
         i.setSolverOutputPreserveFirst(solverOutputPreserveFirst);
         i.setSolverOutputPreserveLast(solverOutputPreserveLast);
         i.setWatcherOutputPreserveFirst(watcherOutputPreserveFirst);
@@ -94,7 +95,7 @@ public class ExperimentDAO {
             st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
         } else if (experiment.isModified()) {
             st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
-            st.setInt(13, experiment.getId());
+            st.setInt(14, experiment.getId());
         } else {
             return;
         }
@@ -103,27 +104,28 @@ public class ExperimentDAO {
         st.setString(3, experiment.getDescription());
         st.setBoolean(4, experiment.isConfigurationExp());
         st.setInt(5, experiment.getPriority());
-        st.setBoolean(6, experiment.isActive());
+        st.setString(6, experiment.getDefaultCost().toString());
+        st.setBoolean(7, experiment.isActive());
         if (experiment.getSolverOutputPreserveFirst() == null) {
-            st.setNull(7, java.sql.Types.INTEGER);
             st.setNull(8, java.sql.Types.INTEGER);
+            st.setNull(9, java.sql.Types.INTEGER);
         } else {
-            st.setInt(7, experiment.getSolverOutputPreserveFirst());
-            st.setInt(8, experiment.getSolverOutputPreserveLast());
+            st.setInt(8, experiment.getSolverOutputPreserveFirst());
+            st.setInt(9, experiment.getSolverOutputPreserveLast());
         }
         if (experiment.getWatcherOutputPreserveFirst() == null) {
-            st.setNull(9, java.sql.Types.INTEGER);
-            st.setNull(10, java.sql.Types.INTEGER);            
+            st.setNull(10, java.sql.Types.INTEGER);
+            st.setNull(11, java.sql.Types.INTEGER);            
         } else {
-            st.setInt(9, experiment.getWatcherOutputPreserveFirst());
-            st.setInt(10, experiment.getWatcherOutputPreserveLast());
+            st.setInt(10, experiment.getWatcherOutputPreserveFirst());
+            st.setInt(11, experiment.getWatcherOutputPreserveLast());
         }
         if (experiment.getVerifierOutputPreserveFirst() == null) {
-            st.setNull(11, java.sql.Types.INTEGER);
-            st.setNull(12, java.sql.Types.INTEGER);  
+            st.setNull(12, java.sql.Types.INTEGER);
+            st.setNull(13, java.sql.Types.INTEGER);  
         } else {
-            st.setInt(11, experiment.getVerifierOutputPreserveFirst());
-            st.setInt(12, experiment.getVerifierOutputPreserveLast());
+            st.setInt(12, experiment.getVerifierOutputPreserveFirst());
+            st.setInt(13, experiment.getVerifierOutputPreserveLast());
         }
         st.executeUpdate();
 

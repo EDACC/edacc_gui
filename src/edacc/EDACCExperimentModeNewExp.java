@@ -6,6 +6,7 @@
 package edacc;
 
 import edacc.experiment.Util;
+import edacc.model.Experiment;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
 
@@ -20,6 +21,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     public Integer solverOutputPreserveFirst, solverOutputPreserveLast;
     public Integer watcherOutputPreserveFirst, watcherOutputPreserveLast;
     public Integer verifierOutputPreserveFirst, verifierOutputPreserveLast;
+    public Experiment.Cost defaultCost;
     public boolean isConfigurationExp;
     public boolean canceled;
 
@@ -34,6 +36,10 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         this.chkLimitWatcherOutputActionPerformed(null);
         this.chkLimitVerifierOutputActionPerformed(null);
         this.getRootPane().setDefaultButton(this.btnCreateExperiment);
+        comboDefaultCost.removeAllItems();
+        for (Experiment.Cost cost : Experiment.Cost.values()) {
+            comboDefaultCost.addItem(cost);
+        }
     }
 
     public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, String expName, String expDescription, boolean configurationExp, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast) {
@@ -130,6 +136,8 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         comboWatcherOutputUnit = new javax.swing.JComboBox();
         lblLimitVerifierOutputIn = new javax.swing.JLabel();
         comboVerifierOutputUnit = new javax.swing.JComboBox();
+        jLabel2 = new javax.swing.JLabel();
+        comboDefaultCost = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentModeNewExp.class);
@@ -288,6 +296,12 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         comboVerifierOutputUnit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "lines", "bytes" }));
         comboVerifierOutputUnit.setName("comboVerifierOutputUnit"); // NOI18N
 
+        jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
+        jLabel2.setName("jLabel2"); // NOI18N
+
+        comboDefaultCost.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboDefaultCost.setName("comboDefaultCost"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -312,10 +326,12 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                             .addComponent(lblExperimentName)
                             .addComponent(lblExperimentDescription)
                             .addComponent(lblVerifierOutputPreserveFirst)
-                            .addComponent(lblVerifierOutputPreserveLast))
+                            .addComponent(lblVerifierOutputPreserveLast)
+                            .addComponent(jLabel2))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 510, Short.MAX_VALUE)
+                            .addComponent(comboDefaultCost, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(chkLimitWatcherOutput)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -355,8 +371,12 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                     .addComponent(txtExperimentName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
-                    .addComponent(lblExperimentDescription))
+                    .addComponent(lblExperimentDescription)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(comboDefaultCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -470,6 +490,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         }
 
         isConfigurationExp = chkConfigurationExp.isSelected();
+        defaultCost = comboDefaultCost.getSelectedItem() instanceof Experiment.Cost ? (Experiment.Cost) comboDefaultCost.getSelectedItem() : Experiment.Cost.resultTime;
         this.canceled = false;
         this.setVisible(false);
     }//GEN-LAST:event_btnCreateExperimentActionPerformed
@@ -568,11 +589,13 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     private javax.swing.JCheckBox chkLimitSolverOutput;
     private javax.swing.JCheckBox chkLimitVerifierOutput;
     private javax.swing.JCheckBox chkLimitWatcherOutput;
+    private javax.swing.JComboBox comboDefaultCost;
     private javax.swing.JComboBox comboSolverOutputUnit;
     private javax.swing.JComboBox comboVerifierOutputUnit;
     private javax.swing.JComboBox comboWatcherOutputUnit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JScrollPane jScrollPane1;

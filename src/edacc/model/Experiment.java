@@ -11,26 +11,27 @@ public class Experiment extends BaseModel implements IntegerPKModel, Serializabl
     private Date date;
     private String name;
     private int priority;
+    private Cost defaultCost;
     private boolean configurationExp;
     private boolean active;
     private Integer solverOutputPreserveFirst, solverOutputPreserveLast;
     private Integer watcherOutputPreserveFirst, watcherOutputPreserveLast;
     private Integer verifierOutputPreserveFirst, verifierOutputPreserveLast;
-
     // only used for export
     public List<ExperimentHasInstance> instances;
     protected ConfigurationScenario scenario;
-    
+
     protected Experiment() {
         super();
     }
-    
+
     protected Experiment(Experiment experiment) {
         this();
         id = experiment.id;
         description = experiment.description;
         date = experiment.date;
         name = experiment.name;
+        defaultCost = experiment.defaultCost;
         priority = experiment.priority;
         configurationExp = experiment.configurationExp;
         active = experiment.active;
@@ -126,6 +127,17 @@ public class Experiment extends BaseModel implements IntegerPKModel, Serializabl
         }
     }
 
+    public Cost getDefaultCost() {
+        return defaultCost;
+    }
+
+    public void setDefaultCost(Cost defaultCost) {
+        this.defaultCost = defaultCost;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
     public int getPriority() {
         return priority;
     }
@@ -206,5 +218,10 @@ public class Experiment extends BaseModel implements IntegerPKModel, Serializabl
     @Override
     public String toString() {
         return name;
+    }
+
+    public enum Cost {
+
+        resultTime, wallTime, cost;
     }
 }

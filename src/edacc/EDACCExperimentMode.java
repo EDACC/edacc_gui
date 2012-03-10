@@ -2624,7 +2624,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                         Experiment newExp;
                         try {
                             newExp = expController.createExperiment(dialogNewExp.expName, dialogNewExp.expDesc,
-                                    dialogNewExp.isConfigurationExp, dialogNewExp.solverOutputPreserveFirst,
+                                    dialogNewExp.isConfigurationExp, dialogNewExp.defaultCost, dialogNewExp.solverOutputPreserveFirst,
                                     dialogNewExp.solverOutputPreserveLast, dialogNewExp.watcherOutputPreserveFirst,
                                     dialogNewExp.watcherOutputPreserveLast, dialogNewExp.verifierOutputPreserveFirst,
                                     dialogNewExp.verifierOutputPreserveLast);
@@ -3017,6 +3017,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             if (!dialogEditExp.canceled) {
                 String oldName = exp.getName();
                 String oldDescr = exp.getDescription();
+                Experiment.Cost oldDefaultCost = exp.getDefaultCost();
                 Integer oldSOPF = exp.getSolverOutputPreserveFirst();
                 Integer oldSOPL = exp.getSolverOutputPreserveLast();
                 Integer oldWOPF = exp.getWatcherOutputPreserveFirst();
@@ -3025,6 +3026,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 Integer oldVOPL = exp.getVerifierOutputPreserveLast();
                 exp.setName(dialogEditExp.expName);
                 exp.setDescription(dialogEditExp.expDesc);
+                exp.setDefaultCost(dialogEditExp.defaultCost);
                 exp.setSolverOutputPreserveFirst(dialogEditExp.solverOutputPreserveFirst);
                 exp.setSolverOutputPreserveLast(dialogEditExp.solverOutputPreserveLast);
                 exp.setVerifierOutputPreserveFirst(dialogEditExp.verifierOutputPreserveFirst);
@@ -3036,6 +3038,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 } catch (SQLException ex) {
                     exp.setName(oldName);
                     exp.setDescription(oldDescr);
+                    exp.setDefaultCost(oldDefaultCost);
                     exp.setSolverOutputPreserveFirst(oldSOPF);
                     exp.setSolverOutputPreserveLast(oldSOPL);
                     exp.setWatcherOutputPreserveFirst(oldWOPF);

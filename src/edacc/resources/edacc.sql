@@ -129,6 +129,7 @@ CREATE  TABLE IF NOT EXISTS `Experiment` (
   `date` DATE NOT NULL ,
   `configurationExp` TINYINT(1)  NULL ,
   `priority` INT NULL ,
+  `defaultCost` ENUM('resultTime', 'wallTime', 'cost') NOT NULL DEFAULT 'resultTime' ,
   `active` TINYINT(1)  NOT NULL ,
   `countUnprocessedJobs` INT NOT NULL DEFAULT 0 ,
   `solverOutputPreserveFirst` INT NULL ,
