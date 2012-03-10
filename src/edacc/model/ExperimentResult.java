@@ -19,6 +19,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
     private int seed;
     private float resultTime;
     private float wallTime;
+    private float cost;
     private int SolverConfigId;
     private int ExperimentId;
     private int InstanceId;
@@ -42,7 +43,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         super();
     }
 
-    protected ExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float resultTime, float wallTime, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit) {
+    protected ExperimentResult(int run, int priority, int computeQueue, StatusCode status, int seed, ResultCode resultCode, float resultTime, float wallTime, float cost, int SolverConfigId, int ExperimentId, int InstanceId, Timestamp startTime, int cpuTimeLimit, int memoryLimit, int wallClockTimeLimit, int stackSizeLimit) {
         this();
         this.run = run;
         this.priority = priority;
@@ -52,6 +53,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         this.resultCode = resultCode;
         this.resultTime = resultTime;
         this.wallTime = wallTime;
+        this.cost = cost;
         this.SolverConfigId = SolverConfigId;
         this.ExperimentId = ExperimentId;
         this.InstanceId = InstanceId;
@@ -75,6 +77,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         resultCode = er.resultCode;
         resultTime = er.resultTime;
         wallTime = er.wallTime;
+        cost = er.cost;
         SolverConfigId = er.SolverConfigId;
         ExperimentId = er.ExperimentId;
         InstanceId = er.InstanceId;
@@ -224,6 +227,17 @@ public class ExperimentResult extends BaseModel implements Serializable {
 
     public void setWallTime(float wallTime) {
         this.wallTime = wallTime;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public float getCost() {
+        return cost;
+    }
+
+    public void setCost(float cost) {
+        this.cost = cost;
         if (this.isSaved()) {
             this.setModified();
         }

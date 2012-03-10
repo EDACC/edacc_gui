@@ -1,5 +1,6 @@
 package edacc.experiment;
 
+import edacc.model.Experiment;
 import edacc.satinstances.ConvertException;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -58,41 +59,44 @@ public class ExperimentResultsBrowserTableModel extends ThreadSafeDefaultTableMo
     public static final int COL_TIME = 10;
     /** The index of the wall time column */
     public static final int COL_WALLTIME = 11;
+    /** The index of the cost column */
+    public static final int COL_COST = 12;
     /** The index of the seed column */
-    public static final int COL_SEED = 12;
+    public static final int COL_SEED = 13;
     /** The index of the status column */
-    public static final int COL_STATUS = 13;
+    public static final int COL_STATUS = 14;
     /** The index of the runtime column */
-    public static final int COL_RUNTIME = 14;
+    public static final int COL_RUNTIME = 15;
     /** The index of the result code column */
-    public static final int COL_RESULTCODE = 15;
+    public static final int COL_RESULTCODE = 16;
     /** The index of the cpu time limit column */
-    public static final int COL_CPUTIMELIMIT = 16;
+    public static final int COL_CPUTIMELIMIT = 17;
     /** The index of the wall clock limit column */
-    public static final int COL_WALLCLOCKLIMIT = 17;
+    public static final int COL_WALLCLOCKLIMIT = 18;
     /** The index of the memory limit column */
-    public static final int COL_MEMORYLIMIT = 18;
+    public static final int COL_MEMORYLIMIT = 19;
     /** The index of the stack size limit column */
-    public static final int COL_STACKSIZELIMIT = 19;
+    public static final int COL_STACKSIZELIMIT = 20;
     /** The index of the solver output column */
-    public static final int COL_SOLVER_OUTPUT = 20;
+    public static final int COL_SOLVER_OUTPUT = 21;
     /** The index of the launcher output column */
-    public static final int COL_LAUNCHER_OUTPUT = 21;
+    public static final int COL_LAUNCHER_OUTPUT = 22;
     /** The index of the watcher output column */
-    public static final int COL_WATCHER_OUTPUT = 22;
+    public static final int COL_WATCHER_OUTPUT = 23;
     /** The index of the verifier output column */
-    public static final int COL_VERIFIER_OUTPUT = 23;
+    public static final int COL_VERIFIER_OUTPUT = 24;
     /** The index of the first property column */
-    public static final int COL_PROPERTY = 24;
+    public static final int COL_PROPERTY = 25;
     private ArrayList<ExperimentResult> jobs;
     // the constant columns
-    private String[] CONST_COLUMNS = {"ID", "Priority", "Compute Queue", "Compute Node", "Compute Node IP", "Solver", "Solver Configuration", "Parameters", "Instance", "Run", "Time", "Wall Time", "Seed", "Status", "Run time", "Result Code", "CPU Time Limit", "Wall Clock Time Limit", "Memory Limit", "Stack Size Limit", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
+    private String[] CONST_COLUMNS = {"ID", "Priority", "Compute Queue", "Compute Node", "Compute Node IP", "Solver", "Solver Configuration", "Parameters", "Instance", "Run", "Time", "Wall Time", "Cost", "Seed", "Status", "Run time", "Result Code", "CPU Time Limit", "Wall Clock Time Limit", "Memory Limit", "Stack Size Limit", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
     /** the default visibility of each column */
-    public static boolean[] DEFAULT_VISIBILITY = {false, false, true, false, false, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false};
+    public static boolean[] DEFAULT_VISIBILITY = {false, false, true, false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false};
     private String[] columns;
     private ArrayList<Property> properties;
     private HashMap<Integer, GridQueue> gridQueues;
     private HashMap<Integer, String> parameters;
+    private Experiment.Cost defaultCost;
     private int firstInstancePropertyColumn;
 
     /** Creates a new experiment result browser table model */
@@ -342,6 +346,8 @@ public class ExperimentResultsBrowserTableModel extends ThreadSafeDefaultTableMo
                 return j.getResultTime();
             case COL_WALLTIME:
                 return j.getWallTime();
+            case COL_COST:
+                return j.getCost();
             case COL_SEED:
                 return j.getSeed();
             case COL_STATUS:
@@ -519,6 +525,10 @@ public class ExperimentResultsBrowserTableModel extends ThreadSafeDefaultTableMo
         return res;
     }
 
+    public void setDefaultCost(Experiment.Cost defaultCost) {
+        this.defaultCost = defaultCost;
+    }
+    
     /**
      * Returns the default visibility.
      * @return 
@@ -528,6 +538,18 @@ public class ExperimentResultsBrowserTableModel extends ThreadSafeDefaultTableMo
         System.arraycopy(DEFAULT_VISIBILITY, 0, res, 0, DEFAULT_VISIBILITY.length);
         for (int i = DEFAULT_VISIBILITY.length; i < res.length; i++) {
             res[i] = false;
+        }
+        if (defaultCost != null) {
+            if (defaultCost.equals(Experiment.Cost.resultTime)) {
+                res[COL_WALLTIME] = false;
+                res[COL_COST] = false;
+            } else if (defaultCost.equals(Experiment.Cost.wallTime)) {
+                res[COL_TIME] = false;
+                res[COL_COST] = false;
+            } else if (defaultCost.equals(Experiment.Cost.cost)) {
+                res[COL_TIME] = false;
+                res[COL_WALLTIME] = false;
+            }
         }
         return res;
     }
