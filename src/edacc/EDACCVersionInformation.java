@@ -13,6 +13,7 @@ package edacc;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
 import edacc.updates.UpdateController;
+import java.awt.Color;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -45,6 +46,7 @@ public class EDACCVersionInformation extends javax.swing.JDialog {
 
             if (developerVersion != null && !appVersion.getCommit().equals(developerVersion.getCommit())) {
                 lblStatus.setText("A new developer version is available. Use the update button to update the EDACC application.");
+                lblStatus.setForeground(edacc.experiment.Util.COLOR_DARKGREEN);
                 btnUpdate.setEnabled(true);
             } else {
                 lblStatus.setText("No updates available.");
@@ -56,6 +58,7 @@ public class EDACCVersionInformation extends javax.swing.JDialog {
             }
             if (appVersion.compareTo(currentVersion) < 0) {
                 lblStatus.setText("EDACC application " + currentVersion + " is available. Use the update button to update the EDACC application.");
+                lblStatus.setForeground(edacc.experiment.Util.COLOR_DARKGREEN);
                 btnUpdate.setEnabled(true);
             } else {
                 lblStatus.setText("No updates available.");
@@ -80,9 +83,10 @@ public class EDACCVersionInformation extends javax.swing.JDialog {
         btnChangeVersion = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCVersionInformation.class);
+        setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCVersionInformation.class);
         jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
         jLabel2.setName("jLabel2"); // NOI18N
 
@@ -177,7 +181,7 @@ public class EDACCVersionInformation extends javax.swing.JDialog {
     private void btnChangeVersionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangeVersionActionPerformed
         Version v = null;
         if (appVersion.isDeveloperVersion()) {
-            if (JOptionPane.showConfirmDialog(this, "Do you really want to update to the current release version?", "Confirmation", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            if (JOptionPane.showConfirmDialog(this, "Do you really want to update to the current release version EDACC " + currentVersion.toString() + "?", "Confirmation", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                 v = currentVersion;
             }
         } else {

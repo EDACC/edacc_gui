@@ -36,6 +36,7 @@ public class Util {
 
     public static final Color COLOR_ROYALBLUE = new Color(4 * 16 + 1, 6 * 16 + 9, 14 * 16 + 1);
     public static final Color COLOR_GREEN = new Color(0 * 16 + 0, 12 * 16 + 12, 3 * 16 + 3);
+    public static final Color COLOR_DARKGREEN = new Color(0,100,0);
     /** Color to be used for errors */
     public static final Color COLOR_ERROR = new Color(0xed1c24);
     /** Color to be used for the generate jobs table if a value is not saved and bigger as the saved value */
