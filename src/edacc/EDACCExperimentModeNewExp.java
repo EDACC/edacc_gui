@@ -42,7 +42,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         }
     }
 
-    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, String expName, String expDescription, boolean configurationExp, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast) {
+    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, String expName, String expDescription, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast) {
         this(parent, modal);
 
         txtExperimentName.setText(expName);
@@ -90,6 +90,8 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         this.chkLimitSolverOutputActionPerformed(null);
         this.chkLimitWatcherOutputActionPerformed(null);
         this.chkLimitVerifierOutputActionPerformed(null);
+        
+        comboDefaultCost.setSelectedItem(defaultCost);
         this.pack();
         this.setTitle("Edit experiment");
     }

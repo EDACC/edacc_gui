@@ -2998,7 +2998,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
 
         Experiment exp = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
-        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription(), exp.isConfigurationExp(), exp.getSolverOutputPreserveFirst(), exp.getSolverOutputPreserveLast(), exp.getWatcherOutputPreserveFirst(), exp.getWatcherOutputPreserveLast(), exp.getVerifierOutputPreserveFirst(), exp.getVerifierOutputPreserveLast());
+        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription(), exp.isConfigurationExp(), exp.getDefaultCost(), exp.getSolverOutputPreserveFirst(), exp.getSolverOutputPreserveLast(), exp.getWatcherOutputPreserveFirst(), exp.getWatcherOutputPreserveLast(), exp.getVerifierOutputPreserveFirst(), exp.getVerifierOutputPreserveLast());
         dialogEditExp.setLocationRelativeTo(mainFrame);
         try {
             while (true) {

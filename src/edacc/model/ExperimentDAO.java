@@ -19,7 +19,7 @@ import java.util.zip.ZipOutputStream;
  * @author daniel
  */
 public class ExperimentDAO {
-
+    
     protected static final String table = "Experiment";
     protected static final String insertQuery = "INSERT INTO " + table + " (Name, Date, description, configurationExp, "
             + "priority, defaultCost, active, solverOutputPreserveFirst, solverOutputPreserveLast, watcherOutputPreserveFirst, "
@@ -122,19 +122,19 @@ public class ExperimentDAO {
         }
         if (experiment.getVerifierOutputPreserveFirst() == null) {
             st.setNull(12, java.sql.Types.INTEGER);
-            st.setNull(13, java.sql.Types.INTEGER);  
+            st.setNull(13, java.sql.Types.INTEGER);            
         } else {
             st.setInt(12, experiment.getVerifierOutputPreserveFirst());
             st.setInt(13, experiment.getVerifierOutputPreserveLast());
         }
         st.executeUpdate();
-
+        
         if (experiment.isNew()) {
             ResultSet generatedKeys = st.getGeneratedKeys();
             if (generatedKeys.next()) {
                 experiment.setId(generatedKeys.getInt(1));
             }
-
+            
             cache.cache(experiment);
         }
         experiment.setSaved();
@@ -154,7 +154,7 @@ public class ExperimentDAO {
         cache.remove(experiment);
         experiment.setDeleted();
     }
-
+    
     private static Experiment getExperimentFromResultset(ResultSet rs) throws SQLException {
         Experiment i = new Experiment();
         i.setId(rs.getInt("idExperiment"));
@@ -163,6 +163,11 @@ public class ExperimentDAO {
         i.setDescription(rs.getString("description"));
         i.setConfigurationExp(rs.getBoolean("configurationExp"));
         i.setPriority(rs.getInt("priority"));
+        try {
+            i.setDefaultCost(Experiment.Cost.valueOf(rs.getString("defaultCost")));
+        } catch (Exception ex) {
+            i.setDefaultCost(Experiment.Cost.resultTime);
+        }
         i.setActive(rs.getBoolean("active"));
         i.setSolverOutputPreserveFirst(rs.getInt("solverOutputPreserveFirst"));
         if (rs.wasNull()) {
@@ -202,7 +207,7 @@ public class ExperimentDAO {
         if (c != null) {
             return c;
         }
-
+        
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idExperiment=?");
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
@@ -242,7 +247,7 @@ public class ExperimentDAO {
         st.close();
         return res;
     }
-
+    
     public static void setModified(Experiment e) {
         e.setModified();
     }
@@ -269,7 +274,7 @@ public class ExperimentDAO {
         ps.close();
         return solvers;
     }
-
+    
     public static int getRunCountInExperimentForSolverConfigurationAndInstance(Experiment exp, Integer idSolverConfig, Integer idInstance) throws SQLException {
         final String query = "select count(idJob) from ExperimentResults WHERE Experiment_idExperiment = ? AND solverConfig_idSolverConfig = ? AND Instances_idInstance = ?";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
@@ -283,7 +288,7 @@ public class ExperimentDAO {
             return 0;
         }
     }
-
+    
     public static int getJobCount(Experiment experiment) throws SQLException {
         final String query = "SELECT COUNT(idJob) FROM ExperimentResults WHERE Experiment_idExperiment = ?";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
@@ -295,11 +300,11 @@ public class ExperimentDAO {
             return 0;
         }
     }
-
+    
     public static void clearCache() {
         cache.clear();
     }
-
+    
     public static ArrayList<StatusCount> getJobCountForExperiment(Experiment exp) throws SQLException, StatusCodeNotInDBException {
         final String query = "SELECT status, COUNT(idJob) FROM ExperimentResults WHERE Experiment_idExperiment = ? GROUP BY status";
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
@@ -313,7 +318,7 @@ public class ExperimentDAO {
         ps.close();
         return res;
     }
-
+    
     public static Pair<Integer, Boolean> getPriorityActiveByExperiment(Experiment exp) throws SQLException {
         Pair<Integer, Boolean> p = new Pair<Integer, Boolean>(0, false);
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
@@ -361,11 +366,11 @@ public class ExperimentDAO {
         }
         task.setStatus("Done.");
     }
-
+    
     public static void importExperiments(Tasks task, ZipFile file, List<Experiment> experiments, HashMap<Integer, SolverBinaries> solverBinaryMap, HashMap<Integer, Parameter> parameterMap, HashMap<Integer, Instance> instanceMap) throws SQLException, IOException, ClassNotFoundException {
         
         int current = 1;
-        for (Experiment experiment: experiments) {
+        for (Experiment experiment : experiments) {
             task.setTaskProgress(0.f);
             task.setOperationName("Importing experiment " + current + " / " + experiments.size());
             task.setStatus("Saving experiment..");
@@ -401,13 +406,13 @@ public class ExperimentDAO {
             current++;
         }
     }
-
+    
     public static void writeExperimentsToStream(ObjectOutputStream stream, List<Experiment> experiments) throws IOException, SQLException {
         for (Experiment exp : experiments) {
             stream.writeUnshared(exp);
         }
     }
-
+    
     public static List<Experiment> readExperimentsFromFile(ZipFile file) throws IOException, ClassNotFoundException {
         ZipEntry entry = file.getEntry("experiments.edacc");
         if (entry == null) {
@@ -421,7 +426,7 @@ public class ExperimentDAO {
         }
         return res;
     }
-
+    
     public static Experiment readExperimentFromStream(ObjectInputStream stream) throws IOException, ClassNotFoundException {
         try {
             return (Experiment) stream.readUnshared();
@@ -430,21 +435,20 @@ public class ExperimentDAO {
         }
     }
     
-
     public static class StatusCount {
-
+        
         StatusCode statusCode;
         Integer count;
-
+        
         public StatusCount(StatusCode statusCode, Integer count) {
             this.statusCode = statusCode;
             this.count = count;
         }
-
+        
         public Integer getCount() {
             return count;
         }
-
+        
         public StatusCode getStatusCode() {
             return statusCode;
         }
