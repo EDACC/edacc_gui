@@ -2525,9 +2525,11 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                             public void run() {
                                 try {
                                     expController.refreshSolverConfigurationModel();
+                                    expController.refreshInstanceSelection();
                                     expController.refreshGenerateJobsModel();
                                 } catch (Exception ex) {
-                                    // TODO: error?
+                                    // TODO: error message
+                                    EDACCApp.getLogger().logException(ex);
                                 }
                             }
                         });
@@ -2655,6 +2657,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         } catch (SQLException ex) {
             createDatabaseErrorMessage(ex);
+            EDACCApp.getLogger().logException(ex);
         } finally {
             dialogNewExp.dispose();
         }
@@ -3217,7 +3220,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                                         expController.refreshSolverConfigurationModel();
                                         expController.refreshGenerateJobsModel();
                                     } catch (Exception ex) {
-                                        // TODO: error?
+                                        // TODO: error message
+                                        EDACCApp.getLogger().logException(ex);
                                     }
                                 }
                             });
@@ -3716,9 +3720,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     @Override
     public void onTaskFailed(String methodName, Throwable e) {
+        EDACCApp.getLogger().logException(e);
         if (methodName.equals("loadExperiment")) {
-            System.out.println("THIS MIGHT BE OUR LOAD EXPERIMENT BUG");
-            e.printStackTrace();
             expController.unloadExperiment();
         }
         if (e instanceof TaskCancelledException) {

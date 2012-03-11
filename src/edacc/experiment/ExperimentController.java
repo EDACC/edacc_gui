@@ -178,7 +178,7 @@ public class ExperimentController {
         main.jobsTableModel.setDefaultCost(exp.getDefaultCost());
         
         ArrayList<Solver> vs = new ArrayList<Solver>();
-        Vector<ExperimentHasInstance> ehi = new Vector<ExperimentHasInstance>();
+        
         task.setStatus("Loading solvers..");
         vs.addAll(SolverDAO.getAll());
         main.solTableModel.setSolvers(vs);
@@ -199,10 +199,8 @@ public class ExperimentController {
         solverConfigurationEntryModel.fireDataChanged();
         task.setTaskProgress(.5f);
         task.setStatus("Loading instances..");
-        // select instances for the experiment
-        ehi.addAll(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
-        main.insTableModel.setExperimentHasInstances(ehi);
-
+        refreshInstanceSelection();
+        
         task.setTaskProgress(.75f);
         task.setStatus("Loading experiment results..");
         experimentResultCache = new ExperimentResultCache(activeExperiment);
@@ -515,6 +513,13 @@ public class ExperimentController {
     public void refreshGenerateJobsModel() throws SQLException, IOException {
         getExperimentResults().updateExperimentResults();
         main.generateJobsTableModel.updateNumRuns();
+    }
+    
+    public void refreshInstanceSelection() throws SQLException {
+        // select instances for the experiment
+        Vector<ExperimentHasInstance> ehi = new Vector<ExperimentHasInstance>();
+        ehi.addAll(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
+        main.insTableModel.setExperimentHasInstances(ehi);
     }
 
     /**
