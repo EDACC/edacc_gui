@@ -2,17 +2,14 @@ package edacc.experiment;
 
 import edacc.EDACCApp;
 import edacc.model.InstanceClass;
-import edacc.model.IntegerPKModel;
 import edacc.model.Parameter;
 import edacc.model.ParameterDAO;
 import edacc.model.ParameterInstance;
 import edacc.model.Solver;
-import edacc.model.SolverConfiguration;
 import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
