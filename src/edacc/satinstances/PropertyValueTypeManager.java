@@ -356,7 +356,13 @@ public class PropertyValueTypeManager {
 
         File file = new File(edacc.experiment.Util.getPath());
         file = new File(file, "tmp");
-        if (!file.mkdir()) {
+        if (file.exists() && !file.isDirectory()) {
+            if (!file.delete()) {
+                EDACCApp.getLogger().logError("Could not remove file: " + file.getPath());
+                return;
+            }
+        }
+        if (!file.exists() && !file.mkdir()) {
             EDACCApp.getLogger().logError("Could not create directory: " + file.getPath());
             return;
         }
