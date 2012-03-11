@@ -352,15 +352,8 @@ public class PropertyValueTypeManager {
      * @author rretz
      */
     public void addDefaultToDB() throws NoConnectionToDBException, SQLException, IOException, PropertyValueTypeAlreadyExistsException {
-        File f = new File(EDACCApp.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-        String path;
-        if (f.isDirectory()) {
-            path = f.getPath() + "/edacc/resources/defaultPropertyValueType.jar";
-        } else {
-            path = f.getParent() + "/edacc/resources/defaultPropertyValueType.jar";
-        }
-
-        File defaultTypes = new File(path);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(EDACCApp.class).getContext().getResourceMap();
+        File defaultTypes = new File(resourceMap.getClassLoader().getResource("edacc/resources/defaultPropertyValueType.jar").getFile());
         Vector<String> names = readNameFromJarFile(defaultTypes);
         addPropertyValueTypes(names, defaultTypes);
     }

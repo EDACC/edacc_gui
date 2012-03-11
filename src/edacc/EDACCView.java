@@ -753,8 +753,10 @@ public class EDACCView extends FrameView implements Observer {
     public void noMode() {
         manageExperimentModeMenuItem.setSelected(false);
         manageDBModeMenuItem.setSelected(false);
-        mainPanelLayout.replace(mode, noMode);
-        mode = noMode;
+        if (mode != noMode) {
+            mainPanelLayout.replace(mode, noMode);
+            mode = noMode;
+        }
         setStatusText(mode, "");
     }
 
