@@ -725,41 +725,10 @@ CREATE  TABLE IF NOT EXISTS `Experiment_has_Client` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
-
 -- -----------------------------------------------------
--- Table `InstanceDownloads`
+-- Table `ParameterGraph`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `InstanceDownloads` ;
-
-CREATE  TABLE IF NOT EXISTS `InstanceDownloads` (
-  `idInstance` INT NOT NULL ,
-  `filesystemID` INT NOT NULL ,
-  `lastReport` DATETIME NOT NULL ,
-  PRIMARY KEY (`idInstance`, `filesystemID`) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `SolverDownloads`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `SolverDownloads` ;
-
-CREATE  TABLE IF NOT EXISTS `SolverDownloads` (
-  `idSolver` INT NOT NULL ,
-  `filesystemID` INT NOT NULL ,
-  `lastReport` DATETIME NOT NULL ,
-  PRIMARY KEY (`idSolver`, `filesystemID`) )
-ENGINE = InnoDB;
-
--- -----------------------------------------------------
-
--- Table `EDACC`.`ParameterGraph`
-
--- -----------------------------------------------------
-
 DROP TABLE IF EXISTS `ParameterGraph` ;
-
-
 
 CREATE  TABLE IF NOT EXISTS `ParameterGraph` (
   `idParameterGraph` INT NOT NULL AUTO_INCREMENT ,
@@ -859,6 +828,17 @@ CREATE  TABLE IF NOT EXISTS `Course` (
     REFERENCES `Instances` (`idInstance` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `LockedFiles`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `LockedFiles` ;
+
+CREATE  TABLE IF NOT EXISTS `LockedFiles` (
+  `filename` VARCHAR(2048) NOT NULL ,
+  `filesystemID` INT NOT NULL ,
+  `lastReport` DATETIME NOT NULL )
 ENGINE = InnoDB;
 
 INSERT INTO StatusCodes VALUES
