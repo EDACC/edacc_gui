@@ -24,6 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -41,13 +42,15 @@ import javax.swing.event.ListSelectionListener;
  */
 public class EDACCVerifiersCreateEditDialog extends javax.swing.JDialog {
 
+    private List<Verifier> otherVerifiers;
     private Verifier verifier;
     private VerifierParameterTableModel model;
     private VerifierParameter currentParameter;
+    private File[] files;
     private boolean cancelled;
 
     /** Creates new form EDACCVerifiersCreateEditDialog */
-    public EDACCVerifiersCreateEditDialog(java.awt.Frame parent, boolean modal) {
+    public EDACCVerifiersCreateEditDialog(java.awt.Frame parent, boolean modal, List<Verifier> otherVerifiers) {
         super(parent, modal);
         initComponents();
 
@@ -72,10 +75,11 @@ public class EDACCVerifiersCreateEditDialog extends javax.swing.JDialog {
             }
         });
         cancelled = true;
+        this.otherVerifiers = otherVerifiers;
     }
 
-    public EDACCVerifiersCreateEditDialog(java.awt.Frame parent, boolean modal, Verifier verifier) {
-        this(parent, modal);
+    public EDACCVerifiersCreateEditDialog(java.awt.Frame parent, boolean modal, List<Verifier> otherVerifiers, Verifier verifier) {
+        this(parent, modal, otherVerifiers);
 
         this.setTitle("Edit Verifier");
         this.verifier = verifier;
@@ -84,6 +88,7 @@ public class EDACCVerifiersCreateEditDialog extends javax.swing.JDialog {
         txtRunCommand.setText(verifier.getRunCommand());
         txtRunPath.setText(verifier.getRunPath());
         lblMd5.setText(verifier.getMd5());
+
         model.setVerifier(verifier);
     }
 
@@ -756,16 +761,17 @@ public class EDACCVerifiersCreateEditDialog extends javax.swing.JDialog {
         }
 
         if (verifier.isNew()) {
-            /* File binaryFile = new File(txtBinary.getText());
-            if (!binaryFile.exists() || !binaryFile.canRead()) {
-            JOptionPane.showMessageDialog(this, "Binary file not readable.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-            }*/
+            if (files == null || files.length == 0) {
+                JOptionPane.showMessageDialog(this, "No binary file selected.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            verifier.setFiles(files);
+            verifier.setMd5(lblMd5.getText());
             verifier.setName(txtName.getText());
             verifier.setDescription(txtDescription.getText());
             verifier.setRunCommand(txtRunCommand.getText());
             verifier.setRunPath(txtRunPath.getText());
-            //verifier.setFile(binaryFile);
+            
             verifier.setParameters(model.getParameters());
         } else {
             Map<Integer, VerifierParameter> modelParams = new HashMap<Integer, VerifierParameter>();
@@ -781,6 +787,15 @@ public class EDACCVerifiersCreateEditDialog extends javax.swing.JDialog {
                     p.setDeleted();
                 }
             }
+            if (files != null && files.length != 0) {
+                verifier.setFiles(files);
+                verifier.setMd5(lblMd5.getText());
+            }
+            verifier.setName(txtName.getText());
+            verifier.setDescription(txtDescription.getText());
+            verifier.setRunCommand(txtRunCommand.getText());
+            verifier.setRunPath(txtRunPath.getText());
+            verifier.setParameters(model.getParameters());
         }
         cancelled = false;
         setVisible(false);
@@ -789,40 +804,48 @@ public class EDACCVerifiersCreateEditDialog extends javax.swing.JDialog {
     private void btnDismissActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDismissActionPerformed
         setVisible(false);
     }//GEN-LAST:event_btnDismissActionPerformed
-    
+
     private void addBinary(File[] binary) throws NoSuchAlgorithmException, IOException {
         if (binary.length == 0) {
             return;
         }
         Arrays.sort(binary);
-      //  SolverBinaries b = new SolverBinaries(currentSolver);
-      //  b.setBinaryArchive(binary);
-      //  b.setBinaryName(binary[0].getName());
         try {
             FileInputStreamList is = new FileInputStreamList(binary);
             SequenceInputStream seq = new SequenceInputStream(is);
             String md5 = Util.calculateMD5(seq);
-            /*if (hasDuplicates(md5)) {
-                if (JOptionPane.showConfirmDialog(gui,
-                        "There already exists a solver binary with the same "
+            boolean hasDuplicates = false;
+            for (Verifier v : otherVerifiers) {
+                if (md5.equals(v.getMd5())) {
+                    hasDuplicates = true;
+                    break;
+                }
+            }
+            if (hasDuplicates) {
+                if (JOptionPane.showConfirmDialog(this,
+                        "There already exists a verifier binary with the same "
                         + "checksum. Do you want to add this binary anyway?",
-                        "Duplicate solver binary",
+                        "Duplicate Verifier Binary",
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
                         == JOptionPane.NO_OPTION) {
                     return;
                 }
-            }*/
-            verifier.setMd5(md5);
-            //Util.removeCommonPrefix(b);
-            
-            EDACCVerifierBinaryDialog dialog = new EDACCVerifierBinaryDialog(EDACCApp.getApplication().getMainFrame(), true);
+            }
+
+            EDACCVerifierBinaryDialog dialog = new EDACCVerifierBinaryDialog(EDACCApp.getApplication().getMainFrame(), true, binary);
             dialog.setName("EDACCVerifierBinaryDialog");
             EDACCApp.getApplication().show(dialog);
+            if (!dialog.isCancelled()) {
+                files = binary;
+                txtRunCommand.setText(verifier.getRunCommand());
+                txtRunPath.setText(verifier.getRunPath());
+                lblMd5.setText(verifier.getMd5());
+            }
         } catch (NoSuchElementException e) {
             JOptionPane.showMessageDialog(this, "You have to choose some files!", "No files chosen!", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void btnChangeBinaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangeBinaryActionPerformed
         JFileChooser binaryFileChooser = null;
 

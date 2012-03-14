@@ -3,6 +3,7 @@ package edacc.manageDB;
 import edacc.model.Verifier;
 import edacc.model.VerifierDAO;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  *
@@ -29,5 +30,9 @@ public class ManageDBVerifiers {
 
     public void verifierUpdated(int index) {
         model.fireTableRowsUpdated(index, index);
+    }
+
+    public List<Verifier> getVerifiers() {
+        return model.getVerifiers();
     }
 }

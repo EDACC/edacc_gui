@@ -17,7 +17,7 @@ public class Verifier extends BaseModel implements IntegerPKModel {
     private String runCommand;
     private String runPath;
     private List<VerifierParameter> parameters;
-    private File file;
+    private File[] files;
 
     public Verifier() {
         id = -1;
@@ -53,12 +53,12 @@ public class Verifier extends BaseModel implements IntegerPKModel {
         }
     }
 
-    public File getFile() {
-        return file;
+    public File[] getFiles() {
+        return files;
     }
 
-    public void setFile(File file) {
-        this.file = file;
+    public void setFiles(File[] files) {
+        this.files = files;
         if (this.isSaved()) {
             this.setModified();
         }

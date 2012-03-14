@@ -3,6 +3,7 @@ package edacc.manageDB;
 import edacc.experiment.ThreadSafeDefaultTableModel;
 import edacc.model.Verifier;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -67,6 +68,17 @@ public class VerifierTableModel extends ThreadSafeDefaultTableModel {
 
     public Verifier getVerifier(int rowIndex) {
         return verifiers.get(rowIndex);
+    }
+
+    public List<Verifier> getVerifiers() {
+        List<Verifier> res = new LinkedList<Verifier>();
+        if (verifiers == null) {
+            return res;
+        }
+        for (Verifier v : verifiers) {
+            res.add(v);
+        }
+        return res;
     }
     
 }

@@ -2316,7 +2316,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     }//GEN-LAST:event_bImportParamsOfSolverActionPerformed
 
     private void btnAddVerifierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddVerifierActionPerformed
-        EDACCVerifiersCreateEditDialog dialog = new EDACCVerifiersCreateEditDialog(EDACCApp.getApplication().getMainFrame(), true);
+        EDACCVerifiersCreateEditDialog dialog = new EDACCVerifiersCreateEditDialog(EDACCApp.getApplication().getMainFrame(), true, manageDBVerifiers.getVerifiers());
         dialog.setName("EDACCVerifiersCreateEditDialog");
         EDACCApp.getApplication().show(dialog);
         if (!dialog.isCancelled()) {
@@ -2328,7 +2328,13 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         int index = tableVerifiers.getSelectedRow();
         if (index != -1) {
             Verifier v = manageDBVerifiers.getVerifier(tableVerifiers.convertRowIndexToModel(index));
-            EDACCVerifiersCreateEditDialog dialog = new EDACCVerifiersCreateEditDialog(EDACCApp.getApplication().getMainFrame(), true, v);
+            List<Verifier> otherVerifiers = manageDBVerifiers.getVerifiers();
+            for (int i = 0; i < otherVerifiers.size(); i++) 
+                if (otherVerifiers.get(i) == v) {
+                    otherVerifiers.remove(i);
+                    break;
+                }
+            EDACCVerifiersCreateEditDialog dialog = new EDACCVerifiersCreateEditDialog(EDACCApp.getApplication().getMainFrame(), true, otherVerifiers, v);
             dialog.setName("EDACCVerifiersCreateEditDialog");
             EDACCApp.getApplication().show(dialog);
             if (!dialog.isCancelled()) {
