@@ -464,6 +464,10 @@ public class PropertyDAO {
             hasMD5 = true;
         }
 
+        //  To reduces the connection requests to the Databaseconnector during the creation an save Process of InstanceHasProperty Objects
+        PreparedStatement psNew = DatabaseConnector.getInstance().getConn().prepareStatement(InstanceHasPropertyDAO.getInsertQuery(), PreparedStatement.RETURN_GENERATED_KEYS);
+        PreparedStatement psMod = DatabaseConnector.getInstance().getConn().prepareStatement(InstanceHasPropertyDAO.getUpdateQuery());
+       
         String line = br.readLine();
 
         while (line != null) {
@@ -491,7 +495,7 @@ public class PropertyDAO {
                 for (int i = count; i < tmpLine.size(); i++) // Get the matching Instance
                 {
                     if (head.get((i - count)) != null) {
-                        InstanceHasPropertyDAO.createInstanceHasInstanceProperty(tmp, head.get((i - count)), tmpLine.get(i), overwrite);
+                        InstanceHasPropertyDAO.createInstanceHasInstanceProperty(tmp, head.get((i - count)), tmpLine.get(i), overwrite, psNew, psMod);
                     }
                 }
             }
@@ -528,12 +532,12 @@ public class PropertyDAO {
                     tmp = true;
                     break;
                 }
-                
+
             }
             if (!tmp) {
                 head.add(null);
             }
-            
+
         }
         return head;
     }

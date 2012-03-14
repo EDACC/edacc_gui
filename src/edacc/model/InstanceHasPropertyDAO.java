@@ -14,10 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -298,7 +295,7 @@ public class InstanceHasPropertyDAO {
         idCache.clear();
     }
 
-    public static void createInstanceHasInstanceProperty(Instance i, Property prop, String value, Boolean overwrite) throws SQLException, NoConnectionToDBException, IOException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, InstanceHasPropertyNotInDBException {
+    public static void createInstanceHasInstanceProperty(Instance i, Property prop, String value, Boolean overwrite, PreparedStatement psNew, PreparedStatement psMod) throws SQLException, NoConnectionToDBException, IOException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, InstanceHasPropertyNotInDBException {
         // Convert value, if an conversionErrorOccures, the value is set to null
         PropertyValueType type = prop.getPropertyValueType();
         try {
@@ -315,14 +312,70 @@ public class InstanceHasPropertyDAO {
             if (overwrite) {
 
                 alreadyExist.setValue(value);
-                save(alreadyExist);
+                save(alreadyExist, psMod);
                 alreadyExist.isSaved();
             }
         } catch (InstanceHasPropertyNotInDBException ex) {
             InstanceHasProperty ihp = new InstanceHasProperty(i, prop, value);
-            save(ihp);
+            save(ihp, psNew);
             ihp.isSaved();
         }
 
+    }
+
+    public static String getInsertQuery() {
+        return insertQuery;
+    }
+
+    public static String getUpdateQuery() {
+        return updateQuery;
+    }
+
+    /**
+     * Persists an InstanceHasInstanceClass object in the DB.
+     * This means: If it's new, it will be inserted into the db and if it's deleted, it will be removed from the db.
+     * Extends the method save(InstanceHasProperty i) with a prepared Statement, to reduces getConn() requests from the DatabaseConnector to
+     * improve the performance. 
+     * @param i
+     * @param st PreparedStatemant have to match with the persistantState of the given InstanceHasPropert-Object. Like PersistanteState = new, 
+     * the PreparedStatement have to provide the InsertQuery.
+     * @throws SQLException 
+     */
+    private static void save(InstanceHasProperty i, PreparedStatement st) throws SQLException {
+        if (i.isDeleted()) {
+            cache.remove(i);
+            idCache.remove(i.getInstance().getId());
+        } else if (i.isNew()) {
+            cache.cache(i);
+            i.setSaved();
+            if (idCache.get(i.getInstance().getId()) == null) {
+                HashMap tmp = new HashMap<Integer, Integer>();
+                tmp.put(i.getProperty().getId(), i.getId());
+                idCache.put(i.getInstance().getId(), tmp);
+            } else {
+                idCache.get(i.getInstance().getId()).put(i.getProperty().getId(), i.getId());
+            }
+            st.setString(3, i.getValue());
+        } else if (i.isModified()) {
+            st.setString(1, i.getValue());
+            st.setInt(2, i.getInstance().getId());
+            st.setInt(3, i.getProperty().getId());
+            st.executeUpdate();
+            return;
+        } else {
+            st = null;
+            return;
+        }
+        st.setInt(1, i.getInstance().getId());
+        st.setInt(2, i.getProperty().getId());
+        st.executeUpdate();
+
+        // set id if necessary
+        if (i.isSaved()) {
+            ResultSet rs = st.getGeneratedKeys();
+            if (rs.next()) {
+                i.setId(rs.getInt(1));
+            }
+        }
     }
 }
