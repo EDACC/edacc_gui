@@ -13,14 +13,8 @@ package edacc;
 
 import edacc.manageDB.ManageDBSolvers;
 import edacc.manageDB.SolverBinariesListModel;
-import edacc.model.Solver;
 import edacc.model.SolverBinaries;
-import edacc.model.SolverBinariesDAO;
 import java.awt.Frame;
-import java.io.File;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
