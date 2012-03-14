@@ -41,6 +41,11 @@ public class SystemPropertyTableModel extends AbstractTableModel {
     }
 
     @Override
+    public String getColumnName(int column){
+        return columns[column];
+    }
+    
+    @Override
     public int getColumnCount() {
         return columns.length;
     }
