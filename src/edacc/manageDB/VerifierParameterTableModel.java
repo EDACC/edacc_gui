@@ -35,7 +35,8 @@ public class VerifierParameterTableModel extends AbstractTableModel{
         this.verifier = verifier;
         params = new ArrayList<VerifierParameter>();
         for (VerifierParameter p : verifier.getParameters()) {
-            params.add(new VerifierParameter(p));
+            if (!p.isDeleted())
+                params.add(new VerifierParameter(p));
         }
     }
     

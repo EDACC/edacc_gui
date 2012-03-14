@@ -30,7 +30,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author simon
  */
 public class Util {
-
+    public static final String[] constSolverParameters = {"instance", "seed", "tempdir", "db_host", "db_port", "db_db", "db_username", "db_password"};
+    
     public static final Color COLOR_ROYALBLUE = new Color(4 * 16 + 1, 6 * 16 + 9, 14 * 16 + 1);
     public static final Color COLOR_GREEN = new Color(0 * 16 + 0, 12 * 16 + 12, 3 * 16 + 3);
     public static final Color COLOR_DARKGREEN = new Color(0,100,0);
@@ -134,7 +135,7 @@ public class Util {
      * @param params the parameter instances
      * @return null if an error occurred
      */
-    public static String getParameterString(ArrayList<ParameterInstance> params, Solver solver) {
+    public static String getSolverParameterString(ArrayList<ParameterInstance> params, Solver solver) {
         try {
             if (params == null || params.isEmpty()) {
                 return "";
@@ -163,10 +164,15 @@ public class Util {
             });
             for (ParameterInstance param : params) {
                 Parameter solverParameter = solverParamsMap.get(param.getParameter_id());
-                if ("instance".equals(solverParameter.getName().toLowerCase())) {
-                    paramString += solverParameter.getPrefix() == null ? "<instance>" : (solverParameter.getPrefix() + (solverParameter.getSpace() ? " " : "")) + "<instance>";
-                } else if ("seed".equals(solverParameter.getName().toLowerCase())) {
-                    paramString += solverParameter.getPrefix() == null ? "<seed>" : (solverParameter.getPrefix() + (solverParameter.getSpace() ? " " : "")) + "<seed>";
+                boolean found = false;
+                for (String s : constSolverParameters) {
+                    if (s.equals(solverParameter.getName().toLowerCase())) {
+                        paramString += solverParameter.getPrefix() == null ? "<" + s + ">" : (solverParameter.getPrefix() + (solverParameter.getSpace() ? " " : "")) + "<" + s + ">";
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) {
                 } else if (solverParameter.getHasValue()) {
                     paramString += solverParameter.getPrefix() == null ? param.getValue() : (solverParameter.getPrefix() + (solverParameter.getSpace() ? " " : "")) + param.getValue();
                 } else {

@@ -92,7 +92,7 @@ public class SolverConfigurationTableModel extends ThreadSafeDefaultTableModel {
                     return "";
                 }
                 SolverConfiguration sc = solverConfigurations.get(rowIndex);
-                return Util.getParameterString(getParametersBySolverConfig(sc), solver);
+                return Util.getSolverParameterString(getParametersBySolverConfig(sc), solver);
         }
         return "";
     }

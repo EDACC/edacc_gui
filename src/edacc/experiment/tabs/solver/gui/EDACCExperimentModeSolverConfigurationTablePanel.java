@@ -339,7 +339,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
                             pis.add(pi);
                         }
                     }
-                    parameterStrings.add(edacc.experiment.Util.getParameterString(pis, solver));
+                    parameterStrings.add(edacc.experiment.Util.getSolverParameterString(pis, solver));
                 }
             }
             fireTableDataChanged();
@@ -357,7 +357,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
                             pis.add(pi);
                         }
                     }
-                    parameterStrings.set(i, edacc.experiment.Util.getParameterString(pis, entry.getSolver()));
+                    parameterStrings.set(i, edacc.experiment.Util.getSolverParameterString(pis, entry.getSolver()));
                     fireTableRowsUpdated(i, i);
                     break;
                 }

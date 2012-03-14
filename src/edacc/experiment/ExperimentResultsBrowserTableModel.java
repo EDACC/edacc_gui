@@ -333,7 +333,7 @@ public class ExperimentResultsBrowserTableModel extends ThreadSafeDefaultTableMo
                 if (solver == null) return "";
                 String params = parameters.get(j.getSolverConfigId());
                 if (params == null) {
-                    params = Util.getParameterString(getParameters(rowIndex), solver);
+                    params = Util.getSolverParameterString(getParameters(rowIndex), solver);
                     parameters.put(j.getSolverConfigId(), params);
                 }
                 return params;

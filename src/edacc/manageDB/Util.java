@@ -6,10 +6,7 @@ package edacc.manageDB;
 
 import SevenZip.CoderPropID;
 import SevenZip.Compression.LZMA.Decoder;
-import SevenZip.Compression.LZMA.Encoder;
 import SevenZip.ICodeProgress;
-import SevenZip.InvalidParamException;
-import edacc.model.DatabaseConnector;
 import edacc.model.DecompressedInputStream;
 import edacc.model.ExperimentDAO;
 import edacc.model.GridQueueDAO;
@@ -21,11 +18,9 @@ import edacc.model.ParameterInstanceDAO;
 import edacc.model.PropertyDAO;
 import edacc.model.SolverBinaries;
 import edacc.model.SolverDAO;
-import edacc.model.Tasks;
-import java.io.BufferedInputStream;
+import edacc.model.Verifier;
+import edacc.model.VerifierParameter;
 import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,30 +29,24 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringReader;
-import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Blob;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-import javax.swing.SwingUtilities;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  *
  * @author dgall
  */
 public class Util {
-
+    private static final String[] constVerifierParameters = {"instance", "output_solver", "output_launcher", "output_watcher"};
     /**
      * Calculates the MD5 sum of the given file.
      * @param file
@@ -455,5 +444,58 @@ public class Util {
             }
         }
         return lcp;
+    }
+    
+    
+        /**
+     * Transforms the parameters from this verifier to a string.
+     * @param verifier the verifier
+     * @return null if an error occurred
+     */
+    public static String getVerifierParameterString(Verifier verifier) {
+        try {
+            if (verifier.getParameters().isEmpty()) {
+                return "";
+            }
+            List<VerifierParameter> params = new ArrayList<VerifierParameter>();
+            params.addAll(verifier.getParameters());
+            String paramString = "";
+            Collections.sort(params, new Comparator<VerifierParameter>() {
+
+                @Override
+                public int compare(VerifierParameter o1, VerifierParameter o2) {
+                    if (o1.getOrder() > o2.getOrder()) {
+                        return 1;
+                    } else if (o1.getOrder() == o2.getOrder()) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                }
+            });
+            for (VerifierParameter param : params) {
+                boolean found = false;
+                for (String s : constVerifierParameters) {
+                    if (s.equals(param.getName().toLowerCase())) {
+                        paramString += param.getPrefix() == null ? "<" + s + ">" : (param.getPrefix() + (param.getSpace() ? " " : "")) + "<" + s + ">";
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) {
+                } else if (param.getHasValue()) {
+                    paramString += param.getPrefix() == null ? "<value>" : (param.getPrefix() + (param.getSpace() ? " " : "")) + "<value>";
+                } else {
+                    paramString += param.getPrefix() == null ? "" : (param.getPrefix());
+                }
+
+                if (params.get(params.size() - 1) != param) {
+                    paramString += " ";
+                }
+            }
+            return paramString;
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

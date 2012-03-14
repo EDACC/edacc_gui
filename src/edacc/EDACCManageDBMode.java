@@ -299,7 +299,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         panelManageDBVerifiers = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
-        tableVerifiers = new javax.swing.JTable();
+        tableVerifiers = new VerifierTable();
         jPanel4 = new javax.swing.JPanel();
         btnRemoveVerifier = new javax.swing.JButton();
         btnAddVerifier = new javax.swing.JButton();

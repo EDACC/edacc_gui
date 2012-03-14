@@ -37,7 +37,7 @@ public class VerifierTableModel extends ThreadSafeDefaultTableModel {
             case COL_NAME:
                 return verifiers.get(row).getName();
             case COL_PARAMETERS:
-                return "tbd";
+                return Util.getVerifierParameterString(verifiers.get(row));
             default:
                 return "";
         }
