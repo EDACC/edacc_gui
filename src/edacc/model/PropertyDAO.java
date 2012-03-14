@@ -27,8 +27,6 @@ import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * data access object of the Property class
@@ -443,6 +441,20 @@ public class PropertyDAO {
 
     }
 
+    /**
+     * Extract and adds the property data from the csvfile to the database.
+     * @param selected Relation between found csvfile properties and existing Property objects.
+     * @param overwrite Overwrite existing property data?
+     * @param csvFile 
+     * @param task
+     * @throws IOException
+     * @throws SQLException
+     * @throws NoConnectionToDBException
+     * @throws PropertyTypeNotExistException
+     * @throws ComputationMethodDoesNotExistException
+     * @throws InstanceHasPropertyNotInDBException
+     * @throws InstancesNotFoundException 
+     */
     public static void importCSV(Set<Entry<Property, String>> selected, Boolean overwrite, File csvFile, Tasks task) throws IOException, SQLException, NoConnectionToDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, InstanceHasPropertyNotInDBException, InstancesNotFoundException {
         task.setCancelable(true);
         task.setOperationName("Import properties from csv file");
@@ -464,6 +476,10 @@ public class PropertyDAO {
             hasMD5 = true;
         }
 
+        //  To reduces the connection requests to the Databaseconnector during the creation an save Process of InstanceHasProperty Objects
+        PreparedStatement psNew = DatabaseConnector.getInstance().getConn().prepareStatement(InstanceHasPropertyDAO.getInsertQuery(), PreparedStatement.RETURN_GENERATED_KEYS);
+        PreparedStatement psMod = DatabaseConnector.getInstance().getConn().prepareStatement(InstanceHasPropertyDAO.getUpdateQuery());
+       
         String line = br.readLine();
 
         while (line != null) {
@@ -491,7 +507,7 @@ public class PropertyDAO {
                 for (int i = count; i < tmpLine.size(); i++) // Get the matching Instance
                 {
                     if (head.get((i - count)) != null) {
-                        InstanceHasPropertyDAO.createInstanceHasInstanceProperty(tmp, head.get((i - count)), tmpLine.get(i), overwrite);
+                        InstanceHasPropertyDAO.createInstanceHasInstanceProperty(tmp, head.get((i - count)), tmpLine.get(i), overwrite, psNew, psMod);
                     }
                 }
             }
@@ -503,6 +519,14 @@ public class PropertyDAO {
 
     }
 
+    /**
+     * 
+     * @param fstLine The first line of the csvfile to import.
+     * @param Set of the relation between existing Property objects and properties from the csv File
+     * @return ArrayList<Property>, which contains in order of the first line of the csvFile, the matching of csvFile 
+     * columns an Property objects. If a property of the csv file is without a related Propert object, an null entry is added to the list.
+     * 
+     */
     private static ArrayList<Property> generateCSVImportHead(ArrayList<String> fstLine, Set<Entry<Property, String>> selected) {
         ArrayList<Property> head = new ArrayList<Property>();
         if (fstLine.size() < 2) {
@@ -528,16 +552,25 @@ public class PropertyDAO {
                     tmp = true;
                     break;
                 }
-                
+
             }
             if (!tmp) {
                 head.add(null);
             }
-            
+
         }
         return head;
     }
 
+    /**
+     * 
+     * @return All InstanceProperty objects, without the objects whose propertySource is CSVImport.
+     * @throws SQLException
+     * @throws NoConnectionToDBException
+     * @throws PropertyNotInDBException
+     * @throws PropertyTypeNotExistException
+     * @throws IOException 
+     */
     public static Vector<Property> getAllInstancePropertiesWithoutCSVImport() throws SQLException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, IOException {
         Vector<Property> res = new Vector<Property>();
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(

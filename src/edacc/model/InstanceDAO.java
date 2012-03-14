@@ -810,6 +810,13 @@ public class InstanceDAO {
         }
     }
 
+    /**
+     * 
+     * @param name
+     * @param md5
+     * @return Instance object identified by a name and a md5sum
+     * @throws SQLException 
+     */
     public static Instance getByMd5AndName(String name, String md5) throws SQLException {
         if (nameMd5Cache.containsKey(name)) {
             Integer id = nameMd5Cache.get(name).get(md5);
@@ -822,6 +829,13 @@ public class InstanceDAO {
         return null;
     }
 
+    /**
+     * 
+     * @param name
+     * @return Instance object identified by a name. If more Instance objects with the name are found, the 
+     * first one of the list is chosen.
+     * @throws SQLException 
+     */
     public static Instance getByName(String name) throws SQLException {
         if (nameMd5Cache.containsKey(name)) {
             return cache.getCached(new ArrayList<Integer>(nameMd5Cache.get(name).values()).get(0));
