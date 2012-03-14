@@ -58,6 +58,7 @@ import edacc.model.SolverDAO;
 import edacc.model.TaskCancelledException;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
+import edacc.model.Verifier;
 import edacc.parameterspace.ParameterConfiguration;
 import edacc.parameterspace.graph.ParameterGraph;
 import edacc.properties.PropertyTypeNotExistException;
@@ -2601,8 +2602,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         if (expController.getActiveExperiment() != null) {
             return;
         }
+        List<Verifier> verifiers;
+        try {
+            verifiers = expController.getVerifiers();
+        } catch (SQLException ex) {
+            this.createDatabaseErrorMessage(ex);
+            return;
+        }
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        final EDACCExperimentModeNewExp dialogNewExp = new EDACCExperimentModeNewExp(mainFrame, true);
+        final EDACCExperimentModeNewExp dialogNewExp = new EDACCExperimentModeNewExp(mainFrame, true, verifiers);
         dialogNewExp.setLocationRelativeTo(mainFrame);
         try {
             while (true) {
@@ -2629,7 +2637,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                                     dialogNewExp.isConfigurationExp, dialogNewExp.defaultCost, dialogNewExp.solverOutputPreserveFirst,
                                     dialogNewExp.solverOutputPreserveLast, dialogNewExp.watcherOutputPreserveFirst,
                                     dialogNewExp.watcherOutputPreserveLast, dialogNewExp.verifierOutputPreserveFirst,
-                                    dialogNewExp.verifierOutputPreserveLast);
+                                    dialogNewExp.verifierOutputPreserveLast, dialogNewExp.verifierConfig);
                             if (experimentUpdateThread != null) {
                                 experimentUpdateThread.cancel(true);
                             }
@@ -3001,7 +3009,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
 
         Experiment exp = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
-        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, exp.getName(), exp.getDescription(), exp.isConfigurationExp(), exp.getDefaultCost(), exp.getSolverOutputPreserveFirst(), exp.getSolverOutputPreserveLast(), exp.getWatcherOutputPreserveFirst(), exp.getWatcherOutputPreserveLast(), exp.getVerifierOutputPreserveFirst(), exp.getVerifierOutputPreserveLast());
+        List<Verifier> verifiers;
+        try {
+            verifiers = expController.getVerifiers();
+        } catch (SQLException ex) {
+            this.createDatabaseErrorMessage(ex);
+            return;
+        }
+        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, verifiers, exp.getName(), exp.getDescription(), exp.isConfigurationExp(), exp.getDefaultCost(), exp.getSolverOutputPreserveFirst(), exp.getSolverOutputPreserveLast(), exp.getWatcherOutputPreserveFirst(), exp.getWatcherOutputPreserveLast(), exp.getVerifierOutputPreserveFirst(), exp.getVerifierOutputPreserveLast(), exp.getVerifierConfiguration());
         dialogEditExp.setLocationRelativeTo(mainFrame);
         try {
             while (true) {

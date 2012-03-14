@@ -23,12 +23,12 @@ public class ExperimentDAO {
     protected static final String table = "Experiment";
     protected static final String insertQuery = "INSERT INTO " + table + " (Name, Date, description, configurationExp, "
             + "priority, defaultCost, active, solverOutputPreserveFirst, solverOutputPreserveLast, watcherOutputPreserveFirst, "
-            + "watcherOutputPreserveLast, verifierOutputPreserveFirst, verifierOutputPreserveLast) "
-            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            + "watcherOutputPreserveLast, verifierOutputPreserveFirst, verifierOutputPreserveLast, VerifierConfig_idVerifierConfig) "
+            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     protected static final String updateQuery = "UPDATE " + table + " SET Name =?, Date =?, description =?, "
             + "configurationExp =?, priority =?, defaultCost=?, active=?,solverOutputPreserveFirst=?,solverOutputPreserveLast=?,"
             + "watcherOutputPreserveFirst=?,watcherOutputPreserveLast=?,verifierOutputPreserveFirst=?,"
-            + "verifierOutputPreserveLast=? WHERE idExperiment=?";
+            + "verifierOutputPreserveLast=?,VerifierConfig_idVerifierConfig=? WHERE idExperiment=?";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idExperiment=?";
     private static final ObjectCache<Experiment> cache = new ObjectCache<Experiment>();
 
@@ -37,7 +37,7 @@ public class ExperimentDAO {
      * so it can be referenced by related objects
      * @return new Experiment object
      */
-    public static Experiment createExperiment(String name, Date date, String description, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast) throws SQLException {
+    public static Experiment createExperiment(String name, Date date, String description, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, VerifierConfiguration verifierConfig) throws SQLException {
         if (getExperimentByName(name) != null) {
             throw new SQLException("There exists already an experiment with the same name.");
         }
@@ -55,6 +55,10 @@ public class ExperimentDAO {
         i.setWatcherOutputPreserveLast(watcherOutputPreserveLast);
         i.setVerifierOutputPreserveFirst(verifierOutputPreserveFirst);
         i.setVerifierOutputPreserveLast(verifierOutputPreserveLast);
+        if (verifierConfig != null && verifierConfig.isNew()) {
+            VerifierConfigurationDAO.save(verifierConfig);
+        }
+        i.setVerifierConfiguration(verifierConfig);
         save(i);
         cache.cache(i);
         return i;
@@ -95,7 +99,7 @@ public class ExperimentDAO {
             st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
         } else if (experiment.isModified()) {
             st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
-            st.setInt(14, experiment.getId());
+            st.setInt(15, experiment.getId());
         } else {
             return;
         }
@@ -126,6 +130,11 @@ public class ExperimentDAO {
         } else {
             st.setInt(12, experiment.getVerifierOutputPreserveFirst());
             st.setInt(13, experiment.getVerifierOutputPreserveLast());
+        }
+        if (experiment.getVerifierConfiguration() == null) {
+            st.setNull(14, java.sql.Types.INTEGER);
+        } else {
+            st.setInt(14, experiment.getVerifierConfiguration().getId());
         }
         st.executeUpdate();
         
@@ -192,6 +201,12 @@ public class ExperimentDAO {
         i.setVerifierOutputPreserveLast(rs.getInt("verifierOutputPreserveLast"));
         if (rs.wasNull()) {
             i.setVerifierOutputPreserveLast(null);
+        }
+        int idVerifierConfig = rs.getInt("VerifierConfig_idVerifierConfig");
+        if (rs.wasNull()) {
+            i.setVerifierConfiguration(null);
+        } else {
+            i.setVerifierConfiguration(VerifierConfigurationDAO.getById(idVerifierConfig));
         }
         return i;
     }

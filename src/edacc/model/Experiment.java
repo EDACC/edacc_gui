@@ -17,6 +17,7 @@ public class Experiment extends BaseModel implements IntegerPKModel, Serializabl
     private Integer solverOutputPreserveFirst, solverOutputPreserveLast;
     private Integer watcherOutputPreserveFirst, watcherOutputPreserveLast;
     private Integer verifierOutputPreserveFirst, verifierOutputPreserveLast;
+    private VerifierConfiguration verifierConfiguration;
     // only used for export
     public List<ExperimentHasInstance> instances;
     protected ConfigurationScenario scenario;
@@ -144,6 +145,17 @@ public class Experiment extends BaseModel implements IntegerPKModel, Serializabl
 
     public void setPriority(int priority) {
         this.priority = priority;
+        if (this.isSaved()) {
+            this.setModified();
+        }
+    }
+
+    public VerifierConfiguration getVerifierConfiguration() {
+        return verifierConfiguration;
+    }
+
+    public void setVerifierConfiguration(VerifierConfiguration verifierConfiguration) {
+        this.verifierConfiguration = verifierConfiguration;
         if (this.isSaved()) {
             this.setModified();
         }

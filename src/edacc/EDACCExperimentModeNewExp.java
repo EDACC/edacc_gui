@@ -6,30 +6,86 @@
 package edacc;
 
 import edacc.experiment.Util;
+import edacc.experiment.VerifierParameterTableModel;
 import edacc.model.Experiment;
+import edacc.model.Verifier;
+import edacc.model.VerifierConfiguration;
+import edacc.model.VerifierDAO;
+import edacc.model.VerifierParameter;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.KeyEvent;
+import java.util.LinkedList;
+import java.util.List;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  *
  * @author balint
  */
 public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
-
+    
     public String expName;
     public String expDesc;
     public Integer solverOutputPreserveFirst, solverOutputPreserveLast;
     public Integer watcherOutputPreserveFirst, watcherOutputPreserveLast;
     public Integer verifierOutputPreserveFirst, verifierOutputPreserveLast;
     public Experiment.Cost defaultCost;
+    public VerifierConfiguration verifierConfig;
     public boolean isConfigurationExp;
     public boolean canceled;
+    private VerifierParameterTableModel verifierParameterTableModel;
 
     /** Creates new form EDACCExperimentModeNewExp */
-    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal) {
+    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, List<Verifier> verifiers) {
         super(parent, modal);
         initComponents();
+        verifierParameterTableModel = new VerifierParameterTableModel();
+        tblVerifierParameters.setModel(verifierParameterTableModel);
+        
+                tblVerifierParameters.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        tblVerifierParameters.setRowSelectionAllowed(false);
+        tblVerifierParameters.setCellSelectionEnabled(false);
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
 
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                JLabel lbl = (JLabel) comp;
+                lbl.setEnabled((Boolean) verifierParameterTableModel.getValueAt(row, 0));
+                return comp;
+            }
+        };
+
+        DefaultTableCellRenderer booleanRenderer = new DefaultTableCellRenderer() {
+
+            protected JCheckBox checkBox;
+
+            {
+                checkBox = new JCheckBox();
+                checkBox.setHorizontalAlignment(SwingConstants.CENTER);
+                checkBox.setBackground(Color.white);
+            }
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                checkBox.setBackground(comp.getBackground());
+                checkBox.setEnabled(!verifierParameterTableModel.getParameters().get(row).isMandatory());
+                checkBox.setSelected((Boolean) value);
+                return checkBox;
+            }
+        };
+
+        tblVerifierParameters.setDefaultRenderer(String.class, renderer);
+        tblVerifierParameters.setDefaultRenderer(Integer.class, renderer);
+        tblVerifierParameters.setDefaultRenderer(Boolean.class, booleanRenderer);
+        
         this.pack();
         this.txtExperimentName.requestFocus();
         this.chkLimitSolverOutputActionPerformed(null);
@@ -40,11 +96,16 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         for (Experiment.Cost cost : Experiment.Cost.values()) {
             comboDefaultCost.addItem(cost);
         }
+        comboVerifierBinary.removeAllItems();
+        comboVerifierBinary.addItem((Verifier) null);
+        for (Verifier v : verifiers) {
+            comboVerifierBinary.addItem(v);
+        }
     }
-
-    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, String expName, String expDescription, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast) {
-        this(parent, modal);
-
+    
+    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, List<Verifier> verifiers, String expName, String expDescription, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, VerifierConfiguration verifierConfig) {
+        this(parent, modal, verifiers);
+        
         txtExperimentName.setText(expName);
         txtExperimentDescription.setText(expDescription);
         this.isConfigurationExp = configurationExp;
@@ -92,6 +153,12 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         this.chkLimitVerifierOutputActionPerformed(null);
         
         comboDefaultCost.setSelectedItem(defaultCost);
+        
+        if (verifierConfig != null) {
+            comboVerifierBinary.setSelectedItem(verifierConfig.getVerifier());
+            verifierParameterTableModel.setParameterInstances(verifierConfig.getParameterInstances());
+        }
+        
         this.pack();
         this.setTitle("Edit experiment");
     }
@@ -140,6 +207,13 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         comboVerifierOutputUnit = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
         comboDefaultCost = new javax.swing.JComboBox();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        comboVerifierBinary = new javax.swing.JComboBox();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblVerifierParameters = new javax.swing.JTable();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentModeNewExp.class);
@@ -304,6 +378,73 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         comboDefaultCost.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         comboDefaultCost.setName("comboDefaultCost"); // NOI18N
 
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        jPanel1.setName("jPanel1"); // NOI18N
+
+        jLabel5.setText(resourceMap.getString("jLabel5.text")); // NOI18N
+        jLabel5.setName("jLabel5"); // NOI18N
+
+        comboVerifierBinary.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboVerifierBinary.setName("comboVerifierBinary"); // NOI18N
+        comboVerifierBinary.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboVerifierBinaryActionPerformed(evt);
+            }
+        });
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel2.border.title"))); // NOI18N
+        jPanel2.setName("jPanel2"); // NOI18N
+
+        jScrollPane2.setName("jScrollPane2"); // NOI18N
+
+        tblVerifierParameters.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tblVerifierParameters.setName("tblVerifierParameters"); // NOI18N
+        jScrollPane2.setViewportView(tblVerifierParameters);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 539, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(comboVerifierBinary, 0, 507, Short.MAX_VALUE))
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(comboVerifierBinary, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
+        jLabel3.setName("jLabel3"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -329,10 +470,11 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                             .addComponent(lblExperimentDescription)
                             .addComponent(lblVerifierOutputPreserveFirst)
                             .addComponent(lblVerifierOutputPreserveLast)
-                            .addComponent(jLabel2))
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 510, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
                             .addComponent(comboDefaultCost, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(chkLimitWatcherOutput)
@@ -349,21 +491,25 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(chkConfigurationExp)
                                 .addGap(38, 38, 38))
-                            .addComponent(txtWatcherOutputPreserveLast, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 510, Short.MAX_VALUE)
-                            .addComponent(txtWatcherOutputPreserveFirst, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 510, Short.MAX_VALUE)
-                            .addComponent(txtSolverOutputPreserveLast, javax.swing.GroupLayout.DEFAULT_SIZE, 510, Short.MAX_VALUE)
-                            .addComponent(txtSolverOutputPreserveFirst, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 510, Short.MAX_VALUE)
+                            .addComponent(txtWatcherOutputPreserveLast, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
+                            .addComponent(txtWatcherOutputPreserveFirst, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
+                            .addComponent(txtSolverOutputPreserveLast, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
+                            .addComponent(txtSolverOutputPreserveFirst, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(chkLimitSolverOutput)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(lblLimitSolverOutputIn)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(comboSolverOutputUnit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(txtExperimentName, javax.swing.GroupLayout.DEFAULT_SIZE, 510, Short.MAX_VALUE)
-                            .addComponent(txtVerifierOutputPreserveFirst, javax.swing.GroupLayout.DEFAULT_SIZE, 510, Short.MAX_VALUE)
-                            .addComponent(txtVerifierOutputPreserveLast, javax.swing.GroupLayout.DEFAULT_SIZE, 510, Short.MAX_VALUE))))
+                            .addComponent(txtExperimentName, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
+                            .addComponent(txtVerifierOutputPreserveFirst, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
+                            .addComponent(txtVerifierOutputPreserveLast, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
+
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnCancel, btnCreateExperiment});
+
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -374,7 +520,11 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblExperimentDescription)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -448,7 +598,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         watcherOutputPreserveLast = null;
         verifierOutputPreserveFirst = null;
         verifierOutputPreserveLast = null;
-
+        
         this.expName = this.txtExperimentName.getText();
         this.expDesc = this.txtExperimentDescription.getText();
         boolean limitCheck = true;
@@ -490,47 +640,47 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, "Could not verify limits.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
+        
         isConfigurationExp = chkConfigurationExp.isSelected();
         defaultCost = comboDefaultCost.getSelectedItem() instanceof Experiment.Cost ? (Experiment.Cost) comboDefaultCost.getSelectedItem() : Experiment.Cost.resultTime;
         this.canceled = false;
         this.setVisible(false);
     }//GEN-LAST:event_btnCreateExperimentActionPerformed
-
+    
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         this.canceled = true;
         this.txtExperimentDescription.setText("");
         this.txtExperimentName.setText("");
         this.setVisible(false);
 }//GEN-LAST:event_btnCancelActionPerformed
-
+    
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         this.expName = "";
         this.expDesc = "";
     }//GEN-LAST:event_formWindowActivated
-
+    
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         this.canceled = true;
     }//GEN-LAST:event_formWindowClosed
-
+    
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         this.canceled = true;
     }//GEN-LAST:event_formWindowClosing
-
+    
     private void btnCreateExperimentKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnCreateExperimentKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) //create Experiment
         {
             this.btnCreateExperimentActionPerformed(null);
         }
     }//GEN-LAST:event_btnCreateExperimentKeyPressed
-
+    
     private void btnCancelKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnCancelKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) //create Experiment
         {
             this.btnCancelActionPerformed(null);
         }
     }//GEN-LAST:event_btnCancelKeyPressed
-
+    
     private void chkLimitSolverOutputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkLimitSolverOutputActionPerformed
         if (chkLimitSolverOutput.isSelected()) {
             txtSolverOutputPreserveFirst.setVisible(true);
@@ -548,7 +698,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             comboSolverOutputUnit.setVisible(false);
         }
     }//GEN-LAST:event_chkLimitSolverOutputActionPerformed
-
+    
     private void chkLimitWatcherOutputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkLimitWatcherOutputActionPerformed
         if (chkLimitWatcherOutput.isSelected()) {
             txtWatcherOutputPreserveFirst.setVisible(true);
@@ -566,7 +716,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             comboWatcherOutputUnit.setVisible(false);
         }
     }//GEN-LAST:event_chkLimitWatcherOutputActionPerformed
-
+    
     private void chkLimitVerifierOutputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkLimitVerifierOutputActionPerformed
         if (chkLimitVerifierOutput.isSelected()) {
             txtVerifierOutputPreserveFirst.setVisible(true);
@@ -584,6 +734,15 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             comboVerifierOutputUnit.setVisible(false);
         }
     }//GEN-LAST:event_chkLimitVerifierOutputActionPerformed
+    
+    private void comboVerifierBinaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboVerifierBinaryActionPerformed
+        Verifier v = (Verifier) comboVerifierBinary.getSelectedItem();
+        if (v == null) {
+            verifierParameterTableModel.setParameters(new LinkedList<VerifierParameter>());
+        } else {
+            verifierParameterTableModel.setParameters(v.getParameters());
+        }
+    }//GEN-LAST:event_comboVerifierBinaryActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnCreateExperiment;
@@ -593,14 +752,20 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     private javax.swing.JCheckBox chkLimitWatcherOutput;
     private javax.swing.JComboBox comboDefaultCost;
     private javax.swing.JComboBox comboSolverOutputUnit;
+    private javax.swing.JComboBox comboVerifierBinary;
     private javax.swing.JComboBox comboVerifierOutputUnit;
     private javax.swing.JComboBox comboWatcherOutputUnit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblExperimentDescription;
     private javax.swing.JLabel lblExperimentName;
     private javax.swing.JLabel lblLimitSolverOutputIn;
@@ -612,6 +777,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     private javax.swing.JLabel lblVerifierOutputPreserveLast;
     private javax.swing.JLabel lblWatcherOutputPreserveFirst;
     private javax.swing.JLabel lblWatcherOutputPreserveLast;
+    private javax.swing.JTable tblVerifierParameters;
     private javax.swing.JTextArea txtExperimentDescription;
     private javax.swing.JTextField txtExperimentName;
     private javax.swing.JTextField txtSolverOutputPreserveFirst;

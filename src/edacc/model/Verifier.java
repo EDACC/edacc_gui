@@ -112,4 +112,11 @@ public class Verifier extends BaseModel implements IntegerPKModel {
     public int getId() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+    
+    
 }

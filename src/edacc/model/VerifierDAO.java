@@ -20,6 +20,7 @@ public class VerifierDAO {
 
     private static final String table = "Verifier";
     private static final String selectQuery = "SELECT idVerifier, name, description, md5, runCommand, runPath FROM " + table;
+    private static final ObjectCache<Verifier> cache = new ObjectCache<Verifier>();
 
     private static String getInsertQuery(int count) {
         StringBuilder query = new StringBuilder("INSERT INTO " + table + " "
@@ -117,11 +118,13 @@ public class VerifierDAO {
                     newVerifiers.get(i).setId(rs.getInt(1));
                     newVerifiers.get(i).setSaved();
                     final Verifier v = newVerifiers.get(i);
+                    cache.cache(v);
                     DatabaseConnector.getInstance().addRollbackOperation(new Runnable() {
 
                         @Override
                         public void run() {
                             v.setNew();
+                            cache.remove(v);
                         }
                     });
                     i++;
@@ -186,13 +189,13 @@ public class VerifierDAO {
                 st.executeUpdate();
                 st.close();
             }
-            
+
             for (Verifier v : verifiers) {
                 for (VerifierParameter vp : v.getParameters()) {
                     vp.setIdVerifier(v.getId());
                 }
             }
-            
+
             VerifierParameterDAO.saveAll(verifiers);
         } catch (Throwable t) {
             if (autoCommit) {
@@ -219,7 +222,7 @@ public class VerifierDAO {
         verifier.setMd5(rs.getString("md5"));
         verifier.setRunCommand(rs.getString("runCommand"));
         verifier.setRunPath(rs.getString("runPath"));
-        
+
         verifier.setParameters(verifierParameterMap.get(verifier.getId()));
         return verifier;
     }
@@ -230,12 +233,30 @@ public class VerifierDAO {
         Map<Integer, List<VerifierParameter>> verifierParameterMap = VerifierParameterDAO.getAll();
         ResultSet rs = st.executeQuery(selectQuery);
         while (rs.next()) {
-            Verifier v = getVerifierFromResultSet(rs, verifierParameterMap);
-            v.setSaved();
+            int id = rs.getInt("idVerifier");
+            Verifier v = cache.getCached(id);
+            if (v == null) {
+                v = getVerifierFromResultSet(rs, verifierParameterMap);
+                v.setSaved();
+                cache.cache(v);
+            }
             res.add(v);
         }
         rs.close();
         st.close();
         return res;
+    }
+
+    public static Verifier getById(int id) throws SQLException {
+        Verifier v = cache.getCached(id);
+        if (v == null) {
+            getAllVerifiers();
+            v = cache.getCached(id);
+        }
+        return v;
+    }
+    
+    public static void clearCache() {
+        cache.clear();
     }
 }
