@@ -77,7 +77,7 @@ public class StringFilter extends javax.swing.JPanel implements FilterInterface 
         if (value instanceof String) {
             val = (String) value;
         } else {
-            val = value.toString();
+            val = value == null ? "" : value.toString();
         }
         try {
             return val.matches(regExp);

@@ -32,19 +32,19 @@ abstract class BaseModel {
         this.persistenceState = PersistenceState.DELETED;
     }
 
-    protected boolean isNew() {
+    public boolean isNew() {
         return persistenceState.equals(PersistenceState.NEW);
     }
 
-    protected boolean isModified() {
+    public boolean isModified() {
         return persistenceState.equals(PersistenceState.MODIFIED);
     }
 
-    protected boolean isSaved() {
+    public boolean isSaved() {
         return persistenceState.equals(PersistenceState.SAVED);
     }
 
-    protected boolean isDeleted() {
+    public boolean isDeleted() {
         return persistenceState.equals(PersistenceState.DELETED);
     }
 }
