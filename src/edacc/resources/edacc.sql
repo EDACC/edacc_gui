@@ -122,7 +122,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `Verifier` ;
 
 CREATE  TABLE IF NOT EXISTS `Verifier` (
-  `idVerifier` INT NOT NULL ,
+  `idVerifier` INT NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(255) NOT NULL ,
   `binaryArchive` LONGBLOB NOT NULL ,
   `description` TEXT NOT NULL ,
@@ -139,7 +139,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `VerifierConfig` ;
 
 CREATE  TABLE IF NOT EXISTS `VerifierConfig` (
-  `idVerifierConfig` INT NOT NULL ,
+  `idVerifierConfig` INT NOT NULL AUTO_INCREMENT ,
   `Verifier_idVerifier` INT NOT NULL ,
   PRIMARY KEY (`idVerifierConfig`, `Verifier_idVerifier`) ,
   INDEX `fk_VerifierConfig_Verifier1` (`Verifier_idVerifier` ASC) ,
@@ -887,7 +887,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `VerifierParameter` ;
 
 CREATE  TABLE IF NOT EXISTS `VerifierParameter` (
-  `idVerifierParameter` INT NOT NULL ,
+  `idVerifierParameter` INT NOT NULL AUTO_INCREMENT ,
   `Verifier_idVerifier` INT NOT NULL ,
   `name` VARCHAR(255) NOT NULL ,
   `prefix` VARCHAR(255) NULL ,

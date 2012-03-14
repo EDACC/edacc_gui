@@ -20,6 +20,7 @@ public class VerifierParameter extends BaseModel implements IntegerPKModel {
     public VerifierParameter(VerifierParameter p) {
         this();
         id = p.id;
+        this.persistenceState = p.persistenceState;
         assign(p);
     }
 

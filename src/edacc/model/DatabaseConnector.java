@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Properties;
 import java.util.Vector;
@@ -103,7 +104,9 @@ public class DatabaseConnector extends Observable {
             watchDog = new ConnectionWatchDog();
             connections.add(new ThreadConnection(Thread.currentThread(), getNewConnection(), System.currentTimeMillis()));
             watchDog.start();
-            if (doCheckVersion) checkVersion();
+            if (doCheckVersion) {
+                checkVersion();
+            }
         } catch (ClassNotFoundException e) {
             throw e;
         } catch (SQLException e) {
@@ -114,7 +117,7 @@ public class DatabaseConnector extends Observable {
             this.notifyObservers();
         }
     }
-    
+
     /**
      * overloaded connect method with implicit version check, see connect() above.
      */
@@ -199,7 +202,7 @@ public class DatabaseConnector extends Observable {
                 // try to find the connection of this thread: every thread can only have one connection at a time
                 for (ThreadConnection tconn : connections) {
                     if (tconn.thread == Thread.currentThread()) {
-                       // System.err.println(Thread.currentThread().getId() + " Found connection");
+                        // System.err.println(Thread.currentThread().getId() + " Found connection");
                         if (tconn.conn.isValid(10)) {
                             tconn.time = System.currentTimeMillis();
                             return tconn.conn;
@@ -209,10 +212,11 @@ public class DatabaseConnector extends Observable {
                 // try to take a connection from a dead thread
                 for (ThreadConnection tconn : connections) {
                     if (tconn.thread == null || !tconn.thread.isAlive()) {
-                       // System.err.println("Taking connection of dead thread");
+                        // System.err.println("Taking connection of dead thread");
                         tconn.thread = Thread.currentThread();
                         if (tconn.conn.isValid(10)) {
                             tconn.time = System.currentTimeMillis();
+                            tconn.rollbackOperations.clear();
                             return tconn.conn;
                         }
                     }
@@ -220,7 +224,7 @@ public class DatabaseConnector extends Observable {
                 // create new connection if max connection count isn't reached
                 if (connections.size() < maxconnections) {
                     Connection conn = getNewConnection();
-                   // System.err.println("Creating new connection");
+                    // System.err.println("Creating new connection");
                     connections.add(new ThreadConnection(Thread.currentThread(), conn, System.currentTimeMillis()));
                     return conn;
                 }
@@ -229,10 +233,11 @@ public class DatabaseConnector extends Observable {
                 // TODO: 500ms is too less?
                 for (ThreadConnection tconn : connections) {
                     if (tconn.conn.getAutoCommit() && System.currentTimeMillis() - tconn.time > 500) {
-                     //   System.err.println("Stealing connection");
-                       
+                        //   System.err.println("Stealing connection");
+
                         tconn.thread = Thread.currentThread();
                         if (tconn.conn.isValid(10)) {
+                            tconn.rollbackOperations.clear();
                             return tconn.conn;
                         }
                     }
@@ -250,6 +255,56 @@ public class DatabaseConnector extends Observable {
             throw new SQLException("No connections available.");
         }
         return getConn(retryCount + 1);
+    }
+
+    private ThreadConnection getThreadConnection(Thread thread) {
+        for (ThreadConnection tconn : connections) {
+            if (tconn.thread == thread) {
+                return tconn;
+            }
+        }
+        return null;
+    }
+
+    public void addRollbackOperation(Runnable runnable) {
+        synchronized (sync) {
+            ThreadConnection tconn = getThreadConnection(Thread.currentThread());
+            if (tconn == null) {
+                throw new IllegalArgumentException("Didn't find any connection for this thread");
+            }
+            tconn.rollbackOperations.add(runnable);
+        }
+    }
+
+    public void rollback() throws SQLException {
+        synchronized (sync) {
+            ThreadConnection tconn = getThreadConnection(Thread.currentThread());
+            if (tconn == null) {
+                throw new IllegalArgumentException("Didn't find any connection for this thread");
+            }
+            if (tconn.conn.getAutoCommit()) {
+                throw new IllegalArgumentException("Cannot rollback a connection with AUTOCOMMIT = true");
+            }
+            for (Runnable r : tconn.rollbackOperations) {
+                r.run();
+            }
+            tconn.rollbackOperations.clear();
+            tconn.conn.rollback();
+        }
+    }
+
+    public void commit() throws SQLException {
+        synchronized (sync) {
+            ThreadConnection tconn = getThreadConnection(Thread.currentThread());
+            if (tconn == null) {
+                throw new IllegalArgumentException("Didn't find any connection for this thread");
+            }
+            if (tconn.conn.getAutoCommit()) {
+                throw new IllegalArgumentException("Cannot rollback a connection with AUTOCOMMIT = true");
+            }
+            tconn.rollbackOperations.clear();
+            tconn.conn.commit();
+        }
     }
 
     /**
@@ -306,11 +361,13 @@ public class DatabaseConnector extends Observable {
         Thread thread;
         Connection conn;
         long time;
+        List<Runnable> rollbackOperations;
 
         public ThreadConnection(Thread thread, Connection conn, long time) {
             this.thread = thread;
             this.conn = conn;
             this.time = time;
+            rollbackOperations = new LinkedList<Runnable>();
         }
     }
 
@@ -362,7 +419,7 @@ public class DatabaseConnector extends Observable {
             getConn().setAutoCommit(false);
             for (int version = currentVersion + 1; version <= localVersion; version++) {
                 task.setStatus("Updating to version " + version);
-               // task.setTaskProgress((version - currentVersion) / (float) (localVersion - currentVersion + 1));
+                // task.setTaskProgress((version - currentVersion) / (float) (localVersion - currentVersion + 1));
                 InputStream in = EDACCApp.class.getClassLoader().getResourceAsStream("edacc/resources/db_version/" + version + ".sql");
                 if (in == null) {
                     throw new SQLQueryFileNotFoundException();
@@ -443,7 +500,7 @@ public class DatabaseConnector extends Observable {
             Statement st = getConn().createStatement();
             int current = 0;
             for (String q : queries) {
-                task.setTaskProgress((float)++current/(float)(queries.size()));
+                task.setTaskProgress((float) ++current / (float) (queries.size()));
                 st.execute(q);
             }
             st.close();

@@ -787,6 +787,10 @@ public class EDACCVerifiersCreateEditDialog extends javax.swing.JDialog {
                     p.setDeleted();
                 }
             }
+            for (VerifierParameter p : model.getParameters()) {
+                if (p.isNew())
+                    verifier.getParameters().add(p);
+            }
             if (files != null && files.length != 0) {
                 verifier.setFiles(files);
                 verifier.setMd5(lblMd5.getText());
@@ -795,7 +799,6 @@ public class EDACCVerifiersCreateEditDialog extends javax.swing.JDialog {
             verifier.setDescription(txtDescription.getText());
             verifier.setRunCommand(txtRunCommand.getText());
             verifier.setRunPath(txtRunPath.getText());
-            verifier.setParameters(model.getParameters());
         }
         cancelled = false;
         setVisible(false);
@@ -837,9 +840,9 @@ public class EDACCVerifiersCreateEditDialog extends javax.swing.JDialog {
             EDACCApp.getApplication().show(dialog);
             if (!dialog.isCancelled()) {
                 files = binary;
-                txtRunCommand.setText(verifier.getRunCommand());
-                txtRunPath.setText(verifier.getRunPath());
-                lblMd5.setText(verifier.getMd5());
+                txtRunCommand.setText(dialog.getRunCommand());
+                txtRunPath.setText(dialog.getRunPath());
+                lblMd5.setText(md5);
             }
         } catch (NoSuchElementException e) {
             JOptionPane.showMessageDialog(this, "You have to choose some files!", "No files chosen!", JOptionPane.ERROR_MESSAGE);

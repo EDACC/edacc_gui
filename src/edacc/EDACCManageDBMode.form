@@ -167,7 +167,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="907" max="32767" attributes="0"/>
+              <Component id="manageDBPane" pref="724" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -216,7 +216,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jPanel3" alignment="1" max="32767" attributes="0"/>
-                          <Component id="jSplitPane2" alignment="1" pref="882" max="32767" attributes="0"/>
+                          <Component id="jSplitPane2" alignment="1" pref="839" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -739,7 +739,7 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="1" attributes="0">
                                       <Component id="jPanel1" alignment="0" max="32767" attributes="1"/>
-                                      <Component id="jScrollPane2" alignment="0" pref="498" max="32767" attributes="2"/>
+                                      <Component id="jScrollPane2" alignment="0" pref="455" max="32767" attributes="2"/>
                                       <Component id="panelSolverButtons" alignment="1" max="32767" attributes="2"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -822,10 +822,10 @@
                                                       <Component id="btnSolverEditBinary" min="-2" pref="77" max="-2" attributes="0"/>
                                                       <EmptySpace max="-2" attributes="0"/>
                                                       <Component id="btnSolverChangeBinaryFiles" min="-2" max="-2" attributes="0"/>
-                                                      <EmptySpace pref="49" max="32767" attributes="0"/>
+                                                      <EmptySpace max="32767" attributes="0"/>
                                                       <Component id="btnSolverDeleteBinary" min="-2" pref="76" max="-2" attributes="0"/>
                                                   </Group>
-                                                  <Component id="jScrollPane4" alignment="0" pref="379" max="32767" attributes="1"/>
+                                                  <Component id="jScrollPane4" alignment="0" pref="336" max="32767" attributes="1"/>
                                               </Group>
                                           </Group>
                                           <Group type="102" alignment="1" attributes="0">
@@ -850,14 +850,14 @@
                                                   <Component id="jlSolverAuthors" alignment="0" min="-2" max="-2" attributes="0"/>
                                               </Group>
                                               <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="tfSolverAuthors" pref="379" max="32767" attributes="1"/>
-                                                  <Component id="jScrollPane3" pref="379" max="32767" attributes="2"/>
-                                                  <Component id="tfSolverName" alignment="0" pref="379" max="32767" attributes="2"/>
+                                                  <Component id="tfSolverAuthors" pref="336" max="32767" attributes="1"/>
+                                                  <Component id="jScrollPane3" pref="336" max="32767" attributes="2"/>
+                                                  <Component id="tfSolverName" alignment="0" pref="336" max="32767" attributes="2"/>
                                                   <Group type="102" alignment="0" attributes="0">
                                                       <EmptySpace max="-2" attributes="0"/>
                                                       <Group type="103" groupAlignment="0" attributes="0">
                                                           <Component id="btnSolverAddCode" alignment="0" min="-2" max="-2" attributes="0"/>
-                                                          <Component id="tfSolverVersion" alignment="0" pref="379" max="32767" attributes="0"/>
+                                                          <Component id="tfSolverVersion" alignment="0" pref="336" max="32767" attributes="0"/>
                                                       </Group>
                                                   </Group>
                                               </Group>
@@ -1094,7 +1094,7 @@
                                       <Component id="btnSolverNew" linkSize="1" min="-2" pref="81" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnSolverDelete" linkSize="1" min="-2" pref="81" max="-2" attributes="0"/>
-                                      <EmptySpace pref="320" max="32767" attributes="0"/>
+                                      <EmptySpace pref="277" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                             </DimensionLayout>
@@ -1161,7 +1161,7 @@
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnSolverRefresh" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="569" max="32767" attributes="0"/>
+                          <EmptySpace pref="526" max="32767" attributes="0"/>
                           <Component id="btnSolverExport" min="-2" pref="79" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="btnSolverSaveToDB" min="-2" max="-2" attributes="0"/>
@@ -1727,8 +1727,11 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jPanel4" alignment="0" max="32767" attributes="0"/>
                   <Component id="jPanel5" alignment="1" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="jPanel4" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -1758,7 +1761,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jScrollPane5" alignment="0" pref="890" max="32767" attributes="0"/>
+                      <Component id="jScrollPane5" alignment="0" pref="707" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -1814,7 +1817,10 @@
                           <Component id="btnEditVerifier" linkSize="17" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnRemoveVerifier" linkSize="17" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="665" max="32767" attributes="0"/>
+                          <EmptySpace pref="324" max="32767" attributes="0"/>
+                          <Component id="btnUndo" linkSize="17" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="btnSave" linkSize="17" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1822,7 +1828,11 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="btnAddVerifier" alignment="1" max="32767" attributes="1"/>
                       <Component id="btnEditVerifier" alignment="1" max="32767" attributes="1"/>
-                      <Component id="btnRemoveVerifier" alignment="1" min="-2" max="-2" attributes="1"/>
+                      <Group type="103" alignment="1" groupAlignment="3" attributes="0">
+                          <Component id="btnRemoveVerifier" alignment="3" min="-2" max="-2" attributes="1"/>
+                          <Component id="btnSave" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnUndo" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
                 </DimensionLayout>
               </Layout>
@@ -1849,6 +1859,24 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnEditVerifierActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnSave">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnSave.text"/>
+                    <Property name="name" type="java.lang.String" value="btnSave" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSaveActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnUndo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnUndo.text"/>
+                    <Property name="name" type="java.lang.String" value="btnUndo" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnUndoActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>

@@ -35,4 +35,8 @@ public class ManageDBVerifiers {
     public List<Verifier> getVerifiers() {
         return model.getVerifiers();
     }
+
+    public void save() throws SQLException {
+        VerifierDAO.saveAll(model.getVerifiers());
+    }
 }
