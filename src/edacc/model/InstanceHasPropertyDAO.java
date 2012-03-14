@@ -295,6 +295,21 @@ public class InstanceHasPropertyDAO {
         idCache.clear();
     }
 
+    /**
+     * Creates an InstanceHasPropety object with the given data.
+     * @param i Instance 
+     * @param prop Property
+     * @param value Value of the InstanceHasProperty object
+     * @param overwrite Overwrite existing value
+     * @param psNew PreparedStatement to insert an new InstanceHasProperty object into the database.
+     * @param psMod PreparedStatement to modify anInstanceHasProperty object in database.
+     * @throws SQLException
+     * @throws NoConnectionToDBException
+     * @throws IOException
+     * @throws PropertyTypeNotExistException
+     * @throws ComputationMethodDoesNotExistException
+     * @throws InstanceHasPropertyNotInDBException 
+     */
     public static void createInstanceHasInstanceProperty(Instance i, Property prop, String value, Boolean overwrite, PreparedStatement psNew, PreparedStatement psMod) throws SQLException, NoConnectionToDBException, IOException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, InstanceHasPropertyNotInDBException {
         // Convert value, if an conversionErrorOccures, the value is set to null
         PropertyValueType type = prop.getPropertyValueType();
