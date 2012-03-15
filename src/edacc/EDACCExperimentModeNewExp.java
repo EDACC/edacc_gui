@@ -10,13 +10,15 @@ import edacc.experiment.VerifierParameterTableModel;
 import edacc.model.Experiment;
 import edacc.model.Verifier;
 import edacc.model.VerifierConfiguration;
-import edacc.model.VerifierDAO;
 import edacc.model.VerifierParameter;
+import edacc.model.VerifierParameterInstance;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -48,11 +50,11 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         verifierParameterTableModel = new VerifierParameterTableModel();
         tblVerifierParameters.setModel(verifierParameterTableModel);
         
-                tblVerifierParameters.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        tblVerifierParameters.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         tblVerifierParameters.setRowSelectionAllowed(false);
         tblVerifierParameters.setCellSelectionEnabled(false);
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
-
+            
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -61,17 +63,17 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                 return comp;
             }
         };
-
+        
         DefaultTableCellRenderer booleanRenderer = new DefaultTableCellRenderer() {
-
+            
             protected JCheckBox checkBox;
-
+            
             {
                 checkBox = new JCheckBox();
                 checkBox.setHorizontalAlignment(SwingConstants.CENTER);
                 checkBox.setBackground(Color.white);
             }
-
+            
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -81,7 +83,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                 return checkBox;
             }
         };
-
+        
         tblVerifierParameters.setDefaultRenderer(String.class, renderer);
         tblVerifierParameters.setDefaultRenderer(Integer.class, renderer);
         tblVerifierParameters.setDefaultRenderer(Boolean.class, booleanRenderer);
@@ -154,9 +156,10 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         
         comboDefaultCost.setSelectedItem(defaultCost);
         
+        this.verifierConfig = verifierConfig;
         if (verifierConfig != null) {
             comboVerifierBinary.setSelectedItem(verifierConfig.getVerifier());
-            verifierParameterTableModel.setParameterInstances(verifierConfig.getParameterInstances());
+            verifierParameterTableModel.assignParameterInstances(verifierConfig.getParameterInstances());
         }
         
         this.pack();
@@ -643,6 +646,55 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         
         isConfigurationExp = chkConfigurationExp.isSelected();
         defaultCost = comboDefaultCost.getSelectedItem() instanceof Experiment.Cost ? (Experiment.Cost) comboDefaultCost.getSelectedItem() : Experiment.Cost.resultTime;
+        if (verifierConfig == null) {
+            Verifier verifier = (Verifier) comboVerifierBinary.getSelectedItem();
+            if (verifier != null) {
+                verifierConfig = new VerifierConfiguration();
+                verifierConfig.setVerifier(verifier);
+                verifierConfig.setParameterInstances(verifierParameterTableModel.getParameterInstances());
+            }
+        } else {
+            Verifier verifier = (Verifier) comboVerifierBinary.getSelectedItem();
+            if (verifier != null) {
+                if (this.verifierConfig.getVerifier() != verifier) {
+                    verifierConfig.setVerifier(verifier);
+                    for (int i = verifierConfig.getParameterInstances().size() - 1; i >= 0; i--) {
+                        VerifierParameterInstance pi = verifierConfig.getParameterInstances().get(i);
+                        if (pi.isSaved() || pi.isModified()) {
+                            pi.setDeleted();
+                        } else if (pi.isNew()) {
+                            verifierConfig.getParameterInstances().remove(i);
+                        }
+                    }
+                    verifierConfig.getParameterInstances().addAll(verifierParameterTableModel.getParameterInstances());
+                } else {
+                    Map<Integer, VerifierParameterInstance> pis = new HashMap<Integer, VerifierParameterInstance>();
+                    for (VerifierParameterInstance pi : verifierParameterTableModel.getParameterInstances()) {
+                        pis.put(pi.getParameter_id(), pi);
+                    }
+                    for (int i = verifierConfig.getParameterInstances().size() - 1; i >= 0; i--) {
+                        VerifierParameterInstance pi = verifierConfig.getParameterInstances().get(i);
+                        VerifierParameterInstance modelPi = pis.get(pi.getParameter_id());
+                        if (modelPi == null) {
+                            if (pi.isNew()) {
+                                verifierConfig.getParameterInstances().remove(i);
+                            } else {
+                                pi.setDeleted();
+                            }
+                        } else {
+                            pi.assign(modelPi);
+                            if (pi.isDeleted()) {
+                                pi.setModified();
+                            }
+                            pis.remove(pi.getParameter_id());
+                        }
+                    }
+                    verifierConfig.getParameterInstances().addAll(pis.values());
+                }
+            } else {
+                verifierConfig.setDeleted();
+            }
+        }
         this.canceled = false;
         this.setVisible(false);
     }//GEN-LAST:event_btnCreateExperimentActionPerformed

@@ -761,12 +761,14 @@ public class EDACCVerifiersCreateEditDialog extends javax.swing.JDialog {
         }
 
         if (verifier.isNew()) {
-            if (files == null || files.length == 0) {
+            if ((files == null || files.length == 0) && (verifier.getFiles() == null || verifier.getFiles().length == 0)) {
                 JOptionPane.showMessageDialog(this, "No binary file selected.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            verifier.setFiles(files);
-            verifier.setMd5(lblMd5.getText());
+            if (files != null && files.length != 0) {
+                verifier.setFiles(files);
+                verifier.setMd5(lblMd5.getText());
+            }
             verifier.setName(txtName.getText());
             verifier.setDescription(txtDescription.getText());
             verifier.setRunCommand(txtRunCommand.getText());

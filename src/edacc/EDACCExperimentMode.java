@@ -59,6 +59,7 @@ import edacc.model.TaskCancelledException;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
 import edacc.model.Verifier;
+import edacc.model.VerifierConfiguration;
 import edacc.parameterspace.ParameterConfiguration;
 import edacc.parameterspace.graph.ParameterGraph;
 import edacc.properties.PropertyTypeNotExistException;
@@ -2603,6 +2604,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             return;
         }
         List<Verifier> verifiers;
+        VerifierConfiguration vConfig;
         try {
             verifiers = expController.getVerifiers();
         } catch (SQLException ex) {
@@ -3010,13 +3012,15 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         Experiment exp = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
         List<Verifier> verifiers;
+        VerifierConfiguration vConfig;
         try {
             verifiers = expController.getVerifiers();
+            vConfig = expController.getVerifierConfig(exp.getId());
         } catch (SQLException ex) {
             this.createDatabaseErrorMessage(ex);
             return;
         }
-        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, verifiers, exp.getName(), exp.getDescription(), exp.isConfigurationExp(), exp.getDefaultCost(), exp.getSolverOutputPreserveFirst(), exp.getSolverOutputPreserveLast(), exp.getWatcherOutputPreserveFirst(), exp.getWatcherOutputPreserveLast(), exp.getVerifierOutputPreserveFirst(), exp.getVerifierOutputPreserveLast(), exp.getVerifierConfiguration());
+        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, verifiers, exp.getName(), exp.getDescription(), exp.isConfigurationExp(), exp.getDefaultCost(), exp.getSolverOutputPreserveFirst(), exp.getSolverOutputPreserveLast(), exp.getWatcherOutputPreserveFirst(), exp.getWatcherOutputPreserveLast(), exp.getVerifierOutputPreserveFirst(), exp.getVerifierOutputPreserveLast(), vConfig);
         dialogEditExp.setLocationRelativeTo(mainFrame);
         try {
             while (true) {
@@ -3063,6 +3067,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     exp.setWatcherOutputPreserveLast(oldWOPL);
                     exp.setVerifierOutputPreserveFirst(oldVOPF);
                     exp.setVerifierOutputPreserveLast(oldVOPL);
+                    createDatabaseErrorMessage(ex);
+                }
+                try {
+                    if (dialogEditExp.verifierConfig != null) {
+                        dialogEditExp.verifierConfig.setIdExperiment(exp.getId());
+                        expController.saveVerifierConfig(dialogEditExp.verifierConfig);
+                    }
+                } catch (SQLException ex) {
                     createDatabaseErrorMessage(ex);
                 }
                 for (int i = 0; i < expTableModel.getRowCount(); i++) {

@@ -132,24 +132,6 @@ CREATE  TABLE IF NOT EXISTS `Verifier` (
   PRIMARY KEY (`idVerifier`) )
 ENGINE = InnoDB;
 
-
--- -----------------------------------------------------
--- Table `VerifierConfig`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `VerifierConfig` ;
-
-CREATE  TABLE IF NOT EXISTS `VerifierConfig` (
-  `idVerifierConfig` INT NOT NULL AUTO_INCREMENT ,
-  `Verifier_idVerifier` INT NOT NULL ,
-  PRIMARY KEY (`idVerifierConfig`, `Verifier_idVerifier`) ,
-  INDEX `fk_VerifierConfig_Verifier1` (`Verifier_idVerifier` ASC) ,
-  CONSTRAINT `fk_VerifierConfig_Verifier1`
-    FOREIGN KEY (`Verifier_idVerifier` )
-    REFERENCES `Verifier` (`idVerifier` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
 -- -----------------------------------------------------
 -- Table `Experiment`
 -- -----------------------------------------------------
@@ -171,14 +153,7 @@ CREATE  TABLE IF NOT EXISTS `Experiment` (
   `watcherOutputPreserveLast` INT NULL ,
   `verifierOutputPreserveFirst` INT NULL ,
   `verifierOutputPreserveLast` INT NULL ,
-  `VerifierConfig_idVerifierConfig` INT NULL ,
-  PRIMARY KEY (`idExperiment`) ,
-  INDEX `fk_Experiment_VerifierConfig1` (`VerifierConfig_idVerifierConfig` ASC) ,
-  CONSTRAINT `fk_Experiment_VerifierConfig1`
-    FOREIGN KEY (`VerifierConfig_idVerifierConfig` )
-    REFERENCES `VerifierConfig` (`idVerifierConfig` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+  PRIMARY KEY (`idExperiment`) )
 ENGINE = InnoDB;
 
 
@@ -372,8 +347,6 @@ CREATE  TABLE IF NOT EXISTS `ExperimentResults` (
   `wallClockTimeLimit` INT NULL ,
   `memoryLimit` INT NULL ,
   `stackSizeLimit` INT NULL ,
-  `outputSizeLimitFirst` INT NULL ,
-  `outputSizeLimitLast` INT NULL ,
   `Client_idClient` INT NULL ,
   `cost` FLOAT NULL ,
   `wallTime` FLOAT NULL ,
@@ -906,6 +879,30 @@ CREATE  TABLE IF NOT EXISTS `VerifierParameter` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- Table `VerifierConfig`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `VerifierConfig` ;
+
+CREATE  TABLE IF NOT EXISTS `VerifierConfig` (
+  `idVerifierConfig` INT NOT NULL AUTO_INCREMENT ,
+  `Verifier_idVerifier` INT NOT NULL ,
+  `Experiment_idExperiment` INT NOT NULL ,
+  PRIMARY KEY (`idVerifierConfig`, `Verifier_idVerifier`) ,
+  INDEX `fk_VerifierConfig_Verifier1` (`Verifier_idVerifier` ASC) ,
+  INDEX `fk_VerifierConfig_Experiment1` (`Experiment_idExperiment` ASC) ,
+  UNIQUE INDEX `Experiment_idExperiment_UNIQUE` (`Experiment_idExperiment` ASC) ,
+  CONSTRAINT `fk_VerifierConfig_Verifier1`
+    FOREIGN KEY (`Verifier_idVerifier` )
+    REFERENCES `Verifier` (`idVerifier` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_VerifierConfig_Experiment1`
+    FOREIGN KEY (`Experiment_idExperiment` )
+    REFERENCES `Experiment` (`idExperiment` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
 
 -- -----------------------------------------------------
 -- Table `VerifierConfig_has_VerifierParameter`

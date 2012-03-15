@@ -1521,7 +1521,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 707, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1533,6 +1533,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
         btnRemoveVerifier.setText(resourceMap.getString("btnRemoveVerifier.text")); // NOI18N
         btnRemoveVerifier.setName("btnRemoveVerifier"); // NOI18N
+        btnRemoveVerifier.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveVerifierActionPerformed(evt);
+            }
+        });
 
         btnAddVerifier.setText(resourceMap.getString("btnAddVerifier.text")); // NOI18N
         btnAddVerifier.setName("btnAddVerifier"); // NOI18N
@@ -1576,7 +1581,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 .addComponent(btnEditVerifier)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRemoveVerifier)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 324, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 80, Short.MAX_VALUE)
                 .addComponent(btnUndo)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSave))
@@ -1620,7 +1625,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(manageDBPane, javax.swing.GroupLayout.DEFAULT_SIZE, 724, Short.MAX_VALUE)
+                .addComponent(manageDBPane, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -2388,6 +2393,14 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             // TODO: error
         }
     }//GEN-LAST:event_btnUndoActionPerformed
+
+    private void btnRemoveVerifierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveVerifierActionPerformed
+        int index = tableVerifiers.getSelectedRow();
+        if (index != -1) {
+            Verifier v = manageDBVerifiers.getVerifier(tableVerifiers.convertRowIndexToModel(index));
+            manageDBVerifiers.markAsDeleted(v);            
+        }
+    }//GEN-LAST:event_btnRemoveVerifierActionPerformed
 
     private void parameterChanged() {
         int selectedRow = tableParameters.getSelectedRow();

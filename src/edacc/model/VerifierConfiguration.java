@@ -8,10 +8,12 @@ import java.util.List;
  * @author simon
  */
 public class VerifierConfiguration extends BaseModel implements IntegerPKModel {
+
     private int id;
     private Verifier verifier;
+    private int idExperiment;
     private List<VerifierParameterInstance> parameterInstances;
-    
+
     public VerifierConfiguration() {
         id = -1;
         verifier = null;
@@ -35,7 +37,11 @@ public class VerifierConfiguration extends BaseModel implements IntegerPKModel {
     }
 
     public void setParameterInstances(List<VerifierParameterInstance> parameterInstances) {
-        this.parameterInstances = parameterInstances;
+        if (parameterInstances == null) {
+            this.parameterInstances = new ArrayList<VerifierParameterInstance>();
+        } else {
+            this.parameterInstances = parameterInstances;
+        }
     }
 
     public Verifier getVerifier() {
@@ -47,5 +53,17 @@ public class VerifierConfiguration extends BaseModel implements IntegerPKModel {
         if (isSaved()) {
             setModified();
         }
+    }
+
+    public int getIdExperiment() {
+        return idExperiment;
+    }
+
+    public void setIdExperiment(int idExperiment) {
+        if (isSaved() && this.idExperiment != idExperiment) {
+            setModified();
+        }
+        this.idExperiment = idExperiment;
+
     }
 }

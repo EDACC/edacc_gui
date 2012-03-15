@@ -167,7 +167,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="724" max="32767" attributes="0"/>
+              <Component id="manageDBPane" pref="480" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -1761,7 +1761,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jScrollPane5" alignment="0" pref="707" max="32767" attributes="0"/>
+                      <Component id="jScrollPane5" alignment="0" pref="463" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -1820,7 +1820,7 @@
                           <Component id="btnEditVerifier" linkSize="17" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnRemoveVerifier" linkSize="17" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="324" max="32767" attributes="0"/>
+                          <EmptySpace pref="80" max="32767" attributes="0"/>
                           <Component id="btnUndo" linkSize="17" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnSave" linkSize="17" min="-2" max="-2" attributes="0"/>
@@ -1845,6 +1845,9 @@
                     <Property name="text" type="java.lang.String" resourceKey="btnRemoveVerifier.text"/>
                     <Property name="name" type="java.lang.String" value="btnRemoveVerifier" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRemoveVerifierActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnAddVerifier">
                   <Properties>

@@ -139,8 +139,10 @@ public class SolverConfigEntryTableModel extends ThreadSafeDefaultTableModel {
             return !parameters[row].isMandatory();
         }
         if (col == 3 && parameters[row].getHasValue()) {
-            if ("instance".equals(parameters[row].getName()) || "seed".equals(parameters[row].getName())) {
-                return false;
+            for (String s : edacc.experiment.Util.constSolverParameters) {
+                if (s.equals(parameters[row].getName().toLowerCase())) {
+                    return false;
+                }
             }
             return selected[row];
         }

@@ -57,6 +57,7 @@ import edacc.model.TaskCancelledException;
 import edacc.model.Tasks;
 import edacc.model.Verifier;
 import edacc.model.VerifierConfiguration;
+import edacc.model.VerifierConfigurationDAO;
 import edacc.model.VerifierDAO;
 import edacc.properties.PropertyTypeNotExistException;
 import edacc.satinstances.ConvertException;
@@ -144,6 +145,8 @@ public class ExperimentController {
         ExperimentDAO.clearCache();
         SolverConfigurationDAO.clearCache();
         ParameterInstanceDAO.clearCache();
+        VerifierDAO.clearCache();
+        VerifierConfigurationDAO.clearCache();
 
         ArrayList<Experiment> experiments = new ArrayList<Experiment>();
         experiments.addAll(ExperimentDAO.getAll());
@@ -161,6 +164,7 @@ public class ExperimentController {
             @Override
             public void run() {
                 if (!isCompetitionDB) {
+                    main.insTableModel.fireTableStructureChanged();
                     main.tableInstances.removeColumn(main.tableInstances.getColumnModel().getColumn(InstanceTableModel.COL_BENCHTYPE));
                 }
             }
@@ -315,7 +319,9 @@ public class ExperimentController {
      */
     public Experiment createExperiment(String name, String description, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, VerifierConfiguration verifierConfig) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         java.util.Date d = new java.util.Date();
-        Experiment res = ExperimentDAO.createExperiment(name, new Date(d.getTime()), description, configurationExp, defaultCost, solverOutputPreserveFirst, solverOutputPreserveLast, watcherOutputPreserveFirst, watcherOutputPreserveLast, verifierOutputPreserveFirst, verifierOutputPreserveLast, verifierConfig);
+        Experiment res = ExperimentDAO.createExperiment(name, new Date(d.getTime()), description, configurationExp, defaultCost, solverOutputPreserveFirst, solverOutputPreserveLast, watcherOutputPreserveFirst, watcherOutputPreserveLast, verifierOutputPreserveFirst, verifierOutputPreserveLast);
+        verifierConfig.setIdExperiment(res.getId());
+        VerifierConfigurationDAO.save(verifierConfig);
         initialize();
         return res;
     }
@@ -2099,5 +2105,13 @@ public class ExperimentController {
 
     public List<Verifier> getVerifiers() throws SQLException {
         return VerifierDAO.getAllVerifiers();
+    }
+
+    public void saveVerifierConfig(VerifierConfiguration verifierConfig) throws SQLException {
+        VerifierConfigurationDAO.save(verifierConfig);
+    }
+
+    public VerifierConfiguration getVerifierConfig(int expId) throws SQLException {
+        return VerifierConfigurationDAO.getByExperimentId(expId);
     }
 }

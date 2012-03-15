@@ -3,6 +3,7 @@ package edacc.manageDB;
 import edacc.model.Verifier;
 import edacc.model.VerifierDAO;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -17,6 +18,7 @@ public class ManageDBVerifiers {
     }
     
     public void loadVerifiers() throws SQLException {
+       VerifierDAO.clearCache();
        model.setVerifiers(VerifierDAO.getAllVerifiers());
     }
 
@@ -37,6 +39,23 @@ public class ManageDBVerifiers {
     }
 
     public void save() throws SQLException {
-        VerifierDAO.saveAll(model.getVerifiers());
+        VerifierDAO.saveAllCached();
+        List<Verifier> verifiers = new LinkedList<Verifier>();
+        for (Verifier v : model.getVerifiers()) {
+            if (!v.isSaved()) {
+                verifiers.add(v);
+            }
+        }
+        VerifierDAO.saveAll(verifiers);
+    }
+
+    public void markAsDeleted(Verifier v) {
+        v.setDeleted();
+        for (int row = 0; row < model.getRowCount(); row++) {
+            if (model.getVerifier(row) == v) {
+                model.removeVerifier(row);
+                break;
+            }
+        }
     }
 }

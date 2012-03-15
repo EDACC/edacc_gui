@@ -501,7 +501,12 @@ public class DatabaseConnector extends Observable {
             int current = 0;
             for (String q : queries) {
                 task.setTaskProgress((float) ++current / (float) (queries.size()));
-                st.execute(q);
+                try {
+                    st.execute(q);
+                } catch (SQLException ex) {
+                    System.err.println("QUERY:\n" + q + "\nfailed");
+                    ex.printStackTrace();
+                }
             }
             st.close();
             task.setTaskProgress(0.f);

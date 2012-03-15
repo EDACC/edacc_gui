@@ -180,7 +180,7 @@ public class VerifierParameterDAO {
         return vp;
     }
 
-    public static final Map<Integer, List<VerifierParameter>> getAll() throws SQLException {
+    public static Map<Integer, List<VerifierParameter>> getAll() throws SQLException {
         HashMap<Integer, List<VerifierParameter>> res = new HashMap<Integer, List<VerifierParameter>>();
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
         ResultSet rs = st.executeQuery(selectQuery);

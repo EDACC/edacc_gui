@@ -259,4 +259,10 @@ public class VerifierDAO {
     public static void clearCache() {
         cache.clear();
     }
+
+    public static void saveAllCached() throws SQLException {
+        List<Verifier> v = new ArrayList<Verifier>();
+        v.addAll(cache.values());
+        saveAll(v);
+    }
 }

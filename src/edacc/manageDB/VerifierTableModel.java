@@ -69,6 +69,11 @@ public class VerifierTableModel extends ThreadSafeDefaultTableModel {
     public Verifier getVerifier(int rowIndex) {
         return verifiers.get(rowIndex);
     }
+    
+    public void removeVerifier(int row) {
+        verifiers.remove(row);
+        fireTableRowsDeleted(row,row);
+    }
 
     public List<Verifier> getVerifiers() {
         List<Verifier> res = new LinkedList<Verifier>();

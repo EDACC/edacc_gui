@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edacc.experiment;
 
 import edacc.model.VerifierParameter;
@@ -15,18 +11,15 @@ import java.util.List;
  * @author simon
  */
 public class VerifierParameterTableModel extends ThreadSafeDefaultTableModel {
-    
+
     private String[] columns = {"Selected", "Parameter Name", "Prefix", "Value", "Order"};
     private VerifierParameter[] parameters;
     private VerifierParameterInstance[] parameterInstances;
-    private String[] values;
-    private Boolean[] selected;
 
-    /** Creates the solver config entry table model */
+    /** Creates the verifier config entry table model */
     public VerifierParameterTableModel() {
         this.parameterInstances = new VerifierParameterInstance[0];
         this.parameters = new VerifierParameter[0];
-        this.values = new String[0];
     }
 
     /**
@@ -36,17 +29,15 @@ public class VerifierParameterTableModel extends ThreadSafeDefaultTableModel {
     public void setParameters(List<VerifierParameter> parameters) {
         this.parameters = new VerifierParameter[parameters.size()];
         this.parameterInstances = new VerifierParameterInstance[parameters.size()];
-        this.selected = new Boolean[parameters.size()];
-        this.values = new String[parameters.size()];
         for (int i = 0; i < parameters.size(); i++) {
             this.parameters[i] = parameters.get(i);
-            this.values[i] = parameters.get(i).getDefaultValue() == null ? "" : parameters.get(i).getDefaultValue();
             if (parameters.get(i).isMandatory()) {
-                this.selected[i] = true;
+                parameterInstances[i] = new VerifierParameterInstance();
+                parameterInstances[i].setParameter_id(parameters.get(i).getId());
+                parameterInstances[i].setValue(parameters.get(i).getDefaultValue() == null ? "" : parameters.get(i).getDefaultValue());
             } else {
-                this.selected[i] = false;
+                parameterInstances[i] = null;
             }
-            this.parameterInstances[i] = null;
         }
         this.fireTableDataChanged();
     }
@@ -57,22 +48,8 @@ public class VerifierParameterTableModel extends ThreadSafeDefaultTableModel {
      */
     public boolean isModified() {
         for (int i = 0; i < parameterInstances.length; i++) {
-            if (selected[i]) {
-                if (parameterInstances[i] == null) {
-                    // new parameter instance
-                    return true;
-                }
-                if (parameters[i].getId() == parameterInstances[i].getParameter_id()) {
-                    // modified parameter instance
-                    if (parameters[i].getHasValue() && !values[i].equals(parameterInstances[i].getValue())) {
-                        return true;
-                    }
-                }
-            } else {
-                if (parameterInstances[i] != null) {
-                    // deleted parameter instance
-                    return true;
-                }
+            if (parameterInstances[i].isModified() || parameterInstances[i].isNew() || parameterInstances[i].isDeleted()) {
+                return true;
             }
         }
         return false;
@@ -85,7 +62,7 @@ public class VerifierParameterTableModel extends ThreadSafeDefaultTableModel {
      * parameter will be selected in this model.
      * @param params parameter instances as <code>ArrayList</code>
      */
-    public void setParameterInstances(List<VerifierParameterInstance> params) {
+    public void assignParameterInstances(List<VerifierParameterInstance> params) {
         if (params == null) {
             for (int i = 0; i < parameterInstances.length; i++) {
                 parameterInstances[i] = null;
@@ -94,14 +71,17 @@ public class VerifierParameterTableModel extends ThreadSafeDefaultTableModel {
             // TODO: performance
             for (int i = 0; i < params.size(); i++) {
                 for (int j = 0; j < parameters.length; j++) {
-                    if (parameters[j].getId() == params.get(i).getParameter_id()) {
-                        parameterInstances[j] = params.get(i);
-                        this.values[j] = params.get(i).getValue();
-                        this.selected[j] = true;
+                    if (!params.get(i).isDeleted() && parameters[j].getId() == params.get(i).getParameter_id()) {
+                        if (parameterInstances[j] == null) {
+                            parameterInstances[j] = new VerifierParameterInstance();
+                        }
+                        parameterInstances[j].assign(params.get(i));
+                        parameterInstances[j].setSaved();
                     }
                 }
             }
         }
+
         this.fireTableDataChanged();
     }
 
@@ -143,10 +123,12 @@ public class VerifierParameterTableModel extends ThreadSafeDefaultTableModel {
             return !parameters[row].isMandatory();
         }
         if (col == 3 && parameters[row].getHasValue()) {
-            if ("instance".equals(parameters[row].getName()) || "seed".equals(parameters[row].getName())) {
-                return false;
+            for (String s : edacc.experiment.Util.constSolverParameters) {
+                if (s.equals(parameters[row].getName().toLowerCase())) {
+                    return false;
+                }
             }
-            return selected[row];
+            return parameterInstances[row] != null && !parameterInstances[row].isDeleted();
         }
         return false;
     }
@@ -154,12 +136,24 @@ public class VerifierParameterTableModel extends ThreadSafeDefaultTableModel {
     @Override
     public void setValueAt(Object value, int row, int col) {
         if (col == 0) {
-            selected[row] = (Boolean) value;
-            if (!selected[row]) {
-                values[row] = "";
+            boolean val = (Boolean) value;
+            if (val) {
+                if (parameterInstances[row] == null) {
+                    parameterInstances[row] = new VerifierParameterInstance();
+                    parameterInstances[row].setValue(parameters[row].getDefaultValue() == null ? "" : parameters[row].getDefaultValue());
+                    parameterInstances[row].setParameter_id(parameters[row].getId());
+                } else {
+                    parameterInstances[row].setModified();
+                }
+            } else {
+                if (parameterInstances[row].isNew()) {
+                    parameterInstances[row] = null;
+                } else {
+                    parameterInstances[row].setDeleted();
+                }
             }
         } else if (col == 3) {
-            values[row] = (String) value;
+            parameterInstances[row].setValue((String) value);
         }
         this.fireTableRowsUpdated(row, row);
     }
@@ -168,14 +162,14 @@ public class VerifierParameterTableModel extends ThreadSafeDefaultTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
             case 0:
-                return selected[rowIndex];
+                return isSelected(rowIndex);
             case 1:
                 return parameters[rowIndex].getName();
             case 2:
                 return parameters[rowIndex].getPrefix() == null ? "" : parameters[rowIndex].getPrefix();
             case 3:
                 if (parameters[rowIndex].getHasValue()) {
-                    return values[rowIndex];
+                    return parameterInstances[rowIndex] == null ? "" : parameterInstances[rowIndex].getValue();
                 } else {
                     return "toggleable flag";
                 }
@@ -207,22 +201,22 @@ public class VerifierParameterTableModel extends ThreadSafeDefaultTableModel {
     public ArrayList<VerifierParameterInstance> getParameterInstances() {
         ArrayList<VerifierParameterInstance> res = new ArrayList<VerifierParameterInstance>();
         for (VerifierParameterInstance pi : parameterInstances) {
-            if (pi != null) {
+            if (pi != null && !pi.isDeleted()) {
                 res.add(pi);
             }
         }
         return res;
     }
-    
+
     public boolean isSelected(int row) {
-        return selected[row];
+        return !(parameterInstances[row] == null || parameterInstances[row].isDeleted());
     }
-    
+
     public VerifierParameter getParameterAt(int row) {
         return parameters[row];
     }
-    
+
     public String getValueAt(int row) {
-        return values[row];
+        return parameterInstances[row].getValue();
     }
 }
