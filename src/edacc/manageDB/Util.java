@@ -46,7 +46,9 @@ import java.util.zip.ZipOutputStream;
  * @author dgall
  */
 public class Util {
+
     private static final String[] constVerifierParameters = {"instance", "output_solver", "output_launcher", "output_watcher"};
+
     /**
      * Calculates the MD5 sum of the given file.
      * @param file
@@ -161,6 +163,51 @@ public class Util {
         return bos;
     }
 
+    public static ByteArrayOutputStream zipFileArrayToByteStreamAutoBasePath(File[] files) throws FileNotFoundException, IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ZipOutputStream out = new ZipOutputStream(bos);
+        for (File f : files) {
+            if (f.isDirectory()) {
+                zipAutoBase(f, f.getParentFile(), out);
+            } else {
+                FileInputStream fin = new FileInputStream(f);
+                ZipEntry entry = new ZipEntry(f.getName());
+                out.putNextEntry(entry);
+                byte[] buffer = new byte[8192];
+                int bytes_read = 0;
+                while ((bytes_read = fin.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytes_read);
+                }
+                fin.close();
+            }
+        }
+        out.close();
+        return bos;
+    }
+
+    private static void zipAutoBase(File f, File base, ZipOutputStream out) throws FileNotFoundException, IOException {
+        if (f.isDirectory()) {
+            for (File file : f.listFiles()) {
+                zipAutoBase(file, base, out);
+            }
+        } else {
+            String path = f.getPath().replace(base.getPath(), "");
+            if (path.startsWith(System.getProperty("file.separator"))) {
+                path = path.substring(1);
+            }
+            path = path.replace(System.getProperty("file.separator"), "/");
+            FileInputStream fin = new FileInputStream(f);
+            ZipEntry entry = new ZipEntry(path);
+            out.putNextEntry(entry);
+            byte[] buffer = new byte[8192];
+            int bytes_read = 0;
+            while ((bytes_read = fin.read(buffer)) != -1) {
+                out.write(buffer, 0, bytes_read);
+            }
+            fin.close();
+        }
+    }
+
     private static void zip(File dir, File base, ZipOutputStream out) throws IOException {
         File[] files = dir.listFiles();
         byte[] buffer = new byte[8192];
@@ -206,7 +253,7 @@ public class Util {
     private static void zip(File[] files, File base, ZipOutputStream out) throws IOException {
         byte[] buffer = new byte[8192];
         final String FILE_SEP = System.getProperty("file.separator");
-        
+
         for (int i = 0; i < files.length; i++) {
             File file_on_disk = new File(base.getPath() + FILE_SEP + files[i].getPath());
             if (file_on_disk.isDirectory()) {
@@ -288,7 +335,7 @@ public class Util {
     }
     encoder.SetEndMarkerMode(false);
     encoder.WriteCoderProperties(outStream);
-
+    
     long fileSize = input.length();
     for (int i = 0; i < 8; i++) {
     outStream.write((int) (fileSize >>> (8 * i)) & 0xFF);
@@ -300,7 +347,7 @@ public class Util {
     }*/
 
     /*  public static void sevenZipDecode(File input, File f) throws FileNotFoundException, IOException, Exception {
-
+    
     // Decode the instance file
     java.io.BufferedInputStream inStream = new java.io.BufferedInputStream(new java.io.FileInputStream(input));
     java.io.BufferedOutputStream outStream = new java.io.BufferedOutputStream(new java.io.FileOutputStream(f));
@@ -387,7 +434,7 @@ public class Util {
 
     public static boolean isLZMA(InputStream is) throws IOException {
         byte[] buf = new byte[lzma_identifier.length()];
-        is.mark(lzma_identifier.length()+8);
+        is.mark(lzma_identifier.length() + 8);
         if (is.read(buf, 0, lzma_identifier.length()) != lzma_identifier.length()) {
             is.reset();
             return false;
@@ -415,21 +462,22 @@ public class Util {
         File[] files = b.getBinaryFiles();
         String lcp = getCommonPrefix(files);
         b.setRootDir(lcp);
-        for (int i = 0; i < files.length; i++)
+        for (int i = 0; i < files.length; i++) {
             files[i] = new File(files[i].getAbsolutePath().replace(lcp, ""));
+        }
     }
 
     private static String getCommonPrefix(File[] files) {
         final String separator = System.getProperty("file.separator");
-        if (files == null || files.length == 0)
+        if (files == null || files.length == 0) {
             return "";
+        }
         Arrays.sort(files, new Comparator<File>() {
 
             @Override
             public int compare(File o1, File o2) {
                 return o1.getPath().compareTo(o2.getPath());
             }
-
         });
         String lcp = "";
         for (int j = 1; j < files[0].getPath().length(); j++) {
@@ -445,9 +493,8 @@ public class Util {
         }
         return lcp;
     }
-    
-    
-        /**
+
+    /**
      * Transforms the parameters from this verifier to a string.
      * @param verifier the verifier
      * @return null if an error occurred
