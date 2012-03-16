@@ -3,6 +3,7 @@ package edacc.model;
 import edacc.manageDB.Util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -77,6 +78,18 @@ public class VerifierDAO {
         return query.toString();
     }
 
+    private static File getBasePath(File[] files) {
+        File res = null;
+        for (File f : files) {
+            if (f.isDirectory()) {
+                res = f.getParentFile();
+            } else {
+                res = f;
+            }
+        }
+        return res;
+    }
+
     public static void saveAll(List<Verifier> verifiers) throws SQLException {
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         DatabaseConnector.getInstance().getConn().setAutoCommit(false);
@@ -104,7 +117,7 @@ public class VerifierDAO {
                 int curCount = 1;
                 for (Verifier v : newVerifiers) {
                     st.setString(curCount++, v.getName());
-                    ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(v.getFiles());
+                    ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(v.getFiles(), getBasePath(v.getFiles()));
                     st.setBinaryStream(curCount++, new ByteArrayInputStream(zipped.toByteArray()));
                     st.setString(curCount++, v.getDescription());
                     st.setString(curCount++, v.getMd5());
@@ -163,7 +176,7 @@ public class VerifierDAO {
                 int curCount = 1;
                 for (Verifier v : verifiersWithModifiedFiles) {
                     st.setInt(curCount++, v.getId());
-                    ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(v.getFiles());
+                    ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(v.getFiles(), getBasePath(v.getFiles()));
                     st.setBinaryStream(curCount++, new ByteArrayInputStream(zipped.toByteArray()));
                     v.setSaved();
 
@@ -255,7 +268,7 @@ public class VerifierDAO {
         }
         return v;
     }
-    
+
     public static void clearCache() {
         cache.clear();
     }
