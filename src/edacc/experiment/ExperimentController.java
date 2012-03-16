@@ -320,8 +320,10 @@ public class ExperimentController {
     public Experiment createExperiment(String name, String description, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, VerifierConfiguration verifierConfig) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         java.util.Date d = new java.util.Date();
         Experiment res = ExperimentDAO.createExperiment(name, new Date(d.getTime()), description, configurationExp, defaultCost, solverOutputPreserveFirst, solverOutputPreserveLast, watcherOutputPreserveFirst, watcherOutputPreserveLast, verifierOutputPreserveFirst, verifierOutputPreserveLast);
-        verifierConfig.setIdExperiment(res.getId());
-        VerifierConfigurationDAO.save(verifierConfig);
+        if (verifierConfig != null) {
+            verifierConfig.setIdExperiment(res.getId());
+            VerifierConfigurationDAO.save(verifierConfig);
+        }
         initialize();
         return res;
     }
