@@ -1,23 +1,25 @@
 package edacc.manageDB;
 
-import edacc.model.SolverBinaries;
+import edacc.model.CostBinary;
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author simon
  */
-public class SolverBinariesTableModel extends DefaultTableModel {
+public class CostBinaryTableModel extends DefaultTableModel {
 
     public static final int COL_NAME = 0;
     public static final int COL_MD5 = 1;
     public static final int COL_RUNCOMMAND = 2;
     public static final int COL_RUNPATH = 3;
-    public static final int COL_VERSION = 4;
-    private static final String[] columns = {"Name", "MD5", "Run Command", "Run Path", "Version"};
-    private ArrayList<SolverBinaries> solverBinaries;
+    public static final int COL_PARAMETERS = 4;
+    public static final int COL_VERSION = 5;
+    public static final int COL_COST = 6;
+    private static final String[] columns = {"Name", "MD5", "Run Command", "Run Path", "Parameters", "Version", "Cost"};
+    private ArrayList<CostBinary> costBinaries;
 
     @Override
     public int getColumnCount() {
@@ -31,18 +33,22 @@ public class SolverBinariesTableModel extends DefaultTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        SolverBinaries solverBinary = solverBinaries.get(row);
+        CostBinary costBinary = costBinaries.get(row);
         switch (column) {
             case COL_NAME:
-                return solverBinary.getBinaryName();
+                return costBinary.getBinaryName();
             case COL_MD5:
-                return solverBinary.getMd5();
+                return costBinary.getMd5();
             case COL_RUNCOMMAND:
-                return solverBinary.getRunCommand();
+                return costBinary.getRunCommand();
             case COL_RUNPATH:
-                return solverBinary.getRunPath();
+                return costBinary.getRunPath();
+            case COL_PARAMETERS:
+                return costBinary.getParameters();
             case COL_VERSION:
-                return solverBinary.getVersion();
+                return costBinary.getVersion();
+            case COL_COST:
+                return costBinary.getCost().toString();
             default:
                 return "";
         }
@@ -57,23 +63,23 @@ public class SolverBinariesTableModel extends DefaultTableModel {
     public void setValueAt(Object aValue, int row, int column) {
         switch (column) {
             case COL_NAME:
-                solverBinaries.get(row).setBinaryName((String) aValue);
+                costBinaries.get(row).setBinaryName((String) aValue);
                 break;
             case COL_RUNCOMMAND:
-                solverBinaries.get(row).setRunCommand((String) aValue);
+                costBinaries.get(row).setRunCommand((String) aValue);
                 break;
             case COL_RUNPATH:
-                solverBinaries.get(row).setRunPath((String) aValue);
+                costBinaries.get(row).setRunPath((String) aValue);
                 break;
             case COL_VERSION:
-                solverBinaries.get(row).setVersion((String) aValue);
+                costBinaries.get(row).setVersion((String) aValue);
                 break;
         }
     }
 
     @Override
     public int getRowCount() {
-        return solverBinaries == null ? 0 : solverBinaries.size();
+        return costBinaries == null ? 0 : costBinaries.size();
     }
 
     @Override
@@ -81,21 +87,21 @@ public class SolverBinariesTableModel extends DefaultTableModel {
         return getRowCount() == 0 ? String.class : getValueAt(0, columnIndex) == null ? String.class : getValueAt(0, columnIndex).getClass();
     }
 
-    public void setSolverBinaries(Vector<SolverBinaries> solverBinaries) {
-        if (this.solverBinaries == null) {
-            this.solverBinaries = new ArrayList<SolverBinaries>();
+    public void setCostBinaries(List<CostBinary> costBinaries) {
+        if (this.costBinaries == null) {
+            this.costBinaries = new ArrayList<CostBinary>();
         } else {
-            this.solverBinaries.clear();
+            this.costBinaries.clear();
         }
-        if (solverBinaries != null) {
-            this.solverBinaries.addAll(solverBinaries);
+        if (costBinaries != null) {
+            this.costBinaries.addAll(costBinaries);
         }
         this.fireTableDataChanged();
     }
 
-    public SolverBinaries getSolverBinaries(int index) {
-        if (this.solverBinaries == null)
+    public CostBinary getCostBinary(int index) {
+        if (this.costBinaries == null)
             return null;
-        return solverBinaries.get(index);
+        return costBinaries.get(index);
     }
 }

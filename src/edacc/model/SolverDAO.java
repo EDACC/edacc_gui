@@ -133,6 +133,11 @@ public class SolverDAO {
             b.setIdSolver(solver.getId());
             SolverBinariesDAO.save(b);
         }
+        
+        for (CostBinary b : solver.getCostBinaries()) {
+            b.setIdSolver(solver.getId());
+            CostDAO.saveBinary(b);
+        }
 
         cache.cache(solver);
         solver.setSaved();
@@ -184,6 +189,7 @@ public class SolverDAO {
         i.setAuthor(rs.getString("authors"));
         i.setVersion(rs.getString("version"));
         i.setSolverBinaries(SolverBinariesDAO.getBinariesOfSolver(i));
+        i.setCostBinaries(CostDAO.getCostBinariesForSolver(i));
         return i;
     }
 

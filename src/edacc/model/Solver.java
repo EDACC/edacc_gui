@@ -4,6 +4,7 @@ import edacc.parameterspace.graph.ParameterGraph;
 import java.io.File;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
@@ -19,6 +20,7 @@ public class Solver extends BaseModel implements IntegerPKModel, Serializable {
     private String authors;
     private String version;
     private Vector<SolverBinaries> solverBinaries;
+    private List<CostBinary> costBinaries;
     
     // currently only used for export! (will not be set by DAOs)
     protected List<Parameter> parameters;
@@ -61,6 +63,7 @@ public class Solver extends BaseModel implements IntegerPKModel, Serializable {
     public Solver() {
         this.setNew();
         this.solverBinaries = new Vector<SolverBinaries>();
+        this.costBinaries = new LinkedList<CostBinary>();
         // set ID to random number
         this.id = rand.nextInt();
     }
@@ -143,6 +146,27 @@ public class Solver extends BaseModel implements IntegerPKModel, Serializable {
 
     protected void setSolverBinaries(Vector<SolverBinaries> solverBinaries) {
         this.solverBinaries = solverBinaries;
+    }
+    
+    public void addCostBinary(CostBinary costBinary) {
+        costBinaries.add(costBinary);
+        if (isSaved()) {
+            setModified();
+        }
+    }
+    
+    public void removeCostBinary(CostBinary costBinary) {
+        costBinaries.remove(costBinary);
+    }
+    
+    public List<CostBinary> getCostBinaries() {
+        LinkedList<CostBinary> res = new LinkedList<CostBinary>();
+        res.addAll(costBinaries);
+        return res;
+    }
+    
+    protected void setCostBinaries(List<CostBinary> costBinaries) {
+        this.costBinaries = costBinaries;
     }
 
     @Override

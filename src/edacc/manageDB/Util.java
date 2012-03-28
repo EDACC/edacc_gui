@@ -7,6 +7,7 @@ package edacc.manageDB;
 import SevenZip.CoderPropID;
 import SevenZip.Compression.LZMA.Decoder;
 import SevenZip.ICodeProgress;
+import edacc.model.CostBinary;
 import edacc.model.DecompressedInputStream;
 import edacc.model.ExperimentDAO;
 import edacc.model.GridQueueDAO;
@@ -459,6 +460,15 @@ public class Util {
     }
 
     public static void removeCommonPrefix(SolverBinaries b) {
+        File[] files = b.getBinaryFiles();
+        String lcp = getCommonPrefix(files);
+        b.setRootDir(lcp);
+        for (int i = 0; i < files.length; i++) {
+            files[i] = new File(files[i].getAbsolutePath().replace(lcp, ""));
+        }
+    }
+
+    public static void removeCommonPrefix(CostBinary b) {
         File[] files = b.getBinaryFiles();
         String lcp = getCommonPrefix(files);
         b.setRootDir(lcp);

@@ -236,6 +236,7 @@ public class ManageDBSolvers implements Observer {
         currentSolver = solverTableModel.getSolver(index); // will be null if no solver selected!
         gui.showSolverDetails(currentSolver);
         gui.showSolverBinariesDetails(currentSolver == null ? null : currentSolver.getSolverBinaries());
+        gui.showCostBinaryDetails(currentSolver == null ? null : currentSolver.getCostBinaries());
     }
 
     public void addSolverBinary(File[] binary) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoConnectionToDBException, SQLException, SolverAlreadyInDBException {
