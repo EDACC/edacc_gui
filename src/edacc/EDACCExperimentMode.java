@@ -3087,7 +3087,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 exp.setVerifierOutputPreserveLast(dialogEditExp.verifierOutputPreserveLast);
                 exp.setWatcherOutputPreserveFirst(dialogEditExp.watcherOutputPreserveFirst);
                 exp.setWatcherOutputPreserveLast(dialogEditExp.watcherOutputPreserveLast);
-                exp.setIdCost(dialogEditExp.cost == null ? null : cost.getId());
+                exp.setIdCost(dialogEditExp.cost == null ? null : dialogEditExp.cost.getId());
                 try {
                     expController.saveExperiment(exp);
                 } catch (SQLException ex) {
