@@ -1104,21 +1104,21 @@ public class ExperimentController {
      * @param queues
      * @throws SQLException
      */
-    public void assignQueuesToExperiment(ArrayList<GridQueue> queues) throws SQLException {
+    public void assignQueuesToExperiment(ArrayList<GridQueue> queues, Experiment experiment) throws SQLException {
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         try {
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
             // create all ExperimentHasGridQueue objects which do not exist
             for (GridQueue q : queues) {
                 // check if assignment already exists
-                if (ExperimentHasGridQueueDAO.getByExpAndQueue(activeExperiment, q) != null) {
+                if (ExperimentHasGridQueueDAO.getByExpAndQueue(experiment, q) != null) {
                     continue;
                 }
-                ExperimentHasGridQueueDAO.createExperimentHasGridQueue(activeExperiment, q);
+                ExperimentHasGridQueueDAO.createExperimentHasGridQueue(experiment, q);
             }
 
             // remove all ExperimentHasGridQueue objects which are not in the queues vektor
-            ArrayList<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(activeExperiment);
+            ArrayList<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(experiment);
             for (ExperimentHasGridQueue egq : ehgqs) {
                 boolean found = false;
                 for (GridQueue q : queues) {

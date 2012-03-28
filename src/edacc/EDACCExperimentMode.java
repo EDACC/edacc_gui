@@ -465,6 +465,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
             @Override
             public void update(Observable o, Object arg) {
+                if (expController == null || expController.getActiveExperiment() == null) {
+                    // selection of grid queues changed in the experiment tab -> do nothing
+                    return;
+                }
                 try {
                     if (GridQueuesController.getInstance().getChosenQueuesByExperiment(expController.getActiveExperiment()).isEmpty()) {
                         btnGeneratePackage.setEnabled(false);
@@ -705,6 +709,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         popupInstanceClassTree = new javax.swing.JPopupMenu();
         menuExpandAll = new javax.swing.JMenuItem();
         menuCollapseAll = new javax.swing.JMenuItem();
+        popupTblExperiments = new javax.swing.JPopupMenu();
+        menuGridQueues = new javax.swing.JMenuItem();
         manageExperimentPane = new javax.swing.JTabbedPane();
         panelManageExperiment = new javax.swing.JPanel();
         scrollPaneExperimentsTable = new javax.swing.JScrollPane();
@@ -877,6 +883,17 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         });
         popupInstanceClassTree.add(menuCollapseAll);
 
+        popupTblExperiments.setName("popupTblExperiments"); // NOI18N
+
+        menuGridQueues.setText(resourceMap.getString("menuGridQueues.text")); // NOI18N
+        menuGridQueues.setName("menuGridQueues"); // NOI18N
+        menuGridQueues.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuGridQueuesActionPerformed(evt);
+            }
+        });
+        popupTblExperiments.add(menuGridQueues);
+
         setName("Form"); // NOI18N
 
         manageExperimentPane.setName("manageExperimentPane"); // NOI18N
@@ -905,6 +922,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         ));
         tableExperiments.setToolTipText(resourceMap.getString("tableExperiments.toolTipText")); // NOI18N
+        tableExperiments.setComponentPopupMenu(popupTblExperiments);
         tableExperiments.setName("tableExperiments"); // NOI18N
         tableExperiments.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tableExperiments.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -1149,7 +1167,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         );
         jPanel10Layout.setVerticalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE)
+            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
         );
 
         btnConfigScenarioSave.setText(resourceMap.getString("btnConfigScenarioSave.text")); // NOI18N
@@ -1350,7 +1368,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
                 .addComponent(lblSolverFilterStatus)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 421, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 417, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSelectAllSolvers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1510,7 +1528,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 509, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
         );
 
         jSplitPane2.setLeftComponent(jPanel4);
@@ -2997,7 +3015,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private void btnSelectQueueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectQueueActionPerformed
         try {
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            EDACCManageGridQueuesDialog manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true, expController);
+            EDACCManageGridQueuesDialog manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true, expController, expController.getActiveExperiment());
             manageGridQueues.setLocationRelativeTo(mainFrame);
             manageGridQueues.setVisible(true);
         } catch (NoConnectionToDBException ex) {
@@ -3431,6 +3449,28 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         updateGenerateJobsFilterStatus();
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void menuGridQueuesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGridQueuesActionPerformed
+        Experiment exp = null;
+        int row = tableExperiments.getSelectedRow();
+        if (row != -1) {
+            exp = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(row));
+        }
+        if (exp != null) {
+        try {
+            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+            EDACCManageGridQueuesDialog manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true, expController, exp);
+            manageGridQueues.setLocationRelativeTo(mainFrame);
+            manageGridQueues.setVisible(true);
+        } catch (NoConnectionToDBException ex) {
+            JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        } else {
+            JOptionPane.showMessageDialog(this, "No experiment has been selected.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_menuGridQueuesActionPerformed
+
     /**
      * Stops the jobs timer.
      */
@@ -3679,6 +3719,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JTabbedPane manageExperimentPane;
     private javax.swing.JMenuItem menuCollapseAll;
     private javax.swing.JMenuItem menuExpandAll;
+    private javax.swing.JMenuItem menuGridQueues;
     private javax.swing.JMenuItem menuKillHard;
     private javax.swing.JMenuItem menuKillSoft;
     private javax.swing.JMenuItem menuRemoveDeadClients;
@@ -3693,6 +3734,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JPanel panelManageExperiment;
     private javax.swing.JPopupMenu popupInstanceClassTree;
     private javax.swing.JPopupMenu popupTblClients;
+    private javax.swing.JPopupMenu popupTblExperiments;
     private javax.swing.JScrollPane scrollPaneExperimentsTable;
     private javax.swing.JSplitPane splitPaneSolverSolverConfigs;
     private javax.swing.JTable tableExperiments;

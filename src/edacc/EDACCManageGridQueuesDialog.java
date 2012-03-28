@@ -8,6 +8,7 @@ package edacc;
 import edacc.experiment.ExperimentController;
 import edacc.gridqueues.GridQueuesController;
 import edacc.gridqueues.QueueListModel;
+import edacc.model.Experiment;
 import edacc.model.GridQueue;
 import edacc.model.GridQueueDAO;
 import edacc.model.NoConnectionToDBException;
@@ -33,17 +34,23 @@ import javax.swing.table.AbstractTableModel;
  */
 public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
 
-    private ExperimentController expController;
+    private Experiment experiment;
+    private ExperimentController experimentController;
     private EDACCGridSettingsView gridSettings;
     private QueueListModel queueListModel;
 
+    public EDACCManageGridQueuesDialog(java.awt.Frame parent, boolean modal) throws NoConnectionToDBException, SQLException {
+        this(parent, modal, null, null);
+    }
+    
     /** Creates new form EDACCManageGridQueuesDialog */
-    public EDACCManageGridQueuesDialog(java.awt.Frame parent, boolean modal, ExperimentController expController) throws NoConnectionToDBException, SQLException {
+    public EDACCManageGridQueuesDialog(java.awt.Frame parent, boolean modal, ExperimentController experimentController, Experiment experiment) throws NoConnectionToDBException, SQLException {
         super(parent, modal);
         gridSettings = new EDACCGridSettingsView(parent, true, this);
         initComponents();
-        this.expController = expController;
-        if (expController == null) {
+        this.experiment = experiment;
+        this.experimentController = experimentController;
+        if (experiment == null) {
             btnChooseQueues.setVisible(false);
             btnCancel.setText("Done");
         } else {
@@ -51,7 +58,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
             btnEditQueue.setVisible(false);
             btnCancel.setText("Cancel");
         }
-        queueListModel = new QueueListModel(expController);
+        queueListModel = new QueueListModel(experiment);
         listQueues.setModel(queueListModel);
         listQueues.addListSelectionListener(new QueueListSelectionListener());
         listQueues.addMouseListener(new MouseAdapter() {
@@ -79,7 +86,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 
-                if (EDACCManageGridQueuesDialog.this.expController != null) {
+                if (EDACCManageGridQueuesDialog.this.experiment != null) {
                     return EDACCManageGridQueuesDialog.this.queueListModel.checkBoxes.get(index);
                 } else {
                     GridQueue queue = (GridQueue) value;
@@ -274,7 +281,7 @@ public class EDACCManageGridQueuesDialog extends javax.swing.JDialog {
 
     private void btnChooseQueues(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseQueues
         try {
-            expController.assignQueuesToExperiment(queueListModel.getSelectedGridQueues());
+            experimentController.assignQueuesToExperiment(queueListModel.getSelectedGridQueues(), experiment);
             GridQueuesController.getInstance().gridQueueSelectionChanged();
         } catch (SQLException ex) {
             javax.swing.JOptionPane.showMessageDialog(null, "An error occured while assigning a grid queue to the experiment: " + ex.getMessage(), "Error", javax.swing.JOptionPane.ERROR_MESSAGE);

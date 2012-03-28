@@ -1,6 +1,7 @@
 package edacc.gridqueues;
 
 import edacc.experiment.ExperimentController;
+import edacc.model.Experiment;
 import edacc.model.ExperimentHasGridQueue;
 import edacc.model.ExperimentHasGridQueueDAO;
 import edacc.model.GridQueue;
@@ -19,10 +20,10 @@ public class QueueListModel extends AbstractListModel {
 
     public ArrayList<JCheckBox> checkBoxes;
     private ArrayList<GridQueue> queues;
-    private ExperimentController expController;
+    private Experiment experiment;
 
-    public QueueListModel(ExperimentController expController) throws NoConnectionToDBException, SQLException {
-        this.expController = expController;
+    public QueueListModel(Experiment experiment) throws NoConnectionToDBException, SQLException {
+        this.experiment = experiment;
         refreshQueues();
     }
 
@@ -39,8 +40,8 @@ public class QueueListModel extends AbstractListModel {
     public void refreshQueues() throws NoConnectionToDBException, SQLException {
 
         queues = GridQueueDAO.getAll();
-        if (expController != null) {
-            ArrayList<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(expController.getActiveExperiment());
+        if (experiment != null) {
+            ArrayList<ExperimentHasGridQueue> ehgqs = ExperimentHasGridQueueDAO.getExperimentHasGridQueueByExperiment(experiment);
             checkBoxes = new ArrayList<JCheckBox>();
             for (GridQueue q : queues) {
                 JCheckBox checkBox = new JCheckBox(q.getName() + " (" + q.getId() + ")");

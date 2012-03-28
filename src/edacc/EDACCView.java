@@ -845,7 +845,7 @@ public class EDACCView extends FrameView implements Observer {
     public void btnGridSettings() {
         try {
             JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            EDACCManageGridQueuesDialog manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true, null);
+            EDACCManageGridQueuesDialog manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true);
             manageGridQueues.setLocationRelativeTo(mainFrame);
             manageGridQueues.setVisible(true);
         } catch (NoConnectionToDBException ex) {
