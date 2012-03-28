@@ -7,6 +7,7 @@ package edacc;
 
 import edacc.experiment.Util;
 import edacc.experiment.VerifierParameterTableModel;
+import edacc.model.Cost;
 import edacc.model.Experiment;
 import edacc.model.Verifier;
 import edacc.model.VerifierConfiguration;
@@ -38,13 +39,14 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     public Integer watcherOutputPreserveFirst, watcherOutputPreserveLast;
     public Integer verifierOutputPreserveFirst, verifierOutputPreserveLast;
     public Experiment.Cost defaultCost;
+    public Cost cost;
     public VerifierConfiguration verifierConfig;
     public boolean isConfigurationExp;
     public boolean canceled;
     private VerifierParameterTableModel verifierParameterTableModel;
 
     /** Creates new form EDACCExperimentModeNewExp */
-    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, List<Verifier> verifiers) {
+    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, List<Verifier> verifiers, List<Cost> costs) {
         super(parent, modal);
         initComponents();
         verifierParameterTableModel = new VerifierParameterTableModel();
@@ -103,10 +105,19 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         for (Verifier v : verifiers) {
             comboVerifierBinary.addItem(v);
         }
+        
+        comboCost.removeAllItems();
+        for (Cost c : costs) {
+             comboCost.addItem(c);
+        }
     }
     
-    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, List<Verifier> verifiers, String expName, String expDescription, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, VerifierConfiguration verifierConfig) {
-        this(parent, modal, verifiers);
+    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, List<Verifier> verifiers, List<Cost> costs, String expName, String expDescription, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, VerifierConfiguration verifierConfig, Cost cost) {
+        this(parent, modal, verifiers, costs);
+        
+        if (cost != null) {
+            comboCost.setSelectedItem(cost);
+        }
         
         txtExperimentName.setText(expName);
         txtExperimentDescription.setText(expDescription);
@@ -217,6 +228,8 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         jScrollPane2 = new javax.swing.JScrollPane();
         tblVerifierParameters = new javax.swing.JTable();
         jLabel3 = new javax.swing.JLabel();
+        lblCostName = new javax.swing.JLabel();
+        comboCost = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentModeNewExp.class);
@@ -380,6 +393,11 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
 
         comboDefaultCost.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         comboDefaultCost.setName("comboDefaultCost"); // NOI18N
+        comboDefaultCost.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboDefaultCostActionPerformed(evt);
+            }
+        });
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jPanel1.setName("jPanel1"); // NOI18N
@@ -448,6 +466,12 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
         jLabel3.setName("jLabel3"); // NOI18N
 
+        lblCostName.setText(resourceMap.getString("lblCostName.text")); // NOI18N
+        lblCostName.setName("lblCostName"); // NOI18N
+
+        comboCost.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboCost.setName("comboCost"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -478,7 +502,12 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
-                            .addComponent(comboDefaultCost, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(comboDefaultCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lblCostName)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(comboCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(chkLimitWatcherOutput)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -531,7 +560,9 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(comboDefaultCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(comboDefaultCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblCostName)
+                    .addComponent(comboCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -646,6 +677,12 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         
         isConfigurationExp = chkConfigurationExp.isSelected();
         defaultCost = comboDefaultCost.getSelectedItem() instanceof Experiment.Cost ? (Experiment.Cost) comboDefaultCost.getSelectedItem() : Experiment.Cost.resultTime;
+        if (Experiment.Cost.cost.equals(defaultCost)) {
+            cost = comboCost.getSelectedItem() instanceof Cost ? (Cost) comboCost.getSelectedItem() : null;
+        } else {
+            cost = null;
+        }
+        
         if (verifierConfig == null) {
             Verifier verifier = (Verifier) comboVerifierBinary.getSelectedItem();
             if (verifier != null) {
@@ -795,6 +832,17 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             verifierParameterTableModel.setParameters(v.getParameters());
         }
     }//GEN-LAST:event_comboVerifierBinaryActionPerformed
+
+    private void comboDefaultCostActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboDefaultCostActionPerformed
+        if (Experiment.Cost.cost.equals(comboDefaultCost.getSelectedItem())) {
+            comboCost.setVisible(true);
+            lblCostName.setVisible(true);
+        } else {
+            comboCost.setVisible(false);
+            lblCostName.setVisible(false);
+        }
+    }//GEN-LAST:event_comboDefaultCostActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnCreateExperiment;
@@ -802,6 +850,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     private javax.swing.JCheckBox chkLimitSolverOutput;
     private javax.swing.JCheckBox chkLimitVerifierOutput;
     private javax.swing.JCheckBox chkLimitWatcherOutput;
+    private javax.swing.JComboBox comboCost;
     private javax.swing.JComboBox comboDefaultCost;
     private javax.swing.JComboBox comboSolverOutputUnit;
     private javax.swing.JComboBox comboVerifierBinary;
@@ -818,6 +867,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblCostName;
     private javax.swing.JLabel lblExperimentDescription;
     private javax.swing.JLabel lblExperimentName;
     private javax.swing.JLabel lblLimitSolverOutputIn;

@@ -33,6 +33,7 @@ import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.ConfigurationScenario;
 import edacc.model.ConfigurationScenarioDAO;
 import edacc.model.ConfigurationScenarioParameter;
+import edacc.model.Cost;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
@@ -2622,15 +2623,17 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             return;
         }
         List<Verifier> verifiers;
+        List<Cost> costs;
         VerifierConfiguration vConfig;
         try {
             verifiers = expController.getVerifiers();
+            costs = expController.getCosts();
         } catch (SQLException ex) {
             this.createDatabaseErrorMessage(ex);
             return;
         }
         JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        final EDACCExperimentModeNewExp dialogNewExp = new EDACCExperimentModeNewExp(mainFrame, true, verifiers);
+        final EDACCExperimentModeNewExp dialogNewExp = new EDACCExperimentModeNewExp(mainFrame, true, verifiers, costs);
         dialogNewExp.setLocationRelativeTo(mainFrame);
         try {
             while (true) {
@@ -2657,7 +2660,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                                     dialogNewExp.isConfigurationExp, dialogNewExp.defaultCost, dialogNewExp.solverOutputPreserveFirst,
                                     dialogNewExp.solverOutputPreserveLast, dialogNewExp.watcherOutputPreserveFirst,
                                     dialogNewExp.watcherOutputPreserveLast, dialogNewExp.verifierOutputPreserveFirst,
-                                    dialogNewExp.verifierOutputPreserveLast, dialogNewExp.verifierConfig);
+                                    dialogNewExp.verifierOutputPreserveLast, dialogNewExp.verifierConfig, dialogNewExp.cost);
                             if (experimentUpdateThread != null) {
                                 experimentUpdateThread.cancel(true);
                             }
@@ -3030,15 +3033,25 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
         Experiment exp = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(tableExperiments.getSelectedRow()));
         List<Verifier> verifiers;
+        List<Cost> costs;
         VerifierConfiguration vConfig;
         try {
             verifiers = expController.getVerifiers();
             vConfig = expController.getVerifierConfig(exp.getId());
+            costs = expController.getCosts();
         } catch (SQLException ex) {
             this.createDatabaseErrorMessage(ex);
             return;
         }
-        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, verifiers, exp.getName(), exp.getDescription(), exp.isConfigurationExp(), exp.getDefaultCost(), exp.getSolverOutputPreserveFirst(), exp.getSolverOutputPreserveLast(), exp.getWatcherOutputPreserveFirst(), exp.getWatcherOutputPreserveLast(), exp.getVerifierOutputPreserveFirst(), exp.getVerifierOutputPreserveLast(), vConfig);
+        Cost cost = null;
+        if (exp.getIdCost() != null) {
+            for (Cost c : costs) {
+                if (c.getId() == exp.getIdCost()) {
+                    cost = c;
+                }
+            }
+        }
+        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, verifiers, costs, exp.getName(), exp.getDescription(), exp.isConfigurationExp(), exp.getDefaultCost(), exp.getSolverOutputPreserveFirst(), exp.getSolverOutputPreserveLast(), exp.getWatcherOutputPreserveFirst(), exp.getWatcherOutputPreserveLast(), exp.getVerifierOutputPreserveFirst(), exp.getVerifierOutputPreserveLast(), vConfig, cost);
         dialogEditExp.setLocationRelativeTo(mainFrame);
         try {
             while (true) {
@@ -3064,6 +3077,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 Integer oldWOPL = exp.getWatcherOutputPreserveLast();
                 Integer oldVOPF = exp.getVerifierOutputPreserveFirst();
                 Integer oldVOPL = exp.getVerifierOutputPreserveLast();
+                Integer oldIdCost = exp.getIdCost();
                 exp.setName(dialogEditExp.expName);
                 exp.setDescription(dialogEditExp.expDesc);
                 exp.setDefaultCost(dialogEditExp.defaultCost);
@@ -3073,6 +3087,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 exp.setVerifierOutputPreserveLast(dialogEditExp.verifierOutputPreserveLast);
                 exp.setWatcherOutputPreserveFirst(dialogEditExp.watcherOutputPreserveFirst);
                 exp.setWatcherOutputPreserveLast(dialogEditExp.watcherOutputPreserveLast);
+                exp.setIdCost(dialogEditExp.cost == null ? null : cost.getId());
                 try {
                     expController.saveExperiment(exp);
                 } catch (SQLException ex) {
@@ -3085,6 +3100,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     exp.setWatcherOutputPreserveLast(oldWOPL);
                     exp.setVerifierOutputPreserveFirst(oldVOPF);
                     exp.setVerifierOutputPreserveLast(oldVOPL);
+                    exp.setIdCost(oldIdCost);
                     createDatabaseErrorMessage(ex);
                 }
                 try {
@@ -3456,16 +3472,16 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             exp = expTableModel.getExperimentAt(tableExperiments.convertRowIndexToModel(row));
         }
         if (exp != null) {
-        try {
-            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-            EDACCManageGridQueuesDialog manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true, expController, exp);
-            manageGridQueues.setLocationRelativeTo(mainFrame);
-            manageGridQueues.setVisible(true);
-        } catch (NoConnectionToDBException ex) {
-            JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
+            try {
+                JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+                EDACCManageGridQueuesDialog manageGridQueues = new EDACCManageGridQueuesDialog(mainFrame, true, expController, exp);
+                manageGridQueues.setLocationRelativeTo(mainFrame);
+                manageGridQueues.setVisible(true);
+            } catch (NoConnectionToDBException ex) {
+                JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         } else {
             JOptionPane.showMessageDialog(this, "No experiment has been selected.", "Error", JOptionPane.ERROR_MESSAGE);
         }

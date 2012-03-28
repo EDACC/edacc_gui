@@ -17,7 +17,7 @@ public class Experiment extends BaseModel implements IntegerPKModel, Serializabl
     private Integer solverOutputPreserveFirst, solverOutputPreserveLast;
     private Integer watcherOutputPreserveFirst, watcherOutputPreserveLast;
     private Integer verifierOutputPreserveFirst, verifierOutputPreserveLast;
-    
+    private Integer idCost;
     // only used for export
     public List<ExperimentHasInstance> instances;
     protected ConfigurationScenario scenario;
@@ -42,6 +42,7 @@ public class Experiment extends BaseModel implements IntegerPKModel, Serializabl
         watcherOutputPreserveLast = experiment.watcherOutputPreserveLast;
         verifierOutputPreserveFirst = experiment.verifierOutputPreserveFirst;
         verifierOutputPreserveLast = experiment.verifierOutputPreserveLast;
+        idCost = experiment.idCost;
     }
 
     @Override
@@ -216,6 +217,17 @@ public class Experiment extends BaseModel implements IntegerPKModel, Serializabl
         }
     }
 
+    public Integer getIdCost() {
+        return idCost;
+    }
+
+    public void setIdCost(Integer idCost) {
+        this.idCost = idCost;
+        if (isSaved()) {
+            setModified();
+        }
+    }
+    
     @Override
     public String toString() {
         return name;

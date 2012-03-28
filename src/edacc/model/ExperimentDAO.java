@@ -23,12 +23,12 @@ public class ExperimentDAO {
     protected static final String table = "Experiment";
     protected static final String insertQuery = "INSERT INTO " + table + " (Name, Date, description, configurationExp, "
             + "priority, defaultCost, active, solverOutputPreserveFirst, solverOutputPreserveLast, watcherOutputPreserveFirst, "
-            + "watcherOutputPreserveLast, verifierOutputPreserveFirst, verifierOutputPreserveLast) "
-            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            + "watcherOutputPreserveLast, verifierOutputPreserveFirst, verifierOutputPreserveLast, Cost_idCost) "
+            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     protected static final String updateQuery = "UPDATE " + table + " SET Name =?, Date =?, description =?, "
             + "configurationExp =?, priority =?, defaultCost=?, active=?,solverOutputPreserveFirst=?,solverOutputPreserveLast=?,"
             + "watcherOutputPreserveFirst=?,watcherOutputPreserveLast=?,verifierOutputPreserveFirst=?,"
-            + "verifierOutputPreserveLast=? WHERE idExperiment=?";
+            + "verifierOutputPreserveLast=?,Cost_idCost=? WHERE idExperiment=?";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idExperiment=?";
     private static final ObjectCache<Experiment> cache = new ObjectCache<Experiment>();
 
@@ -37,7 +37,7 @@ public class ExperimentDAO {
      * so it can be referenced by related objects
      * @return new Experiment object
      */
-    public static Experiment createExperiment(String name, Date date, String description, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast) throws SQLException {
+    public static Experiment createExperiment(String name, Date date, String description, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, Integer idCost) throws SQLException {
         if (getExperimentByName(name) != null) {
             throw new SQLException("There exists already an experiment with the same name.");
         }
@@ -55,6 +55,7 @@ public class ExperimentDAO {
         i.setWatcherOutputPreserveLast(watcherOutputPreserveLast);
         i.setVerifierOutputPreserveFirst(verifierOutputPreserveFirst);
         i.setVerifierOutputPreserveLast(verifierOutputPreserveLast);
+        i.setIdCost(idCost);
         save(i);
         cache.cache(i);
         return i;
@@ -95,7 +96,7 @@ public class ExperimentDAO {
             st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
         } else if (experiment.isModified()) {
             st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
-            st.setInt(14, experiment.getId());
+            st.setInt(15, experiment.getId());
         } else {
             return;
         }
@@ -126,6 +127,11 @@ public class ExperimentDAO {
         } else {
             st.setInt(12, experiment.getVerifierOutputPreserveFirst());
             st.setInt(13, experiment.getVerifierOutputPreserveLast());
+        }
+        if (experiment.getIdCost() == null) {
+            st.setNull(14, java.sql.Types.INTEGER);
+        } else {
+            st.setInt(14, experiment.getIdCost());
         }
         st.executeUpdate();
         
@@ -192,6 +198,10 @@ public class ExperimentDAO {
         i.setVerifierOutputPreserveLast(rs.getInt("verifierOutputPreserveLast"));
         if (rs.wasNull()) {
             i.setVerifierOutputPreserveLast(null);
+        }
+        i.setIdCost(rs.getInt("Cost_idCost"));
+        if (rs.wasNull()) {
+            i.setIdCost(null);
         }
         return i;
     }

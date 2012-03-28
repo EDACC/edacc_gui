@@ -153,7 +153,14 @@ CREATE  TABLE IF NOT EXISTS `Experiment` (
   `watcherOutputPreserveLast` INT NULL ,
   `verifierOutputPreserveFirst` INT NULL ,
   `verifierOutputPreserveLast` INT NULL ,
-  PRIMARY KEY (`idExperiment`) )
+  `Cost_idCost` INT NULL ,
+  PRIMARY KEY (`idExperiment`) ,
+  INDEX `fk_Experiment_Cost1` (`Cost_idCost` ASC) ,
+  CONSTRAINT `fk_Experiment_Cost1`
+    FOREIGN KEY (`Cost_idCost` )
+    REFERENCES `Cost` (`idCost` )
+    ON DELETE SET NULL
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
