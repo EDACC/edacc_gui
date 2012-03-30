@@ -110,7 +110,6 @@ public class UpdateController {
         int length = connection.getContentLength();
         java.io.BufferedInputStream in = new java.io.BufferedInputStream(connection.getInputStream());
         
-        System.out.println(new File(edacc.experiment.Util.getPath() + System.getProperty("file.separator") + "update.zip").getPath());
         java.io.FileOutputStream fos = new java.io.FileOutputStream(edacc.experiment.Util.getPath() + System.getProperty("file.separator") + "update.zip");
         java.io.BufferedOutputStream bout = new BufferedOutputStream(fos, 1024 * 24);
         byte data[] = new byte[1024 * 24];
@@ -157,7 +156,8 @@ public class UpdateController {
             }
             bout.close();
             fos.close();
-            Runtime.getRuntime().exec("\"" + System.getProperty("java.home") + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "java\" -classpath \"" + edacc.experiment.Util.getPath() + "\" Updater");
+            String startUpdater[] = {System.getProperty("java.home") + System.getProperty("file.separator") + "bin" + System.getProperty("file.separator") + "java", "-classpath", edacc.experiment.Util.getPath(), "Updater"};
+            Runtime.getRuntime().exec(startUpdater);
             Runtime.getRuntime().halt(0);
         } else {
             throw new ClassNotFoundException();
