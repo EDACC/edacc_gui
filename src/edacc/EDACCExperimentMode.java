@@ -712,6 +712,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         menuCollapseAll = new javax.swing.JMenuItem();
         popupTblExperiments = new javax.swing.JPopupMenu();
         menuGridQueues = new javax.swing.JMenuItem();
+        popupTblJobs = new javax.swing.JPopupMenu();
+        menuResetJobs = new javax.swing.JMenuItem();
         manageExperimentPane = new javax.swing.JTabbedPane();
         panelManageExperiment = new javax.swing.JPanel();
         scrollPaneExperimentsTable = new javax.swing.JScrollPane();
@@ -894,6 +896,17 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         });
         popupTblExperiments.add(menuGridQueues);
+
+        popupTblJobs.setName("popupTblJobs"); // NOI18N
+
+        menuResetJobs.setText(resourceMap.getString("menuResetJobs.text")); // NOI18N
+        menuResetJobs.setName("menuResetJobs"); // NOI18N
+        menuResetJobs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuResetJobsActionPerformed(evt);
+            }
+        });
+        popupTblJobs.add(menuResetJobs);
 
         setName("Form"); // NOI18N
 
@@ -1900,6 +1913,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         ));
         tableJobs.setToolTipText(resourceMap.getString("tableJobs.toolTipText")); // NOI18N
         tableJobs.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        tableJobs.setComponentPopupMenu(popupTblJobs);
         tableJobs.setName("tableJobs"); // NOI18N
         jScrollPane6.setViewportView(tableJobs);
 
@@ -3487,6 +3501,29 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
     }//GEN-LAST:event_menuGridQueuesActionPerformed
 
+    private void menuResetJobsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuResetJobsActionPerformed
+        int userinput = JOptionPane.showConfirmDialog(this, "Do you really want to reset the currently visible jobs? " + tableJobs.getRowCount() + " jobs will be resetted.", "Reset Jobs", JOptionPane.YES_NO_OPTION);
+        if (userinput == JOptionPane.YES_OPTION) {
+            Tasks.startTask(new TaskRunnable() {
+
+                @Override
+                public void run(Tasks task) {
+                    try {
+                        expController.setStatus(StatusCode.NOT_STARTED);
+                    } catch (final SQLException ex) {
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                EDACCExperimentMode.this.createDatabaseErrorMessage(ex);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    }//GEN-LAST:event_menuResetJobsActionPerformed
+
     /**
      * Stops the jobs timer.
      */
@@ -3739,6 +3776,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JMenuItem menuKillHard;
     private javax.swing.JMenuItem menuKillSoft;
     private javax.swing.JMenuItem menuRemoveDeadClients;
+    private javax.swing.JMenuItem menuResetJobs;
     private javax.swing.JMenuItem menuSendMessage;
     private javax.swing.JScrollPane panelAnalysis;
     private javax.swing.JPanel panelChooseInstances;
@@ -3751,6 +3789,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     private javax.swing.JPopupMenu popupInstanceClassTree;
     private javax.swing.JPopupMenu popupTblClients;
     private javax.swing.JPopupMenu popupTblExperiments;
+    private javax.swing.JPopupMenu popupTblJobs;
     private javax.swing.JScrollPane scrollPaneExperimentsTable;
     private javax.swing.JSplitPane splitPaneSolverSolverConfigs;
     private javax.swing.JTable tableExperiments;
