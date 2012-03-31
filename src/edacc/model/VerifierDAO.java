@@ -3,15 +3,24 @@ package edacc.model;
 import edacc.manageDB.Util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 /**
  *
@@ -265,5 +274,97 @@ public class VerifierDAO {
         List<Verifier> v = new ArrayList<Verifier>();
         v.addAll(cache.values());
         saveAll(v);
+    }
+
+    public static void exportVerifiers(Tasks task, ZipOutputStream stream, List<Verifier> verifiers) throws SQLException, IOException {
+        task.setOperationName("Exporting verifiers..");
+        int current = 1;
+        for (Verifier v : verifiers) {
+            task.setStatus("Writing verifier binary " + current + " / " + verifiers.size());
+            task.setTaskProgress(current / (float) verifiers.size());
+
+            stream.putNextEntry(new ZipEntry("verifier_" + v.getId() + ".binary"));
+            VerifierDAO.writeVerifierBinaryToStream(new ObjectOutputStream(stream), v);
+            current++;
+        }
+        task.setTaskProgress(0.f);
+        task.setStatus("Writing verifier informations..");
+        stream.putNextEntry(new ZipEntry("verifiers.edacc"));
+        writeVerifiersToStream(new ObjectOutputStream(stream), verifiers);
+
+        task.setStatus("Done.");
+    }
+
+    private static void writeVerifierBinaryToStream(ObjectOutputStream stream, Verifier v) throws IOException, SQLException {
+        stream.writeObject(v.getId());
+        InputStream is = getZippedBinaryFile(v);
+        BinaryData data = new BinaryData(is);
+        is.close();
+        stream.writeUnshared(data);
+    }
+
+    private static InputStream getZippedBinaryFile(Verifier v) throws SQLException {
+        final String query = "SELECT binaryArchive FROM " + table + " WHERE idVerifier=?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, v.getId());
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            try {
+                return rs.getBinaryStream("binaryArchive");
+            } finally {
+                rs.close();
+                ps.close();
+            }
+        }
+        rs.close();
+        ps.close();
+        return null;
+    }
+
+    private static void writeVerifiersToStream(ObjectOutputStream stream, List<Verifier> verifiers) throws IOException {
+        for (Verifier v : verifiers) {
+            stream.writeUnshared(v);
+        }
+    }
+
+    public static List<Verifier> readVerifiersFromFile(ZipFile file) throws IOException, ClassNotFoundException {
+        ZipEntry entry = file.getEntry("verifiers.edacc");
+        if (entry == null) {
+            throw new IOException("Invalid file.");
+        }
+        ObjectInputStream stream = new ObjectInputStream(file.getInputStream(entry));
+        List<Verifier> verifiers = new LinkedList<Verifier>();
+        Verifier verifier;
+        while ((verifier = readVerifiersFromStream(stream)) != null) {
+            verifiers.add(verifier);
+        }
+        return verifiers;
+    }
+
+    private static Verifier readVerifiersFromStream(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        try {
+            return (Verifier) stream.readUnshared();
+        } catch (EOFException ex) {
+            return null;
+        }
+    }
+
+    public static HashMap<Integer, List<Verifier>> mapFileVerifiersToExistingVerifiers(List<Verifier> fileVerifiers) throws SQLException {
+        HashMap<Integer, List<Verifier>> res = new HashMap<Integer, List<Verifier>>();
+        List<Verifier> dbVerifiers = getAllVerifiers();
+
+        for (Verifier f : fileVerifiers) {
+            for (Verifier v : dbVerifiers) {
+                if (v.realEquals(f)) {
+                    List<Verifier> verifiers = res.get(f.getId());
+                    if (verifiers == null) {
+                        verifiers = new LinkedList<Verifier>();
+                        res.put(f.getId(), verifiers);
+                    }
+                    verifiers.add(v);
+                }
+            }
+        }
+        return res;
     }
 }

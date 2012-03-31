@@ -7,6 +7,7 @@ package edacc.importexport;
 
 import edacc.EDACCApp;
 import edacc.model.Solver;
+import edacc.model.Verifier;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -37,7 +38,9 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
 
     private ImportController controller;
     private ImportSolverTableModel tableModel;
+    private ImportVerifierTableModel verifierTableModel;
     private JComboBox[] combos;
+    private JComboBox[] verifierCombos;
 
     /** Creates new form ImportSummaryPanel */
     public ImportSummaryPanel(ImportController controller) {
@@ -61,9 +64,15 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
         lblExperiments = new javax.swing.JLabel();
         lblSolvers = new javax.swing.JLabel();
         lblInstances = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        lblVerifiers = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblSolvers = new javax.swing.JTable();
+        btnSolverDetails = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblVerifiers = new javax.swing.JTable();
 
         setName("Form"); // NOI18N
 
@@ -89,6 +98,12 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
         lblInstances.setText(resourceMap.getString("lblInstances.text")); // NOI18N
         lblInstances.setName("lblInstances"); // NOI18N
 
+        jLabel4.setText(resourceMap.getString("jLabel4.text")); // NOI18N
+        jLabel4.setName("jLabel4"); // NOI18N
+
+        lblVerifiers.setText(resourceMap.getString("lblVerifiers.text")); // NOI18N
+        lblVerifiers.setName("lblVerifiers"); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -98,9 +113,11 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2)
-                    .addComponent(jLabel3))
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblVerifiers)
                     .addComponent(lblInstances)
                     .addComponent(lblSolvers)
                     .addComponent(lblExperiments))
@@ -121,6 +138,10 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(lblInstances))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(lblVerifiers))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -145,15 +166,60 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(tblSolvers);
 
+        btnSolverDetails.setText(resourceMap.getString("btnSolverDetails.text")); // NOI18N
+        btnSolverDetails.setName("btnSolverDetails"); // NOI18N
+        btnSolverDetails.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSolverDetailsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(537, Short.MAX_VALUE)
+                .addComponent(btnSolverDetails)
+                .addContainerGap())
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 612, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnSolverDetails))
+        );
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(resourceMap.getString("jPanel3.border.title"))); // NOI18N
+        jPanel3.setName("jPanel3"); // NOI18N
+
+        jScrollPane2.setName("jScrollPane2"); // NOI18N
+
+        tblVerifiers.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        tblVerifiers.setName("tblVerifiers"); // NOI18N
+        jScrollPane2.setViewportView(tblVerifiers);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 612, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -164,6 +230,7 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -174,7 +241,8 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -183,24 +251,41 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
             evt.consume();
             int index;
             if ((index = tblSolvers.getSelectedRow()) != -1) {
-                int modelRow = tblSolvers.convertRowIndexToModel(index);
-                ImportSolverDetail dialog = new ImportSolverDetail(EDACCApp.getApplication().getMainFrame(), true, tableModel.getSolverAt(modelRow), tableModel.getComboBoxAt(modelRow));
-                dialog.setName("ImportSolverDetail");
-                EDACCApp.getApplication().show(dialog);
+                showSolverDetails(index);
             }
         }
     }//GEN-LAST:event_tblSolversMouseClicked
+
+    private void showSolverDetails(int tableRow) {
+        int modelRow = tblSolvers.convertRowIndexToModel(tableRow);
+        ImportSolverDetail dialog = new ImportSolverDetail(EDACCApp.getApplication().getMainFrame(), true, tableModel.getSolverAt(modelRow), tableModel.getComboBoxAt(modelRow));
+        dialog.setName("ImportSolverDetail");
+        EDACCApp.getApplication().show(dialog);
+    }
+
+    private void btnSolverDetailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverDetailsActionPerformed
+        int index;
+        if ((index = tblSolvers.getSelectedRow()) != -1) {
+            showSolverDetails(index);
+        }
+    }//GEN-LAST:event_btnSolverDetailsActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnSolverDetails;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblExperiments;
     private javax.swing.JLabel lblInstances;
     private javax.swing.JLabel lblSolvers;
+    private javax.swing.JLabel lblVerifiers;
     private javax.swing.JTable tblSolvers;
+    private javax.swing.JTable tblVerifiers;
     // End of variables declaration//GEN-END:variables
 
     public void setExperimentCount(int count) {
@@ -227,7 +312,7 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
                 List<Solver> cpList = commonParameters.get(solvers.get(i).getId());
                 combos[i] = new JComboBox();
                 combos[i].setRenderer(new ComboBoxCellRenderer(cbList));
-                combos[i].addItem("Create new Solver");
+                combos[i].addItem("Create new solver");
                 for (Solver s : cbList) {
                     combos[i].addItem(s);
                 }
@@ -258,46 +343,8 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
             tableModel = new ImportSolverTableModel(str);
             tblSolvers.setModel(tableModel);
             tblSolvers.getColumnModel().getColumn(3).setCellRenderer(new NameCellRenderer());
-            tblSolvers.getColumnModel().getColumn(2).setCellRenderer(new ComboBoxRenderer());
-            tblSolvers.getColumnModel().getColumn(2).setCellEditor(new TableCellEditor() {
-
-                @Override
-                public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-                    return combos[row];
-                }
-
-                @Override
-                public Object getCellEditorValue() {
-                    return null;
-                }
-
-                @Override
-                public boolean isCellEditable(EventObject anEvent) {
-                    return true;
-                }
-
-                @Override
-                public boolean shouldSelectCell(EventObject anEvent) {
-                    return true;
-                }
-
-                @Override
-                public boolean stopCellEditing() {
-                    return true;
-                }
-
-                @Override
-                public void cancelCellEditing() {
-                }
-
-                @Override
-                public void addCellEditorListener(CellEditorListener l) {
-                }
-
-                @Override
-                public void removeCellEditorListener(CellEditorListener l) {
-                }
-            });
+            tblSolvers.getColumnModel().getColumn(2).setCellRenderer(new ComboBoxRenderer(combos));
+            tblSolvers.getColumnModel().getColumn(2).setCellEditor(new ComboBoxEditor(combos));
             tableModel.setData(solverArray, combos);
 
         } catch (SQLException ex) {
@@ -308,6 +355,48 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
 
     public void setInstanceCount(int count) {
         lblInstances.setText("" + count);
+    }
+
+    public void setVerifiers(List<Verifier> verifiers) {
+        lblVerifiers.setText("" + verifiers.size());
+        try {
+            HashMap<Integer, List<Verifier>> common = controller.mapFileVerifiersToExistingVerifiers(verifiers);
+            Verifier[] verifierArray = new Verifier[verifiers.size()];
+            verifierCombos = new JComboBox[verifiers.size()];
+            for (int i = 0; i < verifierCombos.length; i++) {
+                verifierArray[i] = verifiers.get(i);
+                List<Verifier> commonVerifiers = common.get(verifiers.get(i).getId());
+                verifierCombos[i] = new JComboBox();
+                verifierCombos[i].setRenderer(new VerifierComboBoxCellRenderer());
+                verifierCombos[i].addItem("Create new verifier");
+                if (commonVerifiers != null) {
+                    for (Verifier c : commonVerifiers) {
+                        verifierCombos[i].addItem(c);
+                    }
+                }
+                if (verifierCombos[i].getItemCount() > 1) {
+                    verifierCombos[i].setSelectedIndex(1);
+                } else {
+                    verifierCombos[i].setSelectedIndex(0);
+                }
+                final int rowIndex = i;
+                verifierCombos[i].addActionListener(new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        verifierTableModel.setValueAt(null, rowIndex, 2);
+                    }
+                });
+            }
+            verifierTableModel = new ImportVerifierTableModel();
+            tblVerifiers.setModel(verifierTableModel);
+            tblVerifiers.getColumnModel().getColumn(2).setCellRenderer(new ComboBoxRenderer(verifierCombos));
+            tblVerifiers.getColumnModel().getColumn(2).setCellEditor(new ComboBoxEditor(verifierCombos));
+            verifierTableModel.setData(verifierArray, verifierCombos);
+        } catch (SQLException ex) {
+            // TODO: error
+            Logger.getLogger(ImportSummaryPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public boolean validateInput() {
@@ -340,6 +429,12 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
     }
 
     private class ComboBoxRenderer implements TableCellRenderer {
+
+        private JComboBox[] combos;
+
+        public ComboBoxRenderer(JComboBox[] combos) {
+            this.combos = combos;
+        }
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -410,6 +505,67 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
                 label.setText((String) value);
             }
             return label;
+        }
+    }
+
+    private class VerifierComboBoxCellRenderer extends DefaultListCellRenderer {
+
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            JLabel label = new JLabel();
+            if (value instanceof Verifier) {
+                String verifierName = ((Verifier) value).getName();
+                label.setText("Don't import (verifier " + verifierName + " is equal)");
+            } else if (value instanceof String) {
+                label.setText((String) value);
+            }
+            return label;
+        }
+    }
+
+    private class ComboBoxEditor implements TableCellEditor {
+
+        private JComboBox[] combos;
+
+        public ComboBoxEditor(JComboBox[] combos) {
+            this.combos = combos;
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            return combos[row];
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            return null;
+        }
+
+        @Override
+        public boolean isCellEditable(EventObject anEvent) {
+            return true;
+        }
+
+        @Override
+        public boolean shouldSelectCell(EventObject anEvent) {
+            return true;
+        }
+
+        @Override
+        public boolean stopCellEditing() {
+            return true;
+        }
+
+        @Override
+        public void cancelCellEditing() {
+        }
+
+        @Override
+        public void addCellEditorListener(CellEditorListener l) {
+        }
+
+        @Override
+        public void removeCellEditorListener(CellEditorListener l) {
         }
     }
 }

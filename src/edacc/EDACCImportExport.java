@@ -15,27 +15,21 @@ import edacc.importexport.ImportExportController;
 import edacc.importexport.ImportSummaryPanel;
 import edacc.importexport.InstanceFixedSelectionTableModel;
 import edacc.importexport.SolverFixedSelectionTableModel;
-import edacc.manageDB.NoSolverBinarySpecifiedException;
-import edacc.manageDB.NoSolverNameSpecifiedException;
+import edacc.importexport.VerifierFixedSelectionTableModel;
 import edacc.model.Instance;
-import edacc.model.InstanceClassAlreadyInDBException;
 import edacc.model.InstanceClassMustBeSourceException;
-import edacc.model.NoConnectionToDBException;
 import edacc.model.Solver;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
+import edacc.model.Verifier;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipException;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -47,18 +41,18 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
-import javax.xml.bind.JAXBException;
 
 /**
  *
  * @author simon
  */
 public class EDACCImportExport extends javax.swing.JPanel {
-
+    
     private ImportExportController controller;
     private ExperimentSelectionTableModel expTableModel;
     private SolverFixedSelectionTableModel solTableModel;
     private InstanceFixedSelectionTableModel insTableModel;
+    private VerifierFixedSelectionTableModel verifierTableModel;
     private EDACCFilter instanceFilter;
     private EDACCFilter experimentFilter;
     private EDACCFilter solverFilter;
@@ -73,7 +67,7 @@ public class EDACCImportExport extends javax.swing.JPanel {
         controller = new ExportController();
         fillTables();
     }
-
+    
     public EDACCImportExport(File file) throws ZipException, IOException, ClassNotFoundException {
         initComponents();
         controller = new ImportController(file);
@@ -82,10 +76,10 @@ public class EDACCImportExport extends javax.swing.JPanel {
         pnlSummaryComponent.add(panelSummary, BorderLayout.CENTER);
         fillTables();
     }
-
+    
     private void fillTables() {
         tblExperiments.setDefaultRenderer(char.class, new DefaultTableCellRenderer() {
-
+            
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                     boolean isSelected, boolean hasFocus, int row, int column) {
@@ -96,31 +90,37 @@ public class EDACCImportExport extends javax.swing.JPanel {
         });
         tblSolvers.setDefaultRenderer(Boolean.class, new BooleanRenderer());
         tblInstances.setDefaultRenderer(Boolean.class, new BooleanRenderer());
+        tblVerifiers.setDefaultRenderer(Boolean.class, new BooleanRenderer());
         expTableModel = new ExperimentSelectionTableModel();
         solTableModel = new SolverFixedSelectionTableModel();
         insTableModel = new InstanceFixedSelectionTableModel();
-
+        verifierTableModel = new VerifierFixedSelectionTableModel();
+        
         tblExperiments.setModel(expTableModel);
         tblSolvers.setModel(solTableModel);
         tblInstances.setModel(insTableModel);
+        tblVerifiers.setModel(verifierTableModel);
         tblExperiments.setRowSorter(new TableRowSorter<ExperimentSelectionTableModel>(expTableModel));
         tblSolvers.setRowSorter(new TableRowSorter<SolverFixedSelectionTableModel>(solTableModel));
         tblInstances.setRowSorter(new TableRowSorter<InstanceFixedSelectionTableModel>(insTableModel));
+        tblVerifiers.setRowSorter(new TableRowSorter<VerifierFixedSelectionTableModel>(verifierTableModel));
         expTableModel.setExperiments(controller.getExperiments());
         solTableModel.setSolvers(controller.getSolvers());
         insTableModel.setInstances(controller.getInstances(), false, false);
-
+        verifierTableModel.setVerifiers(controller.getVerifiers());
+        
         edacc.experiment.Util.addSpaceSelection(tblExperiments, expTableModel.getColumnCount() - 1);
         edacc.experiment.Util.addSpaceSelection(tblSolvers, SolverTableModel.COL_SELECTED);
         edacc.experiment.Util.addSpaceSelection(tblInstances, InstanceTableModel.COL_SELECTED);
-
+        edacc.experiment.Util.addSpaceSelection(tblVerifiers, VerifierFixedSelectionTableModel.COL_SELECTED);
+        
         experimentFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tblExperiments, true);
         instanceFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tblInstances, true);
         solverFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tblSolvers, true);
         experimentFilter.setName("EDACCImportExport.experimentFilter");
         instanceFilter.setName("EDACCImportExport.instanceFilter");
         solverFilter.setName("EDACCImportExport.solverFilter");
-
+        
     }
 
     /** This method is called from within the constructor to
@@ -153,6 +153,11 @@ public class EDACCImportExport extends javax.swing.JPanel {
         btnInstancesNext = new javax.swing.JButton();
         btnInstancesPrevious = new javax.swing.JButton();
         btnInstancesFilter = new javax.swing.JButton();
+        pnlVerifiers = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tblVerifiers = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         pnlSummary = new javax.swing.JPanel();
         pnlSummaryComponent = new javax.swing.JPanel();
         btnFinish = new javax.swing.JButton();
@@ -215,11 +220,14 @@ public class EDACCImportExport extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlExperimentsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnFilterExperiments)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 542, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 540, Short.MAX_VALUE)
                 .addComponent(btnExperimentNext)
                 .addContainerGap())
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 674, Short.MAX_VALUE)
         );
+
+        pnlExperimentsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnExperimentNext, btnFilterExperiments});
+
         pnlExperimentsLayout.setVerticalGroup(
             pnlExperimentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlExperimentsLayout.createSequentialGroup()
@@ -282,7 +290,7 @@ public class EDACCImportExport extends javax.swing.JPanel {
             .addGroup(pnlSolversLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnFilterSolvers)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 463, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 429, Short.MAX_VALUE)
                 .addComponent(btnSolversPrevious)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSolversNext)
@@ -292,6 +300,9 @@ public class EDACCImportExport extends javax.swing.JPanel {
                 .addContainerGap())
             .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 674, Short.MAX_VALUE)
         );
+
+        pnlSolversLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnFilterSolvers, btnSolversNext, btnSolversPrevious});
+
         pnlSolversLayout.setVerticalGroup(
             pnlSolversLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlSolversLayout.createSequentialGroup()
@@ -358,13 +369,16 @@ public class EDACCImportExport extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlInstancesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnInstancesFilter)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 463, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 429, Short.MAX_VALUE)
                 .addComponent(btnInstancesPrevious)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnInstancesNext)
                 .addContainerGap())
             .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 674, Short.MAX_VALUE)
         );
+
+        pnlInstancesLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnInstancesFilter, btnInstancesNext, btnInstancesPrevious});
+
         pnlInstancesLayout.setVerticalGroup(
             pnlInstancesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlInstancesLayout.createSequentialGroup()
@@ -380,6 +394,68 @@ public class EDACCImportExport extends javax.swing.JPanel {
         );
 
         tabbedPane.addTab(resourceMap.getString("pnlInstances.TabConstraints.tabTitle"), pnlInstances); // NOI18N
+
+        pnlVerifiers.setName("pnlVerifiers"); // NOI18N
+
+        jScrollPane4.setName("jScrollPane4"); // NOI18N
+
+        tblVerifiers.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        tblVerifiers.setName("tblVerifiers"); // NOI18N
+        jScrollPane4.setViewportView(tblVerifiers);
+
+        jButton1.setText(resourceMap.getString("jButton1.text")); // NOI18N
+        jButton1.setName("jButton1"); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText(resourceMap.getString("jButton2.text")); // NOI18N
+        jButton2.setName("jButton2"); // NOI18N
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlVerifiersLayout = new javax.swing.GroupLayout(pnlVerifiers);
+        pnlVerifiers.setLayout(pnlVerifiersLayout);
+        pnlVerifiersLayout.setHorizontalGroup(
+            pnlVerifiersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlVerifiersLayout.createSequentialGroup()
+                .addContainerGap(512, Short.MAX_VALUE)
+                .addComponent(jButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1)
+                .addContainerGap())
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 674, Short.MAX_VALUE)
+        );
+
+        pnlVerifiersLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButton1, jButton2});
+
+        pnlVerifiersLayout.setVerticalGroup(
+            pnlVerifiersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlVerifiersLayout.createSequentialGroup()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlVerifiersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jButton2))
+                .addContainerGap())
+        );
+
+        tabbedPane.addTab(resourceMap.getString("pnlVerifiers.TabConstraints.tabTitle"), pnlVerifiers); // NOI18N
 
         pnlSummary.setName("pnlSummary"); // NOI18N
 
@@ -417,13 +493,16 @@ public class EDACCImportExport extends javax.swing.JPanel {
         pnlSummaryLayout.setHorizontalGroup(
             pnlSummaryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlSummaryLayout.createSequentialGroup()
-                .addContainerGap(526, Short.MAX_VALUE)
+                .addContainerGap(512, Short.MAX_VALUE)
                 .addComponent(btnSummaryPrevious)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnFinish)
                 .addContainerGap())
             .addComponent(pnlSummaryComponent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
+
+        pnlSummaryLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnFinish, btnSummaryPrevious});
+
         pnlSummaryLayout.setVerticalGroup(
             pnlSummaryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlSummaryLayout.createSequentialGroup()
@@ -452,62 +531,71 @@ public class EDACCImportExport extends javax.swing.JPanel {
     private void btnExperimentNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExperimentNextActionPerformed
         tabbedPane.setSelectedIndex(1);
     }//GEN-LAST:event_btnExperimentNextActionPerformed
-
+    
     private void btnSolversPreviousActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolversPreviousActionPerformed
         tabbedPane.setSelectedIndex(0);
     }//GEN-LAST:event_btnSolversPreviousActionPerformed
-
+    
     private void btnSolversNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolversNextActionPerformed
         tabbedPane.setSelectedIndex(2);
     }//GEN-LAST:event_btnSolversNextActionPerformed
-
+    
     private void validateSolverSelection() throws Exception {
         List<Solver> depSolvers = controller.getDependentSolvers(expTableModel.getSelectedExperiments());
-
+        
         solTableModel.clearFixedSolvers();
         for (Solver s : depSolvers) {
             solTableModel.setSolverFixed(s.getId(), true);
         }
     }
-
+    
     private void validateInstanceSelection() throws Exception {
         List<Instance> depInstances = controller.getDependentInstances(expTableModel.getSelectedExperiments());
-
+        
         insTableModel.clearFixedInstances();
         for (Instance s : depInstances) {
             insTableModel.setInstanceFixed(s.getId(), true);
         }
     }
-
+    
+    private void validateVerifierSelection() throws Exception {
+        List<Verifier> depVerifiers = controller.getDependentVerifiers(expTableModel.getSelectedExperiments());
+        
+        verifierTableModel.clearFixedVerifiers();
+        for (Verifier v : depVerifiers) {
+            verifierTableModel.setVerifierFixed(v.getId(), true);
+        }
+    }
+    
     private void handleException(final Throwable ex) {
         SwingUtilities.invokeLater(new Runnable() {
-
+            
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Error while loading data: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
-
+    
     private void tabbedPaneStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tabbedPaneStateChanged
         Tasks.startTask(new TaskRunnable() {
-
+            
             @Override
             public void run(Tasks task) {
                 if (tabbedPane.getSelectedIndex() == 0) {
                     // experiments tab
                     SwingUtilities.invokeLater(new Runnable() {
-
+                        
                         @Override
                         public void run() {
                             edacc.experiment.Util.updateTableColumnWidth(tblExperiments, 1000);
                         }
                     });
-
+                    
                 } else if (tabbedPane.getSelectedIndex() == 1) {
                     // solvers tab
                     SwingUtilities.invokeLater(new Runnable() {
-
+                        
                         @Override
                         public void run() {
                             edacc.experiment.Util.updateTableColumnWidth(tblSolvers, 1000);
@@ -522,7 +610,7 @@ public class EDACCImportExport extends javax.swing.JPanel {
                 } else if (tabbedPane.getSelectedIndex() == 2) {
                     // instances tab
                     SwingUtilities.invokeLater(new Runnable() {
-
+                        
                         @Override
                         public void run() {
                             edacc.experiment.Util.updateTableColumnWidth(tblInstances, 1000);
@@ -535,14 +623,30 @@ public class EDACCImportExport extends javax.swing.JPanel {
                         return;
                     }
                 } else if (tabbedPane.getSelectedIndex() == 3) {
+                    // verifiers tab
+                    SwingUtilities.invokeLater(new Runnable() {
+                        
+                        @Override
+                        public void run() {
+                            edacc.experiment.Util.updateTableColumnWidth(tblVerifiers, 1000);
+                        }
+                    });
+                    try {
+                        validateVerifierSelection();
+                    } catch (Exception ex) {
+                        handleException(ex);
+                        return;
+                    }
+                } else if (tabbedPane.getSelectedIndex() == 4) {
                     // summary tab
                     try {
                         validateSolverSelection();
                         validateInstanceSelection();
+                        validateVerifierSelection();
                     } catch (Exception ex) {
                         handleException(ex);
                         SwingUtilities.invokeLater(new Runnable() {
-
+                            
                             @Override
                             public void run() {
                                 tabbedPane.setSelectedIndex(0);
@@ -551,7 +655,7 @@ public class EDACCImportExport extends javax.swing.JPanel {
                         return;
                     }
                     SwingUtilities.invokeLater(new Runnable() {
-
+                        
                         @Override
                         public void run() {
                             if (panelSummary instanceof ImportSummaryPanel) {
@@ -559,42 +663,44 @@ public class EDACCImportExport extends javax.swing.JPanel {
                                 panel.setExperimentCount(expTableModel.getSelectedExperiments().size());
                                 panel.setSolvers(solTableModel.getSelectedSolvers());
                                 panel.setInstanceCount(insTableModel.getSelectedInstances().size());
+                                panel.setVerifiers(verifierTableModel.getSelectedVerifiers());
                             } else if (panelSummary instanceof ExportSummaryPanel) {
                                 ExportSummaryPanel panel = (ExportSummaryPanel) panelSummary;
                                 panel.setExperimentCount(expTableModel.getSelectedExperiments().size());
                                 panel.setSolverCount(solTableModel.getSelectedSolvers().size());
                                 panel.setInstanceCount(insTableModel.getSelectedInstances().size());
+                                panel.setVerifierCount(verifierTableModel.getSelectedVerifiers().size());
                             }
                         }
                     });
                 }
             }
         });
-
+        
     }//GEN-LAST:event_tabbedPaneStateChanged
-
+    
     private void btnInstancesNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInstancesNextActionPerformed
         tabbedPane.setSelectedIndex(3);
     }//GEN-LAST:event_btnInstancesNextActionPerformed
-
+    
     private void btnInstancesPreviousActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInstancesPreviousActionPerformed
         tabbedPane.setSelectedIndex(1);
     }//GEN-LAST:event_btnInstancesPreviousActionPerformed
-
+    
     private void btnSummaryPreviousActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSummaryPreviousActionPerformed
         tabbedPane.setSelectedIndex(2);
     }//GEN-LAST:event_btnSummaryPreviousActionPerformed
-
+    
     private void btnFinishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinishActionPerformed
         if (controller instanceof ExportController) {
             final ExportController c = (ExportController) controller;
-
+            
             String filename = ((ExportSummaryPanel) panelSummary).getExportFilename();
             if (filename.equals("")) {
                 JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Filename cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
+            
             if (!filename.endsWith(".edacc")) {
                 filename += ".edacc";
             }
@@ -606,19 +712,19 @@ public class EDACCImportExport extends javax.swing.JPanel {
                 }
             }
             Tasks.startTask(new TaskRunnable() {
-
+                
                 @Override
                 public void run(Tasks task) {
                     try {
-                        c.export(task, file, expTableModel.getSelectedExperiments(), solTableModel.getSelectedSolvers(), insTableModel.getSelectedInstances());
+                        c.export(task, file, expTableModel.getSelectedExperiments(), solTableModel.getSelectedSolvers(), insTableModel.getSelectedInstances(), verifierTableModel.getSelectedVerifiers());
                         SwingUtilities.invokeLater(new Runnable() {
-
+                            
                             @Override
                             public void run() {
                                 JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Export was successful!", "Information", JOptionPane.INFORMATION_MESSAGE);
                             }
                         });
-
+                        
                     } catch (Exception ex) {
                         handleException(ex);
                     }
@@ -635,13 +741,13 @@ public class EDACCImportExport extends javax.swing.JPanel {
             final HashMap<Integer, String> nameMap = panel.getNameMap();
             
             Tasks.startTask(new TaskRunnable() {
-
+                
                 @Override
                 public void run(Tasks task) {
                     try {
                         c.importData(task, expTableModel.getSelectedExperiments(), solTableModel.getSelectedSolvers(), insTableModel.getSelectedInstances(), solverMap, nameMap);
                         SwingUtilities.invokeLater(new Runnable() {
-
+                            
                             @Override
                             public void run() {
                                 JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Import was successful!", "Information", JOptionPane.INFORMATION_MESSAGE);
@@ -652,15 +758,23 @@ public class EDACCImportExport extends javax.swing.JPanel {
                     }
                 }
             });
-
+            
         }
     }//GEN-LAST:event_btnFinishActionPerformed
-
+    
     private void btnFilterExperimentsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterExperimentsActionPerformed
         EDACCApp.getApplication().show(experimentFilter);
         expTableModel.fireTableDataChanged();
         updateExperimentFilterStatus();
     }//GEN-LAST:event_btnFilterExperimentsActionPerformed
+    
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        tabbedPane.setSelectedIndex(4);
+    }//GEN-LAST:event_jButton1ActionPerformed
+    
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        tabbedPane.setSelectedIndex(2);
+    }//GEN-LAST:event_jButton2ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnExperimentNext;
     private javax.swing.JButton btnFilterExperiments;
@@ -672,9 +786,12 @@ public class EDACCImportExport extends javax.swing.JPanel {
     private javax.swing.JButton btnSolversNext;
     private javax.swing.JButton btnSolversPrevious;
     private javax.swing.JButton btnSummaryPrevious;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JLabel lblExperimentFilterStatus;
     private javax.swing.JLabel lblFilterSolverText;
     private javax.swing.JLabel lblInstancesFilterText;
@@ -683,39 +800,41 @@ public class EDACCImportExport extends javax.swing.JPanel {
     private javax.swing.JPanel pnlSolvers;
     private javax.swing.JPanel pnlSummary;
     private javax.swing.JPanel pnlSummaryComponent;
+    private javax.swing.JPanel pnlVerifiers;
     private javax.swing.JTabbedPane tabbedPane;
     private javax.swing.JTable tblExperiments;
     private javax.swing.JTable tblInstances;
     private javax.swing.JTable tblSolvers;
+    private javax.swing.JTable tblVerifiers;
     // End of variables declaration//GEN-END:variables
 
     public static File getImportFile() {
         final JFileChooser fc = new JFileChooser();
-
+        
         fc.setFileFilter(new EDACCFileFilter());
         fc.showOpenDialog(EDACCApp.getApplication().getMainFrame());
-
+        
         return fc.getSelectedFile();
     }
-
+    
     public static File getExportFile() {
         final JFileChooser fc = new JFileChooser();
-
+        
         fc.setFileFilter(new EDACCFileFilter());
         fc.showSaveDialog(EDACCApp.getApplication().getMainFrame());
-
+        
         if (fc.getSelectedFile() == null) {
             return null;
         }
-
+        
         String filename = fc.getSelectedFile().getAbsolutePath();
         if (!filename.endsWith(".edacc")) {
             filename += ".edacc";
         }
-
+        
         return new File(filename);
     }
-
+    
     private void updateExperimentFilterStatus() {
         lblExperimentFilterStatus.setForeground(Color.red);
         String status = "";
@@ -724,15 +843,15 @@ public class EDACCImportExport extends javax.swing.JPanel {
         }
         lblExperimentFilterStatus.setText(status);
     }
-
+    
     private class BooleanRenderer extends DefaultTableCellRenderer {
-
+        
         private JCheckBox checkbox;
-
+        
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
+            
             if (value instanceof Boolean) {
                 if (checkbox == null) {
                     checkbox = new JCheckBox();
@@ -742,7 +861,7 @@ public class EDACCImportExport extends javax.swing.JPanel {
                 checkbox.setForeground(c.getForeground());
                 checkbox.setSelected((Boolean) value);
                 boolean fixed = false;
-
+                
                 if (table.getModel() instanceof SolverFixedSelectionTableModel) {
                     if (((SolverFixedSelectionTableModel) table.getModel()).isFixed(table.convertRowIndexToModel(row))) {
                         fixed = true;
@@ -753,6 +872,11 @@ public class EDACCImportExport extends javax.swing.JPanel {
                         fixed = true;
                     }
                 }
+                if (table.getModel() instanceof VerifierFixedSelectionTableModel) {
+                    if (((VerifierFixedSelectionTableModel) table.getModel()).isFixed(table.convertRowIndexToModel(row))) {
+                        fixed = true;
+                    }
+                }
                 checkbox.setEnabled(!fixed);
                 checkbox.repaint();
                 c = checkbox;
@@ -760,9 +884,9 @@ public class EDACCImportExport extends javax.swing.JPanel {
             return c;
         }
     }
-
+    
     private static class EDACCFileFilter extends FileFilter {
-
+        
         @Override
         public boolean accept(File f) {
             if (f.isDirectory()) {
@@ -773,7 +897,7 @@ public class EDACCImportExport extends javax.swing.JPanel {
             }
             return false;
         }
-
+        
         @Override
         public String getDescription() {
             return "EDACC Exported Files [.edacc]";

@@ -1,10 +1,12 @@
 package edacc.model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author simon
  */
-public class VerifierParameterInstance extends BaseModel {
+public class VerifierParameterInstance extends BaseModel implements Serializable {
 
     private int parameter_id;
     private int verifierConfigId;

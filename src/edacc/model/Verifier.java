@@ -1,6 +1,7 @@
 package edacc.model;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import java.util.List;
  *
  * @author simon
  */
-public class Verifier extends BaseModel implements IntegerPKModel {
+public class Verifier extends BaseModel implements IntegerPKModel, Serializable {
 
     private int id;
     private String name;
@@ -17,13 +18,36 @@ public class Verifier extends BaseModel implements IntegerPKModel {
     private String runCommand;
     private String runPath;
     private List<VerifierParameter> parameters;
-    private File[] files;
-
+    transient private File[] files;
+    
     public Verifier() {
         id = -1;
         this.parameters = new LinkedList<VerifierParameter>();
         this.setNew();
     }
+    
+    public boolean realEquals(Verifier f) {
+        if (!name.equals(f.name) || !md5.equals(f.md5) || !runCommand.equals(f.runCommand) || !runPath.equals(f.runPath)) {
+            return false;
+        }
+        if (parameters.size() != f.parameters.size()) {
+            return false;
+        }
+        for (VerifierParameter myparam : parameters) {
+            boolean found = false;
+            for (VerifierParameter hisparam : f.parameters) {
+                if (myparam.realEquals(hisparam)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     
     protected void setId(int id) {
         this.id = id;
@@ -117,6 +141,5 @@ public class Verifier extends BaseModel implements IntegerPKModel {
     public String toString() {
         return name;
     }
-    
     
 }

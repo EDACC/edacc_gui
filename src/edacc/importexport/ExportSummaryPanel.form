@@ -63,9 +63,11 @@
                       <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="lblVerifiers" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="lblInstances" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="lblSolvers" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="lblExperiments" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -93,6 +95,10 @@
                       <Component id="lblInstances" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="lblVerifiers" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
           </Group>
         </DimensionLayout>
@@ -132,6 +138,18 @@
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="lblInstances.text"/>
             <Property name="name" type="java.lang.String" value="lblInstances" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel4">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="jLabel4.text"/>
+            <Property name="name" type="java.lang.String" value="jLabel4" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblVerifiers">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="lblVerifiers.text"/>
+            <Property name="name" type="java.lang.String" value="lblVerifiers" noResource="true"/>
           </Properties>
         </Component>
       </SubComponents>

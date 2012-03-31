@@ -1,16 +1,11 @@
 package edacc.importexport;
 
-import edacc.manageDB.NoSolverBinarySpecifiedException;
-import edacc.manageDB.NoSolverNameSpecifiedException;
 import edacc.model.DatabaseConnector;
 import edacc.model.Experiment;
 import edacc.model.ExperimentDAO;
 import edacc.model.ExperimentHasInstance;
 import edacc.model.Instance;
-import edacc.model.InstanceClassAlreadyInDBException;
-import edacc.model.InstanceClassMustBeSourceException;
 import edacc.model.InstanceDAO;
-import edacc.model.NoConnectionToDBException;
 import edacc.model.Parameter;
 import edacc.model.Solver;
 import edacc.model.SolverBinaries;
@@ -18,11 +13,12 @@ import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import edacc.model.Tasks;
+import edacc.model.Verifier;
+import edacc.model.VerifierConfiguration;
+import edacc.model.VerifierDAO;
 import edacc.util.Pair;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
-import javax.xml.bind.JAXBException;
 
 /**
  *
@@ -42,6 +37,7 @@ public class ImportController implements ImportExportController {
     private List<Experiment> experiments;
     private List<Solver> solvers;
     private List<Instance> instances;
+    private List<Verifier> verifiers;
     private HashMap<Integer, List<SolverConfiguration>> solverConfigs;
     
     public ImportController(File file) throws ZipException, IOException, ClassNotFoundException {
@@ -49,6 +45,7 @@ public class ImportController implements ImportExportController {
         experiments = ExperimentDAO.readExperimentsFromFile(zipFile);
         solvers = SolverDAO.readSolversFromFile(zipFile);
         instances = InstanceDAO.readInstancesFromFile(zipFile);
+        verifiers = VerifierDAO.readVerifiersFromFile(zipFile);
         
         solverConfigs = new HashMap<Integer, List<SolverConfiguration>>();
         for (Experiment exp : experiments) {
@@ -118,6 +115,10 @@ public class ImportController implements ImportExportController {
         return SolverDAO.mapFileSolversToExistingSolversWithSameParameters(fileSolvers);
     }
     
+    public HashMap<Integer, List<Verifier>> mapFileVerifiersToExistingVerifiers(List<Verifier> fileVerifiers) throws SQLException {
+        return VerifierDAO.mapFileVerifiersToExistingVerifiers(fileVerifiers);
+    }
+    
     public List<Solver> getDatabaseSolvers() throws SQLException {
         return SolverDAO.getAll();
     }
@@ -137,5 +138,26 @@ public class ImportController implements ImportExportController {
         } finally {
             DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
         }
+    }
+
+    @Override
+    public List<Verifier> getVerifiers() {
+        return verifiers;
+    }
+
+    @Override
+    public List<Verifier> getDependentVerifiers(List<Experiment> experiments) throws Exception {
+        List<Verifier> depVerifiers = new ArrayList<Verifier>();
+        for (Experiment exp : experiments) {
+            if (exp.verifierConfig != null) {
+                for (Verifier v : verifiers) {
+                    if (v.getId() == exp.verifierConfig.getVerifier().getId()) {
+                        depVerifiers.add(v);
+                        break;
+                    }
+                }
+            }
+        }
+        return depVerifiers;
     }
 }

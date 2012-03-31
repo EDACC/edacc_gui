@@ -1,5 +1,6 @@
 package edacc.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import java.util.List;
  *
  * @author simon
  */
-public class VerifierConfiguration extends BaseModel implements IntegerPKModel {
+public class VerifierConfiguration extends BaseModel implements IntegerPKModel, Serializable {
 
     private int id;
     private Verifier verifier;

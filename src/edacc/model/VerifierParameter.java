@@ -1,10 +1,12 @@
 package edacc.model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author simon
  */
-public class VerifierParameter extends BaseModel implements IntegerPKModel {
+public class VerifierParameter extends BaseModel implements IntegerPKModel, Serializable {
 
     private int id;
     private int idVerifier;

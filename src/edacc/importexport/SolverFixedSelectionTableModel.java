@@ -35,15 +35,19 @@ public class SolverFixedSelectionTableModel extends SolverTableModel {
     }
     
     public void setSolverFixed(int sid, boolean value) {
-        for (int i = 0; i < fixed.length; i++)
+        for (int i = 0; i < fixed.length; i++) {
             if (super.getSolver(i).getId() == sid) {
                 fixed[i] = value;
                 this.fireTableRowsUpdated(i, i);
                 break;
             }
+        }
     }
 
     public void clearFixedSolvers() {
+        if (fixed.length == 0) {
+            return ;
+        }
         for (int i = 0; i < fixed.length; i++)
             fixed[i] = false;
         this.fireTableRowsUpdated(0, fixed.length-1);

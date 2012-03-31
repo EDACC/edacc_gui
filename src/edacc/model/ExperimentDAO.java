@@ -363,6 +363,7 @@ public class ExperimentDAO {
             task.setStatus("Retrieving instance and configuration scenario informations..");
             exp.instances = ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(exp.getId());
             exp.scenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(exp.getId());
+            exp.verifierConfig = VerifierConfigurationDAO.getByExperimentId(exp.getId());
             current++;
         }
         task.setOperationName("Exporting experiments..");
@@ -373,6 +374,7 @@ public class ExperimentDAO {
         for (Experiment exp : experiments) {
             exp.instances = null;
             exp.scenario = null;
+            exp.verifierConfig = null;
         }
         task.setStatus("Done.");
     }

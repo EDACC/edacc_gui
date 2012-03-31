@@ -15,6 +15,10 @@ import edacc.model.SolverConfiguration;
 import edacc.model.SolverConfigurationDAO;
 import edacc.model.SolverDAO;
 import edacc.model.Tasks;
+import edacc.model.Verifier;
+import edacc.model.VerifierConfiguration;
+import edacc.model.VerifierConfigurationDAO;
+import edacc.model.VerifierDAO;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,11 +40,17 @@ public class ExportController implements ImportExportController {
     private List<Experiment> experiments;
     private List<Solver> solvers;
     private List<Instance> instances;
+    private List<Verifier> verifiers;
 
     public ExportController() throws SQLException, InstanceClassMustBeSourceException, IOException {
+        ExperimentDAO.clearCache();
+        SolverDAO.clearCache();
+        InstanceDAO.clearCache();
+        VerifierDAO.clearCache();
         experiments = ExperimentDAO.getAll();
         solvers = SolverDAO.getAll();
         instances = InstanceDAO.getAll();
+        verifiers = VerifierDAO.getAllVerifiers();
     }
 
     @Override
@@ -56,6 +66,11 @@ public class ExportController implements ImportExportController {
     @Override
     public List<Instance> getInstances() {
         return instances;
+    }
+
+    @Override
+    public List<Verifier> getVerifiers() {
+        return verifiers;
     }
 
     @Override
@@ -88,7 +103,7 @@ public class ExportController implements ImportExportController {
         return depInstances;
     }
 
-    public void export(Tasks task, File file, List<Experiment> experiments, List<Solver> solvers, List<Instance> instances) throws FileNotFoundException, IOException, SQLException, JAXBException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
+    public void export(Tasks task, File file, List<Experiment> experiments, List<Solver> solvers, List<Instance> instances, List<Verifier> verifiers) throws FileNotFoundException, IOException, SQLException, JAXBException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         try {
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
@@ -96,9 +111,25 @@ public class ExportController implements ImportExportController {
             SolverDAO.exportSolvers(task, os, solvers);
             InstanceDAO.exportInstances(task, os, instances);
             ExperimentDAO.exportExperiments(task, os, experiments);
+            VerifierDAO.exportVerifiers(task, os, verifiers);
             os.close();
         } finally {
             DatabaseConnector.getInstance().getConn().setAutoCommit(autoCommit);
         }
+    }
+
+    @Override
+    public List<Verifier> getDependentVerifiers(List<Experiment> experiments) throws Exception {
+        HashSet<Integer> expIds = new HashSet<Integer>();
+        List<Verifier> res = new ArrayList<Verifier>();
+        for (Experiment exp : experiments) {
+            expIds.add(exp.getId());
+        }
+        for (VerifierConfiguration vc : VerifierConfigurationDAO.getAll()) {
+            if (expIds.contains(vc.getIdExperiment())) {
+                res.add(vc.getVerifier());
+            }
+        }
+        return res;
     }
 }
