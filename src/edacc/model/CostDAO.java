@@ -5,6 +5,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -217,6 +219,34 @@ public class CostDAO {
                 DatabaseConnector.getInstance().getConn().commit();
                 DatabaseConnector.getInstance().getConn().setAutoCommit(autocommit);
             }
+        }
+    }
+
+    public static InputStream getZippedBinaryFile(CostBinary b) throws SQLException {
+        final String query = "SELECT binaryArchive FROM " + binaryTable + " WHERE idCostBinary=?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, b.getId());
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            try {
+                return rs.getBinaryStream("binaryArchive");
+            } finally {
+                rs.close();
+                ps.close();
+            }
+        }
+        rs.close();
+        ps.close();
+        return null;
+    }
+
+    protected static void writeCostBinariesToStream(ObjectOutputStream stream, List<CostBinary> costBinaries) throws IOException, SQLException {
+        for (CostBinary cb : costBinaries) {
+            stream.writeObject(cb.getId());
+            InputStream is = getZippedBinaryFile(cb);
+            BinaryData data = new BinaryData(is);
+            is.close();
+            stream.writeUnshared(data);
         }
     }
 }

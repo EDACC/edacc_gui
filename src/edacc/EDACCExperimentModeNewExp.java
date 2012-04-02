@@ -787,7 +787,6 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                 verifierConfig.setDeleted();
             }
         }
-        System.out.println("PEN= " + costPenalty);
         this.canceled = false;
         this.setVisible(false);
     }//GEN-LAST:event_btnCreateExperimentActionPerformed

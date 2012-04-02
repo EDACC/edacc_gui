@@ -412,12 +412,16 @@ public class SolverDAO {
         task.setOperationName("Exporting solvers..");
         int current = 1;
         for (Solver s : solvers) {
-            task.setStatus("Writing solver binary " + current + " / " + solvers.size());
+            task.setStatus("Writing solver binaries of solver " + current + " / " + solvers.size());
             task.setTaskProgress(current / (float) solvers.size());
             s.parameters = ParameterDAO.getParameterFromSolverId(s.getId());
             s.graph = ParameterGraphDAO.loadParameterGraph(s);
             stream.putNextEntry(new ZipEntry("solver_" + s.getId() + ".solverbinaries"));
             SolverBinariesDAO.writeSolverBinariesToStream(new ObjectOutputStream(stream), s.getSolverBinaries());
+            task.setStatus("Writing cost binaries of solver " + current + " / " + solvers.size());
+            stream.putNextEntry(new ZipEntry("solver_" + s.getId() + ".costbinaries"));
+            CostDAO.writeCostBinariesToStream(new ObjectOutputStream(stream), s.getCostBinaries());
+            
             //List<Parameter> parameters = ParameterDAO.getParameterFromSolverId(s.getId());
             //stream.putNextEntry(new ZipEntry("solver_" + s.getId() + ".parameters"));
             //ParameterDAO.writeParametersToStream(new ObjectOutputStream(stream), parameters);
