@@ -1,0 +1,1 @@
+ALTER TABLE `Experiment` ADD COLUMN `minimize` TINYINT(1) NOT NULL DEFAULT TRUE  AFTER `Cost_idCost` , ADD COLUMN `costPenalty` FLOAT(11) NULL DEFAULT 0  AFTER `minimize` ;

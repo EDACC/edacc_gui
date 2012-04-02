@@ -23,12 +23,12 @@ public class ExperimentDAO {
     protected static final String table = "Experiment";
     protected static final String insertQuery = "INSERT INTO " + table + " (Name, Date, description, configurationExp, "
             + "priority, defaultCost, active, solverOutputPreserveFirst, solverOutputPreserveLast, watcherOutputPreserveFirst, "
-            + "watcherOutputPreserveLast, verifierOutputPreserveFirst, verifierOutputPreserveLast, Cost_idCost) "
-            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            + "watcherOutputPreserveLast, verifierOutputPreserveFirst, verifierOutputPreserveLast, Cost_idCost, minimize, costPenalty) "
+            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     protected static final String updateQuery = "UPDATE " + table + " SET Name =?, Date =?, description =?, "
             + "configurationExp =?, priority =?, defaultCost=?, active=?,solverOutputPreserveFirst=?,solverOutputPreserveLast=?,"
             + "watcherOutputPreserveFirst=?,watcherOutputPreserveLast=?,verifierOutputPreserveFirst=?,"
-            + "verifierOutputPreserveLast=?,Cost_idCost=? WHERE idExperiment=?";
+            + "verifierOutputPreserveLast=?,Cost_idCost=?,minimize=?,costPenalty=? WHERE idExperiment=?";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idExperiment=?";
     private static final ObjectCache<Experiment> cache = new ObjectCache<Experiment>();
 
@@ -37,7 +37,7 @@ public class ExperimentDAO {
      * so it can be referenced by related objects
      * @return new Experiment object
      */
-    public static Experiment createExperiment(String name, Date date, String description, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, Integer idCost) throws SQLException {
+    public static Experiment createExperiment(String name, Date date, String description, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, Integer idCost, boolean minimize, Float costPenalty) throws SQLException {
         if (getExperimentByName(name) != null) {
             throw new SQLException("There exists already an experiment with the same name.");
         }
@@ -56,6 +56,8 @@ public class ExperimentDAO {
         i.setVerifierOutputPreserveFirst(verifierOutputPreserveFirst);
         i.setVerifierOutputPreserveLast(verifierOutputPreserveLast);
         i.setIdCost(idCost);
+        i.setMinimize(minimize);
+        i.setCostPenalty(costPenalty);
         save(i);
         cache.cache(i);
         return i;
@@ -96,7 +98,7 @@ public class ExperimentDAO {
             st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
         } else if (experiment.isModified()) {
             st = DatabaseConnector.getInstance().getConn().prepareStatement(updateQuery);
-            st.setInt(15, experiment.getId());
+            st.setInt(17, experiment.getId());
         } else {
             return;
         }
@@ -132,6 +134,12 @@ public class ExperimentDAO {
             st.setNull(14, java.sql.Types.INTEGER);
         } else {
             st.setInt(14, experiment.getIdCost());
+        }
+        st.setBoolean(15, experiment.getMinimize());
+        if (experiment.getCostPenalty() == null) {
+            st.setNull(16, java.sql.Types.FLOAT);
+        } else {
+            st.setFloat(16, experiment.getCostPenalty());
         }
         st.executeUpdate();
         
@@ -202,6 +210,11 @@ public class ExperimentDAO {
         i.setIdCost(rs.getInt("Cost_idCost"));
         if (rs.wasNull()) {
             i.setIdCost(null);
+        }
+        i.setMinimize(rs.getBoolean("minimize"));
+        i.setCostPenalty(rs.getFloat("costPenalty"));
+        if (rs.wasNull()) {
+            i.setCostPenalty(null);
         }
         return i;
     }

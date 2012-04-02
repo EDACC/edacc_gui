@@ -66,6 +66,12 @@
                               <Component id="lblCostName" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="comboCost" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Component id="chkMinimize" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Component id="lblPenalty" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="txtPenalty" pref="261" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="chkLimitWatcherOutput" min="-2" max="-2" attributes="0"/>
@@ -131,6 +137,9 @@
                   <Component id="comboDefaultCost" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblCostName" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="comboCost" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="chkMinimize" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblPenalty" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtPenalty" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -613,6 +622,28 @@
           </StringArray>
         </Property>
         <Property name="name" type="java.lang.String" value="comboCost" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="chkMinimize">
+      <Properties>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" resourceKey="chkMinimize.text"/>
+        <Property name="name" type="java.lang.String" value="chkMinimize" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkMinimizeActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblPenalty">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="lblPenalty.text"/>
+        <Property name="name" type="java.lang.String" value="lblPenalty" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtPenalty">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="txtPenalty.text"/>
+        <Property name="name" type="java.lang.String" value="txtPenalty" noResource="true"/>
       </Properties>
     </Component>
   </SubComponents>

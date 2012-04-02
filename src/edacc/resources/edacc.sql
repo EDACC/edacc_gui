@@ -154,6 +154,8 @@ CREATE  TABLE IF NOT EXISTS `Experiment` (
   `verifierOutputPreserveFirst` INT NULL ,
   `verifierOutputPreserveLast` INT NULL ,
   `Cost_idCost` INT NULL ,
+  `minimize` TINYINT(1) NOT NULL ,
+  `costPenalty` FLOAT NULL ,
   PRIMARY KEY (`idExperiment`) ,
   INDEX `fk_Experiment_Cost1` (`Cost_idCost` ASC) ,
   CONSTRAINT `fk_Experiment_Cost1`
