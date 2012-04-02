@@ -53,6 +53,7 @@ public class VerifierParameter extends BaseModel implements IntegerPKModel, Seri
         name = prefix = defaultValue = "";
         hasValue = true;
         attachToPrevious = false;
+        setNew();
     }
 
     @Override

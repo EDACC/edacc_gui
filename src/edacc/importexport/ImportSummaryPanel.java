@@ -428,6 +428,26 @@ public class ImportSummaryPanel extends javax.swing.JPanel {
         return nameMap;
     }
 
+    public HashMap<Integer, Verifier> getVerifierMap() {
+        HashMap<Integer, Verifier> verifierMap = new HashMap<Integer, Verifier>();
+        for (int row = 0; row < verifierTableModel.getRowCount(); row++) {
+            if (verifierTableModel.getComboBoxAt(row).getSelectedItem() instanceof Verifier) {
+                verifierMap.put(verifierTableModel.getVerifierAt(row).getId(), (Verifier) verifierTableModel.getComboBoxAt(row).getSelectedItem());
+            }
+        }
+        return verifierMap;
+    }
+
+    public HashMap<Integer, String> getVerifierNameMap() {
+        HashMap<Integer, String> nameMap = new HashMap<Integer, String>();
+        for (int row = 0; row < verifierTableModel.getRowCount(); row++) {
+            if (verifierTableModel.getComboBoxAt(row).getSelectedItem() instanceof String) {
+                nameMap.put(verifierTableModel.getVerifierAt(row).getId(), verifierTableModel.getVerifierNameAt(row));
+            }
+        }
+        return nameMap;
+    }
+
     private class ComboBoxRenderer implements TableCellRenderer {
 
         private JComboBox[] combos;

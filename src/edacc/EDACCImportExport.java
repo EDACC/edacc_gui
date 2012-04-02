@@ -740,12 +740,15 @@ public class EDACCImportExport extends javax.swing.JPanel {
             final HashMap<Integer, Solver> solverMap = panel.getSolverMap();
             final HashMap<Integer, String> nameMap = panel.getNameMap();
             
+            final HashMap<Integer, Verifier> verifierMap = panel.getVerifierMap();
+            final HashMap<Integer, String> verifierNameMap = panel.getVerifierNameMap();
+            
             Tasks.startTask(new TaskRunnable() {
                 
                 @Override
                 public void run(Tasks task) {
                     try {
-                        c.importData(task, expTableModel.getSelectedExperiments(), solTableModel.getSelectedSolvers(), insTableModel.getSelectedInstances(), solverMap, nameMap);
+                        c.importData(task, expTableModel.getSelectedExperiments(), solTableModel.getSelectedSolvers(), insTableModel.getSelectedInstances(), verifierTableModel.getSelectedVerifiers(), solverMap, nameMap, verifierMap, verifierNameMap);
                         SwingUtilities.invokeLater(new Runnable() {
                             
                             @Override
