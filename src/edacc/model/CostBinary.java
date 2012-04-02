@@ -1,12 +1,13 @@
 package edacc.model;
 
 import java.io.File;
+import java.io.Serializable;
 
 /**
  *
  * @author simon
  */
-public class CostBinary extends BaseModel implements IntegerPKModel {
+public class CostBinary extends BaseModel implements IntegerPKModel, Serializable {
     
     private int idCostBinary;
     private int idSolver;

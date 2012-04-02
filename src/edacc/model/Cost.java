@@ -1,10 +1,12 @@
 package edacc.model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author simon
  */
-public class Cost extends BaseModel implements IntegerPKModel {
+public class Cost extends BaseModel implements IntegerPKModel, Serializable {
 
     private int id;
     private String name;

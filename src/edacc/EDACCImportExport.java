@@ -572,6 +572,7 @@ public class EDACCImportExport extends javax.swing.JPanel {
             
             @Override
             public void run() {
+                ex.printStackTrace();
                 JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "Error while loading data: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });

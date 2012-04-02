@@ -392,7 +392,7 @@ public class ExperimentDAO {
         task.setStatus("Done.");
     }
     
-    public static void importExperiments(Tasks task, ZipFile file, List<Experiment> experiments, HashMap<Integer, SolverBinaries> solverBinaryMap, HashMap<Integer, Parameter> parameterMap, HashMap<Integer, Instance> instanceMap) throws SQLException, IOException, ClassNotFoundException {
+    public static void importExperiments(Tasks task, ZipFile file, List<Experiment> experiments, HashMap<Integer, SolverBinaries> solverBinaryMap, HashMap<Integer, Parameter> parameterMap, HashMap<Integer, Instance> instanceMap, HashMap<Integer, Verifier> verifierMap) throws SQLException, IOException, ClassNotFoundException {
         
         int current = 1;
         for (Experiment experiment : experiments) {
@@ -426,6 +426,16 @@ public class ExperimentDAO {
                 ConfigurationScenarioDAO.save(dbScenario);
             }
             HashMap<Integer, SolverConfiguration> solverConfigMap = SolverConfigurationDAO.importSolverConfigurations(task, file, experiment, dbExperiment, solverBinaryMap, parameterMap);
+            
+            if (experiment.verifierConfig != null) {
+                VerifierConfiguration vconfig = experiment.verifierConfig;
+                vconfig.setIdExperiment(dbExperiment.getId());
+                vconfig.setNew();
+                for (VerifierParameterInstance pi : vconfig.getParameterInstances()) {
+                    pi.setNew();
+                }
+                VerifierConfigurationDAO.save(vconfig);
+            }
             
             ExperimentResultDAO.importExperimentResults(task, file, experiment, dbExperiment, solverConfigMap, instanceMap);
             current++;
