@@ -1162,11 +1162,12 @@ public class ManageDBInstances implements Observer {
     }
 
     public void HandlerAddInstance() {
-        JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+        if(!duplicate.isEmpty()){
+                    JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
         EDACCAddInstanceErrorDialog errorDialog = new EDACCAddInstanceErrorDialog(mainFrame, true);       
         errorDialog.initialize(duplicate, classes);
         EDACCApp.getApplication().show(errorDialog);
-        
+        }      
     }
 
     public void setClasses(HashMap<Instance, InstanceClass> classes) {
