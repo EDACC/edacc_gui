@@ -46,6 +46,8 @@ public class Experiment extends BaseModel implements IntegerPKModel, Serializabl
         verifierOutputPreserveFirst = experiment.verifierOutputPreserveFirst;
         verifierOutputPreserveLast = experiment.verifierOutputPreserveLast;
         idCost = experiment.idCost;
+        minimize = experiment.minimize;
+        costPenalty = experiment.costPenalty;
     }
 
     @Override

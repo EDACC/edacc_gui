@@ -128,9 +128,9 @@ public class ImportController implements ImportExportController {
         try {
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
             HashMap<Integer, Instance> instanceMap = InstanceDAO.importInstances(task, zipFile, selectedInstances);
-            Pair<HashMap<Integer, SolverBinaries>, HashMap<Integer, Parameter>> pair = SolverDAO.importSolvers(task, zipFile, selectedSolvers, solverMap, nameMap);
+            SolverDAO.ImportSolversResult solverMaps = SolverDAO.importSolvers(task, zipFile, selectedSolvers, solverMap, nameMap);
             HashMap<Integer, Verifier> importVerifierMap = VerifierDAO.importVerifiers(task, zipFile, selectedVerifiers, verifierMap, verifierNameMap);
-            ExperimentDAO.importExperiments(task, zipFile, selectedExperiments, pair.getFirst(), pair.getSecond(), instanceMap, importVerifierMap);
+            ExperimentDAO.importExperiments(task, zipFile, selectedExperiments, solverMaps.mapSolverBinaries, solverMaps.mapParameters, solverMaps.mapCosts, instanceMap, importVerifierMap);
         } catch (Exception ex) {
             if (autoCommit) {
                 DatabaseConnector.getInstance().getConn().rollback();

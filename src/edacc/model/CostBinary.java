@@ -21,6 +21,9 @@ public class CostBinary extends BaseModel implements IntegerPKModel, Serializabl
     private String parameters;
     private Cost cost;
     
+    // only used for import
+    transient BinaryData data;
+    
     public CostBinary(Solver s) {
         this(s.getId());
     }
