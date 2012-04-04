@@ -38,6 +38,7 @@ CREATE  TABLE IF NOT EXISTS `Solver` (
   `authors` VARCHAR(255) NULL ,
   `description_pdf` LONGBLOB NULL ,
   `User_idUser` INT NULL ,
+  `competition_frozen` TINYINT(1) NULL DEFAULT NULL,
   PRIMARY KEY (`idSolver`) ,
   UNIQUE INDEX `name` (`name` ASC, `version` ASC) ,
   INDEX `fk_Solver_User1` (`User_idUser` ASC) ,
