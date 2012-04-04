@@ -253,4 +253,8 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
             return false;
         }
     }
+
+    public int getInstanceId(int rowIndex) {
+        return instances.get(rowIndex).getId();
+    }
 }
