@@ -392,7 +392,7 @@ public class ExperimentDAO {
         task.setStatus("Done.");
     }
     
-    public static void importExperiments(Tasks task, ZipFile file, List<Experiment> experiments, HashMap<Integer, SolverBinaries> solverBinaryMap, HashMap<Integer, Parameter> parameterMap, HashMap<Integer, Instance> instanceMap, HashMap<Integer, Verifier> verifierMap) throws SQLException, IOException, ClassNotFoundException {
+    public static void importExperiments(Tasks task, ZipFile file, List<Experiment> experiments, HashMap<Integer, SolverBinaries> solverBinaryMap, HashMap<Integer, Parameter> parameterMap, HashMap<Integer, Cost> costMap, HashMap<Integer, Instance> instanceMap, HashMap<Integer, Verifier> verifierMap) throws SQLException, IOException, ClassNotFoundException {
         
         int current = 1;
         for (Experiment experiment : experiments) {
@@ -400,6 +400,9 @@ public class ExperimentDAO {
             task.setOperationName("Importing experiment " + current + " / " + experiments.size());
             task.setStatus("Saving experiment..");
             Experiment dbExperiment = new Experiment(experiment);
+            if (dbExperiment.getIdCost() != null) {
+                dbExperiment.setIdCost(costMap.get(dbExperiment.getIdCost()).getId());
+            }
             ExperimentDAO.save(dbExperiment);
             task.setStatus("Saving instances..");
             int currentInstance = 1;

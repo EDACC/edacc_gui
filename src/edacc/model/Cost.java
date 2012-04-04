@@ -16,6 +16,12 @@ public class Cost extends BaseModel implements IntegerPKModel, Serializable {
         this.name = name;
         setNew();
     }
+    
+    protected Cost(Cost c) {
+        this.id = -1;
+        this.name = c.name;
+        setNew();
+    }
 
     public Cost() {
         this.id = -1;

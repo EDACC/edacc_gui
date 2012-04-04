@@ -133,7 +133,7 @@ public class SolverDAO {
             b.setIdSolver(solver.getId());
             SolverBinariesDAO.save(b);
         }
-        
+
         for (CostBinary b : solver.getCostBinaries()) {
             b.setIdSolver(solver.getId());
             CostDAO.saveBinary(b);
@@ -421,7 +421,7 @@ public class SolverDAO {
             task.setStatus("Writing cost binaries of solver " + current + " / " + solvers.size());
             stream.putNextEntry(new ZipEntry("solver_" + s.getId() + ".costbinaries"));
             CostDAO.writeCostBinariesToStream(new ObjectOutputStream(stream), s.getCostBinaries());
-            
+
             //List<Parameter> parameters = ParameterDAO.getParameterFromSolverId(s.getId());
             //stream.putNextEntry(new ZipEntry("solver_" + s.getId() + ".parameters"));
             //ParameterDAO.writeParametersToStream(new ObjectOutputStream(stream), parameters);
@@ -439,13 +439,27 @@ public class SolverDAO {
         task.setStatus("Done.");
     }
 
-    public static Pair<HashMap<Integer, SolverBinaries>, HashMap<Integer, Parameter>> importSolvers(Tasks task, final ZipFile file, List<Solver> solvers, HashMap<Integer, Solver> solverMap, HashMap<Integer, String> nameMap) throws IOException, ClassNotFoundException, SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, NoSolverNameSpecifiedException, NoSuchAlgorithmException, NoConnectionToDBException, JAXBException {
+    public static class ImportSolversResult {
+
+        public HashMap<Integer, SolverBinaries> mapSolverBinaries;
+        public HashMap<Integer, Parameter> mapParameters;
+        public HashMap<Integer, Cost> mapCosts;
+
+        public ImportSolversResult(HashMap<Integer, SolverBinaries> mapSolverBinaries, HashMap<Integer, Parameter> mapParameters, HashMap<Integer, Cost> mapCosts) {
+            this.mapSolverBinaries = mapSolverBinaries;
+            this.mapParameters = mapParameters;
+            this.mapCosts = mapCosts;
+        }
+    }
+
+    public static ImportSolversResult importSolvers(Tasks task, final ZipFile file, List<Solver> solvers, HashMap<Integer, Solver> solverMap, HashMap<Integer, String> nameMap) throws IOException, ClassNotFoundException, SQLException, FileNotFoundException, NoSolverBinarySpecifiedException, NoSolverNameSpecifiedException, NoSuchAlgorithmException, NoConnectionToDBException, JAXBException {
         task.setOperationName("Importing solvers..");
         clearCache();
 
         HashMap<Integer, SolverBinaries> mapSolverBinaries = new HashMap<Integer, SolverBinaries>();
         HashMap<Integer, Parameter> mapParameters = new HashMap<Integer, Parameter>();
         HashMap<Integer, Integer> mapSolvers = new HashMap<Integer, Integer>();
+        HashMap<Integer, Cost> mapCosts = new HashMap<Integer, Cost>();
         int current = 1;
         for (Solver s : solvers) {
             task.setStatus("Saving solver " + current + " / " + solvers.size());
@@ -497,7 +511,6 @@ public class SolverDAO {
                 }
             }
 
-
             if (!solverBinaryMap.isEmpty()) {
                 ZipEntry entry = file.getEntry("solver_" + s.getId() + ".solverbinaries");
                 ObjectInputStream ois = new ObjectInputStream(file.getInputStream(entry));
@@ -512,12 +525,52 @@ public class SolverDAO {
                     }
                 }
             }
+
+            List<CostBinary> dbCostBinaries = CostDAO.getCostBinariesForSolver(SolverDAO.getById(mapSolvers.get(s.getId())));
+            HashMap<Integer, CostBinary> costBinaryMap = new HashMap<Integer, CostBinary>();
+            for (CostBinary cb : s.getCostBinaries()) {
+                boolean found = false;
+                for (CostBinary dbCb : dbCostBinaries) {
+                    if (dbCb.getCost().getName().equals(cb.getCost().getName())) {
+                        found = true;
+                        mapCosts.put(cb.getCost().getId(), dbCb.getCost());
+                    }
+                }
+                if (!found) {
+                    costBinaryMap.put(cb.getId(), cb);
+                }
+            }
+            if (!costBinaryMap.isEmpty()) {
+                ZipEntry entry = file.getEntry("solver_" + s.getId() + ".costbinaries");
+                ObjectInputStream ois = new ObjectInputStream(file.getInputStream(entry));
+                Pair<Integer, BinaryData> cbData;
+                while ((cbData = CostDAO.readCostBinaryDataFromStream(ois)) != null) {
+                    CostBinary cb = costBinaryMap.get(cbData.getFirst());
+                    if (cb != null) {
+                        CostBinary dbCostBinary = new CostBinary(cb);
+                        dbCostBinary.data = cbData.getSecond();
+                        dbCostBinary.setIdSolver(mapSolvers.get(s.getId()));
+                        dbCostBinary.setNew();
+                        Cost c = CostDAO.getCostByName(dbCostBinary.getCost().getName());
+                        if (c == null) {
+                            c = new Cost(dbCostBinary.getCost());
+                            c.setNew();
+                            CostDAO.saveCost(c);
+                            dbCostBinary.setCost(c);
+
+                        }
+                        mapCosts.put(cb.getCost().getId(), c);
+                        CostDAO.saveBinary(dbCostBinary);
+                        dbCostBinary.data = null;
+                    }
+                }
+            }
             current++;
         }
         task.setStatus("Done.");
         task.setTaskProgress(0.f);
         clearCache();
-        return new Pair<HashMap<Integer, SolverBinaries>, HashMap<Integer, Parameter>>(mapSolverBinaries, mapParameters);
+        return new ImportSolversResult(mapSolverBinaries, mapParameters, mapCosts);
     }
 
     public static void writeSolversToStream(ObjectOutputStream stream, List<Solver> solvers) throws IOException, SQLException {
