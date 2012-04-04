@@ -123,13 +123,14 @@ public class ImportController implements ImportExportController {
         return SolverDAO.getAll();
     }
     
-    public void importData(Tasks task, List<Experiment> selectedExperiments, List<Solver> selectedSolvers, List<Instance> selectedInstances, HashMap<Integer, Solver> solverMap, HashMap<Integer, String> nameMap) throws Exception {
+    public void importData(Tasks task, List<Experiment> selectedExperiments, List<Solver> selectedSolvers, List<Instance> selectedInstances, List<Verifier> selectedVerifiers, HashMap<Integer, Solver> solverMap, HashMap<Integer, String> nameMap, HashMap<Integer, Verifier> verifierMap, HashMap<Integer, String> verifierNameMap) throws Exception {
         boolean autoCommit = DatabaseConnector.getInstance().getConn().getAutoCommit();
         try {
             DatabaseConnector.getInstance().getConn().setAutoCommit(false);
             HashMap<Integer, Instance> instanceMap = InstanceDAO.importInstances(task, zipFile, selectedInstances);
-            Pair<HashMap<Integer, SolverBinaries>, HashMap<Integer, Parameter>> pair = SolverDAO.importSolvers(task, zipFile, selectedSolvers, solverMap, nameMap);
-            ExperimentDAO.importExperiments(task, zipFile, selectedExperiments, pair.getFirst(), pair.getSecond(), instanceMap);
+            SolverDAO.ImportSolversResult solverMaps = SolverDAO.importSolvers(task, zipFile, selectedSolvers, solverMap, nameMap);
+            HashMap<Integer, Verifier> importVerifierMap = VerifierDAO.importVerifiers(task, zipFile, selectedVerifiers, verifierMap, verifierNameMap);
+            ExperimentDAO.importExperiments(task, zipFile, selectedExperiments, solverMaps.mapSolverBinaries, solverMaps.mapParameters, solverMaps.mapCosts, instanceMap, importVerifierMap);
         } catch (Exception ex) {
             if (autoCommit) {
                 DatabaseConnector.getInstance().getConn().rollback();

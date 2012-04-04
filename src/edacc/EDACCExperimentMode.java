@@ -2674,7 +2674,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                                     dialogNewExp.isConfigurationExp, dialogNewExp.defaultCost, dialogNewExp.solverOutputPreserveFirst,
                                     dialogNewExp.solverOutputPreserveLast, dialogNewExp.watcherOutputPreserveFirst,
                                     dialogNewExp.watcherOutputPreserveLast, dialogNewExp.verifierOutputPreserveFirst,
-                                    dialogNewExp.verifierOutputPreserveLast, dialogNewExp.verifierConfig, dialogNewExp.cost);
+                                    dialogNewExp.verifierOutputPreserveLast, dialogNewExp.verifierConfig, dialogNewExp.cost,
+                                    dialogNewExp.minimize, dialogNewExp.costPenalty);
                             if (experimentUpdateThread != null) {
                                 experimentUpdateThread.cancel(true);
                             }
@@ -3065,7 +3066,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
             }
         }
-        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, verifiers, costs, exp.getName(), exp.getDescription(), exp.isConfigurationExp(), exp.getDefaultCost(), exp.getSolverOutputPreserveFirst(), exp.getSolverOutputPreserveLast(), exp.getWatcherOutputPreserveFirst(), exp.getWatcherOutputPreserveLast(), exp.getVerifierOutputPreserveFirst(), exp.getVerifierOutputPreserveLast(), vConfig, cost);
+        EDACCExperimentModeNewExp dialogEditExp = new EDACCExperimentModeNewExp(mainFrame, true, verifiers, costs, exp.getName(), exp.getDescription(), exp.isConfigurationExp(), exp.getDefaultCost(), exp.getSolverOutputPreserveFirst(), exp.getSolverOutputPreserveLast(), exp.getWatcherOutputPreserveFirst(), exp.getWatcherOutputPreserveLast(), exp.getVerifierOutputPreserveFirst(), exp.getVerifierOutputPreserveLast(), vConfig, cost, exp.getMinimize(), exp.getCostPenalty());
         dialogEditExp.setLocationRelativeTo(mainFrame);
         try {
             while (true) {
@@ -3092,6 +3093,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 Integer oldVOPF = exp.getVerifierOutputPreserveFirst();
                 Integer oldVOPL = exp.getVerifierOutputPreserveLast();
                 Integer oldIdCost = exp.getIdCost();
+                boolean oldMinimize = exp.getMinimize();
+                Float oldPenalty = exp.getCostPenalty();
                 exp.setName(dialogEditExp.expName);
                 exp.setDescription(dialogEditExp.expDesc);
                 exp.setDefaultCost(dialogEditExp.defaultCost);
@@ -3102,6 +3105,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 exp.setWatcherOutputPreserveFirst(dialogEditExp.watcherOutputPreserveFirst);
                 exp.setWatcherOutputPreserveLast(dialogEditExp.watcherOutputPreserveLast);
                 exp.setIdCost(dialogEditExp.cost == null ? null : dialogEditExp.cost.getId());
+                exp.setMinimize(dialogEditExp.minimize);
+                exp.setCostPenalty(dialogEditExp.costPenalty);
                 try {
                     expController.saveExperiment(exp);
                 } catch (SQLException ex) {
@@ -3115,6 +3120,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                     exp.setVerifierOutputPreserveFirst(oldVOPF);
                     exp.setVerifierOutputPreserveLast(oldVOPL);
                     exp.setIdCost(oldIdCost);
+                    exp.setMinimize(oldMinimize);
+                    exp.setCostPenalty(oldPenalty);
                     createDatabaseErrorMessage(ex);
                 }
                 try {
@@ -3132,8 +3139,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
             }
         } catch (SQLException ex) {
+            ex.printStackTrace();
             createDatabaseErrorMessage(ex);
         } catch (Exception ex) {
+            ex.printStackTrace();
             javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage(), "Edit experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
         } finally {
             dialogEditExp.dispose();

@@ -20,10 +20,27 @@ public class Verifier extends BaseModel implements IntegerPKModel, Serializable 
     private List<VerifierParameter> parameters;
     transient private File[] files;
     
+    // only for import/export
+    transient protected BinaryData data;
+    
     public Verifier() {
         id = -1;
         this.parameters = new LinkedList<VerifierParameter>();
         this.setNew();
+    }
+
+    protected Verifier(Verifier v) {
+        this();
+        this.name = v.getName();
+        this.description = v.getDescription();
+        this.md5 = v.getMd5();
+        this.runCommand = v.getRunCommand();
+        this.runPath = v.getRunPath();
+        for (VerifierParameter param : v.parameters) {
+            VerifierParameter param2 = new VerifierParameter(param);
+            param2.setNew();
+            parameters.add(param2);
+        }
     }
     
     public boolean realEquals(Verifier f) {

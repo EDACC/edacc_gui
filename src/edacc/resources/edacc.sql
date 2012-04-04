@@ -38,6 +38,7 @@ CREATE  TABLE IF NOT EXISTS `Solver` (
   `authors` VARCHAR(255) NULL ,
   `description_pdf` LONGBLOB NULL ,
   `User_idUser` INT NULL ,
+  `competition_frozen` TINYINT(1) NULL DEFAULT NULL,
   PRIMARY KEY (`idSolver`) ,
   UNIQUE INDEX `name` (`name` ASC, `version` ASC) ,
   INDEX `fk_Solver_User1` (`User_idUser` ASC) ,
@@ -154,6 +155,8 @@ CREATE  TABLE IF NOT EXISTS `Experiment` (
   `verifierOutputPreserveFirst` INT NULL ,
   `verifierOutputPreserveLast` INT NULL ,
   `Cost_idCost` INT NULL ,
+  `minimize` TINYINT(1) NOT NULL ,
+  `costPenalty` FLOAT NULL ,
   PRIMARY KEY (`idExperiment`) ,
   INDEX `fk_Experiment_Cost1` (`Cost_idCost` ASC) ,
   CONSTRAINT `fk_Experiment_Cost1`

@@ -1,12 +1,13 @@
 package edacc.model;
 
 import java.io.File;
+import java.io.Serializable;
 
 /**
  *
  * @author simon
  */
-public class CostBinary extends BaseModel implements IntegerPKModel {
+public class CostBinary extends BaseModel implements IntegerPKModel, Serializable {
     
     private int idCostBinary;
     private int idSolver;
@@ -19,6 +20,9 @@ public class CostBinary extends BaseModel implements IntegerPKModel {
     private String runPath;
     private String parameters;
     private Cost cost;
+    
+    // only used for import
+    transient BinaryData data;
     
     public CostBinary(Solver s) {
         this(s.getId());

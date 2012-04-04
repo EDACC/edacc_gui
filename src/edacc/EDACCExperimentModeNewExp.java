@@ -43,6 +43,8 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     public VerifierConfiguration verifierConfig;
     public boolean isConfigurationExp;
     public boolean canceled;
+    public boolean minimize;
+    public Float costPenalty;
     private VerifierParameterTableModel verifierParameterTableModel;
 
     /** Creates new form EDACCExperimentModeNewExp */
@@ -108,11 +110,13 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         
         comboCost.removeAllItems();
         for (Cost c : costs) {
-             comboCost.addItem(c);
+            comboCost.addItem(c);
         }
+        chkMinimize.setSelected(true);
+        txtPenalty.setText("0");
     }
     
-    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, List<Verifier> verifiers, List<Cost> costs, String expName, String expDescription, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, VerifierConfiguration verifierConfig, Cost cost) {
+    public EDACCExperimentModeNewExp(java.awt.Frame parent, boolean modal, List<Verifier> verifiers, List<Cost> costs, String expName, String expDescription, boolean configurationExp, Experiment.Cost defaultCost, Integer solverOutputPreserveFirst, Integer solverOutputPreserveLast, Integer watcherOutputPreserveFirst, Integer watcherOutputPreserveLast, Integer verifierOutputPreserveFirst, Integer verifierOutputPreserveLast, VerifierConfiguration verifierConfig, Cost cost, boolean minimize, Float costPenalty) {
         this(parent, modal, verifiers, costs);
         
         if (cost != null) {
@@ -173,6 +177,15 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             verifierParameterTableModel.assignParameterInstances(verifierConfig.getParameterInstances());
         }
         
+        chkMinimize.setSelected(minimize);
+        if (costPenalty != null) {
+            txtPenalty.setText("" + costPenalty);
+        }
+        if (!minimize) {
+            lblPenalty.setVisible(false);
+            txtPenalty.setVisible(false);
+        }
+        
         this.pack();
         this.setTitle("Edit experiment");
     }
@@ -230,6 +243,9 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         jLabel3 = new javax.swing.JLabel();
         lblCostName = new javax.swing.JLabel();
         comboCost = new javax.swing.JComboBox();
+        chkMinimize = new javax.swing.JCheckBox();
+        lblPenalty = new javax.swing.JLabel();
+        txtPenalty = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(edacc.EDACCApp.class).getContext().getResourceMap(EDACCExperimentModeNewExp.class);
@@ -472,6 +488,21 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         comboCost.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         comboCost.setName("comboCost"); // NOI18N
 
+        chkMinimize.setSelected(true);
+        chkMinimize.setText(resourceMap.getString("chkMinimize.text")); // NOI18N
+        chkMinimize.setName("chkMinimize"); // NOI18N
+        chkMinimize.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkMinimizeActionPerformed(evt);
+            }
+        });
+
+        lblPenalty.setText(resourceMap.getString("lblPenalty.text")); // NOI18N
+        lblPenalty.setName("lblPenalty"); // NOI18N
+
+        txtPenalty.setText(resourceMap.getString("txtPenalty.text")); // NOI18N
+        txtPenalty.setName("txtPenalty"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -507,7 +538,13 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(lblCostName)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(comboCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(comboCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(chkMinimize)
+                                .addGap(18, 18, 18)
+                                .addComponent(lblPenalty)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtPenalty, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE))
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(chkLimitWatcherOutput)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -562,7 +599,10 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                     .addComponent(jLabel2)
                     .addComponent(comboDefaultCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblCostName)
-                    .addComponent(comboCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(comboCost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkMinimize)
+                    .addComponent(lblPenalty)
+                    .addComponent(txtPenalty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -635,6 +675,13 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         
         this.expName = this.txtExperimentName.getText();
         this.expDesc = this.txtExperimentDescription.getText();
+        defaultCost = comboDefaultCost.getSelectedItem() instanceof Experiment.Cost ? (Experiment.Cost) comboDefaultCost.getSelectedItem() : Experiment.Cost.resultTime;
+
+        if (Experiment.Cost.cost.equals(defaultCost)) {
+            minimize = chkMinimize.isSelected();
+        } else {
+            minimize = true;
+        }
         boolean limitCheck = true;
         try {
             if (chkLimitSolverOutput.isSelected()) {
@@ -667,6 +714,15 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
                     verifierOutputPreserveLast = -verifierOutputPreserveLast;
                 }
             }
+            if (minimize) {
+                if (Experiment.Cost.cost.equals(defaultCost)) {
+                    costPenalty = Float.parseFloat(txtPenalty.getText());
+                } else {
+                    costPenalty = null;
+                }
+            } else {
+                costPenalty = null;
+            }
         } catch (NumberFormatException ex) {
             limitCheck = false;
         }
@@ -676,7 +732,6 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
         }
         
         isConfigurationExp = chkConfigurationExp.isSelected();
-        defaultCost = comboDefaultCost.getSelectedItem() instanceof Experiment.Cost ? (Experiment.Cost) comboDefaultCost.getSelectedItem() : Experiment.Cost.resultTime;
         if (Experiment.Cost.cost.equals(defaultCost)) {
             cost = comboCost.getSelectedItem() instanceof Cost ? (Cost) comboCost.getSelectedItem() : null;
         } else {
@@ -832,17 +887,33 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
             verifierParameterTableModel.setParameters(v.getParameters());
         }
     }//GEN-LAST:event_comboVerifierBinaryActionPerformed
-
+    
     private void comboDefaultCostActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboDefaultCostActionPerformed
         if (Experiment.Cost.cost.equals(comboDefaultCost.getSelectedItem())) {
             comboCost.setVisible(true);
             lblCostName.setVisible(true);
+            chkMinimize.setVisible(true);
+            lblPenalty.setVisible(true);
+            txtPenalty.setVisible(true);
+            chkMinimize.setSelected(true);
         } else {
             comboCost.setVisible(false);
             lblCostName.setVisible(false);
+            chkMinimize.setVisible(false);
+            lblPenalty.setVisible(false);
+            txtPenalty.setVisible(false);
         }
     }//GEN-LAST:event_comboDefaultCostActionPerformed
-
+    
+    private void chkMinimizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkMinimizeActionPerformed
+        if (chkMinimize.isSelected()) {
+            lblPenalty.setVisible(true);
+            txtPenalty.setVisible(true);
+        } else {
+            lblPenalty.setVisible(false);
+            txtPenalty.setVisible(false);
+        }
+    }//GEN-LAST:event_chkMinimizeActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnCreateExperiment;
@@ -850,6 +921,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     private javax.swing.JCheckBox chkLimitSolverOutput;
     private javax.swing.JCheckBox chkLimitVerifierOutput;
     private javax.swing.JCheckBox chkLimitWatcherOutput;
+    private javax.swing.JCheckBox chkMinimize;
     private javax.swing.JComboBox comboCost;
     private javax.swing.JComboBox comboDefaultCost;
     private javax.swing.JComboBox comboSolverOutputUnit;
@@ -873,6 +945,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     private javax.swing.JLabel lblLimitSolverOutputIn;
     private javax.swing.JLabel lblLimitVerifierOutputIn;
     private javax.swing.JLabel lblLimitWatcherOutputIn;
+    private javax.swing.JLabel lblPenalty;
     private javax.swing.JLabel lblSolverOutputPreserveFirst;
     private javax.swing.JLabel lblSolverOutputPreserveLast;
     private javax.swing.JLabel lblVerifierOutputPreserveFirst;
@@ -882,6 +955,7 @@ public class EDACCExperimentModeNewExp extends javax.swing.JDialog {
     private javax.swing.JTable tblVerifierParameters;
     private javax.swing.JTextArea txtExperimentDescription;
     private javax.swing.JTextField txtExperimentName;
+    private javax.swing.JTextField txtPenalty;
     private javax.swing.JTextField txtSolverOutputPreserveFirst;
     private javax.swing.JTextField txtSolverOutputPreserveLast;
     private javax.swing.JTextField txtVerifierOutputPreserveFirst;

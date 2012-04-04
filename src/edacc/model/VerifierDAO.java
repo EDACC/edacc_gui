@@ -114,8 +114,14 @@ public class VerifierDAO {
                 int curCount = 1;
                 for (Verifier v : newVerifiers) {
                     st.setString(curCount++, v.getName());
-                    ByteArrayOutputStream zipped = Util.zipFileArrayToByteStreamAutoBasePath(v.getFiles());
-                    st.setBinaryStream(curCount++, new ByteArrayInputStream(zipped.toByteArray()));
+                    if (v.getFiles() != null) {
+                        ByteArrayOutputStream zipped = Util.zipFileArrayToByteStreamAutoBasePath(v.getFiles());
+                        st.setBinaryStream(curCount++, new ByteArrayInputStream(zipped.toByteArray()));
+                    } else if (v.data != null) {
+                        st.setBytes(curCount++, v.data.getData());
+                    } else {
+                        throw new IllegalArgumentException("No binary specified.");
+                    }
                     st.setString(curCount++, v.getDescription());
                     st.setString(curCount++, v.getMd5());
                     st.setString(curCount++, v.getRunCommand());
@@ -296,11 +302,14 @@ public class VerifierDAO {
     }
 
     private static void writeVerifierBinaryToStream(ObjectOutputStream stream, Verifier v) throws IOException, SQLException {
-        stream.writeObject(v.getId());
         InputStream is = getZippedBinaryFile(v);
         BinaryData data = new BinaryData(is);
         is.close();
         stream.writeUnshared(data);
+    }
+    
+    private static BinaryData readVerifierBinaryDataFromStream(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        return (BinaryData) stream.readObject();
     }
 
     private static InputStream getZippedBinaryFile(Verifier v) throws SQLException {
@@ -363,6 +372,32 @@ public class VerifierDAO {
                     }
                     verifiers.add(v);
                 }
+            }
+        }
+        return res;
+    }
+
+    public static HashMap<Integer, Verifier> importVerifiers(Tasks task, ZipFile file, List<Verifier> verifiers, HashMap<Integer, Verifier> verifierMap, HashMap<Integer, String> nameMap) throws SQLException, IOException, ClassNotFoundException {
+        HashMap<Integer, Verifier> res = new HashMap<Integer, Verifier>();
+
+        task.setOperationName("Importing verifiers..");
+        clearCache();
+        int current = 1;
+        for (Verifier v : verifiers) {
+            task.setStatus("Saving verifier " + current + " / " + verifiers.size());
+            task.setTaskProgress(current / (float) verifiers.size());
+            if (verifierMap.containsKey(v.getId())) {
+            } else {
+                Verifier newDBVerifier = new Verifier(v);
+                newDBVerifier.setName(nameMap.get(v.getId()));
+                ZipEntry entry = file.getEntry("verifier_" + v.getId() + ".binary");
+                ObjectInputStream ois = new ObjectInputStream(file.getInputStream(entry));
+                newDBVerifier.data = VerifierDAO.readVerifierBinaryDataFromStream(ois);
+                newDBVerifier.setNew();
+                List<Verifier> tmp = new LinkedList<Verifier>();
+                tmp.add(newDBVerifier);
+                VerifierDAO.saveAll(tmp);
+                res.put(v.getId(), newDBVerifier);
             }
         }
         return res;

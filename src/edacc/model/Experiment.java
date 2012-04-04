@@ -18,6 +18,8 @@ public class Experiment extends BaseModel implements IntegerPKModel, Serializabl
     private Integer watcherOutputPreserveFirst, watcherOutputPreserveLast;
     private Integer verifierOutputPreserveFirst, verifierOutputPreserveLast;
     private Integer idCost;
+    private boolean minimize;
+    private Float costPenalty;
     // only used for export
     public List<ExperimentHasInstance> instances;
     protected ConfigurationScenario scenario;
@@ -44,6 +46,8 @@ public class Experiment extends BaseModel implements IntegerPKModel, Serializabl
         verifierOutputPreserveFirst = experiment.verifierOutputPreserveFirst;
         verifierOutputPreserveLast = experiment.verifierOutputPreserveLast;
         idCost = experiment.idCost;
+        minimize = experiment.minimize;
+        costPenalty = experiment.costPenalty;
     }
 
     @Override
@@ -228,7 +232,29 @@ public class Experiment extends BaseModel implements IntegerPKModel, Serializabl
             setModified();
         }
     }
-    
+
+    public Float getCostPenalty() {
+        return costPenalty;
+    }
+
+    public void setCostPenalty(Float costPenalty) {
+        this.costPenalty = costPenalty;
+        if (isSaved()) {
+            setModified();
+        }
+    }
+
+    public boolean getMinimize() {
+        return minimize;
+    }
+
+    public void setMinimize(boolean minimize) {
+        this.minimize = minimize;
+        if (isSaved()) {
+            setModified();
+        }
+    }
+
     @Override
     public String toString() {
         return name;

@@ -1,10 +1,15 @@
 package edacc.model;
 
 import edacc.manageDB.Util;
+import edacc.util.Pair;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -77,6 +82,21 @@ public class CostDAO {
         }
         return c;
     }
+    
+    public static Cost getCostByName(String name) throws SQLException {
+        for (Cost c : costCache.values()) {
+            if (c.getName().equals(name)) {
+                return c;
+            }
+        }
+        getAllCosts();
+        for (Cost c : costCache.values()) {
+            if (c.getName().equals(name)) {
+                return c;
+            }
+        }
+        return null;
+    }
 
     public static List<CostBinary> getCostBinariesForSolver(Solver s) throws SQLException {
         List<CostBinary> res = new LinkedList<CostBinary>();
@@ -124,6 +144,7 @@ public class CostDAO {
             ps.executeUpdate();
             ps.close();
         }
+        c.setSaved();
     }
 
     public static void saveBinary(CostBinary b) throws SQLException, IOException, NoSuchAlgorithmException {
@@ -144,6 +165,8 @@ public class CostDAO {
             if (b.getBinaryFiles() != null && b.getBinaryFiles().length > 0) {
                 ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(b.getBinaryFiles(), new File(b.getRootDir()));
                 ps.setBinaryStream(4, new ByteArrayInputStream(zipped.toByteArray()));
+            } else if (b.data != null) {
+                ps.setBytes(4, b.data.getData());
             } else {
                 throw new IllegalArgumentException("No cost binary specified.");
             }
@@ -218,5 +241,44 @@ public class CostDAO {
                 DatabaseConnector.getInstance().getConn().setAutoCommit(autocommit);
             }
         }
+    }
+
+    public static InputStream getZippedBinaryFile(CostBinary b) throws SQLException {
+        final String query = "SELECT binaryArchive FROM " + binaryTable + " WHERE idCostBinary=?";
+        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(query);
+        ps.setInt(1, b.getId());
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            try {
+                return rs.getBinaryStream("binaryArchive");
+            } finally {
+                rs.close();
+                ps.close();
+            }
+        }
+        rs.close();
+        ps.close();
+        return null;
+    }
+
+    protected static void writeCostBinariesToStream(ObjectOutputStream stream, List<CostBinary> costBinaries) throws IOException, SQLException {
+        for (CostBinary cb : costBinaries) {
+            stream.writeObject(cb.getId());
+            InputStream is = getZippedBinaryFile(cb);
+            BinaryData data = new BinaryData(is);
+            is.close();
+            stream.writeUnshared(data);
+        }
+    }
+
+    static Pair<Integer, BinaryData> readCostBinaryDataFromStream(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        Integer cbId;
+        try {
+            cbId = (Integer) stream.readUnshared();
+        } catch (EOFException ex) {
+            return null;
+        }
+        BinaryData data = (BinaryData) stream.readObject();
+        return new Pair<Integer, BinaryData>(cbId, data);
     }
 }
