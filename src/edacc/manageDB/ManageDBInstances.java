@@ -280,7 +280,9 @@ public class ManageDBInstances implements Observer {
      * @throws NoConnectionToDBException
      * @throws InstanceSourceClassHasInstance if one of the selected classes are a source class which has a refernce to an Instance.
      */
-    public void removeInstanceClass(DefaultMutableTreeNode node) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance, InstanceIsInExperimentException {
+    public void removeInstanceClass(DefaultMutableTreeNode node, Tasks task) throws SQLException, NoConnectionToDBException, InstanceSourceClassHasInstance, InstanceIsInExperimentException {
+        task.setCancelable(true);
+        task.setOperationName("Removing Instance Class");
         Vector<InstanceClass> toRemove = new Vector<InstanceClass>();
         toRemove = getAllToEnd(node);
         AddInstanceInstanceClassTableModel tableModel = new AddInstanceInstanceClassTableModel();
@@ -1044,6 +1046,7 @@ public class ManageDBInstances implements Observer {
      * @throws SQLException 
      */
     public void removeInstances(TreePath[] selectionPaths, int[] selectedRows) throws SQLException {
+        //task.setOperationName("Remove selected Instances");
         HashMap<Integer, Instance> selectedToRemove = new HashMap<Integer, Instance>();
 
         for (int i = 0; i < selectedRows.length; i++) {

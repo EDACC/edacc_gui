@@ -1818,13 +1818,13 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         } else {
             try {
                 manageDBInstances.removeInstances(jTreeInstanceClass.getSelectionPaths(), tableInstances.getSelectedRows());
-                jTreeInstanceClass.setSelectionPath(null);
-                instanceTableModel.fireTableDataChanged();
-            } catch (NoConnectionToDBException ex) {
-                Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
                 Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
             }
+            jTreeInstanceClass.setSelectionPath(null);
+            instanceTableModel.fireTableDataChanged();
+            this.tableInstances.requestFocus();
+            //Tasks.startTask("removeInstances", new Class[]{TreePath[].class, tableInstances.getSelectedRows().getClass(), edacc.model.Tasks.class}, new Object[]{jTreeInstanceClass.getSelectionPaths(), tableInstances.getSelectedRows(), null}, manageDBInstances, EDACCManageDBMode.this);
         }
         this.tableInstances.requestFocus();
 
@@ -2163,28 +2163,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                     JOptionPane.WARNING_MESSAGE);
         } else {
             saveExpandedState();
-            try {
-                manageDBInstances.removeInstanceClass((DefaultMutableTreeNode) jTreeInstanceClass.getSelectionPath().getLastPathComponent());
-                tableInstances.clearSelection();
-                instanceTableModel.fireTableDataChanged();
-                manageDBInstances.updateInstanceClasses();
-            } catch (InstanceIsInExperimentException ex) {
-                Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
-                //instanceClassTableModel.fireTableDataChanged();                 ;
-            } catch (NoConnectionToDBException ex) {
-                Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InstanceSourceClassHasInstance ex) {
-                JOptionPane.showMessageDialog(panelManageDBInstances,
-                        "The selected instance class cannot be removed. Because it is a source class with"
-                        + " related instances.",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            } catch (SQLException ex) {
-                Logger.getLogger(EDACCManageDBMode.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            jTreeInstanceClass.setSelectionPath(null);
-            jTreeInstanceClass.setExpandsSelectedPaths(true);
-            restoreExpandedState();
+
+            Tasks.startTask("removeInstanceClass", new Class[]{DefaultMutableTreeNode.class, edacc.model.Tasks.class}, new Object[]{jTreeInstanceClass.getSelectionPath().getLastPathComponent(), null}, manageDBInstances, EDACCManageDBMode.this);
         }
     }//GEN-LAST:event_btnRemoveInstanceClassActionPerformed
 
@@ -2955,8 +2935,40 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 updateInstanceTable();
             }
 
+        } else if (methodName.equals("removeInstanceClass")) {
+            tableInstances.clearSelection();
+            instanceTableModel.fireTableDataChanged();
+            manageDBInstances.updateInstanceClasses();
+            jTreeInstanceClass.setSelectionPath(null);
+            jTreeInstanceClass.setExpandsSelectedPaths(true);
+            restoreExpandedState();
+            if (e instanceof NoConnectionToDBException) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "No connection to database: " + e.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } else if (e instanceof SQLException) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "SQL-Exception: " + e.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } else if (methodName.equals("removeInstance")) {
+            jTreeInstanceClass.setSelectionPath(null);
+            instanceTableModel.fireTableDataChanged();
+            this.tableInstances.requestFocus();
+            if (e instanceof NoConnectionToDBException) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "No connection to database: " + e.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } else if (e instanceof SQLException) {
+                JOptionPane.showMessageDialog(panelManageDBInstances,
+                        "SQL-Exception: " + e.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
-
     }
 
     public void onTaskSuccessful(String methodName, Object result) {
@@ -2969,6 +2981,17 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             this.instanceTableModel.fireTableDataChanged();
             restoreExpandedState();
         } else if (methodName.equals("exportInstances")) {
+        } else if (methodName.equals("removeInstanceClass")) {
+            tableInstances.clearSelection();
+            instanceTableModel.fireTableDataChanged();
+            manageDBInstances.updateInstanceClasses();
+            jTreeInstanceClass.setSelectionPath(null);
+            jTreeInstanceClass.setExpandsSelectedPaths(true);
+            restoreExpandedState();
+        } else if (methodName.equals("removeInstances")) {
+            jTreeInstanceClass.setSelectionPath(null);
+            instanceTableModel.fireTableDataChanged();
+            this.tableInstances.requestFocus();
         }
     }
 
@@ -3045,6 +3068,10 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         btnCostChangeBinaryFiles.setEnabled(selected);
         btnCostEditBinary.setEnabled(selected);
         btnCostDeleteBinary.setEnabled(selected);
+
+
+
+
     }
 
     /**
