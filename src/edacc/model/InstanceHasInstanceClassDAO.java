@@ -14,6 +14,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import javax.management.InstanceAlreadyExistsException;
 
 /**
  *
@@ -25,6 +26,8 @@ public class InstanceHasInstanceClassDAO {
     protected static final String insertQuery = "INSERT INTO " + table + " (Instances_idInstance, instanceClass_idinstanceClass) VALUES (?, ?)";
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE Instances_idInstance=? AND instanceClass_idinstanceClass=?";
     private static final Hashtable<InstanceHasInstanceClass, InstanceHasInstanceClass> cache = new Hashtable<InstanceHasInstanceClass, InstanceHasInstanceClass>();
+    // Cache to getRelatedInstanceClasses Requests HashMap<Instance id, LinkedList<InstanceClass id>>
+    private static final HashMap<Integer, LinkedList<Integer>> relatedInstanceClasses = new HashMap<Integer, LinkedList<Integer>> ();
 
     /**
      * InstanceHasInstanceClass factory method, ensures that the created experiment is persisted.
@@ -75,6 +78,7 @@ public class InstanceHasInstanceClassDAO {
             st.setInt(2, i.getInstanceClass().getInstanceClassID());
             st.executeUpdate();
 
+            relatedInstanceClasses.remove(i.getInstance().getId());
             cache.remove(i);
         } else if (i.isNew()) {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -237,6 +241,9 @@ public class InstanceHasInstanceClassDAO {
     }
 
     public static LinkedList<Integer> getRelatedInstanceClasses(int id) throws SQLException {
+        if(relatedInstanceClasses.containsKey(id))
+            return relatedInstanceClasses.get(id);
+        
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE Instances_idInstance=" + id);
         LinkedList<Integer> classes = new LinkedList<Integer>();
@@ -244,6 +251,7 @@ public class InstanceHasInstanceClassDAO {
             InstanceHasInstanceClass i = getInstanceHasInstanceClassFromResultset(rs);
             classes.add(i.getInstanceClass().getId());
         }
+        relatedInstanceClasses.put(id, classes);
         return classes;
     }
 
@@ -298,5 +306,16 @@ public class InstanceHasInstanceClassDAO {
         }
 
         return result;
+    }
+
+    
+    public static String getRelatedInstanceClassesString(int id) throws SQLException{        
+        LinkedList<Integer> relatedClasses = getRelatedInstanceClasses(id);
+        StringBuilder classesBuffer = new StringBuilder("<html> Instance class paths:");
+        for(Integer ids : relatedClasses){
+            classesBuffer.append("<br> " + InstanceClassDAO.getCompletePathOf(ids));
+        }
+        classesBuffer.append("</html>");
+        return classesBuffer.toString();
     }
 }
