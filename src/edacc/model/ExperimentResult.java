@@ -203,7 +203,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         return status;
     }
 
-    protected void setStatus(StatusCode status) {
+    public void setStatus(StatusCode status) {
         this.status = status;
         if (this.isSaved()) {
             this.setModified();
@@ -287,7 +287,7 @@ public class ExperimentResult extends BaseModel implements Serializable {
         return resultCode;
     }
 
-    protected void setResultCode(ResultCode resultCode) {
+    public void setResultCode(ResultCode resultCode) {
         this.resultCode = resultCode;
     }
 

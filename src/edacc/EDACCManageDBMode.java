@@ -323,6 +323,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         btnUndo = new javax.swing.JButton();
 
         jFileChooserManageDBInstance.setFileSelectionMode(javax.swing.JFileChooser.FILES_AND_DIRECTORIES);
+        jFileChooserManageDBInstance.setMultiSelectionEnabled(true);
         jFileChooserManageDBInstance.setName("jFileChooserManageDBInstance"); // NOI18N
 
         jFileChooserManageDBExportInstance.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
@@ -1779,6 +1780,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                             JOptionPane.WARNING_MESSAGE);
                     return;
                 }
+                
                 //When the user choos autogenerate only directorys can be choosen, else files and directorys.
                 if (input.getName().equals("")) {
                     jFileChooserManageDBInstance.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -1787,9 +1789,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                 }
 
                 int returnVal = jFileChooserManageDBInstance.showOpenDialog(panelManageDBInstances);
-                File ret = jFileChooserManageDBInstance.getSelectedFile();
+                File[] ret = jFileChooserManageDBInstance.getSelectedFiles();
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    Tasks.startTask("addInstances", new Class[]{edacc.model.InstanceClass.class, java.io.File.class, edacc.model.Tasks.class, String.class, Boolean.class, Boolean.class}, new Object[]{input, ret, null, fileExtension, compress, autoClass}, manageDBInstances, EDACCManageDBMode.this);
+                    Tasks.startTask("addInstances", new Class[]{edacc.model.InstanceClass.class, java.io.File[].class, edacc.model.Tasks.class, String.class, Boolean.class, Boolean.class}, new Object[]{input, ret, null, fileExtension, compress, autoClass}, manageDBInstances, EDACCManageDBMode.this);
                 }
 
             }

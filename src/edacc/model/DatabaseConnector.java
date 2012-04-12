@@ -126,15 +126,7 @@ public class DatabaseConnector extends Observable {
     }
 
     private Connection getNewConnection() throws SQLException {
-        Connection conn = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database, properties);
-        Statement st = conn.createStatement();
-        try {
-            st.execute("set NAMES 'utf8'");
-            st.execute("set CHARSET 'utf8'");
-        } catch (Exception ex) {
-        }
-        st.close();
-        return conn;
+        return DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database, properties);
     }
 
     public int getMaxconnections() {

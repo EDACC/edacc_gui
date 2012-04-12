@@ -5,6 +5,7 @@
     <Component class="javax.swing.JFileChooser" name="jFileChooserManageDBInstance">
       <Properties>
         <Property name="fileSelectionMode" type="int" value="2"/>
+        <Property name="multiSelectionEnabled" type="boolean" value="true"/>
         <Property name="name" type="java.lang.String" value="jFileChooserManageDBInstance" noResource="true"/>
       </Properties>
     </Component>

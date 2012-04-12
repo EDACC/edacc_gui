@@ -125,6 +125,16 @@ public class ManageDBInstances implements Observer {
         main.instanceClassTableModel.addClasses(new Vector<InstanceClass>(InstanceClassDAO.getAll()));*/
     }
 
+    public void addInstances(InstanceClass input, File[] ret, Tasks task, String fileExtension, Boolean compress, Boolean autoClass) throws InstanceException, TaskCancelledException {
+        for (File f : ret) {
+            addInstances(input, f, task, fileExtension, compress, autoClass);
+            if (task.isCancelled()) {
+                throw new TaskCancelledException();
+            }
+        }
+    }
+    
+    
     /**
      * 
      * @param input
