@@ -1,0 +1,1 @@
+INSERT INTO ResultCodes VALUES (-1, 'wrong solution');

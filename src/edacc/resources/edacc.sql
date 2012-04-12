@@ -1016,6 +1016,7 @@ INSERT INTO ResultCodes VALUES
 (0, 'unknown'),
 (10, 'UNSAT'),
 (11, 'SAT'),
+(-1, 'wrong solution'),
 (-21, 'time limit exceeded'),
 (-22, 'wall clock limit exceeded'),
 (-23, 'memory limit exceeded'),
