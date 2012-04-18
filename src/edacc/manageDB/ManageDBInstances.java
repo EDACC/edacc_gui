@@ -1020,6 +1020,7 @@ public class ManageDBInstances implements Observer {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) InstanceClassDAO.getTreeCache();
         main.instanceClassTreeModel.setRoot(root);
         main.getInstanceClassTree().setRootVisible(false);
+        main.getInstanceClassTree().updateUI();
         main.instanceClassTreeModel.reload();
     }
 

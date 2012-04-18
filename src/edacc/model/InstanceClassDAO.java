@@ -117,6 +117,7 @@ public class InstanceClassDAO {
             }
             rs.close();
             instanceClass.setSaved();
+
             cache.cache(instanceClass);
             ps.close();
 
@@ -137,6 +138,9 @@ public class InstanceClassDAO {
 
             ps.executeUpdate();
             instanceClass.setSaved();
+            removeFromTreeCache(instanceClass);
+            addToTmpTreeBranch(instanceClass, parent);
+            addTmpTreeBranchToTreeCache();
             cache.cache(instanceClass);
             ps.close();
         } else {
@@ -420,7 +424,7 @@ public class InstanceClassDAO {
      */
     private static void addToTmpTreeBranch(InstanceClass i, InstanceClass parent) {
         if (parent == null) {
-            if(tmpTreeBranch.getDepth() == 0){
+            if (tmpTreeBranch.getDepth() == 0) {
                 tmpTreeBranch = new DefaultMutableTreeNode(null);
             }
             tmpTreeBranch.add(new DefaultMutableTreeNode(i));
@@ -487,7 +491,7 @@ public class InstanceClassDAO {
     private static void searcheInstanceClassRemoveFromTree(InstanceClass i, DefaultMutableTreeNode node) {
         for (int j = 0; j < node.getChildCount(); j++) {
             DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(j);
-            if (child.getUserObject() == i) {
+            if (((InstanceClass) child.getUserObject()).getId() == i.getId()) {
                 node.remove(j);
                 return;
             }
