@@ -185,6 +185,7 @@ public class EDACCCreateEditInstanceClassDialog extends javax.swing.JDialog {
         });
 
         jLabelSelectedParent.setText(resourceMap.getString("jLabelSelectedParent.text")); // NOI18N
+        jLabelSelectedParent.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         jLabelSelectedParent.setName("jLabelSelectedParent"); // NOI18N
 
         jLabelParent.setText(resourceMap.getString("jLabelParent.text")); // NOI18N
