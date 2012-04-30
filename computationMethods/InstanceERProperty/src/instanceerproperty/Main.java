@@ -73,6 +73,10 @@ public class Main {
             }
             if (e.getResultCode().getResultCode() == SAT || e.getResultCode().getResultCode() == UNSAT) {
                 resultTimes.add(e.getResultTime());
+            } else {
+                if (e.getCPUTimeLimit() > 0) {
+                    resultTimes.add(Float.valueOf(e.getCPUTimeLimit()));
+                }
             }
         }
         if (resultTimes.isEmpty()) {
@@ -116,7 +120,7 @@ public class Main {
         } else {
             if ("--help".equals(args[0])) {
                 printHelp();
-            } else if ("--mintime".equals(args[0]) || "--avgtime".equals(args[0]) || "--mediantime".equals(args[0])) {
+            } else if ("--mintime".equals(args[0]) || "--avgtime".equals(args[0]) || "--mediantime".equals(args[0]) || "--status".equals(args[0])) {
                 Integer expId = null;
                 if (args.length > 1 && "--expid".equals(args[1])) {
                     expId = Integer.parseInt(args[2]);
