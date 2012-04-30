@@ -234,6 +234,9 @@ public class Property extends BaseModel implements IntegerPKModel, Serializable 
             case 8:
                 this.source = PropertySource.CSVImport;
                 break;
+            case 9:
+                this.source = PropertySource.InstanceComputationMethod;
+                break;
             default:
                 throw new PropertyTypeNotExistException();
 
@@ -271,6 +274,8 @@ public class Property extends BaseModel implements IntegerPKModel, Serializable 
                 return 7;
             case CSVImport:
                 return 8;
+            case InstanceComputationMethod:
+                return 9;
             default:
                 return -1;
         }

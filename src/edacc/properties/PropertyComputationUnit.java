@@ -29,6 +29,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -123,6 +126,9 @@ public class PropertyComputationUnit implements Runnable {
                     case ExperimentResults:
                         computeFromExperimentResults();
                         break;
+                    case InstanceComputationMethod:
+                        computeFromInstanceComputationMethod();
+                        break;
                 }
             } catch (NoConnectionToDBException ex) {
                 Logger.getLogger(PropertyComputationUnit.class.getName()).log(Level.SEVERE, null, ex);
@@ -146,6 +152,37 @@ public class PropertyComputationUnit implements Runnable {
     }
     public static final Object sync = new Object();
 
+    private void computeFromInstanceComputationMethod() throws NoConnectionToDBException, SQLException, ComputationMethodDoesNotExistException, FileNotFoundException, IOException, InstanceNotInDBException, ErrorInExternalProgramException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        if (ihp == null) {
+            // only instance properties can be computed from instance computation method
+            return;
+        }
+        File classFile;
+        synchronized (sync) {
+            classFile = ComputationMethodDAO.getBinaryOfComputationMethod(property.getComputationMethod());
+        }
+        File nClassFile = new File(new File(classFile.getParentFile(), "edacc"), "properties");
+        nClassFile.mkdirs();
+        nClassFile = new File(nClassFile, classFile.getName());
+        classFile.renameTo(nClassFile);
+        ClassLoader cl = new URLClassLoader(new URL[]{classFile.getParentFile().toURI().toURL()},
+                InstanceComputationMethod.class.getClassLoader());
+        Class<?> clazz = cl.loadClass("edacc.properties." + classFile.getName().substring(0,
+                            classFile.getName().length() - 6).replace('/', '.'));
+        InstanceComputationMethod method = (InstanceComputationMethod) clazz.getDeclaredConstructor().newInstance();
+        String value = "";
+        try {
+            value = method.calculateProperty(ihp.getInstance().getId());
+        } catch (Exception ex) {
+            // TODO: error
+            ex.printStackTrace();
+        }
+        System.out.println("Value: " + value);
+        // set the value and save it
+        ihp.setValue(value);
+        InstanceHasPropertyDAO.save(ihp);
+    }
+
     private void computeFromExperimentResults() throws NoConnectionToDBException, SQLException, ComputationMethodDoesNotExistException, FileNotFoundException, IOException, InstanceNotInDBException, ErrorInExternalProgramException {
         if (ihp == null) {
             // only instance properties can be computed from experiment results
@@ -167,7 +204,7 @@ public class PropertyComputationUnit implements Runnable {
 
         try {
             ArrayList<ExperimentResult> er = ExperimentResultDAO.getAllByInstanceId(ihp.getInstance().getId());
-            System.out.println("found " + er.size() + " results for this instance");           
+            System.out.println("found " + er.size() + " results for this instance");
             ObjectOutputStream os = new ObjectOutputStream(p.getOutputStream());
             os.writeUnshared(er);
             os.flush();
@@ -321,7 +358,7 @@ public class PropertyComputationUnit implements Runnable {
                 String value = in.readLine();
 
                 // set the value and save it
-                if(value.isEmpty()){
+                if (value.isEmpty()) {
                     value = null;
                 }
                 ihp.setValue(value);
