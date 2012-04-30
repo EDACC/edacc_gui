@@ -88,4 +88,8 @@ public class ResultCode extends BaseModel implements Serializable {
         hash = 89 * hash + this.resultCode;
         return hash;
     }
+    
+    public boolean isCorrect() {
+        return String.valueOf(resultCode).startsWith("1");
+    }
 }
