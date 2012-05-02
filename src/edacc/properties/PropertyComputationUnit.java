@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -169,8 +170,8 @@ public class PropertyComputationUnit implements Runnable {
                 InstanceComputationMethod.class.getClassLoader());
         Class<?> clazz = cl.loadClass("edacc.properties." + classFile.getName().substring(0,
                             classFile.getName().length() - 6).replace('/', '.'));
-        String[] args = property.getComputationMethodParameters().split(" ");
-        InstanceComputationMethod method = (InstanceComputationMethod) clazz.getDeclaredConstructor(String[].class).newInstance(args);
+        String[] args = property.getComputationMethodParameters().split(" ");        
+        InstanceComputationMethod method = (InstanceComputationMethod) clazz.getConstructor(new Class[] {String[].class}).newInstance(new Object[] {args});
         String value = "";
         try {
             value = method.calculateProperty(ihp.getInstance().getId());
