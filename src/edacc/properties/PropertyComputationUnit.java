@@ -169,7 +169,8 @@ public class PropertyComputationUnit implements Runnable {
                 InstanceComputationMethod.class.getClassLoader());
         Class<?> clazz = cl.loadClass("edacc.properties." + classFile.getName().substring(0,
                             classFile.getName().length() - 6).replace('/', '.'));
-        InstanceComputationMethod method = (InstanceComputationMethod) clazz.getDeclaredConstructor().newInstance();
+        String[] args = property.getComputationMethodParameters().split(" ");
+        InstanceComputationMethod method = (InstanceComputationMethod) clazz.getDeclaredConstructor(String[].class).newInstance(args);
         String value = "";
         try {
             value = method.calculateProperty(ihp.getInstance().getId());

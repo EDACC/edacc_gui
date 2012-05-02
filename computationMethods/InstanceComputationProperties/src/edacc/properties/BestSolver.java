@@ -11,11 +11,26 @@ import edacc.model.SolverConfigurationDAO;
  */
 public class BestSolver extends InstanceComputationMethod {
 
+    private Integer expId = null;
+    public BestSolver(String[] args) {
+        super(args);
+        if (args.length == 0) {
+            expId = null;
+        } else {
+            if ("--expid".equals(args[0])) {
+                expId = Integer.valueOf(args[1]);
+            }
+        }
+    }
+    
     @Override
     public String calculateProperty(int instanceId) throws Exception {
         float minTime = Float.MAX_VALUE;
         int scid = -1;
         for (ExperimentResult er : ExperimentResultDAO.getAllByInstanceId(instanceId)) {
+            if (expId != null && er.getExperimentId() != expId) {
+                continue;
+            }
             if (er.getResultCode().isCorrect()) {
                 if (er.getResultTime() < minTime) {
                     minTime = er.getResultTime();

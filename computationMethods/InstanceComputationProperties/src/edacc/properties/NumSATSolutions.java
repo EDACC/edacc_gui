@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -15,11 +16,27 @@ import java.util.List;
  */
 public class NumSATSolutions extends InstanceComputationMethod {
 
+    Integer expId;
+
+    public NumSATSolutions(String[] args) {
+        super(args);
+        if (args.length == 0) {
+            expId = null;
+        } else {
+            if ("--expid".equals(args[0])) {
+                expId = Integer.valueOf(args[1]);
+            }
+        }
+    }
+
     @Override
     public String calculateProperty(int id) throws Exception {
         List<ExperimentResult> results = ExperimentResultDAO.getAllByInstanceId(id);
-        HashMap<HashMap<Integer, Integer>, List<HashMap<Integer, Integer>>> solutions = new HashMap<HashMap<Integer, Integer>, List<HashMap<Integer, Integer>>>();
+        HashSet<HashMap<Integer, Integer>> solutions = new HashSet<HashMap<Integer, Integer>>();
         for (ExperimentResult result : results) {
+            if (expId != null && result.getExperimentId() != expId) {
+                continue;
+            }
             // SAT answer
             if (result.getResultCode().getResultCode() == 11) {
                 Blob b = ExperimentResultDAO.getSolverOutput(result);
@@ -32,8 +49,9 @@ public class NumSATSolutions extends InstanceComputationMethod {
                 while ((line = br.readLine()) != null) {
                     // timestamp
                     String tmpar[] = line.split("\t");
-                    if (tmpar.length < 2)
+                    if (tmpar.length < 2) {
                         continue;
+                    }
                     line = tmpar[1];
                     // parse solution
                     if (line.startsWith("v ")) {
@@ -45,30 +63,9 @@ public class NumSATSolutions extends InstanceComputationMethod {
                     }
                 }
                 System.out.println("SOLUTION SIZE: " + solution.size());
-                List<HashMap<Integer, Integer>> list = solutions.get(solution);
-                if (list == null) {
-                    list = new ArrayList<HashMap<Integer, Integer>>();
-                    list.add(solution);
-                    solutions.put(solution, list);
-                } else {
-                    boolean found = false;
-                    for (HashMap<Integer, Integer> m : list) {
-                        if (m.equals(solution)) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        list.add(solution);
-                    }
-                }
+                solutions.add(solution);
             }
         }
-        
-        int res = 0;
-        for (List<HashMap<Integer, Integer>> list : solutions.values()) {
-            res += list.size();
-        }
-        return String.valueOf(res);
+        return String.valueOf(solutions.size());
     }
 }

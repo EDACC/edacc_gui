@@ -5,6 +5,9 @@ package edacc.properties;
  * @author simon
  */
 public class InstanceComputationMethod {   
+    public InstanceComputationMethod(String[] args) {
+    }
+    
     /**
      * Property calculation method. Should be overwritten.
      * @param instanceId

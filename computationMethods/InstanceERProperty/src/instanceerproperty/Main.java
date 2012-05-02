@@ -25,6 +25,8 @@ public class Main {
             + "  --avgtime    prints the average time needed to solve this instance\n"
             + "  --mediantime prints the median time needed to solver this instance\n"
             + "  --status     prints status of the instance: SAT/UNSAT/UNKNOWN\n"
+            + "  --solved     prints how often this instance was solved\n"
+            + "  --used       prints how often this instance was used\n"
             + "  --expid      if specified, use results only from the experiment with that id\n";
 
     public static void printHelp() {
@@ -64,7 +66,7 @@ public class Main {
         }
         return res;
     }
-    
+
     public static Float getMedianTime(ArrayList<ExperimentResult> er, Integer expId) {
         List<Float> resultTimes = new ArrayList<Float>();
         for (ExperimentResult e : er) {
@@ -85,7 +87,7 @@ public class Main {
             return resultTimes.get(resultTimes.size() / 2);
         }
     }
-    
+
     public static String getStatus(ArrayList<ExperimentResult> er, Integer expId) {
         int status = UNKNOWN;
         for (ExperimentResult e : er) {
@@ -111,6 +113,30 @@ public class Main {
         return "";
     }
 
+    public static int getSolvedCount(ArrayList<ExperimentResult> er, Integer expId) {
+        int res = 0;
+        for (ExperimentResult e : er) {
+            if (expId != null && e.getExperimentId() != expId) {
+                continue;
+            }
+            if (e.getResultCode().isCorrect()) {
+                res++;
+            }
+        }
+        return res;
+    }
+
+    public static int getUsedCount(ArrayList<ExperimentResult> er, Integer expId) {
+        int res = 0;
+        for (ExperimentResult e : er) {
+            if (expId != null && e.getExperimentId() != expId) {
+                continue;
+            }
+            res++;
+        }
+        return res;
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -120,7 +146,7 @@ public class Main {
         } else {
             if ("--help".equals(args[0])) {
                 printHelp();
-            } else if ("--mintime".equals(args[0]) || "--avgtime".equals(args[0]) || "--mediantime".equals(args[0]) || "--status".equals(args[0])) {
+            } else {
                 Integer expId = null;
                 if (args.length > 1 && "--expid".equals(args[1])) {
                     expId = Integer.parseInt(args[2]);
@@ -151,6 +177,14 @@ public class Main {
                 } else if ("--status".equals(args[0])) {
                     String res = getStatus(er, expId);
                     System.out.println(res);
+                } else if ("--solved".equals(args[0])) {
+                    int res = getSolvedCount(er, expId);
+                    System.out.println(res);
+                } else if ("--used".equals(args[0])) {
+                    int res = getUsedCount(er, expId);
+                    System.out.println(res);
+                } else {
+                    printHelp();
                 }
             }
         }
