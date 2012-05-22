@@ -7,6 +7,7 @@ package edacc;
 
 import edacc.experiment.ExperimentController;
 import edacc.experiment.ExperimentResultsBrowserTableModel;
+import edacc.model.ConfigurationScenario;
 import edacc.model.ExperimentResult;
 import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
@@ -26,6 +27,13 @@ public class EDACCOutputViewer extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.expController = expController;
+    }
+    
+    public EDACCOutputViewer(java.awt.Frame parent, boolean modal, ConfigurationScenario scenario) {
+        super(parent, modal);
+        initComponents();
+        setTitle("Output Viewer - configurator output");
+        setContent(scenario.getConfiguratorOutput());
     }
 
     /** This method is called from within the constructor to
@@ -88,12 +96,17 @@ public class EDACCOutputViewer extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
 
     public void setContent(String text) {
-        if (text == null) {
+        if (text == null || "".equals(text)) {
             text = "No output";
         }
         txtContent.setText(text);
     }
 
+    /**
+     * Updates the content of this output viewer from experiment result output.
+     * @param column 
+     * @param expResult 
+     */
     public void updateContent(int column, final ExperimentResult expResult) {
         String title = "Output Viewer - ";
         int ot = -1;

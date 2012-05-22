@@ -87,11 +87,12 @@ public class ConfigurationScenarioDAO {
         cs.setId(rs.getInt("idConfigurationScenario"));
         cs.setIdExperiment(rs.getInt("Experiment_idExperiment"));
         cs.setIdSolverBinary(rs.getInt("SolverBinaries_idSolverBinary"));
+        cs.setConfiguratorOutput(rs.getString("configuratorOutput"));
         return cs;
     }
 
     public static ConfigurationScenario getConfigurationScenarioByExperimentId(int idExperiment) throws SQLException {
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idConfigurationScenario, SolverBinaries_idSolverBinary, Experiment_idExperiment, idSolver, initial_course_length FROM " + table + " JOIN SolverBinaries ON SolverBinaries.idSolverBinary=SolverBinaries_idSolverBinary WHERE Experiment_idExperiment=?");
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT idConfigurationScenario, SolverBinaries_idSolverBinary, Experiment_idExperiment, idSolver, initial_course_length, configuratorOutput FROM " + table + " JOIN SolverBinaries ON SolverBinaries.idSolverBinary=SolverBinaries_idSolverBinary WHERE Experiment_idExperiment=?");
         st.setInt(1, idExperiment);
         ResultSet rs = st.executeQuery();
         ConfigurationScenario cs = null;
