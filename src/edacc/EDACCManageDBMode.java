@@ -216,6 +216,8 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         jMIEditInstanceClass = new javax.swing.JMenuItem();
         jMIRemoveInstanceClass = new javax.swing.JMenuItem();
         jMIExportInstanceClass = new javax.swing.JMenuItem();
+        jMIExpandAll = new javax.swing.JMenuItem();
+        jMICollapseAll = new javax.swing.JMenuItem();
         jPMParameterTable = new javax.swing.JPopupMenu();
         jMIMoveUp = new javax.swing.JMenuItem();
         jMIMoveDown = new javax.swing.JMenuItem();
@@ -401,6 +403,24 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             }
         });
         jPMInstanceTreeInstanceClass.add(jMIExportInstanceClass);
+
+        jMIExpandAll.setText(resourceMap.getString("jMIExpandAll.text")); // NOI18N
+        jMIExpandAll.setName("jMIExpandAll"); // NOI18N
+        jMIExpandAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIExpandAllActionPerformed(evt);
+            }
+        });
+        jPMInstanceTreeInstanceClass.add(jMIExpandAll);
+
+        jMICollapseAll.setText(resourceMap.getString("jMICollapseAll.text")); // NOI18N
+        jMICollapseAll.setName("jMICollapseAll"); // NOI18N
+        jMICollapseAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMICollapseAllActionPerformed(evt);
+            }
+        });
+        jPMInstanceTreeInstanceClass.add(jMICollapseAll);
 
         jPMParameterTable.setName("jPMParameterTable"); // NOI18N
 
@@ -1780,7 +1800,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
                             JOptionPane.WARNING_MESSAGE);
                     return;
                 }
-                
+
                 //When the user choos autogenerate only directorys can be choosen, else files and directorys.
                 if (input.getName().equals("")) {
                     jFileChooserManageDBInstance.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -2559,6 +2579,18 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         }
     }//GEN-LAST:event_btnCostDeleteBinaryActionPerformed
 
+    private void jMIExpandAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIExpandAllActionPerformed
+        for (int row = 0; row < jTreeInstanceClass.getRowCount(); row++) {
+            jTreeInstanceClass.expandRow(row);
+        }
+    }//GEN-LAST:event_jMIExpandAllActionPerformed
+
+    private void jMICollapseAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICollapseAllActionPerformed
+        for (int row = 0; row < jTreeInstanceClass.getRowCount(); row++) {
+            jTreeInstanceClass.collapseRow(row);
+        }
+    }//GEN-LAST:event_jMICollapseAllActionPerformed
+
     private void parameterChanged() {
         int selectedRow = tableParameters.getSelectedRow();
 
@@ -2756,7 +2788,9 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenuItem jMIAddInstance;
+    private javax.swing.JMenuItem jMICollapseAll;
     private javax.swing.JMenuItem jMIEditInstanceClass;
+    private javax.swing.JMenuItem jMIExpandAll;
     private javax.swing.JMenuItem jMIExportInstance;
     private javax.swing.JMenuItem jMIExportInstanceClass;
     private javax.swing.JMenuItem jMIMoveDown;
