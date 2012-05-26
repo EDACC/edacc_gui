@@ -1272,7 +1272,7 @@ public class ExperimentController {
         for (int i = 0; i < main.tableJobs.getColumnCount(); i++) {
             int vis_col = main.tableJobs.convertColumnIndexToModel(i);
             out.write("\"" + main.jobsTableModel.getColumnName(vis_col) + "\"");
-            if (i < main.jobsTableModel.getColumnCount() - 1) {
+            if (i < main.tableJobs.getColumnCount() - 1) {
                 out.write(",");
             }
         }
@@ -1296,7 +1296,7 @@ public class ExperimentController {
                 } else {
                     out.write("\"" + main.jobsTableModel.getValueAt(vis, vis_col).toString() + "\"");
                 }
-                if (col < main.jobsTableModel.getColumnCount() - 1) {
+                if (col < main.tableJobs.getColumnCount() - 1) {
                     out.write(",");
                 }
             }

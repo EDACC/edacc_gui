@@ -517,12 +517,14 @@
                               </Group>
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                              <Component id="jButton1" linkSize="5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="btnConfigurationScenarioRandomSolverConfigs" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnConfigurationScenarioRandomSolverConfigs" linkSize="5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="btnDefineCourse" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="328" max="32767" attributes="0"/>
+                              <Component id="btnDefineCourse" linkSize="5" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btnViewConfiguratorOutput" linkSize="5" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace pref="139" max="32767" attributes="0"/>
                               <Component id="btnConfigScenarioUndo" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnConfigScenarioSave" min="-2" max="-2" attributes="0"/>
@@ -554,6 +556,7 @@
                           <Component id="btnConfigurationScenarioRandomSolverConfigs" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnDefineCourse" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnViewConfiguratorOutput" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -709,6 +712,15 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="btnViewConfiguratorOutput">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="btnViewConfiguratorOutput.text"/>
+                <Property name="name" type="java.lang.String" value="btnViewConfiguratorOutput" noResource="true"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnViewConfiguratorOutputActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>

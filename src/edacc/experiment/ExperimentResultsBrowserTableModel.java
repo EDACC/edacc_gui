@@ -53,45 +53,47 @@ public class ExperimentResultsBrowserTableModel extends ThreadSafeDefaultTableMo
     public static final int COL_PARAMETERS = 7;
     /** The index of the instance column */
     public static final int COL_INSTANCE = 8;
+    /** The index of the instance md5 column */
+    public static final int COL_INSTANCE_MD5 = 9;
     /** The index of the run column */
-    public static final int COL_RUN = 9;
+    public static final int COL_RUN = 10;
     /** The index of the time column */
-    public static final int COL_TIME = 10;
+    public static final int COL_TIME = 11;
     /** The index of the wall time column */
-    public static final int COL_WALLTIME = 11;
+    public static final int COL_WALLTIME = 12;
     /** The index of the cost column */
-    public static final int COL_COST = 12;
+    public static final int COL_COST = 13;
     /** The index of the seed column */
-    public static final int COL_SEED = 13;
+    public static final int COL_SEED = 14;
     /** The index of the status column */
-    public static final int COL_STATUS = 14;
+    public static final int COL_STATUS = 15;
     /** The index of the runtime column */
-    public static final int COL_RUNTIME = 15;
+    public static final int COL_RUNTIME = 16;
     /** The index of the result code column */
-    public static final int COL_RESULTCODE = 16;
+    public static final int COL_RESULTCODE = 17;
     /** The index of the cpu time limit column */
-    public static final int COL_CPUTIMELIMIT = 17;
+    public static final int COL_CPUTIMELIMIT = 18;
     /** The index of the wall clock limit column */
-    public static final int COL_WALLCLOCKLIMIT = 18;
+    public static final int COL_WALLCLOCKLIMIT = 19;
     /** The index of the memory limit column */
-    public static final int COL_MEMORYLIMIT = 19;
+    public static final int COL_MEMORYLIMIT = 20;
     /** The index of the stack size limit column */
-    public static final int COL_STACKSIZELIMIT = 20;
+    public static final int COL_STACKSIZELIMIT = 21;
     /** The index of the solver output column */
-    public static final int COL_SOLVER_OUTPUT = 21;
+    public static final int COL_SOLVER_OUTPUT = 22;
     /** The index of the launcher output column */
-    public static final int COL_LAUNCHER_OUTPUT = 22;
+    public static final int COL_LAUNCHER_OUTPUT = 23;
     /** The index of the watcher output column */
-    public static final int COL_WATCHER_OUTPUT = 23;
+    public static final int COL_WATCHER_OUTPUT = 24;
     /** The index of the verifier output column */
-    public static final int COL_VERIFIER_OUTPUT = 24;
+    public static final int COL_VERIFIER_OUTPUT = 25;
     /** The index of the first property column */
-    public static final int COL_PROPERTY = 25;
+    public static final int COL_PROPERTY = 26;
     private ArrayList<ExperimentResult> jobs;
     // the constant columns
-    private String[] CONST_COLUMNS = {"ID", "Priority", "Compute Queue", "Compute Node", "Compute Node IP", "Solver", "Solver Configuration", "Parameters", "Instance", "Run", "Time", "Wall Time", "Cost", "Seed", "Status", "Run time", "Result Code", "CPU Time Limit", "Wall Clock Time Limit", "Memory Limit", "Stack Size Limit", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
+    private String[] CONST_COLUMNS = {"ID", "Priority", "Compute Queue", "Compute Node", "Compute Node IP", "Solver", "Solver Configuration", "Parameters", "Instance", "Instance MD5", "Run", "Time", "Wall Time", "Cost", "Seed", "Status", "Run time", "Result Code", "CPU Time Limit", "Wall Clock Time Limit", "Memory Limit", "Stack Size Limit", "Solver Output", "Launcher Output", "Watcher Output", "Verifier Output"};
     /** the default visibility of each column */
-    public static boolean[] DEFAULT_VISIBILITY = {false, false, true, false, false, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false};
+    public static boolean[] DEFAULT_VISIBILITY = {false, false, true, false, false, true, true, true, true, false, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false};
     private String[] columns;
     private ArrayList<Property> properties;
     private HashMap<Integer, GridQueue> gridQueues;
@@ -340,6 +342,9 @@ public class ExperimentResultsBrowserTableModel extends ThreadSafeDefaultTableMo
             case COL_INSTANCE:
                 Instance instance = getInstance(rowIndex);
                 return instance == null ? "" : instance.getName();
+            case COL_INSTANCE_MD5:
+                instance = getInstance(rowIndex);
+                return instance == null ? "" : instance.getMd5();
             case COL_RUN:
                 return j.getRun();
             case COL_TIME:

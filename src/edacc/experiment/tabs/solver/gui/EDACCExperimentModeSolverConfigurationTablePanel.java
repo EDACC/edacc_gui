@@ -22,10 +22,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -64,7 +61,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
         int condition = JComponent.WHEN_IN_FOCUSED_WINDOW;
         InputMap inputMap = table.getInputMap(condition);
         ActionMap actionMap = table.getActionMap();
-        
+
         itemRemove.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "Delete");
         actionMap.put("Delete", new AbstractAction() {
@@ -319,7 +316,7 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
 
     private class TableModel extends DefaultTableModel {
 
-        private String[] columns = new String[]{"Solver", "Solver Configuration", "Cost", "Cost Function", "Parameters"};
+        private String[] columns = new String[]{"Solver", "Solver Configuration", "Hint", "Cost", "Cost Function", "Parameters"};
         ArrayList<String> parameterStrings;
         ArrayList<SolverConfigurationEntry> entries;
 
@@ -392,10 +389,12 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
                     case 1:
                         return entries.get(row).getName();
                     case 2:
-                        return entries.get(row).getSolverConfig() != null ? entries.get(row).getSolverConfig().getCost() : null;
+                        return entries.get(row).getHint();
                     case 3:
-                        return entries.get(row).getSolverConfig() != null ? entries.get(row).getSolverConfig().getCost_function() : null;
+                        return entries.get(row).getSolverConfig() != null ? entries.get(row).getSolverConfig().getCost() : null;
                     case 4:
+                        return entries.get(row).getSolverConfig() != null ? entries.get(row).getSolverConfig().getCost_function() : null;
+                    case 5:
                         return parameterStrings.get(row);
                     default:
                         return "";
@@ -413,10 +412,12 @@ public class EDACCExperimentModeSolverConfigurationTablePanel extends javax.swin
                 case 1:
                     return String.class;
                 case 2:
-                    return Float.class;
-                case 3:
                     return String.class;
+                case 3:
+                    return Float.class;
                 case 4:
+                    return String.class;
+                case 5:
                     return String.class;
                 default:
                     return String.class;

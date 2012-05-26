@@ -10,6 +10,7 @@ public class ConfigurationScenario extends BaseModel implements IntegerPKModel, 
     private int idSolverBinary;
     private ArrayList<ConfigurationScenarioParameter> parameters;
     private Course course;
+    private String configuratorOutput;
     
     public ConfigurationScenario() {
         super();
@@ -75,5 +76,13 @@ public class ConfigurationScenario extends BaseModel implements IntegerPKModel, 
             }
         }
         this.idSolverBinary = idSolverBinary;
+    }
+    
+    public String getConfiguratorOutput() {
+        return configuratorOutput;
+    }
+    
+    protected void setConfiguratorOutput(String configuratorOutput) {
+        this.configuratorOutput = configuratorOutput;
     }
 }

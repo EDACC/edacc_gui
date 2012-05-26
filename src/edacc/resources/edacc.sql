@@ -787,6 +787,7 @@ CREATE  TABLE IF NOT EXISTS `ConfigurationScenario` (
   `SolverBinaries_idSolverBinary` INT NOT NULL ,
   `Experiment_idExperiment` INT NOT NULL ,
   `initial_course_length` INT NULL ,
+  `configuratorOutput` LONGTEXT NULL ,
   PRIMARY KEY (`idConfigurationScenario`) ,
   INDEX `fk_ConfigurationScenario_SolverBinaries1` (`SolverBinaries_idSolverBinary` ASC) ,
   INDEX `fk_ConfigurationScenario_Experiment1` (`Experiment_idExperiment` ASC) ,

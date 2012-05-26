@@ -20,15 +20,17 @@ public class SolverConfigurationTableModel extends ThreadSafeDefaultTableModel {
     public static final int COL_SOLVER = 1;
     /** The index for the name column */
     public static final int COL_NAME = 2;
+    /** The index for the hint column */
+    public static final int COL_HINT = 3;
     /** The index for the cost column */
-    public static final int COL_COST = 3;
+    public static final int COL_COST = 4;
     /** The index for the cost function column */
-    public static final int COL_COSTFUNCTION = 4;
+    public static final int COL_COSTFUNCTION = 5;
     /** The index for the solver binary column */
-    public static final int COL_SOLVERBINARY = 5;
+    public static final int COL_SOLVERBINARY = 6;
     /** The index for the parameters column */
-    public static final int COL_PARAMETERS = 6;
-    private String[] columns = {"Selected", "Solver", "Solver Configuration", "Cost", "Cost Function", "Solver Binary", "Parameters"};
+    public static final int COL_PARAMETERS = 7;
+    private String[] columns = {"Selected", "Solver", "Solver Configuration", "Hint", "Cost", "Cost Function", "Solver Binary", "Parameters"};
     /** The selection of the rows */
     public boolean[] selected;
     private ArrayList<SolverConfiguration> solverConfigurations;
@@ -78,6 +80,8 @@ public class SolverConfigurationTableModel extends ThreadSafeDefaultTableModel {
                 }
             case COL_NAME:
                 return solverConfigurations.get(rowIndex).getName();
+            case COL_HINT:
+                return solverConfigurations.get(rowIndex).getHint();
             case COL_COST:
                 return solverConfigurations.get(rowIndex).getCost();
             case COL_COSTFUNCTION:

@@ -24,13 +24,15 @@ public class InstanceTableModel extends ThreadSafeDefaultTableModel {
 
     /** The index of the name column */
     public static final int COL_NAME = 0;
+    /** The index of the md5 column */
+    public static final int COL_MD5 = 1;
     /** The index of the benchmark type column */
-    public static final int COL_BENCHTYPE = 1;
+    public static final int COL_BENCHTYPE = 2;
     /** The index of the selected column */
-    public static final int COL_SELECTED = 2;
+    public static final int COL_SELECTED = 3;
     /** The index of the first property column */
-    public static final int COL_PROP = 3;
-    private String[] columns = {"Name", "Benchmark Type", "Selected"};
+    public static final int COL_PROP = 4;
+    private String[] columns = {"Name", "MD5", "Benchmark Type", "Selected"};
     ArrayList<Property> properties;
     private ArrayList<Instance> instances;
     private Vector<ExperimentHasInstance> experimentHasInstances;
@@ -264,6 +266,8 @@ public class InstanceTableModel extends ThreadSafeDefaultTableModel {
         switch (col) {
             case COL_NAME:
                 return String.class;
+            case COL_MD5:
+                return String.class;
             case COL_BENCHTYPE:
                 return String.class;
             case COL_SELECTED:
@@ -323,6 +327,8 @@ public class InstanceTableModel extends ThreadSafeDefaultTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (columnIndex == COL_NAME) {
             return instances.get(rowIndex).getName();
+        } else if (columnIndex == COL_MD5) {
+            return instances.get(rowIndex).getMd5();
         } else if (columnIndex == COL_BENCHTYPE) {
             return (benchmarkTypes == null || benchmarkTypes[rowIndex] == null) ? "" : benchmarkTypes[rowIndex];
         } else if (columnIndex == COL_SELECTED) {
