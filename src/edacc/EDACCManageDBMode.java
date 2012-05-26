@@ -2020,6 +2020,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             saveExpandedState();
             manageDBInstances.editInstanceClass();
             manageDBInstances.updateInstanceClasses();
+            this.instanceTableModel.fireTableDataChanged();
             jTreeInstanceClass.setSelectionPath(null);
             jTreeInstanceClass.setExpandsSelectedPaths(true);
             restoreExpandedState();

@@ -138,8 +138,9 @@ public class InstanceClassDAO {
 
             ps.executeUpdate();
             instanceClass.setSaved();
-            removeFromTreeCache(instanceClass);
-            addToTmpTreeBranch(instanceClass, parent);
+            DefaultMutableTreeNode tmp = searcheInstanceClassReturnAndRemoveFromTree(instanceClass, treeCache);
+            tmp.setUserObject(instanceClass);
+            addToTmpTreeBranch(tmp, parent);
             addTmpTreeBranchToTreeCache();
             cache.cache(instanceClass);
             ps.close();
@@ -500,5 +501,49 @@ public class InstanceClassDAO {
             searcheInstanceClassRemoveFromTree(i, (DefaultMutableTreeNode) node.getChildAt(j));
         }
 
+    }
+
+    private static DefaultMutableTreeNode searcheInstanceClassReturnAndRemoveFromTree(InstanceClass i, DefaultMutableTreeNode node) {
+        for (int j = 0; j < node.getChildCount(); j++) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(j);
+            if (((InstanceClass) child.getUserObject()).getId() == i.getId()) {
+                DefaultMutableTreeNode ret = (DefaultMutableTreeNode) node.getChildAt(j);
+                node.remove(j);
+                return ret;
+            }
+        }
+        for (int j = 0; j < node.getChildCount(); j++) {
+            DefaultMutableTreeNode tmp =  searcheInstanceClassReturnAndRemoveFromTree(i, (DefaultMutableTreeNode) node.getChildAt(j));
+            if(tmp != null){
+                return tmp;
+            }
+        }
+        return null;
+        
+
+    }
+
+    private static void addToTmpTreeBranch(DefaultMutableTreeNode tmp, InstanceClass parent) {
+        if (parent == null) {
+            if (tmpTreeBranch.getDepth() == 0) {
+                tmpTreeBranch = new DefaultMutableTreeNode(null);
+            }
+            tmpTreeBranch.add(tmp);
+        } else if (tmpTreeBranch.isLeaf()) {
+            tmpTreeBranch = new DefaultMutableTreeNode(parent);
+            tmpTreeBranch.add(tmp);
+        } else {
+            searchNodeAddChild(parent, tmp, tmpTreeBranch);
+        }
+    }
+
+    private static void searchNodeAddChild(InstanceClass parent, DefaultMutableTreeNode tmp, DefaultMutableTreeNode node) {
+        if (node.getUserObject() == parent) {
+            node.add(tmp);
+        } else {
+            for (int j = 0; j < node.getChildCount(); j++) {
+                searchNodeAddChild(parent, tmp, (DefaultMutableTreeNode) node.getChildAt(j));
+            }
+        }
     }
 }
