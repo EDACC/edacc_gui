@@ -535,10 +535,13 @@ public class EDACCManagePropertyDialog extends javax.swing.JDialog {
     private void buttonRemovePropertyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemovePropertyActionPerformed
         if (tableProperty.getSelectedRow() == -1) {
             JOptionPane.showMessageDialog(this,
-                    "Nothing is selected. Select a solver property.",
+                    "Nothing is selected. Select a property.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
-        } else {
+        } else if (JOptionPane.showConfirmDialog(this,
+                    "Do you really want to remove the selected property?",
+                    "Option",
+                    JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION){
             try {
                 try {
                     controller.removeProperty(tableProperty.convertRowIndexToModel(tableProperty.getSelectedRow()));

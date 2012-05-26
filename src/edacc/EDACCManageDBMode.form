@@ -1432,7 +1432,7 @@
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="panelButtonsInstanceClass" alignment="0" max="32767" attributes="2"/>
+                                  <Component id="panelButtonsInstanceClass" alignment="0" pref="406" max="32767" attributes="2"/>
                                   <Component id="panelInstanceClassTable" alignment="0" pref="406" max="32767" attributes="2"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
@@ -1464,9 +1464,9 @@
                                   <Component id="btnNewInstanceClass" linkSize="13" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="btnEditInstanceClass" linkSize="13" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
                                   <Component id="btnRemoveInstanceClass" linkSize="13" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
                                   <Component id="btnExportInstanceClass" linkSize="13" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="32767" attributes="0"/>
                               </Group>
@@ -1479,8 +1479,8 @@
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="btnNewInstanceClass" linkSize="15" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnEditInstanceClass" linkSize="15" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="btnRemoveInstanceClass" linkSize="15" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="btnExportInstanceClass" linkSize="15" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="btnRemoveInstanceClass" linkSize="15" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="32767" attributes="0"/>
                               </Group>

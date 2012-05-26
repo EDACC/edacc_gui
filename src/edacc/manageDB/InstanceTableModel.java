@@ -16,6 +16,7 @@ import edacc.satinstances.ConvertException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -298,8 +299,8 @@ public class InstanceTableModel extends edacc.experiment.InstanceTableModel {
     private void addNewInstance(Instance in) {
         if (!instances.contains(in)) {
             try {
-                instances.add(in);
-                LinkedList<Integer> classes = InstanceHasInstanceClassDAO.getRelatedInstanceClasses(in.getId());
+                instances.add(in);     
+                LinkedList<Integer> classes = new LinkedList<Integer>(InstanceHasInstanceClassDAO.getRelatedInstanceClasses(in.getId()));
                 instanceClassIds.put(in, classes);
             } catch (SQLException ex) {
                 Logger.getLogger(InstanceTableModel.class.getName()).log(Level.SEVERE, null, ex);
