@@ -6,7 +6,11 @@
 package edacc.manageDB;
 
 import edacc.model.InstanceClass;
+import edacc.model.InstanceClassDAO;
+import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -37,7 +41,11 @@ public class AddInstanceInstanceClassTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
          switch (columnIndex) {
             case 0:
-                return classes.get(rowIndex).getName();
+        try {
+            return InstanceClassDAO.getCompletePathOf(classes.get(rowIndex).getId());
+        } catch (SQLException ex) {
+            Logger.getLogger(AddInstanceInstanceClassTableModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
             case 1:
                 return classes.get(rowIndex).getDescription();
             case 2:
