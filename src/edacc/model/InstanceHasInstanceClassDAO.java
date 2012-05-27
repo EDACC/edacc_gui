@@ -27,7 +27,7 @@ public class InstanceHasInstanceClassDAO {
     protected static final String deleteQuery = "DELETE FROM " + table + " WHERE Instances_idInstance=? AND instanceClass_idinstanceClass=?";
     private static final Hashtable<InstanceHasInstanceClass, InstanceHasInstanceClass> cache = new Hashtable<InstanceHasInstanceClass, InstanceHasInstanceClass>();
     // Cache to getRelatedInstanceClasses Requests HashMap<Instance id, LinkedList<InstanceClass id>>
-    private static final HashMap<Integer, LinkedList<Integer>> relatedInstanceClasses = new HashMap<Integer, LinkedList<Integer>> ();
+    private static final Hashtable<Integer, ArrayList<Integer>> relatedInstanceClasses = new Hashtable<Integer, ArrayList<Integer>> ();
 
     /**
      * InstanceHasInstanceClass factory method, ensures that the created experiment is persisted.
@@ -77,7 +77,6 @@ public class InstanceHasInstanceClassDAO {
             st.setInt(1, i.getInstance().getId());
             st.setInt(2, i.getInstanceClass().getInstanceClassID());
             st.executeUpdate();
-
             relatedInstanceClasses.remove(i.getInstance().getId());
             cache.remove(i);
         } else if (i.isNew()) {
@@ -87,6 +86,7 @@ public class InstanceHasInstanceClassDAO {
             st.executeUpdate();
             i.setSaved();
             cacheInstanceHasInstanceClass(i);
+            //putToRelatedInstanceClasses(i.getInstance().getId(), i.getInstanceClass().getId());
         }
 
     }
@@ -240,16 +240,17 @@ public class InstanceHasInstanceClassDAO {
         st.close();
     }
 
-    public static LinkedList<Integer> getRelatedInstanceClasses(int id) throws SQLException {
-        if(relatedInstanceClasses.containsKey(id))
+    public static ArrayList<Integer> getRelatedInstanceClasses(int id) throws SQLException {
+        /*if(relatedInstanceClasses.containsKey(id)){
             return relatedInstanceClasses.get(id);
-        
+        }*/
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE Instances_idInstance=" + id);
-        LinkedList<Integer> classes = new LinkedList<Integer>();
+        ArrayList<Integer> classes = new ArrayList<Integer>();
         while (rs.next()) {
             InstanceHasInstanceClass i = getInstanceHasInstanceClassFromResultset(rs);
-            classes.add(i.getInstanceClass().getId());
+            if(!classes.contains(i.getInstanceClass().getId()))
+                classes.add(i.getInstanceClass().getId());
         }
         relatedInstanceClasses.put(id, classes);
         return classes;
@@ -310,12 +311,24 @@ public class InstanceHasInstanceClassDAO {
 
     
     public static String getRelatedInstanceClassesString(int id) throws SQLException{        
-        LinkedList<Integer> relatedClasses = getRelatedInstanceClasses(id);
+        ArrayList<Integer> relatedClasses = getRelatedInstanceClasses(id);
         StringBuilder classesBuffer = new StringBuilder("<html> Instance class paths:");
         for(Integer ids : relatedClasses){
             classesBuffer.append("<br> " + InstanceClassDAO.getCompletePathOf(ids));
         }
         classesBuffer.append("</html>");
         return classesBuffer.toString();
+    }
+
+    private static void putToRelatedInstanceClasses(int instanceId, int instanceClassId) {
+        if(relatedInstanceClasses.containsKey(instanceId)){
+            ArrayList<Integer> classes = relatedInstanceClasses.get(instanceId);
+            if(classes.contains(instanceClassId)){
+                return;
+            }else{
+                classes.add(instanceClassId);
+                relatedInstanceClasses.put(instanceId, classes);
+            }
+        }
     }
 }
