@@ -98,7 +98,12 @@ public class SelectRealDomainPanel extends javax.swing.JPanel implements IDomain
     }
 
     @Override
-    public void setDomain(Domain domain) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setDomain(Domain orDomain, Domain andDomain) throws InvalidDomainException {
+        if (!(orDomain instanceof RealDomain) || !(andDomain instanceof RealDomain)) {
+            throw new InvalidDomainException("Got domains " + orDomain.getName() + "/" + andDomain.getName() + ", expected real/real domains.");
+        }
+        RealDomain d = (RealDomain) andDomain;
+        txtLow.setText(String.valueOf(d.getLow()));
+        txtHigh.setText(String.valueOf(d.getHigh()));
     }
 }

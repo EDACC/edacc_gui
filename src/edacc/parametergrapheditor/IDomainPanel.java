@@ -8,5 +8,5 @@ import edacc.parameterspace.domain.Domain;
  */
 public interface IDomainPanel {
     public Domain getDomain() throws InvalidDomainException;
-    public void setDomain(Domain domain);
+    public void setDomain(Domain orDomain, Domain andDomain) throws InvalidDomainException;
 }

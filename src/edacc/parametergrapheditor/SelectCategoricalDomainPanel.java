@@ -158,6 +158,13 @@ public class SelectCategoricalDomainPanel extends javax.swing.JPanel implements 
         return res;
     }
     
+    protected void setSelectedCategories(Set<String> catSet) {
+        for (int i = 0; i < model.getRowCount(); i++) {
+            model.setSelected(i, catSet.contains(model.getCategoryAt(i)));
+        }
+        model.fireTableDataChanged();
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDeselectAll;
     private javax.swing.JButton btnInvertSelection;
@@ -176,10 +183,13 @@ public class SelectCategoricalDomainPanel extends javax.swing.JPanel implements 
     }
 
     @Override
-    public void setDomain(Domain domain) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setDomain(Domain orDomain, Domain andDomain) throws InvalidDomainException {
+        if (!(orDomain instanceof CategoricalDomain) || !(andDomain instanceof CategoricalDomain)) {
+            throw new InvalidDomainException("Got domains " + orDomain.getName() + "/" + andDomain.getName() + ", expected categorical/categorical domains.");
+        }
+        setSelectedCategories(((CategoricalDomain) andDomain).getCategories());
     }
-
+    
     private class CategoricalDomainTableModel extends DefaultTableModel {
 
         private final String[] columns = {"Category", "Selected"};

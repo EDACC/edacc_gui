@@ -7,7 +7,6 @@ package edacc.parametergrapheditor;
 
 import edacc.parameterspace.Parameter;
 import edacc.parameterspace.domain.Domain;
-import javax.swing.JPanel;
 
 /**
  *
@@ -16,7 +15,7 @@ import javax.swing.JPanel;
 public class CreateAndNodeDialog extends javax.swing.JDialog implements ICreateNodeDialog {
 
     private boolean cancelled;
-    private JPanel pnlDomain;
+    private SelectDomainPanel pnlDomain;
     private Parameter parameter;
 
     /** Creates new form CreateAndNodeDialog */
@@ -29,6 +28,10 @@ public class CreateAndNodeDialog extends javax.swing.JDialog implements ICreateN
 
         pnlDomain = new SelectDomainPanel(domain);
         panel.setViewportView(pnlDomain);
+    }
+    
+    protected void loadValuesFromDomain(Domain orDomain, Domain andDomain) throws InvalidDomainException {
+        pnlDomain.setDomain(orDomain, andDomain);
     }
 
     /** This method is called from within the constructor to
@@ -139,7 +142,7 @@ public class CreateAndNodeDialog extends javax.swing.JDialog implements ICreateN
 
     @Override
     public Domain getDomain() throws InvalidDomainException {
-        return ((IDomainPanel)pnlDomain).getDomain();
+        return pnlDomain.getDomain();
     }
 
     @Override

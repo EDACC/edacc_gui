@@ -6,11 +6,11 @@
 package edacc.parametergrapheditor;
 
 import java.util.Set;
-import javax.swing.JPanel;
 import edacc.parameterspace.domain.*;
 import java.awt.BorderLayout;
 import java.util.LinkedList;
 import java.util.List;
+import javax.swing.JPanel;
 
 /**
  *
@@ -18,9 +18,10 @@ import java.util.List;
  */
 public class SelectDomainPanel extends javax.swing.JPanel implements IDomainPanel {
 
-    JPanel pnlDomain;
+    IDomainPanel pnlDomain;
     Set<String> possibleDomains;
     Domain domain;
+
     /** Creates new form SelectDomainPanel */
     public SelectDomainPanel(Domain domain) {
         initComponents();
@@ -142,15 +143,15 @@ public class SelectDomainPanel extends javax.swing.JPanel implements IDomainPane
         } else {
             pnlDomain = null;
         }
-pnlDomainParameters.removeAll();
+        pnlDomainParameters.removeAll();
         if (pnlDomain == null) {
             pnlDomainParameters.setVisible(false);
         } else {
-            pnlDomain.invalidate();
-            pnlDomain.revalidate();
+            ((JPanel) pnlDomain).invalidate();
+            ((JPanel) pnlDomain).revalidate();
             pnlDomainParameters.setVisible(true);
-            
-            pnlDomainParameters.add(pnlDomain, BorderLayout.CENTER);
+
+            pnlDomainParameters.add(((JPanel) pnlDomain), BorderLayout.CENTER);
         }
         this.invalidate();
         this.revalidate();
@@ -165,7 +166,7 @@ pnlDomainParameters.removeAll();
     @Override
     public Domain getDomain() throws InvalidDomainException {
         if (pnlDomain != null) {
-            return ((IDomainPanel) pnlDomain).getDomain();
+            return pnlDomain.getDomain();
         }
         if ("Optional".equals(comboDomain.getSelectedItem())) {
             return new OptionalDomain();
@@ -174,7 +175,45 @@ pnlDomainParameters.removeAll();
     }
 
     @Override
-    public void setDomain(Domain domain) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setDomain(Domain orDomain, Domain andDomain) throws InvalidDomainException {
+        pnlDomain = null;
+        this.domain = andDomain;
+        
+        if (domain instanceof CategoricalDomain) {
+            comboDomain.setSelectedItem("Categorical");
+            pnlDomain = new SelectCategoricalDomainPanel((CategoricalDomain) orDomain);
+        } else if (domain instanceof IntegerDomain) {
+            comboDomain.setSelectedItem("Integer");
+            pnlDomain = new SelectIntegerDomainPanel();
+        } else if (domain instanceof MixedDomain) {
+            comboDomain.setSelectedItem("Mixed");
+            pnlDomain = new SelectMixedDomainPanel(orDomain);
+        } else if (domain instanceof OrdinalDomain) {
+            comboDomain.setSelectedItem("Ordinal");
+            pnlDomain = new SelectOrdinalDomainPanel((OrdinalDomain) orDomain);
+        } else if (domain instanceof RealDomain) {
+            comboDomain.setSelectedItem("Real");
+            pnlDomain = new SelectRealDomainPanel();
+        } else if (domain instanceof FlagDomain) {
+            comboDomain.setSelectedItem("Flag");
+            pnlDomain = new SelectFlagDomainPanel();
+        }
+        
+        if (pnlDomain != null) {
+            pnlDomain.setDomain(orDomain, andDomain);
+        }
+        pnlDomainParameters.removeAll();
+        if (pnlDomain == null) {
+            pnlDomainParameters.setVisible(false);
+        } else {
+            ((JPanel) pnlDomain).invalidate();
+            ((JPanel) pnlDomain).revalidate();
+            pnlDomainParameters.setVisible(true);
+
+            pnlDomainParameters.add(((JPanel) pnlDomain), BorderLayout.CENTER);
+        }
+        this.invalidate();
+        this.revalidate();
+        this.repaint();
     }
 }

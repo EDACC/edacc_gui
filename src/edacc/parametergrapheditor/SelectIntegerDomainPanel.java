@@ -98,7 +98,12 @@ public class SelectIntegerDomainPanel extends javax.swing.JPanel implements IDom
     }
 
     @Override
-    public void setDomain(Domain domain) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setDomain(Domain orDomain, Domain andDomain) throws InvalidDomainException {
+        if (!(orDomain instanceof IntegerDomain) || !(andDomain instanceof IntegerDomain)) {
+            throw new InvalidDomainException("Got domains " + orDomain.getName() + "/" + andDomain.getName() + ", expected integer/integer domains.");
+        }
+        IntegerDomain iDomain = (IntegerDomain) andDomain;
+        txtLow.setText(String.valueOf(iDomain.getLow()));
+        txtHigh.setText(String.valueOf(iDomain.getHigh()));
     }
 }

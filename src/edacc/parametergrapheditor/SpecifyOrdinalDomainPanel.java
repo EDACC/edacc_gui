@@ -28,12 +28,12 @@ public class SpecifyOrdinalDomainPanel extends SpecifyCategoricalDomainPanel {
     }
     
     @Override
-    public void setDomain(Domain domain) {
-        if (!(domain instanceof OrdinalDomain)) {
+    public void setDomain(Domain orDomain, Domain andDomain) {
+        if (!(orDomain instanceof OrdinalDomain) || andDomain != null) {
             return;
         }
         model.clear();
-        for (String s : ((OrdinalDomain) domain).getOrdered_list()) {
+        for (String s : ((OrdinalDomain) orDomain).getOrdered_list()) {
             model.addElement(s);
         }
     }
@@ -45,7 +45,7 @@ public class SpecifyOrdinalDomainPanel extends SpecifyCategoricalDomainPanel {
         EDACCApp.getApplication().show(dialog);
         Parameter p;
         if ((p = dialog.getSelectedItem()) != null && p.getDomain() instanceof OrdinalDomain) {
-            this.setDomain(p.getDomain());
+            this.setDomain(p.getDomain(), null);
         }
     }
     

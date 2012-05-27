@@ -141,15 +141,19 @@ public class SpecifyMixedDomainPanel extends javax.swing.JPanel implements IDoma
     }
 
     @Override
-    public void setDomain(Domain domain) {
-        if (!(domain instanceof MixedDomain)) {
+    public void setDomain(Domain orDomain, Domain andDomain) {
+        if (!(orDomain instanceof MixedDomain) || andDomain != null) {
             return;
         }
-        for (Domain d : ((MixedDomain) domain).getDomains()) {
+        for (Domain d : ((MixedDomain) orDomain).getDomains()) {
             for (int i = getComponentCount() - 1; i >= 0; i--) {
                 if (getComponent(i) instanceof SpecifyDomainPanel && "".equals(((SpecifyDomainPanel) getComponent(i)).comboDomain.getSelectedItem())) {
                     ((SpecifyDomainPanel) getComponent(i)).comboDomain.setSelectedItem(d.getName());
-                    ((SpecifyDomainPanel) getComponent(i)).setDomain(d);
+                    try {
+                    ((SpecifyDomainPanel) getComponent(i)).setDomain(orDomain, null);
+                    } catch (Exception ex) {
+                        //TODO: error
+                    }
                     break;
                 }
             }

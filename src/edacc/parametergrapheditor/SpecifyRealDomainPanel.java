@@ -101,7 +101,7 @@ public class SpecifyRealDomainPanel extends javax.swing.JPanel implements IDomai
         EDACCApp.getApplication().show(dialog);
         Parameter p;
         if ((p = dialog.getSelectedItem()) != null && p.getDomain() instanceof RealDomain) {
-            this.setDomain(p.getDomain());
+            this.setDomain(p.getDomain(), null);
         }
     }//GEN-LAST:event_btnUseDomainActionPerformed
 
@@ -125,11 +125,11 @@ public class SpecifyRealDomainPanel extends javax.swing.JPanel implements IDomai
     }
 
     @Override
-    public void setDomain(Domain domain) {
-        if (!(domain instanceof RealDomain)) {
+    public void setDomain(Domain orDomain, Domain andDomain) {
+        if (!(orDomain instanceof RealDomain) || andDomain != null) {
             return;
         }
-        RealDomain rDomain = (RealDomain) domain;
+        RealDomain rDomain = (RealDomain) orDomain;
         txtLow.setText("" + rDomain.getLow());
         txtHigh.setText("" + rDomain.getHigh());
     }

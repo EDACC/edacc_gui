@@ -29,11 +29,11 @@ public class SpecifyDomainPanel extends javax.swing.JPanel implements IDomainPan
     }
 
     @Override
-    public void setDomain(Domain domain) {
-        comboDomain.setSelectedItem(domain.getName());
+    public void setDomain(Domain orDomain, Domain andDomain) throws InvalidDomainException {
+        comboDomain.setSelectedItem(orDomain.getName());
         // null for Flag/Optional domain
         if (pnlDomain != null) {
-            ((IDomainPanel) pnlDomain).setDomain(domain);
+            ((IDomainPanel) pnlDomain).setDomain(orDomain, andDomain);
         }
     }
 

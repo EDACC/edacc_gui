@@ -22,8 +22,8 @@ public class SelectMixedDomainPanel extends javax.swing.JPanel implements IDomai
 
     private GridBagConstraints c;
     private GridBagLayout layout;
-
     private Domain domain;
+
     /** Creates new form SelectMixedDomainPanel */
     public SelectMixedDomainPanel(Domain domain) {
         initComponents();
@@ -126,16 +126,50 @@ public class SelectMixedDomainPanel extends javax.swing.JPanel implements IDomai
             throw new InvalidDomainException("You have to select at least one domain for a mixed domain.");
         }
         LinkedList<Domain> domains = new LinkedList<Domain>();
-        
+
         // last domain is an invalid domain (-1)
-        for (int i = 0; i < getComponentCount()-1; i++) {
+        for (int i = 0; i < getComponentCount() - 1; i++) {
             domains.add(((IDomainPanel) getComponent(i)).getDomain());
         }
         return new MixedDomain(domains);
     }
 
     @Override
-    public void setDomain(Domain domain) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setDomain(Domain orDomain, Domain andDomain) throws InvalidDomainException {
+        if (!(andDomain instanceof MixedDomain)) {
+            throw new InvalidDomainException("Got " + andDomain.getName() + ", expected mixed domain.");
+        }
+        this.removeAll();
+        this.domain = orDomain;
+        
+        MixedDomain mDomain = (MixedDomain) andDomain;
+
+        for (Domain d : mDomain.getDomains()) {
+            SelectDomainPanel panel = new SelectDomainPanel(orDomain);
+            panel.setDomain(orDomain, d);
+            panel.comboDomain.removeItem("Mixed");
+            panel.comboDomain.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    comboDomainActionPerformed(e);
+                }
+            });
+            add(panel, c);
+        }
+        SelectDomainPanel panel = new SelectDomainPanel(domain);
+        panel.comboDomain.removeItem("Mixed");
+        panel.comboDomain.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                comboDomainActionPerformed(e);
+            }
+        });
+        add(panel, c);
+        setGridBagConstraints();
+        invalidate();
+        revalidate();
+        repaint();
     }
 }

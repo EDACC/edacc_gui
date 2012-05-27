@@ -184,7 +184,7 @@ public class SpecifyCategoricalDomainPanel extends javax.swing.JPanel implements
         EDACCApp.getApplication().show(dialog);
         Parameter p;
         if ((p = dialog.getSelectedItem()) != null && p.getDomain() instanceof CategoricalDomain) {
-            this.setDomain(p.getDomain());
+            this.setDomain(p.getDomain(), null);
         }
     }
     
@@ -211,12 +211,12 @@ public class SpecifyCategoricalDomainPanel extends javax.swing.JPanel implements
     }
 
     @Override
-    public void setDomain(Domain domain) {
-        if (!(domain instanceof CategoricalDomain)) {
+    public void setDomain(Domain orDomain, Domain andDomain) {
+        if (!(orDomain instanceof CategoricalDomain) || andDomain != null) {
             return;
         }
         model.clear();
-        for (String s : ((CategoricalDomain) domain).getCategories()) {
+        for (String s : ((CategoricalDomain) orDomain).getCategories()) {
             model.addElement(s);
         }
     }

@@ -83,7 +83,12 @@ public class SelectFlagDomainPanel extends javax.swing.JPanel implements IDomain
     }
 
     @Override
-    public void setDomain(Domain domain) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setDomain(Domain orDomain, Domain andDomain) throws InvalidDomainException {
+        if (!(orDomain instanceof FlagDomain) || !(andDomain instanceof FlagDomain)) {
+            throw new InvalidDomainException("Got domains " + orDomain.getName() + "/" + andDomain.getName() + ", expected flag/flag domains.");
+        }
+        FlagDomain fDomain = (FlagDomain) andDomain;
+        chkOn.setSelected(fDomain.getValues().contains(FlagDomain.FLAGS.ON));
+        chkOff.setSelected(fDomain.getValues().contains(FlagDomain.FLAGS.OFF));
     }
 }

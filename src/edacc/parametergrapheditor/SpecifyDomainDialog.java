@@ -32,7 +32,11 @@ public class SpecifyDomainDialog extends javax.swing.JDialog {
         for (Parameter param : savedParams) {
             SpecifyDomainPanel domainPanel = new SpecifyDomainPanel(this);
             domainPanels.put(param.getName(), domainPanel);
-            domainPanel.setDomain(param.getDomain());
+            try {
+                domainPanel.setDomain(param.getDomain(), null);
+            } catch (Exception ex) {
+                //TODO: error
+            }
         }
 
         comboParameter.removeAllItems();

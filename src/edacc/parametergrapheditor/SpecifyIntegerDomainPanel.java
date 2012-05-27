@@ -101,7 +101,7 @@ public class SpecifyIntegerDomainPanel extends javax.swing.JPanel implements IDo
         EDACCApp.getApplication().show(dialog);
         Parameter p;
         if ((p = dialog.getSelectedItem()) != null && p.getDomain() instanceof IntegerDomain) {
-            this.setDomain(p.getDomain());
+            this.setDomain(p.getDomain(), null);
         }
     }//GEN-LAST:event_btnUseDomainActionPerformed
 
@@ -125,11 +125,11 @@ public class SpecifyIntegerDomainPanel extends javax.swing.JPanel implements IDo
     }
 
     @Override
-    public void setDomain(Domain domain) {
-        if (!(domain instanceof IntegerDomain)) {
+    public void setDomain(Domain orDomain, Domain andDomain) {
+        if (!(orDomain instanceof IntegerDomain) || andDomain != null) {
             return;
         }
-        IntegerDomain iDomain = (IntegerDomain) domain;
+        IntegerDomain iDomain = (IntegerDomain) orDomain;
         txtLow.setText("" + iDomain.getLow());
         txtHigh.setText("" + iDomain.getHigh());
     }

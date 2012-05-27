@@ -161,6 +161,11 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                             }
                             graph.getModel().setValue(cell, edge);
                         } else if (cell.isVertex()) {
+                            if (cell != rootNode && cell.getValue() instanceof AndNode) {
+                                editAndNode((AndNode) cell.getValue());
+                                graph.updateCellSize(cell);
+                                graph.refresh();
+                            }
                         }
                     }
                 }
@@ -359,6 +364,33 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             }
         }
         return domain;
+    }
+
+    private void editAndNode(AndNode node) {
+        CreateAndNodeDialog dialog = new CreateAndNodeDialog(new javax.swing.JFrame(), true, node.getParameter(), node.getParameter().getDomain());
+        try {
+            dialog.loadValuesFromDomain(node.getParameter().getDomain(), node.getDomain());
+        } catch (Exception ex) {
+            // TODO: error?
+            ex.printStackTrace();
+            return;
+        }
+        dialog.setLocationRelativeTo(ParameterGraphEditor.this);
+        dialog.setSize(new Dimension(800, 600));
+        dialog.setVisible(true);
+        Domain domain = null;
+        while (!dialog.isCancelled() && domain == null) {
+            try {
+                domain = dialog.getDomain();
+                break;
+            } catch (InvalidDomainException ex) {
+                JOptionPane.showMessageDialog(ParameterGraphEditor.this, ex.getMessage(), "Invalid Domain", JOptionPane.ERROR_MESSAGE);
+                ((JDialog) dialog).setVisible(true);
+            }
+        }
+        if (domain != null) {
+            node.setDomain(domain);
+        }
     }
 
     private String domainToString(Domain domain) {
@@ -594,7 +626,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         Float f = Float.valueOf(sVersion);
         if (f > 1.69) {
             JOptionPane.showMessageDialog(this, "Saving a parameter graph with jdk 1.7 or higher is currently not supported.", "Error", JOptionPane.ERROR_MESSAGE);
-            return ;
+            return;
         }
 
         try {
