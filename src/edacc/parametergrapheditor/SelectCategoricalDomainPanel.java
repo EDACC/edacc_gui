@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * SelectCatgoricalDomainPanel.java
  *
  * Created on 04.07.2011, 11:00:22
@@ -12,7 +7,6 @@ package edacc.parametergrapheditor;
 
 import edacc.parameterspace.domain.CategoricalDomain;
 import edacc.parameterspace.domain.Domain;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -62,6 +56,7 @@ public class SelectCategoricalDomainPanel extends javax.swing.JPanel implements 
 
         jScrollPane1.setName("jScrollPane1"); // NOI18N
 
+        tblCategories.setAutoCreateRowSorter(true);
         tblCategories.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
