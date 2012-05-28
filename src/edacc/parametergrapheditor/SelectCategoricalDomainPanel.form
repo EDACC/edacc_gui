@@ -19,28 +19,28 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jScrollPane1" alignment="0" pref="472" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
-              <Component id="btnSelectAll" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="btnDeselectAll" min="-2" max="-2" attributes="0"/>
+              <Component id="btnSelectAll" linkSize="1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="btnInvertSelection" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="189" max="-2" attributes="0"/>
+              <Component id="btnDeselectAll" linkSize="1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="btnInvertSelection" linkSize="1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="368" max="32767" attributes="0"/>
           </Group>
+          <Component id="jScrollPane1" alignment="0" pref="717" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <Component id="jScrollPane1" min="-2" pref="249" max="-2" attributes="0"/>
+          <Group type="102" alignment="1" attributes="0">
+              <Component id="jScrollPane1" pref="214" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnSelectAll" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnDeselectAll" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnInvertSelection" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
