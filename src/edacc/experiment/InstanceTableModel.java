@@ -362,6 +362,7 @@ public class InstanceTableModel extends ThreadSafeDefaultTableModel {
         res[0] = true;
         res[1] = true;
         res[2] = true;
+        res[3] = true;
         return res;
     }  
 }

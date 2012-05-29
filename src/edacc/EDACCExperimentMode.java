@@ -2602,7 +2602,9 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         List<SortKey> sortKeys = (List<SortKey>) tableInstances.getRowSorter().getSortKeys();
         List<String> columnNames = new ArrayList<String>();
         for (SortKey sk : sortKeys) {
-            columnNames.add(tableInstances.getColumnName(tableInstances.convertColumnIndexToView(sk.getColumn())));
+            // TODO: why column names?
+            if (tableInstances.convertColumnIndexToView(sk.getColumn()) != -1) 
+                columnNames.add(tableInstances.getColumnName(tableInstances.convertColumnIndexToView(sk.getColumn())));
         }
         EDACCInstanceColumnSelection dialog = new EDACCInstanceColumnSelection(EDACCApp.getApplication().getMainFrame(), true, instanceColumnSelector);
         dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
