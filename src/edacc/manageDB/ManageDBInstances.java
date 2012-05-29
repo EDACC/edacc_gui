@@ -133,8 +133,7 @@ public class ManageDBInstances implements Observer {
             }
         }
     }
-    
-    
+
     /**
      * 
      * @param input
@@ -752,8 +751,6 @@ public class ManageDBInstances implements Observer {
     }
 
     public void update(Observable o, Object arg) {
-        /* this.main.instanceTableModel.clearTable();
-        this.main.instanceClassTableModel.clearTable();*/
     }
 
     public void showInstanceClassButtons(boolean enable) {
@@ -1176,12 +1173,12 @@ public class ManageDBInstances implements Observer {
     }
 
     public void HandlerAddInstance() {
-        if(!duplicate.isEmpty()){
-                    JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
-        EDACCAddInstanceErrorDialog errorDialog = new EDACCAddInstanceErrorDialog(mainFrame, true);       
-        errorDialog.initialize(duplicate, classes);
-        EDACCApp.getApplication().show(errorDialog);
-        }      
+        if (!duplicate.isEmpty()) {
+            JFrame mainFrame = EDACCApp.getApplication().getMainFrame();
+            EDACCAddInstanceErrorDialog errorDialog = new EDACCAddInstanceErrorDialog(mainFrame, true);
+            errorDialog.initialize(duplicate, classes);
+            EDACCApp.getApplication().show(errorDialog);
+        }
     }
 
     public void setClasses(HashMap<Instance, InstanceClass> classes) {

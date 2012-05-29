@@ -13,6 +13,8 @@ import edacc.model.Tasks;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.table.TableRowSorter;
 
 /**
@@ -35,7 +37,7 @@ public class AddInstanceErrorController {
 
 
         ArrayList<Instance> toAdd = new ArrayList<Instance>(duplicate.keySet());
-        toAddModel = new InstanceErrorTableModel(toAdd);
+        toAddModel = new InstanceErrorTableModel(toAdd, this);
         toAddSorter = new TableRowSorter<InstanceErrorTableModel>();
 
         this.instanceClasses = instanceClasses;
@@ -84,8 +86,8 @@ public class AddInstanceErrorController {
     }
 
     public void add(int[] row) {
-       Tasks.startTask("tryToAdd", new Class[]{row.getClass(), edacc.model.Tasks.class}, 
-               new Object[]{row, null}, this, this.main);
+        Tasks.startTask("tryToAdd", new Class[]{row.getClass(), edacc.model.Tasks.class},
+                new Object[]{row, null}, this, this.main);
     }
 
     /**
@@ -206,5 +208,27 @@ public class AddInstanceErrorController {
         row = main.ToAddTableConvertRowToModel(row);
         Instance linked = toAddModel.getInstance(row);
         return duplicateModel.isLinked(linked);
+    }
+
+    public String getErrorType(Instance i) {
+        String ret = "";
+
+        ArrayList<Instance> list = duplicateModel.getDupInstances(i);
+        for (Instance inst : list) {
+            if (i.getMd5().equals(inst.getMd5())) {
+                if (ret.equals("Name")) {
+                    return "Both";
+                }
+                ret = "MD5";
+            }
+            if (i.getName().equals(inst.getName())) {
+                if (ret.equals("MD5")) {
+                    return "Both";
+                }
+                ret = "Name";
+            }
+        }
+        return ret;
+
     }
 }

@@ -15,14 +15,17 @@ import javax.swing.table.DefaultTableModel;
  */
 public class InstanceErrorTableModel extends DefaultTableModel {
 
-    private String[] columns = {"Name", "MD5"};
+    private String[] columns = {"Error", "Name", "MD5"};
     private ArrayList<Instance> instances = new ArrayList<Instance>();
+    AddInstanceErrorController controller;
 
     public InstanceErrorTableModel() {
+        
     }
 
-    InstanceErrorTableModel(ArrayList<Instance> toAdd) {
+    InstanceErrorTableModel(ArrayList<Instance> toAdd, AddInstanceErrorController controller) {
         this.instances = toAdd;
+        this.controller = controller;
     }
 
     @Override
@@ -48,16 +51,18 @@ public class InstanceErrorTableModel extends DefaultTableModel {
         if (instances.isEmpty()) {
             return String.class;
         } else {
-            return getValueAt(0, col).getClass();
+            return getValueAt(1, col).getClass();
         }
     }
 
     @Override
     public Object getValueAt(int row, int col) {
         switch (col) {
-            case 0:
-                return instances.get(row).getName();
+            case 0: 
+                return controller.getErrorType(instances.get(row));
             case 1:
+                return instances.get(row).getName();
+            case 2:
                 return instances.get(row).getMd5();
             default:
                 return "";

@@ -5,6 +5,7 @@
 package edacc.manageDB;
 
 import edacc.model.Instance;
+import edacc.model.InstanceDAO;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -159,8 +160,12 @@ public class InstanceDupErrorTableModel extends DefaultTableModel {
     /**
      * Returns the error causing instance object which is related to the given duplicate Instance
      */
-    public ArrayList<Instance> getRelatedErrorInstance(int id) throws SQLException {
-        return relatedInstances.get(instances.get(id));
+    public ArrayList<Instance> getRelatedErrorInstance(int row) {
+        return relatedInstances.get(instances.get(row));
+    }
+    
+    public ArrayList<Instance> getDupInstances(Instance i){
+        return backRelation.get(i);
     }
 
     /**
