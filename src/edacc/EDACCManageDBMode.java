@@ -1640,6 +1640,7 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
 
         jScrollPane5.setName("jScrollPane5"); // NOI18N
 
+        tableVerifiers.setAutoCreateRowSorter(true);
         tableVerifiers.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -1652,6 +1653,11 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             }
         ));
         tableVerifiers.setName("tableVerifiers"); // NOI18N
+        tableVerifiers.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableVerifiersMouseClicked(evt);
+            }
+        });
         jScrollPane5.setViewportView(tableVerifiers);
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -2590,6 +2596,13 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
             jTreeInstanceClass.collapseRow(row);
         }
     }//GEN-LAST:event_jMICollapseAllActionPerformed
+
+    private void tableVerifiersMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableVerifiersMouseClicked
+        if (evt.getClickCount() >= 2) {
+            evt.consume();
+            btnEditVerifierActionPerformed(null);
+        }
+    }//GEN-LAST:event_tableVerifiersMouseClicked
 
     private void parameterChanged() {
         int selectedRow = tableParameters.getSelectedRow();

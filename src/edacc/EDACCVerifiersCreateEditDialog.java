@@ -273,6 +273,7 @@ public class EDACCVerifiersCreateEditDialog extends javax.swing.JDialog {
         jScrollPane1.setName("jScrollPane1"); // NOI18N
         jScrollPane1.setPreferredSize(new java.awt.Dimension(0, 0));
 
+        tableParameters.setAutoCreateRowSorter(true);
         tableParameters.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
