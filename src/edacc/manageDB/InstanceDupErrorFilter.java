@@ -21,7 +21,7 @@ import javax.swing.table.TableRowSorter;
 public class InstanceDupErrorFilter extends RowFilter<InstanceDupErrorTableModel, Integer> {
 
     private InstanceDupErrorTableModel model;
-    private Instance selectedInstance ;
+    private Instance selectedInstance;
     private TableRowSorter< ? extends TableModel> rowSorter;
     private RowFilter<Object, Object> rowFilter;
 
@@ -29,26 +29,23 @@ public class InstanceDupErrorFilter extends RowFilter<InstanceDupErrorTableModel
         this.model = model;
         selectedInstance = null;
 
-       
+
     }
 
     public void setSelectedInstance(Instance selectedInstance) {
-        this.selectedInstance= selectedInstance;
+        this.selectedInstance = selectedInstance;
     }
 
     @Override
     public boolean include(Entry<? extends InstanceDupErrorTableModel, ? extends Integer> entry) {
-        try {
-                    ArrayList<Instance> instances = model.getRelatedErrorInstance((Integer) entry.getIdentifier());
-                    if(instances == null)
-                        return false;
-                                
-                    if (instances.contains(selectedInstance)) {
-                        return true;
-                    }
-                } catch (SQLException ex) {
-                    Logger.getLogger(InstanceDupErrorFilter.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                return false;
+        ArrayList<Instance> instances = model.getRelatedErrorInstance((Integer) entry.getIdentifier());
+        if (instances == null) {
+            return false;
+        }
+
+        if (instances.contains(selectedInstance)) {
+            return true;
+        }
+        return false;
     }
 }
