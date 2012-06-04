@@ -384,10 +384,13 @@ public class InstanceDAO {
 
             i.setSaved();
             cache.cache(i);
+            rs.close();
+            st.close();
             return i;
         }
 
         rs.close();
+        st.close();
         return null;
     }
 

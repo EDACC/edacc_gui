@@ -296,27 +296,6 @@ public class PropertyDAO {
         return res;
     }
 
-    /**
-     *
-     * @param name of the requested Property
-     * @return The property with the given name from the database
-     * @throws NoConnectionToDBException
-     * @throws SQLException
-     * @throws PropertyNotInDBException
-     * @throws PropertyNotInDBException
-     * @throws PropertyTypeNotExistException
-     * @throws IOException
-     */
-    public static Property getByName(String name) throws NoConnectionToDBException, SQLException, PropertyNotInDBException,
-            PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException {
-        PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
-                "SELECT idProperty FROM " + table + " WHERE name=?;");
-        ps.setString(1, name);
-        ResultSet rs = ps.executeQuery();
-        rs.next();
-        return getById(rs.getInt("idProperty"));
-    }
-
     private static Vector<String> getRegularExpressions(int id) throws NoConnectionToDBException, SQLException {
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT regexpr FROM PropertyRegExp WHERE idProperty=?;");
@@ -343,6 +322,7 @@ public class PropertyDAO {
             ps.setString(2, regularExpression.get(i));
             ps.executeUpdate();
         }
+        ps.close();
     }
 
     /**

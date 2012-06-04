@@ -104,57 +104,12 @@ public class InstanceHasPropertyDAO {
         save(i);
     }
 
-    private static Vector<InstanceHasProperty> getInstanceHasInstanceClassByInstancePropertyName(String propertyName) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
-        Vector<InstanceHasProperty> res = new Vector<InstanceHasProperty>();
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idInstanceProperty=?");
-        st.setString(1, propertyName);
-        ResultSet rs = st.executeQuery();
-        while (rs.next()) {
-            InstanceHasProperty i = getInstanceHasInstancePropertyFromResultSet(rs);
-            InstanceHasProperty c = cache.getCached(i.getId());
-            if (c != null) {
-                res.add(c);
-            } else {
-                i.setSaved();
-                cache.cache(i);
-                res.add(i);
-            }
-        }
-        return res;
-    }
-
     private static InstanceHasProperty getInstanceHasInstancePropertyFromResultSet(ResultSet rs) throws SQLException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
         rs.next();
         Instance i = InstanceDAO.getById(rs.getInt("idInstance"));
         Property p = PropertyDAO.getById(rs.getInt("idProperty"));
         String value = rs.getString("value");
         return new InstanceHasProperty(i, p, value);
-    }
-
-    private static Vector<InstanceHasProperty> getInstanceHasInstancePropertyByInstanceId(int id) throws SQLException, InstanceClassMustBeSourceException, IOException, NoConnectionToDBException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
-        Vector<InstanceHasProperty> res = new Vector<InstanceHasProperty>();
-        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT * FROM " + table + " WHERE idInstance=?");
-        st.setInt(1, id);
-        ResultSet rs = st.executeQuery();
-        while (rs.next()) {
-            InstanceHasProperty i = getInstanceHasInstancePropertyFromResultSet(rs);
-            InstanceHasProperty c = cache.getCached(i.getId());
-            if (c != null) {
-                res.add(c);
-            } else {
-                i.setSaved();
-                cache.cache(i);
-                if (idCache.get(i.getInstance().getId()) == null) {
-                    HashMap tmp = new HashMap();
-                    tmp.put(i.getProperty().getId(), i.getId());
-                    idCache.put(i.getInstance().getId(), tmp);
-                } else {
-                    idCache.get(i.getInstance().getId()).put(i.getProperty().getId(), i.getId());
-                }
-                res.add(i);
-            }
-        }
-        return res;
     }
 
     public static void assign(ArrayList<Instance> inst) throws SQLException {
@@ -204,6 +159,8 @@ public class InstanceHasPropertyDAO {
                 instance.getPropertyValues().put(idInstanceProperty, ihip);
             }
         }
+        rs.close();
+        ps.close();
     }
 
     public static void removeAllOfProperty(Property r) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
@@ -217,6 +174,8 @@ public class InstanceHasPropertyDAO {
         while (rs.next()) {
             removeInstanceHasInstancePropertyFromCache(rs.getInt(1));
         }
+        rs.close();
+        ps.close();
     }
 
     public static InstanceHasProperty getById(int id) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException {
@@ -232,6 +191,8 @@ public class InstanceHasPropertyDAO {
         res.setSaved();
         cache.cache(res);
         idCache.get(res.getInstance().getId()).put(res.getProperty().getId(), res.getId());
+        rs.close();
+        ps.close();
         return res;
     }
 
@@ -287,7 +248,8 @@ public class InstanceHasPropertyDAO {
             }
 
         }
-
+        rs.close();
+        ps.close();
     }
 
     public static void clearCache() {
@@ -376,6 +338,7 @@ public class InstanceHasPropertyDAO {
             st.setInt(2, i.getInstance().getId());
             st.setInt(3, i.getProperty().getId());
             st.executeUpdate();
+            i.setSaved();
             return;
         } else {
             st = null;
