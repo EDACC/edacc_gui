@@ -14,6 +14,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -112,11 +114,14 @@ public class InstanceHasPropertyDAO {
         return new InstanceHasProperty(i, p, value);
     }
 
-    public static void assign(ArrayList<Instance> inst) throws SQLException {
+    public static void assign(List<Instance> inst) throws SQLException {
         HashMap<Integer, Instance> instances = new HashMap<Integer, Instance>();
+        List<Integer> instanceIds = new LinkedList<Integer>();
+        
         for (Instance i : inst) {
             i.setPropertyValues(new HashMap<Integer, InstanceHasProperty>());
             instances.put(i.getId(), i);
+            instanceIds.add(i.getId());
         }
 
         HashMap<Integer, Property> instanceProperties = new HashMap<Integer, Property>();
@@ -127,11 +132,14 @@ public class InstanceHasPropertyDAO {
         } catch (Exception e) {
             throw new SQLException(e.getMessage() + e.getClass());
         }
+        
+        
 
         PreparedStatement ps = DatabaseConnector.getInstance().getConn().prepareStatement(
                 "SELECT ihp.id, ihp.idInstance, ihp.idProperty, ihp.value "
                 + "FROM Instance_has_Property AS ihp "
-                + "LEFT JOIN Instances AS i ON (ihp.idInstance = i.idInstance)");
+                + "LEFT JOIN Instances AS i ON (ihp.idInstance = i.idInstance) "
+                + "WHERE i.idInstance IN (" + edacc.experiment.Util.getIdArray(instanceIds) + ")");
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
             int id = rs.getInt(1);
