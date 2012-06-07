@@ -115,6 +115,9 @@ public class InstanceHasPropertyDAO {
     }
 
     public static void assign(List<Instance> inst) throws SQLException {
+        if (inst.isEmpty()) {
+            return;
+        }
         HashMap<Integer, Instance> instances = new HashMap<Integer, Instance>();
         List<Integer> instanceIds = new LinkedList<Integer>();
         
