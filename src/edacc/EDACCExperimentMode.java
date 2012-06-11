@@ -3575,6 +3575,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             JOptionPane.showMessageDialog(EDACCExperimentMode.this, "Please save the configuration scenario before viewer the output of the configurator.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        try {
+            expController.refreshConfiguratorOutput();
+        } catch (Exception ex) {
+        }
         EDACCOutputViewer viewer = new EDACCOutputViewer(EDACCApp.getApplication().getMainFrame(), true, expController.getConfigScenario());
         viewer.setName("EDACCOutputViewer");
         EDACCApp.getApplication().show(viewer);

@@ -2042,6 +2042,12 @@ public class ExperimentController {
     public ConfigurationScenario getConfigScenario() {
         return configScenario;
     }
+    
+    public void refreshConfiguratorOutput() throws SQLException {
+        if (configScenario != null) {
+            ConfigurationScenarioDAO.updateConfiguratorOutput(configScenario);
+        }
+    }
 
     public void reloadConfigurationScenario() throws SQLException {
         configScenario = ConfigurationScenarioDAO.getConfigurationScenarioByExperimentId(activeExperiment.getId());

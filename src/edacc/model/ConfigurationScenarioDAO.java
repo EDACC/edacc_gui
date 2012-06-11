@@ -154,4 +154,15 @@ public class ConfigurationScenarioDAO {
     public static boolean configurationScenarioParameterIsSaved(ConfigurationScenarioParameter param) {
         return param.isSaved();
     }
+
+    public static void updateConfiguratorOutput(ConfigurationScenario configScenario) throws SQLException {
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement("SELECT configuratorOutput FROM " + table + " WHERE idConfigurationScenario=?");
+        st.setInt(1, configScenario.getId());
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            configScenario.setConfiguratorOutput(rs.getString(1));
+        }
+        rs.close();
+        st.close();
+    }
 }
