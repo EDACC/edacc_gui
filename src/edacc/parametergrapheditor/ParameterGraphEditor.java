@@ -70,7 +70,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         this.solver = solver;
         solverParameters = new ArrayList<String>();
         for (edacc.model.Parameter param : ParameterDAO.getParameterFromSolverId(solver.getId())) {
-            if (!"instance".equals(param.getName()) && !"seed".equals(param.getName())) {
+            if (!edacc.experiment.Util.isMagicSolverParameter(param.getName())) {
                 solverParameters.add(param.getName());
             }
         }
@@ -229,10 +229,10 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                                                     graph.refresh();
 
                                                 } catch (Exception ex) {
+                                                    EDACCApp.getLogger().logException(ex);
                                                     graph.getModel().remove(child);
                                                     graph.setSelectionCell(null);
                                                     graph.refresh();
-                                                    ex.printStackTrace();
                                                 }
                                             }
                                         }
@@ -293,7 +293,8 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
         try {
             loadParameterGraph(parameterGraph);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Could not load parameter graph!", "Error", JOptionPane.ERROR_MESSAGE);
+            EDACCApp.getLogger().logException(ex);
+            JOptionPane.showMessageDialog(parent, "Could not load parameter graph!", "Error", JOptionPane.ERROR_MESSAGE);
             graph.removeCells(graph.getChildCells(graph.getDefaultParent()));
             // create root node:
             graph.updateCellSize(rootNode = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, new AndNode(null, null), 20, 20, 80, 30));
@@ -359,6 +360,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                 domain = dialog.getDomain();
                 break;
             } catch (InvalidDomainException ex) {
+                EDACCApp.getLogger().logException(ex);
                 JOptionPane.showMessageDialog(ParameterGraphEditor.this, ex.getMessage(), "Invalid Domain", JOptionPane.ERROR_MESSAGE);
                 ((JDialog) dialog).setVisible(true);
             }
@@ -372,7 +374,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             dialog.loadValuesFromDomain(node.getParameter().getDomain(), node.getDomain());
         } catch (Exception ex) {
             // TODO: error?
-            ex.printStackTrace();
+            EDACCApp.getLogger().logException(ex);
             return;
         }
         dialog.setLocationRelativeTo(ParameterGraphEditor.this);
@@ -384,6 +386,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                 domain = dialog.getDomain();
                 break;
             } catch (InvalidDomainException ex) {
+                EDACCApp.getLogger().logException(ex);
                 JOptionPane.showMessageDialog(ParameterGraphEditor.this, ex.getMessage(), "Invalid Domain", JOptionPane.ERROR_MESSAGE);
                 ((JDialog) dialog).setVisible(true);
             }
@@ -635,9 +638,11 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                 ParameterGraphDAO.saveParameterGraph(parameterGraph, solver);
                 JOptionPane.showMessageDialog(this, "Saved.", "Information", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception ex) {
+                EDACCApp.getLogger().logException(ex);
                 JOptionPane.showMessageDialog(this, "Error while saving:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         } catch (Exception ex) {
+            EDACCApp.getLogger().logException(ex);
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnSaveActionPerformed
@@ -742,6 +747,7 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
             try {
                 parameterGraph = getParameterGraph();
             } catch (Exception ex) {
+                EDACCApp.getLogger().logException(ex);
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -749,10 +755,13 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                 ParameterGraphDAO.saveParameterGraph(f, parameterGraph);
                 JOptionPane.showMessageDialog(this, "Saved.", "Saved", JOptionPane.INFORMATION_MESSAGE);
             } catch (JAXBException ex) {
+                EDACCApp.getLogger().logException(ex);
                 JOptionPane.showMessageDialog(this, "Error while generating XML file. Graph invalid?", "Error", JOptionPane.ERROR_MESSAGE);
             } catch (FileNotFoundException ex) {
+                EDACCApp.getLogger().logException(ex);
                 JOptionPane.showMessageDialog(this, "File not found: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             } catch (IOException ex) {
+                EDACCApp.getLogger().logException(ex);
                 JOptionPane.showMessageDialog(this, "Error while writing file.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -781,8 +790,10 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
                 loadParameterGraph(parameterGraph);
                 JOptionPane.showMessageDialog(this, "Graph has been loaded.", "Loaded", JOptionPane.INFORMATION_MESSAGE);
             } catch (FileNotFoundException ex) {
+                EDACCApp.getLogger().logException(ex);
                 JOptionPane.showMessageDialog(this, "File not found: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             } catch (JAXBException ex) {
+                EDACCApp.getLogger().logException(ex);
                 JOptionPane.showMessageDialog(this, "Error while loading XML file. File invalid?", "Error", JOptionPane.ERROR_MESSAGE);
             }
 

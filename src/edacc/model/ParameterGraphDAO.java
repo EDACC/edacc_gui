@@ -193,7 +193,7 @@ public class ParameterGraphDAO {
                 ParameterConfiguration config = configs.get(i);
                 for (ConfigurationScenarioParameter param : cs.getParameters()) {
                     ParameterInstance pi = new ParameterInstance();
-                    if ("instance".equals(param.getParameter().getName()) || "seed".equals(param.getParameter().getName())) {
+                    if (edacc.experiment.Util.isMagicSolverParameter(param.getParameter().getName())) {
                         pi.setParameter_id(param.getParameter().getId());
                         pi.setSolverConfiguration(solver_config);
                         pi.setValue("");

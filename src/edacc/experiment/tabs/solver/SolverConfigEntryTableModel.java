@@ -139,10 +139,8 @@ public class SolverConfigEntryTableModel extends ThreadSafeDefaultTableModel {
             return !parameters[row].isMandatory();
         }
         if (col == 3 && parameters[row].getHasValue()) {
-            for (String s : edacc.experiment.Util.constSolverParameters) {
-                if (s.equals(parameters[row].getName().toLowerCase())) {
-                    return false;
-                }
+            if (edacc.experiment.Util.isMagicSolverParameter(parameters[row].getName())) {
+                return false;
             }
             return selected[row];
         }
@@ -211,15 +209,15 @@ public class SolverConfigEntryTableModel extends ThreadSafeDefaultTableModel {
         }
         return res;
     }
-    
+
     public boolean isSelected(int row) {
         return selected[row];
     }
-    
+
     public Parameter getParameterAt(int row) {
         return parameters[row];
     }
-    
+
     public String getValueAt(int row) {
         return values[row];
     }

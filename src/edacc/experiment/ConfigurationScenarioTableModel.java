@@ -102,7 +102,7 @@ public class ConfigurationScenarioTableModel extends ThreadSafeDefaultTableModel
             return true;
         }
         if ((Boolean) getValueAt(row, COL_SELECTED) && column == COL_FIXEDVALUE) {
-            if ("instance".equals(parameters.get(row).getName()) || "seed".equals(parameters.get(row).getName())) {
+            if (edacc.experiment.Util.isMagicSolverParameter(parameters.get(row).getName())) {
                 return false;
             }
             return true;

@@ -131,9 +131,8 @@ public class SolverConfigurationEntry {
     }
 
     public boolean hasEmptyValues() {
-        for (int i = 0; i < tableModel.getRowCount(); i++) {
-            if ("instance".equals((String) tableModel.getValueAt(i, 1))
-                    || "seed".equals((String) tableModel.getValueAt(i, 1))) {
+        for (int i = 0; i < tableModel.getRowCount(); i++) {            
+            if (edacc.experiment.Util.isMagicSolverParameter((String) tableModel.getValueAt(i, 1))) {
                 continue;
             }
             if ((Boolean) tableModel.getValueAt(i, 0)) {

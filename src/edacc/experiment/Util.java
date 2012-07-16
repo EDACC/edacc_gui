@@ -30,11 +30,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author simon
  */
 public class Util {
+
     public static final String[] constSolverParameters = {"instance", "seed", "tempdir", "db_host", "db_port", "db_db", "db_username", "db_password"};
-    
     public static final Color COLOR_ROYALBLUE = new Color(4 * 16 + 1, 6 * 16 + 9, 14 * 16 + 1);
     public static final Color COLOR_GREEN = new Color(0 * 16 + 0, 12 * 16 + 12, 3 * 16 + 3);
-    public static final Color COLOR_DARKGREEN = new Color(0,100,0);
+    public static final Color COLOR_DARKGREEN = new Color(0, 100, 0);
     /** Color to be used for errors */
     public static final Color COLOR_ERROR = new Color(0xed1c24);
     /** Color to be used for the generate jobs table if a value is not saved and bigger as the saved value */
@@ -45,6 +45,20 @@ public class Util {
     public static final Color COLOR_JOBBROWSER_ERROR = COLOR_ERROR;
     public static final Color COLOR_JOBBROWSER_RUNNING = Color.orange;
     public static final Color COLOR_JOBBROWSER_FINISHED = COLOR_GREEN;
+
+    /**
+     * Checks if the given parameter name is a 'magic' solver parameter.
+     * @param parameterName
+     * @return true, iff <code>parameterName</code> is a 'magic' solver parameter name.
+     */
+    public static boolean isMagicSolverParameter(String parameterName) {
+        for (String p : constSolverParameters) {
+            if (p.equals(parameterName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Calls <code>updateTableColumnWidth(table, 5000)</code>.
@@ -164,15 +178,8 @@ public class Util {
             });
             for (ParameterInstance param : params) {
                 Parameter solverParameter = solverParamsMap.get(param.getParameter_id());
-                boolean found = false;
-                for (String s : constSolverParameters) {
-                    if (s.equals(solverParameter.getName().toLowerCase())) {
-                        paramString += solverParameter.getPrefix() == null ? "<" + s + ">" : (solverParameter.getPrefix() + (solverParameter.getSpace() ? " " : "")) + "<" + s + ">";
-                        found = true;
-                        break;
-                    }
-                }
-                if (found) {
+                if (isMagicSolverParameter(solverParameter.getName())) {
+                    paramString += solverParameter.getPrefix() == null ? "<" + solverParameter.getName() + ">" : (solverParameter.getPrefix() + (solverParameter.getSpace() ? " " : "")) + "<" + solverParameter.getName() + ">";
                 } else if (solverParameter.getHasValue()) {
                     paramString += solverParameter.getPrefix() == null ? param.getValue() : (solverParameter.getPrefix() + (solverParameter.getSpace() ? " " : "")) + param.getValue();
                 } else {

@@ -123,10 +123,8 @@ public class VerifierParameterTableModel extends ThreadSafeDefaultTableModel {
             return !parameters[row].isMandatory();
         }
         if (col == 3 && parameters[row].getHasValue()) {
-            for (String s : edacc.experiment.Util.constSolverParameters) {
-                if (s.equals(parameters[row].getName().toLowerCase())) {
-                    return false;
-                }
+            if (edacc.experiment.Util.isMagicSolverParameter(parameters[row].getName())) {
+                return false;
             }
             return parameterInstances[row] != null && !parameterInstances[row].isDeleted();
         }
