@@ -87,8 +87,6 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
@@ -302,7 +300,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         clientUpdateThread = new ClientUpdateThread(clientTableModel);
         /* -------------------------------- end of client browser tab -------------------------------- */
         /* -------------------------------- configuration scenario tab -------------------------------- */
-        Util.addSpaceSelection(tblConfigurationScenario, configScenarioTableModel.COL_SELECTED);
+        Util.addSpaceSelection(tblConfigurationScenario, ConfigurationScenarioTableModel.COL_SELECTED);
         configScenarioTableModel = new ConfigurationScenarioTableModel();
         tblConfigurationScenario.setModel(configScenarioTableModel);
         TableCellRenderer configurationScenarioTableCellRenderer = new TableCellRenderer() {
@@ -3075,7 +3073,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         } catch (NoConnectionToDBException ex) {
             JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            EDACCApp.getLogger().logException(ex);
         }
     }//GEN-LAST:event_btnSelectQueueActionPerformed
 
@@ -3175,10 +3173,10 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            EDACCApp.getLogger().logException(ex);
             createDatabaseErrorMessage(ex);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            EDACCApp.getLogger().logException(ex);
             javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage(), "Edit experiment", javax.swing.JOptionPane.ERROR_MESSAGE);
         } finally {
             dialogEditExp.dispose();
@@ -3540,7 +3538,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             } catch (NoConnectionToDBException ex) {
                 JOptionPane.showMessageDialog(this, "You have to establish a connection to the database first!", "Error!", JOptionPane.ERROR_MESSAGE);
             } catch (SQLException ex) {
-                ex.printStackTrace();
+                EDACCApp.getLogger().logException(ex);
             }
         } else {
             JOptionPane.showMessageDialog(this, "No experiment has been selected.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -3578,6 +3576,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         try {
             expController.refreshConfiguratorOutput();
         } catch (Exception ex) {
+            EDACCApp.getLogger().logException(ex);
         }
         EDACCOutputViewer viewer = new EDACCOutputViewer(EDACCApp.getApplication().getMainFrame(), true, expController.getConfigScenario());
         viewer.setName("EDACCOutputViewer");
@@ -3965,7 +3964,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
     public void onTaskFailed(String methodName, Throwable e) {
         EDACCApp.getLogger().logException(e);
         if (methodName.equals("loadExperiment")) {
-            e.printStackTrace();
+            EDACCApp.getLogger().logException(e);
             expController.unloadExperiment();
         }
         if (e instanceof TaskCancelledException) {
