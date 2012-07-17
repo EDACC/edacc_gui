@@ -91,6 +91,12 @@ public class ParameterInstanceDAO {
             PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery.toString());
             int count = 1;
             for (ParameterInstance pi : newOnes) {
+                // update cache
+                ArrayList<ParameterInstance> cachedPis = getCached(pi.getSolverConfiguration());
+                if (cachedPis != null) {
+                    cachedPis.add(pi);
+                }
+                
                 st.setString(count++, pi.getValue());
                 pi.setSaved();
             }

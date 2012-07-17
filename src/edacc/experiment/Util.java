@@ -177,6 +177,7 @@ public class Util {
                 }
             });
             for (ParameterInstance param : params) {
+                
                 Parameter solverParameter = solverParamsMap.get(param.getParameter_id());
                 if (isMagicSolverParameter(solverParameter.getName())) {
                     paramString += solverParameter.getPrefix() == null ? "<" + solverParameter.getName() + ">" : (solverParameter.getPrefix() + (solverParameter.getSpace() ? " " : "")) + "<" + solverParameter.getName() + ">";
