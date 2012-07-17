@@ -4,9 +4,9 @@
  */
 package edacc.properties;
 
+import edacc.EDACCApp;
 import edacc.EDACCManagePropertyDialog;
 import edacc.model.ComputationMethod;
-import edacc.model.ComputationMethodAlreadyExistsException;
 import edacc.model.ComputationMethodDAO;
 import edacc.model.ComputationMethodDoesNotExistException;
 import edacc.model.ComputationMethodSameNameAlreadyExists;
@@ -20,13 +20,19 @@ import edacc.model.PropertyNotInDBException;
 import edacc.model.PropertyType;
 import edacc.model.PropertyTypeDoesNotExistException;
 import edacc.satinstances.PropertyValueType;
+import edacc.satinstances.PropertyValueTypeAlreadyExistsException;
 import edacc.satinstances.PropertyValueTypeManager;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Vector;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -231,4 +237,5 @@ public class ManagePropertyController {
     public void importPropertyCSV(File file) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
+
 }
