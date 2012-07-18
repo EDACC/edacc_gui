@@ -1,9 +1,12 @@
 package edacc.model;
 
 import edacc.EDACCApp;
+import edacc.properties.ManagePropertyController;
+import edacc.satinstances.DefaultPropertiesManager;
 import edacc.satinstances.PropertyValueTypeAlreadyExistsException;
 import edacc.satinstances.PropertyValueTypeManager;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -460,6 +463,21 @@ public class DatabaseConnector extends Observable {
         } catch (PropertyValueTypeAlreadyExistsException ex) {
             Logger.getLogger(DatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        task.setStatus("Adding default satpc-properties and computation methods");
+        try {
+            DefaultPropertiesManager.getInstance().addDefaultToDB();
+        } catch (ComputationMethodAlreadyExistsException ex) {
+            Logger.getLogger(DatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoComputationMethodBinarySpecifiedException ex) {
+            Logger.getLogger(DatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(DatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ComputationMethodSameNameAlreadyExists ex) {
+            Logger.getLogger(DatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ComputationMethodSameMD5AlreadyExists ex) {
+            Logger.getLogger(DatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void executeSqlScript(Tasks task, InputStream in) throws IOException, SQLException {
@@ -577,4 +595,5 @@ public class DatabaseConnector extends Observable {
         modelVersion = version;
         return modelVersion;
     }
+
 }

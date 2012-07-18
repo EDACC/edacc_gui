@@ -269,7 +269,6 @@ public class PropertyComputationUnit implements Runnable {
                     bin = ComputationMethodDAO.getBinaryOfComputationMethod(property.getComputationMethod());
                 }
                 bin.setExecutable(true);
-                System.out.println(bin.getAbsolutePath());
                 String prefix = "";
                 if (System.getProperty("os.name") != null && System.getProperty("os.name").contains("Windows")) {
                     prefix = "cmd /c ";
@@ -278,6 +277,7 @@ public class PropertyComputationUnit implements Runnable {
                     prefix += "java -jar ";
                 }
                 Process p = Runtime.getRuntime().exec(prefix + bin.getAbsolutePath() + " " + property.getComputationMethodParameters());
+                
                 InputStream is = input;
                 InputStreamReader ir = new InputStreamReader(is);
                 BufferedReader instanceReader = new BufferedReader(ir);
