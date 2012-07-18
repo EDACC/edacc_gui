@@ -2064,15 +2064,24 @@ public class ExperimentController {
      * @return instance of CostFunction
      */
     public CostFunction costFunctionByName(String databaseRepresentation) {
+        if (activeExperiment == null) {
+            throw new IllegalArgumentException("No experiment loaded.");
+        }
+        
         if ("average".equals(databaseRepresentation)) {
-            return new Average();
+            return new Average(activeExperiment.getDefaultCost(), activeExperiment.getMinimize());
         } else if ("median".equals(databaseRepresentation)) {
-            return new Median();
+            return new Median(activeExperiment.getDefaultCost(), activeExperiment.getMinimize());
         } else if (databaseRepresentation != null && databaseRepresentation.startsWith("par")) {
             try {
                 int penaltyFactor = Integer.valueOf(databaseRepresentation.substring(3));
-                return new PARX(penaltyFactor);
+                if (activeExperiment.getCostPenalty() == null) {
+                    return new PARX(activeExperiment.getDefaultCost(), activeExperiment.getMinimize(), penaltyFactor);
+                } else {
+                    return new PARX(activeExperiment.getDefaultCost(), activeExperiment.getMinimize(), activeExperiment.getCostPenalty(), penaltyFactor);
+                }
             } catch (Exception e) {
+                e.printStackTrace();
                 return null;
             }
         }

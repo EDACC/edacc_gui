@@ -3,7 +3,15 @@ package edacc.api.costfunctions;
 import java.util.List;
 
 public interface CostFunction {
-    /**
+    
+	/**
+     * Calculate the value of the cost function over one single job
+     * @param job
+     * @return the value according to the stat function
+     */
+	public float singleCost(edacc.model.ExperimentResult job);
+		
+	/**
      * Calculate the value of the cost function over the list of
      * experiment <code>results</code>.
      * @param results
@@ -11,7 +19,7 @@ public interface CostFunction {
      */
 	public float calculateCost(List<edacc.model.ExperimentResult> results);
 	
-	 /**
+	/**
      * Calculate the cumulated value of the costs over the list of
      * experiment <code>results</code>.
      * @param results
@@ -25,4 +33,6 @@ public interface CostFunction {
 	 * @return representation string
 	 */
 	public String databaseRepresentation();
+	
+	public boolean getMinimize();
 }
