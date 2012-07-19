@@ -26,6 +26,7 @@ import edacc.model.Parameter;
 import edacc.model.Solver;
 import edacc.model.SolverBinaries;
 import edacc.model.TaskCancelledException;
+import edacc.model.TaskRunnable;
 import edacc.model.Tasks;
 import edacc.model.Verifier;
 import edacc.model.VerifierDAO;
@@ -2319,17 +2320,39 @@ public class EDACCManageDBMode extends javax.swing.JPanel implements TaskEvents 
         {
             return;
         }
-        SolverBinaries selectedBinary = solverBinariesTableModel.getSolverBinaries(tableSolverBinaries.convertRowIndexToModel(selectedIndex));
-        try {
-            manageDBSolvers.editSolverBinaryDetails(selectedBinary);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(panelManageDBInstances,
-                    "An error occured while adding the binary of the solver: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-        tableSolver.updateUI();
+        final SolverBinaries selectedBinary = solverBinariesTableModel.getSolverBinaries(tableSolverBinaries.convertRowIndexToModel(selectedIndex));
+
+        Tasks.startTask(new TaskRunnable() {
+
+            @Override
+            public void run(Tasks task) {
+                try {
+                    task.setOperationName("Edit Solver Binary");
+                    task.setStatus("Loading solver binary..");
+                    manageDBSolvers.editSolverBinaryDetails(selectedBinary);
+                } catch (final Exception ex) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            EDACCApp.getLogger().logException(ex);
+                            JOptionPane.showMessageDialog(panelManageDBInstances,
+                                    "An error occured while adding the binary of the solver: " + ex.getMessage(),
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    });
+
+                }
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        tableSolver.updateUI();
+                    }
+                });
+            }
+        });
     }//GEN-LAST:event_btnSolverEditBinaryActionPerformed
 
     private void btnSolverDeleteBinaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolverDeleteBinaryActionPerformed
