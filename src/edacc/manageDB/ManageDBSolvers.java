@@ -117,6 +117,7 @@ public class ManageDBSolvers implements Observer {
 
                         @Override
                         public void run() {
+                            EDACCApp.getLogger().logException(ex);
                             JOptionPane.showMessageDialog(gui,
                                     "Solvers cannot be saved. There is a problem with the Database: " + ex.getMessage(),
                                     "Error",
@@ -129,6 +130,7 @@ public class ManageDBSolvers implements Observer {
 
                         @Override
                         public void run() {
+                            EDACCApp.getLogger().logException(ex);
                             JOptionPane.showMessageDialog(gui,
                                     "Solvers cannot be saved because a file couldn't be found: " + ex.getMessage(),
                                     "Error",
@@ -140,6 +142,7 @@ public class ManageDBSolvers implements Observer {
 
                         @Override
                         public void run() {
+                            EDACCApp.getLogger().logException(ex);
                             JOptionPane.showMessageDialog(gui,
                                     ex.getMessage(),
                                     "Error",
@@ -151,6 +154,7 @@ public class ManageDBSolvers implements Observer {
 
                         @Override
                         public void run() {
+                            EDACCApp.getLogger().logException(ex);
                             JOptionPane.showMessageDialog(gui,
                                     ex.getMessage(),
                                     "Error",
@@ -162,6 +166,7 @@ public class ManageDBSolvers implements Observer {
 
                         @Override
                         public void run() {
+                            EDACCApp.getLogger().logException(ex);
                             JOptionPane.showMessageDialog(gui,
                                     "IO exception while reading solver data from the filesystem" + ex.getMessage(),
                                     "Error",
@@ -173,6 +178,7 @@ public class ManageDBSolvers implements Observer {
 
                         @Override
                         public void run() {
+                            EDACCApp.getLogger().logException(ex);
                             JOptionPane.showMessageDialog(gui,
                                     ex.getMessage(),
                                     "Error",
@@ -184,6 +190,7 @@ public class ManageDBSolvers implements Observer {
 
                         @Override
                         public void run() {
+                            EDACCApp.getLogger().logException(ex);
                             JOptionPane.showMessageDialog(gui,
                                     ex.getMessage(),
                                     "Error",

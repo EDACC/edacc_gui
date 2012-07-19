@@ -39,7 +39,7 @@ public class EDACCCostBinaryDialog extends javax.swing.JDialog {
         initComponents();
         lbRunPath.setSelectedIndex(0);
         updateCosts();
-        showSolverBin();
+        showCostBin();
     }
     
     private void updateCosts() throws SQLException {
@@ -351,12 +351,13 @@ public class EDACCCostBinaryDialog extends javax.swing.JDialog {
         lCommandPreview.setText(command);
     }
     
-    private void showSolverBin() {
+    private void showCostBin() {
         if (costBinary == null) {
             return;
         }
         tfBinaryName.setText(costBinary.getBinaryName());
         tfRunCommand.setText(costBinary.getRunCommand());
+        tfParameters.setText(costBinary.getParameters());
         tfVersion.setText(costBinary.getVersion());
         int selectedIndex = ((CostBinaryListModel) lbRunPath.getModel()).getIndexOf(costBinary.getRunPath());
         // if an error occured select first index
@@ -371,5 +372,6 @@ public class EDACCCostBinaryDialog extends javax.swing.JDialog {
             this.setTitle("Edit Solver Binary");
             bAddBinary.setText("Edit Binary");
         }
+        updateRunCommandLine();
     }
 }

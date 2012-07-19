@@ -15,8 +15,11 @@ import java.io.SequenceInputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import javax.swing.JOptionPane;
 
 /**
@@ -48,13 +51,29 @@ public class ManageDBCosts {
             b.setMd5(md5);
             Util.removeCommonPrefix(b);
             EDACCCostBinaryDialog dialog = new EDACCCostBinaryDialog(EDACCApp.getApplication().getMainFrame(), b, this, EDACCCostBinaryDialog.DialogMode.CREATE_MODE);
+            dialog.setName("EDACCCostBinaryDialog");
             EDACCApp.getApplication().show(dialog);
             gui.showCostBinaryDetails(solverController.getCurrentSolver().getCostBinaries());
         } catch (NoSuchElementException e) {
             JOptionPane.showMessageDialog(gui, "You have to choose some files!", "No files chosen!", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    
+    public void setFileArrayOfCostBinary(CostBinary binary) throws SQLException, IOException {
+        // make temporary directory
+        File tmpDir = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + "edacctmpdir");
+        tmpDir.mkdirs();
+        ZipInputStream zis = new ZipInputStream(CostDAO.getZippedBinaryFile(binary));
+        LinkedList<File> bins = new LinkedList<File>(); // the binary files in the zip 
+        ZipEntry entry;
+        while ((entry = zis.getNextEntry()) != null) {
+            bins.add(new File(tmpDir.getAbsolutePath() + System.getProperty("file.separator") + entry.getName()));
+        }
+        binary.setBinaryArchive(bins.toArray(new File[bins.size()]));
+        binary.setRootDir(tmpDir.getAbsolutePath());
+    }
+    
+    
     public void selectCostBinary(boolean selected) {
         gui.enableCostBinaryButtons(selected);
     }

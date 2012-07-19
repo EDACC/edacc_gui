@@ -179,10 +179,12 @@ public class CostDAO {
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(binaryUpdateQuery);
             ps.setInt(1, b.getCost().getId());
             ps.setString(2, b.getBinaryName());
-            ps.setString(3, b.getVersion());
-            ps.setString(4, b.getRunCommand());
-            ps.setString(5, b.getRunPath());
-            ps.setInt(6, b.getId());
+            ps.setString(3, b.getMd5());
+            ps.setString(4, b.getVersion());
+            ps.setString(5, b.getRunCommand());
+            ps.setString(6, b.getRunPath());
+            ps.setString(7, b.getParameters());
+            ps.setInt(8, b.getId());
         } else if (b.isDeleted()) {
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(binaryDeleteQuery);
             ps.setInt(1, b.getId());

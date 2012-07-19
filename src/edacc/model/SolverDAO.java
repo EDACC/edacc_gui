@@ -62,6 +62,12 @@ public class SolverDAO {
                     break;
                 }
             }
+            for (CostBinary cb : solver.getCostBinaries()) {
+                if (cb.isModified()) {
+                    solver.setModified();
+                    break;
+                }
+            }
         }
         if (solver.isSaved()) {
             return;

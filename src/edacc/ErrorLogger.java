@@ -34,6 +34,7 @@ public class ErrorLogger extends EventQueue implements Thread.UncaughtExceptionH
     }
 
     public void logException(Throwable e) {
+        //e.printStackTrace();
         StringWriter sw = new StringWriter();
         e.printStackTrace(new PrintWriter(sw));
         logError(sw.toString());

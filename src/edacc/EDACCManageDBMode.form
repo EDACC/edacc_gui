@@ -186,7 +186,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="480" max="32767" attributes="0"/>
+              <Component id="manageDBPane" pref="985" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -195,7 +195,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="manageDBPane" pref="569" max="32767" attributes="0"/>
+              <Component id="manageDBPane" pref="799" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -235,7 +235,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jPanel3" alignment="1" max="32767" attributes="0"/>
-                          <Component id="jSplitPane2" alignment="1" pref="908" max="32767" attributes="0"/>
+                          <Component id="jSplitPane2" alignment="1" pref="960" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -245,7 +245,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane2" pref="545" max="32767" attributes="0"/>
+                      <Component id="jSplitPane2" pref="706" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jPanel3" min="-2" pref="37" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -284,14 +284,14 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="panelParameters" alignment="0" pref="378" max="32767" attributes="0"/>
+                          <Component id="panelParameters" alignment="0" pref="405" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="panelParameters" pref="532" max="32767" attributes="0"/>
+                              <Component id="panelParameters" pref="693" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -318,7 +318,7 @@
                               <Group type="102" alignment="1" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="1" attributes="0">
-                                      <Component id="jScrollPane1" alignment="0" pref="346" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane1" alignment="0" pref="373" max="32767" attributes="0"/>
                                       <Component id="panelParametersButons" alignment="0" max="32767" attributes="0"/>
                                       <Component id="jPanel2" alignment="0" max="32767" attributes="0"/>
                                   </Group>
@@ -329,7 +329,7 @@
                         <DimensionLayout dim="1">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="1" attributes="0">
-                                  <Component id="jScrollPane1" pref="235" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane1" pref="396" max="32767" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -417,10 +417,10 @@
                                       </Group>
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Group type="103" alignment="1" groupAlignment="0" attributes="0">
-                                              <Component id="tfParametersName" alignment="1" pref="229" max="32767" attributes="3"/>
-                                              <Component id="tfParametersPrefix" alignment="1" pref="229" max="32767" attributes="3"/>
-                                              <Component id="tfParametersOrder" alignment="1" pref="229" max="32767" attributes="3"/>
-                                              <Component id="tfParametersDefaultValue" alignment="1" pref="229" max="32767" attributes="0"/>
+                                              <Component id="tfParametersName" alignment="1" pref="256" max="32767" attributes="3"/>
+                                              <Component id="tfParametersPrefix" alignment="1" pref="256" max="32767" attributes="3"/>
+                                              <Component id="tfParametersOrder" alignment="1" pref="256" max="32767" attributes="3"/>
+                                              <Component id="tfParametersDefaultValue" alignment="1" pref="256" max="32767" attributes="0"/>
                                               <Component id="chkSpace" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                           <Component id="chkAttachToPrevious" alignment="0" min="-2" pref="28" max="-2" attributes="0"/>
@@ -642,7 +642,7 @@
                                       <Component id="btnGraph" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnParametersDelete" linkSize="3" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="32767" attributes="0"/>
+                                      <EmptySpace pref="37" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                             </DimensionLayout>
@@ -757,7 +757,7 @@
                               <Group type="102" alignment="1" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="1" attributes="0">
-                                      <Component id="jScrollPane2" alignment="0" pref="491" max="32767" attributes="2"/>
+                                      <Component id="jScrollPane2" alignment="0" pref="516" max="32767" attributes="2"/>
                                       <Component id="panelSolverButtons" alignment="1" max="32767" attributes="2"/>
                                       <Component id="jPanel1" alignment="1" max="32767" attributes="1"/>
                                   </Group>
@@ -768,7 +768,7 @@
                         <DimensionLayout dim="1">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="1" attributes="0">
-                                  <Component id="jScrollPane2" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane2" pref="261" max="32767" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -834,7 +834,7 @@
                                           <Group type="102" alignment="0" attributes="0">
                                               <Component id="jlSolverBinary" linkSize="7" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace max="-2" attributes="0"/>
-                                              <Component id="jTabbedPane1" pref="372" max="32767" attributes="0"/>
+                                              <Component id="jTabbedPane1" pref="397" max="32767" attributes="0"/>
                                           </Group>
                                           <Group type="102" alignment="1" attributes="0">
                                               <Group type="103" groupAlignment="0" attributes="0">
@@ -858,14 +858,14 @@
                                                   <Component id="jlSolverAuthors" alignment="0" min="-2" max="-2" attributes="0"/>
                                               </Group>
                                               <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="tfSolverAuthors" pref="372" max="32767" attributes="1"/>
-                                                  <Component id="jScrollPane3" pref="372" max="32767" attributes="2"/>
-                                                  <Component id="tfSolverName" alignment="0" pref="372" max="32767" attributes="2"/>
+                                                  <Component id="tfSolverAuthors" pref="397" max="32767" attributes="1"/>
+                                                  <Component id="jScrollPane3" pref="397" max="32767" attributes="2"/>
+                                                  <Component id="tfSolverName" alignment="0" pref="397" max="32767" attributes="2"/>
                                                   <Group type="102" alignment="0" attributes="0">
                                                       <EmptySpace max="-2" attributes="0"/>
                                                       <Group type="103" groupAlignment="0" attributes="0">
                                                           <Component id="btnSolverAddCode" alignment="0" min="-2" max="-2" attributes="0"/>
-                                                          <Component id="tfSolverVersion" alignment="0" pref="372" max="32767" attributes="0"/>
+                                                          <Component id="tfSolverVersion" alignment="0" pref="397" max="32767" attributes="0"/>
                                                       </Group>
                                                   </Group>
                                               </Group>
@@ -1044,10 +1044,10 @@
                                               <Component id="btnSolverEditBinary" linkSize="19" min="-2" pref="77" max="-2" attributes="0"/>
                                               <EmptySpace max="-2" attributes="0"/>
                                               <Component id="btnSolverChangeBinaryFiles" linkSize="19" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace max="32767" attributes="0"/>
+                                              <EmptySpace pref="8" max="32767" attributes="0"/>
                                               <Component id="btnSolverDeleteBinary" linkSize="19" min="-2" pref="76" max="-2" attributes="0"/>
                                           </Group>
-                                          <Component id="jScrollPane4" alignment="0" pref="390" max="32767" attributes="1"/>
+                                          <Component id="jScrollPane4" alignment="0" pref="392" max="32767" attributes="1"/>
                                       </Group>
                                     </DimensionLayout>
                                     <DimensionLayout dim="1">
@@ -1153,10 +1153,10 @@
                                               <Component id="btnCostEditBinary" linkSize="18" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace max="-2" attributes="0"/>
                                               <Component id="btnCostChangeBinaryFiles" linkSize="18" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace max="32767" attributes="0"/>
+                                              <EmptySpace pref="8" max="32767" attributes="0"/>
                                               <Component id="btnCostDeleteBinary" linkSize="18" min="-2" max="-2" attributes="0"/>
                                           </Group>
-                                          <Component id="jScrollPane6" alignment="0" pref="390" max="32767" attributes="0"/>
+                                          <Component id="jScrollPane6" alignment="0" pref="392" max="32767" attributes="0"/>
                                       </Group>
                                     </DimensionLayout>
                                     <DimensionLayout dim="1">
@@ -1255,7 +1255,7 @@
                                       <Component id="btnSolverNew" linkSize="1" min="-2" pref="81" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnSolverDelete" linkSize="1" min="-2" pref="81" max="-2" attributes="0"/>
-                                      <EmptySpace pref="313" max="32767" attributes="0"/>
+                                      <EmptySpace pref="338" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                             </DimensionLayout>
@@ -1322,7 +1322,7 @@
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnSolverRefresh" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="595" max="32767" attributes="0"/>
+                          <EmptySpace pref="647" max="32767" attributes="0"/>
                           <Component id="btnSolverExport" min="-2" pref="79" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="btnSolverSaveToDB" min="-2" max="-2" attributes="0"/>
@@ -1407,7 +1407,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSplitPane1" pref="530" max="32767" attributes="0"/>
+                      <Component id="jSplitPane1" pref="760" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1460,7 +1460,7 @@
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="panelInstanceClassTable" pref="432" max="32767" attributes="0"/>
+                              <Component id="panelInstanceClassTable" pref="662" max="32767" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="panelButtonsInstanceClass" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -1625,7 +1625,7 @@
                                   <Component id="lblFilterStatus" min="-2" pref="16" max="-2" attributes="1"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="panelInstanceTable" pref="359" max="32767" attributes="0"/>
+                              <Component id="panelInstanceTable" pref="589" max="32767" attributes="0"/>
                               <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
                               <Component id="panelButtonsInstances" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -1918,12 +1918,12 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jScrollPane5" alignment="0" pref="463" max="32767" attributes="0"/>
+                      <Component id="jScrollPane5" alignment="0" pref="968" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jScrollPane5" alignment="0" pref="472" max="32767" attributes="0"/>
+                      <Component id="jScrollPane5" alignment="0" pref="702" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
               </Layout>
@@ -1981,7 +1981,7 @@
                           <Component id="btnEditVerifier" linkSize="17" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnRemoveVerifier" linkSize="17" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="90" max="32767" attributes="0"/>
+                          <EmptySpace pref="595" max="32767" attributes="0"/>
                           <Component id="btnUndo" linkSize="17" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="btnSave" linkSize="17" min="-2" max="-2" attributes="0"/>

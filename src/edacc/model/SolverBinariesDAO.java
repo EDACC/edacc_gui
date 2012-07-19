@@ -113,6 +113,8 @@ public class SolverBinariesDAO {
 
         // modify files if necessary
         if (s.isModified() && s.getBinaryFiles() != null && s.getBinaryFiles().length > 0) { // binary files have been changed validly
+            
+            System.out.println("HERE I AM");
             ps = DatabaseConnector.getInstance().getConn().prepareStatement(UPDATE_FILES_QUERY, PreparedStatement.RETURN_GENERATED_KEYS);
             ByteArrayOutputStream zipped = Util.zipFileArrayToByteStream(s.getBinaryFiles(), new File(s.getRootDir()));
             s.setMd5(Util.calculateMD5(new ByteArrayInputStream(zipped.toByteArray())));
