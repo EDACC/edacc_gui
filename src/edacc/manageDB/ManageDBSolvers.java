@@ -321,7 +321,6 @@ public class ManageDBSolvers implements Observer {
     public void editSolverBinaryDetails(SolverBinaries solverBin) throws IOException, NoSuchAlgorithmException, SQLException {
         // create file list of binary
         setFileArrayOfSolverBinary(solverBin);
-        Util.removeCommonPrefix(solverBin);
         new EDACCSolverBinaryDlg(EDACCApp.getApplication().getMainFrame(), solverBin, this, EDACCSolverBinaryDlg.DialogMode.EDIT_MODE).setVisible(true);
         // reset binary archive
         solverBin.setBinaryArchive(null);
