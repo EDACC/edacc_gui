@@ -466,7 +466,8 @@ public class DatabaseConnector extends Observable {
 
         task.setStatus("Adding default satpc-properties and computation methods");
         try {
-            DefaultPropertiesManager.getInstance().addDefaultToDB();
+                DefaultPropertiesManager.getInstance().addDefaultToDB();
+
         } catch (ComputationMethodAlreadyExistsException ex) {
             Logger.getLogger(DatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoComputationMethodBinarySpecifiedException ex) {
@@ -477,7 +478,11 @@ public class DatabaseConnector extends Observable {
             Logger.getLogger(DatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ComputationMethodSameMD5AlreadyExists ex) {
             Logger.getLogger(DatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }             catch (PropertyIsUsedException ex) {
+                Logger.getLogger(DatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (PropertyTypeDoesNotExistException ex) {
+                Logger.getLogger(DatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
+            }
     }
 
     public void executeSqlScript(Tasks task, InputStream in) throws IOException, SQLException {
