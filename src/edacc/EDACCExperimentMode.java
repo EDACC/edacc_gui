@@ -945,8 +945,8 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
             }
         });
         tableExperiments.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                tableExperimentsKeyReleased(evt);
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tableExperimentsKeyPressed(evt);
             }
         });
         scrollPaneExperimentsTable.setViewportView(tableExperiments);
@@ -2484,13 +2484,6 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
     }//GEN-LAST:event_btnImportSolverConfigsActionPerformed
 
-    private void tableExperimentsKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableExperimentsKeyReleased
-        if (!tableExperimentsWasEditing && evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            btnLoadExperimentActionPerformed(null);
-        }
-        tableExperimentsWasEditing = false;
-    }//GEN-LAST:event_tableExperimentsKeyReleased
-
     private void tblClientsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblClientsMouseClicked
         if (evt.getClickCount() == 2) {
             if (tblClients.getSelectedRow() != -1) {
@@ -3639,6 +3632,14 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
         }
         manageExperimentPaneStateChanged(null);
     }//GEN-LAST:event_btnImportCourseActionPerformed
+
+    private void tableExperimentsKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tableExperimentsKeyPressed
+        if (!tableExperimentsWasEditing && evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            evt.consume();
+            btnLoadExperimentActionPerformed(null);
+        }
+        tableExperimentsWasEditing = false;
+    }//GEN-LAST:event_tableExperimentsKeyPressed
 
     /**
      * Stops the jobs timer.
