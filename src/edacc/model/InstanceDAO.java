@@ -491,30 +491,40 @@ public class InstanceDAO {
         return rs.next();
     }
 
+    public static InputStream getBinary(Instance instance) throws NoConnectionToDBException, SQLException, InstanceNotInDBException, IOException, InterruptedException {
+        return getBinary(instance, true, true);
+    }
+    
     /**
      * @author rretz
      * Get the binary of a instance with the given id as a Blob from the database.
-     * @param id
+     * @param instance
+     * @param useFileCache if this is true, the file cache will be used. This means if the instance binary has been downloaded previously it will not be downloaded again.
      * @return Blob of the instance binary.
      * @throws NoConnectionToDBException
      * @throws SQLException
      * @throws InstanceNotInDBException
      */
-    public static InputStream getBinary(Instance instance) throws NoConnectionToDBException, SQLException, InstanceNotInDBException, IOException, InterruptedException {
+    public static InputStream getBinary(Instance instance, boolean useFileCache, boolean useTasks) throws NoConnectionToDBException, SQLException, InstanceNotInDBException, IOException, InterruptedException {
         Statement st = DatabaseConnector.getInstance().getConn().createStatement();
-        FileCache fc = FileCache.getInstance();
-        if (fc.hasFile(instance.getId(), instance.getMd5())) {
-            return Util.getDecompressedInputStream(fc.getInputStream(instance.getId(), instance.getMd5()));
+        FileCache fc = null;
+        if (useFileCache) {
+            fc = FileCache.getInstance();
+            if (fc.hasFile(instance.getId(), instance.getMd5())) {
+                return Util.getDecompressedInputStream(fc.getInputStream(instance.getId(), instance.getMd5()), useTasks);
+            }
         }
-
+        
         ResultSet rs = st.executeQuery("SELECT i.instance FROM " + table + " AS i WHERE i.idInstance = " + instance.getId());
         try {
             if (rs.next()) {
                 InputStream is = rs.getBlob("instance").getBinaryStream();
-                fc.cacheFile(is, instance.getId(), instance.getMd5());
-                is.close();
-                is = fc.getInputStream(instance.getId(), instance.getMd5());
-                return Util.getDecompressedInputStream(is);
+                if (useFileCache) {
+                    fc.cacheFile(is, instance.getId(), instance.getMd5());
+                    is.close();
+                    is = fc.getInputStream(instance.getId(), instance.getMd5());
+                }
+                return Util.getDecompressedInputStream(is, useTasks);
             } else {
                 throw new InstanceNotInDBException();
             }
@@ -567,20 +577,28 @@ public class InstanceDAO {
         return null;
     }
 
+    public static File getBinaryFileOfInstance(Instance i) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, InstanceNotInDBException, InterruptedException {
+        return getBinaryFileOfInstance(i, true, true);
+    }
+    
     /**
      * Copies the binary file of an instance to a temporary location on the file system
      * and returns a File reference on it.
      * @param i
      * @return
      */
-    public static File getBinaryFileOfInstance(Instance i) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, InstanceNotInDBException, InterruptedException {
+    public static File getBinaryFileOfInstance(Instance i, boolean useFileCache, boolean useTasks) throws NoConnectionToDBException, SQLException, FileNotFoundException, IOException, InstanceNotInDBException, InterruptedException {
         File f = new File("tmp" + System.getProperty("file.separator") + i.getId() + "_" + i.getName());
         // create missing directories
         f.getParentFile().mkdirs();
-        getBinaryFileOfInstance(i, f);
+        getBinaryFileOfInstance(i, f, useFileCache, useTasks);
         return f;
     }
 
+    public static void getBinaryFileOfInstance(Instance i, File f) throws FileNotFoundException, IOException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
+        getBinaryFileOfInstance(i, f, true, true);
+    }
+    
     /**
      * Copies the binary file of an instance to a specified location on the filesystem.
      * @param i
@@ -590,10 +608,10 @@ public class InstanceDAO {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public static void getBinaryFileOfInstance(Instance i, File f) throws FileNotFoundException, IOException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
+    public static void getBinaryFileOfInstance(Instance i, File f, boolean useFileCache, boolean useTasks) throws FileNotFoundException, IOException, NoConnectionToDBException, InstanceNotInDBException, InterruptedException {
         FileOutputStream out = new FileOutputStream(f);
         try {
-            Util.sevenZipDecode(getBinary(i), out);
+            Util.sevenZipDecode(getBinary(i, useFileCache, useTasks), out);
         } catch (SQLException e) {
             // TODO: error
             e.printStackTrace();

@@ -448,12 +448,16 @@ public class Util {
         }
         return true;
     }
-
+    
     public static InputStream getDecompressedInputStream(final InputStream input) throws IOException {
+        return getDecompressedInputStream(input, true);
+    }
+    
+    public static InputStream getDecompressedInputStream(final InputStream input, boolean useTasks) throws IOException {
         if (isLZMA(input)) {
             final Decoder dec = getDecoder(input);
             final long outSize = getOutSize(input);
-            return new DecompressedInputStream(dec, outSize, input);
+            return new DecompressedInputStream(dec, outSize, input, useTasks);
         } else {
             return input;
         }

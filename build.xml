@@ -128,11 +128,13 @@
                 <include name="edacc/properties/**"/>
                 <include name="edacc/satinstances/**"/>
                 <include name="edacc/experiment/Util*.*"/>
+                <include name="edacc/manageDB/Util*.*"/>
                 <include name="**/*Exception*"/>
             </fileset>
             <fileset dir="${src.dir}" defaultexcludes="true">
                 <include name="edacc/model/**"/>
                 <include name="edacc/experiment/Util*.*"/>
+                <include name="edacc/manageDB/Util*.*"/>
             </fileset>
         </jar>
     </target>

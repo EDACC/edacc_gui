@@ -5,7 +5,6 @@ import edacc.EDACCTaskView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import javax.swing.SwingUtilities;
 
 /**
  *
@@ -24,11 +23,16 @@ public class DecompressedInputStream extends InputStream {
     final static int maxBufSize = 16 * 1024;
     byte[] buf = new byte[maxBufSize * 2];
 
+    
     public DecompressedInputStream(Decoder dec, long outSize, InputStream input) {
+        this(dec, outSize, input, true);
+    }
+    
+    public DecompressedInputStream(Decoder dec, long outSize, InputStream input, boolean useTasks) {
         this.dec = dec;
         this.outSize = outSize;
         this.input = input;
-        this.view = Tasks.getTaskView();
+        this.view = useTasks ? Tasks.getTaskView() : null;
         if (view != null) {
             id = view.getSubTaskId();
             view.setMessage(id, "Decompressing");
