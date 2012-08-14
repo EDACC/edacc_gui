@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.xml.bind.JAXBException;
 
@@ -165,9 +166,14 @@ public class ManageDBParameters implements Observer {
     }
 
     public void showParameterGraphEditor() throws SQLException, JAXBException {
-        ParameterGraphEditor dialog = new ParameterGraphEditor(EDACCApp.getApplication().getMainFrame(), true, parameterTableModel.getCurrentSolver());
-        dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
-        EDACCApp.getApplication().show(dialog);
+        Solver solver = parameterTableModel.getCurrentSolver();        
+        if (solver.isSaved()) {
+            ParameterGraphEditor dialog = new ParameterGraphEditor(EDACCApp.getApplication().getMainFrame(), true, solver);
+            dialog.setLocationRelativeTo(EDACCApp.getApplication().getMainFrame());
+            EDACCApp.getApplication().show(dialog);
+        } else {
+            JOptionPane.showMessageDialog(EDACCApp.getApplication().getMainFrame(), "You have to save the solver before editing the parameter graph.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public void moveUp(int[] selectedIndices, JTable paramTable) {
