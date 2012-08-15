@@ -623,15 +623,6 @@ public class ParameterGraphEditor extends javax.swing.JDialog {
     }
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-
-        String sVersion = java.lang.System.getProperties().getProperty("java.version");
-        sVersion = sVersion.substring(0, 3);
-        Float f = Float.valueOf(sVersion);
-        if (f > 1.69) {
-            JOptionPane.showMessageDialog(this, "Saving a parameter graph with jdk 1.7 or higher is currently not supported.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
         try {
             ParameterGraph parameterGraph = getParameterGraph();
             try {
