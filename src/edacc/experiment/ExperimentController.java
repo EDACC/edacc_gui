@@ -2075,11 +2075,7 @@ public class ExperimentController {
         } else if (databaseRepresentation != null && databaseRepresentation.startsWith("par")) {
             try {
                 int penaltyFactor = Integer.valueOf(databaseRepresentation.substring(3));
-                if (activeExperiment.getCostPenalty() == null) {
-                    return new PARX(activeExperiment.getDefaultCost(), activeExperiment.getMinimize(), penaltyFactor);
-                } else {
-                    return new PARX(activeExperiment.getDefaultCost(), activeExperiment.getMinimize(), activeExperiment.getCostPenalty(), penaltyFactor);
-                }
+                return new PARX(activeExperiment.getDefaultCost(), activeExperiment.getMinimize(), activeExperiment.getCostPenalty() != null ? activeExperiment.getCostPenalty() : 0.f, penaltyFactor);
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
