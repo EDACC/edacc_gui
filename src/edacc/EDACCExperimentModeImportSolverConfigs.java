@@ -97,14 +97,6 @@ public class EDACCExperimentModeImportSolverConfigs extends javax.swing.JDialog 
             }
         });
 
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                existingSolverConfigFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tblSolverConfigsBySolvers, true);
-                solverFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tableSolvers, true);
-            }
-        });
         TableRowSorter tableSolverConfigurationsRowSorterByExperiments = new TableRowSorter<SolverConfigurationTableModel>(solverConfigTableModelByExperiments);
         solverConfigurationTableRowFilterByExperiments = new SolverConfigurationTableRowFilter();
         tableSolverConfigurationsRowSorterByExperiments.setRowFilter(solverConfigurationTableRowFilterByExperiments);
@@ -139,6 +131,15 @@ public class EDACCExperimentModeImportSolverConfigs extends javax.swing.JDialog 
                 }
                 solverConfigTableModelBySolvers.fireTableDataChanged();
                 updateExistingSolverConfigFilterStatus();
+            }
+        });
+
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                existingSolverConfigFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tblSolverConfigsBySolvers, true);
+                solverFilter = new EDACCFilter(EDACCApp.getApplication().getMainFrame(), true, tableSolvers, true);
             }
         });
 
