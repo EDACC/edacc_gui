@@ -405,13 +405,11 @@ public class ExperimentDAO {
             }
             ExperimentDAO.save(dbExperiment);
             task.setStatus("Saving instances..");
-            int currentInstance = 1;
+            List<ExperimentHasInstance> ehis = new LinkedList<ExperimentHasInstance>();
             for (ExperimentHasInstance ehi : experiment.instances) {
-                task.setTaskProgress(currentInstance / (float) experiment.instances.size());
-                ExperimentHasInstanceDAO.createExperimentHasInstance(dbExperiment.getId(), instanceMap.get(ehi.getInstances_id()).getId());
-                currentInstance++;
+                ehis.add(ExperimentHasInstanceDAO.createExperimentHasInstance(dbExperiment.getId(), instanceMap.get(ehi.getInstances_id()).getId()));
             }
-            task.setTaskProgress(0.f);
+            ExperimentHasInstanceDAO.save(ehis);
             
             if (experiment.scenario != null) {
                 task.setStatus("Saving configuration scenario..");

@@ -555,42 +555,53 @@ public class ExperimentController {
         task.setStatus("Checking jobs..");
         ArrayList<ExperimentHasInstance> deletedInstances = main.insTableModel.getDeletedExperimentHasInstances();
         if (deletedInstances.size() > 0) {
-            ArrayList<ExperimentResult> deletedJobs = new ArrayList<ExperimentResult>();
+            experimentResultCache.updateExperimentResults(task);
+            HashSet<Integer> instanceIds = new HashSet<Integer>();
             for (ExperimentHasInstance ehi : deletedInstances) {
-                deletedJobs.addAll(ExperimentResultDAO.getAllByExperimentHasInstance(ehi));
+                instanceIds.add(ehi.getInstances_id());
             }
-            int notDeletableJobsCount = 0;
-            for (ExperimentResult job : deletedJobs) {
-                if (job.getStatus() != StatusCode.NOT_STARTED) {
-                    notDeletableJobsCount++;
+            ArrayList<ExperimentResult> deletedJobs = experimentResultCache.getResultsByInstanceIds(instanceIds);
+            
+            if (!deletedJobs.isEmpty()) {
+                int notDeletableJobsCount = 0;
+                for (ExperimentResult job : deletedJobs) {
+                    if (job.getStatus() != StatusCode.NOT_STARTED) {
+                        notDeletableJobsCount++;
+                    }
                 }
-            }
-            String msg = "";
-            if (notDeletableJobsCount > 0) {
-                msg = "There are " + notDeletableJobsCount + " started jobs and " + (deletedJobs.size() - notDeletableJobsCount) + " jobs waiting in the database which would be deleted. Do you want to continue?";
-            } else {
-                msg = "There are " + deletedJobs.size() + " jobs waiting in the database which would be deleted. Do you want to continue?";
-            }
-            int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), msg, "Jobs would be deleted", javax.swing.JOptionPane.YES_NO_OPTION);
-            if (userInput == 1) {
-                return;
-            } else {
-                task.setStatus("Deleting jobs..");
-                ExperimentResultDAO.deleteExperimentResults(deletedJobs);
+
+                String msg = "";
+                if (notDeletableJobsCount > 0) {
+                    msg = "There are " + notDeletableJobsCount + " started jobs and " + (deletedJobs.size() - notDeletableJobsCount) + " jobs waiting in the database which would be deleted. Do you want to continue?";
+                } else {
+                    msg = "There are " + deletedJobs.size() + " jobs waiting in the database which would be deleted. Do you want to continue?";
+                }
+                int userInput = javax.swing.JOptionPane.showConfirmDialog(Tasks.getTaskView(), msg, "Jobs would be deleted", javax.swing.JOptionPane.YES_NO_OPTION);
+                if (userInput == 1) {
+                    return;
+                } else {
+                    task.setStatus("Deleting jobs..");
+                    ExperimentResultDAO.deleteExperimentResults(deletedJobs);
+                }
             }
         }
         task.setStatus("Saving instances..");
 
 
         // First: add all new ExperimentHasInstance objects
+        List<ExperimentHasInstance> ehi = new LinkedList<ExperimentHasInstance>();
         for (Integer instanceId : main.insTableModel.getNewInstanceIds()) {
-            ExperimentHasInstanceDAO.createExperimentHasInstance(activeExperiment.getId(), instanceId);
+            ehi.add(ExperimentHasInstanceDAO.createExperimentHasInstance(activeExperiment.getId(), instanceId));
         }
-
+        ExperimentHasInstanceDAO.save(ehi);
+        
         // Then: remove all removed ExperimentHasInstance objects
-        for (ExperimentHasInstance ehi : main.insTableModel.getDeletedExperimentHasInstances()) {
-            ExperimentHasInstanceDAO.removeExperimentHasInstance(ehi);
+        ehi = main.insTableModel.getDeletedExperimentHasInstances();
+        for (ExperimentHasInstance i : main.insTableModel.getDeletedExperimentHasInstances()) {
+            ExperimentHasInstanceDAO.removeExperimentHasInstance(i);
         }
+        ExperimentHasInstanceDAO.save(ehi);
+        
         main.insTableModel.setExperimentHasInstances(ExperimentHasInstanceDAO.getExperimentHasInstanceByExperimentId(activeExperiment.getId()));
         main.generateJobsTableModel.updateNumRuns();
         SwingUtilities.invokeLater(new Runnable() {
@@ -1723,11 +1734,13 @@ public class ExperimentController {
 
             task.setStatus("Saving instances..");
             // save instances
+            List<ExperimentHasInstance> ehis = new LinkedList<ExperimentHasInstance>();
             for (Instance i : selectedInstances) {
                 if (!instanceIds.contains(i.getId())) {
-                    ExperimentHasInstanceDAO.createExperimentHasInstance(activeExperiment.getId(), i.getId());
+                    ehis.add(ExperimentHasInstanceDAO.createExperimentHasInstance(activeExperiment.getId(), i.getId()));
                 }
             }
+            ExperimentHasInstanceDAO.save(ehis);
 
             // import jobs
             if (!statusCodes.isEmpty()) {

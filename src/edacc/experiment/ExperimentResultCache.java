@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Provides caching for experiment results. Use the higher level methods to get
@@ -149,7 +151,7 @@ public class ExperimentResultCache {
         }
         lastUpdated = ts;
     }
-
+    
     /**
      * Returns the number of runs of the (solver config id, instance id)-pair.
      * @param solverConfigId the solver config id
@@ -242,6 +244,16 @@ public class ExperimentResultCache {
         return res;
     }
 
+    public ArrayList<ExperimentResult> getResultsByInstanceIds(Set<Integer> instanceIds) {
+        ArrayList<ExperimentResult> res = new ArrayList<ExperimentResult>();
+        for (ExperimentResult er : resultMap.values()) {
+            if (instanceIds.contains(er.getInstanceId())) {
+                res.add(er);
+            }
+        }
+        return res;
+    }
+    
     /**
      * Returns a Vector of all ExperimentResults in the current experiment with the solverConfig id and instance id specified
      * @param solverConfigId the solverConfig id of the ExperimentResults

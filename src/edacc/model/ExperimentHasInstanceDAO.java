@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -18,20 +20,37 @@ import java.util.Vector;
 public class ExperimentHasInstanceDAO {
 
     protected static final String table = "Experiment_has_Instances";
-    protected static final String insertQuery = "INSERT INTO " + table + " (Experiment_idExperiment, Instances_idInstance) VALUES (?, ?)";
-    protected static final String deleteQuery = "DELETE FROM " + table + " WHERE idEI=?";
     private static final ObjectCache<ExperimentHasInstance> cache = new ObjectCache<ExperimentHasInstance>();
-
+    
+    
+    private static String getInsertQuery(int count) {
+        StringBuilder query = new StringBuilder("INSERT INTO " + table + " (Experiment_idExperiment, Instances_idInstance) VALUES (?, ?)");
+        count--;
+        for (int i = 0; i < count; i++) {
+            query.append(",(?,?)");
+        }
+        return query.toString();
+    }
+    
+    private static String getDeleteQuery(int count) {
+        StringBuilder query = new StringBuilder("DELETE FROM " + table + " WHERE idEI IN (?");
+        count--;
+        for (int i = 0; i < count; i++) {
+            query.append(",?");
+        }
+        query.append(')');
+        return query.toString();
+    }
+    
     /**
-     * ExperimentHasInstance factory method, ensures that the created experiment is persisted and assigned an ID
+     * ExperimentHasInstance factory method.
      * @return new Experiment object
      */
-    public static ExperimentHasInstance createExperimentHasInstance(int experiment_id, int instances_id) throws SQLException {
+    public static ExperimentHasInstance createExperimentHasInstance(int experiment_id, int instances_id) {
         ExperimentHasInstance i = new ExperimentHasInstance();
         i.setExperiment_id(experiment_id);
         i.setInstances_id(instances_id);
         i.setNew();
-        save(i);
         return i;
     }
 
@@ -43,33 +62,53 @@ public class ExperimentHasInstanceDAO {
         return i;
     }
 
-    private static void save(ExperimentHasInstance i) throws SQLException {
-        if (i.isDeleted()) {
-            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(deleteQuery);
-            st.setInt(1, i.getId());
+    public static void save(List<ExperimentHasInstance> is) throws SQLException {
+        List<ExperimentHasInstance> i_deleted = new LinkedList<ExperimentHasInstance>();
+        List<ExperimentHasInstance> i_new = new LinkedList<ExperimentHasInstance>();
+        for (ExperimentHasInstance i : is) {
+           if (i.isDeleted()) {
+               i_deleted.add(i);
+           } else if (i.isNew()) {
+               i_new.add(i);
+           }
+        }
+        
+        if (!i_deleted.isEmpty()) {
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(getDeleteQuery(i_deleted.size()));
+            for (int i = 0; i < i_deleted.size(); i++) {
+                st.setInt(i+1, i_deleted.get(i).getId());
+            }
             st.executeUpdate();
             st.close();
-            cache.remove(i);
-        } else if (i.isNew()) {
-            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS);
-            st.setInt(1, i.getExperiment_id());
-            st.setInt(2, i.getInstances_id());
+
+            for (ExperimentHasInstance i : i_deleted) {
+                cache.remove(i);
+            }
+        } else if (!i_new.isEmpty()) {
+            PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(getInsertQuery(i_new.size()), PreparedStatement.RETURN_GENERATED_KEYS);
+            int c = 1;
+            for (ExperimentHasInstance i : i_new) {
+                st.setInt(c++, i.getExperiment_id());
+                st.setInt(c++, i.getInstances_id());
+            }
             st.executeUpdate();
             ResultSet generatedKeys = st.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                i.setId(generatedKeys.getInt(1));
+            for (ExperimentHasInstance i : i_new) {
+                if (generatedKeys.next()) {
+                    i.setId(generatedKeys.getInt(1));
+                }
             }
             generatedKeys.close();
             st.close();
-            i.setSaved();
-            cache.cache(i);
+            for (ExperimentHasInstance i : i_new) {
+                i.setSaved();
+                cache.cache(i);
+            }
         }
-        
     }
 
     public static void removeExperimentHasInstance(ExperimentHasInstance e) throws SQLException {
         e.setDeleted();
-        save(e);
     }
 
     public static Vector<ExperimentHasInstance> getExperimentHasInstanceByExperimentId(int id) throws SQLException {
