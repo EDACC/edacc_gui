@@ -1225,6 +1225,28 @@ public class ExperimentResultDAO {
         return v;
     }
 
+        public static ArrayList<ExperimentResult> getAllByExperimentAndInstanceId(int expid, int id) throws NoConnectionToDBException, SQLException, PropertyNotInDBException, PropertyTypeNotExistException, IOException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
+        ArrayList<ExperimentResult> v = new ArrayList<ExperimentResult>();
+        HashMap<Integer, ExperimentResult> expResultsMap = new HashMap<Integer, ExperimentResult>();
+        PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
+                selectQuery
+                + "WHERE Experiment_idExperiment = ? AND Instances_idInstance=?;");
+        st.setInt(1, expid);
+        st.setInt(2, id);
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            ExperimentResult er = getExperimentResultFromResultSet(rs);
+            er.setSaved();
+            expResultsMap.put(er.getId(), er);
+            v.add(er);
+        }
+     //   ExperimentResultHasPropertyDAO.assign(expResultsMap, v);
+        rs.close();
+        st.close();
+        return v;
+    }
+    
+    
     public static ArrayList<ExperimentResult> getAllModifiedByClientId(int id, Timestamp modified) throws NoConnectionToDBException, SQLException, IOException, PropertyNotInDBException, PropertyTypeNotExistException, ComputationMethodDoesNotExistException, ExpResultHasSolvPropertyNotInDBException, ExperimentResultNotInDBException, StatusCodeNotInDBException, ResultCodeNotInDBException {
         ArrayList<ExperimentResult> v = new ArrayList<ExperimentResult>();
         PreparedStatement st = DatabaseConnector.getInstance().getConn().prepareStatement(
