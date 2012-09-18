@@ -1785,17 +1785,19 @@ public class ExperimentController {
                             if (firstRun == null)
                                 firstRun = 0;
                         }
-                        for (ExperimentResult er : tmp) {
-                            boolean contains = false;
-                            for (StatusCode stat : statusCodes) {
-                                if (er.getStatus().equals(stat)) {
-                                    contains = true;
-                                    break;
+                        if (tmp != null) {
+                            for (ExperimentResult er : tmp) {
+                                boolean contains = false;
+                                for (StatusCode stat : statusCodes) {
+                                    if (er.getStatus().equals(stat)) {
+                                        contains = true;
+                                        break;
+                                    }
                                 }
-                            }
-                            if (contains) {
-                                resultsToImport.add(er);
-                                importedResults.add(ExperimentResultDAO.createExperimentResult(firstRun++, er.getPriority(), er.getComputeQueue(), er.getStatus(), er.getSeed(), er.getResultCode(), er.getResultTime(), er.getWallTime(), er.getCost(), mapHisScToMySc.get(sc.getId()), activeExperiment.getId(), er.getInstanceId(), er.getStartTime(), er.getCPUTimeLimit(), er.getMemoryLimit(), er.getWallClockTimeLimit(), er.getStackSizeLimit()));
+                                if (contains) {
+                                    resultsToImport.add(er);
+                                    importedResults.add(ExperimentResultDAO.createExperimentResult(firstRun++, er.getPriority(), er.getComputeQueue(), er.getStatus(), er.getSeed(), er.getResultCode(), er.getResultTime(), er.getWallTime(), er.getCost(), mapHisScToMySc.get(sc.getId()), activeExperiment.getId(), er.getInstanceId(), er.getStartTime(), er.getCPUTimeLimit(), er.getMemoryLimit(), er.getWallClockTimeLimit(), er.getStackSizeLimit()));
+                                }
                             }
                         }
                         seedGroupFirstRun.put(solverConfig.getSeed_group(), firstRun);

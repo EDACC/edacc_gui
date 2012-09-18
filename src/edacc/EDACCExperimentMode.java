@@ -2598,6 +2598,7 @@ public class EDACCExperimentMode extends javax.swing.JPanel implements TaskEvent
 
                             @Override
                             public void run() {
+                                EDACCApp.getLogger().logException(ex);
                                 JOptionPane.showMessageDialog(EDACCExperimentMode.this, "Error while importing data: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                             }
                         });
